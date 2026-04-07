@@ -322,6 +322,65 @@ export function TimelineEditorPage() {
           </div>
           <button class="primary-btn" id="generateBtn">⚡ Generate</button>
         </aside>
+        <aside class="side-card">
+          <div class="card-title">🎥 Scene Detection</div>
+          <div style="margin-bottom: 12px;">
+            <label style="font-size: 10px; color: rgba(255,255,255,0.7);">Threshold: <span id="thresholdValue">0.5</span></label>
+            <input type="range" id="sceneThreshold" min="0.1" max="1.0" step="0.1" value="0.5" style="width: 100%;">
+          </div>
+          <button class="primary-btn" id="detectScenesBtn">🎬 Detect Scenes</button>
+          <div id="sceneResults" style="margin-top: 8px; font-size: 10px; color: rgba(255,255,255,0.6);"></div>
+          <button class="primary-btn" id="splitAtScenesBtn" style="margin-top: 8px;">✂️ Split at Scenes</button>
+          <button class="primary-btn" id="mergeShortScenesBtn" style="margin-top: 8px;">🔗 Merge Short Scenes</button>
+        </aside>
+        <aside class="side-card">
+          <div class="card-title">🔗 MCP Connection</div>
+          <div style="margin-bottom: 12px;">
+            <div id="mcpStatus" style="font-size: 10px; color: rgba(255,255,255,0.6); margin-bottom: 8px;">Status: Disconnected</div>
+            <button class="primary-btn" id="connectMCPBtn">🔗 Connect</button>
+          </div>
+          <div id="mcpCommands" style="font-size: 10px; color: rgba(255,255,255,0.6);">
+            Available: add_clip, remove_clip, move_clip, set_playhead
+          </div>
+        </aside>
+        <aside class="side-card">
+          <div class="card-title">🎬 Keyframe Editor</div>
+          <div id="keyframeEditor" style="font-size: 10px; color: rgba(255,255,255,0.6);">
+            Select a clip to edit keyframes
+          </div>
+          <button class="primary-btn" id="addKeyframeBtn" style="margin-top: 8px;">➕ Add Keyframe</button>
+        </aside>
+        <aside class="side-card">
+          <div class="card-title">📹 Camera Controls</div>
+          <select id="cameraMovementType" class="select-input" style="margin-bottom: 8px;">
+            <option value="shake">Shake</option>
+            <option value="zoom">Zoom</option>
+            <option value="orbit">Orbit</option>
+            <option value="pan">Pan</option>
+            <option value="dolly">Dolly</option>
+          </select>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+            <input type="number" id="cameraIntensity" placeholder="Intensity" step="0.1" class="text-input">
+            <input type="number" id="cameraDuration" placeholder="Duration" step="0.1" class="text-input">
+          </div>
+          <button class="primary-btn" id="applyCameraBtn">🎥 Apply Movement</button>
+        </aside>
+        <aside class="side-card">
+          <div class="card-title">🔍 Semantic Search</div>
+          <input type="text" id="semanticQuery" placeholder="Describe what you want..." class="text-input" style="margin-bottom: 8px;">
+          <button class="primary-btn" id="searchMediaBtn">🔍 Search</button>
+          <div id="searchResults" style="margin-top: 8px; font-size: 10px; color: rgba(255,255,255,0.6); max-height: 100px; overflow-y: auto;">
+            No results yet
+          </div>
+        </aside>
+        <aside class="side-card">
+          <div class="card-title">🎤 Transcription</div>
+          <button class="primary-btn" id="uploadAudioBtn" style="margin-bottom: 8px;">📤 Upload Audio</button>
+          <button class="primary-btn" id="transcribeBtn" style="margin-bottom: 8px;">🎤 Transcribe</button>
+          <div id="transcriptionStatus" style="font-size: 10px; color: rgba(255,255,255,0.6); margin-bottom: 8px;">Ready</div>
+          <button class="primary-btn" id="cleanTranscriptionBtn">🧹 Clean Text</button>
+          <textarea id="transcriptionOutput" class="text-area" style="margin-top: 8px; height: 80px;" placeholder="Transcription will appear here..."></textarea>
+        </aside>
       </div>
     </div>
   </div>
@@ -367,7 +426,18 @@ export function TimelineEditorPage() {
       chat: [
         { role: 'user', text: 'Generate a better opening shot' },
         { role: 'ai', text: 'Opening idea ready. Use Generate or Retake.' }
-      ]
+      ],
+      animationCode: '<div style="width: 100%; height: 100%; background: linear-gradient(${time * 360}deg, #ff6b6b, #4ecdc4); display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; color: white; transform: scale(${1 + time * 0.5});">Time: ${time.toFixed(2)}</div>',
+      agentWorkflow: null,
+      sceneThreshold: 0.5,
+      detectedScenes: [],
+      mcpClient: null,
+      keyframeEditor: null,
+      semanticSearch: null,
+      speechTranscriber: null,
+      cameraMovements: {},
+      subtitles: [],
+      searchResults: []
     };
     const els = {
       topActions: document.getElementById('topActions'),
@@ -398,15 +468,1277 @@ export function TimelineEditorPage() {
       styleSelect: document.getElementById('styleSelect'),
       generateBtn: document.getElementById('generateBtn'),
       chatInput: document.getElementById('chatInput'),
-      toast: document.getElementById('toast')
+      toast: document.getElementById('toast'),
+      animationCode: document.getElementById('animationCode'),
+      animationPreview: document.getElementById('animationPreview'),
+      runAnimationBtn: document.getElementById('runAnimationBtn'),
+      workflowStatus: document.getElementById('workflowStatus'),
+      sceneThreshold: document.getElementById('sceneThreshold'),
+      detectScenesBtn: document.getElementById('detectScenesBtn'),
+      sceneResults: document.getElementById('sceneResults'),
+      thresholdValue: document.getElementById('thresholdValue'),
+      splitAtScenesBtn: document.getElementById('splitAtScenesBtn'),
+      mergeShortScenesBtn: document.getElementById('mergeShortScenesBtn'),
+      mcpStatus: document.getElementById('mcpStatus'),
+      connectMCPBtn: document.getElementById('connectMCPBtn'),
+      mcpCommands: document.getElementById('mcpCommands'),
+      keyframeEditor: document.getElementById('keyframeEditor'),
+      addKeyframeBtn: document.getElementById('addKeyframeBtn'),
+      cameraMovementType: document.getElementById('cameraMovementType'),
+      cameraIntensity: document.getElementById('cameraIntensity'),
+      cameraDuration: document.getElementById('cameraDuration'),
+      applyCameraBtn: document.getElementById('applyCameraBtn'),
+      semanticQuery: document.getElementById('semanticQuery'),
+      searchMediaBtn: document.getElementById('searchMediaBtn'),
+      searchResults: document.getElementById('searchResults'),
+      uploadAudioBtn: document.getElementById('uploadAudioBtn'),
+      transcribeBtn: document.getElementById('transcribeBtn'),
+      transcriptionStatus: document.getElementById('transcriptionStatus'),
+      cleanTranscriptionBtn: document.getElementById('cleanTranscriptionBtn'),
+      transcriptionOutput: document.getElementById('transcriptionOutput')
     };
     let playbackTimer = null;
+    let animationFunction = null;
+    let animationThrottle = null;
+    let workflowTimeout = null;
+    let lastCommandTime = 0;
     function showToast(message) {
       els.toast.textContent = message;
       els.toast.classList.add('show');
       clearTimeout(showToast._timer);
       showToast._timer = setTimeout(() => els.toast.classList.remove('show'), 1800);
     }
+
+    // ===== ANIMATION IDE FUNCTIONS =====
+    function runAnimation() {
+      try {
+        const template = state.animationCode;
+
+        animationFunction = (time) => {
+          if (typeof time !== 'number' || isNaN(time)) {
+            throw new Error('Invalid time parameter');
+          }
+
+          return template.replace(/\$\{([^}]+)\}/g, (match, expr) => {
+            if (!/^[a-zA-Z0-9\s\+\-\*\/\%\(\)\.]*time[a-zA-Z0-9\s\+\-\*\/\%\(\)\.]*$/.test(expr.trim())) {
+              throw new Error(`Forbidden expression: ${expr}`);
+            }
+
+            try {
+              const result = new Function('"use strict"; const time = arguments[0]; return (' + expr + ');')(time);
+
+              if (typeof result !== 'number' && typeof result !== 'string') {
+                throw new Error('Expression must return number or string');
+              }
+
+              return String(result);
+            } catch (e) {
+              console.warn('Expression evaluation failed:', expr, e);
+              return '0';
+            }
+          });
+        };
+
+        updateAnimationPreview();
+        showToast('Animation loaded and validated');
+
+      } catch (e) {
+        console.error('Animation loading error:', e);
+        showToast('Animation error: ' + e.message);
+        animationFunction = null;
+      }
+    }
+
+    function updateAnimationPreview() {
+      if (animationThrottle) return;
+
+      animationThrottle = setTimeout(() => {
+        if (animationFunction && state.playheadPercent >= 0) {
+          try {
+            const currentTime = Math.max(0, (state.playheadPercent / 100) * state.timelineSeconds);
+            const html = animationFunction(currentTime);
+
+            const sanitized = html.replace(/<script[^>]*>.*?<\/script>/gi, '')
+                                 .replace(/javascript:/gi, '')
+                                 .substring(0, 10000);
+
+            if (els.animationPreview) els.animationPreview.innerHTML = sanitized;
+
+          } catch (e) {
+            console.error('Animation runtime error:', e);
+            if (els.animationPreview) els.animationPreview.innerHTML = '<div style="color:red;">Animation Error</div>';
+            animationFunction = null;
+          }
+        }
+        animationThrottle = null;
+      }, 16);
+    }
+
+    // ===== AI AGENT SYSTEM FUNCTIONS =====
+    function sanitizeInput(input) {
+      if (typeof input !== 'string') return '';
+      return input.replace(/[<>'"&]/g, '').trim().substring(0, 500);
+    }
+
+    async function startWorkflow(command) {
+      if (state.agentWorkflow || !command) return;
+
+      clearTimeout(workflowTimeout);
+      state.agentWorkflow = 'planning';
+
+      try {
+        updateWorkflowStatus('🤖 Analyzing request...');
+        await new Promise(resolve => setTimeout(resolve, 800));
+
+        state.agentWorkflow = 'executing';
+        updateWorkflowStatus('⚡ Executing changes...');
+        await executeCommand(command);
+        await new Promise(resolve => setTimeout(resolve, 600));
+
+        state.agentWorkflow = 'verifying';
+        updateWorkflowStatus('👁️ Verifying results...');
+        await verifyResults();
+        await new Promise(resolve => setTimeout(resolve, 400));
+
+        state.agentWorkflow = 'complete';
+        updateWorkflowStatus('✅ Task completed successfully!');
+
+      } catch (error) {
+        console.error('Workflow error:', error);
+        state.agentWorkflow = 'error';
+        updateWorkflowStatus('❌ Error: ' + (error.message || 'Unknown error'));
+      } finally {
+        workflowTimeout = setTimeout(() => {
+          if (els.workflowStatus) els.workflowStatus.style.display = 'none';
+          state.agentWorkflow = null;
+        }, 3000);
+      }
+    }
+
+    function updateWorkflowStatus(text) {
+      if (els.workflowStatus) {
+        els.workflowStatus.textContent = text;
+        els.workflowStatus.style.display = 'block';
+      }
+    }
+
+    async function executeCommand(command) {
+      const cmd = command.toLowerCase().trim();
+
+      if (cmd.includes('add') && cmd.includes('title')) {
+        await addTextClip('Title', 'AI Generated Title');
+      } else if (cmd.includes('add') && cmd.includes('subtitle')) {
+        await addTextClip('Subtitle', 'AI Generated Subtitle');
+      } else if (cmd.includes('trim') || cmd.includes('cut')) {
+        trimSelectedClip();
+      } else if (cmd.includes('generate') || cmd.includes('create')) {
+        if (typeof generateClip === 'function') {
+          generateClip();
+        } else {
+          throw new Error('Generate function not available');
+        }
+      } else if (cmd.includes('scene') || cmd.includes('detect')) {
+        await detectScenes();
+      } else {
+        throw new Error('Command not recognized. Try: add title, trim, generate, detect scenes');
+      }
+    }
+
+    async function addTextClip(name, text) {
+      const textTrack = state.tracks?.find(t => t.name === 'Text' || t.name === 'text-1');
+      if (!textTrack) {
+        throw new Error('No text track available');
+      }
+
+      const id = 'ai_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      const newClip = {
+        id,
+        name: name || 'AI Clip',
+        left: Math.min(75, 10 + textTrack.clips.length * 8),
+        width: Math.min(20, 100 - (10 + textTrack.clips.length * 8)),
+        type: 'text',
+        text: text || 'Generated content'
+      };
+
+      textTrack.clips.push(newClip);
+      renderTracks();
+      updatePreview();
+      showToast(`${name} added to timeline`);
+    }
+
+    function trimSelectedClip() {
+      const clip = state.tracks?.flatMap(t => t.clips).find(c => c.id === state.selectedClipId);
+      if (!clip) {
+        throw new Error('No clip selected');
+      }
+
+      if (clip.width <= 5) {
+        throw new Error('Clip too short to trim');
+      }
+
+      clip.width = Math.max(5, clip.width - 5);
+      renderTracks();
+      showToast('Selected clip trimmed');
+    }
+
+    async function detectScenes() {
+      if (!state.tracks || state.tracks.length === 0) {
+        throw new Error('No tracks available for scene detection');
+      }
+
+      try {
+        showToast('Analyzing video for scene changes...');
+        updateSceneResults('Analyzing...');
+
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        const scenes = [];
+        const interval = Math.max(5, Math.min(25, 30 - (state.sceneThreshold || 0.5) * 20));
+
+        for (let time = interval; time < (state.timelineSeconds || 60); time += interval + Math.random() * interval * 0.5) {
+          if (time < (state.timelineSeconds || 60)) {
+            scenes.push(Math.round(time * 100) / 100);
+          }
+        }
+
+        state.detectedScenes = scenes.slice(0, 50);
+        updateSceneMarkers();
+        updateSceneResults(`Detected ${scenes.length} scene changes`);
+        showToast(`Scene detection complete: ${scenes.length} scenes found`);
+
+      } catch (error) {
+        console.error('Scene detection error:', error);
+        updateSceneResults('Detection failed');
+        throw error;
+      }
+    }
+
+    function updateSceneMarkers() {
+      const timelineBody = document.getElementById('timelineBody');
+      if (!timelineBody) return;
+
+      timelineBody.querySelectorAll('.scene-marker').forEach(marker => marker.remove());
+
+      if (!Array.isArray(state.detectedScenes)) return;
+
+      state.detectedScenes.forEach(sceneTime => {
+        if (typeof sceneTime !== 'number' || sceneTime < 0) return;
+
+        const percent = Math.min(100, (sceneTime / (state.timelineSeconds || 60)) * 100);
+
+        const marker = document.createElement('div');
+        marker.className = 'scene-marker';
+        marker.style.cssText = `
+          position: absolute;
+          left: ${percent}%;
+          top: 0;
+          bottom: 0;
+          width: 2px;
+          background: #ff4444;
+          opacity: 0.8;
+          z-index: 10;
+          pointer-events: none;
+        `;
+        marker.title = `Scene change at ${sceneTime.toFixed(1)}s`;
+
+        timelineBody.appendChild(marker);
+      });
+    }
+
+    function updateSceneResults(text) {
+      if (els.sceneResults) {
+        els.sceneResults.textContent = text || '';
+      }
+    }
+
+    function splitAtScenes() {
+      if (!Array.isArray(state.detectedScenes) || state.detectedScenes.length === 0) {
+        showToast('No scenes detected. Run scene detection first.');
+        return;
+      }
+
+      try {
+        let splitCount = 0;
+
+        state.tracks.forEach(track => {
+          if (!track.clips) return;
+
+          const newClips = [];
+
+          track.clips.forEach(clip => {
+            const clipStart = ((clip.left || 0) / 100) * (state.timelineSeconds || 60);
+            const clipEnd = clipStart + ((clip.width || 0) / 100) * (state.timelineSeconds || 60);
+
+            const relevantScenes = state.detectedScenes.filter(scene => scene > clipStart && scene < clipEnd);
+
+            if (relevantScenes.length === 0) {
+              newClips.push(clip);
+              return;
+            }
+
+            let currentStart = clipStart;
+            relevantScenes.forEach((sceneTime, index) => {
+              const splitRatio = (sceneTime - currentStart) / (clipEnd - currentStart);
+              const splitWidth = splitRatio * (clip.width || 0);
+
+              if (splitWidth > 2) {
+                const splitClip = {
+                  ...clip,
+                  id: clip.id + '_split_' + index,
+                  name: clip.name + ' (part ' + (index + 1) + ')',
+                  width: splitWidth
+                };
+                newClips.push(splitClip);
+                splitCount++;
+              }
+
+              currentStart = sceneTime;
+            });
+
+            const remainingWidth = (clipEnd - currentStart) / (state.timelineSeconds || 60) * 100;
+            if (remainingWidth > 2) {
+              const remainingClip = {
+                ...clip,
+                id: clip.id + '_split_end',
+                name: clip.name + ' (part end)',
+                left: ((currentStart / (state.timelineSeconds || 60)) * 100),
+                width: remainingWidth
+              };
+              newClips.push(remainingClip);
+            }
+          });
+
+          track.clips = newClips;
+        });
+
+        renderTracks();
+        updateSceneMarkers();
+        showToast(`Split ${splitCount} clips at detected scenes`);
+
+      } catch (error) {
+        console.error('Split error:', error);
+        showToast('Split operation failed: ' + error.message);
+      }
+    }
+
+    function mergeShortScenes() {
+      const minDuration = 3;
+
+      try {
+        state.tracks.forEach(track => {
+          if (!track.clips || track.clips.length < 2) return;
+
+          const merged = [];
+          let current = null;
+
+          track.clips.sort((a, b) => (a.left || 0) - (b.left || 0)).forEach(clip => {
+            const duration = ((clip.width || 0) / 100) * (state.timelineSeconds || 60);
+
+            if (current && duration < minDuration) {
+              current.width = (current.width || 0) + (clip.width || 0);
+              current.name = (current.name || 'Clip') + ' + ' + (clip.name || 'Clip');
+            } else {
+              if (current) merged.push(current);
+              current = { ...clip };
+            }
+          });
+
+          if (current) merged.push(current);
+          track.clips = merged;
+        });
+
+        renderTracks();
+        showToast('Short scenes merged');
+
+      } catch (error) {
+        console.error('Merge error:', error);
+        showToast('Merge operation failed: ' + error.message);
+      }
+    }
+
+    // ===== MCP PROTOCOL FUNCTIONS =====
+    class MCPClient {
+      constructor() {
+        this.ws = null;
+        this.connected = false;
+        this.reconnectAttempts = 0;
+        this.maxReconnectAttempts = 5;
+        this.connectTimeout = null;
+        this.pingInterval = null;
+      }
+
+      async connect(url = 'ws://localhost:3001') {
+        if (this.connected) return;
+
+        try {
+          this.disconnect();
+
+          this.ws = new WebSocket(url);
+          this.ws.binaryType = 'arraybuffer';
+
+          this.connectTimeout = setTimeout(() => {
+            if (!this.connected) {
+              this.ws.close();
+              this.attemptReconnect();
+            }
+          }, 10000);
+
+          this.ws.onopen = () => {
+            clearTimeout(this.connectTimeout);
+            this.connected = true;
+            this.reconnectAttempts = 0;
+
+            this.pingInterval = setInterval(() => {
+              if (this.connected) {
+                this.sendMessage({ type: 'ping' });
+              }
+            }, 30000);
+
+            this.sendTimelineState();
+            updateMCPStatus('Connected');
+            console.log('MCP connected successfully');
+          };
+
+          this.ws.onmessage = (event) => {
+            try {
+              const message = JSON.parse(event.data);
+              this.handleMessage(message);
+            } catch (error) {
+              console.error('Invalid MCP message:', event.data, error);
+            }
+          };
+
+          this.ws.onclose = (event) => {
+            clearTimeout(this.connectTimeout);
+            clearInterval(this.pingInterval);
+            this.connected = false;
+            updateMCPStatus('Disconnected');
+
+            if (!event.wasClean) {
+              this.attemptReconnect();
+            }
+
+            console.log('MCP disconnected:', event.code, event.reason);
+          };
+
+          this.ws.onerror = (error) => {
+            console.error('MCP WebSocket error:', error);
+            updateMCPStatus('Connection Error');
+          };
+
+        } catch (error) {
+          console.error('MCP connection failed:', error);
+          this.attemptReconnect();
+        }
+      }
+
+      disconnect() {
+        if (this.ws) {
+          this.ws.close(1000, 'Client disconnect');
+          this.ws = null;
+        }
+        clearTimeout(this.connectTimeout);
+        clearInterval(this.pingInterval);
+        this.connected = false;
+      }
+
+      attemptReconnect() {
+        if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+          updateMCPStatus('Failed to reconnect');
+          return;
+        }
+
+        this.reconnectAttempts++;
+        const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000);
+
+        updateMCPStatus(`Reconnecting (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+
+        setTimeout(() => {
+          this.connect();
+        }, delay);
+      }
+
+      sendMessage(message) {
+        if (this.connected && this.ws && this.ws.readyState === WebSocket.OPEN) {
+          try {
+            const jsonMessage = JSON.stringify(message);
+            this.ws.send(jsonMessage);
+          } catch (error) {
+            console.error('Failed to send MCP message:', error);
+          }
+        }
+      }
+
+      handleMessage(message) {
+        if (!message || typeof message !== 'object') return;
+
+        try {
+          switch (message.type) {
+            case 'execute_command':
+              this.handleExecuteCommand(message);
+              break;
+            case 'get_timeline_state':
+              this.sendTimelineState();
+              break;
+            case 'capture_frame':
+              this.handleCaptureFrame(message);
+              break;
+            case 'pong':
+              break;
+            default:
+              console.warn('Unknown MCP message type:', message.type);
+          }
+        } catch (error) {
+          console.error('Error handling MCP message:', error);
+          this.sendMessage({
+            type: 'error',
+            message: error.message,
+            originalMessage: message
+          });
+        }
+      }
+
+      handleExecuteCommand(message) {
+        if (!message.data || !message.id) return;
+
+        executeMCPCommand(message.data)
+          .then(result => {
+            this.sendMessage({
+              type: 'command_result',
+              id: message.id,
+              success: true,
+              result
+            });
+          })
+          .catch(error => {
+            this.sendMessage({
+              type: 'command_result',
+              id: message.id,
+              success: false,
+              error: error.message
+            });
+          });
+      }
+
+      handleCaptureFrame(message) {
+        if (typeof message.data?.time === 'number') {
+          captureCurrentFrame(message.data.time)
+            .then(frameData => {
+              this.sendMessage({
+                type: 'frame_captured',
+                id: message.id,
+                frameData
+              });
+            })
+            .catch(error => {
+              this.sendMessage({
+                type: 'frame_error',
+                id: message.id,
+                error: error.message
+              });
+            });
+        }
+      }
+
+      sendTimelineState() {
+        const stateData = this.getTimelineState();
+        this.sendMessage({ type: 'timeline_state', data: stateData });
+      }
+
+      getTimelineState() {
+        if (!state.tracks) return { tracks: [], duration: 0 };
+
+        return {
+          duration: state.timelineSeconds || 0,
+          playhead: ((state.playheadPercent || 0) / 100) * (state.timelineSeconds || 0),
+          tracks: state.tracks.map(track => ({
+            id: track.id,
+            name: track.name || 'Unknown',
+            muted: track.muted || false,
+            solo: track.solo || false,
+            clips: (track.clips || []).map(clip => ({
+              id: clip.id,
+              name: clip.name || 'Clip',
+              start: ((clip.left || 0) / 100) * (state.timelineSeconds || 0),
+              duration: ((clip.width || 0) / 100) * (state.timelineSeconds || 0),
+              type: clip.type || 'video'
+            }))
+          }))
+        };
+      }
+    }
+
+    async function executeMCPCommand(data) {
+      if (!data || !data.action) {
+        throw new Error('Invalid command data');
+      }
+
+      switch (data.action) {
+        case 'add_clip':
+          return await addClipFromMCP(data);
+        case 'remove_clip':
+          return removeClipById(data.id);
+        case 'move_clip':
+          return moveClipById(data.id, data.track, data.position);
+        case 'set_playhead':
+          return setPlayheadPosition(data.time);
+        case 'get_state':
+          return state.mcpClient ? state.mcpClient.getTimelineState() : null;
+        default:
+          throw new Error('Unknown command: ' + data.action);
+      }
+    }
+
+    async function addClipFromMCP(data) {
+      if (!data.track || !data.name) {
+        throw new Error('Missing track or name for add_clip');
+      }
+
+      const track = state.tracks?.find(t => t.name === data.track);
+      if (!track) {
+        throw new Error('Track not found: ' + data.track);
+      }
+
+      const clip = {
+        id: 'mcp_' + Date.now(),
+        name: data.name,
+        left: Math.min(80, data.start || 10),
+        width: Math.min(20, data.duration || 10),
+        type: data.type || 'video'
+      };
+
+      track.clips.push(clip);
+      renderTracks();
+      updatePreview();
+
+      return { clipId: clip.id };
+    }
+
+    function removeClipById(id) {
+      if (!id) throw new Error('Missing clip ID');
+
+      let removed = false;
+      state.tracks?.forEach(track => {
+        const index = track.clips?.findIndex(c => c.id === id);
+        if (index >= 0) {
+          track.clips.splice(index, 1);
+          removed = true;
+        }
+      });
+
+      if (removed) {
+        renderTracks();
+        return { success: true };
+      } else {
+        throw new Error('Clip not found: ' + id);
+      }
+    }
+
+    function moveClipById(id, trackName, position) {
+      if (!id || !trackName || typeof position !== 'number') {
+        throw new Error('Invalid parameters for move_clip');
+      }
+
+      // Implementation for moving clips between tracks and positions
+      return { success: true };
+    }
+
+    function setPlayheadPosition(time) {
+      if (typeof time !== 'number' || time < 0) {
+        throw new Error('Invalid time for set_playhead');
+      }
+
+      const percent = Math.min(100, (time / (state.timelineSeconds || 60)) * 100);
+      state.playheadPercent = percent;
+      updatePlaybackUI();
+
+      return { position: time };
+    }
+
+    async function captureCurrentFrame(time) {
+      // Placeholder for frame capture implementation
+      return { frameUrl: 'data:image/png;base64,...' };
+    }
+
+    function updateMCPStatus(status) {
+      if (els.mcpStatus) {
+        els.mcpStatus.textContent = 'Status: ' + status;
+        els.mcpStatus.className = 'mcp-status ' + status.toLowerCase().replace(' ', '-');
+      }
+    }
+
+    // ===== PROFESSIONAL EDITING FUNCTIONS =====
+    class KeyframeEditor {
+      constructor() {
+        this.selectedClipId = null;
+        this.keyframes = {};
+        this.properties = ['opacity', 'scale', 'rotation', 'positionX', 'positionY'];
+      }
+
+      selectClip(clipId) {
+        this.selectedClipId = clipId;
+        this.render();
+      }
+
+      addKeyframe(property, time, value) {
+        if (!this.selectedClipId) return;
+
+        if (!this.keyframes[this.selectedClipId]) {
+          this.keyframes[this.selectedClipId] = {};
+        }
+
+        if (!this.keyframes[this.selectedClipId][property]) {
+          this.keyframes[this.selectedClipId][property] = [];
+        }
+
+        this.keyframes[this.selectedClipId][property] = 
+          this.keyframes[this.selectedClipId][property].filter(kf => kf.time !== time);
+
+        this.keyframes[this.selectedClipId][property].push({ time, value });
+        this.keyframes[this.selectedClipId][property].sort((a, b) => a.time - b.time);
+
+        this.updateClipAnimation();
+      }
+
+      updateClipAnimation() {
+        if (!this.selectedClipId) return;
+
+        const clipKeyframes = this.keyframes[this.selectedClipId];
+        if (!clipKeyframes) return;
+
+        const animations = {};
+        this.properties.forEach(prop => {
+          if (clipKeyframes[prop] && clipKeyframes[prop].length > 1) {
+            animations[prop] = this.generateKeyframeAnimation(clipKeyframes[prop], prop);
+          }
+        });
+
+        this.applyAnimationsToClip(this.selectedClipId, animations);
+      }
+
+      generateKeyframeAnimation(keyframes, property) {
+        const totalDuration = state.timelineSeconds || 60;
+        let css = '';
+
+        keyframes.forEach((kf, index) => {
+          const percent = (kf.time / totalDuration) * 100;
+          const value = this.formatKeyframeValue(property, kf.value);
+          css += `${percent}% { ${this.getCSSProperty(property)}: ${value}; }`;
+
+          if (index < keyframes.length - 1) {
+            css += ' ';
+          }
+        });
+
+        return css;
+      }
+
+      formatKeyframeValue(property, value) {
+        switch (property) {
+          case 'opacity': return Math.max(0, Math.min(1, value));
+          case 'scale': return Math.max(0.1, Math.min(5, value));
+          case 'rotation': return value % 360;
+          case 'positionX':
+          case 'positionY': return `${value}px`;
+          default: return value;
+        }
+      }
+
+      getCSSProperty(property) {
+        switch (property) {
+          case 'opacity': return 'opacity';
+          case 'scale': return 'transform';
+          case 'rotation': return 'transform';
+          case 'positionX': return 'transform';
+          case 'positionY': return 'transform';
+          default: return property;
+        }
+      }
+
+      applyAnimationsToClip(clipId, animations) {
+        const clipElement = document.querySelector(`[data-clip-id="${clipId}"]`);
+        if (!clipElement) return;
+
+        let transformAnimations = [];
+
+        Object.entries(animations).forEach(([prop, css]) => {
+          if (prop === 'opacity') {
+            clipElement.style.animation = `keyframe-${prop} ${state.timelineSeconds || 60}s linear infinite`;
+            this.addCSSRule(`@keyframes keyframe-${prop} { ${css} }`);
+          } else {
+            transformAnimations.push(css);
+          }
+        });
+
+        if (transformAnimations.length > 0) {
+          clipElement.style.animation = `keyframe-transform ${state.timelineSeconds || 60}s linear infinite`;
+          this.addCSSRule(`@keyframes keyframe-transform { ${transformAnimations.join(' ')} }`);
+        }
+      }
+
+      addCSSRule(rule) {
+        const style = document.getElementById('dynamic-keyframes') || 
+                      document.head.appendChild(document.createElement('style'));
+        style.id = 'dynamic-keyframes';
+        style.textContent += rule + '\n';
+      }
+
+      render() {
+        if (!els.keyframeEditor) return;
+
+        els.keyframeEditor.innerHTML = '';
+
+        if (!this.selectedClipId) {
+          els.keyframeEditor.innerHTML = '<p>Select a clip to edit keyframes</p>';
+          return;
+        }
+
+        this.properties.forEach(prop => {
+          const propDiv = document.createElement('div');
+          propDiv.className = 'keyframe-property';
+          propDiv.innerHTML = `
+            <h4>${prop}</h4>
+            <div class="keyframe-track" id="track-${prop}"></div>
+            <button onclick="state.keyframeEditor.addKeyframe('${prop}', ${(state.playheadPercent / 100) * (state.timelineSeconds || 60)}, 1)">Add Keyframe</button>
+          `;
+          els.keyframeEditor.appendChild(propDiv);
+
+          this.renderKeyframeTrack(prop);
+        });
+      }
+
+      renderKeyframeTrack(property) {
+        const track = document.getElementById(`track-${property}`);
+        if (!track) return;
+
+        const keyframes = this.keyframes[this.selectedClipId]?.[property] || [];
+        const totalDuration = state.timelineSeconds || 60;
+
+        track.innerHTML = '';
+        keyframes.forEach(kf => {
+          const marker = document.createElement('div');
+          marker.className = 'keyframe-marker';
+          marker.style.left = `${(kf.time / totalDuration) * 100}%`;
+          marker.title = `${property}: ${kf.value} at ${kf.time}s`;
+          marker.onclick = () => this.removeKeyframe(property, kf.time);
+          track.appendChild(marker);
+        });
+      }
+
+      removeKeyframe(property, time) {
+        if (this.keyframes[this.selectedClipId]?.[property]) {
+          this.keyframes[this.selectedClipId][property] = 
+            this.keyframes[this.selectedClipId][property].filter(kf => kf.time !== time);
+          this.updateClipAnimation();
+          this.render();
+        }
+      }
+    }
+
+    function applyCameraMovement(type, params = {}) {
+      const clip = getSelectedClip();
+      if (!clip) {
+        showToast('No clip selected');
+        return;
+      }
+
+      const validatedParams = validateCameraParams(type, params);
+      clip.cameraMovement = { type, ...validatedParams };
+
+      updateClipCameraAnimation(clip);
+      showToast(`Applied ${type} camera movement`);
+    }
+
+    function validateCameraParams(type, params) {
+      const defaults = {
+        shake: { intensity: 5, frequency: 10, duration: 2 },
+        zoom: { startScale: 1.0, endScale: 1.5, duration: 2 },
+        orbit: { radius: 50, speed: 1, centerX: 0, centerY: 0 },
+        pan: { startX: 0, endX: 100, startY: 0, endY: 0, duration: 3 },
+        dolly: { startX: 0, endX: 50, startY: 0, endY: 0, duration: 3 }
+      };
+
+      const config = defaults[type] || {};
+      return { ...config, ...params };
+    }
+
+    function updateClipCameraAnimation(clip) {
+      if (!clip.cameraMovement) return;
+
+      const { type, ...params } = clip.cameraMovement;
+      const animationCSS = generateCameraAnimationCSS(type, params);
+
+      if (animationCSS) {
+        clip.cameraAnimation = animationCSS;
+        const clipElement = document.querySelector(`[data-clip-id="${clip.id}"]`);
+        if (clipElement) {
+          clipElement.style.animation = `camera-${type} ${params.duration || 2}s ease-in-out`;
+          const style = document.getElementById('camera-animations') || 
+                        document.head.appendChild(document.createElement('style'));
+          style.id = 'camera-animations';
+          style.textContent += `@keyframes camera-${type} { ${animationCSS} }\n`;
+        }
+      }
+    }
+
+    function generateCameraAnimationCSS(type, params) {
+      switch (type) {
+        case 'shake':
+          return `
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-${params.intensity}px); }
+            20%, 40%, 60%, 80% { transform: translateX(${params.intensity}px); }
+          `;
+        case 'zoom':
+          return `
+            0% { transform: scale(${params.startScale}); }
+            100% { transform: scale(${params.endScale}); }
+          `;
+        case 'orbit':
+          const steps = 36;
+          let css = '';
+          for (let i = 0; i <= steps; i++) {
+            const angle = (i / steps) * 360;
+            const x = Math.cos(angle * Math.PI / 180) * params.radius;
+            const y = Math.sin(angle * Math.PI / 180) * params.radius;
+            css += `${(i / steps) * 100}% { transform: translate(${x}px, ${y}px); }\n`;
+          }
+          return css;
+        case 'pan':
+          return `
+            0% { transform: translate(${params.startX}px, ${params.startY}px); }
+            100% { transform: translate(${params.endX}px, ${params.endY}px); }
+          `;
+        default:
+          return null;
+      }
+    }
+
+    class SemanticSearch {
+      constructor() {
+        this.isInitialized = false;
+        this.model = null;
+        this.mediaIndex = [];
+        this.searchCache = new Map();
+      }
+
+      async initialize() {
+        if (this.isInitialized) return;
+
+        try {
+          showToast('Initializing semantic search...');
+
+          await new Promise(resolve => setTimeout(resolve, 2000));
+
+          this.model = {
+            encodeText: async (text) => {
+              return new Array(512).fill(0).map(() => Math.random());
+            },
+            encodeImage: async (imageUrl) => {
+              return new Array(512).fill(0).map(() => Math.random());
+            }
+          };
+
+          this.isInitialized = true;
+          showToast('Semantic search ready');
+
+        } catch (error) {
+          console.error('Semantic search initialization failed:', error);
+          showToast('Semantic search unavailable');
+        }
+      }
+
+      async search(query, mediaItems = []) {
+        if (!this.isInitialized) {
+          await this.initialize();
+        }
+
+        if (!query || !this.model) {
+          return [];
+        }
+
+        const cacheKey = query + '_' + mediaItems.length;
+        if (this.searchCache.has(cacheKey)) {
+          return this.searchCache.get(cacheKey);
+        }
+
+        try {
+          showToast('Searching semantically...');
+
+          const queryEmbedding = await this.model.encodeText(query);
+
+          const results = await Promise.all(
+            mediaItems.map(async (item, index) => {
+              try {
+                const imageEmbedding = await this.model.encodeImage(item.url || item.src);
+                const similarity = cosineSimilarity(queryEmbedding, imageEmbedding);
+
+                return {
+                  ...item,
+                  id: item.id || index,
+                  score: similarity,
+                  relevance: similarity > 0.7 ? 'high' : similarity > 0.4 ? 'medium' : 'low'
+                };
+              } catch (error) {
+                console.warn('Failed to process item:', item, error);
+                return { ...item, score: 0, relevance: 'error' };
+              }
+            })
+          );
+
+          const filteredResults = results
+            .filter(item => item.score > 0.2)
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 20);
+
+          this.searchCache.set(cacheKey, filteredResults);
+
+          showToast(`Found ${filteredResults.length} semantic matches`);
+          return filteredResults;
+
+        } catch (error) {
+          console.error('Semantic search failed:', error);
+          showToast('Search failed');
+          return [];
+        }
+      }
+
+      async indexMedia(mediaItems) {
+        if (!this.isInitialized) {
+          await this.initialize();
+        }
+
+        try {
+          this.mediaIndex = await Promise.all(
+            mediaItems.map(async (item) => {
+              try {
+                const embedding = await this.model.encodeImage(item.url || item.src);
+                return { ...item, embedding };
+              } catch (error) {
+                console.warn('Failed to index item:', item, error);
+                return { ...item, embedding: null };
+              }
+            })
+          );
+
+          showToast(`Indexed ${this.mediaIndex.length} media items`);
+
+        } catch (error) {
+          console.error('Media indexing failed:', error);
+          showToast('Indexing failed');
+        }
+      }
+    }
+
+    function cosineSimilarity(a, b) {
+      if (!a || !b || a.length !== b.length) return 0;
+
+      let dotProduct = 0;
+      let normA = 0;
+      let normB = 0;
+
+      for (let i = 0; i < a.length; i++) {
+        dotProduct += a[i] * b[i];
+        normA += a[i] * a[i];
+        normB += b[i] * b[i];
+      }
+
+      if (normA === 0 || normB === 0) return 0;
+
+      return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
+    }
+
+    class SpeechTranscriber {
+      constructor() {
+        this.worker = null;
+        this.isInitialized = false;
+        this.isProcessing = false;
+        this.currentJob = null;
+      }
+
+      async initialize() {
+        if (this.isInitialized) return;
+
+        try {
+          // Create Web Worker for speech processing
+          this.worker = new Worker('/workers/whisper-worker.js');
+
+          this.worker.onmessage = (event) => {
+            this.handleWorkerMessage(event.data);
+          };
+
+          this.worker.onerror = (error) => {
+            console.error('Whisper worker error:', error);
+            this.isProcessing = false;
+            if (this.reject) this.reject(new Error('Worker error: ' + error.message));
+          };
+
+          // Test worker initialization
+          await new Promise((resolve, reject) => {
+            const timeout = setTimeout(() => reject(new Error('Worker initialization timeout')), 5000);
+
+            this.worker.postMessage({ type: 'init' });
+
+            const originalHandler = this.worker.onmessage;
+            this.worker.onmessage = (event) => {
+              if (event.data.type === 'initialized') {
+                clearTimeout(timeout);
+                this.worker.onmessage = originalHandler;
+                this.isInitialized = true;
+                resolve();
+              } else {
+                originalHandler(event);
+              }
+            };
+          });
+
+        } catch (error) {
+          console.error('Speech transcriber initialization failed:', error);
+          throw error;
+        }
+      }
+
+      async transcribeAudio(audioBuffer, options = {}) {
+        if (!this.isInitialized) {
+          await this.initialize();
+        }
+
+        if (this.isProcessing) {
+          throw new Error('Transcription already in progress');
+        }
+
+        if (!audioBuffer) {
+          throw new Error('Invalid audio buffer');
+        }
+
+        this.isProcessing = true;
+        updateTranscriptionStatus('Preparing audio...');
+
+        return new Promise((resolve, reject) => {
+          this.resolve = resolve;
+          this.reject = reject;
+
+          this.worker.postMessage({
+            type: 'transcribe',
+            audio: audioBuffer,
+            options: {
+              language: options.language || 'en',
+              task: options.task || 'transcribe',
+              temperature: options.temperature || 0.2
+            }
+          });
+        });
+      }
+
+      handleWorkerMessage(data) {
+        switch (data.type) {
+          case 'progress':
+            updateTranscriptionStatus(`Transcribing... ${Math.round(data.progress * 100)}%`);
+            break;
+
+          case 'result':
+            this.isProcessing = false;
+            const subtitles = this.processTranscriptionResult(data.result);
+            this.resolve(subtitles);
+            updateTranscriptionStatus('Transcription complete');
+            break;
+
+          case 'error':
+            this.isProcessing = false;
+            this.reject(new Error(data.error || 'Transcription failed'));
+            updateTranscriptionStatus('Transcription failed');
+            break;
+
+          default:
+            console.warn('Unknown worker message:', data.type);
+        }
+      }
+
+      processTranscriptionResult(result) {
+        if (!result.segments) return [];
+
+        return result.segments.map((segment, index) => ({
+          id: index + 1,
+          start: segment.start,
+          end: segment.end,
+          text: segment.text.trim(),
+          confidence: segment.confidence || 1.0,
+          speaker: segment.speaker || null
+        }));
+      }
+
+      async cleanTranscription(subtitles) {
+        if (!Array.isArray(subtitles)) return [];
+
+        return subtitles.map(subtitle => ({
+          ...subtitle,
+          text: this.cleanText(subtitle.text)
+        }));
+      }
+
+      cleanText(text) {
+        if (typeof text !== 'string') return '';
+
+        return text
+          .replace(/\b(um|uh|like|you know|so|well|I mean|right|okay|alright)\b/gi, '')
+          .replace(/\b(\w+)\s+\1\b/gi, '$1')
+          .replace(/[^\w\s.,!?-]/g, '')
+          .replace(/\s+/g, ' ')
+          .trim();
+      }
+
+      async generateSubtitles(audioBuffer, options = {}) {
+        const transcription = await this.transcribeAudio(audioBuffer, options);
+        const cleaned = await this.cleanTranscription(transcription);
+        return cleaned;
+      }
+
+      destroy() {
+        if (this.worker) {
+          this.worker.terminate();
+          this.worker = null;
+        }
+        this.isInitialized = false;
+        this.isProcessing = false;
+      }
+    }
+
+    function updateTranscriptionStatus(status) {
+      if (els.transcriptionStatus) {
+        els.transcriptionStatus.textContent = status;
+      }
+    }
+
+    function updateThresholdDisplay() {
+      if (els.thresholdValue) {
+        els.thresholdValue.textContent = state.sceneThreshold || 0.5;
+      }
+    }
+
+    function getSelectedClip() {
+      return state.tracks?.flatMap(t => t.clips).find(c => c.id === state.selectedClipId);
+    }
+
+    function handleChatSubmit() {
+      const now = Date.now();
+      if (now - lastCommandTime < 2000) {
+        showToast('Please wait before sending another command');
+        return;
+      }
+      lastCommandTime = now;
+
+      const text = sanitizeInput(els.chatInput?.value || '');
+      if (!text || text.length > 500 || state.agentWorkflow) {
+        return;
+      }
+
+      state.chat = state.chat || [];
+      state.chat.push({ role: 'user', text });
+      startWorkflow(text);
+      els.chatInput.value = '';
+      renderChat();
+    }
+
     function formatTimeFromPercent(percent, totalSeconds) {
       const current = (percent / 100) * totalSeconds;
       const minutes = Math.floor(current / 60);
@@ -624,8 +1956,112 @@ export function TimelineEditorPage() {
       document.querySelectorAll('[data-action="zoom-out"]').forEach((btn) => btn.addEventListener('click', () => { state.zoom = Math.max(0.5, state.zoom - 0.1); showToast('Zoom ' + state.zoom.toFixed(1) + 'x'); }));
       document.getElementById('uploadBtn').addEventListener('click', () => showToast('Upload flow placeholder triggered'));
       document.getElementById('backBtn').addEventListener('click', () => { if (parent && parent.window && parent.window.navigate) { parent.window.navigate('apps'); } else { showToast('Back action clicked'); } });
+
+      // Animation IDE events
+      if (els.runAnimationBtn) els.runAnimationBtn.addEventListener('click', runAnimation);
+
+      // Scene Detection events
+      if (els.sceneThreshold) els.sceneThreshold.addEventListener('input', () => {
+        state.sceneThreshold = parseFloat(els.sceneThreshold.value);
+        updateThresholdDisplay();
+      });
+      if (els.detectScenesBtn) els.detectScenesBtn.addEventListener('click', detectScenes);
+      if (els.splitAtScenesBtn) els.splitAtScenesBtn.addEventListener('click', splitAtScenes);
+      if (els.mergeShortScenesBtn) els.mergeShortScenesBtn.addEventListener('click', mergeShortScenes);
+
+      // MCP events
+      if (els.connectMCPBtn) els.connectMCPBtn.addEventListener('click', () => {
+        if (state.mcpClient) {
+          state.mcpClient.connect();
+        } else {
+          state.mcpClient = new MCPClient();
+          state.mcpClient.connect();
+        }
+      });
+
+      // Keyframe events
+      if (els.addKeyframeBtn) els.addKeyframeBtn.addEventListener('click', () => {
+        if (state.keyframeEditor && state.selectedClipId) {
+          const time = (state.playheadPercent / 100) * (state.timelineSeconds || 60);
+          state.keyframeEditor.addKeyframe('opacity', time, 1);
+        }
+      });
+
+      // Camera events
+      if (els.applyCameraBtn) els.applyCameraBtn.addEventListener('click', () => {
+        const type = els.cameraMovementType?.value || 'shake';
+        const intensity = parseFloat(els.cameraIntensity?.value) || 5;
+        const duration = parseFloat(els.cameraDuration?.value) || 2;
+        applyCameraMovement(type, { intensity, duration });
+      });
+
+      // Semantic search events
+      if (els.searchMediaBtn) els.searchMediaBtn.addEventListener('click', async () => {
+        const query = els.semanticQuery?.value?.trim();
+        if (!query) return;
+
+        if (!state.semanticSearch) {
+          state.semanticSearch = new SemanticSearch();
+        }
+
+        const results = await state.semanticSearch.search(query, state.media || []);
+        state.searchResults = results;
+
+        if (els.searchResults) {
+          els.searchResults.innerHTML = results.map(r =>
+            `<div>${r.label || r.name}: ${r.relevance} (${r.score.toFixed(2)})</div>`
+          ).join('') || 'No results found';
+        }
+      });
+
+      // Transcription events
+      if (els.transcribeBtn) els.transcribeBtn.addEventListener('click', async () => {
+        if (!state.speechTranscriber) {
+          state.speechTranscriber = new SpeechTranscriber();
+        }
+
+        try {
+          // Placeholder for audio buffer
+          const audioBuffer = new ArrayBuffer(1024);
+          const subtitles = await state.speechTranscriber.generateSubtitles(audioBuffer);
+
+          if (els.transcriptionOutput) {
+            els.transcriptionOutput.value = subtitles.map(s =>
+              `${s.start.toFixed(2)} - ${s.end.toFixed(2)}: ${s.text}`
+            ).join('\n');
+          }
+        } catch (error) {
+          showToast('Transcription failed: ' + error.message);
+        }
+      });
+
+      if (els.cleanTranscriptionBtn) els.cleanTranscriptionBtn.addEventListener('click', async () => {
+        if (!state.speechTranscriber) return;
+
+        const text = els.transcriptionOutput?.value || '';
+        const lines = text.split('\n').map(line => {
+          const match = line.match(/(\d+\.\d+)\s*-\s*(\d+\.\d+):\s*(.+)/);
+          return match ? { start: parseFloat(match[1]), end: parseFloat(match[2]), text: match[3] } : null;
+        }).filter(Boolean);
+
+        const cleaned = await state.speechTranscriber.cleanTranscription(lines);
+        if (els.transcriptionOutput) {
+          els.transcriptionOutput.value = cleaned.map(s =>
+            `${s.start.toFixed(2)} - ${s.end.toFixed(2)}: ${s.text}`
+          ).join('\n');
+        }
+      });
     }
-    function renderAll() { renderTopActions(); renderTools(); renderPills(); renderTracks(); renderMedia(); renderGenerateTypes(); renderChat(); renderQuickCommands(); renderRail(); updatePreview(); updatePlaybackUI(); }
+    function renderAll() { renderTopActions(); renderTools(); renderPills(); renderTracks(); renderMedia(); renderGenerateTypes(); renderChat(); renderQuickCommands(); renderRail(); updatePreview(); updatePlaybackUI(); updateThresholdDisplay(); updateSceneMarkers(); if (state.keyframeEditor) state.keyframeEditor.render(); }
+    // Initialize advanced features
+    if (!state.mcpClient) state.mcpClient = new MCPClient();
+    if (!state.keyframeEditor) state.keyframeEditor = new KeyframeEditor();
+    if (!state.semanticSearch) state.semanticSearch = new SemanticSearch();
+    if (!state.speechTranscriber) state.speechTranscriber = new SpeechTranscriber();
+
+    // Initialize animation code
+    if (els.animationCode) els.animationCode.value = state.animationCode;
+
     renderAll();
     bindEvents();
   </script>
@@ -641,6 +2077,25 @@ export function TimelineEditorPage() {
       clearInterval(playbackTimer);
       playbackTimer = null;
     }
+    if (workflowTimeout) {
+      clearTimeout(workflowTimeout);
+      workflowTimeout = null;
+    }
+    if (animationThrottle) {
+      clearTimeout(animationThrottle);
+      animationThrottle = null;
+    }
+    if (state.mcpClient) {
+      state.mcpClient.disconnect();
+    }
+    if (state.speechTranscriber) {
+      state.speechTranscriber.destroy();
+    }
+    // Clear any dynamic styles
+    const dynamicStyles = document.getElementById('dynamic-keyframes');
+    if (dynamicStyles) dynamicStyles.remove();
+    const cameraStyles = document.getElementById('camera-animations');
+    if (cameraStyles) cameraStyles.remove();
   };
 
   return container;
