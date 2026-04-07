@@ -592,17 +592,25 @@ export function TimelineEditorPage() {
 
       try {
         updateWorkflowStatus('🤖 Analyzing request...');
-        await new Promise(resolve => setTimeout(resolve, 800));
 
-        state.agentWorkflow = 'executing';
+        // Call backend AI agent API
+        const response = await fetch('http://localhost:3001/api/ai-agent/process', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ command })
+        });
+
+        if (!response.ok) {
+          throw new Error('Backend API error: ' + response.status);
+        }
+
+        const result = await response.json();
+
         updateWorkflowStatus('⚡ Executing changes...');
-        await executeCommand(command);
-        await new Promise(resolve => setTimeout(resolve, 600));
+        await executeCommandFromBackend(result.result);
 
-        state.agentWorkflow = 'verifying';
         updateWorkflowStatus('👁️ Verifying results...');
         await verifyResults();
-        await new Promise(resolve => setTimeout(resolve, 400));
 
         state.agentWorkflow = 'complete';
         updateWorkflowStatus('✅ Task completed successfully!');
@@ -648,6 +656,37 @@ export function TimelineEditorPage() {
       }
     }
 
+    async function executeCommandFromBackend(backendResult) {
+      if (!backendResult || !backendResult.action) {
+        throw new Error('Invalid backend response');
+      }
+
+      switch (backendResult.action) {
+        case 'add_clip':
+          if (backendResult.type === 'text') {
+            await addTextClip(backendResult.name || 'AI Clip', backendResult.text || 'Generated content');
+          }
+          break;
+
+        case 'trim_clip':
+          trimSelectedClip();
+          break;
+
+        case 'generate_clip':
+          if (typeof generateClip === 'function') {
+            generateClip();
+          }
+          break;
+
+        case 'detect_scenes':
+          await detectScenes();
+          break;
+
+        default:
+          console.log('Backend action:', backendResult.action);
+      }
+    }
+
     async function addTextClip(name, text) {
       const textTrack = state.tracks?.find(t => t.name === 'Text' || t.name === 'text-1');
       if (!textTrack) {
@@ -686,33 +725,43 @@ export function TimelineEditorPage() {
     }
 
     async function detectScenes() {
-      if (!state.tracks || state.tracks.length === 0) {
-        throw new Error('No tracks available for scene detection');
-      }
-
       try {
         showToast('Analyzing video for scene changes...');
         updateSceneResults('Analyzing...');
 
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // Call backend scene detection API
+        const response = await fetch('http://localhost:3001/api/scene-detection/detect', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            threshold: state.sceneThreshold || 0.5
+          })
+        });
 
-        const scenes = [];
-        const interval = Math.max(5, Math.min(25, 30 - (state.sceneThreshold || 0.5) * 20));
-
-        for (let time = interval; time < (state.timelineSeconds || 60); time += interval + Math.random() * interval * 0.5) {
-          if (time < (state.timelineSeconds || 60)) {
-            scenes.push(Math.round(time * 100) / 100);
-          }
+        if (!response.ok) {
+          throw new Error('Backend API error: ' + response.status);
         }
 
-        state.detectedScenes = scenes.slice(0, 50);
-        updateSceneMarkers();
-        updateSceneResults(`Detected ${scenes.length} scene changes`);
-        showToast(`Scene detection complete: ${scenes.length} scenes found`);
+        const result = await response.json();
+
+        if (result.success) {
+          // Convert backend response to frontend format
+          state.detectedScenes = result.scenes.map(scene => ({
+            time: scene.time,
+            confidence: scene.confidence || 0.8
+          }));
+
+          updateSceneMarkers();
+          updateSceneResults(`Detected ${result.totalScenes} scene changes`);
+          showToast(`Scene detection complete: ${result.totalScenes} scenes found`);
+        } else {
+          throw new Error(result.message || 'Scene detection failed');
+        }
 
       } catch (error) {
         console.error('Scene detection error:', error);
         updateSceneResults('Detection failed');
+        showToast('Scene detection failed: ' + error.message);
         throw error;
       }
     }
@@ -1743,6 +1792,67 @@ export function TimelineEditorPage() {
       renderChat();
     }
 
+    // ===== MCP WEBSOCKET FUNCTIONS =====
+    let mcpSocket = null;
+
+    function initializeMCPConnection() {
+      try {
+        mcpSocket = new WebSocket('ws://localhost:3001/mcp');
+
+        mcpSocket.onopen = () => {
+          console.log('MCP WebSocket connected');
+          if (els.mcpStatus) els.mcpStatus.textContent = 'Status: Connected';
+        };
+
+        mcpSocket.onmessage = (event) => {
+          try {
+            const message = JSON.parse(event.data);
+            handleMCPMessage(message);
+          } catch (error) {
+            console.error('Invalid MCP message:', error);
+          }
+        };
+
+        mcpSocket.onclose = () => {
+          console.log('MCP WebSocket disconnected');
+          if (els.mcpStatus) els.mcpStatus.textContent = 'Status: Disconnected';
+          // Auto-reconnect after 5 seconds
+          setTimeout(initializeMCPConnection, 5000);
+        };
+
+        mcpSocket.onerror = (error) => {
+          console.error('MCP WebSocket error:', error);
+          if (els.mcpStatus) els.mcpStatus.textContent = 'Status: Error';
+        };
+
+      } catch (error) {
+        console.error('Failed to initialize MCP connection:', error);
+      }
+    }
+
+    function handleMCPMessage(message) {
+      console.log('Received MCP message:', message);
+
+      if (message.type === 'command_result') {
+        if (message.success) {
+          showToast('MCP Command executed successfully');
+        } else {
+          showToast('MCP Command failed: ' + message.error);
+        }
+      }
+    }
+
+    function sendMCPCommand(command) {
+      if (mcpSocket && mcpSocket.readyState === WebSocket.OPEN) {
+        mcpSocket.send(JSON.stringify({
+          type: 'execute_command',
+          data: command
+        }));
+      } else {
+        showToast('MCP connection not available');
+      }
+    }
+
     function formatTimeFromPercent(percent, totalSeconds) {
       const current = (percent / 100) * totalSeconds;
       const minutes = Math.floor(current / 60);
@@ -2004,55 +2114,131 @@ export function TimelineEditorPage() {
         const query = els.semanticQuery?.value?.trim();
         if (!query) return;
 
-        if (!state.semanticSearch) {
-          state.semanticSearch = new SemanticSearch();
-        }
+        try {
+          showToast('Searching semantically...');
 
-        const results = await state.semanticSearch.search(query, state.media || []);
-        state.searchResults = results;
+          // Call backend semantic search API
+          const response = await fetch('http://localhost:3001/api/semantic-search/search', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              query,
+              mediaItems: state.media || []
+            })
+          });
 
-        if (els.searchResults) {
-          els.searchResults.innerHTML = results.map(r =>
-            `<div>${r.label || r.name}: ${r.relevance} (${r.score.toFixed(2)})</div>`
-          ).join('') || 'No results found';
+          if (!response.ok) {
+            throw new Error('Backend API error: ' + response.status);
+          }
+
+          const result = await response.json();
+
+          if (result.success) {
+            state.searchResults = result.results;
+
+            if (els.searchResults) {
+              els.searchResults.innerHTML = result.results.map(r =>
+                `<div>${r.label || r.name}: ${r.relevance} (${r.score.toFixed(2)})</div>`
+              ).join('') || 'No results found';
+            }
+
+            showToast(`Found ${result.results.length} semantic matches`);
+          } else {
+            throw new Error(result.message || 'Search failed');
+          }
+
+        } catch (error) {
+          console.error('Semantic search error:', error);
+          showToast('Search failed: ' + error.message);
+          if (els.searchResults) {
+            els.searchResults.innerHTML = 'Search failed';
+          }
         }
       });
 
       // Transcription events
       if (els.transcribeBtn) els.transcribeBtn.addEventListener('click', async () => {
-        if (!state.speechTranscriber) {
-          state.speechTranscriber = new SpeechTranscriber();
-        }
-
         try {
-          // Placeholder for audio buffer
-          const audioBuffer = new ArrayBuffer(1024);
-          const subtitles = await state.speechTranscriber.generateSubtitles(audioBuffer);
+          showToast('Starting transcription...');
+          updateTranscriptionStatus('Preparing audio...');
 
-          if (els.transcriptionOutput) {
-            els.transcriptionOutput.value = subtitles.map(s =>
-              `${s.start.toFixed(2)} - ${s.end.toFixed(2)}: ${s.text}`
-            ).join('\n');
+          // For demo, send a mock audio buffer
+          // In production, this would get actual audio from file upload
+          const mockAudioData = new Uint8Array(1024).buffer;
+
+          // Call backend speech transcription API
+          const response = await fetch('http://localhost:3001/api/speech-transcription/transcribe', {
+            method: 'POST',
+            body: mockAudioData,
+            headers: {
+              'Content-Type': 'application/octet-stream'
+            }
+          });
+
+          if (!response.ok) {
+            throw new Error('Backend API error: ' + response.status);
           }
+
+          const result = await response.json();
+
+          if (result.success) {
+            if (els.transcriptionOutput) {
+              els.transcriptionOutput.value = result.transcription + '\n\n' +
+                result.subtitles.map(s =>
+                  `${s.start.toFixed(2)} - ${s.end.toFixed(2)}: ${s.text}`
+                ).join('\n');
+            }
+            updateTranscriptionStatus('Complete');
+            showToast('Transcription completed successfully');
+          } else {
+            throw new Error(result.message || 'Transcription failed');
+          }
+
         } catch (error) {
+          console.error('Transcription error:', error);
+          updateTranscriptionStatus('Failed');
           showToast('Transcription failed: ' + error.message);
         }
       });
 
       if (els.cleanTranscriptionBtn) els.cleanTranscriptionBtn.addEventListener('click', async () => {
-        if (!state.speechTranscriber) return;
-
         const text = els.transcriptionOutput?.value || '';
-        const lines = text.split('\n').map(line => {
-          const match = line.match(/(\d+\.\d+)\s*-\s*(\d+\.\d+):\s*(.+)/);
-          return match ? { start: parseFloat(match[1]), end: parseFloat(match[2]), text: match[3] } : null;
-        }).filter(Boolean);
+        if (!text.trim()) return;
 
-        const cleaned = await state.speechTranscriber.cleanTranscription(lines);
-        if (els.transcriptionOutput) {
-          els.transcriptionOutput.value = cleaned.map(s =>
-            `${s.start.toFixed(2)} - ${s.end.toFixed(2)}: ${s.text}`
-          ).join('\n');
+        try {
+          showToast('Cleaning transcription...');
+
+          // Parse subtitles from text
+          const lines = text.split('\n').map(line => {
+            const match = line.match(/(\d+\.\d+)\s*-\s*(\d+\.\d+):\s*(.+)/);
+            return match ? { start: parseFloat(match[1]), end: parseFloat(match[2]), text: match[3] } : null;
+          }).filter(Boolean);
+
+          // Call backend cleaning API
+          const response = await fetch('http://localhost:3001/api/speech-transcription/clean', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ subtitles: lines })
+          });
+
+          if (!response.ok) {
+            throw new Error('Backend API error: ' + response.status);
+          }
+
+          const result = await response.json();
+
+          if (result.success && els.transcriptionOutput) {
+            els.transcriptionOutput.value = result.cleaned.map(s =>
+              `${s.start.toFixed(2)} - ${s.end.toFixed(2)}: ${s.text}`
+            ).join('\n');
+            showToast(`Cleaned ${result.improvements} filler words`);
+          } else {
+            throw new Error(result.message || 'Cleaning failed');
+          }
+
+        } catch (error) {
+          console.error('Cleaning error:', error);
+          showToast('Cleaning failed: ' + error.message);
         }
       });
     }
@@ -2065,6 +2251,9 @@ export function TimelineEditorPage() {
 
     // Initialize animation code
     if (els.animationCode) els.animationCode.value = state.animationCode;
+
+    // Initialize MCP WebSocket connection
+    initializeMCPConnection();
 
     renderAll();
     bindEvents();
