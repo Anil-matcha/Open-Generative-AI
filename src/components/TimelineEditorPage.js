@@ -234,6 +234,7 @@ export function TimelineEditorPage() {
           <aside class="side-card" style="min-height:100%; display:flex; flex-direction:column;">
             <div class="card-title">💬 AI</div>
             <div class="chat-stack" id="chatStack"></div>
+            <div id="workflowStatus" class="workflow-status" style="display:none; padding:8px; background: rgba(34,211,238,0.2); border-radius:8px; margin-bottom:8px; font-size:10px;"></div>
             <input class="text-input" id="chatInput" placeholder="Type command..." />
             <div class="quick-commands" id="quickCommands" style="margin-top:2px;"></div>
           </aside>
@@ -241,9 +242,12 @@ export function TimelineEditorPage() {
             <div class="preview-glow"></div>
             <div class="preview-inner">
               <div class="preview-screen">
-                <div class="preview-emoji" id="previewEmoji">🎥</div>
-                <div class="preview-title" id="previewTitle">Center Preview</div>
-                <div class="preview-sub" id="previewSubtitle">Glow preview styled like the render page</div>
+            <div class="preview-emoji" id="previewEmoji">🎥</div>
+            <div class="preview-title" id="previewTitle">Center Preview</div>
+            <div class="preview-sub" id="previewSubtitle">Glow preview styled like the render page</div>
+            <textarea class="text-area" id="animationCode" placeholder="Write HTML animation code..." style="margin-top: 12px;"></textarea>
+            <div class="animation-preview" id="animationPreview" style="width: 100%; height: 80px; border: 1px solid var(--border); background: black; margin-top: 8px; border-radius: 8px;"></div>
+            <button class="primary-btn" id="runAnimationBtn" style="margin-top: 8px; width: 100%;">▶ Run Animation</button>
               </div>
             </div>
             <div class="preview-overlay">
