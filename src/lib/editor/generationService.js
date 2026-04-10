@@ -514,7 +514,7 @@ class GeminiProvider {
     try {
       const { apiKey } = await this.getAiClient();
       const aspectRatio = request.aspectRatio || '16:9';
-      let body = {
+      const body = {
         prompt: request.prompt,
         numberOfVideos: 1,
         resolution: '720p',

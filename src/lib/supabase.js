@@ -50,7 +50,7 @@ export function getSupabaseUrl() {
 }
 
 export function getUserKey() {
-  let key = localStorage.getItem('muapi_key');
+  const key = localStorage.getItem('muapi_key');
   if (!key) return 'anonymous';
   let hash = 0;
   for (let i = 0; i < key.length; i++) {

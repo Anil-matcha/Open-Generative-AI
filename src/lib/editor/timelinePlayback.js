@@ -4,7 +4,7 @@
  */
 
 let playbackTimer = null;
-let panState = { x: 0, startX: 0, dragging: false };
+const panState = { x: 0, startX: 0, dragging: false };
 let dragState = null;
 
 // Import renderTracks dynamically

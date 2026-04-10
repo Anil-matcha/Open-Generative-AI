@@ -32,7 +32,7 @@ export function CinematicTemplateWizard(template, onComplete, onBack) {
   let currentStep = 0;
   const steps = ['Configure', 'Scenes', 'Preview', 'Generate'];
   let mode = 'quick'; // 'quick' or 'advanced'
-  let inputs = {};
+  const inputs = {};
   let sceneBuilder = null;
   let storyboardBuilder = null;
   let uploadedUrl = null;

@@ -51,7 +51,7 @@ export function DirectorPage() {
     const videoUrl = urlParams.get('videoUrl') || '';
     
     let chatHistory = [];
-    let activeAgents = new Set();
+    const activeAgents = new Set();
     let isProcessing = false;
     
     container.innerHTML = `

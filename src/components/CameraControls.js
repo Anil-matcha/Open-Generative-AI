@@ -35,7 +35,7 @@ export function CameraControls(onChange) {
     // Changed justify-center to justify-start md:justify-center to allow left-aligned scrolling on mobile
     container.className = 'w-full flex justify-start md:justify-center gap-3 md:gap-6 py-4 md:py-8 overflow-x-auto no-scrollbar snap-x px-4 md:px-0';
 
-    let state = {
+    const state = {
         camera: Object.keys(CAMERA_MAP)[0],
         lens: Object.keys(LENS_MAP)[0],
         focal: 35,

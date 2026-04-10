@@ -87,8 +87,8 @@ export function RenderPage() {
   let activeAction = 'Export Video';
   let activeIntervals = [];
   let isRunning = false;
-  let progress = 0;
-  let currentStage = 'finishing';
+  const progress = 0;
+  const currentStage = 'finishing';
 
   const inner = document.createElement('div');
   inner.className = 'w-full';

@@ -244,39 +244,6 @@ export const TEMPLATE_SPECS = {
     negativePrompt: 'flat illustration, poor 3D quality, unrealistic material, blurry details',
     outputPackage: ['figurine prompt', 'pose variants', 'display options']
   },
-  '1950s-style': {
-    coreUseCase: '1950s aesthetic',
-    uiDescription: 'Transform into mid-century Americana style.',
-    promptGoal: 'Generate authentic 1950s nostalgia.',
-    visualStyle: 'Mid-century, Americana, retro, nostalgic',
-    sceneBlueprint: ['Period backdrop', 'retro styling', 'classic car optional', 'diner setting'],
-    cinematography: 'Period-appropriate framing, vintage color palette',
-    enhancerKeywords: '1950s style, mid-century Americana, retro aesthetic, vintage nostalgia',
-    negativePrompt: 'modern elements, anachronistic, poor period detail, flat colors',
-    outputPackage: ['period prompt', 'setting variants', 'style options']
-  },
-  '1970s-style': {
-    coreUseCase: '1970s aesthetic',
-    uiDescription: 'Transform into groovy seventies retro style.',
-    promptGoal: 'Generate authentic 1970s vibes.',
-    visualStyle: 'Groovy, psychedelic, retro, warm tones',
-    sceneBlueprint: ['Retro backdrop', '70s styling', 'warm colors', 'period fashion'],
-    cinematography: 'Vintage framing, warm color grading',
-    enhancerKeywords: '1970s style, groovy seventies, retro aesthetic, psychedelic vibes',
-    negativePrompt: 'modern elements, cool tones, anachronistic, flat colors',
-    outputPackage: ['period prompt', 'style variants', 'setting options']
-  },
-  '1980s-style': {
-    coreUseCase: '1980s aesthetic',
-    uiDescription: 'Transform into neon-lit synthwave eighties look.',
-    promptGoal: 'Generate authentic 1980s neon aesthetic.',
-    visualStyle: 'Neon, synthwave, retro-futuristic, Miami Vice',
-    sceneBlueprint: ['Neon backdrop', 'synthwave styling', 'hot colors', 'retro fashion'],
-    cinematography: 'Neon-lit framing, hot color palette',
-    enhancerKeywords: '1980s style, synthwave, neon lights, retro-futuristic, Miami Vice aesthetic',
-    negativePrompt: 'muted colors, modern elements, anachronistic, flat lighting',
-    outputPackage: ['period prompt', 'neon variants', 'setting options']
-  },
   'action-figure': {
     coreUseCase: 'Action figure style',
     uiDescription: 'Turn yourself into a collectible action figure.',
