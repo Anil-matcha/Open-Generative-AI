@@ -1,3 +1,5 @@
+import DOMPurify from 'dompurify';
+
 /**
  * Security utilities for safe DOM manipulation
  * Prevents XSS vulnerabilities by providing safe alternatives to innerHTML
@@ -157,18 +159,17 @@ export function escapeHtml(text) {
 }
 
 /**
- * Create HTML with escaped content - use sparingly, prefer other methods
+ * Create HTML with sanitized content using DOMPurify - use sparingly, prefer other methods
  * Only use this when template strings are necessary
- * @param {Object} values - Object with values to escape
- * @returns {string} HTML string with escaped values
+ * @param {string} html - HTML string to sanitize
+ * @returns {string} Sanitized HTML string
  */
-export function safeHtml(template, values) {
-  let result = template;
-  for (const [key, value] of Object.entries(values)) {
-    const escaped = escapeHtml(String(value ?? ''));
-    result = result.replace(new RegExp(`\\{${key}\\}`, 'g'), escaped);
-  }
-  return result;
+export function safeHtml(html) {
+  return DOMPurify.sanitize(html, {
+    ALLOWED_TAGS: ['div', 'span', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'strong', 'em', 'b', 'i', 'u', 'br', 'img', 'a', 'button'],
+    ALLOWED_ATTR: ['class', 'id', 'src', 'alt', 'href', 'target', 'rel', 'type', 'onclick'],
+    ALLOW_DATA_ATTR: false
+  });
 }
 
 /**

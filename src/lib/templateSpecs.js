@@ -189,7 +189,7 @@ export const TEMPLATE_SPECS = {
     negativePrompt: 'flat image, no refraction, poor glass quality, blurry scene',
     outputPackage: ['sphere prompt', 'scene variants', 'lighting options']
   },
-  '1920s-style': {
+  '1920s-style-alt': {
     coreUseCase: '1920s aesthetic',
     uiDescription: 'Transform into roaring twenties art deco style.',
     promptGoal: 'Generate authentic 1920s art deco aesthetic.',
@@ -200,7 +200,7 @@ export const TEMPLATE_SPECS = {
     negativePrompt: 'modern elements, anachronistic, poor period detail, flat style',
     outputPackage: ['period prompt', 'style variants', 'setting options']
   },
-  '1950s-style': {
+  '1950s-style-alt': {
     coreUseCase: '1950s aesthetic',
     uiDescription: 'Transform into mid-century Americana style.',
     promptGoal: 'Generate authentic 1950s nostalgia.',
@@ -211,29 +211,29 @@ export const TEMPLATE_SPECS = {
     negativePrompt: 'modern elements, anachronistic, poor period detail, flat colors',
     outputPackage: ['period prompt', 'setting variants', 'style options']
   },
-  '1970s-style': {
+  '1970s-style-alt': {
     coreUseCase: '1970s aesthetic',
     uiDescription: 'Transform into groovy seventies retro style.',
     promptGoal: 'Generate authentic 1970s vibes.',
     visualStyle: 'Groovy, psychedelic, retro, warm tones',
     sceneBlueprint: ['Retro backdrop', '70s styling', 'warm colors', 'period fashion'],
-    cinematography: 'Vintage framing, warm color grading',
-    enhancerKeywords: '1970s style, groovy seventies, retro aesthetic, psychedelic vibes',
-    negativePrompt: 'modern elements, cool tones, anachronistic, flat colors',
-    outputPackage: ['period prompt', 'style variants', 'setting options']
+    cinematography: 'Psychedelic framing, warm color palette',
+    enhancerKeywords: '1970s style, groovy aesthetic, psychedelic, retro warm tones',
+    negativePrompt: 'modern elements, anachronistic, poor period detail, cold colors',
+    outputPackage: ['period prompt', 'style variants', 'color options']
   },
-  '1980s-style': {
+  '1980s-style-alt': {
     coreUseCase: '1980s aesthetic',
-    uiDescription: 'Transform into neon-lit synthwave eighties look.',
-    promptGoal: 'Generate authentic 1980s neon aesthetic.',
-    visualStyle: 'Neon, synthwave, retro-futuristic, Miami Vice',
-    sceneBlueprint: ['Neon backdrop', 'synthwave styling', 'hot colors', 'retro fashion'],
-    cinematography: 'Neon-lit framing, hot color palette',
-    enhancerKeywords: '1980s style, synthwave, neon lights, retro-futuristic, Miami Vice aesthetic',
-    negativePrompt: 'muted colors, modern elements, anachronistic, flat lighting',
-    outputPackage: ['period prompt', 'neon variants', 'setting options']
+    uiDescription: 'Transform into neon eighties cyberpunk style.',
+    promptGoal: 'Generate authentic 1980s synthwave vibes.',
+    visualStyle: 'Neon, cyberpunk, synthwave, vibrant',
+    sceneBlueprint: ['Neon backdrop', '80s styling', 'neon lights', 'cyberpunk fashion'],
+    cinematography: 'Synthwave framing, neon color palette',
+    enhancerKeywords: '1980s style, neon aesthetic, cyberpunk, synthwave vibrant',
+    negativePrompt: 'modern elements, anachronistic, poor period detail, dull colors',
+    outputPackage: ['period prompt', 'style variants', 'neon options']
   },
-  '3d-figurine': {
+  '3d-figurine-alt': {
     coreUseCase: '3D figurine style',
     uiDescription: 'Turn yourself into a collectible 3D figure.',
     promptGoal: 'Create realistic 3D collectible figurine renders.',

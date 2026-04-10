@@ -98,12 +98,7 @@ export function CinemaTemplateStudio() {
         </button>
         </div>
       `;
-      } else {
-          TemplateStorage.addFavorite(template.id);
-        }
-        render();
-        return;
-      }
+      render();
       selectTemplate(template);
     };
 

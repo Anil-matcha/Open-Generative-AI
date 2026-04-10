@@ -88,8 +88,10 @@ export function renderTracks(state, els, showToast) {
         if (e.target !== lane) return;
         panState.startX = e.clientX - panState.x;
         panState.dragging = true;
-        document.addEventListener('mousemove', handlePanMove);
-        document.addEventListener('mouseup', handlePanUp);
+        const moveHandler = (e) => handlePanMove(state, els, e);
+        const upHandler = (e) => handlePanUp(state, els, e);
+        document.addEventListener('mousemove', moveHandler);
+        document.addEventListener('mouseup', upHandler);
       });
     }
     track.items.forEach((item) => {

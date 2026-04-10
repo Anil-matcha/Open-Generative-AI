@@ -49,7 +49,7 @@ export function updateTimelineTransform(state, els) {
   timelineBody.style.transformOrigin = 'left top';
 }
 
-export function handlePanMove(state, els) {
+export function handlePanMove(state, els, event) {
   if (!panState.dragging) return;
   panState.x = event.clientX - panState.startX;
   updateTimelineTransform(state, els);

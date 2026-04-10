@@ -1,3 +1,5 @@
+/* global FileReader */
+
 /**
  * Generation Service
  * Unified abstraction layer for AI video generation
@@ -87,7 +89,23 @@ class LtxProvider {
    * @returns {Promise<GenerationResult>}
    */
   async submit(request) {
+    // Input validation
+    if (!request || typeof request !== 'object') {
+      throw new Error('Invalid request: must be an object');
+    }
+    if (!request.mode || !['text-to-video', 'image-to-video', 'audio-to-video', 'retake', 'extend', 'broll', 'variation'].includes(request.mode)) {
+      throw new Error('Invalid mode: must be one of text-to-video, image-to-video, audio-to-video, retake, extend, broll, variation');
+    }
+    if (!request.prompt || typeof request.prompt !== 'string' || request.prompt.trim().length === 0) {
+      throw new Error('Invalid prompt: must be a non-empty string');
+    }
+    if (request.prompt.length > 1000) {
+      throw new Error('Prompt too long: maximum 1000 characters');
+    }
+
     const generationId = `gen_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+    console.log(`[LtxProvider] Starting generation ${generationId} for mode: ${request.mode}`);
 
     try {
       let endpoint = '';
@@ -214,6 +232,7 @@ class LtxProvider {
         metadata: result,
       };
     } catch (error) {
+      console.error(`[LtxProvider] Generation ${generationId} failed:`, error);
       return {
         generationId,
         status: 'failed',

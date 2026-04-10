@@ -6,6 +6,7 @@ import { perfMonitor } from './lib/performance.js';
 import { analytics } from './lib/analytics.js';
 import { showToast } from './lib/loading.js';
 import { generationService } from './lib/editor/generationService.js';
+import { escapeHtml, safeHtml } from './lib/security.js';
 
 // Make generation service available globally for embedded components
 window.generationService = generationService;
@@ -54,7 +55,8 @@ window.addEventListener('unhandledrejection', (event) => {
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').catch(err => {
-      console.log('[SW] Registration failed:', err);
+      console.warn('[SW] Registration failed:', err);
+      // Continue without service worker
     });
   });
 }
@@ -140,7 +142,7 @@ try {
   // Track fatal error
   analytics.trackError('fatal_init', error.message);
   
-  document.body.innerHTML = `
+  document.body.innerHTML = safeHtml(`
     <div style="display: flex; align-items: center; justify-content: center; height: 100vh; background: #000; color: #fff; flex-direction: column; padding: 20px; text-align: center;">
       <div style="font-size: 48px; margin-bottom: 20px;">😕</div>
       <h1 style="color: #ff4444; margin-bottom: 20px;">Application Error</h1>
@@ -148,7 +150,7 @@ try {
       <p style="color: #666; font-size: 12px; margin-bottom: 20px;">Please try refreshing the page. If the problem persists, clear your browser cache.</p>
       <button onclick="location.reload()" style="padding: 12px 24px; background: #3b82f6; border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: bold;">Reload Page</button>
     </div>
-  `;
+  `);
 }
 
 window.addEventListener('navigate', (e) => {
@@ -178,8 +180,4 @@ const wrapNavigate = (navigateFn) => {
 // Expose navigate globally for debugging
 window.navigate = navigate;
 
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
-}
+

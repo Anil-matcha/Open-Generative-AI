@@ -4,6 +4,10 @@
  * Enhanced with advanced timeline features from remix-new-editor
  */
 
+import { updatePlaybackUI } from './timelinePlayback.js';
+import { updatePreview } from './timelineRendererOriginal.js';
+import { showToast } from '../loading.js';
+
 let timelineZoom = 1.0;
 let timelinePan = 0;
 let timelineHeight = 300;

@@ -17,10 +17,13 @@ export class MuapiClient {
     getKey() {
         const key = localStorage.getItem('muapi_key');
         if (!key) {
-            // Set default API key if not configured
-            const defaultKey = 'd370ae6ecc87e99654ed2220fba0d1511224f41623867aedc2c2a0a06f15b208';
-            localStorage.setItem('muapi_key', defaultKey);
-            return defaultKey;
+            console.warn('[MuapiClient] No API key configured. Please set your API key in settings.');
+            throw new Error('API key not configured. Please set your API key in the application settings.');
+        }
+        // Validate key format (basic check)
+        if (key.length < 20) {
+            console.warn('[MuapiClient] API key appears to be invalid (too short).');
+            throw new Error('Invalid API key format. Please check your API key.');
         }
         return key;
     }
