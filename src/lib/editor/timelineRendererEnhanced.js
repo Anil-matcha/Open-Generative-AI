@@ -7,6 +7,7 @@
 import { updatePlaybackUI } from './timelinePlayback.js';
 import { updatePreview } from './timelineRendererOriginal.js';
 import { showToast } from '../loading.js';
+import { initializeClipDragDrop, setupEnhancedTooltips } from './dragDrop.js';
 
 let timelineZoom = 1.0;
 let timelinePan = 0;
@@ -215,7 +216,7 @@ export function renderTracks(state, els, showToast) {
     });
 
     track.items.forEach((item) => {
-      const itemEl = createEnhancedClipElement(item, track, state);
+      const itemEl = createEnhancedClipElement(item, track, state, timelineZoom);
       lane.appendChild(itemEl);
     });
 
@@ -248,15 +249,16 @@ function createTimelineRuler(state) {
   return ruler;
 }
 
-function createEnhancedClipElement(item, track, state) {
+export function createEnhancedClipElement(item, track, state, zoom = 1.0) {
   const itemEl = document.createElement('div');
-  itemEl.className = `clip ${getClipTypeClass(item)} ${state.selectedClipId === item.id ? 'active' : ''}`;
+  itemEl.className = `clip ${getClipTypeClass(item)} ${state.selectedClipId === item.id ? 'active' : ''} drag-ready`;
   itemEl.dataset.itemId = item.id;
   itemEl.dataset.trackId = track.id;
+  itemEl.title = `Clip: ${item.name || item.text || 'Item'}\nTrack: ${track.name}\nDuration: ${formatTime(item.end - item.start)}\nStart: ${formatTime(item.start)}`;
 
   // Calculate position and width with zoom
-  const leftPercent = (item.start / state.timelineSeconds) * 100 * timelineZoom;
-  const widthPercent = ((item.end - item.start) / state.timelineSeconds) * 100 * timelineZoom;
+  const leftPercent = (item.start / state.timelineSeconds) * 100 * zoom;
+  const widthPercent = ((item.end - item.start) / state.timelineSeconds) * 100 * zoom;
 
   itemEl.style.left = `${leftPercent}%`;
   itemEl.style.width = `${widthPercent}%`;
@@ -288,19 +290,45 @@ function createEnhancedClipElement(item, track, state) {
   durationEl.textContent = formatTime(duration);
   clipContent.appendChild(durationEl);
 
+  // Add drag handles for trimming
+  const leftHandle = document.createElement('div');
+  leftHandle.className = 'clip-handle clip-handle-left';
+  leftHandle.title = 'Drag to trim start';
+
+  const rightHandle = document.createElement('div');
+  rightHandle.className = 'clip-handle clip-handle-right';
+  rightHandle.title = 'Drag to trim end';
+
+  itemEl.appendChild(leftHandle);
   itemEl.appendChild(clipContent);
+  itemEl.appendChild(rightHandle);
 
   // Enhanced event handlers
   itemEl.addEventListener('click', (e) => {
+    // Don't trigger if clicking on handles
+    if (e.target.classList.contains('clip-handle')) return;
+
     e.stopPropagation();
     state.selectedClipId = item.id;
     updatePreview(state, { previewTitle: document.getElementById('previewTitle') });
     renderTracks(state, { trackRows: document.getElementById('trackRows') }, () => {});
   });
 
-  itemEl.addEventListener('dblclick', () => {
+  itemEl.addEventListener('dblclick', (e) => {
+    // Don't trigger if double-clicking on handles
+    if (e.target.classList.contains('clip-handle')) return;
+
     // Open clip editor
     showToast(`Opening ${item.name} in editor`);
+  });
+
+  // Add mouse enter/leave for enhanced tooltips
+  itemEl.addEventListener('mouseenter', () => {
+    itemEl.classList.add('clip-hover');
+  });
+
+  itemEl.addEventListener('mouseleave', () => {
+    itemEl.classList.remove('clip-hover');
   });
 
   return itemEl;
@@ -329,6 +357,12 @@ export function drawWaveform(canvas, waveformData) {
     else ctx.lineTo(x, y);
   });
   ctx.stroke();
+}
+
+// Initialize drag and drop functionality
+export function initializeTimelineDragDrop(state, els) {
+  initializeClipDragDrop(state, els);
+  setupEnhancedTooltips();
 }
 
 // Re-export other functions that might be needed

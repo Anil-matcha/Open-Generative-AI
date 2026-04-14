@@ -148,3 +148,27 @@ class StoryboardResponse(BaseModel):
 class ExportRequest(BaseModel):
     project_id: int
     format: str = "json"
+
+
+class StoryboardProjectCreate(BaseModel):
+    characters: List[dict]
+    scenes: List[dict]
+    shots: List[dict]
+
+
+class CharacterData(BaseModel):
+    name: str
+    traits: str
+    image_url: Optional[str] = None
+
+
+class SceneData(BaseModel):
+    title: str
+    description: str
+
+
+class ShotData(BaseModel):
+    scene_index: int
+    prompt: str
+    narration: Optional[str] = None
+    shot_type: str

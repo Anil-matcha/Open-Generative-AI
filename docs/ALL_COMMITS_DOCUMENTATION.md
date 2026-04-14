@@ -1,0 +1,209 @@
+# All Commits Documentation
+
+This document records the full commit history for the `Open-Higgsfield-AI` repository.
+
+- Generated on: 2026-04-10
+- Source: `git log --reverse --pretty=format:'- %ad | %h | %an | %s' --date=short`
+- Total commits at generation time: 194
+
+## Complete Commit List
+
+- 2026-02-10 | 5db9f98 | Anil Matcha | Initial commit: Scaffold Open-Higgsfield-ai with Vite and README
+- 2026-02-12 | e0efb74 | Anil Matcha | feat: Add image generation studio with Muapi API integration
+- 2026-02-13 | c8060de | Anil Matcha | docs: Update README with project features, architecture and setup instructions
+- 2026-02-13 | bf2efdb | Anil Matcha | fix: Constraint prompt textarea height and remove redundant search icon
+- 2026-02-13 | 50f5bb3 | Anil Matcha | docs: Add preview images and demo video to README
+- 2026-02-13 | c80b21b | Anil Matcha | docs: Update README hero with high-quality animated studio demo
+- 2026-02-13 | f937100 | Anil Matcha | docs: Replace demo media with high-quality pg2.mp4 version
+- 2026-02-14 | c30891e | Anil Matcha | docs: Add comprehensive project knowledge and vision document
+- 2026-02-14 | f9adf55 | Anil Matcha | Cinema studio feature supported
+- 2026-02-14 | c9ae730 | Anil Chandra Naidu Matcha | Merge pull request #23 from Anil-matcha/master
+- 2026-02-14 | 3bf62fb | Anil Matcha | Resolution change to lower case fix for cinema studio
+- 2026-02-14 | 0622997 | Anil Chandra Naidu Matcha | Merge pull request #24 from Anil-matcha/master
+- 2026-02-15 | 69f7dce | Anil Matcha | Added comprehensive Medium guide
+- 2026-02-15 | 119589e | Anil Chandra Naidu Matcha | Merge pull request #25 from Anil-matcha/master
+- 2026-02-17 | 6eebebc | Anil Matcha | Added Video Studio
+- 2026-02-17 | 4b48d1c | Anil Chandra Naidu Matcha | Merge pull request #27 from Anil-matcha/master
+- 2026-02-17 | a205e30 | Anil Matcha | Improved README and description
+- 2026-02-17 | 3364a34 | Anil Chandra Naidu Matcha | Merge pull request #28 from Anil-matcha/master
+- 2026-02-23 | 9965718 | Anil Matcha | Add image upload history, i2i/i2v model support with dynamic mode switching
+- 2026-02-23 | 5b1cfcf | Anil Chandra Naidu Matcha | Merge pull request #33 from Anil-matcha/master
+- 2026-02-23 | b61de54 | Anil Matcha | Update README with Image Studio, Video Studio, upload history, and 200+ model support
+- 2026-02-23 | cf5ca7c | Anil Chandra Naidu Matcha | Merge pull request #34 from Anil-matcha/master
+- 2026-02-27 | a65bdb2 | Anil Matcha | Add Nano Banana 2, Seedream 5.0 models with multi-image input support
+- 2026-02-27 | aca8ff1 | Anil Matcha | Nano banana resolution fix
+- 2026-02-27 | d9f7151 | Anil Chandra Naidu Matcha | Merge pull request #35 from Anil-matcha/master
+- 2026-03-02 | 492f8bf | Anil Matcha | Add Seedance 2.0 text-to-video model
+- 2026-03-02 | 07f3eb2 | Anil Chandra Naidu Matcha | Merge pull request #36 from Anil-matcha/master
+- 2026-03-04 | d707604 | Anil Matcha | Add Seedance 2.0 i2v and video extend support
+- 2026-03-04 | 692cef8 | Anil Chandra Naidu Matcha | Merge pull request #37 from Anil-matcha/master
+- 2026-03-07 | ade8e20 | Anil Matcha | Seedance 2.0 watermark remover changes added
+- 2026-03-07 | d6aafa1 | Anil Chandra Naidu Matcha | Merge pull request #38 from Anil-matcha/master
+- 2026-03-09 | a85089c | Anil Matcha | Video generation fix
+- 2026-03-09 | be5c759 | Anil Chandra Naidu Matcha | Merge pull request #40 from Anil-matcha/master
+- 2026-03-10 | f40dcaf | Dean Gilmore | Updated .gitignore
+- 2026-03-10 | 78da1be | Dean Gilmore | Added vite.config.js.timestamp-1773127564250-6ccb7aa32ab658.mjs
+- 2026-03-10 | dcea26e | Dean Gilmore | Deleted vite.config.js.timestamp-1773127564250-6ccb7aa32ab658.mjs
+- 2026-03-10 | 12e7984 | Dean Gilmore | Added vite.config.js.timestamp-1773128963000-455b0ca53525d.mjs
+- 2026-03-10 | 07c72ae | Dean Gilmore | Deleted vite.config.js.timestamp-1773128963000-455b0ca53525d.mjs
+- 2026-03-10 | e4a64c2 | Dean Gilmore | Added CommunityPage.js
+- 2026-03-10 | c999c4e | Dean Gilmore | Added router.js
+- 2026-03-10 | 59b716b | Dean Gilmore | Updated package-lock.json
+- 2026-03-10 | 7e08004 | Dean Gilmore | Added vite.config.js.timestamp-1773130479798-eda8697af06ec.mjs
+- 2026-03-10 | 1b2eb6e | Dean Gilmore | Deleted vite.config.js.timestamp-1773130479798-eda8697af06ec.mjs
+- 2026-03-10 | 653b358 | Dean Gilmore | Updated UploadPicker.js
+- 2026-03-10 | d18eefd | Dean Gilmore | Updated Header.js
+- 2026-03-10 | 6b152fc | Dean Gilmore | Added tiktok-video.webp
+- 2026-03-10 | 8380c14 | Dean Gilmore | Updated AppsHub.js
+- 2026-03-10 | 16dd0c3 | Dean Gilmore | Updated router.js
+- 2026-03-10 | 7e553e6 | Dean Gilmore | Added 20260310160745_seed_remaining_template_thumbnails.sql
+- 2026-03-10 | bdb87c2 | Dean Gilmore | Added action-figure.webp
+- 2026-03-10 | eaa1856 | Dean Gilmore | Added anime-converter.webp
+- 2026-03-10 | 7b0575e | Dean Gilmore | Added asmr-video.webp
+- 2026-03-10 | 7116f4e | Dean Gilmore | Added billboard-ad.webp
+- 2026-03-10 | 90ecacf | Dean Gilmore | Added building-explosion.webp
+- 2026-03-10 | 9dcda1b | Dean Gilmore | Added bullet-time.webp
+- 2026-03-10 | 9f8df5b | Dean Gilmore | Added comic-book.webp
+- 2026-03-10 | bb3ea31 | Dean Gilmore | Added cyberpunk-style.webp
+- 2026-03-10 | 73eb0b2 | Dean Gilmore | Added disney-pixar.webp
+- 2026-03-10 | e257b99 | Dean Gilmore | Added film-noir.webp
+- 2026-03-10 | 58f2dee | Dean Gilmore | Added ghibli-style.webp
+- 2026-03-10 | d9e1160 | Dean Gilmore | Added glass-ball.webp
+- 2026-03-10 | 7a844a9 | Dean Gilmore | Added gta-loading-screen.webp
+- 2026-03-10 | 80e77b5 | Dean Gilmore | Added instagram-reel.webp
+- 2026-03-10 | 6243266 | Dean Gilmore | Added lego-style.webp
+- 2026-03-10 | 4fcd294 | Dean Gilmore | Added magazine-cover.webp
+- 2026-03-10 | ff0d1a2 | Dean Gilmore | Added movie-poster.webp
+- 2026-03-10 | 5356cdd | Dean Gilmore | Added pixel-art.webp
+- 2026-03-10 | 95b1c8e | Dean Gilmore | Added product-hero.webp
+- 2026-03-10 | a27485e | Dean Gilmore | Added product-photography.webp
+- 2026-03-10 | 3c7f6d7 | Dean Gilmore | Added product-placement.webp
+- 2026-03-10 | 23c9ff7 | Dean Gilmore | Added profile-picture.webp
+- 2026-03-10 | cf139e2 | Dean Gilmore | Added tiktok-video.webp
+- 2026-03-10 | 984c77e | Dean Gilmore | Added vhs-retro.webp
+- 2026-03-10 | 9446966 | Dean Gilmore | Updated global.css
+- 2026-03-10 | 519fbbf | Dean Gilmore | Added vite.config.js.timestamp-1773161034311-99966c477c7558.mjs
+- 2026-03-10 | e6b6b17 | Dean Gilmore | Deleted vite.config.js.timestamp-1773161034311-99966c477c7558.mjs
+- 2026-03-10 | 6c856ff | Dean Gilmore | Updated index.html
+- 2026-03-10 | c01e53f | Dean Gilmore | Added commercial.webp
+- 2026-03-10 | 91117ad | Dean Gilmore | Added decade.webp
+- 2026-03-10 | d7ab0bc | Dean Gilmore | Added entertainment.webp
+- 2026-03-10 | 49cce34 | Dean Gilmore | Added portrait.webp
+- 2026-03-10 | b3a23cd | Dean Gilmore | Added social.webp
+- 2026-03-10 | 689ba90 | Dean Gilmore | Added style.webp
+- 2026-03-10 | 46f49b1 | Dean Gilmore | Added vfx.webp
+- 2026-03-10 | 837ab08 | Dean Gilmore | Added character.webp
+- 2026-03-10 | 5ce547f | Dean Gilmore | Added cinema.webp
+- 2026-03-10 | 903347a | Dean Gilmore | Added commercial.webp
+- 2026-03-10 | 565acad | Dean Gilmore | Added edit.webp
+- 2026-03-10 | 9aed5e5 | Dean Gilmore | Added effects.webp
+- 2026-03-10 | 1de2fc1 | Dean Gilmore | Added image.webp
+- 2026-03-10 | 7c13af0 | Dean Gilmore | Added influencer.webp
+- 2026-03-10 | 603d75c | Dean Gilmore | Added storyboard.webp
+- 2026-03-10 | 100485b | Dean Gilmore | Added upscale.webp
+- 2026-03-10 | 34ff25a | Dean Gilmore | Added video.webp
+- 2026-03-10 | dca4811 | Dean Gilmore | Added assist.webp
+- 2026-03-10 | 3a4fcd2 | Dean Gilmore | Added community.webp
+- 2026-03-10 | d0c6216 | Dean Gilmore | Added library.webp
+- 2026-03-10 | b6109d6 | Dean Gilmore | Added placeholder.webp
+- 2026-03-10 | b33530c | Dean Gilmore | Added ai-edit.webp
+- 2026-03-10 | c40bce6 | Dean Gilmore | Added colorize.webp
+- 2026-03-10 | 7dfbab5 | Dean Gilmore | Added dress-change.webp
+- 2026-03-10 | 3052434 | Dean Gilmore | Added extend.webp
+- 2026-03-10 | bad328a | Dean Gilmore | Added reframe.webp
+- 2026-03-10 | 1987f31 | Dean Gilmore | Added remove-bg.webp
+- 2026-03-10 | 9a193f1 | Dean Gilmore | Added remove-object.webp
+- 2026-03-10 | f6e425e | Dean Gilmore | Added skin-enhance.webp
+- 2026-03-10 | 1073be8 | Dean Gilmore | Added watermark.webp
+- 2026-03-10 | c4ca519 | Dean Gilmore | docs: comprehensive README with features, API reference, and architecture
+- 2026-03-10 | 0431e3b | Dean Gilmore | Updated postcss.config.js
+- 2026-03-10 | 2fa118b | Dean Gilmore | Updated global.css
+- 2026-03-10 | a3ae671 | Dean Gilmore | Updated Sidebar.js
+- 2026-03-10 | fa8fdfc | Dean Gilmore | Added vite.config.js.timestamp-1773172984456-271135cb2ecc8.mjs
+- 2026-03-10 | 8f764c9 | Dean Gilmore | Deleted vite.config.js.timestamp-1773172984456-271135cb2ecc8.mjs
+- 2026-03-10 | c97181b | Dean Gilmore | Updated TemplatesPage.js
+- 2026-03-10 | 76b2a83 | Dean Gilmore | Updated instructions.js
+- 2026-03-10 | 3b69bbb | Dean Gilmore | Updated VideoStudio.js
+- 2026-03-10 | 3fd4afd | Dean Gilmore | Added vite.config.js.timestamp-1773188573671-c9925790d0a778.mjs
+- 2026-03-10 | c16ccc0 | Dean Gilmore | Deleted vite.config.js.timestamp-1773188573671-c9925790d0a778.mjs
+- 2026-03-10 | d143227 | Dean Gilmore | Updated Header.js
+- 2026-03-10 | 38eecba | Dean Gilmore | Updated muapi.js
+- 2026-03-13 | ec0ba6a | Dean Gilmore | Added vite.config.js.timestamp-1773403257861-9b89301d298c2.mjs
+- 2026-03-13 | 927bfba | Dean Gilmore | Deleted vite.config.js.timestamp-1773403257861-9b89301d298c2.mjs
+- 2026-03-13 | 66950c5 | kiloconnect[bot] | feat(db): add seed_ai_video_effects_thumbnails migration
+- 2026-03-13 | dbd643f | kiloconnect[bot] | feat(ui): add thumbnail-generator.html
+- 2026-03-13 | 524776d | kiloconnect[bot] | chore(build): add scripts directory
+- 2026-03-14 | fa79649 | Dean Gilmore | Added vite.config.js.timestamp-1773513223744-6b3d745ec0fa28.mjs
+- 2026-03-14 | 32c303a | Dean Gilmore | Deleted vite.config.js.timestamp-1773513223744-6b3d745ec0fa28.mjs
+- 2026-03-14 | f961c67 | Dean Gilmore | Added DATABASE_QUICK_REFERENCE.md
+- 2026-03-14 | 3062d15 | Dean Gilmore | Added STORAGE_ARCHITECTURE.md
+- 2026-03-14 | 8b0a6f0 | Dean Gilmore | Updated muapi.js
+- 2026-03-14 | 0d18b22 | Dean Gilmore | Updated UpscaleStudio.js
+- 2026-03-14 | e2b3f06 | Dean Gilmore | Updated main.js
+- 2026-03-14 | f033a48 | Dean Gilmore | Added vite.config.js.timestamp-1773528463366-eb16157ae2eef8.mjs
+- 2026-03-14 | 796a56a | Dean Gilmore | Deleted vite.config.js.timestamp-1773528463366-eb16157ae2eef8.mjs
+- 2026-03-14 | 8780bec | Dean Gilmore | Added vite.config.js.timestamp-1773536905405-93ebe60ca74598.mjs
+- 2026-03-14 | 1cfa904 | Dean Gilmore | Deleted vite.config.js.timestamp-1773536905405-93ebe60ca74598.mjs
+- 2026-03-14 | f494f39 | Dean Gilmore | Added vite.config.js.timestamp-1773537679606-e108b7448eee1.mjs
+- 2026-03-14 | e4c2f42 | Dean Gilmore | Deleted vite.config.js.timestamp-1773537679606-e108b7448eee1.mjs
+- 2026-03-15 | 369387a | kiloconnect[bot] | feat(pages): add text/image/video page components and router mappings
+- 2026-03-15 | abb6994 | kiloconnect[bot] | feat(components): add FEATURES/LOGOS data for hero sections
+- 2026-03-15 | af549d8 | Dean Gilmore | Added vite.config.js.timestamp-1773611579174-c36129172a9ce8.mjs
+- 2026-03-15 | ada724d | Dean Gilmore | Deleted vite.config.js.timestamp-1773611579174-c36129172a9ce8.mjs
+- 2026-03-15 | f2fdb8f | kiloconnect[bot] | feat(router): add dynamic routes for new pages and header navigation
+- 2026-03-17 | e5bb214 | Dean Gilmore | Added vite.config.js.timestamp-1773801637243-5cc6ef955c337.mjs
+- 2026-03-17 | 3bf1eb3 | Dean Gilmore | Deleted vite.config.js.timestamp-1773801637243-5cc6ef955c337.mjs
+- 2026-03-18 | 823c691 | Dean Gilmore | Added vite.config.js.timestamp-1773848260576-7f1812a66cdda.mjs
+- 2026-03-18 | 84b4033 | Dean Gilmore | Deleted vite.config.js.timestamp-1773848260576-7f1812a66cdda.mjs
+- 2026-03-18 | 6ba59b1 | kiloconnect[bot] | wip
+- 2026-03-18 | 994ee68 | kiloconnect[bot] | wip
+- 2026-03-18 | ddf87aa | kiloconnect[bot] | feat(ui): add AI Video Agency Platform routes and pages
+- 2026-03-18 | 2c83c0d | kiloconnect[bot] | feat(ui): add AI tool catalogs and scaffolding
+- 2026-03-18 | e821eaa | kiloconnect[bot] | feat(ui): add frame agent commands and AI tagging to EditorPage
+- 2026-03-18 | f88768f | kiloconnect[bot] | feat(ui): wire up frame-agent auto-clip API in EditorPage
+- 2026-03-18 | 346cc8d | YourName | Add Frame Video Agent features - chat panel, smart organization, auto-clip
+- 2026-03-18 | 37b16bc | YourName | Merge remote changes and resolve conflicts
+- 2026-03-19 | 0367aad | YourName | Merge EditorPage commits from session branch - AI Chat Panel, Smart Organization, Auto-Clip features
+- 2026-03-19 | fde10c6 | YourName | Merge session branch - add scripts, thumbnail generator, database migrations
+- 2026-03-19 | bd24b6f | YourName | Merge session branch - add dynamic routes, hero sections, page components
+- 2026-03-23 | 007bc3d | YourName | Fix Avatar and Audio module routing and resolve scrolling issues
+- 2026-03-24 | 78fe921 | Developer | Add LipSync Studio, fix Training/VideoTools/Chat routes, and sync upstream features
+- 2026-03-25 | 1920b45 | Developer | feat: Integrate prompt tools into ImageStudio and CinemaStudio
+- 2026-03-25 | 16cb5c2 | Developer | feat: Add hover tooltips to platform buttons
+- 2026-03-25 | 5a4d58d | Developer | feat(VideoAgent): Add production-ready API integration with job polling
+- 2026-03-25 | c74fbf9 | Developer | refactor(RenderPage): Update design to match VideoStudio/CinemaStudio
+- 2026-03-25 | 18250e3 | Developer | feat(thumbnails): Add VideoAgent tool and use case thumbnail images
+- 2026-03-26 | b3671df | Developer | Add Rendiv, LTX-Desktop, and chatvideo-yucut as submodules
+- 2026-03-26 | b5222be | kiloconnect[bot] | refactor(ui): adopt dark glass theme and centralize hero sections
+- 2026-03-26 | a5e4ab4 | kiloconnect[bot] | refactor(ui): unify color tokens to primary across components
+- 2026-03-27 | 2d467c8 | Developer | Merge branch 'main' of https://github.com/deangilmoreremix/Open-Higgsfield-AI
+- 2026-03-27 | 57def1e | kiloconnect[bot] | feat(router): add dynamic routes for render, video-agent, director
+- 2026-03-27 | 182e12b | kiloconnect[bot] | feat(sidebar): add Render, Video Agent, and Director to navigation
+- 2026-03-27 | 746250d | kiloconnect[bot] | fix(sidebar): add overflow-y-auto so all nav items are scrollable
+- 2026-03-27 | 73169bd | kiloconnect[bot] | fix(sw): use network-first for navigation to prevent stale index.html caching; bump cache to v2
+- 2026-03-30 | 3e7802a | Developer | feat(timeline): enhance Timeline Editor with LTX and CineGen features
+- 2026-03-30 | 68fdf77 | Developer | docs(commit): add commit documentation for timeline editor enhancement
+- 2026-04-02 | fa060b1 | Developer | fix: production readiness - security, performance, and code quality improvements
+- 2026-04-03 | 655e2b5 | Developer | feat: enable full-width layout across all components
+- 2026-04-03 | d7c91fa | Developer | feat: add comprehensive AI features to coded timeline editor
+- 2026-04-03 | 76bea88 | Developer | fix: complete full-width layout for all remaining apps
+- 2026-04-06 | b4cf110 | Developer | feat: integrate Remix-Go as standalone app
+- 2026-04-06 | e0d3b0b | Developer | feat: remove user instructions from Remix-Go error state and add tooltips to editor features
+- 2026-04-06 | c762d3a | Developer | feat: add Commits item to sidebar showing 0
+- 2026-04-06 | 1d339e1 | Developer | docs: complete production readiness documentation
+- 2026-04-09 | d54fbc5 | kiloconnect[bot] | feat(director-ui): overhaul index.html to Timeline Editor UI
+- 2026-04-09 | 8f2f3e6 | kiloconnect[bot] | docs(plans): add new plan 1775746977415-.md
+- 2026-04-09 | 6c1c641 | kiloconnect[bot] | docs(plans): revise timeline editor plan to vanilla JS
+- 2026-04-09 | 54b9992 | kiloconnect[bot] | docs(plans): update current state analysis for timeline editor plan
+- 2026-04-09 | 6275c75 | kiloconnect[bot] | refactor(director-frontend): migrate timeline editor UI to vanilla JS
+- 2026-04-09 | eb2fa51 | Developer | Update components and add new features
+- 2026-04-10 | 7aeb4f3 | kiloconnect[bot] | wip
+- 2026-04-10 | 852676d | kiloconnect[bot] | chore(config): add $schema to kilo.json
+- 2026-04-10 | e380108 | kiloconnect[bot] | wip
+- 2026-04-10 | cf747e5 | kiloconnect[bot] | wip
+- 2026-04-10 | e86ca83 | Developer | Merge video agent fixes from session
+
+## Notes
+
+- This file is a point-in-time snapshot.
+- To refresh this list, re-run the command shown near the top and overwrite this document.

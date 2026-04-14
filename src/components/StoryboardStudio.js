@@ -1,7 +1,21 @@
+import { cutai } from '../lib/cutai-api.js';
 import { muapi } from '../lib/muapi.js';
 import { AuthModal } from './AuthModal.js';
 import { createInlineInstructions } from './InlineInstructions.js';
 import { createHeroSection } from '../lib/thumbnails.js';
+
+// Toast notification system
+function showToast(message, type = 'info') {
+  const toast = document.createElement('div');
+  toast.className = `fixed top-4 right-4 px-4 py-2 rounded-lg text-white text-sm font-bold z-50 transition-all duration-300 ${
+    type === 'success' ? 'bg-green-600' :
+    type === 'error' ? 'bg-red-600' :
+    type === 'warning' ? 'bg-yellow-600' : 'bg-blue-600'
+  }`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
 
 const SHOT_TYPES = ['Wide Shot', 'Medium Shot', 'Close-Up', 'Extreme Close-Up', 'POV', 'Overhead', 'Low Angle'];
 
@@ -31,13 +45,60 @@ export function StoryboardStudio() {
   const characters = [];
   const scenes = [];
   let storyboardResult = null;
+  let currentProjectId = null;
+
+  // Persistence functions
+  function saveProject() {
+    const projectData = {
+      characters: characters.map(c => ({ ...c })),
+      scenes: scenes.map(s => ({ ...s })),
+      storyboardResult,
+      projectId: currentProjectId,
+      timestamp: Date.now()
+    };
+    localStorage.setItem('storyboard_project', JSON.stringify(projectData));
+    showToast('Project saved locally', 'success');
+  }
+
+  function loadProject() {
+    const saved = localStorage.getItem('storyboard_project');
+    if (saved) {
+      try {
+        const projectData = JSON.parse(saved);
+        characters.length = 0;
+        characters.push(...projectData.characters);
+        scenes.length = 0;
+        scenes.push(...projectData.scenes);
+        storyboardResult = projectData.storyboardResult;
+        currentProjectId = projectData.projectId;
+        renderTabs();
+        showToast('Project loaded from local storage', 'success');
+      } catch (err) {
+        showToast('Failed to load project', 'error');
+      }
+    } else {
+      showToast('No saved project found', 'warning');
+    }
+  }
+
+  function clearProject() {
+    if (confirm('Are you sure you want to clear the current project?')) {
+      characters.length = 0;
+      scenes.length = 0;
+      storyboardResult = null;
+      currentProjectId = null;
+      localStorage.removeItem('storyboard_project');
+      renderTabs();
+      showToast('Project cleared', 'info');
+    }
+  }
 
   // Tab navigation
   const tabs = ['Characters', 'Scenes', 'Results'];
   let currentTab = 'Characters';
 
   const tabBar = document.createElement('div');
-  tabBar.className = 'px-4 md:px-8 mb-4 flex gap-2';
+  tabBar.className = 'px-4 md:px-8 mb-4 flex gap-2 items-center';
   tabs.forEach(tab => {
     const tabBtn = document.createElement('button');
     tabBtn.className = `px-4 py-2 rounded-lg text-xs font-bold transition-all ${
@@ -50,6 +111,30 @@ export function StoryboardStudio() {
     };
     tabBar.appendChild(tabBtn);
   });
+
+  // Add persistence buttons
+  const persistenceDiv = document.createElement('div');
+  persistenceDiv.className = 'ml-auto flex gap-2';
+  const saveBtn = document.createElement('button');
+  saveBtn.className = 'px-3 py-1 bg-white/5 border border-white/10 rounded text-xs font-bold text-white hover:bg-white/10 transition-all';
+  saveBtn.textContent = 'Save';
+  saveBtn.onclick = saveProject;
+
+  const loadBtn = document.createElement('button');
+  loadBtn.className = 'px-3 py-1 bg-white/5 border border-white/10 rounded text-xs font-bold text-white hover:bg-white/10 transition-all';
+  loadBtn.textContent = 'Load';
+  loadBtn.onclick = loadProject;
+
+  const clearBtn = document.createElement('button');
+  clearBtn.className = 'px-3 py-1 bg-white/5 border border-white/10 rounded text-xs font-bold text-white hover:bg-white/10 transition-all';
+  clearBtn.textContent = 'Clear';
+  clearBtn.onclick = clearProject;
+
+  persistenceDiv.appendChild(saveBtn);
+  persistenceDiv.appendChild(loadBtn);
+  persistenceDiv.appendChild(clearBtn);
+  tabBar.appendChild(persistenceDiv);
+
   container.appendChild(tabBar);
 
   const contentArea = document.createElement('div');
@@ -58,7 +143,9 @@ export function StoryboardStudio() {
 
   function renderTabs() {
     contentArea.innerHTML = '';
-    // Update tab buttons
+
+    // Update tab buttons (keep persistence buttons)
+    const persistenceDiv = tabBar.querySelector('.ml-auto');
     tabBar.innerHTML = '';
     tabs.forEach(tab => {
       const tabBtn = document.createElement('button');
@@ -72,6 +159,10 @@ export function StoryboardStudio() {
       };
       tabBar.appendChild(tabBtn);
     });
+
+    if (persistenceDiv) {
+      tabBar.appendChild(persistenceDiv);
+    }
 
     switch (currentTab) {
       case 'Characters':
@@ -160,9 +251,15 @@ export function StoryboardStudio() {
 
   async function generateCharacter(idx, btn, imageArea) {
     const char = characters[idx];
-    if (!char.traits.trim()) { alert('Enter character traits'); return; }
+    if (!char.traits.trim()) {
+      showToast('Please enter character traits first', 'warning');
+      return;
+    }
     const apiKey = localStorage.getItem('muapi_key');
-    if (!apiKey) { AuthModal(() => generateCharacter(idx, btn, imageArea)); return; }
+    if (!apiKey) {
+      AuthModal(() => generateCharacter(idx, btn, imageArea));
+      return;
+    }
 
     btn.disabled = true;
     btn.innerHTML = '<span class="animate-spin inline-block mr-2">&#9711;</span>';
@@ -173,9 +270,11 @@ export function StoryboardStudio() {
       if (result?.url) {
         char.imageUrl = result.url;
         imageArea.innerHTML = `<img src="${result.url}" class="w-full h-full object-cover">`;
+        showToast('Character image generated successfully!', 'success');
       }
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      console.error('Character generation error:', err);
+      showToast(`Failed to generate character image: ${err.message}`, 'error');
     } finally {
       btn.disabled = false;
       btn.textContent = 'Generate Character Image';
@@ -325,7 +424,7 @@ export function StoryboardStudio() {
       header.innerHTML = '<h2 class="text-lg font-bold text-white">Generated Storyboard</h2>';
       const exportBtn = document.createElement('button');
       exportBtn.className = 'px-4 py-2 bg-white/10 border border-white/10 rounded-xl text-xs font-bold text-white hover:bg-white/20 transition-all';
-      exportBtn.innerHTML = 'Export PDF';
+      exportBtn.innerHTML = 'Export JSON';
       exportBtn.onclick = () => exportStoryboard();
       header.appendChild(exportBtn);
       section.appendChild(header);
@@ -383,19 +482,19 @@ export function StoryboardStudio() {
 
   async function generateStoryboard(btn) {
     if (characters.length === 0 || scenes.length === 0) {
-      alert('Please create at least one character and one scene.');
+      showToast('Please create at least one character and one scene.', 'warning');
       return;
     }
-    const apiKey = localStorage.getItem('muapi_key');
-    if (!apiKey) { AuthModal(() => generateStoryboard(btn)); return; }
+    // No API key needed for CutAI backend
 
     btn.disabled = true;
     btn.innerHTML = '<span class="animate-spin inline-block mr-2">&#9711;</span> Generating...';
+    showToast('Generating storyboard...', 'info');
 
     try {
       // Prepare data for createStoryboard
       const chars = characters.map(c => ({ name: c.name, traits: c.traits, image_url: c.imageUrl }));
-      const shots = scenes.flatMap((scene, sceneIdx) => 
+      const shots = scenes.flatMap((scene, sceneIdx) =>
         scene.shots.map(shot => ({
           scene_index: sceneIdx,
           prompt: shot.prompt,
@@ -404,12 +503,19 @@ export function StoryboardStudio() {
         }))
       );
 
-      const result = await muapi.createStoryboard({ characters: chars, scenes, shots });
+      const result = await cutai.createStoryboardProject({ characters: chars, scenes, shots });
       storyboardResult = result;
+      currentProjectId = result.project?.id;
       currentTab = 'Results';
       renderTabs();
+      saveProject(); // Auto-save after successful generation
+      showToast('Storyboard generated successfully!', 'success');
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      console.error('Storyboard generation error:', err);
+      const errorMessage = err.message?.includes('fetch') ?
+        'Network error: Please check your connection and ensure the backend is running.' :
+        err.message || 'Generation failed. Please try again.';
+      showToast(errorMessage, 'error');
     } finally {
       btn.disabled = false;
       btn.textContent = 'Generate Storyboard';
@@ -417,15 +523,24 @@ export function StoryboardStudio() {
   }
 
   function exportStoryboard() {
-    if (!storyboardResult) return;
-    const data = JSON.stringify(storyboardResult, null, 2);
-    const blob = new Blob([data], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'storyboard-project.json';
-    a.click();
-    URL.revokeObjectURL(url);
+    if (!storyboardResult) {
+      showToast('No storyboard to export', 'warning');
+      return;
+    }
+    try {
+      const data = JSON.stringify(storyboardResult, null, 2);
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `storyboard-project-${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Storyboard exported successfully!', 'success');
+    } catch (err) {
+      console.error('Export error:', err);
+      showToast('Failed to export storyboard', 'error');
+    }
   }
 
   renderTabs();

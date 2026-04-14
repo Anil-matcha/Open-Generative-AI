@@ -4,7 +4,7 @@
 
 class CutAIClient {
   constructor() {
-    this.baseUrl = '/api/cutai';
+    this.baseUrl = '/api';
   }
 
   async request(endpoint, options = {}) {
@@ -95,6 +95,13 @@ class CutAIClient {
     return this.request('/export/pdf', {
       method: 'POST',
       body: { project_id: projectId, format: 'pdf' },
+    });
+  }
+
+  async createStoryboardProject(data) {
+    return this.request('/storyboard/projects', {
+      method: 'POST',
+      body: data,
     });
   }
 }

@@ -3,6 +3,7 @@ import { showToast } from '../lib/loading.js';
 import { createHeroSection } from '../lib/thumbnails.js';
 import { getSupabaseUrl, isSupabaseConfigured } from '../lib/supabase.js';
 import { createVideoAgentWorkspace } from './video-agent-workspace.js';
+import { directorRuntime } from '../lib/directorAgentRuntime.js';
 
 const AI_TOOLS = [
     { id: 'scene-detection', name: 'Scene Detection', icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 2v20M17 2v20M2 12h20M2 7h5M2 17h5M17 7h5M17 17h5"/></svg>', thumbnail: '/thumbnails/videoagent/scene-detection.png', color: 'blue', description: 'Identify scene boundaries', category: 'understanding' },
@@ -28,8 +29,15 @@ const USE_CASES = [
     { id: 'qa', name: 'Video Q&A', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>', thumbnail: '/thumbnails/videoagent/qa.png', description: 'Interactive video Q&A' },
 ];
 
+// Initialize the director runtime
+let runtime = null;
+
 export function VideoAgentPage() {
-    return createVideoAgentWorkspace();
+    if (!runtime) {
+        runtime = directorRuntime;
+        runtime.initialize();
+    }
+    return createVideoAgentWorkspace(runtime);
 }
 
 function escapeHtml(text) {

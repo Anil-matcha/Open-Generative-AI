@@ -1,7 +1,8 @@
 import { navigate } from '../lib/router.js';
-import { showToast, createLoadingSpinner } from '../lib/loading.js';
+import { showToast, createLoadingSpinner, createLoadingOverlay } from '../lib/loading.js';
 import { createHeroSection } from '../lib/thumbnails.js';
 import { escapeHtml } from '../lib/security.js';
+import { supabase } from '../lib/supabase.js';
 
 // Repository endpoints
 const REPO_ENDPOINTS = {
@@ -90,6 +91,17 @@ export function RenderPage() {
   const progress = 0;
   const currentStage = 'finishing';
 
+  // Video loading state
+  let videoElement = null;
+  let videoMetadata = {
+    duration: null,
+    width: null,
+    height: null,
+    loaded: false,
+    error: null
+  };
+  let isVideoLoading = false;
+
   const inner = document.createElement('div');
   inner.className = 'w-full';
 
@@ -153,7 +165,7 @@ export function RenderPage() {
       <div class="truncate text-xl font-black md:text-2xl">${escapeHtml(videoTitle)}</div>
       <div class="mt-1 text-sm text-white/45">ID: ${escapeHtml(videoId)}</div>
     </div>
-    <div class="flex w-fit items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-xs text-emerald-300">
+    <div id="statusBadge" class="flex w-fit items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-xs text-emerald-300">
       <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
       Processing preview updated
     </div>
@@ -180,23 +192,59 @@ export function RenderPage() {
   // Video preview area
   const previewArea = document.createElement('div');
   previewArea.className = 'relative flex min-h-[320px] items-center justify-center overflow-hidden rounded-2xl border border-white/5 bg-black shadow-[0_0_120px_rgba(16,185,129,0.18),0_0_90px_rgba(99,102,241,0.14)] md:min-h-[460px]';
-  previewArea.innerHTML = `
+  previewArea.id = 'previewArea';
+
+  // Add background gradients
+  const bgGradients = document.createElement('div');
+  bgGradients.className = 'absolute inset-0';
+  bgGradients.innerHTML = `
     <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.10),transparent_38%),radial-gradient(circle_at_50%_58%,rgba(16,185,129,0.20),transparent_34%)]"></div>
-    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(120,119,198,0.24),transparent_28%),radial-gradient(circle_at_50%_78%,rgba(16,185,129,0.24),transparent_26%),radial-gradient(circle_at_bottom_right,rgba(255,255,255,0.09),transparent_24%)]"></div>
-    <div class="relative flex aspect-video w-[88%] max-w-3xl items-center justify-center overflow-hidden rounded-2xl border border-emerald-400/12 bg-[linear-gradient(135deg,#101114_0%,#191b20_50%,#0c0d10_100%)] shadow-[0_25px_80px_rgba(0,0,0,0.5),0_0_110px_rgba(16,185,129,0.20),0_0_70px_rgba(99,102,241,0.12)]">
-      <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(99,102,241,0.22),transparent_26%),radial-gradient(circle_at_50%_82%,rgba(16,185,129,0.22),transparent_24%)]"></div>
-      <div class="absolute left-4 top-4 rounded-full border border-emerald-400/18 bg-black/45 px-3 py-1 text-xs text-emerald-100/80 shadow-[0_0_24px_rgba(16,185,129,0.14)] backdrop-blur" id="previewBadge">${escapeHtml(selectedPreset)} • ${progress}% • ${currentStage}</div>
-      <div class="absolute bottom-4 right-4 rounded-full border border-white/10 bg-black/45 px-3 py-1 text-xs text-white/75 backdrop-blur" id="actionBadge">Export Video</div>
-      <div class="flex h-20 w-20 items-center justify-center rounded-full border border-white/15 bg-white/10 backdrop-blur-md">
-        <div class="ml-1 h-0 w-0 border-y-[14px] border-y-transparent border-l-[22px] border-l-white"></div>
-      </div>
-    </div>
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(120,119,198,0.24),transparent_28%),radial-gradient(circle_at_50%_78%,rgba(16,185,129,0.24),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(255,255,255,0.09),transparent_24%)]"></div>
   `;
+  previewArea.appendChild(bgGradients);
+
+  // Video container
+  const videoContainer = document.createElement('div');
+  videoContainer.className = 'relative flex aspect-video w-[88%] max-w-3xl items-center justify-center overflow-hidden rounded-2xl border border-emerald-400/12 bg-[linear-gradient(135deg,#101114_0%,#191b20_50%,#0c0d10_100%)] shadow-[0_25px_80px_rgba(0,0,0,0.5),0_0_110px_rgba(16,185,129,0.20),0_0_70px_rgba(99,102,241,0.12)]';
+  videoContainer.id = 'videoContainer';
+
+  // Add video container gradients
+  const videoBg = document.createElement('div');
+  videoBg.className = 'absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(99,102,241,0.22),transparent_26%),radial-gradient(circle_at_50%_82%,rgba(16,185,129,0.22),transparent_24%)]';
+  videoContainer.appendChild(videoBg);
+
+  // Status badges
+  const previewBadge = document.createElement('div');
+  previewBadge.className = 'absolute left-4 top-4 rounded-full border border-emerald-400/18 bg-black/45 px-3 py-1 text-xs text-emerald-100/80 shadow-[0_0_24px_rgba(16,185,129,0.14)] backdrop-blur';
+  previewBadge.id = 'previewBadge';
+  previewBadge.textContent = `${selectedPreset} • ${progress}% • ${currentStage}`;
+
+  const actionBadge = document.createElement('div');
+  actionBadge.className = 'absolute bottom-4 right-4 rounded-full border border-white/10 bg-black/45 px-3 py-1 text-xs text-white/75 backdrop-blur';
+  actionBadge.id = 'actionBadge';
+  actionBadge.textContent = 'Export Video';
+
+  videoContainer.appendChild(previewBadge);
+  videoContainer.appendChild(actionBadge);
+
+  // Initialize video loading if URL is provided
+  if (videoUrl) {
+    loadVideo(videoUrl, videoContainer);
+  } else {
+    // Placeholder content
+    const placeholder = document.createElement('div');
+    placeholder.className = 'flex h-20 w-20 items-center justify-center rounded-full border border-white/15 bg-white/10 backdrop-blur-md';
+    placeholder.innerHTML = '<div class="ml-1 h-0 w-0 border-y-[14px] border-y-transparent border-l-[22px] border-l-white"></div>';
+    videoContainer.appendChild(placeholder);
+  }
+
+  previewArea.appendChild(videoContainer);
   leftSection.appendChild(previewArea);
 
   // Stats row
   const statsRow = document.createElement('div');
   statsRow.className = 'mt-5 grid grid-cols-1 gap-4 md:grid-cols-3';
+  statsRow.id = 'statsRow';
   statsRow.innerHTML = `
     <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-4"><p class="text-xs uppercase tracking-[0.2em] text-white/40">Duration</p><p class="mt-2 text-lg font-semibold">--:--</p></div>
     <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-4"><p class="text-xs uppercase tracking-[0.2em] text-white/40">Resolution</p><p class="mt-2 text-lg font-semibold">1920 × 1080</p></div>
@@ -363,12 +411,18 @@ export function RenderPage() {
   });
   sidebar.appendChild(repoSection);
 
+  // Outputs section
+  const outputsSection = document.createElement('div');
+  outputsSection.className = 'mt-6 rounded-2xl border border-white/10 bg-white/[0.03] p-4';
+  outputsSection.innerHTML = '<p class="text-xs uppercase tracking-[0.22em] text-white/40 mb-3">Processing Results</p><div id="outputsSection" class="space-y-2"></div>';
+  sidebar.appendChild(outputsSection);
+
   mainGrid.appendChild(sidebar);
   inner.appendChild(mainGrid);
   container.appendChild(inner);
 
   // Action handler
-  function runAction(action) {
+  async function runAction(action) {
     if (isRunning) return;
     isRunning = true;
     activeAction = action;
@@ -386,23 +440,245 @@ export function RenderPage() {
 
     showToast(`${action} started`);
 
-    // Simulate progress
-    let currentProgress = 0;
-    const interval = setInterval(() => {
-      currentProgress += Math.random() * 15;
-      if (currentProgress >= 100) {
-        currentProgress = 100;
-        clearInterval(interval);
-        activeIntervals = activeIntervals.filter(i => i !== interval);
-        isRunning = false;
-        showToast(`${action} completed!`);
-      }
+    // Real API processing
+    try {
+      const result = await executeRepositoryTask(action, pipeline);
+      isRunning = false;
+      showToast(`${action} completed!`);
+
+      // Update outputs section with results
+      updateOutputsSection(action, result);
+
+      // Reset UI elements
       const progressBar = container.querySelector('#progressBar');
       const progressPercent = container.querySelector('#progressPercent');
+      if (progressBar) progressBar.style.width = '100%';
+      if (progressPercent) progressPercent.textContent = '100%';
+
+    } catch (error) {
+      console.error('Action failed:', error);
+      isRunning = false;
+      showToast(`Action failed: ${error.message}`, 'error');
+
+      // Reset progress on error
+      const progressBar = container.querySelector('#progressBar');
+      const progressPercent = container.querySelector('#progressPercent');
+      if (progressBar) progressBar.style.width = '0%';
+      if (progressPercent) progressPercent.textContent = '0%';
+    }
+  }
+
+  // Execute repository task with real API calls
+  async function executeRepositoryTask(action, pipeline) {
+    if (!videoUrl) {
+      throw new Error('No video URL provided');
+    }
+
+    const progressBar = container.querySelector('#progressBar');
+    const progressPercent = container.querySelector('#progressPercent');
+    const progressSteps = container.querySelector('#progressSteps');
+
+    // Map action to videoagent action
+    const actionMap = {
+      'AI Auto-Edit': 'auto-edit',
+      'Agentic Editor': 'agentic-editor',
+      'Full Editor': 'timeline-editor',
+      'Create Shorts': 'create-shorts',
+      'Generate Highlights': 'highlight-detection',
+      'Add Subtitles': 'add-subtitles',
+      'Dub / Voiceover': 'dub-voiceover',
+      'Export Variations': 'export-variations',
+      'Trailer Cut': 'trailer-cut',
+      'Social Resize': 'social-resize',
+      'Remix Scene': 'remix-scene',
+      'Export Video': 'export-video',
+      'Download Frame': 'download-frame',
+      'Queue Render': 'queue-render',
+      'Copy Prompt': 'copy-prompt',
+      'Duplicate Render': 'duplicate-render',
+      'Save as Template': 'save-template',
+      'Send to Storyboard': 'send-storyboard',
+      'Publish / Deliver': 'publish-deliver'
+    };
+
+    const videoAction = actionMap[action] || 'auto-edit';
+
+    // Update progress steps
+    if (progressSteps && pipeline?.pipeline) {
+      progressSteps.innerHTML = pipeline.pipeline.map((step, index) => {
+        const titleCaseStep = titleCasePipelineStep(step);
+        const isActive = index === 0;
+        const status = isActive ? 'text-indigo-300' : 'text-emerald-200';
+        const icon = isActive ? 'h-2.5 w-2.5 animate-pulse rounded-full bg-indigo-400' : 'h-2.5 w-2.5 rounded-full bg-emerald-400';
+        return `<div class="flex items-center gap-3 ${status}"><div class="${icon}"></div><span class="font-semibold">${titleCaseStep}</span></div>`;
+      }).join('');
+    }
+
+    // Execute via videoagent function
+    const response = await supabase.functions.invoke('videoagent', {
+      body: {
+        action: videoAction,
+        videoId: videoId || 'uploaded-video',
+        videoUrl: videoUrl,
+        options: {
+          repoKeys: pipeline?.repoKeys || ['open-higgsfield'],
+          pipeline: pipeline?.pipeline || ['scene-detect', 'highlight-pass']
+        }
+      }
+    });
+
+    if (response.error) {
+      throw new Error(response.error.message || 'Processing failed');
+    }
+
+    // Update progress incrementally
+    let currentProgress = 0;
+    const totalSteps = pipeline?.pipeline?.length || 4;
+
+    for (let i = 0; i < totalSteps; i++) {
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate step processing
+      currentProgress = ((i + 1) / totalSteps) * 100;
+
       if (progressBar) progressBar.style.width = `${currentProgress}%`;
       if (progressPercent) progressPercent.textContent = `${Math.round(currentProgress)}%`;
-    }, 500);
-    activeIntervals.push(interval);
+
+      // Update step status
+      if (progressSteps && pipeline?.pipeline) {
+        const steps = progressSteps.querySelectorAll('.flex.items-center.gap-3');
+        steps.forEach((step, index) => {
+          if (index < i + 1) {
+            step.classList.remove('text-indigo-300');
+            step.classList.add('text-emerald-200');
+            const icon = step.querySelector('.h-2.5.w-2.5');
+            if (icon) {
+              icon.className = 'h-2.5 w-2.5 rounded-full bg-emerald-400';
+              icon.classList.remove('animate-pulse');
+            }
+          }
+        });
+      }
+    }
+
+    return response.data || { success: true, message: 'Processing completed' };
+  }
+
+  // Update outputs section with processing results
+  function updateOutputsSection(action, result) {
+    const outputsSection = container.querySelector('#outputsSection');
+    if (!outputsSection) return;
+
+    const outputItem = document.createElement('div');
+    outputItem.className = 'flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10';
+    outputItem.innerHTML = `
+      <div class="flex items-center gap-3">
+        <div class="h-8 w-8 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <div>
+          <div class="font-semibold text-emerald-200">${action}</div>
+          <div class="text-sm text-white/50">${result.message || 'Processing completed successfully'}</div>
+        </div>
+      </div>
+      <div class="text-xs text-white/40">${new Date().toLocaleTimeString()}</div>
+    `;
+
+    outputsSection.appendChild(outputItem);
+  }
+
+  // Video loading function
+  function loadVideo(url, container) {
+    if (!url) return;
+
+    isVideoLoading = true;
+    videoMetadata = { duration: null, width: null, height: null, loaded: false, error: null };
+
+    // Create loading overlay
+    const loadingOverlay = createLoadingOverlay('Loading video...');
+    container.appendChild(loadingOverlay);
+
+    // Create video element
+    videoElement = document.createElement('video');
+    videoElement.className = 'absolute inset-0 w-full h-full object-contain';
+    videoElement.preload = 'metadata';
+    videoElement.muted = true;
+    videoElement.playsInline = true;
+    videoElement.controls = false;
+
+    // Video event handlers
+    videoElement.onloadedmetadata = () => {
+      videoMetadata.duration = videoElement.duration;
+      videoMetadata.width = videoElement.videoWidth;
+      videoMetadata.height = videoElement.videoHeight;
+      videoMetadata.loaded = true;
+      updateVideoStats();
+    };
+
+    videoElement.onloadeddata = () => {
+      loadingOverlay.hide();
+      isVideoLoading = false;
+      showToast('Video loaded successfully');
+    };
+
+    videoElement.onerror = () => {
+      videoMetadata.error = 'Failed to load video';
+      loadingOverlay.hide();
+      isVideoLoading = false;
+      showToast('Failed to load video', 'error');
+      updateVideoStats();
+    };
+
+    videoElement.oncanplaythrough = () => {
+      // Video is fully loaded and can play without buffering
+      videoMetadata.loaded = true;
+    };
+
+    // Set source and load
+    videoElement.src = url;
+    videoElement.load();
+
+    // Add to container (behind loading overlay)
+    container.insertBefore(videoElement, loadingOverlay);
+  }
+
+  // Update video stats in UI
+  function updateVideoStats() {
+    const statsRow = container.querySelector('#statsRow');
+    if (!statsRow) return;
+
+    const durationText = videoMetadata.duration
+      ? `${Math.floor(videoMetadata.duration / 60)}:${(videoMetadata.duration % 60).toFixed(0).padStart(2, '0')}`
+      : '--:--';
+
+    const resolutionText = videoMetadata.width && videoMetadata.height
+      ? `${videoMetadata.width} × ${videoMetadata.height}`
+      : '1920 × 1080';
+
+    const estimatedTimeText = videoMetadata.duration
+      ? `${Math.floor(videoMetadata.duration / 60)}:${(videoMetadata.duration % 60).toFixed(0).padStart(2, '0')}`
+      : '--:--';
+
+    statsRow.innerHTML = `
+      <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-4"><p class="text-xs uppercase tracking-[0.2em] text-white/40">Duration</p><p class="mt-2 text-lg font-semibold">${durationText}</p></div>
+      <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-4"><p class="text-xs uppercase tracking-[0.2em] text-white/40">Resolution</p><p class="mt-2 text-lg font-semibold">${resolutionText}</p></div>
+      <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-4"><p class="text-xs uppercase tracking-[0.2em] text-white/40">Estimated Time</p><p class="mt-2 text-lg font-semibold">${estimatedTimeText}</p></div>
+    `;
+
+    // Update status badge
+    const statusBadge = container.querySelector('#statusBadge');
+    if (statusBadge) {
+      if (videoMetadata.error) {
+        statusBadge.className = 'flex w-fit items-center gap-2 rounded-full border border-red-500/30 bg-red-500/10 px-3 py-1.5 text-xs text-red-300';
+        statusBadge.innerHTML = '<span class="h-2 w-2 rounded-full bg-red-400"></span>Video load failed';
+      } else if (videoMetadata.loaded) {
+        statusBadge.className = 'flex w-fit items-center gap-2 rounded-full border border-green-500/30 bg-green-500/10 px-3 py-1.5 text-xs text-green-300';
+        statusBadge.innerHTML = '<span class="h-2 w-2 rounded-full bg-green-400"></span>Video loaded';
+      } else if (isVideoLoading) {
+        statusBadge.className = 'flex w-fit items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1.5 text-xs text-blue-300';
+        statusBadge.innerHTML = '<span class="h-2 w-2 rounded-full bg-blue-400 animate-pulse"></span>Loading video';
+      }
+    }
   }
 
   // Preset selector
@@ -444,10 +720,20 @@ export function RenderPage() {
   container.querySelector('#saveDraftBtn')?.addEventListener('click', () => runAction('Save as Template'));
   container.querySelector('#startRenderBtn')?.addEventListener('click', () => runAction('Queue Render'));
 
-  // Cleanup function to clear active intervals
+  // Initialize video stats
+  updateVideoStats();
+
+  // Cleanup function to clear active intervals and video resources
   container.cleanup = () => {
     activeIntervals.forEach(interval => clearInterval(interval));
     activeIntervals = [];
+
+    // Clean up video element
+    if (videoElement) {
+      videoElement.pause();
+      videoElement.src = '';
+      videoElement.load();
+    }
   };
 
   return container;

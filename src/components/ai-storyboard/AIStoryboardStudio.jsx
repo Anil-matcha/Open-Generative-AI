@@ -111,6 +111,7 @@ export function AIStoryboardStudio() {
       renderProjectGallery();
     } catch (e) {
       console.error('Failed to load projects:', e);
+      showToast('Failed to load projects. Please check your connection.', 'error');
     }
   }
 
@@ -248,7 +249,10 @@ export function AIStoryboardStudio() {
     } catch (e) {
       console.error('Failed to load project:', e);
       removeLoadingOverlay();
-      alert('Failed to load project');
+      const errorMessage = e.message?.includes('404') ?
+        'Project not found.' :
+        'Failed to load project. Please check your connection.';
+      alert(errorMessage);
     }
   }
 
@@ -310,17 +314,22 @@ export function AIStoryboardStudio() {
 
   async function createAndGenerateProject(name, genre, premise) {
     showLoadingOverlay('Creating project and generating storyboard...');
-    
+
     try {
       const data = await cutai.generateStoryboard(0, genre, premise);
       currentProject = data.project;
       scenes = data.scenes || [];
       openProject(currentProject, scenes);
+      removeLoadingOverlay();
     } catch (error) {
       console.error('Failed to create project:', error);
       removeLoadingOverlay();
-      alert('Failed to generate storyboard. Please make sure the backend is running on port 8001.');
+      const errorMessage = error.message?.includes('fetch') ?
+        'Network error: Please check your connection and ensure the backend server is running.' :
+        error.message || 'Failed to generate storyboard. Please try again.';
+      alert(errorMessage);
     }
+  }
   }
 
   function openProject(project, projectScenes) {
@@ -901,10 +910,10 @@ export function AIStoryboardStudio() {
           </button>
           <button id="exportPDF" class="w-full flex items-center justify-between px-4 py-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all">
             <div class="flex items-center gap-3">
-              <span class="text-xl">📑</span>
+              <span class="text-xl">📄</span>
               <div class="text-left">
-                <p class="text-sm font-semibold text-white">PDF</p>
-                <p class="text-xs text-white/50">Professional document</p>
+                <p class="text-sm font-semibold text-white">HTML</p>
+                <p class="text-xs text-white/50">Web document</p>
               </div>
             </div>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-white/40"><path d="M9 18l6-6-6-6"/></svg>
@@ -949,11 +958,11 @@ export function AIStoryboardStudio() {
     if (!currentProject) return;
     try {
       const data = await cutai.exportPDF(currentProject.id);
-      const blob = new Blob([data.xml], { type: 'text/xml' });
+      const blob = new Blob([data.html], { type: 'text/html' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${currentProject.name.replace(/\s+/g, '-').toLowerCase()}-storyboard.xml`;
+      a.download = `${currentProject.name.replace(/\s+/g, '-').toLowerCase()}-storyboard.html`;
       a.click();
       URL.revokeObjectURL(url);
     } catch (e) {

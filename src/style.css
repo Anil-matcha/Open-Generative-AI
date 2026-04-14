@@ -1,6 +1,7 @@
 @import './styles/variables.css';
 @import './styles/global.css';
 @import './styles/studio.css';
+@import './styles/drag-drop.css';
 
 #app {
   display: flex;

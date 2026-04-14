@@ -1,0 +1,446 @@
+/* Timeline Editor Styles */
+
+/* Main timeline container */
+.timeline {
+  position: relative;
+  background: #1a1a1a;
+  border-top: 1px solid #333;
+  min-height: 50px;
+  transition: height 0.3s;
+}
+
+.timeline-open {
+  min-height: 300px;
+}
+
+/* Timeline tray resize handle */
+.tray-resize {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: #333;
+  cursor: ns-resize;
+  z-index: 10;
+}
+
+.timeline-arrow {
+  position: absolute;
+  top: -10px;
+  right: 20px;
+  width: 20px;
+  height: 20px;
+  background: #333;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: white;
+  z-index: 5;
+}
+
+.timeline-arrow-open {
+  background: #007bff;
+}
+
+/* Timeline zoom controls */
+.timeline-zoom {
+  position: absolute;
+  top: 10px;
+  right: 50px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  z-index: 5;
+}
+
+.timeline-zoom__btn {
+  width: 24px;
+  height: 24px;
+  background: #333;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.timeline-zoom__btn:hover {
+  background: #444;
+}
+
+.timeline-zoom__reset {
+  background: #dc3545;
+}
+
+/* Timeline top section */
+.timeline-top {
+  padding: 10px;
+  border-bottom: 1px solid #333;
+}
+
+.timeline-top-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.timeline__btns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Layers section */
+.layers {
+  display: flex;
+  height: calc(100% - 60px);
+}
+
+.layers-settings {
+  width: 250px;
+  background: #252525;
+  border-right: 1px solid #333;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.timeline-side {
+  flex: 1;
+  background: #1a1a1a;
+  position: relative;
+}
+
+/* Layer component styles */
+.layer {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  border-bottom: 1px solid #333;
+  background: #2a2a2a;
+  margin-bottom: 2px;
+  border-radius: 4px;
+  cursor: grab;
+}
+
+.layer:hover {
+  background: #333;
+}
+
+.layer__drag-handle {
+  color: #666;
+  font-size: 12px;
+  margin-right: 8px;
+  cursor: grab;
+  user-select: none;
+}
+
+.layer__drag-handle:hover {
+  color: #ccc;
+}
+
+.layer__controls {
+  display: flex;
+  gap: 4px;
+  margin-right: 8px;
+}
+
+.layer-control {
+  background: none;
+  border: none;
+  color: #666;
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.layer-control:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.layer-control.active {
+  color: #007bff;
+}
+
+.layer.locked {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.layer.hidden {
+  opacity: 0.5;
+}
+
+.layer__block {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.layer__delete {
+  margin-right: 8px;
+}
+
+.layer__flex {
+  display: flex;
+  align-items: center;
+}
+
+.icon-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.svg-fix {
+  width: 16px;
+  height: 16px;
+}
+
+.title {
+  background: none;
+  border: 1px solid transparent;
+  color: white;
+  font-size: 14px;
+  padding: 4px 8px;
+  border-radius: 3px;
+  flex: 1;
+}
+
+.title:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+/* Blend mode and opacity controls */
+.blend-mode-select,
+.opacity-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.blend-mode-dropdown,
+.opacity-slider {
+  background: #333;
+  border: 1px solid #555;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 3px;
+}
+
+.opacity-slider {
+  width: 60px;
+}
+
+.opacity-value {
+  font-size: 12px;
+  color: #ccc;
+  min-width: 35px;
+}
+
+/* Context menu */
+.context-menu {
+  position: absolute;
+  background: #2a2a2a;
+  border: 1px solid #555;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.context-menu__button {
+  width: 100%;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  color: white;
+  text-align: left;
+  cursor: pointer;
+  border-bottom: 1px solid #444;
+}
+
+.context-menu__button:last-child {
+  border-bottom: none;
+}
+
+.context-menu__button:hover {
+  background: #007bff;
+}
+
+/* Play button */
+.play-button {
+  background: #007bff;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.play-button:hover {
+  background: #0056b3;
+}
+
+/* Plus button */
+.plus-button {
+  background: #28a745;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.plus-button:hover {
+  background: #1e7e34;
+}
+
+/* Play time */
+.play-time {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: monospace;
+  font-size: 14px;
+  color: #ccc;
+}
+
+.separator {
+  color: #666;
+}
+
+/* Sortable list */
+.sortable-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.drag-handle {
+  cursor: grab;
+  color: #666;
+  font-size: 12px;
+  padding: 0 4px;
+}
+
+.drag-handle:hover {
+  color: #ccc;
+}
+
+/* Menu component */
+.menu-component {
+  position: relative;
+}
+
+.menu-toggle {
+  background: #333;
+  border: 1px solid #555;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  min-width: 80px;
+}
+
+.menu-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #2a2a2a;
+  border: 1px solid #555;
+  border-radius: 3px;
+  min-width: 120px;
+  z-index: 100;
+  margin-top: 2px;
+}
+
+.menu-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  color: white;
+  border-bottom: 1px solid #444;
+}
+
+.menu-item:last-child {
+  border-bottom: none;
+}
+
+.menu-item:hover {
+  background: #007bff;
+}
+
+/* Tooltip box */
+.tooltip-box {
+  position: relative;
+}
+
+/* Timeline ruler */
+.timeline-ruler {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background: #1a1a1a;
+  border-bottom: 1px solid #333;
+  pointer-events: none;
+}
+
+.ruler-tick {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: #666;
+}
+
+.ruler-tick::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -0.5px;
+  width: 1px;
+  height: 10px;
+  background: #999;
+}
+
+.ruler-label {
+  position: absolute;
+  top: 12px;
+  left: 4px;
+  font-size: 10px;
+  color: #ccc;
+  font-family: monospace;
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+
+/* Timeline side adjustments for ruler */
+.timeline-side {
+  position: relative;
+  padding-top: 30px;
+}

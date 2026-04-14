@@ -3,13 +3,14 @@
  * Handles media asset management, upload, and library interactions
  */
 
-export function renderMediaGrid(mediaItems, container, onMediaSelect, showToast) {
+export function renderMediaGrid(mediaItems, container, onMediaSelect, showToast, state) {
   if (!container) return;
 
   container.innerHTML = '';
   mediaItems.forEach((media, index) => {
     const item = document.createElement('button');
-    item.className = 'media-item';
+    item.className = 'media-item drag-ready';
+    item.dataset.mediaIndex = index;
     item.innerHTML = `
       <span class="media-icon">${media.icon}</span>
       <span class="media-copy">
@@ -17,9 +18,30 @@ export function renderMediaGrid(mediaItems, container, onMediaSelect, showToast)
         <div class="media-desc">${media.desc}</div>
       </span>
     `;
+
+    // Enhanced title for tooltips
+    item.title = `${media.label}\n${media.desc}\nClick to add or drag to timeline`;
+
     item.addEventListener('click', () => onMediaSelect(media, index, showToast));
+
+    // Add mouse enter/leave for enhanced tooltips
+    item.addEventListener('mouseenter', () => {
+      item.classList.add('media-item-hover');
+    });
+
+    item.addEventListener('mouseleave', () => {
+      item.classList.remove('media-item-hover');
+    });
+
     container.appendChild(item);
   });
+
+  // Initialize drag and drop for media items
+  if (state) {
+    import('./dragDrop.js').then(({ initializeMediaLibraryDragDrop }) => {
+      initializeMediaLibraryDragDrop(state, container);
+    });
+  }
 }
 
 export function addMediaToTimeline(media, index, state, showToast) {
