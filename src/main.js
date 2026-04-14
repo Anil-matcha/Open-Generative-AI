@@ -3,6 +3,10 @@ import { Header } from './components/Header.js';
 import { Sidebar } from './components/Sidebar.js';
 import { initRouter, navigate } from './lib/router.js';
 import { perfMonitor } from './lib/performance.js';
+import { enhancedPerfMonitor } from './lib/enhanced-performance-monitor.js';
+import { memoryLeakDetector } from './lib/memory-leak-detector.js';
+import { mediaLoader } from './lib/media-loader.js';
+import { performanceBudget } from './lib/performance-budget.js';
 import { analytics } from './lib/analytics.js';
 import { showToast } from './lib/loading.js';
 import { generationService } from './lib/editor/generationService.js';
@@ -15,6 +19,17 @@ console.log('[App] Starting initialization...');
 
 // Track initialization performance
 const initStart = performance.now();
+
+// Initialize performance monitoring
+window.enhancedPerfMonitor = enhancedPerfMonitor;
+window.memoryLeakDetector = memoryLeakDetector;
+window.mediaLoader = mediaLoader;
+window.performanceBudget = performanceBudget;
+
+// Start memory leak detection in development
+if (import.meta.env.DEV) {
+  memoryLeakDetector.startDetection();
+}
 
 // Global error handlers for uncaught exceptions
 window.addEventListener('error', (event) => {

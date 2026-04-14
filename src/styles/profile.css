@@ -1,0 +1,132 @@
+/* Profile Styles */
+
+.profile-avatar-container {
+  position: relative;
+}
+
+.profile-avatar-upload-btn {
+  transition: all 0.2s ease-in-out;
+}
+
+.profile-avatar-upload-btn:hover {
+  transform: scale(1.1);
+}
+
+.profile-setting-row {
+  transition: background-color 0.2s ease-in-out;
+}
+
+.profile-setting-row:hover {
+  background-color: var(--bg-panel);
+}
+
+/* Theme Toggle Animation */
+.theme-toggle-slider {
+  transition: transform 0.2s ease-in-out;
+}
+
+.theme-toggle-slider.dark {
+  transform: translateX(1.25rem);
+}
+
+/* Avatar Upload Animation */
+@keyframes avatar-upload-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.avatar-uploading {
+  animation: avatar-upload-pulse 1s infinite;
+}
+
+/* Profile Statistics */
+.profile-stat-card {
+  background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-panel) 100%);
+  border: 1px solid var(--border-color);
+  transition: all 0.2s ease-in-out;
+}
+
+.profile-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.profile-stat-number {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Danger Zone */
+.danger-zone {
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.danger-zone-btn {
+  transition: all 0.2s ease-in-out;
+}
+
+.danger-zone-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* Form Focus States */
+.profile-input:focus {
+  box-shadow: 0 0 0 2px rgba(217, 255, 0, 0.5);
+  border-color: var(--color-primary);
+}
+
+.profile-select:focus {
+  box-shadow: 0 0 0 2px rgba(217, 255, 0, 0.5);
+  border-color: var(--color-primary);
+}
+
+.profile-checkbox:focus {
+  box-shadow: 0 0 0 2px rgba(217, 255, 0, 0.5);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-settings-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+/* Loading States */
+.profile-loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.profile-loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid var(--color-primary);
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

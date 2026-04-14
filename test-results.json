@@ -1,0 +1,161 @@
+{
+  "config": {
+    "configFile": "/workspaces/Open-Higgsfield-AI/playwright.config.js",
+    "rootDir": "/workspaces/Open-Higgsfield-AI/tests/e2e",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": "/workspaces/Open-Higgsfield-AI/tests/e2e/setup/global-setup.js",
+    "globalTeardown": "/workspaces/Open-Higgsfield-AI/tests/e2e/setup/global-teardown.js",
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {},
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/workspaces/Open-Higgsfield-AI/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "main-app-chromium",
+        "name": "main-app-chromium",
+        "testDir": "/workspaces/Open-Higgsfield-AI/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/main-app/**/*.spec.js"
+        ],
+        "timeout": 10000
+      },
+      {
+        "outputDir": "/workspaces/Open-Higgsfield-AI/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "main-app-firefox",
+        "name": "main-app-firefox",
+        "testDir": "/workspaces/Open-Higgsfield-AI/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/main-app/**/*.spec.js"
+        ],
+        "timeout": 10000
+      },
+      {
+        "outputDir": "/workspaces/Open-Higgsfield-AI/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "main-app-mobile",
+        "name": "main-app-mobile",
+        "testDir": "/workspaces/Open-Higgsfield-AI/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/main-app/**/*.spec.js"
+        ],
+        "timeout": 10000
+      },
+      {
+        "outputDir": "/workspaces/Open-Higgsfield-AI/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "modules-chromium",
+        "name": "modules-chromium",
+        "testDir": "/workspaces/Open-Higgsfield-AI/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/modules/**/*.spec.js"
+        ],
+        "timeout": 10000
+      },
+      {
+        "outputDir": "/workspaces/Open-Higgsfield-AI/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "apps-chromium",
+        "name": "apps-chromium",
+        "testDir": "/workspaces/Open-Higgsfield-AI/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/apps/**/*.spec.js"
+        ],
+        "timeout": 10000
+      },
+      {
+        "outputDir": "/workspaces/Open-Higgsfield-AI/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "performance",
+        "name": "performance",
+        "testDir": "/workspaces/Open-Higgsfield-AI/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/performance/**/*.spec.js"
+        ],
+        "timeout": 10000
+      },
+      {
+        "outputDir": "/workspaces/Open-Higgsfield-AI/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "accessibility",
+        "name": "accessibility",
+        "testDir": "/workspaces/Open-Higgsfield-AI/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/accessibility/**/*.spec.js"
+        ],
+        "timeout": 10000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "html",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results.json"
+        }
+      ],
+      [
+        "junit",
+        {
+          "outputFile": "test-results.xml"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.59.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [],
+  "errors": [
+    {
+      "message": "Error: Process from config.webServer was not able to start. Exit code: 1",
+      "stack": "Error: Process from config.webServer was not able to start. Exit code: 1"
+    }
+  ],
+  "stats": {
+    "startTime": "2026-04-13T18:51:54.817Z",
+    "duration": 4647.5199999999995,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

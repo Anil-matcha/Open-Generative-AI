@@ -133,6 +133,9 @@ CREATE INDEX IF NOT EXISTS idx_roles_tenant_id ON roles(tenant_id);
 CREATE INDEX IF NOT EXISTS idx_user_roles_user_id ON user_roles(user_id);
 CREATE INDEX IF NOT EXISTS idx_user_roles_tenant_id ON user_roles(tenant_id);
 CREATE INDEX IF NOT EXISTS idx_tenants_slug ON tenants(slug);
+
+-- Add status column if it doesn't exist (for existing tables)
+ALTER TABLE tenants ADD COLUMN IF NOT EXISTS status text NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'suspended', 'cancelled', 'trial'));
 CREATE INDEX IF NOT EXISTS idx_tenants_status ON tenants(status);
 
 -- Enable Row Level Security

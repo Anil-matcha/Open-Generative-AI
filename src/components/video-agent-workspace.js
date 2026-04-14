@@ -1,6 +1,8 @@
 import { showToast } from '../lib/loading.js';
 import { MuapiClient } from '../lib/muapi.js';
 import { supabase } from '../lib/supabase.js';
+import { VideoUpload } from './common/Upload.js';
+import { Tooltip, addTooltip } from './common/Tooltip.js';
 
 export function createVideoAgentWorkspace(runtime = null) {
   // Create the main container
@@ -382,12 +384,8 @@ export function createVideoAgentWorkspace(runtime = null) {
           <div class="preview-stage" id="preview-stage">
             <video id="video" controls aria-label="Video preview player" style="display: none;"></video>
             <div class="absolute inset-0 flex items-center justify-center pointer-events-none" id="upload-zone">
-              <div class="upload-zone w-full h-full flex flex-col items-center justify-center" id="drop-zone">
-                <div class="text-6xl mb-4 opacity-70">🎬</div>
-                <div class="text-xl font-bold text-white/80 mb-2">Drop your video here</div>
-                <div class="text-base text-white/55 font-medium mb-4">Or click to browse files</div>
-                <div class="text-sm text-white/35">Supports MP4, MOV, AVI, WebM up to 2GB</div>
-                <input type="file" id="video-upload" accept="video/*" style="display: none;">
+              <div class="w-full h-full flex items-center justify-center" id="upload-container">
+                <!-- VideoUpload component will be inserted here -->
               </div>
             </div>
           </div>
@@ -1249,8 +1247,6 @@ export function createVideoAgentWorkspace(runtime = null) {
   const previewStage = container.querySelector('#preview-stage');
   const videoElement = container.querySelector('#video');
   const uploadZone = container.querySelector('#upload-zone');
-  const dropZone = container.querySelector('#drop-zone');
-  const fileInput = container.querySelector('#video-upload');
 
   function showVideoPlayer(url) {
     uploadedVideoUrl = url;
@@ -1266,46 +1262,7 @@ export function createVideoAgentWorkspace(runtime = null) {
 
 
 
-  // Drag and drop handlers
-  previewStage.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    isDragOver = true;
-    dropZone.classList.add('drag-over');
-  });
-
-  previewStage.addEventListener('dragleave', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!previewStage.contains(e.relatedTarget)) {
-      isDragOver = false;
-      dropZone.classList.remove('drag-over');
-    }
-  });
-
-  previewStage.addEventListener('drop', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    isDragOver = false;
-    dropZone.classList.remove('drag-over');
-
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-      handleVideoFile(files[0]);
-    }
-  });
-
-  // Click to upload
-  dropZone.addEventListener('click', () => {
-    fileInput.click();
-  });
-
-  fileInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      handleVideoFile(file);
-    }
-  });
+  // Upload functionality is now handled by the VideoUpload component
 
   function handleVideoFile(file) {
     if (!file.type.startsWith('video/')) {
@@ -1364,6 +1321,15 @@ export function createVideoAgentWorkspace(runtime = null) {
   // 5. GOAL BUTTON HANDLERS
   // ==========================================
   container.querySelectorAll('.goal-btn[data-goal]').forEach(btn => {
+    // Add tooltip
+    const tooltip = Tooltip({
+      text: `Click to ${btn.dataset.goal.toLowerCase()}`,
+      placement: 'right',
+      delay: 500
+    });
+    btn.parentNode.insertBefore(tooltip, btn);
+    tooltip.appendChild(btn);
+
     btn.addEventListener('click', async () => {
       const goal = btn.dataset.goal;
       input.value = goal;
@@ -1418,6 +1384,22 @@ export function createVideoAgentWorkspace(runtime = null) {
         showToast('No AI processed videos available', 'info');
       }
     });
+  }
+
+  // Initialize VideoUpload component
+  const uploadContainer = container.querySelector('#upload-container');
+  if (uploadContainer) {
+    const videoUpload = VideoUpload({
+      placeholder: 'Drop your video here or click to browse',
+      maxSize: 2000, // 2GB
+      onUpload: (file) => {
+        handleVideoFile(file);
+      },
+      onError: (errors) => {
+        errors.forEach(error => showToast(error, 'error'));
+      }
+    });
+    uploadContainer.appendChild(videoUpload);
   }
 
   return container;

@@ -1,28 +1,34 @@
 import { supabase, uploadFileToStorage } from '../lib/supabase.js';
 import { showToast } from '../lib/loading.js';
-import { initializeTimelineDragDrop, createEnhancedClipElement } from '../lib/editor/timelineRendererEnhanced.js';
+import { initializeTimelineDragDrop, createEnhancedClipElement, renderCompositingOverlay, renderTimelineControls, renderLayerManagement, renderPopcornElements, showTimelineContextMenu } from '../lib/editor/timelineRendererEnhanced.js';
 import { initializeMediaLibraryDragDrop, setupEnhancedTooltips } from '../lib/editor/dragDrop.js';
 import { renderMediaGrid, addMediaToTimeline } from '../lib/editor/mediaLibrary.js';
+import { extendClipContextMenu, extendGenerationPanel, extendMediaLibrary, extendTopActions } from '../lib/uiIntegration.js';
+import { integrateMediaIngest, GiphyIntegration, StickersLibrary, LowerThirds, VideoGallery, AnimationList } from '../lib/mediaIngest.js';
+import { renderMultiCameraToolbar, renderPipControls, renderSplitScreenControls } from '../lib/editor/multiCamera.js';
+import { createTimelineState } from '../lib/editor/timelineEditorState.js';
+import { TransitionEditor } from '../lib/editor/transitionEditor.js';
+import { TimelineTransitions } from '../lib/editor/timelineTransitions.js';
+import TIMELINE_DESIGN_SYSTEM, { enforceDesignSystem } from '../lib/designSystemEnforcer.js';
+import { createVideoPreview } from '../lib/videoPlayer.js';
+// Import rendiv animation primitives
+import { interpolate, spring, blendColors, noise2D, useSequence, useSeries } from '../lib/editor/animationControls.jsx';
+// ColorCorrectionSystem removed - file does not exist
+
+// Modal imports removed - app uses vanilla JS, not React
+// These modals would need to be converted to vanilla JS implementations
+
+// Category C Editor Surface imports removed - not implemented
 
 export function TimelineEditorPage() {
   const container = document.createElement('div');
   container.className = 'w-full h-full bg-app-bg overflow-hidden relative';
 
+  // Initialize design system enforcement
+  enforceDesignSystem();
+
   const styles = `
-:root {
-  --bg: #05070b;
-  --panel: rgba(255,255,255,0.05);
-  --panel-soft: rgba(255,255,255,0.03);
-  --border: rgba(255,255,255,0.1);
-  --border-soft: rgba(255,255,255,0.08);
-  --text: #ffffff;
-  --muted: rgba(255,255,255,0.6);
-  --dim: rgba(255,255,255,0.4);
-  --cyan: #22d3ee;
-  --emerald: #34d399;
-  --shadow: 0 20px 60px rgba(0,0,0,0.45);
-  --radius-xl: 28px;
-}
+/* Design system variables are now enforced globally by designSystemEnforcer.js */
 
 * { box-sizing: border-box; }
 html, body {
@@ -197,6 +203,143 @@ button, input, textarea, select { font: inherit; }
 .rail-btn .emoji { font-size: 16px; }
 .status-toast { position: fixed; right: 18px; bottom: 18px; max-width: 320px; padding: 12px 14px; border-radius: 14px; border: 1px solid rgba(34,211,238,0.18); background: rgba(7,12,18,0.95); color: rgba(255,255,255,0.86); box-shadow: 0 18px 50px rgba(0,0,0,0.4); font-size: 12px; opacity: 0; transform: translateY(10px); pointer-events: none; transition: all .2s ease; }
 .status-toast.show { opacity: 1; transform: translateY(0); }
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(8px);
+}
+.modal-content {
+  background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03)); border: 1px solid var(--border);
+  border-radius: 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.45); max-width: 600px; width: 90%; max-height: 80vh; overflow: hidden;
+}
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid var(--border);
+  background: rgba(0,0,0,0.2);
+}
+.modal-header h3 { margin: 0; color: rgba(255,255,255,0.9); }
+.modal-close { background: none; border: none; color: rgba(255,255,255,0.6); font-size: 20px; cursor: pointer; padding: 4px; }
+.modal-body { padding: 24px; max-height: 60vh; overflow-y: auto; }
+.clip-editor, .transition-settings { color: rgba(255,255,255,0.9); }
+.clip-editor__section { margin-bottom: 20px; }
+.clip-editor__section h3 { margin: 0 0 12px 0; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
+.clip-editor__field { margin-bottom: 12px; }
+.clip-editor__field label { display: block; margin-bottom: 4px; font-size: 12px; color: rgba(255,255,255,0.7); }
+.clip-editor__field input, .clip-editor__field select { width: 100%; padding: 8px 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 6px; color: white; }
+.clip-editor__field button { padding: 8px 16px; background: rgba(255,255,255,0.1); border: 1px solid var(--border); border-radius: 6px; color: white; cursor: pointer; }
+.transition-settings__section { margin-bottom: 20px; }
+.transition-settings__section h4 { margin: 0 0 12px 0; font-size: 14px; color: rgba(255,255,255,0.9); }
+.transition-types { display: grid; gap: 8px; }
+.transition-type { padding: 12px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; background: rgba(0,0,0,0.2); }
+.transition-type.selected { border-color: var(--cyan); background: rgba(34,211,238,0.1); }
+.transition-name { font-weight: 600; margin-bottom: 4px; }
+.transition-description { font-size: 12px; color: rgba(255,255,255,0.6); }
+.duration-controls { display: flex; align-items: center; gap: 12px; }
+.duration-controls input { flex: 1; }
+.transition-settings__actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; }
+.preview-btn, .create-btn { padding: 10px 16px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-weight: 600; }
+.preview-btn { background: rgba(255,255,255,0.1); color: white; }
+.create-btn { background: var(--cyan); color: black; }
+.clip-input { margin-bottom: 12px; }
+.clip-input label { display: block; margin-bottom: 4px; font-size: 12px; }
+.clip-input input { width: 100%; padding: 8px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 6px; color: white; }
+
+/* Transition System Styles */
+.transition-editor { display: flex; flex-direction: column; gap: 16px; }
+.transition-editor__header { display: flex; align-items: center; justify-content: space-between; }
+.transition-editor__controls { display: flex; gap: 8px; }
+.transition-btn { padding: 6px 12px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.8); border-radius: 6px; cursor: pointer; font-size: 12px; }
+.transition-btn:hover { background: rgba(255,255,255,0.1); }
+.transition-btn.primary { background: var(--cyan); color: black; }
+.transition-btn.secondary { background: rgba(34,211,238,0.1); border-color: rgba(34,211,238,0.3); }
+
+.transition-editor__preview { border: 1px solid var(--border); border-radius: 8px; padding: 12px; background: rgba(0,0,0,0.2); }
+#transitionPreview { width: 100%; border-radius: 4px; }
+.transition-editor__timeline { position: relative; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; margin-top: 8px; overflow: hidden; }
+.preview-progress { position: absolute; left: 0; top: 0; height: 100%; background: linear-gradient(to right, var(--cyan), var(--emerald)); border-radius: inherit; }
+.preview-playhead { position: absolute; top: -2px; width: 2px; height: 10px; background: white; box-shadow: 0 0 8px rgba(255,255,255,0.8); }
+
+.transition-editor__library { border: 1px solid var(--border); border-radius: 8px; padding: 12px; background: rgba(0,0,0,0.2); }
+.transition-categories { display: flex; gap: 4px; margin-bottom: 12px; flex-wrap: wrap; }
+.category-btn { padding: 6px 12px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.6); border-radius: 6px; cursor: pointer; font-size: 11px; }
+.category-btn.active { background: rgba(34,211,238,0.2); border-color: rgba(34,211,238,0.4); color: #cffafe; }
+.transition-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
+.transition-item { padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: rgba(255,255,255,0.02); cursor: pointer; text-align: center; transition: all 0.15s ease; }
+.transition-item:hover { border-color: rgba(34,211,238,0.3); background: rgba(34,211,238,0.05); }
+.transition-item.selected { border-color: var(--cyan); background: rgba(34,211,238,0.1); }
+.transition-icon { font-size: 20px; margin-bottom: 4px; }
+.transition-name { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.9); margin-bottom: 2px; }
+.transition-desc { font-size: 9px; color: rgba(255,255,255,0.5); line-height: 1.3; }
+
+.transition-editor__params { border: 1px solid var(--border); border-radius: 8px; padding: 12px; background: rgba(0,0,0,0.2); }
+.params-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.params-header h4 { margin: 0; color: rgba(255,255,255,0.9); }
+.preset-selector select { padding: 4px 8px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 4px; color: white; font-size: 11px; }
+
+.duration-control { margin-bottom: 12px; }
+.duration-control label { display: block; margin-bottom: 6px; font-size: 12px; color: rgba(255,255,255,0.8); }
+.duration-control input { width: 100%; }
+
+.params-grid { display: grid; gap: 8px; margin-bottom: 12px; }
+.param-item { padding: 8px; border: 1px solid var(--border); border-radius: 6px; background: rgba(0,0,0,0.2); }
+.param-item label { display: block; margin-bottom: 4px; font-size: 11px; color: rgba(255,255,255,0.7); }
+.param-item input[type="range"] { width: 100%; }
+.param-item input[type="text"] { width: 100%; padding: 4px 6px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 4px; color: white; font-size: 11px; }
+.param-item select { width: 100%; padding: 4px 6px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 4px; color: white; font-size: 11px; }
+
+.advanced-controls { margin-bottom: 12px; }
+.control-group { margin-bottom: 8px; }
+.control-group label { display: flex; align-items: center; gap: 8px; font-size: 12px; color: rgba(255,255,255,0.7); cursor: pointer; }
+
+.transition-editor__actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+.transition-drop-zone { position: relative; width: 20px; height: 62px; background: rgba(34,211,238,0.1); border: 1px dashed rgba(34,211,238,0.3); border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s ease; }
+.transition-drop-zone.drag-over { background: rgba(34,211,238,0.2); border-color: var(--cyan); }
+.transition-drop-zone.has-transition { background: transparent; border: none; cursor: default; }
+.transition-placeholder { text-align: center; }
+.transition-placeholder .transition-icon { font-size: 12px; display: block; margin-bottom: 2px; }
+.transition-placeholder .transition-label { font-size: 8px; color: rgba(255,255,255,0.5); }
+
+.timeline-transition { position: absolute; top: 8px; height: 46px; background: linear-gradient(135deg, rgba(34,211,238,0.2), rgba(52,211,153,0.1)); border: 1px solid rgba(34,211,238,0.4); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: grab; transition: all 0.15s ease; }
+.timeline-transition:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(34,211,238,0.2); }
+.timeline-transition.dragging { cursor: grabbing; opacity: 0.8; }
+.transition-visual { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4px; }
+.transition-visual .transition-icon { font-size: 14px; margin-bottom: 2px; }
+.transition-visual .transition-name { font-size: 8px; font-weight: 600; color: #cffafe; text-align: center; line-height: 1.1; }
+.transition-visual .transition-duration { font-size: 7px; color: rgba(255,255,255,0.6); }
+.transition-controls { position: absolute; top: -6px; right: -6px; display: flex; gap: 2px; opacity: 0; transition: opacity 0.15s ease; }
+.timeline-transition:hover .transition-controls { opacity: 1; }
+.transition-edit-btn, .transition-delete-btn { width: 16px; height: 16px; border-radius: 50%; border: 1px solid var(--border); background: rgba(0,0,0,0.8); color: rgba(255,255,255,0.8); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 10px; }
+.transition-edit-btn:hover { background: rgba(34,211,238,0.2); }
+.transition-delete-btn:hover { background: rgba(239,68,68,0.2); }
+
+/* Rendiv Animation Demo Styles */
+.animation-demo-controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.animation-demo-canvas {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.animation-demo-canvas canvas {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(0,0,0,0.3);
+}
+
+.animation-demo-info {
+  font-size: 11px;
+  color: rgba(255,255,255,0.7);
+  text-align: center;
+  padding: 8px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 6px;
+}
+
 @media (max-width: 1180px) { .main-grid { grid-template-columns: 1fr; } }
 @media (max-width: 980px) { .top-actions { max-width: none; } .left-top { grid-template-columns: 1fr; } }
 @media (max-width: 860px) {
@@ -204,7 +347,100 @@ button, input, textarea, select { font: inherit; }
   .project-head { text-align: left; }
   .timeline-header, .track-row { grid-template-columns: 86px 1fr; }
   .playhead-layer { left: 86px; }
-  .floating-rail { left: 16px; right: 16px; transform: none; justify-content: center; }
+   .floating-rail { left: 16px; right: 16px; transform: none; justify-content: center; }
+}
+
+/* Enhanced Timeline Engine Styles */
+.timeline-controls-enhanced {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid var(--border);
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.transport-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.navigation-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.element-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.layer-management {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  margin-top: 8px;
+}
+
+.blending-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.popcorn-element {
+  background: rgba(34, 211, 238, 0.1);
+  border: 1px solid rgba(34, 211, 238, 0.3);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: rgba(34, 211, 238, 0.9);
+}
+
+.default-element {
+  background: rgba(52, 211, 153, 0.1);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  color: rgba(52, 211, 153, 0.9);
+}
+
+.line-slider-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  margin: 8px 0;
+}
+
+.line-slider-marker {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+}
+
+.line-slider-timestamp {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 2px;
+}
+
+.line-slider-line {
+  width: 1px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.3);
 }
 `;
 
@@ -274,9 +510,11 @@ button, input, textarea, select { font: inherit; }
           </div>
           <div class="pill-row" id="pillRow"></div>
         </div>
+        <div class="timeline-controls-enhanced" id="timelineControlsEnhanced"></div>
         <div class="timeline-shell">
           <div class="timeline-header"><div>Tracks</div><div>Timeline</div></div>
           <div class="timeline-body" id="timelineBody">
+            <div class="compositing-overlay" id="compositingOverlay"></div>
             <div class="playhead-layer"><div class="playhead-line" id="playheadLine"></div><div class="playhead-knob" id="playheadKnob"></div></div>
             <div id="trackRows"></div>
           </div>
@@ -302,11 +540,84 @@ button, input, textarea, select { font: inherit; }
         </div>
         <button class="primary-btn" id="generateBtn" aria-label="Generate a new asset from the prompt settings">⚡ Generate</button>
       </aside>
+      <aside class="side-card" id="animationDemoPanel">
+        <div class="card-title">🎭 Rendiv Animation Demo</div>
+        <div id="animationDemoContainer">
+          <div class="animation-demo-controls">
+            <button class="mini-btn" id="runSpringDemo">Spring Animation</button>
+            <button class="mini-btn" id="runNoiseDemo">Noise Animation</button>
+            <button class="mini-btn" id="runInterpolateDemo">Interpolate Demo</button>
+          </div>
+          <div class="animation-demo-canvas">
+            <canvas id="animationCanvas" width="300" height="200"></canvas>
+          </div>
+          <div class="animation-demo-info">
+            <div id="demoStatus">Click a button to start animation demo</div>
+          </div>
+        </div>
+      </aside>
+      <aside class="side-card" id="clipSettingsPanel" style="display: none;">
+        <div class="card-title">🎬 Clip Editor</div>
+        <div id="clipEditorContainer"></div>
+      </aside>
+      <aside class="side-card" id="transitionSettingsPanel" style="display: none;">
+        <div class="card-title">🔄 Transitions</div>
+        <div id="transitionEditorContainer"></div>
+      </aside>
+      <aside class="side-card" id="multiCameraPanel">
+        <div class="card-title">📺 Multi-Camera</div>
+        <div id="multiCameraToolbar"></div>
+        <div id="pipControls" class="pip-controls-container" style="display: none;"></div>
+        <div id="splitControls" class="split-controls-container" style="display: none;"></div>
+      </aside>
+      <aside class="side-card" id="colorCorrectionPanel" style="display: none;">
+        <div class="card-title">🎨 Color Correction</div>
+        <div id="colorCorrectionContainer"></div>
+      </aside>
+      <aside class="side-card" id="colorScopesPanel">
+        <div class="card-title">📊 Color Scopes</div>
+        <div id="colorScopesContainer"></div>
+      </aside>
+
+      <!-- Category C Editor Surfaces -->
+      <aside class="side-card" id="canvasPanel" style="display: none;">
+        <div class="card-title">🎨 Canvas Editor</div>
+        <div id="canvasContainer"></div>
+      </aside>
+      <aside class="side-card" id="tokenEditorPanel" style="display: none;">
+        <div class="card-title">🏷️ Token Editor</div>
+        <div id="tokenEditorContainer"></div>
+      </aside>
+      <aside class="side-card" id="batchGeneratorPanel" style="display: none;">
+        <div class="card-title">📦 Batch Generator</div>
+        <div id="batchGeneratorContainer"></div>
+      </aside>
+      <aside class="side-card" id="workflowPanel" style="display: none;">
+        <div class="card-title">🔄 Workflow Automation</div>
+        <div id="workflowContainer"></div>
+      </aside>
+      <aside class="side-card" id="personalizationPanel" style="display: none;">
+        <div class="card-title">👤 Personalization</div>
+        <div id="personalizationContainer"></div>
+      </aside>
+      <aside class="side-card" id="personalizationEditorPanel" style="display: none;">
+        <div class="card-title">✏️ Personalization Editor</div>
+        <div id="personalizationEditorContainer"></div>
+      </aside>
     </div>
   </div>
 </div>
 <div class="floating-rail" id="floatingRail"></div>
 <div class="status-toast" id="toast"></div>
+<div class="modal-overlay" id="modalOverlay" style="display: none;">
+  <div class="modal-content" id="modalContent">
+    <div class="modal-header">
+      <h3 id="modalTitle">Advanced Editing</h3>
+      <button class="modal-close" id="modalClose" aria-label="Close modal">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
 `;
 
   function injectStyles() {
@@ -322,7 +633,10 @@ button, input, textarea, select { font: inherit; }
   }
 
   function createState() {
-    return {
+    const baseState = createTimelineState();
+
+    // Override with local demo data but keep enhanced features
+    const demoState = {
       projectTitle: 'Untitled Project',
       selectedTool: 'Select',
       selectedClipId: 1,
@@ -346,9 +660,9 @@ button, input, textarea, select { font: inherit; }
           { id: 5, name: 'City Cutaway', left: 52, width: 20, type: 'image', src: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720"><defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#020617"/><stop offset="1" stop-color="#1e3a8a"/></linearGradient></defs><rect width="1280" height="720" fill="url(#g)"/><g opacity=".9"><rect x="120" y="340" width="120" height="250" fill="#0f172a"/><rect x="260" y="280" width="140" height="310" fill="#111827"/><rect x="430" y="210" width="180" height="380" fill="#1f2937"/><rect x="650" y="250" width="110" height="340" fill="#0f172a"/><rect x="780" y="180" width="210" height="410" fill="#1e293b"/></g><circle cx="1060" cy="130" r="70" fill="#e0f2fe" opacity=".75"/><text x="120" y="150" fill="white" font-size="78" font-family="Arial" font-weight="700">City Cutaway</text></svg>`), fit: 'cover' }
         ] }
       ],
-      tools: [['↖', 'Select'], ['✂', 'Blade'], ['⤵', 'Ripple'], ['⤶', 'Roll'], ['⇿', 'Slip'], ['⇆', 'Slide'], ['🔍', 'Zoom'], ['✋', 'Hand']],
+      tools: baseState.tools, // Use enhanced tools from baseState
       pills: ['Text to Video', 'Image to Video', 'Retake', 'Extend', 'B-Roll', 'Music Gen', 'Audio Sync', 'Fill Gap AI', 'Elements', 'Dual Viewer'],
-      topIcons: ['👁','📺','📁','⚡','🎵','🔊','🎞️','👤','⚙️','💬','📋'],
+      topIcons: ['👁','📺','📁','⚡','🎵','🔊','🎞️','👤','🎨','💬','📋','🎬','💾','⚙️','💳','🔗','👀','▶️'],
       media: [
         { icon: '🎬', label: 'Video Clip', desc: 'Insert a source shot or generated video clip.' },
         { icon: '🖼️', label: 'Image Frame', desc: 'Add still images, frames, or storyboard art.' },
@@ -357,7 +671,7 @@ button, input, textarea, select { font: inherit; }
       ],
       generateTypes: [['✍️', 'Text'], ['🖼️', 'Image'], ['🔄', 'Retake'], ['➡️', 'Extend'], ['🎞️', 'B-Roll']],
       quickCommands: ['⚡Generate','Retake','Extend','B-Roll'],
-      railActions: [['⚡', 'Generate', true], ['✂️', 'Split'], ['🎬', 'Scenes'], ['💬', 'Subtitle'], ['🎞️', 'B-Roll'], ['⏱️', 'Speed'], ['🪄', 'Stabilize'], ['📝', 'Text']],
+      railActions: [['⚡', 'Generate', true], ['✂️', 'Split'], ['🎬', 'Scenes'], ['💬', 'Subtitle'], ['🎞️', 'B-Roll'], ['⏱️', 'Speed'], ['🪄', 'Stabilize'], ['📝', 'Text'], ['🔄', 'Transitions'], ['🎬', 'AI Video'], ['🎥', 'Recorder'], ['🎙️', 'Enhanced Recorder'], ['📋', 'Templates'], ['👀', 'Preview Template'], ['📱', 'Social'], ['📧', 'Email Campaign'], ['🔗', 'URL Video'], ['📸', 'Page Shot'], ['👥', 'Contacts'], ['🎨', 'Canvas'], ['🏷️', 'Token Editor'], ['📦', 'Batch Generator'], ['🔄', 'Workflow'], ['👤', 'Personalization'], ['✏️', 'Personalization Editor']],
       chat: [
         { role: 'user', text: 'Generate a better opening shot' },
         { role: 'ai', text: 'Opening idea ready. Use Generate or Retake.' }
@@ -370,6 +684,8 @@ button, input, textarea, select { font: inherit; }
       generationQueue: [],
       isProcessing: false
     };
+
+    return { ...baseState, ...demoState };
   }
 
   // Enhanced state management with local storage persistence
@@ -469,6 +785,9 @@ button, input, textarea, select { font: inherit; }
   function createTimelineEditorApp(root) {
     const state = loadProjectFromStorage();
     let playbackTimer = null;
+    let transitionEditor = null;
+    let timelineTransitions = null;
+    // let colorCorrectionSystem = null; // Disabled - file not found
 
     // Keyboard shortcuts for undo/redo
     function handleKeyboardShortcuts(event) {
@@ -532,7 +851,38 @@ button, input, textarea, select { font: inherit; }
       toast: root.querySelector('#toast'),
       uploadBtn: root.querySelector('#uploadBtn'),
       backBtn: root.querySelector('#backBtn'),
-      uploadInput: root.querySelector('#uploadInput')
+      uploadInput: root.querySelector('#uploadInput'),
+      clipSettingsPanel: root.querySelector('#clipSettingsPanel'),
+      transitionSettingsPanel: root.querySelector('#transitionSettingsPanel'),
+      clipEditorContainer: root.querySelector('#clipEditorContainer'),
+      transitionEditorContainer: root.querySelector('#transitionEditorContainer'),
+      multiCameraPanel: root.querySelector('#multiCameraPanel'),
+      multiCameraToolbar: root.querySelector('#multiCameraToolbar'),
+      pipControls: root.querySelector('#pipControls'),
+      splitControls: root.querySelector('#splitControls'),
+      colorCorrectionPanel: root.querySelector('#colorCorrectionPanel'),
+      colorCorrectionContainer: root.querySelector('#colorCorrectionContainer'),
+      colorScopesPanel: root.querySelector('#colorScopesPanel'),
+      colorScopesContainer: root.querySelector('#colorScopesContainer'),
+      compositingOverlay: root.querySelector('#compositingOverlay'),
+      // Category C Editor Surfaces
+      canvasPanel: root.querySelector('#canvasPanel'),
+      canvasContainer: root.querySelector('#canvasContainer'),
+      tokenEditorPanel: root.querySelector('#tokenEditorPanel'),
+      tokenEditorContainer: root.querySelector('#tokenEditorContainer'),
+      batchGeneratorPanel: root.querySelector('#batchGeneratorPanel'),
+      batchGeneratorContainer: root.querySelector('#batchGeneratorContainer'),
+      workflowPanel: root.querySelector('#workflowPanel'),
+      workflowContainer: root.querySelector('#workflowContainer'),
+      personalizationPanel: root.querySelector('#personalizationPanel'),
+      personalizationContainer: root.querySelector('#personalizationContainer'),
+      personalizationEditorPanel: root.querySelector('#personalizationEditorPanel'),
+      personalizationEditorContainer: root.querySelector('#personalizationEditorContainer'),
+      modalOverlay: root.querySelector('#modalOverlay'),
+      modalContent: root.querySelector('#modalContent'),
+      modalTitle: root.querySelector('#modalTitle'),
+      modalBody: root.querySelector('#modalBody'),
+      modalClose: root.querySelector('#modalClose')
     };
 
     function showToast(message) {
@@ -577,13 +927,9 @@ button, input, textarea, select { font: inherit; }
       els.previewEmoji.textContent = selected.type === 'audio' ? '🎵' : selected.type === 'text' ? '📝' : selected.type === 'image' ? '🖼️' : '🎥';
 
       if (selected.type === 'video' && selected.src) {
-        const video = document.createElement('video');
-        video.className = 'preview-media';
-        video.src = selected.src;
-        if (selected.poster) video.poster = selected.poster;
-        video.controls = true;
-        video.preload = 'metadata';
-        video.playsInline = true;
+        const video = createVideoPreview(selected.src, 'preview-media', {
+          poster: selected.poster
+        });
         els.previewStage.appendChild(video);
         return;
       }
@@ -735,12 +1081,141 @@ button, input, textarea, select { font: inherit; }
       showToast('Project notes opened', 'info');
     }
 
+    // Modal functions for timeline-specific triggers
+    function openEndScreenModal(state, showToast) {
+      try {
+        const modal = new EndScreenModal({
+          timelineData: state,
+          onComplete: (result) => {
+            // Add end screen elements to timeline
+            addEndScreenToTimeline(result, state);
+            showToast('End screen elements added successfully', 'success');
+          },
+          onError: (error) => showToast(`End screen creation failed: ${error}`, 'error')
+        });
+        modal.open();
+      } catch (error) {
+        showToast('Failed to open End Screen Modal', 'error');
+      }
+    }
+
+    function openSaveProjectModal(state, showToast) {
+      try {
+        const modal = new SaveProjectModal({
+          projectData: state,
+          onComplete: (result) => {
+            state.projectId = result.projectId;
+            showToast('Project saved successfully', 'success');
+          },
+          onError: (error) => showToast(`Project save failed: ${error}`, 'error')
+        });
+        modal.open();
+      } catch (error) {
+        showToast('Failed to open Save Project Modal', 'error');
+      }
+    }
+
+    function openSettingsModal(state, showToast) {
+      try {
+        const modal = new SettingsModal({
+          settings: state.settings || {},
+          onComplete: (result) => {
+            state.settings = result;
+            showToast('Settings updated successfully', 'success');
+          },
+          onError: (error) => showToast(`Settings update failed: ${error}`, 'error')
+        });
+        modal.open();
+      } catch (error) {
+        showToast('Failed to open Settings Modal', 'error');
+      }
+    }
+
+    function openBillingModal(state, showToast) {
+      try {
+        const modal = new BillingModal({
+          onComplete: (result) => {
+            showToast('Billing updated successfully', 'success');
+          },
+          onError: (error) => showToast(`Billing update failed: ${error}`, 'error')
+        });
+        modal.open();
+      } catch (error) {
+        showToast('Failed to open Billing Modal', 'error');
+      }
+    }
+
+    function openConnectModal(state, showToast) {
+      try {
+        const modal = new ConnectModal({
+          onComplete: (result) => {
+            state.connections = result.connections;
+            showToast('Connections updated successfully', 'success');
+          },
+          onError: (error) => showToast(`Connection setup failed: ${error}`, 'error')
+        });
+        modal.open();
+      } catch (error) {
+        showToast('Failed to open Connect Modal', 'error');
+      }
+    }
+
+    function openPreviewMediaModal(state, showToast) {
+      try {
+        const modal = new PreviewMediaModal({
+          mediaData: state.tracks.flatMap(t => t.clips),
+          onComplete: (result) => {
+            showToast('Media preview completed', 'success');
+          },
+          onError: (error) => showToast(`Media preview failed: ${error}`, 'error')
+        });
+        modal.open();
+      } catch (error) {
+        showToast('Failed to open Preview Media Modal', 'error');
+      }
+    }
+
+    function openVideoPlayerModal(state, showToast) {
+      try {
+        const modal = new VideoPlayerModal({
+          timelineData: state,
+          onComplete: (result) => {
+            showToast('Video playback completed', 'success');
+          },
+          onError: (error) => showToast(`Video player error: ${error}`, 'error')
+        });
+        modal.open();
+      } catch (error) {
+        showToast('Failed to open Video Player Modal', 'error');
+      }
+    }
+
+    function addEndScreenToTimeline(endScreenData, state) {
+      // Add end screen elements to the end of the timeline
+      const videoTrack = state.tracks.find(t => t.name === 'Video');
+      if (videoTrack && endScreenData.elements) {
+        endScreenData.elements.forEach(element => {
+          const clip = {
+            id: Date.now() + Math.random(),
+            name: element.name || 'End Screen Element',
+            left: state.timelineSeconds * 10, // Position at end
+            width: element.duration || 5,
+            type: element.type || 'text',
+            ...element
+          };
+          videoTrack.clips.push(clip);
+        });
+        renderTracks();
+      }
+    }
+
     function renderTopActions() {
       els.topActions.innerHTML = '';
       const topActionLabels = {
         '👁': 'Toggle preview visibility tools', '📺': 'Open monitor or viewer settings', '📁': 'Open project media or files', '⚡': 'Open quick AI actions',
         '🎵': 'Open music tools', '🔊': 'Open audio controls', '🎞️': 'Open video strip or scene tools', '👤': 'Open character or profile tools',
-        '⚙️': 'Open editor settings', '💬': 'Open AI chat tools', '📋': 'Open project notes or clipboard actions'
+        '🎨': 'Open color correction tools', '⚙️': 'Open editor settings', '💬': 'Open AI chat tools', '📋': 'Open project notes or clipboard actions',
+        '🎬': 'End screen elements', '💾': 'Save project', '💳': 'Billing & subscriptions', '🔗': 'Connection setup', '👀': 'Preview media', '▶️': 'Video player'
       };
       state.topIcons.forEach((icon, index) => {
         const button = document.createElement('button');
@@ -776,6 +1251,9 @@ button, input, textarea, select { font: inherit; }
             case '👤':
               openProfileTools();
               break;
+            case '🎨':
+              showColorCorrectionPanel();
+              break;
             case '⚙️':
               openEditorSettings();
               break;
@@ -785,6 +1263,25 @@ button, input, textarea, select { font: inherit; }
             case '📋':
               openProjectNotes();
               break;
+            case '🎬':
+              openEndScreenModal(state, showToast);
+              break;
+             case '💾':
+               openSaveProjectModal(state, showToast);
+               break;
+             // Duplicate case removed
+            case '💳':
+              openBillingModal(state, showToast);
+              break;
+            case '🔗':
+              openConnectModal(state, showToast);
+              break;
+            case '👀':
+              openPreviewMediaModal(state, showToast);
+              break;
+            case '▶️':
+              openVideoPlayerModal(state, showToast);
+              break;
             default:
               showToast(`${icon} action clicked`);
           }
@@ -792,6 +1289,10 @@ button, input, textarea, select { font: inherit; }
 
         els.topActions.appendChild(button);
       });
+
+      // Extend top actions with enhancement features
+      extendTopActions(els.topActions, state, showToast);
+
       const ready = document.createElement('div');
       ready.className = 'ready-pill';
       ready.innerHTML = '<span class="ready-dot"></span>Ready';
@@ -831,34 +1332,100 @@ button, input, textarea, select { font: inherit; }
       });
     }
 
-    function renderTracks() {
+    function renderTracksBasic(state, els, showToast) {
       els.trackRows.innerHTML = '';
-      state.tracks.forEach((track) => {
+      state.tracks.forEach(track => {
         const row = document.createElement('div');
         row.className = 'track-row';
+
         const meta = document.createElement('div');
         meta.className = 'track-meta';
         meta.innerHTML = `
           <div class="track-name">${track.name}</div>
           <div class="track-actions">
-            <button class="track-toggle ${track.muted ? 'locked' : ''}" data-toggle="mute" aria-label="Mute or unmute this track">M</button>
-            <button class="track-toggle ${track.solo ? 'locked' : ''}" data-toggle="solo" aria-label="Solo this track">S</button>
-            <button class="track-toggle ${track.locked ? 'locked' : ''}" data-toggle="lock" aria-label="Lock or unlock this track">L</button>
+            <button class="track-toggle ${track.muted ? 'locked' : ''}" data-toggle="mute">M</button>
+            <button class="track-toggle ${track.solo ? 'locked' : ''}" data-toggle="solo">S</button>
+            <button class="track-toggle ${track.locked ? 'locked' : ''}" data-toggle="lock">L</button>
           </div>
-          <div class="track-count">${track.clips.length} clips</div>
+          <div class="track-count">${track.items.length} clips</div>
         `;
-        meta.querySelectorAll('.track-toggle').forEach((button) => {
-          button.addEventListener('click', () => {
-            const key = button.dataset.toggle;
+
+        meta.querySelectorAll('.track-toggle').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const key = btn.dataset.toggle;
             if (key === 'mute') track.muted = !track.muted;
             if (key === 'solo') track.solo = !track.solo;
             if (key === 'lock') track.locked = !track.locked;
-            renderTracks();
-            showToast(`${track.name} ${key} toggled`);
+            renderTracksBasic(state, els, showToast);
           });
         });
+
         const lane = document.createElement('div');
         lane.className = 'track-lane';
+        lane.dataset.trackId = track.id;
+
+        track.items.forEach(clip => {
+          const clipEl = document.createElement('button');
+          clipEl.className = `clip ${state.selectedClipId === clip.id ? 'active' : ''}`;
+          const leftPercent = (clip.start / state.timelineSeconds) * 100;
+          const widthPercent = ((clip.end - clip.start) / state.timelineSeconds) * 100;
+          clipEl.style.left = `${leftPercent}%`;
+          clipEl.style.width = `${widthPercent}%`;
+          clipEl.innerHTML = `<span class="clip-label">${clip.text || clip.name}</span>`;
+          clipEl.addEventListener('click', (event) => {
+            if (event.target.classList.contains('clip-handle')) return;
+            event.stopPropagation();
+            // Update the main state
+            window.timelineState.selectedClipId = clip.id;
+            renderTracksBasic(state, els, showToast);
+            updatePreview({ id: clip.id, name: clip.name, type: clip.type, src: clip.src });
+          });
+          lane.appendChild(clipEl);
+        });
+
+        row.appendChild(meta);
+        row.appendChild(lane);
+        els.trackRows.appendChild(row);
+      });
+    }
+
+    function renderTracks() {
+      // Convert tracks to enhanced format
+      const enhancedState = {
+        tracks: state.tracks.map(track => ({
+          id: track.id,
+          name: track.name,
+          locked: track.locked,
+          muted: track.muted,
+          solo: track.solo,
+          opacity: track.opacity || 1,
+          blendMode: track.blendMode || 'normal',
+          items: track.clips.map(clip => ({
+            id: clip.id,
+            name: clip.name,
+            text: clip.heading || clip.name,
+            start: (clip.left / 100) * state.timelineSeconds,
+            end: ((clip.left + clip.width) / 100) * state.timelineSeconds,
+            type: clip.type,
+            src: clip.src,
+            fit: clip.fit,
+            heading: clip.heading,
+            body: clip.body,
+            waveformData: clip.waveformData,
+            opacity: clip.opacity || 1,
+            blendMode: clip.blendMode || 'normal'
+          }))
+        })),
+        selectedClipId: state.selectedClipId,
+        timelineSeconds: state.timelineSeconds,
+        playheadPercent: state.playheadPercent
+      };
+
+      // Use basic renderer (enhanced has broken imports)
+      renderTracksBasic(enhancedState, { trackRows: els.trackRows }, showToast);
+
+      // Add enhanced drag and drop handlers
+      els.trackRows.querySelectorAll('.track-lane').forEach(lane => {
         lane.addEventListener('click', (event) => {
           if (event.target !== lane) return;
           const rect = lane.getBoundingClientRect();
@@ -866,19 +1433,23 @@ button, input, textarea, select { font: inherit; }
           state.playheadPercent = Math.max(0, Math.min(100, percent));
           updatePlaybackUI();
         });
+
         lane.addEventListener('dragover', (e) => {
           e.preventDefault();
           e.dataTransfer.dropEffect = 'move';
         });
+
         lane.addEventListener('drop', (e) => {
           e.preventDefault();
           const data = JSON.parse(e.dataTransfer.getData('application/json'));
           const rect = lane.getBoundingClientRect();
           const percent = ((e.clientX - rect.left) / rect.width) * 100;
+          const track = state.tracks.find(t => t.id === parseInt(lane.dataset.trackId));
+
           if (data.type === 'clip') {
             const allClips = state.tracks.flatMap(t => t.clips);
             const clip = allClips.find(c => c.id === data.clipId);
-            if (clip) {
+            if (clip && track) {
               // Remove from old track
               state.tracks.forEach(t => t.clips = t.clips.filter(c => c.id !== clip.id));
               // Add to new track
@@ -890,7 +1461,7 @@ button, input, textarea, select { font: inherit; }
               renderTracks();
               showToast(`Clip moved to ${track.name}`);
             }
-          } else if (data.type === 'media') {
+          } else if (data.type === 'media' && track) {
             const extra = {};
             if (data.mediaType === 'video') {
               extra.src = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
@@ -902,7 +1473,7 @@ button, input, textarea, select { font: inherit; }
             } else {
               extra.heading = data.label;
               extra.body = 'Dragged text asset.';
-            }
+    }
             const newClip = { id: Date.now(), name: data.label, left: Math.max(0, percent), width: 16, type: data.mediaType, ...extra };
             track.clips.push(newClip);
             state.selectedClipId = newClip.id;
@@ -932,6 +1503,9 @@ button, input, textarea, select { font: inherit; }
             selectedClipId: state.selectedClipId,
             timelineSeconds: state.timelineSeconds
           }, state.zoom || 1);
+
+          // Extend clip with enhancement context menus
+          extendClipContextMenu(clipEl, clip, track, state, showToast);
 
           // Override click handler to work with this timeline's state management
           clipEl.addEventListener('click', (event) => {
@@ -999,6 +1573,34 @@ button, input, textarea, select { font: inherit; }
         }
         showToast(`${media.label} inserted into timeline`);
       }, showToast, state);
+
+      // Extend media library with enhancement features
+      extendMediaLibrary(els.mediaGrid, state, showToast);
+
+      // Add media ingest components to media library
+      const mediaLibraryContainer = els.mediaGrid.parentElement;
+      if (mediaLibraryContainer && !mediaLibraryContainer.querySelector('.media-ingest-components')) {
+        const ingestContainer = document.createElement('div');
+        ingestContainer.className = 'media-ingest-components';
+
+        // Add video gallery
+        const videoGallery = VideoGallery();
+        ingestContainer.appendChild(videoGallery);
+
+        // Add stickers library
+        const stickersLibrary = StickersLibrary();
+        ingestContainer.appendChild(stickersLibrary);
+
+        // Add lower thirds
+        const lowerThirds = LowerThirds();
+        ingestContainer.appendChild(lowerThirds);
+
+        // Add animations list
+        const animationList = AnimationList();
+        ingestContainer.appendChild(animationList);
+
+        mediaLibraryContainer.appendChild(ingestContainer);
+      }
     }
 
     function renderGenerateTypes() {
@@ -1016,6 +1618,9 @@ button, input, textarea, select { font: inherit; }
         });
         els.generateTypes.appendChild(button);
       });
+
+      // Extend with enhancement features
+      extendGenerationPanel(els.generateTypes, state, showToast);
     }
 
     function renderChat() {
@@ -1027,6 +1632,127 @@ button, input, textarea, select { font: inherit; }
         els.chatStack.appendChild(bubble);
       });
     }
+
+    function renderClipEditor(clipId) {
+      const clip = state.tracks.flatMap(t => t.clips).find(c => c.id === clipId);
+      if (!clip) {
+        els.clipEditorContainer.innerHTML = '<p>Clip not found</p>';
+        return;
+      }
+
+      els.clipEditorContainer.innerHTML = `
+        <div class="clip-editor">
+          <div class="clip-editor__section">
+            <h3>Basic Properties</h3>
+            <div class="clip-editor__field">
+              <label for="clip-title">Clip Title</label>
+              <input id="clip-title" type="text" value="${clip.name || ''}" placeholder="Enter clip title" />
+            </div>
+            <div class="clip-editor__field">
+              <label for="clip-start">Start Time (seconds)</label>
+              <input id="clip-start" type="number" step="0.1" min="0" value="${clip.left || 0}" />
+            </div>
+            <div class="clip-editor__field">
+              <label for="clip-end">End Time (seconds)</label>
+              <input id="clip-end" type="number" step="0.1" min="0" value="${(clip.left || 0) + (clip.width || 0)}" />
+            </div>
+          </div>
+          <div class="clip-editor__section">
+            <h3>Audio Controls</h3>
+            <div class="clip-editor__field">
+              <label for="clip-volume">Volume: ${Math.round((clip.volume || 1) * 100)}%</label>
+              <input id="clip-volume" type="range" min="0" max="1" step="0.01" value="${clip.volume || 1}" />
+            </div>
+            <div class="clip-editor__field">
+              <button id="clip-mute" type="button">${clip.mute ? 'Unmute' : 'Mute'}</button>
+            </div>
+          </div>
+          <div class="clip-editor__section">
+            <h3>Visual Controls</h3>
+            <div class="clip-editor__field">
+              <button id="clip-visibility" type="button">${clip.hidden ? 'Show' : 'Hide'}</button>
+            </div>
+            <div class="clip-editor__field">
+              <label for="clip-fill">Fill Mode</label>
+              <select id="clip-fill">
+                <option value="scale" ${clip.fit === 'contain' ? 'selected' : ''}>Scale to Fit</option>
+                <option value="fit" ${clip.fit !== 'contain' ? 'selected' : ''}>Fit</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Add event listeners
+      els.clipEditorContainer.querySelector('#clip-title').addEventListener('input', (e) => {
+        clip.name = e.target.value;
+        renderTracks();
+      });
+      els.clipEditorContainer.querySelector('#clip-start').addEventListener('input', (e) => {
+        const newStart = parseFloat(e.target.value);
+        clip.left = Math.max(0, newStart);
+        renderTracks();
+      });
+      els.clipEditorContainer.querySelector('#clip-end').addEventListener('input', (e) => {
+        const newEnd = parseFloat(e.target.value);
+        clip.width = Math.max(0, newEnd - (clip.left || 0));
+        renderTracks();
+      });
+      els.clipEditorContainer.querySelector('#clip-volume').addEventListener('input', (e) => {
+        clip.volume = parseFloat(e.target.value);
+        e.target.previousElementSibling.textContent = `Volume: ${Math.round(clip.volume * 100)}%`;
+      });
+      els.clipEditorContainer.querySelector('#clip-mute').addEventListener('click', () => {
+        clip.mute = !clip.mute;
+        e.target.textContent = clip.mute ? 'Unmute' : 'Mute';
+      });
+      els.clipEditorContainer.querySelector('#clip-visibility').addEventListener('click', () => {
+        clip.hidden = !clip.hidden;
+        e.target.textContent = clip.hidden ? 'Show' : 'Hide';
+        renderTracks();
+      });
+      els.clipEditorContainer.querySelector('#clip-fill').addEventListener('change', (e) => {
+        clip.fit = e.target.value === 'fit' ? 'contain' : 'cover';
+        renderTracks();
+      });
+    }
+
+    function initializeTransitionEditor() {
+      if (!transitionEditor) {
+        transitionEditor = new TransitionEditor(els.transitionEditorContainer, (transition, params, duration) => {
+          // Handle transition application from editor
+          showToast(`Transition "${transition.name}" configured`, 'success');
+        });
+      }
+    }
+
+    function initializeTimelineTransitions() {
+      if (!timelineTransitions) {
+        timelineTransitions = new TimelineTransitions(els.timelineBody, state);
+      }
+    }
+
+    // function initializeColorCorrectionSystem() { // Disabled - ColorCorrectionSystem not available
+    //   if (!colorCorrectionSystem) {
+    //     // Create a keyframe system for color correction
+    //     const { KeyframeSystem } = require('../lib/editor/keyframeSystem.js');
+    //     const keyframeSystem = new KeyframeSystem();
+    //
+    //     colorCorrectionSystem = new ColorCorrectionSystem(els.timelineBody, state, keyframeSystem);
+    //
+    //     // Add color correction panel to DOM
+    //     const colorPanel = colorCorrectionSystem.getPanel();
+    //     if (colorPanel && els.colorCorrectionContainer) {
+    //       els.colorCorrectionContainer.appendChild(colorPanel);
+    //     }
+    //
+    //     // Add color scopes panel to DOM
+    //     const scopesPanel = colorCorrectionSystem.getScopes();
+    //     if (scopesPanel && els.colorScopesContainer) {
+    //       els.colorScopesContainer.appendChild(scopesPanel);
+    //     }
+    //   }
+    // }
 
     async function handleChatSubmit() {
       const text = els.chatInput.value.trim();
@@ -1362,6 +2088,225 @@ button, input, textarea, select { font: inherit; }
       }
     }
 
+    // Modal integration functions for timeline toolbar
+    function openAIVideoCreatorModal(state, showToast) {
+      try {
+        const modal = new AIVideoCreator({
+          onComplete: (result) => {
+            addVideoToTimeline(result, state);
+            showToast('AI Video created successfully', 'success');
+          },
+          onError: (error) => showToast(`AI Video creation failed: ${error}`, 'error')
+        });
+        modal.open();
+      } catch (error) {
+        showToast('Failed to open AI Video Creator', 'error');
+      }
+    }
+
+    function openRecorderModal(state, showToast) {
+      try {
+        const modal = new RecorderModal({
+          onComplete: (result) => {
+            addVideoToTimeline(result, state);
+            showToast('Recording saved successfully', 'success');
+          },
+          onError: (error) => showToast(`Recording failed: ${error}`, 'error')
+        });
+        modal.open();
+      } catch (error) {
+        showToast('Failed to open Recorder', 'error');
+      }
+    }
+
+    function openEnhancedRecorderModal(state, showToast) {
+      try {
+        const modal = new EnhancedRecorderModal({
+          onComplete: (result) => {
+            addVideoToTimeline(result, state);
+            showToast('Enhanced recording saved successfully', 'success');
+          },
+          onError: (error) => showToast(`Enhanced recording failed: ${error}`, 'error')
+        });
+        modal.open();
+      } catch (error) {
+        showToast('Failed to open Enhanced Recorder', 'error');
+      }
+    }
+
+    function openTemplateGeneratorModal(state, showToast) {
+      try {
+        const modal = new TemplateGeneratorModal({
+          onComplete: (result) => {
+            // Apply template to timeline
+            applyTemplateToTimeline(result, state);
+            showToast('Template applied successfully', 'success');
+          },
+          onError: (error) => showToast(`Template generation failed: ${error}`, 'error')
+        });
+        modal.open();
+      } catch (error) {
+        showToast('Failed to open Template Generator', 'error');
+      }
+    }
+
+    function openTemplatePreviewModal(state, showToast) {
+      try {
+        const modal = new TemplatePreviewModal({
+          onComplete: (result) => {
+            applyTemplateToTimeline(result, state);
+            showToast('Template preview applied successfully', 'success');
+          },
+          onError: (error) => showToast(`Template preview failed: ${error}`, 'error')
+        });
+        modal.open();
+      } catch (error) {
+        showToast('Failed to open Template Preview', 'error');
+      }
+    }
+
+    function openSocialPublisherModal(state, showToast) {
+      try {
+        const modal = new SocialPublisherModal({
+          projectData: state,
+          onComplete: (result) => {
+            showToast('Content published successfully', 'success');
+          },
+          onError: (error) => showToast(`Publishing failed: ${error}`, 'error')
+        });
+        modal.open();
+      } catch (error) {
+        showToast('Failed to open Social Publisher', 'error');
+      }
+    }
+
+    function openEmailCampaignModal(state, showToast) {
+      try {
+        const modal = new EmailCampaignModal({
+          projectData: state,
+          onComplete: (result) => {
+            showToast('Email campaign created successfully', 'success');
+          },
+          onError: (error) => showToast(`Email campaign creation failed: ${error}`, 'error')
+        });
+        modal.open();
+      } catch (error) {
+        showToast('Failed to open Email Campaign', 'error');
+      }
+    }
+
+    function openUrlVideoModal(state, showToast) {
+      try {
+        const modal = new UrlVideoModal({
+          onComplete: (result) => {
+            addVideoToTimeline(result, state);
+            showToast('URL video added successfully', 'success');
+          },
+          onError: (error) => showToast(`URL video import failed: ${error}`, 'error')
+        });
+        modal.open();
+      } catch (error) {
+        showToast('Failed to open URL Video', 'error');
+      }
+    }
+
+    function openPageShotModal(state, showToast) {
+      try {
+        const modal = new PageShotModal({
+          onComplete: (result) => {
+            addImageToTimeline(result, state);
+            showToast('Page screenshot added successfully', 'success');
+          },
+          onError: (error) => showToast(`Page screenshot failed: ${error}`, 'error')
+        });
+        modal.open();
+      } catch (error) {
+        showToast('Failed to open Page Shot', 'error');
+      }
+    }
+
+    function openContactImporterModal(state, showToast) {
+      try {
+        const modal = new ContactImporterModal({
+          onComplete: (result) => {
+            // Store contacts for personalization
+            state.contacts = result.contacts;
+            showToast('Contacts imported successfully', 'success');
+          },
+          onError: (error) => showToast(`Contact import failed: ${error}`, 'error')
+        });
+        modal.open();
+      } catch (error) {
+        showToast('Failed to open Contact Importer', 'error');
+      }
+    }
+
+    // Helper functions for modal integration
+    function addVideoToTimeline(videoData, state) {
+      const videoTrack = state.tracks.find(t => t.name === 'Video');
+      if (videoTrack) {
+        const newClip = {
+          id: Date.now(),
+          name: videoData.name || 'Imported Video',
+          left: 50,
+          width: 20,
+          type: 'video',
+          src: videoData.src,
+          poster: videoData.poster
+        };
+        videoTrack.clips.push(newClip);
+        renderTracks();
+      }
+    }
+
+    function addImageToTimeline(imageData, state) {
+      const videoTrack = state.tracks.find(t => t.name === 'Video');
+      if (videoTrack) {
+        const newClip = {
+          id: Date.now(),
+          name: imageData.name || 'Imported Image',
+          left: 50,
+          width: 15,
+          type: 'image',
+          src: imageData.src
+        };
+        videoTrack.clips.push(newClip);
+        renderTracks();
+      }
+    }
+
+    function addAudioToTimeline(audioData, state) {
+      const audioTrack = state.tracks.find(t => t.name === 'Audio');
+      if (audioTrack) {
+        const newClip = {
+          id: Date.now(),
+          name: audioData.name || 'Generated Audio',
+          left: 50,
+          width: 20,
+          type: 'audio',
+          src: audioData.src
+        };
+        audioTrack.clips.push(newClip);
+        renderTracks();
+      }
+    }
+
+    function applyTemplateToTimeline(templateData, state) {
+      // Apply template settings to timeline
+      if (templateData.settings) {
+        Object.assign(state, templateData.settings);
+      }
+      if (templateData.clips) {
+        templateData.clips.forEach(clip => {
+          const track = state.tracks.find(t => t.name === clip.trackType);
+          if (track) {
+            track.clips.push({ ...clip, id: Date.now() });
+          }
+        });
+      }
+      renderTracks();
+    }
+
     function renderRail() {
       els.floatingRail.innerHTML = '';
       state.railActions.forEach(([icon, label, active]) => {
@@ -1399,6 +2344,57 @@ button, input, textarea, select { font: inherit; }
             case 'Text':
               addTextOverlay();
               break;
+            case 'Transitions':
+              showTransitionSettings();
+              break;
+            case 'AI Video':
+              openAIVideoCreatorModal(state, showToast);
+              break;
+            case 'Recorder':
+              openRecorderModal(state, showToast);
+              break;
+            case 'Enhanced Recorder':
+              openEnhancedRecorderModal(state, showToast);
+              break;
+            case 'Templates':
+              openTemplateGeneratorModal(state, showToast);
+              break;
+            case 'Preview Template':
+              openTemplatePreviewModal(state, showToast);
+              break;
+            case 'Social':
+              openSocialPublisherModal(state, showToast);
+              break;
+            case 'Email Campaign':
+              openEmailCampaignModal(state, showToast);
+              break;
+            case 'URL Video':
+              openUrlVideoModal(state, showToast);
+              break;
+            case 'Page Shot':
+              openPageShotModal(state, showToast);
+              break;
+            case 'Contacts':
+              openContactImporterModal(state, showToast);
+              break;
+            case 'Canvas':
+              showCanvasPanel();
+              break;
+            case 'Token Editor':
+              showTokenEditorPanel();
+              break;
+            case 'Batch Generator':
+              showBatchGeneratorPanel();
+              break;
+            case 'Workflow':
+              showWorkflowPanel();
+              break;
+            case 'Personalization':
+              showPersonalizationPanel();
+              break;
+            case 'Personalization Editor':
+              showPersonalizationEditorPanel();
+              break;
             default:
               showToast(`${label} action triggered`);
           }
@@ -1412,6 +2408,255 @@ button, input, textarea, select { font: inherit; }
       state.tracks.push({ id: `${type.toLowerCase()}-${Date.now()}`, name: type, muted: false, solo: false, locked: false, clips: [] });
       renderTracks();
       showToast(`${type} track added`);
+    }
+
+    function showClipEditor(clipId) {
+      els.clipSettingsPanel.style.display = 'block';
+      renderClipEditor(clipId);
+      showToast('Clip editor opened');
+    }
+
+    function showTransitionSettings() {
+      els.transitionSettingsPanel.style.display = 'block';
+      // The transition editor is now initialized automatically
+      showToast('Transition settings opened');
+    }
+
+    function openAdvancedModal(content, title = 'Advanced Editing') {
+      els.modalTitle.textContent = title;
+      els.modalBody.innerHTML = content;
+      els.modalOverlay.style.display = 'flex';
+    }
+
+    function closeModal() {
+      els.modalOverlay.style.display = 'none';
+    }
+
+    // Category C Editor Surface panel functions
+    function showCanvasPanel() {
+      // Hide other panels
+      hideAllEditorPanels();
+      els.canvasPanel.style.display = 'block';
+
+      // Render Canvas component
+      if (!els.canvasContainer.innerHTML) {
+        // For now, render basic canvas HTML. In a full implementation, this would use ReactDOM
+        els.canvasContainer.innerHTML = `
+          <div style="padding: 16px; height: 100%; display: flex; flex-direction: column;">
+            <h3 style="margin: 0 0 16px 0; color: #e5e7eb;">Canvas Editor</h3>
+            <p style="color: #9ca3af; margin-bottom: 16px;">Visual canvas-based editing surface for composition.</p>
+            <canvas id="canvasEditor" width="800" height="450" style="border: 1px solid #374151; background: #1a1a1a; flex: 1;"></canvas>
+            <div style="margin-top: 16px; display: flex; gap: 8px;">
+              <button style="padding: 8px 12px; background: #3b82f6; color: white; border: none; border-radius: 4px;">Add Text</button>
+              <button style="padding: 8px 12px; background: #3b82f6; color: white; border: none; border-radius: 4px;">Add Shape</button>
+              <button style="padding: 8px 12px; background: #3b82f6; color: white; border: none; border-radius: 4px;">Add Image</button>
+            </div>
+          </div>
+        `;
+      }
+      showToast('Canvas editor opened');
+    }
+
+    function showTokenEditorPanel() {
+      hideAllEditorPanels();
+      els.tokenEditorPanel.style.display = 'block';
+
+      if (!els.tokenEditorContainer.innerHTML) {
+        els.tokenEditorContainer.innerHTML = `
+          <div style="padding: 16px; height: 100%; display: flex; flex-direction: column;">
+            <h3 style="margin: 0 0 16px 0; color: #e5e7eb;">Token Editor</h3>
+            <p style="color: #9ca3af; margin-bottom: 16px;">Create content with dynamic tokens for personalization.</p>
+            <textarea placeholder="Enter text with {tokens}..." style="flex: 1; padding: 12px; background: #1f2937; border: 1px solid #374151; border-radius: 8px; color: #e5e7eb; resize: vertical;"></textarea>
+            <div style="margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px;">
+              <button class="token-btn" data-token="{first_name}">first_name</button>
+              <button class="token-btn" data-token="{last_name}">last_name</button>
+              <button class="token-btn" data-token="{email}">email</button>
+              <button class="token-btn" data-token="{company}">company</button>
+            </div>
+          </div>
+        `;
+
+        // Add token button functionality
+        els.tokenEditorContainer.querySelectorAll('.token-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const textarea = els.tokenEditorContainer.querySelector('textarea');
+            const token = btn.dataset.token;
+            textarea.value += token;
+          });
+        });
+      }
+      showToast('Token editor opened');
+    }
+
+    function showBatchGeneratorPanel() {
+      hideAllEditorPanels();
+      els.batchGeneratorPanel.style.display = 'block';
+
+      if (!els.batchGeneratorContainer.innerHTML) {
+        els.batchGeneratorContainer.innerHTML = `
+          <div style="padding: 16px; height: 100%; display: flex; flex-direction: column;">
+            <h3 style="margin: 0 0 16px 0; color: #e5e7eb;">Batch Generator</h3>
+            <p style="color: #9ca3af; margin-bottom: 16px;">Generate multiple videos or content items at once.</p>
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 16px;">
+              <select style="padding: 8px; background: #1f2937; border: 1px solid #374151; border-radius: 4px; color: #e5e7eb;">
+                <option>Select Template...</option>
+                <option>Video Template 1</option>
+                <option>Video Template 2</option>
+              </select>
+              <div id="batchItems" style="flex: 1; overflow-y: auto; border: 1px solid #374151; border-radius: 4px; padding: 8px;">
+                <!-- Batch items will be added here -->
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button id="addBatchItem" style="padding: 8px 12px; background: #10b981; color: white; border: none; border-radius: 4px;">Add Item</button>
+                <button id="startBatch" style="padding: 8px 12px; background: #3b82f6; color: white; border: none; border-radius: 4px;">Start Batch</button>
+              </div>
+            </div>
+          </div>
+        `;
+
+        // Add batch functionality
+        const addBtn = els.batchGeneratorContainer.querySelector('#addBatchItem');
+        const batchItems = els.batchGeneratorContainer.querySelector('#batchItems');
+
+        addBtn.addEventListener('click', () => {
+          const itemCount = batchItems.children.length + 1;
+          const itemDiv = document.createElement('div');
+          itemDiv.style.cssText = 'background: #111827; padding: 8px; margin-bottom: 8px; border-radius: 4px;';
+          itemDiv.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span>Item ${itemCount}</span>
+              <button class="remove-item" style="background: #ef4444; color: white; border: none; border-radius: 4px; padding: 2px 6px;">×</button>
+            </div>
+            <input type="text" placeholder="Item data..." style="width: 100%; padding: 4px; background: #1f2937; border: 1px solid #374151; border-radius: 4px; color: #e5e7eb;">
+          `;
+          itemDiv.querySelector('.remove-item').addEventListener('click', () => itemDiv.remove());
+          batchItems.appendChild(itemDiv);
+        });
+      }
+      showToast('Batch generator opened');
+    }
+
+    function showWorkflowPanel() {
+      hideAllEditorPanels();
+      els.workflowPanel.style.display = 'block';
+
+      if (!els.workflowContainer.innerHTML) {
+        els.workflowContainer.innerHTML = `
+          <div style="padding: 16px; height: 100%; display: flex; flex-direction: column;">
+            <h3 style="margin: 0 0 16px 0; color: #e5e7eb;">Workflow Automation</h3>
+            <p style="color: #9ca3af; margin-bottom: 16px;">Automate your video creation and distribution workflows.</p>
+            <div style="flex: 1; overflow-y: auto;">
+              <div style="display: grid; gap: 12px;">
+                <div class="workflow-card" style="background: #1f2937; border: 1px solid #374151; border-radius: 8px; padding: 12px; cursor: pointer;">
+                  <h4 style="margin: 0 0 8px 0; color: #e5e7eb;">Video Creation Pipeline</h4>
+                  <p style="margin: 0; color: #9ca3af; font-size: 14px;">Generate, edit, and publish videos automatically</p>
+                </div>
+                <div class="workflow-card" style="background: #1f2937; border: 1px solid #374151; border-radius: 8px; padding: 12px; cursor: pointer;">
+                  <h4 style="margin: 0 0 8px 0; color: #e5e7eb;">Batch Processing</h4>
+                  <p style="margin: 0; color: #9ca3af; font-size: 14px;">Process multiple videos with consistent branding</p>
+                </div>
+                <div class="workflow-card" style="background: #1f2937; border: 1px solid #374151; border-radius: 8px; padding: 12px; cursor: pointer;">
+                  <h4 style="margin: 0 0 8px 0; color: #e5e7eb;">Personalization Hub</h4>
+                  <p style="margin: 0; color: #9ca3af; font-size: 14px;">Create personalized content at scale</p>
+                </div>
+              </div>
+            </div>
+            <button style="margin-top: 16px; padding: 10px; background: #3b82f6; color: white; border: none; border-radius: 4px;">Create New Workflow</button>
+          </div>
+        `;
+      }
+      showToast('Workflow automation opened');
+    }
+
+    function showPersonalizationPanel() {
+      hideAllEditorPanels();
+      els.personalizationPanel.style.display = 'block';
+
+      if (!els.personalizationContainer.innerHTML) {
+        els.personalizationContainer.innerHTML = `
+          <div style="padding: 16px; height: 100%; display: flex; flex-direction: column;">
+            <h3 style="margin: 0 0 16px 0; color: #e5e7eb;">Personalization</h3>
+            <p style="color: #9ca3af; margin-bottom: 16px;">Create personalized content using merge fields.</p>
+            <div style="flex: 1; overflow-y: auto; display: grid; gap: 8px;">
+              <div class="merge-field" style="background: #1f2937; padding: 8px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <div style="font-weight: bold; color: #e5e7eb;">First Name</div>
+                  <div style="font-size: 12px; color: #6b7280;">{first_name}</div>
+                </div>
+                <span style="color: #9ca3af;">John</span>
+              </div>
+              <div class="merge-field" style="background: #1f2937; padding: 8px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <div style="font-weight: bold; color: #e5e7eb;">Email</div>
+                  <div style="font-size: 12px; color: #6b7280;">{email}</div>
+                </div>
+                <span style="color: #9ca3af;">john@example.com</span>
+              </div>
+              <div class="merge-field" style="background: #1f2937; padding: 8px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <div style="font-weight: bold; color: #e5e7eb;">Company</div>
+                  <div style="font-size: 12px; color: #6b7280;">{company}</div>
+                </div>
+                <span style="color: #9ca3af;">Acme Corp</span>
+              </div>
+            </div>
+            <button style="margin-top: 16px; padding: 10px; background: #3b82f6; color: white; border: none; border-radius: 4px;">Add Field</button>
+          </div>
+        `;
+      }
+      showToast('Personalization panel opened');
+    }
+
+    function showPersonalizationEditorPanel() {
+      hideAllEditorPanels();
+      els.personalizationEditorPanel.style.display = 'block';
+
+      if (!els.personalizationEditorContainer.innerHTML) {
+        els.personalizationEditorContainer.innerHTML = `
+          <div style="padding: 16px; height: 100%; display: flex; flex-direction: column;">
+            <h3 style="margin: 0 0 16px 0; color: #e5e7eb;">Personalization Editor</h3>
+            <p style="color: #9ca3af; margin-bottom: 16px;">Edit personalized content with dynamic tokens.</p>
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 16px;">
+              <textarea placeholder="Enter personalized text..." style="flex: 1; padding: 12px; background: #1f2937; border: 1px solid #374151; border-radius: 8px; color: #e5e7eb; resize: vertical;"></textarea>
+              <div style="background: #1f2937; border: 1px solid #374151; border-radius: 8px; padding: 12px;">
+                <h4 style="margin: 0 0 8px 0; color: #e5e7eb;">Preview</h4>
+                <div id="personalizationPreview" style="color: #e5e7eb;">Preview will appear here...</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      showToast('Personalization editor opened');
+    }
+
+    function hideAllEditorPanels() {
+      els.canvasPanel.style.display = 'none';
+      els.tokenEditorPanel.style.display = 'none';
+      els.batchGeneratorPanel.style.display = 'none';
+      els.workflowPanel.style.display = 'none';
+      els.personalizationPanel.style.display = 'none';
+      els.personalizationEditorPanel.style.display = 'none';
+    }
+
+    function renderLineDuration(clipId) {
+      const clip = state.tracks.flatMap(t => t.clips).find(c => c.id === clipId);
+      if (!clip) return '';
+
+      const start = (clip.left / 100) * state.timelineSeconds;
+      const end = ((clip.left + clip.width) / 100) * state.timelineSeconds;
+      const trimIn = clip.trimIn || 0;
+      const trimOut = clip.trimOut || (end - start);
+
+      return `
+        <div class="line-duration" style="width: 300px; height: 60px; margin: 20px 0;">
+          <div class="line-duration-track" style="position: relative; width: 100%; height: 100%; background: #2a2a2a; border-radius: 4px; cursor: pointer;">
+            <div class="line-duration-trimmed" style="position: absolute; left: ${(trimIn / (end - start)) * 100}%; width: ${((trimOut - trimIn) / (end - start)) * 100}%; height: 100%; background: #4a9eff; border-radius: 2px; opacity: 0.8;"></div>
+            <div class="line-duration-handle line-duration-handle-in" style="position: absolute; left: ${(trimIn / (end - start)) * 300 - 8}px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; background: #ff6b6b; border-radius: 50%; cursor: ew-resize; border: 2px solid #fff; z-index: 10;"></div>
+            <div class="line-duration-handle line-duration-handle-out" style="position: absolute; left: ${(trimOut / (end - start)) * 300 - 8}px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; background: #4ecdc4; border-radius: 50%; cursor: ew-resize; border: 2px solid #fff; z-index: 10;"></div>
+            <div class="line-duration-display" style="position: absolute; top: -24px; left: ${(trimIn / (end - start)) * 300}px; background: #1a1a1a; color: #fff; padding: 2px 6px; border-radius: 3px; font-size: 12px;">${(trimOut - trimIn).toFixed(2)}s</div>
+          </div>
+        </div>
+      `;
     }
 
     async function generateClip() {
@@ -1631,11 +2876,203 @@ button, input, textarea, select { font: inherit; }
       }
     }
 
+    // Rendiv Animation Demo Functions
+    function runSpringDemo(canvas, statusEl) {
+      if (!canvas) return;
+
+      const ctx = canvas.getContext('2d');
+      const width = canvas.width;
+      const height = canvas.height;
+      let animationId = null;
+      let frame = 0;
+
+      statusEl.textContent = 'Running spring animation demo...';
+
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+
+        // Draw background
+        ctx.fillStyle = '#0a0a0a';
+        ctx.fillRect(0, 0, width, height);
+
+        // Calculate spring position (simulate a bouncing ball)
+        const springValue = spring({ frame, fps: 30, config: { damping: 12, stiffness: 100 } });
+        const x = width / 2;
+        const y = height - (springValue * height * 0.8) - 50;
+
+        // Draw ball
+        ctx.fillStyle = '#22d3ee';
+        ctx.beginPath();
+        ctx.arc(x, y, 20, 0, 2 * Math.PI);
+        ctx.fill();
+
+        // Draw trail
+        for (let i = 1; i <= 5; i++) {
+          const trailFrame = Math.max(0, frame - i * 2);
+          const trailSpring = spring({ frame: trailFrame, fps: 30, config: { damping: 12, stiffness: 100 } });
+          const trailY = height - (trailSpring * height * 0.8) - 50;
+          const alpha = (6 - i) / 6;
+
+          ctx.fillStyle = `rgba(34, 211, 238, ${alpha * 0.5})`;
+          ctx.beginPath();
+          ctx.arc(x, trailY, 20 - i * 2, 0, 2 * Math.PI);
+          ctx.fill();
+        }
+
+        frame++;
+        if (frame < 180) { // 6 seconds at 30fps
+          animationId = requestAnimationFrame(animate);
+        } else {
+          statusEl.textContent = 'Spring demo complete! Ball reached rest position.';
+        }
+      }
+
+      animate();
+    }
+
+    function runNoiseDemo(canvas, statusEl) {
+      if (!canvas) return;
+
+      const ctx = canvas.getContext('2d');
+      const width = canvas.width;
+      const height = canvas.height;
+      let animationId = null;
+      let frame = 0;
+
+      statusEl.textContent = 'Running Perlin noise animation demo...';
+
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+
+        // Draw background
+        ctx.fillStyle = '#0a0a0a';
+        ctx.fillRect(0, 0, width, height);
+
+        // Generate organic movement using noise
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const radius = 60;
+
+        // Create multiple orbiting elements with noise
+        for (let i = 0; i < 8; i++) {
+          const angle = (i / 8) * Math.PI * 2 + frame * 0.02;
+          const noiseOffset = noise2D(frame * 0.05 + i, 0) * Math.PI * 0.5;
+          const finalAngle = angle + noiseOffset;
+
+          const x = centerX + Math.cos(finalAngle) * radius;
+          const y = centerY + Math.sin(finalAngle) * radius;
+
+          // Color based on position
+          const hue = (i / 8) * 360;
+          ctx.fillStyle = `hsl(${hue}, 70%, 60%)`;
+          ctx.beginPath();
+          ctx.arc(x, y, 8, 0, 2 * Math.PI);
+          ctx.fill();
+        }
+
+        // Draw central pulsing element
+        const pulseScale = 1 + noise2D(frame * 0.1, 1) * 0.3;
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, 15 * pulseScale, 0, 2 * Math.PI);
+        ctx.fill();
+
+        frame++;
+        if (frame < 300) { // 10 seconds at 30fps
+          animationId = requestAnimationFrame(animate);
+        } else {
+          statusEl.textContent = 'Noise demo complete! Organic movement simulation finished.';
+        }
+      }
+
+      animate();
+    }
+
+    function runInterpolateDemo(canvas, statusEl) {
+      if (!canvas) return;
+
+      const ctx = canvas.getContext('2d');
+      const width = canvas.width;
+      const height = canvas.height;
+      let animationId = null;
+      let frame = 0;
+
+      statusEl.textContent = 'Running interpolation animation demo...';
+
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+
+        // Draw background
+        ctx.fillStyle = '#0a0a0a';
+        ctx.fillRect(0, 0, width, height);
+
+        // Demonstrate different interpolation types
+        const progress = (frame / 120) % 1; // 4 seconds loop at 30fps
+
+        // Linear interpolation
+        const linearX = interpolate(progress, [0, 1], [50, width - 50]);
+        ctx.fillStyle = '#22d3ee';
+        ctx.beginPath();
+        ctx.arc(linearX, 60, 8, 0, 2 * Math.PI);
+        ctx.fill();
+
+        // Ease-out interpolation
+        const easeOutX = interpolate(progress, [0, 1], [50, width - 50], 'ease-out');
+        ctx.fillStyle = '#10b981';
+        ctx.beginPath();
+        ctx.arc(easeOutX, 100, 8, 0, 2 * Math.PI);
+        ctx.fill();
+
+        // Bounce interpolation
+        const bounceX = interpolate(progress, [0, 1], [50, width - 50], 'bounce');
+        ctx.fillStyle = '#f59e0b';
+        ctx.beginPath();
+        ctx.arc(bounceX, 140, 8, 0, 2 * Math.PI);
+        ctx.fill();
+
+        // Color interpolation
+        const color = blendColors(progress, '#ff0000', '#0000ff');
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(width / 2, 180, 12, 0, 2 * Math.PI);
+        ctx.fill();
+
+        // Labels
+        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        ctx.font = '11px Arial';
+        ctx.fillText('Linear', 50, 50);
+        ctx.fillText('Ease-Out', 50, 90);
+        ctx.fillText('Bounce', 50, 130);
+        ctx.fillText('Color Blend', 50, 170);
+
+        frame++;
+        if (frame < 480) { // 16 seconds at 30fps
+          animationId = requestAnimationFrame(animate);
+        } else {
+          statusEl.textContent = 'Interpolation demo complete! Showed linear, easing, bounce, and color interpolation.';
+        }
+      }
+
+      animate();
+    }
+
     function bindEvents() {
       els.playBtn.addEventListener('click', togglePlayback);
       els.stopBtn.addEventListener('click', stopPlayback);
       els.rewindBtn.addEventListener('click', rewindPlayback);
       els.generateBtn.addEventListener('click', generateClip);
+
+      // Rendiv Animation Demo handlers
+      const runSpringDemoBtn = root.querySelector('#runSpringDemo');
+      const runNoiseDemoBtn = root.querySelector('#runNoiseDemo');
+      const runInterpolateDemoBtn = root.querySelector('#runInterpolateDemo');
+      const animationCanvas = root.querySelector('#animationCanvas');
+      const demoStatus = root.querySelector('#demoStatus');
+
+      if (runSpringDemoBtn) runSpringDemoBtn.addEventListener('click', () => runSpringDemo(animationCanvas, demoStatus));
+      if (runNoiseDemoBtn) runNoiseDemoBtn.addEventListener('click', () => runNoiseDemo(animationCanvas, demoStatus));
+      if (runInterpolateDemoBtn) runInterpolateDemoBtn.addEventListener('click', () => runInterpolateDemo(animationCanvas, demoStatus));
+
       els.uploadBtn.addEventListener('click', () => els.uploadInput.click());
       els.uploadInput.addEventListener('change', (event) => handleUpload(event.target.files?.[0]));
       els.backBtn.addEventListener('click', () => showToast('Back action clicked'));
@@ -1655,9 +3092,19 @@ button, input, textarea, select { font: inherit; }
       renderChat();
       renderQuickCommands();
       renderRail();
+      renderMultiCamera();
       updatePreview();
       updatePlaybackUI();
     }
+
+    function renderMultiCamera() {
+      renderMultiCameraToolbar(state, els.multiCameraToolbar);
+      renderPipControls(state, els.pipControls);
+      renderSplitScreenControls(state, els.splitControls);
+      renderCompositingOverlay(state, els.compositingOverlay);
+    }
+
+    // Color correction system not implemented
 
     renderAll();
     bindEvents();
@@ -1665,6 +3112,22 @@ button, input, textarea, select { font: inherit; }
     // Initialize enhanced drag and drop functionality
     initializeTimelineDragDrop(state, els);
     setupEnhancedTooltips();
+
+    // Initialize media ingest components
+    integrateMediaIngest();
+
+    // Render enhanced timeline controls
+    const timelineControlsContainer = document.getElementById('timelineControlsEnhanced');
+    if (timelineControlsContainer) {
+      renderTimelineControls(state, timelineControlsContainer);
+    }
+
+    // Initialize transition system
+    initializeTimelineTransitions();
+    initializeTransitionEditor();
+
+    // Initialize multi-camera functionality
+    window.timelineState = state; // Make state globally accessible for multi-camera functions
 
     return {
       destroy() {
@@ -1676,6 +3139,7 @@ button, input, textarea, select { font: inherit; }
     };
   }
 
+  // Inject styles and initialize the timeline editor app
   injectStyles();
   createTimelineEditorApp(container);
 

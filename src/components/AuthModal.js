@@ -1,68 +1,159 @@
 import { apiKeyManager } from '../lib/apiKeyManager.js';
+import TIMELINE_DESIGN_SYSTEM from '../lib/designSystemEnforcer.js';
 
 export function AuthModal(onSuccess) {
     const existing = document.querySelector('[data-auth-modal]');
     if (existing) existing.remove();
 
-    const overlay = document.createElement('div');
+    // Use design system enforced modal creation
+    const overlay = TIMELINE_DESIGN_SYSTEM.utils.createModal({
+        title: 'Muapi API Key Required',
+        onClose: () => {}
+    });
     overlay.setAttribute('data-auth-modal', '');
-    overlay.className = 'fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm px-6';
 
     const removeModal = () => {
         if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
     };
 
-    const modal = document.createElement('div');
-    modal.className = 'w-full max-w-md bg-panel-bg border border-white/10 rounded-3xl p-8 shadow-3xl animate-fade-in-up relative';
+    // Get references to modal elements
+    const modalContent = overlay.querySelector(`.${TIMELINE_DESIGN_SYSTEM.styles.modal.content}`);
+    const modalBody = overlay.querySelector(`.${TIMELINE_DESIGN_SYSTEM.styles.modal.body}`);
+    const modalHeader = overlay.querySelector(`.${TIMELINE_DESIGN_SYSTEM.styles.modal.header}`);
 
-    modal.innerHTML = `
-        <button class="auth-close-btn absolute top-4 right-4 text-white/40 hover:text-white transition-colors p-1">
+    // Remove default title and add custom header content
+    modalHeader.innerHTML = `
+        <button class="auth-close-btn absolute top-4 right-4 text-white/40 hover:text-white transition-colors p-1" style="position: absolute; top: 16px; right: 20px; color: ${TIMELINE_DESIGN_SYSTEM.variables['--muted']}; background: none; border: none; font-size: 20px; cursor: pointer; padding: 4px;">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
         <div class="flex flex-col items-center text-center mb-8">
-            <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20 shadow-glow mb-6">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#d9ff00" stroke-width="2">
+            <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20 shadow-glow mb-6" style="
+                width: 64px;
+                height: 64px;
+                background: rgba(217, 255, 0, 0.1);
+                border-radius: 16px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border: 1px solid rgba(217, 255, 0, 0.2);
+                box-shadow: 0 0 16px rgba(217, 255, 0, 0.4);
+                margin-bottom: 24px;
+            ">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="${TIMELINE_DESIGN_SYSTEM.variables['--color-primary']}" stroke-width="2">
                     <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3m-3-3l-2.25-2.25"/>
                 </svg>
             </div>
-            <h2 class="text-2xl font-black text-white uppercase tracking-wider mb-2">Muapi API Key Required</h2>
-            <p class="text-secondary text-sm">Please provide your Muapi.ai API key to start creating high-aesthetic images.</p>
+            <p class="text-secondary text-sm" style="
+                color: ${TIMELINE_DESIGN_SYSTEM.variables['--text-secondary']};
+                font-size: 14px;
+                margin-top: 8px;
+            ">Please provide your Muapi.ai API key to start creating high-aesthetic images.</p>
         </div>
-
-        <div class="space-y-6">
-            <div class="space-y-2">
-                <label class="text-[10px] font-bold text-muted uppercase tracking-widest ml-1">Your API Key</label>
-                <input
-                    type="password"
-                    id="muapi-key-input"
-                    placeholder="sk-..."
-                    class="w-full bg-black/40 border border-white/5 rounded-2xl px-5 py-4 text-white placeholder:text-muted focus:outline-none focus:border-primary/50 transition-colors shadow-inner"
-                    autocomplete="off"
-                >
-            </div>
-
-            <div class="flex flex-col gap-3">
-                <button id="save-key-btn" class="w-full bg-primary text-black font-black py-4 rounded-2xl hover:shadow-glow hover:scale-[1.02] active:scale-[0.98] transition-all">
-                    Initialize Studio
-                </button>
-                <a href="https://muapi.ai" target="_blank" rel="noopener noreferrer" class="text-center text-[11px] font-bold text-muted hover:text-white transition-colors py-2 uppercase tracking-tighter">
-                    Get an API Key at Muapi.ai &rarr;
-                </a>
-            </div>
-        </div>
-        
-        <p class="text-[10px] text-muted/50 mt-4 text-center">
-            Your API key is stored securely and never shared.
-        </p>
     `;
 
-    overlay.appendChild(modal);
+    // Create modal body content using design system
+    const formContainer = document.createElement('div');
+    formContainer.style.cssText = 'display: flex; flex-direction: column; gap: 24px;';
+
+    // API Key input section
+    const inputSection = document.createElement('div');
+    inputSection.style.cssText = 'display: flex; flex-direction: column; gap: 8px;';
+
+    const label = document.createElement('label');
+    label.textContent = 'Your API Key';
+    label.style.cssText = `
+        font-size: 10px;
+        font-weight: bold;
+        color: ${TIMELINE_DESIGN_SYSTEM.variables['--muted']};
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-left: 4px;
+    `;
+
+    const apiKeyInput = document.createElement('input');
+    apiKeyInput.type = 'password';
+    apiKeyInput.id = 'muapi-key-input';
+    apiKeyInput.placeholder = 'sk-...';
+    apiKeyInput.autocomplete = 'off';
+    apiKeyInput.style.cssText = `
+        width: 100%;
+        background: rgba(0,0,0,0.4);
+        border: 1px solid ${TIMELINE_DESIGN_SYSTEM.variables['--border']};
+        border-radius: 12px;
+        padding: 12px 16px;
+        color: ${TIMELINE_DESIGN_SYSTEM.variables['--text']};
+        outline: none;
+        transition: border-color 0.15s ease;
+    `;
+
+    // Focus styles
+    apiKeyInput.addEventListener('focus', () => {
+        apiKeyInput.style.borderColor = TIMELINE_DESIGN_SYSTEM.variables['--cyan'];
+    });
+    apiKeyInput.addEventListener('blur', () => {
+        apiKeyInput.style.borderColor = TIMELINE_DESIGN_SYSTEM.variables['--border'];
+    });
+
+    inputSection.appendChild(label);
+    inputSection.appendChild(apiKeyInput);
+
+    // Buttons section
+    const buttonSection = document.createElement('div');
+    buttonSection.style.cssText = 'display: flex; flex-direction: column; gap: 12px;';
+
+    const saveBtn = TIMELINE_DESIGN_SYSTEM.utils.createButton({
+        type: 'primary',
+        text: 'Initialize Studio'
+    });
+    saveBtn.id = 'save-key-btn';
+    saveBtn.style.cssText += 'width: 100%; padding: 16px;';
+
+    const link = document.createElement('a');
+    link.href = 'https://muapi.ai';
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.textContent = 'Get an API Key at Muapi.ai →';
+    link.style.cssText = `
+        text-align: center;
+        font-size: 11px;
+        font-weight: bold;
+        color: ${TIMELINE_DESIGN_SYSTEM.variables['--muted']};
+        text-decoration: none;
+        padding: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        transition: color 0.15s ease;
+    `;
+    link.addEventListener('mouseenter', () => {
+        link.style.color = TIMELINE_DESIGN_SYSTEM.variables['--text'];
+    });
+    link.addEventListener('mouseleave', () => {
+        link.style.color = TIMELINE_DESIGN_SYSTEM.variables['--muted'];
+    });
+
+    buttonSection.appendChild(saveBtn);
+    buttonSection.appendChild(link);
+
+    // Footer text
+    const footer = document.createElement('p');
+    footer.textContent = 'Your API key is stored securely and never shared.';
+    footer.style.cssText = `
+        font-size: 10px;
+        color: ${TIMELINE_DESIGN_SYSTEM.variables['--dim']};
+        text-align: center;
+        margin-top: 16px;
+    `;
+
+    formContainer.appendChild(inputSection);
+    formContainer.appendChild(buttonSection);
+    modalBody.appendChild(formContainer);
+    modalBody.appendChild(footer);
     document.body.appendChild(overlay);
 
-    modal.querySelector('.auth-close-btn').onclick = removeModal;
+    overlay.querySelector('.auth-close-btn').onclick = removeModal;
 
-    const input = modal.querySelector('#muapi-key-input');
-    const btn = modal.querySelector('#save-key-btn');
+    const input = overlay.querySelector('#muapi-key-input');
+    const btn = overlay.querySelector('#save-key-btn');
 
     // Focus input on open
     setTimeout(() => input.focus(), 100);
@@ -82,17 +173,17 @@ export function AuthModal(onSuccess) {
                 setTimeout(() => input.classList.remove('border-red-500/50'), 2000);
                 return;
             }
-            
+
             try {
                 btn.disabled = true;
                 btn.textContent = 'Saving...';
-                
+
                 // Use the secure ApiKeyManager
                 await apiKeyManager.setKey(key, true);
-                
+
                 removeModal();
                 if (onSuccess) onSuccess();
-                
+
                 console.log('[AuthModal] API key saved securely');
             } catch (error) {
                 console.error('[AuthModal] Failed to save key:', error);

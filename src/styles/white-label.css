@@ -1,0 +1,291 @@
+/* White Label Theming System */
+
+/* White Label CSS Variables (will be overridden by whiteLabelManager) */
+:root {
+  /* Brand Colors */
+  --wl-primary: var(--color-primary);
+  --wl-primary-hover: var(--color-primary-hover);
+  --wl-accent: var(--color-accent);
+  --wl-accent-hover: var(--color-accent-hover);
+
+  /* Backgrounds */
+  --wl-bg-app: var(--bg-app);
+  --wl-bg-panel: var(--bg-panel);
+  --wl-bg-card: var(--bg-card);
+  --wl-bg-glass: var(--bg-glass);
+
+  /* Text */
+  --wl-text-primary: var(--text-primary);
+  --wl-text-secondary: var(--text-secondary);
+  --wl-text-muted: var(--text-muted);
+
+  /* Borders */
+  --wl-border-color: var(--border-color);
+  --wl-border-light: var(--border-light);
+
+  /* Shadows */
+  --wl-shadow-sm: var(--shadow-sm);
+  --wl-shadow-md: var(--shadow-md);
+  --wl-shadow-lg: var(--shadow-lg);
+  --wl-shadow-glow: var(--shadow-glow);
+}
+
+/* White Label Classes */
+.wl-primary {
+  color: var(--wl-primary);
+}
+
+.wl-bg-primary {
+  background-color: var(--wl-primary);
+}
+
+.wl-bg-app {
+  background-color: var(--wl-bg-app);
+}
+
+.wl-bg-panel {
+  background-color: var(--wl-bg-panel);
+}
+
+.wl-bg-card {
+  background-color: var(--wl-bg-card);
+}
+
+.wl-text-primary {
+  color: var(--wl-text-primary);
+}
+
+.wl-text-secondary {
+  color: var(--wl-text-secondary);
+}
+
+.wl-border-color {
+  border-color: var(--wl-border-color);
+}
+
+/* Header Branding */
+.wl-header {
+  background: var(--wl-bg-panel);
+  border-bottom: 1px solid var(--wl-border-color);
+}
+
+.wl-logo {
+  filter: brightness(1);
+  transition: filter 0.2s ease-in-out;
+}
+
+.wl-logo:hover {
+  filter: brightness(1.1);
+}
+
+/* Sidebar Theming */
+.wl-sidebar {
+  background: var(--wl-bg-panel);
+  border-right: 1px solid var(--wl-border-color);
+}
+
+.wl-sidebar-item {
+  color: var(--wl-text-secondary);
+  transition: all 0.2s ease-in-out;
+}
+
+.wl-sidebar-item:hover {
+  color: var(--wl-text-primary);
+  background: var(--wl-bg-glass);
+}
+
+.wl-sidebar-item.active {
+  color: var(--wl-primary);
+  background: rgba(217, 255, 0, 0.1);
+}
+
+/* Content Area */
+.wl-content {
+  background: var(--wl-bg-app);
+}
+
+/* Cards and Panels */
+.wl-card {
+  background: var(--wl-bg-card);
+  border: 1px solid var(--wl-border-color);
+  border-radius: var(--border-radius-md);
+}
+
+.wl-panel {
+  background: var(--wl-bg-panel);
+  border: 1px solid var(--wl-border-light);
+}
+
+/* Buttons */
+.wl-btn-primary {
+  background: var(--wl-primary);
+  color: black;
+  border: none;
+  border-radius: var(--border-radius-md);
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.wl-btn-primary:hover {
+  background: var(--wl-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--wl-shadow-md);
+}
+
+.wl-btn-secondary {
+  background: var(--wl-bg-panel);
+  color: var(--wl-text-primary);
+  border: 1px solid var(--wl-border-color);
+  border-radius: var(--border-radius-md);
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.wl-btn-secondary:hover {
+  background: var(--wl-bg-card);
+  border-color: var(--wl-border-light);
+}
+
+/* Inputs and Forms */
+.wl-input {
+  background: var(--wl-bg-panel);
+  border: 1px solid var(--wl-border-color);
+  border-radius: var(--border-radius-md);
+  color: var(--wl-text-primary);
+  padding: 0.5rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.wl-input:focus {
+  outline: none;
+  border-color: var(--wl-primary);
+  box-shadow: 0 0 0 2px rgba(217, 255, 0, 0.2);
+}
+
+.wl-select {
+  background: var(--wl-bg-panel);
+  border: 1px solid var(--wl-border-color);
+  border-radius: var(--border-radius-md);
+  color: var(--wl-text-primary);
+  padding: 0.5rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.wl-select:focus {
+  outline: none;
+  border-color: var(--wl-primary);
+  box-shadow: 0 0 0 2px rgba(217, 255, 0, 0.2);
+}
+
+/* Loading States */
+.wl-loading {
+  border: 2px solid var(--wl-border-color);
+  border-top: 2px solid var(--wl-primary);
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: wl-spin 1s linear infinite;
+}
+
+@keyframes wl-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Animations */
+.wl-fade-in {
+  animation: wl-fade-in 0.3s ease-in-out;
+}
+
+@keyframes wl-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .wl-sidebar {
+    position: fixed;
+    left: -100%;
+    top: 0;
+    width: 280px;
+    height: 100vh;
+    z-index: 50;
+    transition: left 0.3s ease-in-out;
+  }
+
+  .wl-sidebar.open {
+    left: 0;
+  }
+
+  .wl-mobile-menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 40;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease-in-out;
+  }
+
+  .wl-mobile-menu-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .wl-sidebar,
+  .wl-header-actions {
+    display: none !important;
+  }
+
+  .wl-content {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .wl-card,
+  .wl-panel {
+    border-width: 2px;
+  }
+
+  .wl-btn-primary,
+  .wl-btn-secondary {
+    border-width: 2px;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .wl-btn-primary,
+  .wl-btn-secondary,
+  .wl-sidebar-item,
+  .wl-input,
+  .wl-select {
+    transition: none;
+  }
+
+  .wl-fade-in {
+    animation: none;
+  }
+
+  .wl-loading {
+    animation: none;
+  }
+}

@@ -3,6 +3,8 @@ import { showToast } from '../lib/loading.js';
 import { escapeHtml } from '../lib/security.js';
 import { directorRuntime } from '../lib/directorAgentRuntime.js';
 import { supabase } from '../lib/supabase.js';
+import { VideoUpload } from './common/Upload.js';
+import { Tooltip, addTooltip } from './common/Tooltip.js';
 
 const DIRECTOR_AGENTS = [
     { id: 'summarizer', name: 'Video Summarizer', icon: '📝', description: 'Summarize video content', category: 'analysis' },
@@ -247,22 +249,11 @@ export function DirectorPage() {
                                 >
                                     Your browser does not support video playback.
                                 </video>
-                            ` : `
-                                <div class="text-center p-8">
-                                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="text-secondary mx-auto mb-4">
-                                        <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/>
-                                        <line x1="7" y1="2" x2="7" y2="22"/>
-                                        <line x1="17" y1="2" x2="17" y2="22"/>
-                                        <line x1="2" y1="12" x2="22" y2="12"/>
-                                        <line x1="2" y1="7" x2="7" y2="7"/>
-                                        <line x1="2" y1="17" x2="7" y2="17"/>
-                                        <line x1="17" y1="17" x2="22" y2="17"/>
-                                        <line x1="17" y1="7" x2="22" y2="7"/>
-                                    </svg>
-                                    <p class="text-secondary">No video loaded</p>
-                                    <p class="text-xs text-muted mt-2">Generate a video first to use Director</p>
-                                </div>
-                            `}
+                             ` : `
+                                 <div id="upload-placeholder" class="text-center p-8">
+                                     <!-- Upload component will be inserted here -->
+                                 </div>
+                             `}
                         </div>
                     </div>
                 </div>
@@ -930,6 +921,33 @@ export function DirectorPage() {
 
     // Initialize storyboard frames display
     updateStoryboardFrames();
+
+    // Initialize upload component if no video is loaded
+    if (!videoUrl) {
+        const uploadPlaceholder = container.querySelector('#upload-placeholder');
+        if (uploadPlaceholder) {
+            const videoUpload = VideoUpload({
+                placeholder: 'Upload a video to start directing',
+                maxSize: 2000, // 2GB
+                onUpload: (file) => {
+                    // Handle uploaded video
+                    const url = URL.createObjectURL(file);
+                    const videoElement = container.querySelector('#director-video');
+                    if (videoElement) {
+                        videoElement.src = url;
+                        videoElement.style.display = 'block';
+                        uploadPlaceholder.style.display = 'none';
+                    }
+                    showToast('Video uploaded successfully', 'success');
+                    updateTimelinePreview();
+                },
+                onError: (errors) => {
+                    errors.forEach(error => showToast(error, 'error'));
+                }
+            });
+            uploadPlaceholder.appendChild(videoUpload);
+        }
+    }
 
     return container;
 }

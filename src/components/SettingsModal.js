@@ -1,58 +1,91 @@
+import TIMELINE_DESIGN_SYSTEM from '../lib/designSystemEnforcer.js';
+
 export function SettingsModal(onClose) {
-    const overlay = document.createElement('div');
-    overlay.className = 'fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm px-6';
+    // Use design system enforced modal creation
+    const overlay = TIMELINE_DESIGN_SYSTEM.utils.createModal({
+        title: 'Settings',
+        onClose: onClose
+    });
+
+    // Get references to the created modal elements
+    const modalContent = overlay.querySelector(`.${TIMELINE_DESIGN_SYSTEM.styles.modal.content}`);
+    const modalBody = overlay.querySelector(`.${TIMELINE_DESIGN_SYSTEM.styles.modal.body}`);
 
     const removeModal = () => {
         if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
         if (onClose) onClose();
     };
 
-    const modal = document.createElement('div');
-    modal.className = 'w-full max-w-sm bg-panel-bg border border-white/10 rounded-3xl p-8 shadow-3xl animate-fade-in-up';
-
-    const title = document.createElement('h2');
-    title.textContent = 'Settings';
-    title.className = 'text-xl font-black text-white mb-6';
-
+    // Create modal content using design system
     const label = document.createElement('label');
     label.textContent = 'Muapi API Key';
-    label.className = 'block text-[10px] font-bold text-muted uppercase tracking-widest mb-2 ml-1';
+    label.style.cssText = `
+        display: block;
+        font-size: 10px;
+        font-weight: bold;
+        color: ${TIMELINE_DESIGN_SYSTEM.variables['--muted']};
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 8px;
+        margin-left: 4px;
+    `;
 
     const input = document.createElement('input');
     input.type = 'password';
-    input.className = 'w-full mb-6 bg-black/40 border border-white/5 rounded-2xl px-5 py-4 text-white placeholder:text-muted focus:outline-none focus:border-primary/50 transition-colors shadow-inner';
+    input.style.cssText = `
+        width: 100%;
+        margin-bottom: 24px;
+        background: rgba(0,0,0,0.4);
+        border: 1px solid ${TIMELINE_DESIGN_SYSTEM.variables['--border']};
+        border-radius: 12px;
+        padding: 12px 16px;
+        color: ${TIMELINE_DESIGN_SYSTEM.variables['--text']};
+        outline: none;
+        transition: border-color 0.15s ease;
+    `;
     input.value = localStorage.getItem('muapi_key') || '';
     input.placeholder = 'sk-...';
 
+    // Focus styles
+    input.addEventListener('focus', () => {
+        input.style.borderColor = TIMELINE_DESIGN_SYSTEM.variables['--cyan'];
+    });
+    input.addEventListener('blur', () => {
+        input.style.borderColor = TIMELINE_DESIGN_SYSTEM.variables['--border'];
+    });
+
     const btnContainer = document.createElement('div');
-    btnContainer.className = 'flex justify-end gap-3';
+    btnContainer.style.cssText = 'display: flex; justify-content: flex-end; gap: 12px;';
 
-    const cancelBtn = document.createElement('button');
-    cancelBtn.textContent = 'Cancel';
-    cancelBtn.className = 'px-5 py-2.5 rounded-xl text-sm font-bold text-white/60 hover:text-white hover:bg-white/5 transition-all';
-    cancelBtn.onclick = removeModal;
+    // Use design system button creation
+    const cancelBtn = TIMELINE_DESIGN_SYSTEM.utils.createButton({
+        text: 'Cancel',
+        onClick: removeModal
+    });
+    cancelBtn.style.cssText += `
+        background: ${TIMELINE_DESIGN_SYSTEM.variables['--panel']};
+        color: ${TIMELINE_DESIGN_SYSTEM.variables['--muted']};
+        border-color: ${TIMELINE_DESIGN_SYSTEM.variables['--border']};
+    `;
 
-    const saveBtn = document.createElement('button');
-    saveBtn.textContent = 'Save';
-    saveBtn.className = 'px-6 py-2.5 rounded-xl bg-primary text-black font-black text-sm hover:shadow-glow hover:scale-[1.02] active:scale-[0.98] transition-all';
-
-    saveBtn.onclick = () => {
-        const key = input.value.trim();
-        if (key) {
-            localStorage.setItem('muapi_key', key);
-            removeModal();
+    const saveBtn = TIMELINE_DESIGN_SYSTEM.utils.createButton({
+        type: 'primary',
+        text: 'Save',
+        onClick: () => {
+            const key = input.value.trim();
+            if (key) {
+                localStorage.setItem('muapi_key', key);
+                removeModal();
+            }
         }
-    };
+    });
 
-    modal.appendChild(title);
-    modal.appendChild(label);
-    modal.appendChild(input);
-
+    // Add content to modal body
+    modalBody.appendChild(label);
+    modalBody.appendChild(input);
+    modalBody.appendChild(btnContainer);
     btnContainer.appendChild(cancelBtn);
     btnContainer.appendChild(saveBtn);
-    modal.appendChild(btnContainer);
-
-    overlay.appendChild(modal);
 
     overlay.addEventListener('click', (e) => {
         if (e.target === overlay) removeModal();

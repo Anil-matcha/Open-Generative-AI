@@ -1,0 +1,107 @@
+/* Template Browser Styles */
+
+.templates-browser {
+  /* Custom styles for template browser if needed */
+}
+
+/* Template Card Hover Effects */
+.template-card {
+  transition: all 0.2s ease-in-out;
+}
+
+.template-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Template Type Badges */
+.template-badge-built-in {
+  background: rgba(217, 255, 0, 0.1);
+  color: #d9ff00;
+}
+
+.template-badge-user {
+  background: rgba(168, 85, 247, 0.1);
+  color: #a855f7;
+}
+
+/* Category Tabs */
+.category-tabs {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+.category-tabs::-webkit-scrollbar {
+  height: 4px;
+}
+
+.category-tabs::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.category-tabs::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+/* Loading Animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Template Preview Modal */
+.template-preview-modal {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Template Actions Menu */
+.template-actions-menu {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Search Input Focus */
+.template-search-input:focus {
+  box-shadow: 0 0 0 2px rgba(217, 255, 0, 0.5);
+}
+
+/* Grid Responsive Adjustments */
+@media (max-width: 640px) {
+  .templates-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .templates-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1025px) and (max-width: 1280px) {
+  .templates-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1281px) {
+  .templates-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Template Icon Animations */
+.template-icon {
+  transition: transform 0.2s ease-in-out;
+}
+
+.template-card:hover .template-icon {
+  transform: scale(1.1);
+}

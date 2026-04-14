@@ -3,6 +3,9 @@ import { showToast, createLoadingSpinner, createLoadingOverlay } from '../lib/lo
 import { createHeroSection } from '../lib/thumbnails.js';
 import { escapeHtml } from '../lib/security.js';
 import { supabase } from '../lib/supabase.js';
+import { VideoUpload } from './common/Upload.js';
+import { Tooltip, addTooltip } from './common/Tooltip.js';
+import { createVideoUpload, addVideoErrorRecovery } from '../lib/videoPlayer.js';
 
 // Repository endpoints
 const REPO_ENDPOINTS = {
@@ -231,11 +234,20 @@ export function RenderPage() {
   if (videoUrl) {
     loadVideo(videoUrl, videoContainer);
   } else {
-    // Placeholder content
-    const placeholder = document.createElement('div');
-    placeholder.className = 'flex h-20 w-20 items-center justify-center rounded-full border border-white/15 bg-white/10 backdrop-blur-md';
-    placeholder.innerHTML = '<div class="ml-1 h-0 w-0 border-y-[14px] border-y-transparent border-l-[22px] border-l-white"></div>';
-    videoContainer.appendChild(placeholder);
+    // Upload component for when no video URL is provided
+    const uploadComponent = VideoUpload({
+      placeholder: 'Upload video to render',
+      maxSize: 1000, // 1GB for render page
+      onUpload: (file) => {
+        const url = URL.createObjectURL(file);
+        loadVideo(url, videoContainer);
+        showToast('Video uploaded for rendering', 'success');
+      },
+      onError: (errors) => {
+        errors.forEach(error => showToast(error, 'error'));
+      }
+    });
+    videoContainer.appendChild(uploadComponent);
   }
 
   previewArea.appendChild(videoContainer);
@@ -598,35 +610,29 @@ export function RenderPage() {
     const loadingOverlay = createLoadingOverlay('Loading video...');
     container.appendChild(loadingOverlay);
 
-    // Create video element
-    videoElement = document.createElement('video');
-    videoElement.className = 'absolute inset-0 w-full h-full object-contain';
-    videoElement.preload = 'metadata';
-    videoElement.muted = true;
-    videoElement.playsInline = true;
-    videoElement.controls = false;
+    // Create video element using standardized component
+    videoElement = createVideoUpload(url, 'absolute inset-0 w-full h-full object-contain', {
+      onLoad: (video) => {
+        videoMetadata.duration = video.duration;
+        videoMetadata.width = video.videoWidth;
+        videoMetadata.height = video.videoHeight;
+        videoMetadata.loaded = true;
+        updateVideoStats();
+      },
+      onError: (error) => {
+        videoMetadata.error = 'Failed to load video';
+        loadingOverlay.hide();
+        isVideoLoading = false;
+        showToast('Failed to load video', 'error');
+        updateVideoStats();
+      }
+    });
 
-    // Video event handlers
-    videoElement.onloadedmetadata = () => {
-      videoMetadata.duration = videoElement.duration;
-      videoMetadata.width = videoElement.videoWidth;
-      videoMetadata.height = videoElement.videoHeight;
-      videoMetadata.loaded = true;
-      updateVideoStats();
-    };
-
+    // Additional event handlers
     videoElement.onloadeddata = () => {
       loadingOverlay.hide();
       isVideoLoading = false;
       showToast('Video loaded successfully');
-    };
-
-    videoElement.onerror = () => {
-      videoMetadata.error = 'Failed to load video';
-      loadingOverlay.hide();
-      isVideoLoading = false;
-      showToast('Failed to load video', 'error');
-      updateVideoStats();
     };
 
     videoElement.oncanplaythrough = () => {
@@ -634,9 +640,18 @@ export function RenderPage() {
       videoMetadata.loaded = true;
     };
 
-    // Set source and load
-    videoElement.src = url;
-    videoElement.load();
+    // Add error recovery
+    addVideoErrorRecovery(videoElement, {
+      onError: (message, error) => {
+        console.error('Video error in RenderPage:', message, error);
+        videoMetadata.error = message;
+        updateVideoStats();
+      },
+      onFallback: (video) => {
+        // Could implement fallback UI here
+        console.log('Video fallback triggered');
+      }
+    });
 
     // Add to container (behind loading overlay)
     container.insertBefore(videoElement, loadingOverlay);
@@ -722,6 +737,20 @@ export function RenderPage() {
 
   // Initialize video stats
   updateVideoStats();
+
+  // Add tooltips to action buttons
+  container.querySelectorAll('#actionButtonsRow button').forEach(btn => {
+    const tooltipText = `Click to ${btn.textContent.toLowerCase()}`;
+    addTooltip(btn, { text: tooltipText, placement: 'top' });
+  });
+
+  // Add tooltips to action tiles
+  container.querySelectorAll('.action-tiles button').forEach(btn => {
+    const title = btn.querySelector('.text-base')?.textContent;
+    if (title) {
+      addTooltip(btn, { text: title, placement: 'top' });
+    }
+  });
 
   // Cleanup function to clear active intervals and video resources
   container.cleanup = () => {

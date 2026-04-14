@@ -1,5 +1,6 @@
 import { getPageThumbnail, createThumbnailImg } from '../lib/thumbnails.js';
 import { createSafeImage, createSafeVideo, safeSetText } from '../lib/security.js';
+import { createVideoPreview } from '../lib/videoPlayer.js';
 
 export function LibraryPage() {
   const container = document.createElement('div');
@@ -167,12 +168,9 @@ export function LibraryPage() {
     wrapper.appendChild(closeBtn);
 
     if (item.type === 'video') {
-      const video = document.createElement('video');
-      video.src = item.url;
-      video.controls = true;
-      video.autoplay = true;
-      video.loop = true;
-      video.className = 'max-h-[70vh] rounded-xl';
+      const video = createVideoPreview(item.url, 'max-h-[70vh] max-w-full rounded-xl', {
+        loop: true
+      });
       wrapper.appendChild(video);
     } else {
       const img = document.createElement('img');

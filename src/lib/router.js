@@ -64,6 +64,7 @@ const pageLoaders = {
   'video-agent': () => import('../components/VideoAgentPage.js').then(m => m.VideoAgentPage()),
   director: () => import('../components/DirectorPage.js').then(m => m.DirectorPage()),
   timeline: () => import('../components/TimelineEditorPage.js').then(m => m.TimelineEditorPage()),
+  'timeline-test': () => import('../components/TimelineTestPage.jsx').then(m => m.TimelineTestPage),
   'remix-go': () => import('../components/RemixGoPage.js').then(m => m.RemixGoPage()),
 };
 
@@ -71,6 +72,34 @@ let currentPage = null;
 let contentArea = null;
 let onNavigateCallback = null;
 let isNavigating = false;
+
+/**
+ * Clean up components in content area before navigation
+ */
+function cleanupContentArea() {
+  if (!contentArea) return;
+  
+  // Find all elements with cleanup methods and call them
+  const elementsWithCleanup = contentArea.querySelectorAll('*');
+  elementsWithCleanup.forEach(element => {
+    if (element._cleanup && typeof element._cleanup === 'function') {
+      try {
+        element._cleanup();
+      } catch (error) {
+        console.warn('[Router] Cleanup error:', error);
+      }
+    }
+  });
+  
+  // Also check the content area itself
+  if (contentArea._cleanup && typeof contentArea._cleanup === 'function') {
+    try {
+      contentArea._cleanup();
+    } catch (error) {
+      console.warn('[Router] Content area cleanup error:', error);
+    }
+  }
+}
 
 export function initRouter(container, callback) {
   contentArea = container;
@@ -120,10 +149,16 @@ export async function navigate(page, params = {}) {
       return;
     }
 
+    // Clean up previous component before replacing
+    cleanupContentArea();
+    
     contentArea.innerHTML = '';
     contentArea.appendChild(element);
   } catch (err) {
     console.error(`[Router] Failed to load page: ${page}`, err);
+    // Clean up before showing error
+    cleanupContentArea();
+    
     contentArea.innerHTML = '';
     const errEl = document.createElement('div');
     errEl.className = 'w-full h-full flex items-center justify-center text-red-400 text-sm';

@@ -40,6 +40,14 @@ export const createTimelineState = () => ({
   selectedRange: null,
   clipboard: null,
 
+  // Multi-camera editing features
+  multiCameraMode: false,
+  pipMode: false,
+  splitScreenMode: false,
+  cameraAngles: [],
+  activeCameraAngle: null,
+  compositingMode: 'normal', // 'normal', 'multiply', 'screen', 'overlay', 'soft-light'
+
   // Tracks data (enhanced)
   tracks: [
     {
@@ -252,8 +260,114 @@ export const createTimelineState = () => ({
     ['🎥', 'Record', 'Record webcam'],
     ['🖼️', 'Generate Image', 'AI image generation'],
     ['🎨', 'Edit Image', 'Image editing tools'],
-    ['🔊', 'Text to Speech', 'Generate voiceovers']
+    ['🔊', 'Text to Speech', 'Generate voiceovers'],
+    ['📺', 'Multi-Camera', 'Multi-camera editing mode'],
+    ['🖼️', 'Picture-in-Picture', 'Add PIP overlay'],
+    ['📱', 'Split Screen', 'Split screen layouts'],
+    ['🎬', 'Camera Angles', 'Manage camera angles']
   ],
+
+  // Methods for timeline operations
+  updateClipDuration: function(clipId, updates) {
+    const trackIndex = this.tracks.findIndex(track =>
+      track.items.some(item => item.id === clipId)
+    );
+
+    if (trackIndex === -1) return false;
+
+    const itemIndex = this.tracks[trackIndex].items.findIndex(item => item.id === clipId);
+    if (itemIndex === -1) return false;
+
+    const item = this.tracks[trackIndex].items[itemIndex];
+
+    // Update trim values
+    if (updates.trimIn !== undefined) {
+      item.trimIn = Math.max(0, Math.min(updates.trimIn, item.trimOut - 0.1));
+    }
+    if (updates.trimOut !== undefined) {
+      item.trimOut = Math.max(item.trimIn + 0.1, Math.min(updates.trimOut, item.sourceEnd));
+    }
+
+    // Update start/end times based on trim changes
+    const trimmedDuration = item.trimOut - item.trimIn;
+    if (updates.trimIn !== undefined || updates.trimOut !== undefined) {
+      item.end = item.start + trimmedDuration;
+    }
+
+    return true;
+  },
+
+  // Multi-camera methods
+  addCameraAngle: function(name, color = '#3b82f6') {
+    const angle = {
+      id: `angle-${Date.now()}`,
+      name: name,
+      color: color,
+      tracks: []
+    };
+    this.cameraAngles.push(angle);
+    return angle.id;
+  },
+
+  removeCameraAngle: function(angleId) {
+    this.cameraAngles = this.cameraAngles.filter(angle => angle.id !== angleId);
+    if (this.activeCameraAngle === angleId) {
+      this.activeCameraAngle = this.cameraAngles[0]?.id || null;
+    }
+  },
+
+  switchToCameraAngle: function(angleId) {
+    this.activeCameraAngle = angleId;
+  },
+
+  addPipWindow: function(clipId, config = {}) {
+    const pipWindow = {
+      id: `pip-${Date.now()}`,
+      clipId: clipId,
+      position: config.position || 'top-right', // 'top-left', 'top-right', 'bottom-left', 'bottom-right', 'custom'
+      size: config.size || { width: 0.3, height: 0.3 }, // relative to main canvas
+      x: config.x || 0.7,
+      y: config.y || 0.1,
+      opacity: config.opacity || 1.0,
+      borderRadius: config.borderRadius || 8,
+      shadow: config.shadow || true,
+      blendMode: config.blendMode || 'normal'
+    };
+    this.pipWindows.push(pipWindow);
+    return pipWindow.id;
+  },
+
+  removePipWindow: function(pipId) {
+    this.pipWindows = this.pipWindows.filter(pip => pip.id !== pipId);
+  },
+
+  updatePipWindow: function(pipId, updates) {
+    const pip = this.pipWindows.find(p => p.id === pipId);
+    if (pip) {
+      Object.assign(pip, updates);
+    }
+  },
+
+  setSplitScreen: function(type, ratio = 0.5) {
+    this.splitScreenMode = true;
+    this.pipMode = false;
+    this.splitScreenConfig = {
+      type: type, // 'horizontal', 'vertical', 'quad'
+      ratio: ratio,
+      transition: 'none'
+    };
+  },
+
+  disableSplitScreen: function() {
+    this.splitScreenMode = false;
+  },
+
+  togglePipMode: function() {
+    this.pipMode = !this.pipMode;
+    if (this.pipMode) {
+      this.splitScreenMode = false;
+    }
+  },
 
   pills: [
     'Text to Video',
@@ -354,5 +468,14 @@ export const createTimelineState = () => ({
   chat: [
     { role: 'user', text: 'Generate a better opening shot' },
     { role: 'ai', text: 'Opening idea ready. Use the Generate or Retake.' }
-  ]
+  ],
+
+  // Multi-camera compositing data
+  compositingLayers: [],
+  pipWindows: [],
+  splitScreenConfig: {
+    type: 'horizontal', // 'horizontal', 'vertical', 'quad'
+    ratio: 0.5, // split ratio
+    transition: 'none' // 'none', 'fade', 'wipe'
+  }
 });

@@ -1,0 +1,92 @@
+/* Project Dashboard Styles */
+
+.projects-dashboard {
+  /* Custom styles for project dashboard if needed */
+}
+
+/* Project Card Hover Effects */
+.project-card {
+  transition: all 0.2s ease-in-out;
+}
+
+.project-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Project Status Indicators */
+.project-status-published {
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+}
+
+.project-status-draft {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
+
+.project-status-archived {
+  background: rgba(107, 114, 128, 0.1);
+  color: #6b7280;
+}
+
+/* Project Actions Menu */
+.project-actions-menu {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Loading Animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Grid Responsive Adjustments */
+@media (max-width: 640px) {
+  .projects-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .projects-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1025px) and (max-width: 1280px) {
+  .projects-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1281px) {
+  .projects-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Search Input Focus */
+.project-search-input:focus {
+  box-shadow: 0 0 0 2px rgba(217, 255, 0, 0.5);
+}
+
+/* Empty State Styling */
+.empty-state-icon {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}

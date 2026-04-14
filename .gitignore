@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 .env
 .worktrees
+
+# Local Netlify folder
+.netlify
