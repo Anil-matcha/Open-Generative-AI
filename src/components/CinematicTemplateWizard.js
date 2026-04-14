@@ -32,7 +32,7 @@ export function CinematicTemplateWizard(template, onComplete, onBack) {
   let currentStep = 0;
   const steps = ['Configure', 'Scenes', 'Preview', 'Generate'];
   let mode = 'quick'; // 'quick' or 'advanced'
-  let inputs = {};
+  const inputs = {};
   let sceneBuilder = null;
   let storyboardBuilder = null;
   let uploadedUrl = null;
@@ -177,6 +177,11 @@ export function CinematicTemplateWizard(template, onComplete, onBack) {
       }
     };
     
+    const generateContent = () => {
+      console.log('Generating content with inputs:', inputs);
+      // TODO: Implement content generation
+    };
+
     footer.querySelector('#next-btn').onclick = () => {
       if (isLastStep) {
         generateContent();
@@ -256,7 +261,7 @@ export function CinematicTemplateWizard(template, onComplete, onBack) {
     field.appendChild(label);
     
     switch (input.type) {
-      case 'image':
+      case 'image': {
         const picker = createUploadPicker({
           anchorContainer: container,
           onSelect: ({ url }) => {
@@ -269,7 +274,7 @@ export function CinematicTemplateWizard(template, onComplete, onBack) {
           }
         });
         pickerRef = picker;
-        
+
         const uploadRow = document.createElement('div');
         uploadRow.className = 'flex items-center gap-3';
         uploadRow.appendChild(picker.trigger);
@@ -280,8 +285,9 @@ export function CinematicTemplateWizard(template, onComplete, onBack) {
         field.appendChild(uploadRow);
         field.appendChild(picker.panel);
         break;
+      }
         
-      case 'textarea':
+      case 'textarea': {
         const textarea = document.createElement('textarea');
         textarea.className = 'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder:text-muted focus:outline-none focus:border-primary/50 resize-none';
         textarea.rows = 3;
@@ -290,11 +296,12 @@ export function CinematicTemplateWizard(template, onComplete, onBack) {
         textarea.oninput = () => { inputs[input.name] = textarea.value; };
         field.appendChild(textarea);
         break;
+      }
         
-      case 'select':
+      case 'select': {
         const select = document.createElement('select');
         select.className = 'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-primary/50 cursor-pointer';
-        
+
         if (input.options && input.options.length > 0) {
           input.options.forEach(opt => {
             const option = document.createElement('option');
@@ -306,15 +313,14 @@ export function CinematicTemplateWizard(template, onComplete, onBack) {
             select.appendChild(option);
           });
         }
-        
-        inputs[input.name] = inputs[input.name] || (input.options?.[0] ? 
-          (typeof input.options[0] === 'string' ? input.options[0] : input.options[0].id || input.options[0]) : '');
-        select.value = inputs[input.name];
+
+        select.value = inputs[input.name] || '';
         select.onchange = () => { inputs[input.name] = select.value; };
         field.appendChild(select);
         break;
+      }
         
-      default: // text
+      default: { // text
         const textInput = document.createElement('input');
         textInput.type = 'text';
         textInput.className = 'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder:text-muted focus:outline-none focus:border-primary/50';
@@ -322,6 +328,7 @@ export function CinematicTemplateWizard(template, onComplete, onBack) {
         textInput.value = inputs[input.name] || '';
         textInput.oninput = () => { inputs[input.name] = textInput.value; };
         field.appendChild(textInput);
+      }
     }
     
     return field;

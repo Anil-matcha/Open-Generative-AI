@@ -231,7 +231,7 @@ export function validateParams(params, schema) {
         }
         
         switch (rules.type) {
-            case 'string':
+            case 'string': {
                 const strResult = validatePrompt(value, {
                     minLength: rules.minLength,
                     maxLength: rules.maxLength,
@@ -243,9 +243,10 @@ export function validateParams(params, schema) {
                     sanitized[key] = strResult.value;
                 }
                 break;
+            }
                 
             case 'number':
-            case 'integer':
+            case 'integer': {
                 const numResult = validateNumber(value, {
                     min: rules.min,
                     max: rules.max,
@@ -258,8 +259,9 @@ export function validateParams(params, schema) {
                     sanitized[key] = numResult.value;
                 }
                 break;
+            }
                 
-            case 'url':
+            case 'url': {
                 const urlResult = validateUrl(value, {
                     allowedDomains: rules.allowedDomains,
                     required: rules.required
@@ -270,6 +272,7 @@ export function validateParams(params, schema) {
                     sanitized[key] = urlResult.value;
                 }
                 break;
+            }
                 
             case 'array':
                 if (!Array.isArray(value)) {

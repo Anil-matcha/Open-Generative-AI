@@ -1433,24 +1433,24 @@ export function EditorPage() {
     });
 
     // AI Chat Panel Functionality
-    const chatMessages = container.querySelector('#chat-messages');
+    const aiChatMessages = container.querySelector('#chat-messages');
     const chatInput = container.querySelector('#chat-input');
     const sendChatBtn = container.querySelector('#send-chat-btn');
     const quickCommands = container.querySelector('#quick-commands');
 
-    function addChatMessage(text, isUser = false) {
+    function addAIChatMessage(text, isUser = false) {
         const messageDiv = document.createElement('div');
         messageDiv.className = `flex gap-2 ${isUser ? 'justify-end' : ''}`;
         messageDiv.innerHTML = `
-            <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${isUser ? 'bg-primary text-black' : 'bg-white/10 text-white'}">
-                ${isUser ? 'You' : 'AI'}
+            <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${isUser ? 'bg-primary text-white' : 'bg-white/10 text-white'}">
+                ${isUser ? 'U' : 'AI'}
             </div>
-            <div class="bg-${isUser ? 'primary/20' : 'white/10'} rounded-lg px-3 py-2 max-w-[80%]">
-                <p class="text-xs text-white leading-relaxed">${text}</p>
+            <div class="bg-white/5 rounded-lg px-3 py-2 max-w-xs text-sm">
+                ${text}
             </div>
         `;
-        chatMessages.appendChild(messageDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+        aiChatMessages.appendChild(messageDiv);
+        aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
     }
 
     function processChatCommand(command) {
@@ -1491,8 +1491,8 @@ export function EditorPage() {
     });
 
     // Add welcome message to new AI chat panel
-    if (chatMessages) {
-        setTimeout(() => addChatMessage("Hello! I'm your AI timeline assistant. I can help you generate content, edit clips, and optimize your video project.", false), 500);
+    if (aiChatMessages) {
+        setTimeout(() => addAIChatMessage("Hello! I'm your AI timeline assistant. I can help you generate content, edit clips, and optimize your video project.", false), 500);
     }
 
     // Generate Panel Functionality

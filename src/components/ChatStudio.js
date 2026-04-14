@@ -9,7 +9,7 @@ export function ChatStudio() {
   container.className = 'w-full h-full flex flex-col items-center bg-app-bg overflow-y-auto p-6 md:p-10 relative';
 
   let selectedModel = textModels[0];
-  let messages = []; // Chat history
+  const messages = []; // Chat history
   let isGenerating = false;
 
   // Header with hero banner

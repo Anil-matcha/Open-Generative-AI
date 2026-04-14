@@ -38,7 +38,8 @@
     "@higgsfield/tokens": "file:packages/tokens",
     "@supabase/supabase-js": "^2.99.0",
     "@tailwindcss/postcss": "^4.1.18",
-    "@tailwindcss/vite": "^4.1.18"
+    "@tailwindcss/vite": "^4.1.18",
+    "dompurify": "^3.3.3"
   },
   "engines": {
     "node": ">=18.0.0"

@@ -12,20 +12,14 @@
     "@higgsfield/layout": "file:../../../../packages/layout",
     "@higgsfield/tokens": "file:../../../../packages/tokens",
     "@higgsfield/navigation": "file:../../../../packages/navigation",
-    "@videodb/chat-vue": "^0.0.41",
-    "@videodb/player-vue": "^0.0.2",
     "axios": "^1.7.5",
     "dayjs": "^1.11.13",
     "lodash.debounce": "^4.0.8",
     "marked": "^14.1.0",
     "socket.io-client": "^4.7.5",
-    "uuid": "^10.0.0",
-    "vue": "^3.4.37",
-    "vue-router": "^4.4.3",
-    "vue3-popper": "^1.5.0"
+    "uuid": "^10.0.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^5.1.2",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.41",
     "tailwindcss": "^3.4.10",

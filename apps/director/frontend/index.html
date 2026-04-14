@@ -1,13 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" href="/favicon.png" />
-    <title>Director</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Timeline Editor</title>
+  <link rel="stylesheet" href="/src/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="header">
+      <div class="brand">
+        <button class="icon-btn" id="backBtn">←</button>
+        <div class="brand-mark">🎬</div>
+        <div>
+          <div class="brand-title">TIMELINE</div>
+          <div class="brand-sub">AI Video Editor</div>
+        </div>
+      </div>
+      <div class="project-head">
+        <div class="title" id="projectTitle">Untitled Project</div>
+        <div class="sub" id="projectSub">Working timeline preview</div>
+      </div>
+      <div class="top-actions" id="topActions"></div>
+    </header>
+    <div class="main-grid">
+      <div class="left-col">
+        <div class="left-top" style="display:grid; grid-template-columns: 300px minmax(0,1fr); gap:16px; margin-bottom:16px; align-items:stretch;">
+          <aside class="side-card" style="min-height:100%; display:flex; flex-direction:column;">
+            <div class="card-title">💬 AI</div>
+            <div class="chat-stack" id="chatStack"></div>
+            <input class="text-input" id="chatInput" placeholder="Type command..." />
+            <div class="quick-commands" id="quickCommands" style="margin-top:2px;"></div>
+          </aside>
+          <section class="preview-card" style="margin-bottom:0;">
+            <div class="preview-glow"></div>
+            <div class="preview-inner">
+              <div class="preview-screen">
+                <div class="preview-emoji" id="previewEmoji">🎥</div>
+                <div class="preview-title" id="previewTitle">Center Preview</div>
+                <div class="preview-sub" id="previewSubtitle">Glow preview styled like the render page</div>
+              </div>
+            </div>
+            <div class="preview-overlay">
+              <div class="time-row">
+                <span id="currentTime">00:12.40</span>
+                <span id="totalTime">01:00.00</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+              <div class="control-row">
+                <button class="circle-btn" id="rewindBtn">⏮</button>
+                <button class="circle-btn primary" id="playBtn">▶</button>
+                <button class="circle-btn" id="stopBtn">⏹</button>
+              </div>
+            </div>
+          </section>
+        </div>
+        <section class="timeline-card">
+          <div class="timeline-top">
+            <div class="toolbar-left">
+              <div class="tool-group" id="toolGroup"></div>
+              <button class="mini-btn" data-action="zoom-out">🔍-</button>
+              <button class="mini-btn" data-action="zoom-in">🔍+</button>
+              <button class="mini-btn" data-add-track="Video">+Video</button>
+              <button class="mini-btn" data-add-track="Audio">+Audio</button>
+              <button class="mini-btn" data-add-track="Text">+Text</button>
+              <button class="mini-btn" data-add-track="B-Roll">+B-Roll</button>
+            </div>
+            <div class="pill-row" id="pillRow"></div>
+          </div>
+          <div class="timeline-shell">
+            <div class="timeline-header">
+              <div>Tracks</div>
+              <div>Timeline</div>
+            </div>
+            <div class="timeline-body" id="timelineBody">
+              <div class="playhead-layer">
+                <div class="playhead-line" id="playheadLine"></div>
+                <div class="playhead-knob" id="playheadKnob"></div>
+              </div>
+              <div id="trackRows"></div>
+            </div>
+          </div>
+        </section>
+      </div>
+      <div class="side-col">
+        <aside class="side-card">
+          <div class="card-title">📁 Media</div>
+          <button class="upload-btn" id="uploadBtn">Upload</button>
+          <div class="media-note">Choose what you want to add to the timeline. Each tile inserts a different type of source asset.</div>
+          <div class="media-grid" id="mediaGrid"></div>
+        </aside>
+        <aside class="side-card generate">
+          <div class="generate-head">
+            <div class="card-title cyan">⚡ Generate</div>
+            <div style="color: rgba(255,255,255,0.4)">✕</div>
+          </div>
+          <div class="generate-types" id="generateTypes"></div>
+          <textarea class="text-area" id="promptInput" placeholder="A cinematic shot of..."></textarea>
+          <input class="text-input" id="negativeInput" placeholder="Negative prompt" />
+          <div class="select-row">
+            <select class="select-input" id="durationSelect">
+              <option>5s</option>
+              <option>8s</option>
+              <option>12s</option>
+            </select>
+            <select class="select-input" id="aspectSelect">
+              <option>16:9</option>
+              <option>9:16</option>
+              <option>1:1</option>
+            </select>
+            <select class="select-input" id="styleSelect">
+              <option>Cinematic</option>
+              <option>Commercial</option>
+              <option>Documentary</option>
+            </select>
+          </div>
+          <button class="primary-btn" id="generateBtn">⚡ Generate</button>
+        </aside>
+      </div>
+    </div>
+  </div>
+  <div class="floating-rail" id="floatingRail"></div>
+  <div class="status-toast" id="toast"></div>
+  <script type="module" src="/src/main.js"></script>
+</body>
 </html>

@@ -36,6 +36,11 @@ interface GenerateRequest {
 }
 
 function validateEndpoint(endpoint: string): boolean {
+  // Prevent SSRF by blocking dangerous paths
+  if (endpoint.includes('..') || endpoint.startsWith('/') || endpoint.includes('://')) {
+    return false;
+  }
+
   // Only allow specific endpoints to prevent SSRF
   const allowedPatterns = [
     /^predictions(\/.*)?$/,
@@ -44,6 +49,11 @@ function validateEndpoint(endpoint: string): boolean {
     /^image-to-image(\/.*)?$/,
     /^image-to-video(\/.*)?$/,
     /^video-to-video(\/.*)?$/,
+    /^flux-dev-image$/,
+    /^generate_wan_ai_effects$/,
+    /^ai-image-face-swap$/,
+    /^api\/storyboard\/projects$/,
+    /^upload_file$/,
   ];
   return allowedPatterns.some(pattern => pattern.test(endpoint));
 }

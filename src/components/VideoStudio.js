@@ -24,6 +24,7 @@ export function VideoStudio() {
     let uploadedImageUrl = null;
     let imageMode = false; // false = t2v models, true = i2v models
     let v2vMode = false;   // true = video-to-video tools mode
+    let effectsMode = false; // true = video effects mode
     let uploadedVideoUrl = null;
     
     // Advanced parameters state
@@ -31,7 +32,7 @@ export function VideoStudio() {
     let seed = -1;
     let showAdvanced = false;
 
-    const getCurrentModels = () => v2vMode ? v2vModels : (imageMode ? i2vModels : t2vModels);
+    const getCurrentModels = () => effectsMode ? i2vModels.filter(m => m.family === 'effects') : (v2vMode ? v2vModels : (imageMode ? i2vModels : t2vModels));
     const getCurrentAspectRatios = (id) => imageMode ? getAspectRatiosForI2VModel(id) : getAspectRatiosForVideoModel(id);
     const getCurrentDurations = (id) => imageMode ? getDurationsForI2VModel(id) : getDurationsForModel(id);
     const getCurrentResolutions = (id) => imageMode ? getResolutionsForI2VModel(id) : getResolutionsForVideoModel(id);
@@ -218,6 +219,47 @@ export function VideoStudio() {
     };
 
     topRow.appendChild(videoPickerBtn);
+
+    // --- Effects Mode Toggle ---
+    const effectsBtn = document.createElement('button');
+    effectsBtn.type = 'button';
+    effectsBtn.title = 'Toggle video effects mode';
+    effectsBtn.className = `w-10 h-10 shrink-0 rounded-xl border transition-all flex items-center justify-center relative overflow-hidden mt-1.5 ${effectsMode ? 'bg-primary/20 border-primary/60' : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40'} group`;
+    effectsBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted group-hover:text-primary transition-colors"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10"/></svg>`;
+
+    effectsBtn.onclick = () => {
+        effectsMode = !effectsMode;
+        if (effectsMode) {
+            // Clear other modes
+            if (v2vMode) {
+                uploadedVideoUrl = null;
+                v2vMode = false;
+                showVideoIcon();
+            }
+            if (imageMode) {
+                picker.reset();
+                uploadedImageUrl = null;
+                imageMode = false;
+            }
+            // Switch to effects model
+            selectedModel = 'ai-video-effects';
+            selectedModelName = 'AI Video Effects';
+            document.getElementById('v-model-btn-label').textContent = selectedModelName;
+            updateControlsForModel(selectedModel);
+            textarea.placeholder = 'Describe the effect you want to apply';
+            textarea.disabled = false;
+        } else {
+            // Switch back to default
+            selectedModel = t2vModels[0].id;
+            selectedModelName = t2vModels[0].name;
+            document.getElementById('v-model-btn-label').textContent = selectedModelName;
+            updateControlsForModel(selectedModel);
+            textarea.placeholder = 'Describe the video you want to create';
+        }
+        effectsBtn.className = `w-10 h-10 shrink-0 rounded-xl border transition-all flex items-center justify-center relative overflow-hidden mt-1.5 ${effectsMode ? 'bg-primary/20 border-primary/60' : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40'} group`;
+    };
+
+    topRow.appendChild(effectsBtn);
 
     const textarea = document.createElement('textarea');
     textarea.placeholder = 'Describe the video you want to create';
@@ -890,6 +932,7 @@ export function VideoStudio() {
         picker.reset();
         uploadedImageUrl = null;
         imageMode = false;
+        effectsMode = false;
         uploadedVideoUrl = null;
         v2vMode = false;
         showVideoIcon();
@@ -938,6 +981,11 @@ export function VideoStudio() {
         } else if (imageMode) {
             if (!uploadedImageUrl) {
                 alert('Please upload a start frame image first.');
+                return;
+            }
+        } else if (effectsMode) {
+            if (!uploadedImageUrl) {
+                alert('Please upload an image first for video effects.');
                 return;
             }
         } else {
@@ -1003,6 +1051,35 @@ export function VideoStudio() {
                         lastGenerationModel = null;
                     }
                     addToHistory({ id: genId, url: res.url, prompt, model: selectedModel, aspect_ratio: selectedAr, duration: selectedDuration, timestamp: new Date().toISOString() });
+                    showVideoInCanvas(res.url, selectedModel);
+                } else {
+                    throw new Error('No video URL returned by API');
+                }
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = `Generate ✨`;
+                return;
+            }
+
+            if (effectsMode) {
+                if (!uploadedImageUrl) {
+                    alert('Please upload an image first for video effects.');
+                    return;
+                }
+                const effectsParams = {
+                    image_url: uploadedImageUrl,
+                    aspect_ratio: selectedAr,
+                    resolution: selectedResolution,
+                };
+                if (prompt) effectsParams.prompt = prompt;
+
+                const res = await muapi.generateVideoEffect(effectsParams);
+                console.log('[VideoStudio] Video Effects response:', res);
+
+                if (res && res.url) {
+                    const genId = res.id || res.request_id || Date.now().toString();
+                    lastGenerationId = null;
+                    lastGenerationModel = null;
+                    addToHistory({ id: genId, url: res.url, prompt, model: selectedModel, aspect_ratio: selectedAr, timestamp: new Date().toISOString() });
                     showVideoInCanvas(res.url, selectedModel);
                 } else {
                     throw new Error('No video URL returned by API');

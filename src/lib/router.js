@@ -1,3 +1,5 @@
+/* global history */
+
 const ROUTE_MAP = {
   'Explore': 'explore',
   'Image': 'image',

@@ -1,0 +1,297 @@
+/* Drag and Drop Styles */
+
+/* Dragging ghost element */
+.dragging-ghost {
+  transform: rotate(2deg);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  border-color: rgba(34, 211, 238, 0.6) !important;
+  background: rgba(34, 211, 238, 0.1) !important;
+}
+
+/* Drop zone highlighting */
+.drop-highlight {
+  background: rgba(34, 211, 238, 0.1) !important;
+  border: 2px dashed rgba(34, 211, 238, 0.4) !important;
+  transition: all 0.2s ease;
+}
+
+.drop-highlight.track-lane {
+  background: rgba(34, 211, 238, 0.05) !important;
+}
+
+/* Enhanced tooltips */
+.drag-tooltip {
+  position: fixed;
+  z-index: 10000;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 12px;
+  max-width: 280px;
+  pointer-events: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.9);
+  animation: tooltipFadeIn 0.2s ease-out;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tooltip-header {
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 8px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tooltip-body {
+  line-height: 1.4;
+}
+
+.tooltip-body > div {
+  margin-bottom: 4px;
+}
+
+.tooltip-body > div:last-child {
+  margin-bottom: 0;
+}
+
+.tooltip-actions {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.tooltip-actions span {
+  display: block;
+  margin-bottom: 2px;
+}
+
+.tooltip-actions span:last-child {
+  margin-bottom: 0;
+}
+
+.tooltip-hint {
+  font-style: italic;
+  color: rgba(34, 211, 238, 0.8);
+  font-size: 11px;
+}
+
+/* Enhanced clip styles for drag interaction */
+.clip {
+  transition: all 0.15s ease;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.clip:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+  border-color: rgba(34, 211, 238, 0.3);
+}
+
+.clip.dragging {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* Enhanced media item styles for drag interaction */
+.media-item {
+  position: relative;
+  transition: all 0.15s ease;
+}
+
+.media-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  border-color: rgba(34, 211, 238, 0.3);
+}
+
+.media-item.dragging {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Track lane drop indicators */
+.track-lane.drop-target {
+  position: relative;
+}
+
+.track-lane.drop-target::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(34, 211, 238, 0.05);
+  border: 2px dashed rgba(34, 211, 238, 0.3);
+  border-radius: 8px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.track-lane.drop-target.drop-allowed::before {
+  background: rgba(52, 211, 153, 0.05);
+  border-color: rgba(52, 211, 153, 0.4);
+}
+
+/* Drag cursor states */
+.dragging * {
+  cursor: grabbing !important;
+}
+
+.drag-ready {
+  cursor: grab;
+}
+
+.drag-ready:active {
+  cursor: grabbing;
+}
+
+/* Timeline drop zone overlay */
+.timeline-body.drop-active {
+  position: relative;
+}
+
+.timeline-body.drop-active::after {
+  content: 'Drop media here to add to timeline';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  color: rgba(34, 211, 238, 0.9);
+  padding: 20px 30px;
+  border-radius: 12px;
+  border: 2px dashed rgba(34, 211, 238, 0.4);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  z-index: 100;
+  pointer-events: none;
+  animation: dropZonePulse 2s ease-in-out infinite;
+}
+
+@keyframes dropZonePulse {
+  0%, 100% {
+    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.02);
+  }
+}
+
+/* Enhanced clip handles for trimming */
+.clip-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  background: rgba(34, 211, 238, 0.8);
+  opacity: 0;
+  transition: all 0.2s ease;
+  cursor: ew-resize;
+  z-index: 2;
+  border-radius: 2px;
+}
+
+.clip-handle-left {
+  left: -4px;
+}
+
+.clip-handle-right {
+  right: -4px;
+}
+
+.clip:hover .clip-handle,
+.clip-handle:hover {
+  opacity: 1;
+  width: 12px;
+}
+
+.clip-handle:hover {
+  background: rgba(34, 211, 238, 1);
+  box-shadow: 0 0 8px rgba(34, 211, 238, 0.5);
+}
+
+.clip-handle-left:hover {
+  left: -6px;
+}
+
+.clip-handle-right:hover {
+  right: -6px;
+}
+
+/* Legacy styles for backward compatibility */
+.clip::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -2px;
+  width: 4px;
+  background: rgba(34, 211, 238, 0.6);
+  border-radius: 2px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  cursor: ew-resize;
+}
+
+.clip::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: -2px;
+  width: 4px;
+  background: rgba(34, 211, 238, 0.6);
+  border-radius: 2px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  cursor: ew-resize;
+}
+
+.clip:hover::after,
+.clip:hover::before {
+  opacity: 1;
+}
+
+/* Enhanced visual feedback for drag operations */
+.drag-feedback {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  background: rgba(34, 211, 238, 0.1);
+  border: 2px solid rgba(34, 211, 238, 0.5);
+  border-radius: 8px;
+  transition: all 0.1s ease;
+}
+
+.drag-feedback.valid {
+  border-color: rgba(52, 211, 153, 0.6);
+  background: rgba(52, 211, 153, 0.1);
+}
+
+.drag-feedback.invalid {
+  border-color: rgba(239, 68, 68, 0.6);
+  background: rgba(239, 68, 68, 0.1);
+}

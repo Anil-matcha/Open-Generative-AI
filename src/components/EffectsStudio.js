@@ -10,12 +10,16 @@ const EFFECT_TABS = [
   { id: 'image-effects', label: 'Image Effects', type: 'i2i', field: 'name' },
   { id: 'nano-banana-effects', label: 'Nano Banana', type: 'i2i', field: 'name' },
   { id: 'flux-kontext-effects', label: 'Kontext Effects', type: 'i2i', field: 'name' },
-  { id: 'ai-video-effects', label: 'Video Effects', type: 'i2v', field: 'name' },
+  { id: 'ai-video-effects', label: 'AI Video Effects', type: 'i2v', field: 'name' },
+  { id: 'custom-ai-video-effects', label: 'Custom AI Effects', type: 'muapi-custom', field: 'prompt' },
   { id: 'motion-controls', label: 'Motion Controls', type: 'i2v', field: 'name' },
   { id: 'video-effects', label: 'Video FX v2', type: 'i2v', field: 'name' },
 ];
 
 function getEffectsForModel(modelId) {
+  // Special handling for custom AI video effects - no preset effects needed
+  if (modelId === 'custom-ai-video-effects') return [];
+
   const allModels = [...i2iModels, ...i2vModels];
   const model = allModels.find(m => m.id === modelId);
   if (!model) return [];
@@ -41,11 +45,30 @@ export function EffectsStudio() {
   if (effectsBanner) {
     const bannerText = document.createElement('div');
     bannerText.className = 'absolute bottom-0 left-0 right-0 p-4 z-10';
-    bannerText.innerHTML = '<h1 class="text-2xl md:text-3xl font-black text-white tracking-tight mb-1">Effects Studio</h1><p class="text-white/60 text-xs">Apply 350+ visual effects to your photos and videos</p>';
+
+    const h1 = document.createElement('h1');
+    h1.className = 'text-2xl md:text-3xl font-black text-white tracking-tight mb-1';
+    h1.textContent = 'Effects Studio';
+
+    const p = document.createElement('p');
+    p.className = 'text-white/60 text-xs';
+    p.textContent = 'Apply 350+ visual effects to your photos and videos';
+
+    bannerText.appendChild(h1);
+    bannerText.appendChild(p);
     effectsBanner.appendChild(bannerText);
     topBar.appendChild(effectsBanner);
   } else {
-    topBar.innerHTML = '<h1 class="text-2xl md:text-3xl font-black text-white tracking-tight mb-1">Effects Studio</h1><p class="text-secondary text-xs mb-4">Apply 350+ visual effects to your photos and videos</p>';
+    const h1 = document.createElement('h1');
+    h1.className = 'text-2xl md:text-3xl font-black text-white tracking-tight mb-1';
+    h1.textContent = 'Effects Studio';
+
+    const p = document.createElement('p');
+    p.className = 'text-secondary text-xs mb-4';
+    p.textContent = 'Apply 350+ visual effects to your photos and videos';
+
+    topBar.appendChild(h1);
+    topBar.appendChild(p);
   }
 
   const tabRow = document.createElement('div');
@@ -227,6 +250,20 @@ export function EffectsStudio() {
     selectedEffect = null;
     selectedBadge.textContent = 'No effect selected';
     selectedBadge.className = 'text-xs font-bold text-muted';
+
+    // Update prompt placeholders based on tab
+    if (tab.id === 'custom-ai-video-effects') {
+      promptInput.placeholder = 'Describe your desired video effect...';
+      mobilePrompt.placeholder = 'Describe your desired video effect...';
+      // Hide effects grid for custom tab
+      effectsPanel.style.display = 'none';
+    } else {
+      promptInput.placeholder = 'Optional prompt...';
+      mobilePrompt.placeholder = 'Optional prompt...';
+      // Show effects grid for other tabs
+      effectsPanel.style.display = 'block';
+    }
+
     Object.entries(tabButtons).forEach(([id, btn]) => {
       btn.className = id === tab.id
         ? 'px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all bg-primary text-black'
@@ -301,6 +338,16 @@ export function EffectsStudio() {
 
   function renderEffects(filter = '') {
     effectsGrid.innerHTML = '';
+
+    // Special handling for custom AI video effects - no effect selection needed
+    if (activeTab.id === 'custom-ai-video-effects') {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'col-span-2 text-xs text-muted py-6 text-center';
+      messageDiv.textContent = 'Free-form prompt mode - no templates required';
+      effectsGrid.appendChild(messageDiv);
+      return;
+    }
+
     let effects = getEffectsForModel(activeTab.id);
 
     if (filter) {
@@ -314,24 +361,85 @@ export function EffectsStudio() {
       
       card.className = 'bg-white/[0.03] border border-white/5 rounded-xl p-2 cursor-pointer hover:bg-white/[0.06] hover:border-white/10 transition-all group overflow-hidden';
       
-      // Card HTML with thumbnail
-      card.innerHTML = `
-        <div class="relative w-full aspect-square mb-2 rounded-lg overflow-hidden bg-white/5">
-          ${thumbnailUrl ? `<img src="${thumbnailUrl}" alt="${name}" class="w-full h-full object-cover" loading="lazy" decoding="async" />` : `
-            <div class="w-full h-full flex items-center justify-center">
-              ${isVideo ? 
-                '<svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>' :
-                '<svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>'
-              }
-            </div>
-          `}
-        </div>
-        <div class="flex items-center gap-1.5">
-          ${isVideo ? '<div class="w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0"></div>' : '<div class="w-1.5 h-1.5 rounded-full bg-primary shrink-0"></div>'}
-          <div class="text-[10px] font-bold text-white group-hover:text-primary transition-colors truncate">${name}</div>
-        </div>
-        <div class="text-[9px] text-muted mt-0.5">${isVideo ? 'Video' : 'Image'}</div>
-      `;
+      // Card content using createElement
+      const thumbnailDiv = document.createElement('div');
+      thumbnailDiv.className = 'relative w-full aspect-square mb-2 rounded-lg overflow-hidden bg-white/5';
+
+      if (thumbnailUrl) {
+        const img = document.createElement('img');
+        img.src = thumbnailUrl;
+        img.alt = name;
+        img.className = 'w-full h-full object-cover';
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        thumbnailDiv.appendChild(img);
+      } else {
+        const iconContainer = document.createElement('div');
+        iconContainer.className = 'w-full h-full flex items-center justify-center';
+
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('class', isVideo ? 'w-8 h-8 text-blue-400' : 'w-8 h-8 text-primary');
+        svg.setAttribute('fill', 'none');
+        svg.setAttribute('stroke', 'currentColor');
+        svg.setAttribute('viewBox', '0 0 24 24');
+
+        if (isVideo) {
+          const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+          polygon.setAttribute('points', '23 7 16 12 23 17 23 7');
+          svg.appendChild(polygon);
+
+          const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          rect.setAttribute('x', '1');
+          rect.setAttribute('y', '5');
+          rect.setAttribute('width', '15');
+          rect.setAttribute('height', '14');
+          rect.setAttribute('rx', '2');
+          rect.setAttribute('ry', '2');
+          svg.appendChild(rect);
+        } else {
+          const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          rect.setAttribute('x', '3');
+          rect.setAttribute('y', '3');
+          rect.setAttribute('width', '18');
+          rect.setAttribute('height', '18');
+          rect.setAttribute('rx', '2');
+          rect.setAttribute('ry', '2');
+          svg.appendChild(rect);
+
+          const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          circle.setAttribute('cx', '8.5');
+          circle.setAttribute('cy', '8.5');
+          circle.setAttribute('r', '1.5');
+          svg.appendChild(circle);
+
+          const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+          polyline.setAttribute('points', '21 15 16 10 5 21');
+          svg.appendChild(polyline);
+        }
+
+        iconContainer.appendChild(svg);
+        thumbnailDiv.appendChild(iconContainer);
+      }
+
+      const contentDiv = document.createElement('div');
+      contentDiv.className = 'flex items-center gap-1.5';
+
+      const indicatorDot = document.createElement('div');
+      indicatorDot.className = isVideo ? 'w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0' : 'w-1.5 h-1.5 rounded-full bg-primary shrink-0';
+      contentDiv.appendChild(indicatorDot);
+
+      const nameDiv = document.createElement('div');
+      nameDiv.className = 'text-[10px] font-bold text-white group-hover:text-primary transition-colors truncate';
+      nameDiv.textContent = name;
+      contentDiv.appendChild(nameDiv);
+
+      const typeDiv = document.createElement('div');
+      typeDiv.className = 'text-[9px] text-muted mt-0.5';
+      typeDiv.textContent = isVideo ? 'Video' : 'Image';
+
+      card.appendChild(thumbnailDiv);
+      card.appendChild(contentDiv);
+      card.appendChild(typeDiv);
       card.onclick = () => {
         selectedEffect = name;
         effectsGrid.querySelectorAll('[data-selected]').forEach(el => {
@@ -349,14 +457,31 @@ export function EffectsStudio() {
     });
 
     if (effects.length === 0) {
-      effectsGrid.innerHTML = '<div class="col-span-2 text-xs text-muted py-6 text-center">No effects match your search</div>';
+      const noResultsDiv = document.createElement('div');
+      noResultsDiv.className = 'col-span-2 text-xs text-muted py-6 text-center';
+      noResultsDiv.textContent = 'No effects match your search';
+      effectsGrid.appendChild(noResultsDiv);
     }
   }
 
   searchInput.oninput = () => renderEffects(searchInput.value);
 
   async function handleGenerate() {
-    if (!selectedEffect) { alert('Select an effect first'); return; }
+    // Special validation for different tab types
+    if (activeTab.id === 'ai-video-effects' && !selectedEffect) {
+      alert('Please select an effect template first');
+      return;
+    }
+    if (activeTab.id === 'custom-ai-video-effects') {
+      const customPrompt = promptInput.value.trim() || mobilePrompt.value.trim();
+      if (!customPrompt) {
+        alert('Please enter a prompt describing the desired effect');
+        return;
+      }
+    } else if (!selectedEffect) {
+      alert('Select an effect first');
+      return;
+    }
     if (!uploadedUrl) { alert('Upload an image or video first'); return; }
     const apiKey = localStorage.getItem('muapi_key');
     if (!apiKey) { AuthModal(() => handleGenerate()); return; }
@@ -366,30 +491,62 @@ export function EffectsStudio() {
     generateBtn.innerHTML = '<span class="animate-spin inline-block mr-2">&#9711;</span> Processing...';
     mobileGenBtn.innerHTML = generateBtn.innerHTML;
 
-    outputPreview.showLoading(`Applying "${selectedEffect}"...`);
+    const effectName = activeTab.id === 'custom-ai-video-effects' ? 'Custom Effect' : selectedEffect;
+    outputPreview.showLoading(`Applying "${effectName}"...`);
     mobileOutputPreview.showLoading('Processing...');
 
     try {
-      const params = {
-        model: activeTab.id,
-        image_url: uploadedUrl,
-        [activeTab.field]: selectedEffect,
-      };
-      const prompt = promptInput.value.trim() || mobilePrompt.value.trim();
-      if (prompt) params.prompt = prompt;
-
       let result;
-      if (activeTab.type === 'i2v') {
-        params.resolution = '720p';
-        params.duration = 5;
-        result = await muapi.generateI2V(params);
+
+      // Handle MuAPI AI Video Effects
+      if (activeTab.id === 'ai-video-effects') {
+        // Preset effects mode
+        const prompt = promptInput.value.trim() || mobilePrompt.value.trim();
+        result = await muapi.generateVideoEffect({
+          prompt: prompt || 'Apply effect',
+          image_url: uploadedUrl,
+          name: selectedEffect,
+          aspect_ratio: '16:9',
+          resolution: '720p',
+          quality: 'medium',
+          duration: 5
+        });
+      } else if (activeTab.id === 'custom-ai-video-effects') {
+        // Custom prompt mode
+        const customPrompt = promptInput.value.trim() || mobilePrompt.value.trim();
+        result = await muapi.generateVideoEffect({
+          prompt: customPrompt,
+          image_url: uploadedUrl,
+          aspect_ratio: '16:9',
+          resolution: '720p',
+          quality: 'medium',
+          duration: 5
+        });
       } else {
-        result = await muapi.generateI2I(params);
+        // Original logic for other tabs
+        const params = {
+          model: activeTab.id,
+          image_url: uploadedUrl,
+          [activeTab.field]: selectedEffect,
+        };
+        const prompt = promptInput.value.trim() || mobilePrompt.value.trim();
+        if (prompt) params.prompt = prompt;
+
+        if (activeTab.type === 'i2v') {
+          params.resolution = '720p';
+          params.duration = 5;
+          result = await muapi.generateI2V(params);
+        } else {
+          result = await muapi.generateI2I(params);
+        }
       }
 
       if (result?.url) {
-        const mediaType = activeTab.type === 'i2v' ? 'video' : 'image';
-        outputPreview.load(result.url, { type: mediaType, model: activeTab.label, filename: `${selectedEffect}-${Date.now()}` });
+        const mediaType = (activeTab.type === 'i2v' || activeTab.id.includes('video')) ? 'video' : 'image';
+        const filename = activeTab.id === 'custom-ai-video-effects' ?
+          `custom-effect-${Date.now()}` :
+          `${effectName}-${Date.now()}`;
+        outputPreview.load(result.url, { type: mediaType, model: activeTab.label, filename });
         mobileOutputPreview.load(result.url, { type: mediaType });
 
         saveToHistory(result.url, mediaType);
@@ -412,10 +569,17 @@ export function EffectsStudio() {
     try {
       const key = type === 'video' ? 'video_history' : 'muapi_history';
       const history = JSON.parse(localStorage.getItem(key) || '[]');
+
+      // For custom effects, save the actual prompt used
+      let savedPrompt = selectedEffect;
+      if (activeTab.id === 'custom-ai-video-effects') {
+        savedPrompt = promptInput.value.trim() || mobilePrompt.value.trim();
+      }
+
       history.unshift({
         id: Date.now().toString(),
         url,
-        prompt: selectedEffect,
+        prompt: savedPrompt,
         model: activeTab.id,
         type,
         timestamp: new Date().toISOString(),

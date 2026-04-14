@@ -166,6 +166,38 @@ const STUDIO_INSTRUCTIONS = {
       'Higher output resolutions take longer to process',
     ],
   },
+  audio: {
+    title: 'Audio Studio',
+    steps: [
+      { number: 1, heading: 'Choose audio type', description: 'Select from text-to-speech, music generation, voice cloning, or lip sync based on your needs.' },
+      { number: 2, heading: 'Input your content', description: 'For TTS: type your text with natural language. For music: describe style, mood, and instruments. For voice cloning: upload 30+ seconds of clear audio. For lip sync: provide video and audio.' },
+      { number: 3, heading: 'Configure settings', description: 'Choose voice, language, speed, and style options. Set duration, quality, and voice parameters for best results.' },
+      { number: 4, heading: 'Generate and download', description: 'Process takes 10-180 seconds depending on type. Download your AI-generated audio when complete.' },
+    ],
+    quickTips: [
+      'For natural speech, use conversational language with proper punctuation and breathing pauses',
+      'Music generation works best with specific genres, instruments, and mood descriptions like "upbeat pop with synth leads"',
+      'Voice cloning requires clean, noise-free audio samples of 30+ seconds for best quality',
+      'Higher quality settings improve results but take 2-3x longer to generate',
+      'Lip sync works best with clear mouth visibility and matching audio/video lengths',
+    ],
+  },
+  avatar: {
+    title: 'Avatar Studio',
+    steps: [
+      { number: 1, heading: 'Upload reference media', description: 'Upload a clear photo or video clip of the person. Face-forward, well-lit photos work best for animation.' },
+      { number: 2, heading: 'Choose animation type', description: 'Select lip sync (with audio), facial expressions, head movements, or full body animation options.' },
+      { number: 3, heading: 'Add audio (for lip sync)', description: 'Upload or record clear audio. The AI will automatically sync lip movements to match speech patterns.' },
+      { number: 4, heading: 'Generate avatar video', description: 'Process takes 1-3 minutes. Download your animated avatar video with synchronized movements.' },
+    ],
+    quickTips: [
+      'Use high-quality, well-lit photos with neutral expressions for best animation results',
+      'Lip sync works best with clear audio and unobstructed mouth visibility in the reference',
+      'Multiple reference photos from different angles improve consistency and natural movement',
+      'Keep audio under 30 seconds for optimal processing speed and quality',
+      'For best results, match the audio language to the reference person\'s native language patterns',
+    ],
+  },
   chat: {
     title: 'Chat Studio',
     steps: [
