@@ -84,8 +84,10 @@ export default defineConfig({
         rollupOptions: {
             input: 'index.html',
             output: {
-                manualChunks: {
-                    'vendor': ['@supabase/supabase-js'],
+                manualChunks: (id) => {
+                    if (id.includes('@supabase/supabase-js')) {
+                        return 'vendor';
+                    }
                 },
                 entryFileNames: 'assets/[name]-[hash].js',
                 chunkFileNames: 'assets/[name]-[hash].js',
