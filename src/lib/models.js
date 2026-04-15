@@ -4794,11 +4794,14 @@ export const i2iModels = [
 export const i2vModels = [
   {
     "id": "ai-video-effects",
-    "name": "AI Video Effects",
+    "name": "AI Video Effects (Enhanced)",
     "endpoint": "generate_wan_ai_effects",
     "family": "effects",
     "imageField": "image_url",
     "hasPrompt": true,
+    // Array of available WAN AI effect types that can be applied to this model
+    // These correspond to the keys in WAN_AI_EFFECTS from muapiConfig.js
+    "wanAiEffects": ["cakeify", "vhs", "samurai", "film-noir", "animal", "rotation"],
     "inputs": {
       "prompt": {
         "type": "string",
@@ -4808,6 +4811,15 @@ export const i2vModels = [
         "examples": [
           "a cute kitten"
         ]
+      },
+      // Enum for selecting the WAN AI effect type
+      // Values must match the keys in WAN_AI_EFFECTS from muapiConfig.js
+      // Mapping: lowercase keys (effectType) -> human-readable names (name enum)
+      "effectType": {
+        "type": "string",
+        "enum": ["cakeify", "vhs", "samurai", "film-noir", "animal", "rotation"],
+        "default": "cakeify",
+        "title": "Wan AI Effect Type"
       },
       "name": {
         "type": "string",
