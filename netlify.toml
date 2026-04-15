@@ -1,6 +1,28 @@
 [build]
   publish = "dist"
-  command = "npm run build"
+  # Use build:all to support workspace architecture (packages/*, apps/*, modules/*)
+  # This runs build:remix-go followed by the main build process
+  command = "npm run build:all"
 
 [build.environment]
   NODE_VERSION = "18"
+
+# Environment variables (set these in Netlify dashboard)
+# VITE_MUAPI_URL = "https://api.muapi.ai"
+# VITE_SUPABASE_URL = "your-supabase-url"
+# VITE_SUPABASE_ANON_KEY = "your-anon-key"
+
+# Add build hooks if needed
+[build.processing]
+  skip_processing = false
+
+[build.processing.css]
+  bundle = true
+  minify = true
+
+[build.processing.js]
+  bundle = true
+  minify = true
+
+[build.processing.html]
+  pretty_urls = true
