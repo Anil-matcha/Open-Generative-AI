@@ -63,12 +63,24 @@ export default defineConfig({
             'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
             'Access-Control-Allow-Headers': 'Content-Type, Authorization'
         },
-        proxy: {
-            '/api': {
-                target: process.env.VITE_MUAPI_URL || 'https://api.muapi.ai',
+        proxy: process.env.NODE_ENV === "production" ? {
+            "/api": {
+                target: process.env.VITE_MUAPI_URL || "https://api.muapi.ai",
                 changeOrigin: true,
                 secure: true,
-                rewrite: (path) => path.replace(/^\/api/, '')
+                rewrite: (path) => path.replace(/^\/api/, "")
+            }
+        } : {
+            "/api": {
+                target: process.env.VITE_MUAPI_URL || "https://api.muapi.ai",
+                changeOrigin: true,
+                secure: true,
+                rewrite: (path) => path.replace(/^\/api/, "")
+            },
+            "/apps/remix-go": {
+                target: "http://localhost:5173",
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/apps\/remix-go/, "")
             }
         }
     },

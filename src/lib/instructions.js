@@ -213,6 +213,22 @@ const STUDIO_INSTRUCTIONS = {
       'Context helps the AI understand your needs better',
     ],
   },
+  'advanced-dubbing': {
+    title: 'Advanced Dubbing Studio',
+    steps: [
+      { number: 1, heading: 'Upload source video', description: 'Upload a video file that you want to translate and dub. The system will automatically detect the source language.' },
+      { number: 2, heading: 'Select languages', description: 'Choose the source and target languages from 20+ supported languages. The system auto-detects the source language.' },
+      { number: 3, heading: 'Configure voice settings', description: 'Select a voice from available AI voices, or enable voice cloning to create a custom voice from reference audio.' },
+      { number: 4, heading: 'Adjust quality controls', description: 'Set lip-sync quality, speed adjustment, and other parameters for professional dubbing results.' },
+      { number: 5, heading: 'Generate preview & dub', description: 'Preview the voice before processing, then choose to translate only or translate and dub the full video.' },
+    ],
+    quickTips: [
+      'Voice cloning requires 30+ seconds of reference audio for best results',
+      'Use "High" lip-sync quality for professional videos',
+      'Speed adjustment affects both audio and video timing',
+      'Preserve emotion maintains the original speaker\'s emotional tone',
+    ],
+  },
 };
 
 let cachedInstructions = null;

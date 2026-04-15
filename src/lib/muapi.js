@@ -28,6 +28,48 @@ export class MuapiClient {
         return key;
     }
 
+    // Generic makeRequest method for enhanced API calls
+    async makeRequest(endpoint, params = {}) {
+        try {
+            const response = await fetch(this.proxyUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    endpoint,
+                    params,
+                    generationType: 'enhanced',
+                    studioType: 'enhanced'
+                })
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+            }
+
+            const data = await response.json();
+            this.validateResponse(data, 'enhanced');
+
+            // If it's a direct result, return it
+            if (data.outputs || data.url || data.result) {
+                return data;
+            }
+
+            // If it has a request_id, poll for result
+            const requestId = data.request_id || data.id;
+            if (requestId) {
+                return await this.pollForResult(requestId, 60, 2000);
+            }
+
+            return data;
+        } catch (error) {
+            console.error(`[MuapiClient] makeRequest failed for ${endpoint}:`, error);
+            throw error;
+        }
+    }
+
     // Cancel a specific request
     cancelRequest(requestId) {
         const controller = this.activeControllers.get(requestId);
@@ -1486,6 +1528,61 @@ export class MuapiClient {
             case '21:9': return [1536, 640];
             default: return [1024, 1024];
         }
+    }
+
+    // Apply video effects (motion controls, stabilization, etc.)
+    async applyVideoEffects(videoUrl, effects = []) {
+        const params = {
+            video_url: videoUrl,
+            effects: effects
+        };
+
+        return await this.makeRequest('apply-video-effects', params);
+    }
+
+    // Apply advanced image-to-video effects (Veo enhanced)
+    async applyVeoAdvancedI2V(imageUrl, options = {}) {
+        const params = {
+            image_url: imageUrl,
+            prompt: options.prompt || '',
+            motion_strength: options.motionStrength || 5,
+            camera_movement: options.cameraMovement || 'subtle',
+            duration: options.duration || 5,
+            resolution: options.resolution || '1080p',
+            aspect_ratio: options.aspectRatio || '16:9',
+            style: options.style || 'realistic'
+        };
+
+        return await this.makeRequest('veo-advanced-i2v', params);
+    }
+
+    // Apply Pixverse advanced effects
+    async applyPixverseAdvancedEffect(videoUrl, effectType, options = {}) {
+        const params = {
+            video_url: videoUrl,
+            effect_type: effectType,
+            intensity: options.intensity || 5,
+            duration: options.duration || null,
+            style: options.style || 'cinematic',
+            ...options
+        };
+
+        return await this.makeRequest('pixverse-advanced-effect', params);
+    }
+
+    // Apply Runway motion effects
+    async applyRunwayMotion(videoUrl, motionConfig = {}) {
+        const params = {
+            video_url: videoUrl,
+            motion_type: motionConfig.type || 'pan',
+            direction: motionConfig.direction || 'left',
+            speed: motionConfig.speed || 5,
+            intensity: motionConfig.intensity || 5,
+            stabilization: motionConfig.stabilization || false,
+            motion_blur: motionConfig.motionBlur || false
+        };
+
+        return await this.makeRequest('runway-motion', params);
     }
 }
 

@@ -6,7 +6,10 @@
   "main": "src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./react": "./src/react/index.ts",
+    "./react": {
+      "types": "./src/react/index.ts",
+      "default": "./src/react/index.js"
+    },
     "./vue": "./src/vue/index.ts",
     "./vanilla": "./src/vanilla/index.ts"
   },

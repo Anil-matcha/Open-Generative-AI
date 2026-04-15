@@ -66,6 +66,9 @@ const pageLoaders = {
   timeline: () => import('../components/TimelineEditorPage.js').then(m => m.TimelineEditorPage()),
   'timeline-test': () => import('../components/TimelineTestPage.jsx').then(m => m.TimelineTestPage),
   'remix-go': () => import('../components/RemixGoPage.js').then(m => m.RemixGoPage()),
+  'runway-motion': () => import('../components/RunwayMotionStudio.js').then(m => m.RunwayMotionStudio()),
+  'tiktok-carousel': () => import('../components/TikTokCarouselStudio.js').then(m => m.TikTokCarouselStudio()),
+  'advanced-dubbing': () => import('../components/AdvancedDubbingStudio.js').then(m => m.AdvancedDubbingStudio()),
 };
 
 let currentPage = null;

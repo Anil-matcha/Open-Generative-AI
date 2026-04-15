@@ -37,7 +37,7 @@ export function RemixGoPage() {
 
   // Iframe container
   const iframe = document.createElement('iframe');
-  iframe.src = 'http://localhost:3001';
+  iframe.src = '/apps/remix-go/';
   iframe.className = 'w-full h-full border-0';
   iframe.style.display = 'none';
   iframe.onload = () => {
@@ -61,7 +61,7 @@ export function RemixGoPage() {
     if (retryCount < maxRetries) {
       setTimeout(() => {
         const testIframe = document.createElement('iframe');
-        testIframe.src = 'http://localhost:3001';
+        testIframe.src = 'http://localhost:5173';
         testIframe.style.display = 'none';
         testIframe.onload = () => {
           location.reload(); // Reload to show the iframe

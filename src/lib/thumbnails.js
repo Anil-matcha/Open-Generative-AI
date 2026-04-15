@@ -13,6 +13,7 @@ const STUDIO_THUMBNAILS = {
   training: '/thumbnails/studios/training.webp',
   videotools: '/thumbnails/studios/videotools.webp',
   chat: '/thumbnails/studios/chat.webp',
+  'advanced-dubbing': '/thumbnails/studios/advanced-dubbing.webp',
 };
 
 const HERO_THUMBNAILS = {
@@ -34,6 +35,7 @@ const HERO_THUMBNAILS = {
   lipsync: '/thumbnails/heroes/lipsync.webp',
   render: '/thumbnails/heroes/render.webp',
   chat: '/thumbnails/heroes/chat.webp',
+  'advanced-dubbing': '/thumbnails/heroes/advanced-dubbing.webp',
   templates: '/thumbnails/heroes/templates.webp',
 };
 

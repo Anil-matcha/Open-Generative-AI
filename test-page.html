@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test ImageToVideoPage</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: #000; color: white; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 3px; }
+    </style>
+</head>
+<body class="bg-app-bg">
+    <div id="app"></div>
+
+    <script type="module">
+        // Mock router
+        window.navigate = (page) => {
+            console.log('Navigate to:', page);
+            alert(`Would navigate to: ${page}`);
+        };
+
+        // Mock localStorage
+        window.localStorage = {
+            setItem: (key, value) => console.log('localStorage set:', key, value),
+            getItem: (key) => console.log('localStorage get:', key)
+        };
+
+        // Import and test the component
+        import { ImageToVideoPage } from './src/components/ImageToVideoPage.js';
+
+        const app = document.getElementById('app');
+        const page = ImageToVideoPage();
+        app.appendChild(page);
+
+        console.log('ImageToVideoPage component loaded successfully');
+    </script>
+</body>
+</html></content>
+<parameter name="filePath">test-page.html

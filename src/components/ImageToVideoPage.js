@@ -42,6 +42,10 @@ export function ImageToVideoPage() {
   const container = document.createElement('div');
   container.className = 'w-full h-full flex flex-col items-center bg-app-bg relative p-4 md:p-6 overflow-y-auto custom-scrollbar overflow-x-hidden';
 
+  // State for advanced options
+  let selectedModel = null;
+  let showAdvancedOptions = false;
+
   // ==========================================
   // 1. HERO SECTION
   // ==========================================
@@ -126,6 +130,100 @@ export function ImageToVideoPage() {
       </div>
     </div>
 
+    <!-- Advanced Veo Options Panel -->
+    <div id="advanced-options-panel" class="bg-[#111]/90 backdrop-blur-xl border border-white/10 rounded-[1.5rem] p-6 md:p-8 shadow-3xl mb-6 hidden">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-xl font-black text-white mb-1">Advanced Veo Controls</h2>
+          <p class="text-sm text-muted">Fine-tune your image-to-video generation</p>
+        </div>
+        <button id="close-advanced-btn" class="text-muted hover:text-white transition-colors">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6">
+        <!-- Motion Strength -->
+        <div class="flex flex-col gap-3">
+          <div class="flex items-center justify-between">
+            <label class="text-sm font-bold text-secondary uppercase tracking-wider">Motion Strength</label>
+            <span id="motion-strength-value" class="text-sm font-bold text-primary">5</span>
+          </div>
+          <input type="range" id="motion-strength-slider" min="1" max="10" step="1" value="5"
+            class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-primary">
+          <div class="flex justify-between text-xs text-muted">
+            <span>Subtle</span>
+            <span>Dramatic</span>
+          </div>
+        </div>
+
+        <!-- Camera Movement -->
+        <div class="flex flex-col gap-3">
+          <label class="text-sm font-bold text-secondary uppercase tracking-wider mb-2">Camera Movement</label>
+          <div class="grid grid-cols-3 gap-2">
+            <button class="camera-btn bg-white/[0.03] border border-white/5 rounded-lg p-3 hover:border-primary/20 transition-all text-center" data-camera="pan-left">
+              <div class="text-lg mb-1">⬅️</div>
+              <div class="text-xs text-muted">Pan Left</div>
+            </button>
+            <button class="camera-btn bg-white/[0.03] border border-white/5 rounded-lg p-3 hover:border-primary/20 transition-all text-center" data-camera="zoom-in">
+              <div class="text-lg mb-1">🔍</div>
+              <div class="text-xs text-muted">Zoom In</div>
+            </button>
+            <button class="camera-btn bg-white/[0.03] border border-white/5 rounded-lg p-3 hover:border-primary/20 transition-all text-center" data-camera="tilt-up">
+              <div class="text-lg mb-1">⬆️</div>
+              <div class="text-xs text-muted">Tilt Up</div>
+            </button>
+            <button class="camera-btn bg-white/[0.03] border border-white/5 rounded-lg p-3 hover:border-primary/20 transition-all text-center" data-camera="pan-right">
+              <div class="text-lg mb-1">➡️</div>
+              <div class="text-xs text-muted">Pan Right</div>
+            </button>
+            <button class="camera-btn bg-white/[0.03] border border-white/5 rounded-lg p-3 hover:border-primary/20 transition-all text-center active" data-camera="none">
+              <div class="text-lg mb-1">📷</div>
+              <div class="text-xs text-muted">Static</div>
+            </button>
+            <button class="camera-btn bg-white/[0.03] border border-white/5 rounded-lg p-3 hover:border-primary/20 transition-all text-center" data-camera="tilt-down">
+              <div class="text-lg mb-1">⬇️</div>
+              <div class="text-xs text-muted">Tilt Down</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Prompt Enhancement -->
+        <div class="flex flex-col gap-3">
+          <label class="text-sm font-bold text-secondary uppercase tracking-wider">Prompt Enhancement</label>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-muted">AI-enhanced prompts for better results</span>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="prompt-enhancement-toggle" class="sr-only peer">
+              <div class="w-11 h-6 bg-white/10 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/25 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Quality Presets -->
+        <div class="flex flex-col gap-3">
+          <label class="text-sm font-bold text-secondary uppercase tracking-wider">Quality Preset</label>
+          <div class="grid grid-cols-3 gap-2">
+            <button class="quality-btn bg-white/[0.03] border border-white/5 rounded-lg p-3 hover:border-primary/20 transition-all text-center" data-quality="draft">
+              <div class="text-sm font-bold text-muted mb-1">Draft</div>
+              <div class="text-xs text-muted">Fast</div>
+            </button>
+            <button class="quality-btn bg-white/[0.03] border border-primary/50 rounded-lg p-3 transition-all text-center active" data-quality="standard">
+              <div class="text-sm font-bold text-primary mb-1">Standard</div>
+              <div class="text-xs text-muted">Balanced</div>
+            </button>
+            <button class="quality-btn bg-white/[0.03] border border-white/5 rounded-lg p-3 hover:border-primary/20 transition-all text-center" data-quality="premium">
+              <div class="text-sm font-bold text-muted mb-1">Premium</div>
+              <div class="text-xs text-muted">Best</div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- CTA Panel -->
     <div class="bg-[#111]/90 backdrop-blur-xl border border-white/10 rounded-[1.5rem] p-8 md:p-10 shadow-3xl text-center">
       <h2 class="text-2xl font-black text-white mb-2">Bring Images to Life</h2>
@@ -166,6 +264,148 @@ export function ImageToVideoPage() {
       localStorage.setItem('prefill_prompt', prompt.prompt);
       localStorage.setItem('prefill_model', prompt.model);
       navigate('video');
+    };
+  });
+
+  // ==========================================
+  // ADVANCED OPTIONS LOGIC
+  // ==========================================
+
+  const advancedPanel = container.querySelector('#advanced-options-panel');
+  const closeAdvancedBtn = container.querySelector('#close-advanced-btn');
+
+  // State for advanced options
+  let veoOptions = {
+    motionStrength: 5,
+    cameraMovement: 'none',
+    promptEnhancement: false,
+    qualityPreset: 'standard'
+  };
+
+  // Function to show/hide advanced options based on selected model
+  const updateAdvancedOptionsVisibility = (modelName) => {
+    selectedModel = modelName;
+    const isVeoModel = modelName && modelName.includes('Veo');
+
+    if (isVeoModel && !showAdvancedOptions) {
+      showAdvancedOptions = true;
+      advancedPanel.classList.remove('hidden');
+      // Animate in
+      advancedPanel.style.animation = 'fade-in-up 0.3s ease-out';
+    } else if (!isVeoModel && showAdvancedOptions) {
+      showAdvancedOptions = false;
+      advancedPanel.classList.add('hidden');
+    }
+  };
+
+  // Close advanced options
+  closeAdvancedBtn.onclick = () => {
+    showAdvancedOptions = false;
+    advancedPanel.classList.add('hidden');
+  };
+
+  // Motion strength slider
+  const motionStrengthSlider = container.querySelector('#motion-strength-slider');
+  const motionStrengthValue = container.querySelector('#motion-strength-value');
+
+  motionStrengthSlider.oninput = (e) => {
+    veoOptions.motionStrength = parseInt(e.target.value);
+    motionStrengthValue.textContent = veoOptions.motionStrength;
+  };
+
+  // Camera movement buttons
+  container.querySelectorAll('.camera-btn').forEach(btn => {
+    btn.onclick = (e) => {
+      // Remove active class from all camera buttons
+      container.querySelectorAll('.camera-btn').forEach(b => {
+        b.classList.remove('active', 'border-primary/50', 'bg-primary/10');
+        b.classList.add('border-white/5', 'bg-white/[0.03]');
+      });
+
+      // Add active class to clicked button
+      e.target.closest('.camera-btn').classList.add('active', 'border-primary/50', 'bg-primary/10');
+      e.target.closest('.camera-btn').classList.remove('border-white/5', 'bg-white/[0.03]');
+
+      veoOptions.cameraMovement = e.target.closest('.camera-btn').dataset.camera;
+    };
+  });
+
+  // Prompt enhancement toggle
+  const promptEnhancementToggle = container.querySelector('#prompt-enhancement-toggle');
+  promptEnhancementToggle.onchange = (e) => {
+    veoOptions.promptEnhancement = e.target.checked;
+  };
+
+  // Quality preset buttons
+  container.querySelectorAll('.quality-btn').forEach(btn => {
+    btn.onclick = (e) => {
+      // Remove active class from all quality buttons
+      container.querySelectorAll('.quality-btn').forEach(b => {
+        b.classList.remove('active', 'border-primary/50', 'bg-primary/10', 'text-primary');
+        b.classList.add('border-white/5', 'bg-white/[0.03]', 'text-muted');
+        b.querySelector('div:first-child').classList.remove('text-primary');
+        b.querySelector('div:first-child').classList.add('text-muted');
+      });
+
+      // Add active class to clicked button
+      e.target.closest('.quality-btn').classList.add('active', 'border-primary/50', 'bg-primary/10');
+      e.target.closest('.quality-btn').classList.remove('border-white/5', 'bg-white/[0.03]');
+      const qualityText = e.target.closest('.quality-btn').querySelector('div:first-child');
+      qualityText.classList.remove('text-muted');
+      qualityText.classList.add('text-primary');
+
+      veoOptions.qualityPreset = e.target.closest('.quality-btn').dataset.quality;
+    };
+  });
+
+  // Override model card clicks to show advanced options for Veo
+  container.querySelectorAll('.model-card').forEach(card => {
+    const originalOnclick = card.onclick;
+    card.onclick = (e) => {
+      const modelName = card.dataset.model;
+      updateAdvancedOptionsVisibility(modelName);
+
+      // Store Veo options in localStorage if Veo model selected
+      if (modelName.includes('Veo')) {
+        localStorage.setItem('veo_advanced_options', JSON.stringify(veoOptions));
+      }
+
+      // Call original click handler
+      originalOnclick.call(card, e);
+    };
+  });
+
+  // Override prompt card clicks to check for Veo models
+  container.querySelectorAll('.prompt-card').forEach((card, i) => {
+    const originalOnclick = card.onclick;
+    card.onclick = (e) => {
+      const prompt = EXAMPLE_PROMPTS[i];
+      updateAdvancedOptionsVisibility(prompt.model);
+
+      // Store Veo options if Veo model
+      if (prompt.model.includes('Veo')) {
+        localStorage.setItem('veo_advanced_options', JSON.stringify(veoOptions));
+      }
+
+      // Call original click handler
+      originalOnclick.call(card, e);
+    };
+  });
+
+  container.querySelectorAll('.prompt-card .try-btn').forEach((btn, i) => {
+    const originalOnclick = btn.onclick;
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const prompt = EXAMPLE_PROMPTS[i];
+      updateAdvancedOptionsVisibility(prompt.model);
+
+      // Store Veo options if Veo model
+      if (prompt.model.includes('Veo')) {
+        localStorage.setItem('veo_advanced_options', JSON.stringify(veoOptions));
+      }
+
+      // Call original click handler
+      originalOnclick.call(btn, e);
     };
   });
 

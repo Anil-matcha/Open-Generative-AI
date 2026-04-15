@@ -1,9 +1,11 @@
 import { muapi } from '../lib/muapi.js';
+import { applyPixverseAdvancedEffect } from '../lib/muapiEnhanced.js';
 import { AuthModal } from './AuthModal.js';
 import { createUploadPicker } from './UploadPicker.js';
 import { createMediaPreview, createFullscreenPreview } from './MediaPreview.js';
 import { createInlineInstructions } from './InlineInstructions.js';
 import { i2iModels, i2vModels } from '../lib/models.js';
+import { PIXVERSE_ADVANCED_EFFECTS } from '../lib/muapiConfig.js';
 import { createHeroSection } from '../lib/thumbnails.js';
 
 const EFFECT_TABS = [
@@ -14,11 +16,17 @@ const EFFECT_TABS = [
   { id: 'custom-ai-video-effects', label: 'Custom AI Effects', type: 'muapi-custom', field: 'prompt' },
   { id: 'motion-controls', label: 'Motion Controls', type: 'i2v', field: 'name' },
   { id: 'video-effects', label: 'Video FX v2', type: 'i2v', field: 'name' },
+  { id: 'pixverse-advanced-effects', label: 'Pixverse Advanced', type: 'pixverse-advanced', field: 'name' },
 ];
 
 function getEffectsForModel(modelId) {
   // Special handling for custom AI video effects - no preset effects needed
   if (modelId === 'custom-ai-video-effects') return [];
+
+  // Special handling for Pixverse advanced effects
+  if (modelId === 'pixverse-advanced-effects') {
+    return Object.keys(PIXVERSE_ADVANCED_EFFECTS);
+  }
 
   const allModels = [...i2iModels, ...i2vModels];
   const model = allModels.find(m => m.id === modelId);
@@ -327,12 +335,17 @@ export function EffectsStudio() {
       // Video Effects v2 - use direct slug mapping
       return `/thumbnails/effects/vfx/${slug}.webp.png`;
     }
-    
+
+    if (tabId === 'pixverse-advanced-effects') {
+      // Pixverse Advanced Effects - use specialized thumbnails
+      return `/thumbnails/effects/pixverse-advanced/${slug}.webp.png`;
+    }
+
     if (tabType === 'i2v' && index) {
       // Fallback for other i2v tabs
       return `/thumbnails/effects/ai-video/${index}-${slug}.webp.png`;
     }
-    
+
     return null;
   }
 
@@ -356,8 +369,13 @@ export function EffectsStudio() {
 
     effects.forEach(name => {
       const card = document.createElement('div');
-      const isVideo = activeTab.type === 'i2v';
+      const isVideo = activeTab.type === 'i2v' || activeTab.type === 'pixverse-advanced';
       const thumbnailUrl = getEffectThumbnail(name, activeTab.id, activeTab.type);
+
+      // Get display name for Pixverse effects
+      const displayName = activeTab.id === 'pixverse-advanced-effects'
+        ? PIXVERSE_ADVANCED_EFFECTS[name]?.name || name
+        : name;
       
       card.className = 'bg-white/[0.03] border border-white/5 rounded-xl p-2 cursor-pointer hover:bg-white/[0.06] hover:border-white/10 transition-all group overflow-hidden';
       
@@ -478,6 +496,9 @@ export function EffectsStudio() {
         alert('Please enter a prompt describing the desired effect');
         return;
       }
+    } else if (activeTab.id === 'pixverse-advanced-effects' && !selectedEffect) {
+      alert('Please select a Pixverse advanced effect first');
+      return;
     } else if (!selectedEffect) {
       alert('Select an effect first');
       return;
@@ -522,6 +543,22 @@ export function EffectsStudio() {
           quality: 'medium',
           duration: 5
         });
+      } else if (activeTab.id === 'pixverse-advanced-effects') {
+        // Pixverse advanced effects mode
+        const prompt = promptInput.value.trim() || mobilePrompt.value.trim();
+        result = await applyPixverseAdvancedEffect(
+          { url: uploadedUrl },
+          selectedEffect,
+          {
+            prompt: prompt || 'Apply advanced effect',
+            aspectRatio: '16:9',
+            resolution: '720p',
+            quality: 'high',
+            duration: 5,
+            detailLevel: 'ultra',
+            enhancementLevel: 'maximum'
+          }
+        );
       } else {
         // Original logic for other tabs
         const params = {

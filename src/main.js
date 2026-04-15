@@ -11,6 +11,8 @@ import { analytics } from './lib/analytics.js';
 import { showToast } from './lib/loading.js';
 import { generationService } from './lib/editor/generationService.js';
 import { escapeHtml, safeHtml } from './lib/security.js';
+import { initializeEnhancedMuAPI } from './lib/muapiEnhanced.js';
+import { loadConfig } from './lib/muapiConfig.js';
 
 // Make generation service available globally for embedded components
 window.generationService = generationService;
@@ -25,6 +27,22 @@ window.enhancedPerfMonitor = enhancedPerfMonitor;
 window.memoryLeakDetector = memoryLeakDetector;
 window.mediaLoader = mediaLoader;
 window.performanceBudget = performanceBudget;
+
+// Initialize enhanced MuAPI system
+console.log('[App] Initializing enhanced MuAPI...');
+const muapiConfig = loadConfig();
+initializeEnhancedMuAPI(muapiConfig).then(success => {
+  if (success) {
+    console.log('[App] Enhanced MuAPI initialized successfully');
+    showToast('Enhanced AI features enabled', 'success', 3000);
+  } else {
+    console.log('[App] Enhanced MuAPI initialization failed, using basic features');
+    showToast('Using basic AI features', 'info', 3000);
+  }
+}).catch(error => {
+  console.warn('[App] Enhanced MuAPI initialization error:', error);
+  showToast('AI features unavailable', 'warning', 5000);
+});
 
 // Start memory leak detection in development
 if (import.meta.env.DEV) {

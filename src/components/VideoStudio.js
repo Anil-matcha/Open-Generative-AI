@@ -26,6 +26,7 @@ export function VideoStudio() {
     let v2vMode = false;   // true = video-to-video tools mode
     let effectsMode = false; // true = video effects mode
     let uploadedVideoUrl = null;
+    let wanAiSection = null; // Reference to Wan AI effects section
     
     // Advanced parameters state
     let negativePrompt = '';
@@ -248,6 +249,8 @@ export function VideoStudio() {
             updateControlsForModel(selectedModel);
             textarea.placeholder = 'Describe the effect you want to apply';
             textarea.disabled = false;
+            // Show Wan AI section
+            if (wanAiSection) wanAiSection.classList.remove('hidden');
         } else {
             // Switch back to default
             selectedModel = t2vModels[0].id;
@@ -255,6 +258,8 @@ export function VideoStudio() {
             document.getElementById('v-model-btn-label').textContent = selectedModelName;
             updateControlsForModel(selectedModel);
             textarea.placeholder = 'Describe the video you want to create';
+            // Hide Wan AI section
+            if (wanAiSection) wanAiSection.classList.add('hidden');
         }
         effectsBtn.className = `w-10 h-10 shrink-0 rounded-xl border transition-all flex items-center justify-center relative overflow-hidden mt-1.5 ${effectsMode ? 'bg-primary/20 border-primary/60' : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40'} group`;
     };
@@ -395,6 +400,10 @@ export function VideoStudio() {
         </div>
     `;
     container.appendChild(wanAiSection);
+
+    // Attach event handler to apply button
+    const applyBtn = wanAiSection.querySelector('#apply-wan-effect');
+    if (applyBtn) applyBtn.addEventListener('click', applySelectedWanEffect);
 
     const inlineInstructions = createInlineInstructions('video');
     inlineInstructions.classList.add('mt-8');
@@ -945,19 +954,24 @@ export function VideoStudio() {
         button.textContent = 'Applying Effect...';
 
         try {
+            showProcessingIndicator('Applying Wan AI Effect...');
+
             const result = await muapi.applyWanAIEffect(currentVideo, effectType, {
                 prompt: `Apply ${effectType} style transformation`
             });
 
             if (result.success) {
                 resultVideo.src = result.url;
-                alert(`Wan AI ${effectType} effect applied successfully`);
+                showToast(`Wan AI ${effectType} effect applied successfully`, 'success');
+            } else {
+                showWanEffectError(new Error(result.error || 'Unknown error'), effectType);
             }
         } catch (error) {
-            alert('Wan AI effect application failed');
+            showWanEffectError(error, effectType);
         } finally {
             button.disabled = false;
             button.textContent = originalText;
+            hideProcessingIndicator();
         }
     };
 
@@ -1008,6 +1022,8 @@ export function VideoStudio() {
         updateControlsForModel(selectedModel);
         textarea.placeholder = 'Describe the video you want to create';
         textarea.disabled = false;
+        // Hide Wan AI section
+        if (wanAiSection) wanAiSection.classList.add('hidden');
         textarea.focus();
     };
 
@@ -1216,6 +1232,66 @@ export function VideoStudio() {
         generateBtn.disabled = false;
         generateBtn.innerHTML = `Generate ✨`;
     };
+
+    // --- Wan AI Effects UI Helper Functions ---
+
+    function showProcessingIndicator(message = 'Processing...') {
+        const indicator = document.createElement('div');
+        indicator.id = 'wan-processing-indicator';
+        indicator.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-purple-500/90 text-white px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-3';
+        indicator.innerHTML = `
+            <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            <span class="text-sm font-medium">${message}</span>
+        `;
+
+        document.body.appendChild(indicator);
+    }
+
+    function hideProcessingIndicator() {
+        const indicator = document.getElementById('wan-processing-indicator');
+        if (indicator) indicator.remove();
+    }
+
+    function showWanEffectError(error, effectType) {
+        const errorToast = document.createElement('div');
+        errorToast.className = 'fixed top-4 right-4 bg-red-500/90 text-white px-4 py-3 rounded-lg shadow-lg z-50 max-w-sm';
+        errorToast.innerHTML = `
+            <div class="flex items-start gap-3">
+                <div class="text-red-200 mt-0.5">🎭</div>
+                <div class="flex-1">
+                    <div class="font-semibold text-sm">Wan AI Effect Failed</div>
+                    <div class="text-xs opacity-90 mt-1">${effectType}: ${error.message.slice(0, 80)}...</div>
+                    <div class="text-xs opacity-75 mt-1">Using original video</div>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(errorToast);
+        setTimeout(() => errorToast.remove(), 5000);
+    }
+
+    // Add validation and better UX
+    function validateWanEffectSelection() {
+        const effectSelect = document.getElementById('wan-ai-effect');
+        const applyButton = document.getElementById('apply-wan-effect');
+
+        if (effectSelect && applyButton) {
+            if (effectSelect.value) {
+                applyButton.disabled = false;
+                applyButton.classList.remove('opacity-50');
+            } else {
+                applyButton.disabled = true;
+                applyButton.classList.add('opacity-50');
+            }
+        }
+    }
+
+    // Initialize validation when Wan AI section is created
+    const wanEffectSelect = document.getElementById('wan-ai-effect');
+    if (wanEffectSelect) {
+        wanEffectSelect.addEventListener('change', validateWanEffectSelection);
+        validateWanEffectSelection(); // Initial validation
+    }
 
     return container;
 }
