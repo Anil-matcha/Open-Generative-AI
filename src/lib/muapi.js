@@ -729,6 +729,48 @@ export class MuapiClient {
         }
     }
 
+    async applyWanAIEffect(videoUrl, effectType, options = {}, signal) {
+        const finalPayload = {
+            video_url: videoUrl,
+            effect_type: effectType,
+            prompt: options.prompt || `Apply ${effectType} style transformation`
+        };
+
+        try {
+            const response = await fetch(this.proxyUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    endpoint: 'generate_wan_ai_effects',
+                    params: finalPayload,
+                    generationType: 'video-effect',
+                    studioType: 'video'
+                }),
+                signal
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+            }
+
+            const submitData = await response.json();
+            this.validateResponse(submitData, 'submit');
+
+            const requestId = submitData.request_id || submitData.id;
+            if (!requestId) return submitData;
+
+            const result = await this.pollForResult(requestId, 120, 2000, signal);
+            const newVideoUrl = result.outputs?.[0] || result.url || result.output?.url;
+            return { success: true, url: newVideoUrl };
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                throw new Error('Request cancelled by user');
+            }
+            throw error;
+        }
+    }
+
     async faceSwap(params, signal) {
         const finalPayload = {};
 

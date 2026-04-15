@@ -366,6 +366,36 @@ export function VideoStudio() {
     promptWrapper.appendChild(bar);
     container.appendChild(promptWrapper);
 
+    // ==========================================
+    // WAN AI EFFECTS SECTION
+    // ==========================================
+    const wanAiSection = document.createElement('div');
+    wanAiSection.className = 'w-full mt-4 hidden animate-fade-in-up';
+    wanAiSection.style.animationDelay = '0.3s';
+    wanAiSection.innerHTML = `
+        <div class="bg-[#111]/90 backdrop-blur-xl border border-purple-500/20 rounded-[1.5rem] p-4">
+            <h4 class="text-sm font-semibold text-purple-400 mb-3 flex items-center gap-2">
+                <span class="w-2 h-2 bg-purple-400 rounded-full"></span>
+                Wan AI Video Effects
+            </h4>
+            <div class="space-y-3">
+                <select id="wan-ai-effect" class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded text-sm text-white">
+                    <option value="">Select Wan AI Effect...</option>
+                    <option value="cakeify">🎨 Cakeify - Stylized Animation</option>
+                    <option value="vhs">📼 VHS Footage - Retro Video</option>
+                    <option value="samurai">⚔️ Samurai It - Character Animation</option>
+                    <option value="film-noir">🎭 Film Noir - Cinematic Style</option>
+                    <option value="animal">🐾 Animal Transformation</option>
+                    <option value="rotation">🔄 Rotation Effect</option>
+                </select>
+                <button id="apply-wan-effect" class="w-full py-2 bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/40 rounded text-sm font-medium transition-colors disabled:opacity-50 text-white">
+                    Apply Wan AI Effect
+                </button>
+            </div>
+        </div>
+    `;
+    container.appendChild(wanAiSection);
+
     const inlineInstructions = createInlineInstructions('video');
     inlineInstructions.classList.add('mt-8');
     container.appendChild(inlineInstructions);
@@ -892,6 +922,42 @@ export function VideoStudio() {
             URL.revokeObjectURL(blobUrl);
         } catch (err) {
             window.open(url, '_blank');
+        }
+    };
+
+    // --- Wan AI Effect Application ---
+    const applySelectedWanEffect = async () => {
+        const effectType = document.getElementById('wan-ai-effect').value;
+        if (!effectType) {
+            alert('Please select a Wan AI effect first');
+            return;
+        }
+
+        const currentVideo = resultVideo.src;
+        if (!currentVideo) {
+            alert('Please generate or upload a video first');
+            return;
+        }
+
+        const button = document.getElementById('apply-wan-effect');
+        const originalText = button.textContent;
+        button.disabled = true;
+        button.textContent = 'Applying Effect...';
+
+        try {
+            const result = await muapi.applyWanAIEffect(currentVideo, effectType, {
+                prompt: `Apply ${effectType} style transformation`
+            });
+
+            if (result.success) {
+                resultVideo.src = result.url;
+                alert(`Wan AI ${effectType} effect applied successfully`);
+            }
+        } catch (error) {
+            alert('Wan AI effect application failed');
+        } finally {
+            button.disabled = false;
+            button.textContent = originalText;
         }
     };
 
