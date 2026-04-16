@@ -11,7 +11,7 @@ const SUPABASE_URL = process.env.SUPABASE_URL
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
 
 // VideoDB configuration
-const VIDEO_DB_API_KEY = process.env.VIDEO_DB_API_KEY || 'sk-1a4MzrimOpn7NHpEgrVYnwFHNgCiJweSemObWLdtnEs'
+const VIDEO_DB_API_KEY = process.env.VIDEO_DB_API_KEY
 const VIDEO_DB_BASE_URL = process.env.VIDEO_DB_BASE_URL || 'https://api.videodb.io'
 
 export default async function handler(req, context) {

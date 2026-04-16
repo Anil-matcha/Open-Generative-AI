@@ -374,7 +374,7 @@ export function VideoStudio() {
     // ==========================================
     // WAN AI EFFECTS SECTION
     // ==========================================
-    const wanAiSection = document.createElement('div');
+    wanAiSection = document.createElement('div');
     wanAiSection.className = 'w-full mt-4 hidden animate-fade-in-up';
     wanAiSection.style.animationDelay = '0.3s';
     wanAiSection.innerHTML = `
