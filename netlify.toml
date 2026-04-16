@@ -13,7 +13,6 @@
 # Do not commit secrets to this file
 
 # Frontend Environment Variables (for local development)
-VITE_DIRECTOR_BACKEND_URL=http://localhost:8000
 
 # Add build hooks if needed
 [build.processing]
