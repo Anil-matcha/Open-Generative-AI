@@ -1,16 +1,19 @@
 [build]
+  base = "."
   publish = "dist"
+  ignore = "git diff --quiet HEAD^ HEAD apps/ packages/ modules/"
   # Use build:all to support workspace architecture (packages/*, apps/*, modules/*)
   # This runs build:remix-go followed by the main build process
   command = "npm run build:all"
 
 [build.environment]
-  NODE_VERSION = "18"
+  NODE_VERSION = "20"
 
-# Environment variables (set these in Netlify dashboard)
-# VITE_MUAPI_URL = "https://api.muapi.ai"
-# VITE_SUPABASE_URL = "your-supabase-url"
-# VITE_SUPABASE_ANON_KEY = "your-anon-key"
+# Environment variables are set via Netlify CLI or dashboard
+# Do not commit secrets to this file
+
+# Frontend Environment Variables (for local development)
+VITE_DIRECTOR_BACKEND_URL=http://localhost:8000
 
 # Add build hooks if needed
 [build.processing]
