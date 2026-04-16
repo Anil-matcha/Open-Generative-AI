@@ -1,10 +1,7 @@
 [build]
-  base = "."
   publish = "dist"
-  ignore = "git diff --quiet HEAD^ HEAD apps/ packages/ modules/"
-  # Use build:all to support workspace architecture (packages/*, apps/*, modules/*)
-  # This runs build:remix-go followed by the main build process
-  command = "npm run build:all"
+  # Use pnpm for better monorepo support
+  command = "pnpm install && npm run build:all"
 
 [build.environment]
   NODE_VERSION = "20"
