@@ -48,7 +48,7 @@
     "@playwright/test": "^1.59.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
-    "@vitest/ui": "^4.1.2",
+    "@vitest/ui": "^1.0.0",
     "autoprefixer": "^10.4.24",
     "canvas": "^3.2.3",
     "eslint": "^10.1.0",
@@ -58,8 +58,8 @@
     "tailwindcss": "^4.1.18",
     "terser": "^5.27.0",
     "typescript": "^6.0.2",
-    "vite": "^8.0.8",
-    "vitest": "^4.1.2"
+    "vite": "^7.0.0",
+    "vitest": "^1.0.0"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.99.0",
