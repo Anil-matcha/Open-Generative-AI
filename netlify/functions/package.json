@@ -5,12 +5,14 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "build": "tsc",
     "test": "jest --config jest.config.cjs",
     "test:watch": "jest --config jest.config.cjs --watch"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.99.0",
-    "node-fetch": "^3.0.0"
+    "node-fetch": "^3.0.0",
+    "videodb": "^0.1.0"
   },
   "devDependencies": {
     "jest": "^29.7.0",

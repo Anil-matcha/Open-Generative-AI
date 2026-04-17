@@ -92,6 +92,7 @@ export function EditorPage() {
         : [];
     let timelineZoom = 1;
     let undoStack = [];
+    let chatHistoryLoaded = false;
 
     // Modal for track name input
     function showTrackNameModal(callback) {
@@ -162,13 +163,23 @@ export function EditorPage() {
                     </div>
                 </div>
             </div>
-            <div class="flex items-center gap-2">
-                <button id="toggle-chat-btn" class="px-3 py-1.5 bg-primary/10 text-primary text-sm rounded-lg hover:bg-primary/10 transition-colors flex items-center gap-2" title="Toggle AI Frame Agent panel">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                    </svg>
-                    Frame Agent
-                </button>
+                <div class="flex items-center gap-2">
+                    <button id="load-project-btn" class="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white text-sm rounded-lg transition-colors flex items-center gap-2" title="Load saved project">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                            <path d="M14 2v6h6"/>
+                            <path d="M16 13H8"/>
+                            <path d="M16 17H8"/>
+                            <path d="M10 9H8"/>
+                        </svg>
+                        Projects
+                    </button>
+                    <button id="toggle-chat-btn" class="px-3 py-1.5 bg-primary/10 text-primary text-sm rounded-lg hover:bg-primary/10 transition-colors flex items-center gap-2" title="Toggle AI Frame Agent panel">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+                        </svg>
+                        Frame Agent
+                    </button>
                 <button id="undo-btn" class="p-2 hover:bg-white/10 rounded-lg transition-colors" title="Undo last action">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/>
@@ -1112,8 +1123,116 @@ export function EditorPage() {
         onClear: () => { uploadedUrl = null; },
     });
 
+    // ── Project Browser ───────────────────────────────────────────────────────────
+    function showProjectBrowser() {
+        try {
+            const savedData = localStorage.getItem('editor_project');
+            if (!savedData) {
+                showToast('No saved projects found', 'info');
+                return;
+            }
+
+            const projectData = JSON.parse(savedData);
+            let projects = [];
+
+            if (Array.isArray(projectData)) {
+                projects = projectData.filter(p => p && p.timelineClips?.length > 0);
+            } else if (projectData && projectData.timelineClips?.length > 0) {
+                projects = [projectData];
+            }
+
+            if (projects.length === 0) {
+                showToast('No valid saved projects found', 'info');
+                return;
+            }
+
+            // Create project browser modal
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-gray-900 border border-white/10 rounded-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-hidden flex flex-col">
+                    <div class="p-6 border-b border-white/5">
+                        <h3 class="text-lg font-bold text-white">Load Saved Project</h3>
+                        <p class="text-sm text-secondary mt-1">Select a project to load</p>
+                    </div>
+                    <div class="flex-1 overflow-auto p-4 space-y-3">
+                        ${projects.map((project, index) => `
+                            <button class="project-item w-full p-4 bg-white/5 hover:bg-white/10 rounded-lg text-left transition-colors border border-transparent hover:border-primary/50" data-index="${index}">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex-1">
+                                        <div class="font-medium text-white">Project ${index + 1}</div>
+                                        <div class="text-sm text-secondary">
+                                            ${project.timelineClips?.length || 0} clips •
+                                            ${project.chatHistory?.length || 0} messages •
+                                            ${project.timestamp ? new Date(project.timestamp).toLocaleDateString() : 'Unknown date'}
+                                        </div>
+                                        ${project.videoId ? `<div class="text-xs text-primary">Video ID: ${project.videoId}</div>` : ''}
+                                    </div>
+                                    <div class="text-secondary">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M9 5l7 7-7 7"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div class="p-4 border-t border-white/5 flex gap-3">
+                        <button class="flex-1 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors" id="cancel-btn">Cancel</button>
+                        <button class="flex-1 py-2 bg-red-600/20 text-red-400 rounded-lg hover:bg-red-600/30 transition-colors" id="clear-all-btn">Clear All</button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            // Handle project selection
+            modal.querySelectorAll('.project-item').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const index = parseInt(btn.dataset.index);
+                    const selectedProject = projects[index];
+
+                    // Load the selected project
+                    timelineClips = selectedProject.timelineClips || [];
+                    chatHistory = selectedProject.chatHistory || [];
+                    videoId = selectedProject.videoId || videoId;
+                    if (selectedProject.videoUrl && !videoUrl) {
+                        videoUrl = selectedProject.videoUrl;
+                    }
+
+                    renderTimelineTracks();
+                    updateTimelineDuration();
+                    chatHistoryLoaded = true;
+
+                    showToast(`Loaded Project ${index + 1}`, 'success');
+                    document.body.removeChild(modal);
+                });
+            });
+
+            // Handle cancel
+            modal.querySelector('#cancel-btn').addEventListener('click', () => {
+                document.body.removeChild(modal);
+            });
+
+            // Handle clear all
+            modal.querySelector('#clear-all-btn').addEventListener('click', () => {
+                if (confirm('Are you sure you want to clear all saved projects? This cannot be undone.')) {
+                    localStorage.removeItem('editor_project');
+                    showToast('All saved projects cleared', 'success');
+                    document.body.removeChild(modal);
+                }
+            });
+
+        } catch (error) {
+            console.error('Error loading project browser:', error);
+            showToast('Error loading saved projects', 'error');
+        }
+    }
+
     // ── Event Handlers ────────────────────────────────────────────────────────────
     container.querySelector('#back-btn').onclick = () => navigate('render', { videoId, videoUrl });
+
+    container.querySelector('#load-project-btn').onclick = () => showProjectBrowser();
 
     const importBtn = container.querySelector('#import-media-btn');
     if (importBtn) importBtn.onclick = (e) => { e.stopPropagation(); picker.trigger.click(); };
@@ -1150,9 +1269,36 @@ export function EditorPage() {
 
     container.querySelector('#save-btn').onclick = () => {
         try {
-            localStorage.setItem('editor_project', JSON.stringify({ timelineClips, videoId, videoUrl, timestamp: new Date().toISOString() }));
+            const currentProject = { timelineClips, chatHistory, videoId, videoUrl, timestamp: new Date().toISOString() };
+            const existingData = localStorage.getItem('editor_project');
+
+            if (existingData) {
+                try {
+                    const parsedData = JSON.parse(existingData);
+                    if (Array.isArray(parsedData)) {
+                        // Add to existing array of projects, keeping only the last 5
+                        parsedData.push(currentProject);
+                        if (parsedData.length > 5) {
+                            parsedData.shift(); // Remove oldest
+                        }
+                        localStorage.setItem('editor_project', JSON.stringify(parsedData));
+                    } else {
+                        // Convert single project to array
+                        localStorage.setItem('editor_project', JSON.stringify([parsedData, currentProject]));
+                    }
+                } catch (parseError) {
+                    // If parsing fails, replace with current project
+                    localStorage.setItem('editor_project', JSON.stringify([currentProject]));
+                }
+            } else {
+                // No existing data, save as single project for now
+                localStorage.setItem('editor_project', JSON.stringify(currentProject));
+            }
+
             showToast('Project saved!', 'success');
-        } catch (err) { showToast('Save failed: ' + err.message, 'error'); }
+        } catch (err) {
+            showToast('Save failed: ' + err.message, 'error');
+        }
     };
 
     container.querySelector('#export-btn').onclick = () => {
@@ -1550,16 +1696,49 @@ export function EditorPage() {
 
     try {
         const savedProject = localStorage.getItem('editor_project');
-        if (savedProject && !videoUrl) {
+        if (savedProject) {
             const projectData = JSON.parse(savedProject);
-            if (projectData.timelineClips?.length > 0) {
-                timelineClips = projectData.timelineClips;
-                renderTimelineTracks();
-                updateTimelineDuration();
+
+            // Handle both single project object and array of projects
+            let projectToLoad = null;
+
+            if (Array.isArray(projectData)) {
+                // If it's an array, find the most recent project with timeline clips
+                const validProjects = projectData.filter(p => p && p.timelineClips?.length > 0);
+                if (validProjects.length > 0) {
+                    // Load the most recent project (by timestamp or last in array)
+                    projectToLoad = validProjects[validProjects.length - 1];
+                    showToast(`Loaded recent project (${validProjects.length} available)`, 'info');
+                }
+            } else if (projectData && projectData.timelineClips?.length > 0) {
+                // Single project object
+                projectToLoad = projectData;
                 showToast('Loaded saved project', 'info');
             }
+
+            if (projectToLoad) {
+                timelineClips = projectToLoad.timelineClips;
+                chatHistory = projectToLoad.chatHistory || [];
+                videoId = projectToLoad.videoId || videoId;
+                // Only override videoUrl from saved project if no URL param provided
+                if (projectToLoad.videoUrl && videoUrl === '') {
+                    videoUrl = projectToLoad.videoUrl;
+                }
+                renderTimelineTracks();
+                updateTimelineDuration();
+                // Mark chat history as loaded to prevent re-initialization
+                chatHistoryLoaded = true;
+            }
         }
-    } catch (e) { /* ignore */ }
+    } catch (e) {
+        console.warn('Failed to load saved project:', e);
+        // Clear corrupted data to prevent future crashes
+        try {
+            localStorage.removeItem('editor_project');
+        } catch (storageError) {
+            console.warn('Failed to clear corrupted project data:', storageError);
+        }
+    }
 
     // Add floating rail for AI actions
     const floatingRail = document.createElement('div');

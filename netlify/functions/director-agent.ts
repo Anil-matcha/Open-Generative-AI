@@ -134,5 +134,13 @@ async function handleFacelessVideo(collection, prompt) {
     const stream = await timeline.generate_stream()
 
     return {
-      video_url: stream.url,
-    
+      video_url: stream.url
+    }
+  } catch (error) {
+    console.error('Faceless video error:', error)
+    return {
+      error: error.message,
+      status: 'failed'
+    }
+  }
+}

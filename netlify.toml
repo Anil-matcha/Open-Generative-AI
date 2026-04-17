@@ -4,7 +4,7 @@
   command = "pnpm install && npm run build:all"
 
 [functions]
-  directory = "netlify/functions"
+  directory = "netlify/functions/dist"
 
 [build.environment]
   NODE_VERSION = "20"
