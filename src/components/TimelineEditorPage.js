@@ -893,7 +893,7 @@ button, input, textarea, select { font: inherit; }
     }
 
     function findSelectedClip() {
-      return state.tracks.flatMap((track) => track.clips).find((item) => item.id === state.selectedClipId);
+      return state.tracks.flatMap((track) => track.items).find((item) => item.id === state.selectedClipId);
     }
 
     function clearPreviewStage() {
@@ -1163,7 +1163,7 @@ button, input, textarea, select { font: inherit; }
     function openPreviewMediaModal(state, showToast) {
       try {
         const modal = new PreviewMediaModal({
-          mediaData: state.tracks.flatMap(t => t.clips),
+          mediaData: state.tracks.flatMap(t => t.items),
           onComplete: (result) => {
             showToast('Media preview completed', 'success');
           },
@@ -1203,7 +1203,7 @@ button, input, textarea, select { font: inherit; }
             type: element.type || 'text',
             ...element
           };
-          videoTrack.clips.push(clip);
+          videoTrack.items.push(clip);
         });
         renderTracks();
       }
@@ -1400,7 +1400,7 @@ button, input, textarea, select { font: inherit; }
           solo: track.solo,
           opacity: track.opacity || 1,
           blendMode: track.blendMode || 'normal',
-          items: track.clips.map(clip => ({
+          items: track.items.map(clip => ({
             id: clip.id,
             name: clip.name,
             text: clip.heading || clip.name,
@@ -1447,16 +1447,16 @@ button, input, textarea, select { font: inherit; }
           const track = state.tracks.find(t => t.id === parseInt(lane.dataset.trackId));
 
           if (data.type === 'clip') {
-            const allClips = state.tracks.flatMap(t => t.clips);
+            const allClips = state.tracks.flatMap(t => t.items);
             const clip = allClips.find(c => c.id === data.clipId);
             if (clip && track) {
               // Remove from old track
-              state.tracks.forEach(t => t.clips = t.clips.filter(c => c.id !== clip.id));
+              state.tracks.forEach(t => t.items = t.items.filter(c => c.id !== clip.id));
               // Add to new track
               clip.left = Math.max(0, Math.min(100 - clip.width, percent));
-              track.clips.push(clip);
+              track.items.push(clip);
               // Sort clips by left
-              track.clips.sort((a, b) => a.left - b.left);
+              track.items.sort((a, b) => a.left - b.left);
               saveStateSnapshot(state);
               renderTracks();
               showToast(`Clip moved to ${track.name}`);
@@ -1475,7 +1475,7 @@ button, input, textarea, select { font: inherit; }
               extra.body = 'Dragged text asset.';
     }
             const newClip = { id: Date.now(), name: data.label, left: Math.max(0, percent), width: 16, type: data.mediaType, ...extra };
-            track.clips.push(newClip);
+            track.items.push(newClip);
             state.selectedClipId = newClip.id;
             saveStateSnapshot(state);
             renderTracks();
@@ -1483,7 +1483,7 @@ button, input, textarea, select { font: inherit; }
             showToast(`${data.label} added to ${track.name}`);
           }
         });
-        track.clips.forEach((clip) => {
+        track.items.forEach((clip) => {
           // Convert clip format for enhanced renderer
           const enhancedClip = {
             id: clip.id,
@@ -1543,10 +1543,10 @@ button, input, textarea, select { font: inherit; }
         delete clip.start;
         delete clip.end;
       } else {
-        clip.left = Math.min(78, 8 + targetTrack.clips.length * 10);
+        clip.left = Math.min(78, 8 + targetTrack.items.length * 10);
       }
 
-      targetTrack.clips.push(clip);
+      targetTrack.items.push(clip);
       state.selectedClipId = clip.id;
       renderTracks();
       updatePreview(clip);
@@ -1634,7 +1634,7 @@ button, input, textarea, select { font: inherit; }
     }
 
     function renderClipEditor(clipId) {
-      const clip = state.tracks.flatMap(t => t.clips).find(c => c.id === clipId);
+      const clip = state.tracks.flatMap(t => t.items).find(c => c.id === clipId);
       if (!clip) {
         els.clipEditorContainer.innerHTML = '<p>Clip not found</p>';
         return;
@@ -1782,7 +1782,7 @@ button, input, textarea, select { font: inherit; }
                 tracks: state.tracks.map(track => ({
                   id: track.id,
                   name: track.name,
-                  clipCount: track.clips.length
+                  clipCount: track.items.length
                 }))
               }
             }
@@ -1849,7 +1849,7 @@ button, input, textarea, select { font: inherit; }
         modifications.clipChanges.forEach(change => {
           const track = state.tracks.find(t => t.id === change.trackId);
           if (track) {
-            const clip = track.clips.find(c => c.id === change.clipId);
+            const clip = track.items.find(c => c.id === change.clipId);
             if (clip) {
               Object.assign(clip, change.updates);
             }
@@ -1872,7 +1872,7 @@ button, input, textarea, select { font: inherit; }
         modifications.newClips.forEach(clipData => {
           const track = state.tracks.find(t => t.name === clipData.trackName);
           if (track) {
-            track.clips.push(clipData.clip);
+            track.items.push(clipData.clip);
             state.selectedClipId = clipData.clip.id;
           }
         });
@@ -1907,10 +1907,10 @@ button, input, textarea, select { font: inherit; }
 
       saveStateSnapshot(state);
 
-      const track = state.tracks.find(t => t.clips.some(c => c.id === selectedClip.id));
+      const track = state.tracks.find(t => t.items.some(c => c.id === selectedClip.id));
       if (!track) return;
 
-      const clipIndex = track.clips.findIndex(c => c.id === selectedClip.id);
+      const clipIndex = track.items.findIndex(c => c.id === selectedClip.id);
       const splitPosition = (state.playheadPercent / 100) * 100; // Convert to clip width percentage
 
       if (splitPosition <= selectedClip.left || splitPosition >= selectedClip.left + selectedClip.width) {
@@ -1933,7 +1933,7 @@ button, input, textarea, select { font: inherit; }
       };
 
       // Replace the original clip with the two new ones
-      track.clips.splice(clipIndex, 1, leftClip, rightClip);
+      track.items.splice(clipIndex, 1, leftClip, rightClip);
       state.selectedClipId = leftClip.id;
 
       renderTracks();
@@ -2254,7 +2254,7 @@ button, input, textarea, select { font: inherit; }
           src: videoData.src,
           poster: videoData.poster
         };
-        videoTrack.clips.push(newClip);
+        videoTrack.items.push(newClip);
         renderTracks();
       }
     }
@@ -2270,7 +2270,7 @@ button, input, textarea, select { font: inherit; }
           type: 'image',
           src: imageData.src
         };
-        videoTrack.clips.push(newClip);
+        videoTrack.items.push(newClip);
         renderTracks();
       }
     }
@@ -2286,7 +2286,7 @@ button, input, textarea, select { font: inherit; }
           type: 'audio',
           src: audioData.src
         };
-        audioTrack.clips.push(newClip);
+        audioTrack.items.push(newClip);
         renderTracks();
       }
     }
@@ -2300,7 +2300,7 @@ button, input, textarea, select { font: inherit; }
         templateData.clips.forEach(clip => {
           const track = state.tracks.find(t => t.name === clip.trackType);
           if (track) {
-            track.clips.push({ ...clip, id: Date.now() });
+            track.items.push({ ...clip, id: Date.now() });
           }
         });
       }
@@ -2639,7 +2639,7 @@ button, input, textarea, select { font: inherit; }
     }
 
     function renderLineDuration(clipId) {
-      const clip = state.tracks.flatMap(t => t.clips).find(c => c.id === clipId);
+      const clip = state.tracks.flatMap(t => t.items).find(c => c.id === clipId);
       if (!clip) return '';
 
       const start = (clip.left / 100) * state.timelineSeconds;
