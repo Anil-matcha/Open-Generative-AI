@@ -1,7 +1,7 @@
 [build]
   publish = "dist"
   # Use pnpm for better monorepo support
-  command = "pnpm install --ignore-scripts command = "pnpm install && npm run build:all"command = "pnpm install && npm run build:all" npm run build:all"
+  command = "pnpm install --ignore-scripts && npm run build:all"
 
 [functions]
   directory = "netlify/functions/dist"
