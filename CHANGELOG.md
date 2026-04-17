@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.3] - 2026-04-17
 
+- **Postinstall Script Conflict**: Removed npm/pnpm workspace conflicts
+  - Removed problematic postinstall script from apps/vimax/package.json
+  - Fixed "Cannot read properties of null (reading 'matches'" npm error
+  - PNPM workspace install now handles all dependencies cleanly
+
 - **Lockfile Synchronization**: Fixed pnpm workspace dependency conflicts
   - Regenerated pnpm-lock.yaml to include CineGen submodule dependencies
   - Resolved ERR_PNPM_OUTDATED_LOCKFILE error with 26 missing specifiers
