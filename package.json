@@ -13,8 +13,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:all": "npm run build:remix-go && npm run build",
-    "build:remix-go": "cd apps/remix-go && npm run build && cd ../.. && mkdir -p public/apps/remix-go && cp -r apps/remix-go/dist/* public/apps/remix-go/",
+    "build:all": "pnpm run build:remix-go && pnpm run build",
+    "build:remix-go": "pnpm --filter remix-go run build && mkdir -p public/apps/remix-go && cp -r apps/remix-go/dist/* public/apps/remix-go/",
     "build:analyze": "vite build --mode analyze",
     "preview": "vite preview",
     "lint": "eslint src --ext .js,.ts",
