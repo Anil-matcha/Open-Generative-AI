@@ -4,9 +4,20 @@
   "description": "Netlify Functions for Director Backend with VideoDB Integration",
   "main": "index.js",
   "type": "module",
+  "scripts": {
+    "test": "jest --config jest.config.cjs",
+    "test:watch": "jest --config jest.config.cjs --watch"
+  },
   "dependencies": {
     "@supabase/supabase-js": "^2.99.0",
     "node-fetch": "^3.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-environment-node": "^29.7.0",
+    "ts-jest": "^29.1.0",
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0"
   },
   "engines": {
     "node": ">=18.0.0"

@@ -1,108 +1,5 @@
-import { createClient } from '@supabase/supabase-js'
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Client-Info, Apikey',
-}
-
-const SUPABASE_URL = process.env.SUPABASE_URL
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
-const VIDEO_DB_API_KEY = process.env.VIDEO_DB_API_KEY
-const VIDEO_DB_BASE_URL = process.env.VIDEO_DB_BASE_URL || 'https://api.videodb.io'
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY
-
-export default async function handler(req, context) {
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
-  }
-
-  try {
-    if (req.method === 'POST') {
-      const { session_id, conv_id, agents, content, actions } = await req.json()
-
-      console.log('Director agent request:', { agents, session_id })
-
-      const agentId = agents[0] // Use first agent
-      const userPrompt = content[0]?.text || ''
-
-      let result = {}
-
-      // Route to appropriate handler based on agent
-      switch (agentId) {
-        case 'faceless_video_creator':
-          result = await handleFacelessVideo(userPrompt)
-          break
-        case 'ai_ad_films':
-          result = await handleAIAd(userPrompt)
-          break
-        case 'tiktok_lyric_video':
-          result = await handleLyricVideo(userPrompt)
-          break
-        case 'ai_voiceovers':
-          result = await handleVoiceover(userPrompt)
-          break
-        case 'trailer_narration':
-          result = await handleTrailerNarration(userPrompt)
-          break
-        case 'kids_storyteller':
-          result = await handleKidsStory(userPrompt)
-          break
-        case 'year_in_frames':
-          result = await handlePhotoMontage(userPrompt)
-          break
-        case 'summarizer':
-          result = await handleVideoSummary(userPrompt)
-          break
-        case 'clipper':
-          result = await handleVideoClipping(userPrompt)
-          break
-        case 'dubbing':
-          result = await handleVideoDubbing(userPrompt)
-          break
-        default:
-          result = { error: `Unknown agent: ${agentId}` }
-      }
-
-      return new Response(JSON.stringify({
-        status: 'success',
-        data: result,
-        session_id,
-        conv_id
-      }), {
-        headers: {
-          ...corsHeaders,
-          'Content-Type': 'application/json'
-        }
-      })
-    }
-
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-      status: 405,
-      headers: {
-        ...corsHeaders,
-        'Content-Type': 'application/json'
-      }
-    })
-
-  } catch (error) {
-    console.error('Director agent error:', error)
-    return new Response(JSON.stringify({
-      status: 'error',
-      message: error.message
-    }), {
-      status: 500,
-      headers: {
-        ...corsHeaders,
-        'Content-Type': 'application/json'
-      }
-    })
-  }
-}
-
 // Content Factory Handlers using VideoDB REST API
-export async function handleFacelessVideo(prompt) {
+export async function handleFacelessVideo(prompt: string) {
   try {
     // Extract topic from prompt
     const topic = prompt.replace(/create faceless video|make faceless video|generate faceless video/i, '').trim()
@@ -114,7 +11,7 @@ export async function handleFacelessVideo(prompt) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${OPENAI_API_KEY}`
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
         model: 'gpt-4',
@@ -134,11 +31,11 @@ export async function handleFacelessVideo(prompt) {
     const script = scriptData.choices[0].message.content.trim()
 
     // Step 2: Generate voiceover using VideoDB
-    const voiceResponse = await fetch(`${VIDEO_DB_BASE_URL}/voice/generate`, {
+    const voiceResponse = await fetch(`${process.env.VIDEO_DB_BASE_URL}/voice/generate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${VIDEO_DB_API_KEY}`
+        'Authorization': `Bearer ${process.env.VIDEO_DB_API_KEY}`
       },
       body: JSON.stringify({
         text: script,
@@ -155,11 +52,11 @@ export async function handleFacelessVideo(prompt) {
 
     // Step 3: Generate background visuals
     const visualPrompt = `Professional cinematic background footage suitable for a video about: ${topic}. Smooth, high-quality, engaging visuals.`
-    const videoResponse = await fetch(`${VIDEO_DB_BASE_URL}/video/generate`, {
+    const videoResponse = await fetch(`${process.env.VIDEO_DB_BASE_URL}/video/generate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${VIDEO_DB_API_KEY}`
+        'Authorization': `Bearer ${process.env.VIDEO_DB_API_KEY}`
       },
       body: JSON.stringify({
         prompt: visualPrompt,
@@ -175,11 +72,11 @@ export async function handleFacelessVideo(prompt) {
     const videoData = await videoResponse.json()
 
     // Step 4: Create timeline composition
-    const timelineResponse = await fetch(`${VIDEO_DB_BASE_URL}/timeline/compose`, {
+    const timelineResponse = await fetch(`${process.env.VIDEO_DB_BASE_URL}/timeline/compose`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${VIDEO_DB_API_KEY}`
+        'Authorization': `Bearer ${process.env.VIDEO_DB_API_KEY}`
       },
       body: JSON.stringify({
         collection_id: 'default',
@@ -218,7 +115,7 @@ export async function handleFacelessVideo(prompt) {
   }
 }
 
-export async function handleAIAd(prompt) {
+export async function handleAIAd(prompt: string) {
   try {
     // Extract product info from prompt
     const productMatch = prompt.match(/(?:create ad|make ad|generate ad).*?(?:for|about)\s*(.+)/i)
@@ -231,7 +128,7 @@ export async function handleAIAd(prompt) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${OPENAI_API_KEY}`
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
         model: 'gpt-4',
@@ -260,34 +157,22 @@ export async function handleAIAd(prompt) {
 }
 
 // Placeholder handlers for other agents
-export async function handleLyricVideo(prompt) {
+export async function handleLyricVideo(prompt: string) {
   return { message: 'Lyric video creation - feature coming soon', status: 'pending' }
 }
 
-export async function handleVoiceover(prompt) {
+export async function handleVoiceover(prompt: string) {
   return { message: 'Voiceover creation - feature coming soon', status: 'pending' }
 }
 
-export async function handleTrailerNarration(prompt) {
+export async function handleTrailerNarration(prompt: string) {
   return { message: 'Trailer narration - feature coming soon', status: 'pending' }
 }
 
-export async function handleKidsStory(prompt) {
+export async function handleKidsStory(prompt: string) {
   return { message: 'Kids story creation - feature coming soon', status: 'pending' }
 }
 
-export async function handlePhotoMontage(prompt) {
+export async function handlePhotoMontage(prompt: string) {
   return { message: 'Photo montage creation - feature coming soon', status: 'pending' }
-}
-
-async function handleVideoSummary(prompt) {
-  return { message: 'Video summary - feature coming soon', status: 'pending' }
-}
-
-async function handleVideoClipping(prompt) {
-  return { message: 'Video clipping - feature coming soon', status: 'pending' }
-}
-
-async function handleVideoDubbing(prompt) {
-  return { message: 'Video dubbing - feature coming soon', status: 'pending' }
 }
