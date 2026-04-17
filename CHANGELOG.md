@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.3] - 2026-04-17
 
+- **Lockfile Synchronization**: Fixed pnpm workspace dependency conflicts
+  - Regenerated pnpm-lock.yaml to include CineGen submodule dependencies
+  - Resolved ERR_PNPM_OUTDATED_LOCKFILE error with 26 missing specifiers
+  - Ensured compatibility with Netlify CI frozen-lockfile mode
+
 - **Netlify Configuration**: Fixed invalid TOML syntax preventing deployment
   - Corrected malformed build command in netlify.toml
   - Resolved "Failed to parse configuration" error
