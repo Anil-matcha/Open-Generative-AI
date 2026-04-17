@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.3] - 2026-04-17
 
+- **Browser Compatibility**: Fixed environment validation for browser runtime
+  - Replaced process.env with import.meta.env for Vite compatibility
+  - Resolved "process is not defined" ReferenceError in browser console
+  - Environment configuration now works correctly in production builds
+
 - **Code Hardening Complete**: Comprehensive security and performance improvements
   - Implemented HTTPS enforcement and secure protocol handling
   - Added Content Security Policy (CSP) with violation reporting
