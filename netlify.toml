@@ -1,8 +1,10 @@
 [build]
   publish = "dist"
-  functions = "netlify/functions"
   # Use pnpm for better monorepo support
   command = "pnpm install && npm run build:all"
+
+[functions]
+  directory = "netlify/functions"
 
 [build.environment]
   NODE_VERSION = "20"
