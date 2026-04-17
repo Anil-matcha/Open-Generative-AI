@@ -502,7 +502,6 @@ export const MODEL_ADVANCED_FEATURES = {
   'video-effects': ['cinematicFilters', 'colorGrading'],
   'motion-controls': ['cameraMovement', 'dynamicAnimation'],
   'vfx': ['specialEffects', 'compositing'],
-  'heygen-video-translate': ['multilingualTranslation', 'lipSyncTranslation'],
 
   // ===== NEW APP FEATURE MAPPINGS =====
   'runway-motion': ['motionControls', 'vfx', 'facialAnimation'],
