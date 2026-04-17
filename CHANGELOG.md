@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.3] - 2026-04-17
 
+- **Netlify Configuration**: Fixed invalid TOML syntax preventing deployment
+  - Corrected malformed build command in netlify.toml
+  - Resolved "Failed to parse configuration" error
+  - Ensures proper TOML formatting for Netlify CI
+
 ### Fixed
 - **Netlify Deployment**: Resolved pnpm lockfile conflicts causing build failures
   - Updated build command to use `pnpm install --ignore-scripts` to avoid npm postinstall issues
