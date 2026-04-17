@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-04-17
+
+### Added
+- **Project Management**: Complete project save/load system for timeline editor
+  - Project browser modal with multiple project support
+  - Timestamp tracking and project metadata
+  - Automatic project persistence with chat history integration
+  - Load recent projects functionality
+
+### Changed
+- **Netlify Configuration**: Updated functions directory to 'dist' for proper deployment
+- **Functions Package**: Added videodb dependency and build script for Netlify functions
+- **Timeline Editor**: Enhanced with project management UI and improved save functionality
+
 ## [1.0.1] - 2026-04-17
 
 ### Fixed
