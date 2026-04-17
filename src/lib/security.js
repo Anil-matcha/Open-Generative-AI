@@ -1,3 +1,4 @@
+import { validateEmail, validateURL, sanitizeFilename, secureApiRequest } from "./security/index.js";
 import DOMPurify from 'dompurify';
 
 /**
@@ -287,3 +288,5 @@ export function sanitizeForSerialization(obj) {
   
   return sanitized;
 }
+// Enhanced security functions
+export { validateEmail, validateURL, sanitizeFilename, secureApiRequest };

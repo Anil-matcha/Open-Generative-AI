@@ -10,10 +10,37 @@ import { performanceBudget } from './lib/performance-budget.js';
 import { analytics } from './lib/analytics.js';
 import { showToast } from './lib/loading.js';
 import { generationService } from './lib/editor/generationService.js';
+import { initializeAuthHardening } from './lib/auth-hardening.js';
+import { initializeEnvironmentValidation } from './lib/environment-config.js';
+import { initializePerformanceHardening } from './lib/performance-hardening.js';
+import { initializeErrorHandling } from './lib/error-handling.js';
+import { initializeSecurity } from './lib/security/index.js';
+import { enforceHTTPS, validateEnvironment, generateCSPHeader } from './lib/security/index.js';
 import { escapeHtml, safeHtml } from './lib/security.js';
 import { initializeEnhancedMuAPI } from './lib/muapiEnhanced.js';
 import { loadConfig } from './lib/muapiConfig.js';
+// Initialize environment validation
+const envConfig = initializeEnvironmentValidation();
 
+// Initialize authentication hardening
+const authTools = initializeAuthHardening();
+// Initialize security measures
+// Initialize comprehensive security and error handling
+// Initialize performance hardening
+const performanceTools = initializePerformanceHardening();
+const securityStatus = initializeSecurity();
+initializeErrorHandling();
+enforceHTTPS();
+const envStatus = validateEnvironment();
+console.log('[Security] Environment validated:', envStatus);
+
+// Set CSP header if in browser environment
+if (typeof document !== 'undefined') {
+  const meta = document.createElement('meta');
+  meta.httpEquiv = 'Content-Security-Policy';
+  meta.content = generateCSPHeader();
+  document.head.appendChild(meta);
+}
 // Make generation service available globally for embedded components
 window.generationService = generationService;
 

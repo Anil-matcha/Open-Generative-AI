@@ -1,3 +1,4 @@
+import { createSecureIframe } from "../lib/security/index.js";
 export function RemixGoPage() {
   const element = document.createElement('div');
   element.className = 'w-full h-full relative';
@@ -60,7 +61,7 @@ export function RemixGoPage() {
   const checkAvailability = () => {
     if (retryCount < maxRetries) {
       setTimeout(() => {
-        const testIframe = document.createElement('iframe');
+        const testIframe = createSecureIframe('http://localhost:5173');
         testIframe.src = 'http://localhost:5173';
         testIframe.style.display = 'none';
         testIframe.onload = () => {
