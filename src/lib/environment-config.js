@@ -83,7 +83,7 @@ export class EnvironmentValidator {
     this.config = {};
 
     for (const [key, schema] of Object.entries(ENV_SCHEMA)) {
-      const value = process.env[key] || schema.defaultValue;
+      const value = import.meta.env[key] || schema.defaultValue;
 
       try {
         // Check required fields
