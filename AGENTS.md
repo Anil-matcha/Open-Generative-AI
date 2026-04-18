@@ -10,9 +10,12 @@ This document provides comprehensive testing coverage for the timeline editor ap
 tests/
 ├── e2e/              # Playwright E2E tests
 │   ├── timeline-editor.e2e.spec.ts
+│   ├── navigation-routing.e2e.spec.ts    # NEW: Comprehensive navigation tests
 │   └── setup.config.ts
 └── unit/              # Vitest unit tests
     ├── timeline-editor.unit.spec.ts
+    ├── router.unit.spec.ts               # NEW: Router unit tests
+    ├── route-events.unit.spec.ts         # NEW: Route events unit tests
     ├── setup.config.ts
     └── src/
         ├── test-setup.ts
@@ -39,10 +42,17 @@ tests/
 - Security headers verification
 - Performance metrics (load time < 5s)
 
-### 2. Route Navigation
-- Timeline, library, settings pages
-- Browser history navigation
-- URL pattern matching
+### 2. Route Navigation & URL Handling
+- **Core Routes**: Timeline, library, settings, explore, image, video, storyboard, edit, character
+- **Extended Routes**: Effects, cinema, influencer, apps, templates, assist, community, avatar, audio
+- **Template Routes**: Text-to-image, image-to-image, text-to-video, image-to-video, video-to-video
+- **Page Routes**: Character pages, effects pages, cinema pages, influencer pages
+- **URL Parameter Handling**: Query parameters, hash parameters, parameter encoding
+- **Browser History Navigation**: Back/forward navigation, history state management
+- **Navigation Edge Cases**: Invalid routes, malformed URLs, concurrent navigation
+- **Page Transitions**: Loading states, component cleanup, transition animations
+- **Route Events**: Custom event system, event bubbling, listener management
+- **Performance**: Navigation timing, memory management, concurrent request handling
 
 ### 3. App Shell Components
 - Header, sidebar, layout rendering
@@ -127,6 +137,9 @@ tests/
 # Run all E2E tests
 npm run test:e2e
 
+# Run navigation tests specifically
+npm run test:e2e -- --grep "Comprehensive Navigation"
+
 # Run with UI
 npm run test:e2e:ui
 
@@ -138,6 +151,12 @@ npm run dev & npx playwright test
 ```bash
 # Run all unit tests
 npm run test
+
+# Run router tests specifically
+npm run test -- --run tests/unit/router.unit.spec.ts
+
+# Run route events tests specifically
+npm run test -- --run tests/unit/route-events.unit.spec.ts
 
 # Run with UI
 npm run test:ui
@@ -168,6 +187,38 @@ npx vitest run tests/unit/timeline-editor.unit.spec.ts
 - Update tests when features change
 - Keep test code DRY
 - Use page object patterns for complex UI interactions
+
+## Navigation & Routing Test Coverage
+
+### Comprehensive Navigation Testing (`tests/e2e/navigation-routing.e2e.spec.ts`)
+- **Core Route Navigation**: Tests all primary routes (timeline, library, settings, explore, image, video, etc.)
+- **Extended Route Navigation**: Tests additional feature routes (effects, cinema, influencer, apps, templates, etc.)
+- **Template Route Navigation**: Tests AI generation routes (text-to-image, image-to-image, text-to-video, etc.)
+- **Page Route Navigation**: Tests dedicated page routes (character-page, effects-page, cinema-page, etc.)
+- **URL Parameter Handling**: Query parameters, hash parameters, special character encoding
+- **Browser History Navigation**: Back/forward navigation, rapid navigation changes
+- **Navigation Edge Cases**: Invalid routes, empty routes, long routes, special characters
+- **Page Transition Behavior**: Loading states, component cleanup, concurrent navigation
+- **Route Event System**: Custom events, event bubbling, error handling
+- **Navigation Performance**: Performance budgets, memory pressure handling
+- **Cross-browser Compatibility**: Hash changes, page refresh handling
+
+### Router Unit Testing (`tests/unit/router.unit.spec.ts`)
+- **Router Initialization**: Container and callback setup
+- **Route Navigation**: Valid routes, parameter handling, concurrent navigation prevention
+- **Route Map and URL Generation**: Item-to-route mapping, URL construction
+- **Content Area Management**: Cleanup, loading states, component management
+- **Current Page Tracking**: Page state management, navigation interruption
+- **Error Handling**: Page loader errors, graceful error recovery
+- **Route Parameters**: Empty params, special characters, array parameters
+- **Navigation State Management**: Loop prevention, rapid navigation, state reset
+
+### Route Events Unit Testing (`tests/unit/route-events.unit.spec.ts`)
+- **Event Dispatching**: Route change events with/without parameters
+- **Event Listening**: Callback registration, parameter handling, unsubscription
+- **Event Bubbling**: DOM event propagation, parent-child relationships
+- **Error Handling**: Malformed events, callback errors
+- **Memory Management**: Listener cleanup, multiple unsubscription safety
 
 ## Coverage Metrics
 - Target: 80% code coverage

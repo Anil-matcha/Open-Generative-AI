@@ -134,14 +134,13 @@ class VideoGenerationAgent(BaseAgent):
         :param kwargs: Additional keyword arguments
         :return: Response containing the generated video ID
         """
+        video_content = None
+        output_path = None
         try:
             media = None
-            self.videodb_tool = VideoDBTool(collection_id=collection_id)
             stealth_mode = kwargs.get("stealth_mode", False)
 
-            if engine not in SUPPORTED_ENGINES:
-                raise Exception(f"{engine} not supported")
-
+            # Initialize video_content early for error handling
             video_content = VideoContent(
                 agent_name=self.agent_name,
                 status=MsgStatus.progress,
@@ -149,6 +148,12 @@ class VideoGenerationAgent(BaseAgent):
             )
             if not stealth_mode:
                 self.output_message.content.append(video_content)
+
+            if engine not in SUPPORTED_ENGINES:
+                raise Exception(f"{engine} not supported")
+
+            # Initialize VideoDB tool after basic validation
+            self.videodb_tool = VideoDBTool(collection_id=collection_id)
 
             if engine == "stabilityai":
                 STABILITYAI_API_KEY = os.getenv("STABILITYAI_API_KEY")
@@ -286,9 +291,10 @@ class VideoGenerationAgent(BaseAgent):
 
         except Exception as e:
             logger.exception(f"Error in {self.agent_name} agent: {e}")
-            video_content.status = MsgStatus.error
-            video_content.status_message = "Failed to generate video"
-            self.output_message.push_update()
+            if video_content:
+                video_content.status = MsgStatus.error
+                video_content.status_message = "Failed to generate video"
+                self.output_message.push_update()
             self.output_message.publish()
             return AgentResponse(status=AgentStatus.ERROR, message=str(e))
 
