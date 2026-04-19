@@ -27,3 +27,6 @@ dist-ssr
 
 # Local Netlify folder
 .netlify
+
+# AI agent development tools (not part of application)
+superpowers/
