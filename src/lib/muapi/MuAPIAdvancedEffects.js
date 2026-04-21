@@ -818,6 +818,329 @@ export class MuAPIAdvancedEffects {
   }
 }
 
+  /**
+   * Upscale image using AI/ML models
+   */
+  async upscaleImage(imageData, scale = 2, options = {}) {
+    try {
+      const payload = {
+        image_url: imageData.url,
+        upscale: {
+          scale: Math.min(Math.max(scale, 1), 4), // Limit to reasonable range
+          method: options.method || 'ai',
+          model: options.model || 'esrgan',
+          enhance_details: options.enhanceDetails !== false,
+          ...options
+        }
+      };
+
+      const result = await this.muapi._makeRequest('/effects/upscale', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+
+      if (result.success && result.data?.url) {
+        return {
+          ...imageData,
+          url: result.data.url,
+          upscaled: true,
+          upscaleOptions: { scale, ...options }
+        };
+      }
+    } catch (error) {
+      console.warn('Image upscaling failed:', error.message);
+      // Return original image data for graceful degradation
+      return {
+        ...imageData,
+        upscaled: false,
+        upscaleError: error.message
+      };
+    }
+
+    return imageData;
+  }
+
+  /**
+   * Upscale video using AI/ML models
+   */
+  async upscaleVideo(videoData, scale = 2, options = {}) {
+    try {
+      const payload = {
+        video_url: videoData.url,
+        upscale: {
+          scale: Math.min(Math.max(scale, 1), 2), // Video upscale is more limited
+          method: options.method || 'ai',
+          model: options.model || 'topaz-video',
+          frame_interpolation: options.frameInterpolation || false,
+          ...options
+        }
+      };
+
+      const result = await this.muapi._makeRequest('/effects/upscale-video', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+
+      if (result.success && result.data?.url) {
+        return {
+          ...videoData,
+          url: result.data.url,
+          upscaled: true,
+          upscaleOptions: { scale, ...options }
+        };
+      }
+    } catch (error) {
+      console.warn('Video upscaling failed:', error.message);
+      // Return original video data for graceful degradation
+      return {
+        ...videoData,
+        upscaled: false,
+        upscaleError: error.message
+      };
+    }
+
+    return videoData;
+  }
+
+  /**
+   * Apply video color correction
+   */
+  async applyVideoColorCorrection(videoData, options = {}) {
+    try {
+      const payload = {
+        video_url: videoData.url,
+        color_correction: {
+          brightness: options.brightness || 0,
+          contrast: options.contrast || 0,
+          saturation: options.saturation || 0,
+          hue: options.hue || 0,
+          temperature: options.temperature || 0,
+          tint: options.tint || 0,
+          ...options
+        }
+      };
+
+      const result = await this.muapi._makeRequest('/effects/color-correct-video', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+
+      if (result.success && result.data?.url) {
+        return {
+          ...videoData,
+          url: result.data.url,
+          colorCorrected: true,
+          colorCorrectionOptions: options
+        };
+      }
+    } catch (error) {
+      console.warn('Video color correction failed:', error.message);
+    }
+
+    return videoData;
+  }
+
+  /**
+   * Apply multiple video effects in sequence
+   */
+  async applyVideoEffects(videoData, effects = []) {
+    let processedData = videoData;
+
+    for (const effect of effects) {
+      const effectName = typeof effect === 'string' ? effect : effect.name;
+      const options = typeof effect === 'object' ? effect : {};
+
+      switch (effectName) {
+        case 'stabilize':
+          processedData = await this.applyVideoStabilization(processedData, options);
+          break;
+        case 'denoise':
+          processedData = await this.applyVideoDenoise(processedData, options);
+          break;
+        case 'color-correct':
+          processedData = await this.applyVideoColorCorrection(processedData, options);
+          break;
+        case 'upscale':
+          processedData = await this.upscaleVideo(processedData, options.scale || 2, options);
+          break;
+        default:
+          console.warn(`Unknown video effect: ${effectName}`);
+      }
+    }
+
+    return {
+      ...processedData,
+      appliedEffects: effects
+    };
+  }
+
+  /**
+   * Compress and optimize video
+   */
+  async compressVideo(videoData, options = {}) {
+    try {
+      const payload = {
+        video_url: videoData.url,
+        compression: {
+          quality: options.quality || 'medium',
+          format: options.format || 'mp4',
+          bitrate: options.bitrate || 'auto',
+          resolution: options.resolution || 'original',
+          ...options
+        }
+      };
+
+      const result = await this.muapi._makeRequest('/effects/compress-video', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+
+      if (result.success && result.data?.url) {
+        return {
+          ...videoData,
+          url: result.data.url,
+          compressed: true,
+          compressionOptions: options,
+          originalSize: videoData.size,
+          compressedSize: result.data.size
+        };
+      }
+    } catch (error) {
+      console.warn('Video compression failed:', error.message);
+    }
+
+    return videoData;
+  }
+
+  /**
+   * Apply video stabilization
+   */
+  async applyVideoStabilization(videoData, options = {}) {
+    try {
+      const payload = {
+        video_url: videoData.url,
+        stabilization: {
+          method: options.method || 'optical-flow',
+          smoothing: options.smoothing || 0.5,
+          crop_to_stable: options.cropToStable !== false,
+          ...options
+        }
+      };
+
+      const result = await this.muapi._makeRequest('/effects/stabilize-video', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+
+      if (result.success && result.data?.url) {
+        return {
+          ...videoData,
+          url: result.data.url,
+          stabilized: true,
+          stabilizationOptions: options
+        };
+      }
+    } catch (error) {
+      console.warn('Video stabilization failed:', error.message);
+    }
+
+    return videoData;
+  }
+
+  /**
+   * Apply video denoising
+   */
+  async applyVideoDenoise(videoData, options = {}) {
+    try {
+      const payload = {
+        video_url: videoData.url,
+        denoise: {
+          strength: options.strength || 0.5,
+          method: options.method || 'temporal',
+          preserve_details: options.preserveDetails !== false,
+          ...options
+        }
+      };
+
+      const result = await this.muapi._makeRequest('/effects/denoise-video', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+
+      if (result.success && result.data?.url) {
+        return {
+          ...videoData,
+          url: result.data.url,
+          denoised: true,
+          denoiseOptions: options
+        };
+      }
+    } catch (error) {
+      console.warn('Video denoising failed:', error.message);
+    }
+
+    return videoData;
+  }
+
+  /**
+   * Optimize processing for different file sizes
+   */
+  async optimizeProcessing(mediaData, options = {}) {
+    const fileSize = mediaData.size || 0;
+
+    // For large files, apply preprocessing optimizations
+    if (fileSize > 100 * 1024 * 1024) { // > 100MB
+      console.log('Large file detected, applying preprocessing optimizations');
+      options.preprocess = true;
+      options.chunked = true;
+    }
+
+    return options;
+  }
+
+  /**
+   * Process large files with memory management
+   */
+  async processLargeFile(mediaData, options = {}) {
+    try {
+      // Implement chunked processing for large files
+      const chunkSize = options.chunkSize || 50 * 1024 * 1024; // 50MB chunks
+      const totalSize = mediaData.size || 0;
+
+      if (totalSize <= chunkSize) {
+        // Process normally
+        return await this.applyFilter(mediaData, 'optimize', options);
+      }
+
+      // For very large files, we'd implement chunked processing here
+      // For now, return as-is with a warning
+      console.warn('Large file processing not fully implemented yet');
+      return mediaData;
+
+    } catch (error) {
+      console.warn('Large file processing failed:', error.message);
+      return mediaData;
+    }
+  }
+
+  /**
+   * Implement caching for repeated operations
+   */
+  async getCachedResult(cacheKey, operation, ttl = 3600000) { // 1 hour default
+    const cached = this.effectsCache.get(cacheKey);
+    if (cached && (Date.now() - cached.timestamp) < ttl) {
+      return cached.result;
+    }
+
+    const result = await operation();
+    this.effectsCache.set(cacheKey, {
+      result,
+      timestamp: Date.now()
+    });
+
+    return result;
+  }
+
 /**
  * Global instance
  */

@@ -24,6 +24,30 @@ export default defineConfig({
   },
 
   projects: [
+    // Demo video generation
+    {
+      name: 'demo-videos',
+      use: {
+        ...devices['Desktop Chrome'],
+        headless: true,
+        video: 'on',
+        screenshot: 'on'
+      },
+      testMatch: '**/demo/**/*.spec.ts'
+    },
+
+    // Demo videos with server
+    {
+      name: 'demo-videos-with-server',
+      use: {
+        ...devices['Desktop Chrome'],
+        headless: true,
+        video: 'on',
+        screenshot: 'on'
+      },
+      testMatch: '**/demo/**/*.spec.ts'
+    },
+
     // Main app testing
     {
       name: 'main-app-chromium',
@@ -76,20 +100,20 @@ export default defineConfig({
       url: 'http://localhost:8080',
       reuseExistingServer: !process.env.CI,
       timeout: 120000
-    },
-    // Module servers for integration testing
-    {
-      command: 'cd modules/CineGen && npm run dev',
-      url: 'http://localhost:8081',
-      reuseExistingServer: !process.env.CI,
-      timeout: 60000
-    },
-    {
-      command: 'cd apps/director && npm run dev',
-      url: 'http://localhost:8082',
-      reuseExistingServer: !process.env.CI,
-      timeout: 60000
     }
+    // Module servers disabled for demo
+    // {
+    //   command: 'cd modules/CineGen && npm run dev',
+    //   url: 'http://localhost:8081',
+    //   reuseExistingServer: !process.env.CI,
+    //   timeout: 60000
+    // },
+    // {
+    //   command: 'cd apps/director && npm run dev',
+    //   url: 'http://localhost:8082',
+    //   reuseExistingServer: !process.env.CI,
+    //   timeout: 60000
+    // }
   ],
 
   globalSetup: './tests/e2e/setup/global-setup.js',

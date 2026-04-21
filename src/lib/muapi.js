@@ -12,6 +12,14 @@ export class MuapiClient {
             this.proxyUrl = `${supabaseUrl}/functions/v1/muapi-proxy`;
         }
         this.activeControllers = new Map(); // For request cancellation
+
+        // Repository processor URLs
+        this.processorUrls = {
+            yucut: supabaseUrl ? `${supabaseUrl}/functions/v1/yucut-processor` : '/functions/v1/yucut-processor',
+            cinegen: supabaseUrl ? `${supabaseUrl}/functions/v1/cinegen-processor` : '/functions/v1/cinegen-processor',
+            ltx: supabaseUrl ? `${supabaseUrl}/functions/v1/ltx-processor` : '/functions/v1/ltx-processor',
+            cutai: supabaseUrl ? `${supabaseUrl}/functions/v1/cutai-processor` : '/functions/v1/cutai-processor'
+        };
     }
 
     getKey() {
@@ -28,10 +36,48 @@ export class MuapiClient {
         return key;
     }
 
+    // Determine which processor to use based on request parameters
+    getProcessorUrl(endpoint, params = {}) {
+        // Yucut processing (scene detection, media scraping, etc.)
+        if (endpoint.includes('scene-detection') || endpoint.includes('media-scraper') ||
+            endpoint.includes('yucut') || params.action?.includes('yucut') ||
+            params.model === 'transnet-v2') {
+            return this.processorUrls.yucut;
+        }
+
+        // CineGen processing (LLM chat, advanced export, edit tools)
+        if (endpoint.includes('cinegen') || params.action?.includes('cinegen') ||
+            params.model?.includes('cinegen') || params.context?.includes('render') ||
+            params.prompt && (params.prompt.includes('render') || params.prompt.includes('export'))) {
+            return this.processorUrls.cinegen;
+        }
+
+        // LTX processing (video generation, lip sync, voice clone)
+        if (endpoint.includes('ltx') || params.action?.includes('ltx') ||
+            params.model?.includes('ltx') || params.model?.includes('text-to-video') ||
+            params.model?.includes('image-to-video') || params.action?.includes('lip-sync') ||
+            params.action?.includes('voice-clone')) {
+            return this.processorUrls.ltx;
+        }
+
+        // CutAI processing (script generation, storyboard)
+        if (endpoint.includes('cutai') || params.action?.includes('cutai') ||
+            params.action?.includes('script') || params.action?.includes('storyboard') ||
+            params.genre || params.premise) {
+            return this.processorUrls.cutai;
+        }
+
+        // Default to MuAPI proxy for everything else
+        return this.proxyUrl;
+    }
+
     // Generic makeRequest method for enhanced API calls
     async makeRequest(endpoint, params = {}) {
         try {
-            const response = await fetch(this.proxyUrl, {
+            // Determine which processor to use
+            const processorUrl = this.getProcessorUrl(endpoint, params);
+
+            const response = await fetch(processorUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -250,6 +296,42 @@ export class MuapiClient {
     }
 
     async generateVideo(params, signal) {
+        // Route LTX requests to LTX processor
+        if (params.model?.includes('ltx') || params.model?.includes('text-to-video') ||
+            params.model?.includes('image-to-video') || params.model?.includes('video-to-video')) {
+            const processorUrl = this.processorUrls.ltx;
+
+            try {
+                const response = await fetch(processorUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: params.model.includes('text-to-video') ? 'text-to-video' :
+                               params.model.includes('image-to-video') ? 'image-to-video' :
+                               params.model.includes('video-to-video') ? 'video-to-video' : 'text-to-video',
+                        ...params
+                    }),
+                    signal
+                });
+
+                if (!response.ok) {
+                    const errText = await response.text();
+                    throw new Error(`LTX API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+                }
+
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    throw new Error('Request cancelled by user');
+                }
+                throw error;
+            }
+        }
+
+        // Default video generation through MuAPI
         const modelInfo = getVideoModelById(params.model);
         const endpoint = modelInfo?.endpoint || params.model;
 
@@ -636,6 +718,40 @@ export class MuapiClient {
 
             const result = await this.pollForResult(requestId, 300, 5000, signal);
             return result;
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                throw new Error('Request cancelled by user');
+            }
+            throw error;
+        }
+    }
+
+    async processVideo(params, signal) {
+        // Route to appropriate processor based on task/model
+        const processorUrl = this.getProcessorUrl(params.task || params.model || 'video', params);
+
+        try {
+            const response = await fetch(processorUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    action: params.task || params.action || 'process-video',
+                    ...params
+                }),
+                signal
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+            }
+
+            const data = await response.json();
+            this.validateResponse(data, 'video');
+
+            return data;
         } catch (error) {
             if (error.name === 'AbortError') {
                 throw new Error('Request cancelled by user');

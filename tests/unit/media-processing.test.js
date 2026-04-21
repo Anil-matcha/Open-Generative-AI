@@ -3,15 +3,13 @@ import { MuAPIAdvancedEffects } from '../../src/lib/muapi/MuAPIAdvancedEffects.j
 import MuAPIConnection from '../../src/lib/muapi/MuAPIConnection.js';
 
 // Mock MuAPIConnection
-vi.mock('../src/lib/muapi/MuAPIConnection.js', () => ({
-  default: vi.fn().mockImplementation(() => ({
-    _makeRequest: vi.fn(),
-    uploadFile: vi.fn()
-  })),
-  getMuAPIInstance: vi.fn(() => ({
-    _makeRequest: vi.fn(),
-    uploadFile: vi.fn()
-  }))
+vi.mock('../../src/lib/muapi/MuAPIConnection.js', () => ({
+  default: {
+    getMuAPIInstance: vi.fn(() => ({
+      _makeRequest: vi.fn(),
+      uploadFile: vi.fn()
+    }))
+  }
 }));
 
 describe('Media Processing Features - Comprehensive Tests', () => {
@@ -26,7 +24,7 @@ describe('Media Processing Features - Comprehensive Tests', () => {
     };
 
     // Mock the getMuAPIInstance to return our mock
-    MuAPIConnection.getMuAPIInstance = vi.fn(() => mockMuapi);
+    MuAPIConnection.default.getMuAPIInstance = vi.fn(() => mockMuapi);
 
     effectsProcessor = new MuAPIAdvancedEffects();
   });

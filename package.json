@@ -47,7 +47,12 @@
     "dev:ltx-desktop": "cd modules/LTX-Desktop && npm run dev",
     "dev:director": "cd apps/director && npm run dev",
     "dev:vimax": "cd apps/vimax && npm run dev",
-    "dev:remix-go": "cd apps/remix-go && npm run dev"
+    "dev:remix-go": "cd apps/remix-go && npm run dev",
+    "demo:create": "node demo-scripts/create-demo-video.js",
+    "demo:automated": "node demo-scripts/automated-demo.js",
+    "demo:videos": "node demo-scripts/demo-video-runner.js",
+    "demo:view": "open demo-viewer.html",
+    "demo:full": "npm run demo:create && npm run demo:view"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

@@ -8,7 +8,7 @@ export default async function globalSetup() {
 }
 
 // Global teardown for E2E tests
-export default async function globalTeardown() {
+export async function globalTeardown() {
   // Clean up test environment
   console.log('Tearing down E2E test environment...');
 

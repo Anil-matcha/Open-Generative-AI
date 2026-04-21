@@ -12,15 +12,48 @@ const supabase = createClient(
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 );
 
+// Yucut Scraper API configuration
+const YUCUT_SCRAPER_URL = Deno.env.get('YUCUT_SCRAPER_URL') || 'http://localhost:3100';
+
+// Helper function to call Yucut scraper API
+async function callYucutScraper(endpoint: string, params: any = {}) {
+  try {
+    const response = await fetch(`${YUCUT_SCRAPER_URL}${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(params)
+    });
+
+    if (!response.ok) {
+      console.warn(`Yucut scraper not available: ${response.status}`);
+      return null; // Return null to indicate fallback to mock
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.warn('Yucut scraper call failed:', error.message);
+    return null; // Return null to indicate fallback to mock
+  }
+}
+
 interface YucutRequest {
-  action: 'create-shorts' | 'reframe' | 'social-resize' | 'trim-video' | 'extract-clips';
-  videoUrl: string;
+  action: 'create-shorts' | 'reframe' | 'social-resize' | 'trim-video' | 'extract-clips' | 'scene-detection' | 'media-scraper' | 'mcp-protocol' | 'animation-ide' | 'keyframe-effects' | 'speech-editing' | 'semantic-search' | '3d-camera' | 'multi-stage-agent';
+  videoUrl?: string;
   options?: {
     duration?: number;
     aspectRatio?: string;
     startTime?: number;
     endTime?: number;
     clips?: Array<{ start: number; end: number; title?: string }>;
+    prompt?: string;
+    model?: string;
+    advanced?: boolean;
+    confidenceThreshold?: number;
+    query?: string;
+    source?: string;
+    maxResults?: number;
   };
 }
 
@@ -57,6 +90,88 @@ export async function handler(req: Request): Promise<Response> {
 
     // Yucut-style video processing logic
     switch (action) {
+      case 'scene-detection-advanced':
+        // Try real Yucut TransNet V2 scene detection first
+        if (videoUrl) {
+          const sceneResult = await callYucutScraper('/api/scene-detect', {
+            videoUrl,
+            advanced: options.advanced || true,
+            confidenceThreshold: options.confidenceThreshold || 0.8
+          });
+
+          if (sceneResult && sceneResult.success) {
+            return new Response(
+              JSON.stringify({
+                scenes: sceneResult.scenes,
+                totalScenes: sceneResult.scenes.length,
+                method: 'TransNet V2 Advanced (Real)',
+                confidence: sceneResult.averageConfidence
+              }),
+              { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+          }
+        }
+
+        // Fallback to mock scene detection
+        const mockScenes = [];
+        const sceneCount = Math.floor(Math.random() * 10) + 5;
+        for (let i = 0; i < sceneCount; i++) {
+          mockScenes.push({
+            startTime: i * 10,
+            endTime: (i + 1) * 10,
+            confidence: Math.random() * 0.3 + 0.7,
+            type: ['transition', 'cut', 'fade'][Math.floor(Math.random() * 3)]
+          });
+        }
+
+        return new Response(
+          JSON.stringify({
+            scenes: mockScenes,
+            totalScenes: mockScenes.length,
+            method: 'TransNet V2 Advanced (Mock)',
+            note: 'Real Yucut scraper not available - using mock data'
+          }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+
+      case 'media-scraper':
+        // Try real Yucut media scraper
+        const scraperResult = await callYucutScraper('/api/search/video', {
+          query: options.query || 'nature',
+          source: options.source || 'mixkit',
+          maxResults: options.maxResults || 10
+        });
+
+        if (scraperResult && scraperResult.success) {
+          return new Response(
+            JSON.stringify({
+              results: scraperResult.results,
+              count: scraperResult.count,
+              source: scraperResult.source,
+              method: 'Real Yucut Scraper'
+            }),
+            { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        // Fallback mock
+        return new Response(
+          JSON.stringify({
+            results: [{
+              id: 'mock_video_1',
+              title: 'Beautiful Nature Scene',
+              url: 'https://example.com/video.mp4',
+              thumbnail: 'https://example.com/thumb.jpg',
+              duration: 30,
+              tags: ['nature', 'scenic']
+            }],
+            count: 1,
+            source: 'mock',
+            method: 'Mock Scraper (Real Yucut not available)'
+          }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+
       case 'create-shorts':
         // Create short-form video clips
         const shorts = [];
@@ -220,11 +335,65 @@ export async function handler(req: Request): Promise<Response> {
           { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
 
+      case 'mcp-protocol':
+        // MCP protocol integration - for now return mock capabilities
+        return new Response(
+          JSON.stringify({
+            capabilities: [
+              'scene-detection',
+              'media-scraper',
+              'animation-ide',
+              'keyframe-effects',
+              'speech-editing',
+              'semantic-search',
+              '3d-camera'
+            ],
+            version: '1.0.0',
+            status: 'mock-implementation',
+            note: 'Real MCP integration requires local Yucut instance'
+          }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+
+      case 'animation-ide':
+        return new Response(
+          JSON.stringify({
+            ide: {
+              time: 0,
+              code: '// Animation code here\n// time variable syncs with timeline',
+              preview: 'timeline-preview-url',
+              supported: ['react', 'tailwind', 'framer-motion']
+            },
+            status: 'mock-implementation',
+            note: 'Real animation IDE requires local Yucut instance'
+          }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+
+      case 'keyframe-effects':
+      case 'speech-editing':
+      case 'semantic-search':
+      case '3d-camera':
+      case 'multi-stage-agent':
+        return new Response(
+          JSON.stringify({
+            action,
+            status: 'mock-implementation',
+            message: `${action} feature available in local Yucut instance`,
+            fallback: 'Using basic processing'
+          }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+
       default:
         return new Response(
           JSON.stringify({
             error: 'Unknown action',
-            supportedActions: ['create-shorts', 'reframe', 'social-resize', 'trim-video', 'extract-clips']
+            supportedActions: [
+              'create-shorts', 'reframe', 'social-resize', 'trim-video', 'extract-clips',
+              'scene-detection-advanced', 'media-scraper', 'mcp-protocol', 'animation-ide',
+              'keyframe-effects', 'speech-editing', 'semantic-search', '3d-camera', 'multi-stage-agent'
+            ]
           }),
           { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
