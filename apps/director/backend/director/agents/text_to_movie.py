@@ -16,14 +16,15 @@ from director.core.session import (
     VideoData,
 )
 from director.llm import get_default_llm
-from director.tools.kling import KlingAITool, PARAMS_CONFIG as KLING_PARAMS_CONFIG
-from director.tools.stabilityai import (
-    StabilityAITool,
-    PARAMS_CONFIG as STABILITYAI_PARAMS_CONFIG,
+# MuAPI replaces individual video generation tools
+from director.tools.muapi import (
+    MuapiVideoTool,
+    PARAMS_CONFIG as MUAPI_PARAMS_CONFIG,
 )
-from director.tools.elevenlabs import (
-    ElevenLabsTool,
-    PARAMS_CONFIG as ELEVENLABS_PARAMS_CONFIG,
+# OpenAI replaces ElevenLabs for TTS
+from director.tools.openai_tts import (
+    OpenAITTSTool,
+    PARAMS_CONFIG as OPENAI_TTS_PARAMS_CONFIG,
 )
 from director.tools.videodb_tool import VDBAudioGenerationTool, VDBVideoGenerationTool, VideoDBTool
 from director.constants import DOWNLOADS_PATH
@@ -31,8 +32,8 @@ from director.constants import DOWNLOADS_PATH
 
 logger = logging.getLogger(__name__)
 
-SUPPORTED_ENGINES = ["stabilityai", "kling", "videodb"]
-SUPPORTED_AUDIO_ENGINES = ["elevenlabs", "videodb"]
+SUPPORTED_ENGINES = ["muapi"]
+SUPPORTED_AUDIO_ENGINES = ["openai"]
 TEXT_TO_MOVIE_AGENT_PARAMETERS = {
     "type": "object",
     "properties": {
@@ -69,20 +70,15 @@ TEXT_TO_MOVIE_AGENT_PARAMETERS = {
                     "description": "Optional description for background music generation",
                     "default": None,
                 },
-                "video_stabilityai_config": {
+                "video_muapi_config": {
                     "type": "object",
-                    "description": "Optional configuration for StabilityAI engine",
-                    "properties": STABILITYAI_PARAMS_CONFIG["text_to_video"],
+                    "description": "Configuration for MuAPI video generation",
+                    "properties": MUAPI_PARAMS_CONFIG["text_to_video"],
                 },
-                "video_kling_config": {
+                "audio_openai_config": {
                     "type": "object",
-                    "description": "Optional configuration for Kling engine",
-                    "properties": KLING_PARAMS_CONFIG["text_to_video"],
-                },
-                "audio_elevenlabs_config": {
-                    "type": "object",
-                    "description": "Optional configuration for ElevenLabs engine",
-                    "properties": ELEVENLABS_PARAMS_CONFIG["sound_effect"],
+                    "description": "Configuration for OpenAI TTS",
+                    "properties": OPENAI_TTS_PARAMS_CONFIG["text_to_speech"],
                 },
             },
             "required": ["storyline"],
@@ -134,21 +130,9 @@ class TextToMovieAgent(BaseAgent):
         self.llm = get_default_llm()
 
         self.engine_configs = {
-            "kling": EngineConfig(
-                name="kling",
+            "muapi": EngineConfig(
+                name="muapi",
                 max_duration=10,
-                preferred_style="cinematic",
-                prompt_format="detailed",
-            ),
-            "stabilityai": EngineConfig(
-                name="stabilityai",
-                max_duration=4,
-                preferred_style="photorealistic",
-                prompt_format="concise",
-            ),
-            "videodb": EngineConfig(
-                name="kling",
-                max_duration=6,
                 preferred_style="cinematic",
                 prompt_format="detailed",
             ),
@@ -158,8 +142,8 @@ class TextToMovieAgent(BaseAgent):
     def run(
         self,
         collection_id: str,
-        engine: str = "stabilityai",
-        audio_engine: str = "videodb",
+        engine: str = "muapi",
+        audio_engine: str = "openai",
         job_type: str = "text_to_movie",
         text_to_movie: Optional[dict] = None,
         *args,
@@ -186,48 +170,25 @@ class TextToMovieAgent(BaseAgent):
             if engine not in self.engine_configs:
                 raise ValueError(f"Unsupported engine: {engine}")
 
-            if engine == "stabilityai":
-                STABILITY_API_KEY = os.getenv("STABILITYAI_API_KEY")
-                if not STABILITY_API_KEY:
-                    raise Exception("Stability AI API key not found")
-                self.video_gen_tool = StabilityAITool(api_key=STABILITY_API_KEY)
-                self.video_gen_config_key = "video_stabilityai_config"
-            elif engine == "kling":
-                KLING_API_ACCESS_KEY = os.getenv("KLING_AI_ACCESS_API_KEY")
-                KLING_API_SECRET_KEY = os.getenv("KLING_AI_SECRET_API_KEY")
-                if not KLING_API_ACCESS_KEY or not KLING_API_SECRET_KEY:
-                    raise Exception("Kling AI API key not found")
-                self.video_gen_tool = KlingAITool(
-                    access_key=KLING_API_ACCESS_KEY, secret_key=KLING_API_SECRET_KEY
-                )
-                self.video_gen_config_key = "video_kling_config"
-
-            elif engine == "videodb":
-                self.video_gen_config_key = "video_kling_config"
-                self.video_gen_tool = VDBVideoGenerationTool()
+            if engine == "muapi":
+                self.video_gen_tool = MuapiVideoTool()
+                self.video_gen_config_key = "video_muapi_config"
             else:
                 raise Exception(f"{engine} not supported")
 
             # Initialize tools
-            self.audio_gen_config_key = "audio_elevenlabs_config"
+            self.audio_gen_config_key = "audio_openai_config"
 
-            if audio_engine == "elevenlabs":
-                ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
-                if not ELEVENLABS_API_KEY:
-                    raise Exception("ElevenLabs API key not found")
-                self.audio_gen_tool = ElevenLabsTool(api_key=ELEVENLABS_API_KEY)
-
+            if audio_engine == "openai":
+                self.audio_gen_tool = OpenAITTSTool()
             else:
-                self.audio_gen_tool = VDBAudioGenerationTool()    
+                raise Exception(f"Audio engine {audio_engine} not supported")    
 
             if job_type == "text_to_movie":
                 raw_storyline = text_to_movie.get("storyline", [])
                 video_gen_config = text_to_movie.get(self.video_gen_config_key, {})
 
-                if engine == "videodb":
-                    audio_gen_config = {}
-                else:
-                    audio_gen_config = text_to_movie.get(self.audio_gen_config_key, {})
+                audio_gen_config = text_to_movie.get(self.audio_gen_config_key, {})
 
                 # Generate visual style
                 visual_style = self.generate_visual_style(raw_storyline)
@@ -456,21 +417,12 @@ class TextToMovieAgent(BaseAgent):
     def generate_engine_prompt(
         self, scene: dict, style: VisualStyle, engine: str
     ) -> str:
-        """Generate engine-specific prompt"""
-        if engine == "stabilityai":
-            return f"""
-            {style.director_reference} style.
-            {scene['scene_description']}.
-            {style.character_constants['physical_description']}.
-            {style.lighting_style}, {style.color_grading}.
-            Photorealistic, detailed, high quality, masterful composition.
-            """
-        else:  # Kling
-            initial_prompt = f"""
-            {style.director_reference} style shot. 
-            Filmed on {style.camera_setup}.
-            
-            {scene['scene_description']}
+        """Generate engine-specific prompt for MuAPI"""
+        initial_prompt = f"""
+        {style.director_reference} style shot.
+        Filmed on {style.camera_setup}.
+
+        {scene['scene_description']}
             
             Character Details:
             {json.dumps(style.character_constants, indent=2)}

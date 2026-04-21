@@ -1,4 +1,4 @@
-import { supabase } from '../supabase.js';
+import { supabase } from './hybrid-supabase.js';
 
 /**
  * Profile Service - Manages user profile operations with Supabase

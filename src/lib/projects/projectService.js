@@ -1,4 +1,4 @@
-import { supabase } from '../supabase.js';
+import { supabase } from './hybrid-supabase.js';
 import { errorHandler } from '../error-handling/errorHandler.js';
 import { inputValidator } from '../error-handling/inputValidator.js';
 import { cacheManager } from '../caching/cacheManager.js';

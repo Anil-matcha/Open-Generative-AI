@@ -6,20 +6,16 @@ from typing import Optional
 
 from director.agents.base import BaseAgent, AgentResponse, AgentStatus
 from director.core.session import Session, VideoContent, VideoData, MsgStatus
-from director.tools.videodb_tool import VDBVideoGenerationTool, VideoDBTool
-from director.tools.stabilityai import (
-    StabilityAITool,
-    PARAMS_CONFIG as STABILITYAI_PARAMS_CONFIG,
-)
-from director.tools.fal_video import (
-    FalVideoGenerationTool,
-    PARAMS_CONFIG as FAL_VIDEO_GEN_PARAMS_CONFIG,
+from director.tools.videodb_tool import VideoDBTool
+from director.tools.muapi import (
+    MuapiVideoTool,
+    PARAMS_CONFIG as MUAPI_PARAMS_CONFIG,
 )
 from director.constants import DOWNLOADS_PATH
 
 logger = logging.getLogger(__name__)
 
-SUPPORTED_ENGINES = ["stabilityai", "fal", "videodb"]
+SUPPORTED_ENGINES = ["muapi"]
 
 VIDEO_GENERATION_AGENT_PARAMETERS = {
     "type": "object",
@@ -30,8 +26,8 @@ VIDEO_GENERATION_AGENT_PARAMETERS = {
         },
         "engine": {
             "type": "string",
-            "description": "The video generation engine to use. Use VideoDB by default. If the query includes any of the following: 'minimax-video, mochi-v1, hunyuan-video, luma-dream-machine, cogvideox-5b, ltx-video, fast-svd, fast-svd-lcm, t2v-turbo, kling video v 1.0, kling video v1.5 pro, fast-animatediff, fast-animatediff turbo, and animatediff-sparsectrl-lcm'- always use Fal. In case user specifies any other engine, use the supported engines like Stability or Fal.",
-            "default": "videodb",
+            "description": "The video generation engine to use. Only MuAPI is supported, which includes Fal, LTX-Desktop, and Gemini models.",
+            "default": "muapi",
             "enum": SUPPORTED_ENGINES,
         },
         "job_type": {
@@ -60,16 +56,11 @@ VIDEO_GENERATION_AGENT_PARAMETERS = {
                     "description": "The duration of the video in seconds",
                     "default": 5,
                 },
-                "stabilityai_config": {
-                    "type": "object",
-                    "properties": STABILITYAI_PARAMS_CONFIG["text_to_video"],
-                    "description": "Config to use when stabilityai engine is used",
-                },
-                "fal_config": {
-                    "type": "object",
-                    "properties": FAL_VIDEO_GEN_PARAMS_CONFIG["text_to_video"],
-                    "description": "Config to use when fal engine is used",
-                },
+        "muapi_config": {
+            "type": "object",
+            "properties": MUAPI_PARAMS_CONFIG["text_to_video"],
+            "description": "Config to use with MuAPI engine",
+        },
             },
             "required": ["prompt", "name"],
         },
@@ -93,10 +84,10 @@ VIDEO_GENERATION_AGENT_PARAMETERS = {
                     "description": "The duration of the video in seconds",
                     "default": 5,
                 },
-                "fal_config": {
+                "muapi_config": {
                     "type": "object",
-                    "properties": FAL_VIDEO_GEN_PARAMS_CONFIG["image_to_video"],
-                    "description": "Config to use when fal engine is used",
+                    "properties": MUAPI_PARAMS_CONFIG["image_to_video"],
+                    "description": "Config to use with MuAPI engine",
                 },
             },
             "required": ["prompt", "image_id", "name"],
@@ -124,10 +115,10 @@ class VideoGenerationAgent(BaseAgent):
         **kwargs,
     ) -> AgentResponse:
         """
-        Generates video using Stability AI's API based on input text prompt.
+        Generates video using MuAPI based on input text prompt or image.
         :param collection_id: The collection ID to store the generated video
         :param job_type: The type of video generation job to perform
-        :param engine: The engine to use for video generation
+        :param engine: The engine to use for video generation (only 'muapi' supported)
         :param text_to_video: The text to convert to video
         :param image_to_video: The image to convert to video
         :param args: Additional positional arguments
@@ -152,25 +143,13 @@ class VideoGenerationAgent(BaseAgent):
             if engine not in SUPPORTED_ENGINES:
                 raise Exception(f"{engine} not supported")
 
-            # Initialize VideoDB tool after basic validation
+            # Initialize VideoDB tool for storage operations
             self.videodb_tool = VideoDBTool(collection_id=collection_id)
 
-            if engine == "stabilityai":
-                STABILITYAI_API_KEY = os.getenv("STABILITYAI_API_KEY")
-                if not STABILITYAI_API_KEY:
-                    raise Exception("Stability AI API key not found")
-                video_gen_tool = StabilityAITool(api_key=STABILITYAI_API_KEY)
-                config_key = "stabilityai_config"
-            elif engine == "fal":
-                FAL_KEY = os.getenv("FAL_KEY")
-                if not FAL_KEY:
-                    raise Exception("FAL API key not found")
-                video_gen_tool = FalVideoGenerationTool(api_key=FAL_KEY)
-                config_key = "fal_config"
-
-            elif engine == "videodb":
-                video_gen_tool = VDBVideoGenerationTool()
-                config_key = "videodb_config"
+            if engine == "muapi":
+                # MuAPI uses Supabase proxy, no direct API key needed
+                video_gen_tool = MuapiVideoTool()
+                config_key = "muapi_config"
             else:
                 raise Exception(f"{engine} not supported")
 

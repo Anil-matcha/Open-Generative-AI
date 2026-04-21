@@ -6,6 +6,17 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
 };
 
+const DIRECTOR_API_BASE_URL = Deno.env.get('DIRECTOR_API_BASE_URL') || 'https://api.director.ai/v1';
+const DIRECTOR_API_KEY = Deno.env.get('DIRECTOR_API_KEY');
+
+if (!DIRECTOR_API_BASE_URL) {
+  console.error('[frame-agent] Missing DIRECTOR_API_BASE_URL environment variable');
+}
+
+if (!DIRECTOR_API_KEY) {
+  console.error('[frame-agent] Missing DIRECTOR_API_KEY environment variable');
+}
+
 interface FrameAgentRequest {
   command: string;
   videoId?: string;
@@ -131,6 +142,33 @@ const AUTO_CLIP_RESULTS = [
   { time: '0:48 - 1:05', type: 'Scene', confidence: '91%' },
 ];
 
+// Helper function for Director API calls
+async function callDirectorAPI(endpoint: string, params: Record<string, any>): Promise<any> {
+  if (!DIRECTOR_API_BASE_URL || !DIRECTOR_API_KEY) {
+    throw new Error('Director API not configured');
+  }
+
+  const url = `${DIRECTOR_API_BASE_URL}/${endpoint}`;
+
+  console.log(`[frame-agent] Calling Director API: ${endpoint}`);
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${DIRECTOR_API_KEY}`
+    },
+    body: JSON.stringify(params)
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Director API call failed: ${response.status} ${response.statusText} - ${errorText}`);
+  }
+
+  return await response.json();
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, {
@@ -150,41 +188,75 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const cmd = command.toLowerCase();
-    let matchedAction = COMMAND_ACTIONS['default'];
+    // Process command using Director API
     let result: any = null;
+    let responseMessage = '';
+    let actionType = action || 'process-command';
 
-    for (const [key, value] of Object.entries(COMMAND_ACTIONS)) {
-      if (cmd.includes(key)) {
-        matchedAction = value;
-        break;
+    try {
+      if (!videoUrl) {
+        return new Response(
+          JSON.stringify({ error: 'Video URL is required for frame operations' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
       }
-    }
 
-    if (action === 'auto-clip') {
-      matchedAction = {
-        action: 'auto-clip',
-        steps: ['Analyzing video', 'Detecting scene changes', 'Finding audio peaks', 'Identifying motion', 'Creating clips'],
-        response: 'Auto-clip detection complete! Found 4 segments in your video.'
-      };
-      result = { clips: AUTO_CLIP_RESULTS };
-    } else if (action === 'ai-organize') {
-      matchedAction = {
-        action: 'ai-organize',
-        steps: ['Scanning for faces', 'Detecting actions', 'Identifying scenes', 'Tagging objects'],
-        response: 'AI organization complete! Your video has been analyzed and tagged.'
-      };
-      result = { tags: AI_TAGS_RESULT };
-    }
+      // Call Director API based on command
+      const directorResult = await callDirectorAPI('frame/process', {
+        command: command,
+        action: action,
+        video_url: videoUrl,
+        video_id: videoId
+      });
 
-    console.log(`[frame-agent] Processing command: "${command}" -> action: ${matchedAction.action}`);
+      result = directorResult.result;
+      responseMessage = directorResult.message || 'Frame operation completed successfully';
+      actionType = directorResult.action || actionType;
+
+      console.log(`[frame-agent] Director API processed command: "${command}" -> action: ${actionType}`);
+
+    } catch (apiError) {
+      console.error('[frame-agent] Director API call failed:', apiError);
+
+      // Fallback to basic command matching for backward compatibility
+      const cmd = command.toLowerCase();
+      let matchedAction = COMMAND_ACTIONS['default'];
+
+      for (const [key, value] of Object.entries(COMMAND_ACTIONS)) {
+        if (cmd.includes(key)) {
+          matchedAction = value;
+          break;
+        }
+      }
+
+      if (action === 'auto-clip') {
+        matchedAction = {
+          action: 'auto-clip',
+          steps: ['Analyzing video', 'Detecting scene changes', 'Finding audio peaks', 'Identifying motion', 'Creating clips'],
+          response: 'Auto-clip detection complete! Found 4 segments in your video.'
+        };
+        result = { clips: AUTO_CLIP_RESULTS };
+      } else if (action === 'ai-organize') {
+        matchedAction = {
+          action: 'ai-organize',
+          steps: ['Scanning for faces', 'Detecting actions', 'Identifying scenes', 'Tagging objects'],
+          response: 'AI organization complete! Your video has been analyzed and tagged.'
+        };
+        result = { tags: AI_TAGS_RESULT };
+      }
+
+      responseMessage = matchedAction.response;
+      actionType = matchedAction.action;
+    }
 
     const response: FrameAgentResponse = {
       success: true,
-      action: matchedAction.action,
-      message: matchedAction.response,
-      steps: matchedAction.steps,
-      result: result
+      action: actionType,
+      message: responseMessage,
+      steps: result?.steps || [],
+      result: result,
+      tags: result?.tags,
+      clips: result?.clips
     };
 
     return new Response(

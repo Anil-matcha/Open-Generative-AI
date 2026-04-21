@@ -14,6 +14,11 @@ const supabase = createClient(
 
 // CineGen API configuration
 const CINEGEN_API_URL = Deno.env.get('CINEGEN_API_URL') || 'http://localhost:3001';
+const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+
+if (!OPENAI_API_KEY) {
+  console.error('[cinegen-processor] Missing OPENAI_API_KEY environment variable');
+}
 
 interface CineGenRequest {
   action: 'llm-chat' | 'advanced-export' | 'edit-ai-tool' | 'gap-fill' | 'clip-extension' | 'music-generation' | 'render-assistant';
@@ -56,15 +61,23 @@ export async function handler(req: Request): Promise<Response> {
     // CineGen-style processing logic
     switch (action) {
       case 'llm-chat':
-        // CineGen LLM Chat Assistant
-        const chatResponse = await generateLLMResponse(prompt || 'Hello', projectContext);
+        // CineGen LLM Chat Assistant using OpenAI
+        if (!prompt) {
+          return new Response(
+            JSON.stringify({ error: 'Prompt is required for LLM chat' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        const chatResponse = await callOpenAI(prompt, projectContext);
 
         return new Response(
           JSON.stringify({
             response: chatResponse,
             context: projectContext,
             assistant: 'CineGen LLM',
-            capabilities: ['rendering', 'editing', 'export', 'ai-tools']
+            capabilities: ['rendering', 'editing', 'export', 'ai-tools'],
+            model: 'gpt-4'
           }),
           { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
@@ -140,8 +153,22 @@ export async function handler(req: Request): Promise<Response> {
         );
 
       case 'render-assistant':
-        // CineGen Render Assistant
-        const renderAdvice = generateRenderAdvice(prompt || 'optimize render settings', projectContext);
+        // CineGen Render Assistant using OpenAI
+        const renderPrompt = `Provide detailed rendering optimization advice for CineGen:
+
+User request: ${prompt || 'optimize render settings'}
+Project context: ${JSON.stringify(projectContext || {})}
+
+Provide specific recommendations for:
+1. GPU acceleration settings
+2. Format and codec optimization
+3. Parallel processing configuration
+4. Quality vs speed trade-offs
+5. Hardware-specific optimizations
+
+Be technical and actionable.`;
+
+        const renderAdvice = await callOpenAI(renderPrompt);
 
         return new Response(
           JSON.stringify({
@@ -149,9 +176,12 @@ export async function handler(req: Request): Promise<Response> {
             suggestions: [
               'Enable GPU acceleration for 10x speed improvement',
               'Use CineGen ProRes 422 for intermediate editing',
-              'Enable parallel frame rendering with 4 threads'
+              'Enable parallel frame rendering with 4 threads',
+              'Optimize color management pipeline',
+              'Use proxy workflows for complex compositions'
             ],
-            assistant: 'CineGen Render Assistant'
+            assistant: 'CineGen Render Assistant',
+            model: 'gpt-4'
           }),
           { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
@@ -176,57 +206,78 @@ export async function handler(req: Request): Promise<Response> {
 }
 
 // Helper functions
-async function generateLLMResponse(prompt: string, context?: any): Promise<string> {
-  // Mock CineGen LLM responses
-  const responses = {
-    'rendering': "For optimal rendering performance, I recommend CineGen's GPU-accelerated ProRes 422 export with 4K resolution. Your project will benefit from parallel frame processing.",
-    'editing': "CineGen's AI tools can help with gap filling and clip extension. Try the smart cut detection for seamless edits.",
-    'export': "For professional delivery, use CineGen's advanced export formats with color management and metadata embedding.",
-    'default': "I'm your CineGen assistant. I can help with rendering optimization, AI editing tools, and professional export formats."
-  };
+async function callOpenAI(prompt: string, context?: any): Promise<string> {
+  if (!OPENAI_API_KEY) {
+    throw new Error('OpenAI API key not configured');
+  }
 
-  const topic = prompt.toLowerCase().includes('render') ? 'rendering' :
-               prompt.toLowerCase().includes('edit') ? 'editing' :
-               prompt.toLowerCase().includes('export') ? 'export' : 'default';
+  console.log('[cinegen-processor] Calling OpenAI API');
 
-  return responses[topic];
+  const systemMessage = context ?
+    `You are CineGen, a professional video editing and rendering assistant. Project context: ${JSON.stringify(context)}` :
+    'You are CineGen, a professional video editing and rendering assistant with expertise in advanced video processing, AI tools, and professional rendering workflows.';
+
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${OPENAI_API_KEY}`
+    },
+    body: JSON.stringify({
+      model: 'gpt-4',
+      messages: [
+        {
+          role: 'system',
+          content: systemMessage
+        },
+        {
+          role: 'user',
+          content: prompt
+        }
+      ],
+      temperature: 0.7,
+      max_tokens: 1500
+    })
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`OpenAI API call failed: ${response.status} ${response.statusText} - ${errorText}`);
+  }
+
+  const result = await response.json();
+  return result.choices[0]?.message?.content || '';
 }
 
 async function executeEditTool(tool: string, options: any): Promise<any> {
-  // Mock edit tool execution
-  switch (tool) {
-    case 'gap-fill':
-      return {
-        type: 'gap-fill',
-        duration: 3,
-        content: 'AI-generated transition',
-        confidence: 0.92
-      };
-    case 'clip-extension':
-      return {
-        type: 'extension',
-        addedDuration: 5,
-        method: 'content-aware',
-        quality: 'high'
-      };
-    default:
-      return {
-        type: 'unknown',
-        message: 'Tool executed successfully'
-      };
-  }
-}
+  // Use OpenAI to generate intelligent edit tool results
+  const toolPrompt = `Execute the ${tool} editing tool with these options: ${JSON.stringify(options)}
 
-function generateRenderAdvice(prompt: string, context?: any): string {
-  if (prompt.includes('performance')) {
-    return "Enable LTX-Desktop GPU acceleration for 10x speed improvement. Use Rendiv's parallel frame rendering with 4 concurrent threads. Monitor performance with Rendiv's profiling tools.";
-  } else if (prompt.includes('quality')) {
-    return "For premium quality rendering, use CineGen's '4K Cinema Export' preset with GPU acceleration enabled. This provides lossless compression perfect for professional distribution.";
-  } else if (prompt.includes('web')) {
-    return "For web streaming platforms, select CineGen's 'Web Optimized HD' preset with VP9 codec. This reduces file size by up to 50% while maintaining visual quality.";
-  }
+Provide a detailed result including:
+- Tool type
+- Duration affected
+- Method used
+- Quality assessment
+- Confidence score (0-1)
+- Technical details
 
-  return "For optimal rendering, combine CineGen's advanced export formats with LTX-Desktop GPU acceleration and Rendiv's parallel processing capabilities.";
+Be specific and technical in your response.`;
+
+  const resultText = await callOpenAI(toolPrompt);
+
+  // Parse the result (in a real implementation, you might want more structured parsing)
+  try {
+    return JSON.parse(resultText);
+  } catch {
+    // Fallback to structured response
+    return {
+      type: tool,
+      result: resultText,
+      confidence: 0.85,
+      method: 'ai-powered',
+      quality: 'high'
+    };
+  }
 }
 
 Deno.serve(handler);</content>

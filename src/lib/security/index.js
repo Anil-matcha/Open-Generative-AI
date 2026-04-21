@@ -55,9 +55,9 @@ export function sanitizeURL(url) {
 // Secure iframe handling
 export function createSecureIframe(src, options = {}) {
   const iframe = document.createElement('iframe');
-  
+
   // Only allow HTTPS URLs in production
-  if (process.env.NODE_ENV === 'production' && src && !src.startsWith('https://')) {
+  if (import.meta.env.PROD && src && !src.startsWith('https://')) {
     throw new Error('Insecure iframe source not allowed in production');
   }
   
@@ -73,16 +73,16 @@ export function createSecureIframe(src, options = {}) {
 
 // Environment validation
 export function validateEnvironment() {
-  const requiredVars = ['NODE_ENV'];
-  const missing = requiredVars.filter(varName => !process.env[varName]);
-  
+  const requiredVars = ['MODE'];
+  const missing = requiredVars.filter(varName => !import.meta.env[varName]);
+
   if (missing.length > 0) {
     console.warn('Missing required environment variables:', missing);
   }
-  
+
   return {
-    isProduction: process.env.NODE_ENV === 'production',
-    isDevelopment: process.env.NODE_ENV === 'development',
+    isProduction: import.meta.env.PROD,
+    isDevelopment: import.meta.env.DEV,
     missingVars: missing
   };
 }
@@ -151,7 +151,7 @@ export function setupCSPViolationReporting() {
       });
       
       // In production, you might want to send this to a logging service
-      if (process.env.NODE_ENV === 'production') {
+      if (import.meta.env.PROD) {
         // analytics.track('csp_violation', {
         //   directive: event.violatedDirective,
         //   blockedURI: event.blockedURI
@@ -188,7 +188,7 @@ export async function secureApiRequest(url, options = {}) {
   }
   
   // Ensure HTTPS in production
-  if (process.env.NODE_ENV === 'production' && !url.startsWith('https://')) {
+  if (import.meta.env.PROD && !url.startsWith('https://')) {
     throw new Error('Insecure API requests not allowed in production');
   }
   

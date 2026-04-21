@@ -391,6 +391,63 @@ class PerformanceMonitor {
         console.error(`[Performance] Error [${type}]:`, message, context);
     }
 
+    // Track custom metrics
+    trackMetric(name, value, metadata = {}) {
+        if (!this.isEnabled) return;
+
+        const metric = {
+            name,
+            value,
+            metadata,
+            timestamp: Date.now()
+        };
+
+        // Store in metrics (create array if doesn't exist)
+        if (!this.metrics.custom) {
+            this.metrics.custom = [];
+        }
+
+        this.metrics.custom.push(metric);
+
+        // Keep last 200 custom metrics
+        if (this.metrics.custom.length > 200) {
+            this.metrics.custom.shift();
+        }
+
+        // Log in development
+        if (import.meta.env.DEV) {
+            console.log(`[Performance] Metric "${name}":`, value, metadata);
+        }
+    }
+
+    // Track custom events
+    trackEvent(name, metadata = {}) {
+        if (!this.isEnabled) return;
+
+        const event = {
+            name,
+            metadata,
+            timestamp: Date.now()
+        };
+
+        // Store in metrics (create array if doesn't exist)
+        if (!this.metrics.events) {
+            this.metrics.events = [];
+        }
+
+        this.metrics.events.push(event);
+
+        // Keep last 200 events
+        if (this.metrics.events.length > 200) {
+            this.metrics.events.shift();
+        }
+
+        // Log in development
+        if (import.meta.env.DEV) {
+            console.log(`[Performance] Event "${name}":`, metadata);
+        }
+    }
+
     // Get metrics summary
     getSummary() {
         const pageLoads = this.metrics.pageLoads;

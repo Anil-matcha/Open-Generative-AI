@@ -1,6 +1,6 @@
 import { navigate } from '../lib/router.js';
 import { showToast } from '../lib/loading.js';
-import { getSupabaseUrl } from '../lib/supabase.js';
+import { getSupabaseUrl } from '../lib/hybrid-supabase.js';
 import { escapeHtml } from '../lib/security.js';
 import { createUploadPicker } from './UploadPicker.js';
 import { createMediaPreview, createFullscreenPreview } from './MediaPreview.js';

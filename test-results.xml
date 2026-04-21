@@ -1,2 +1,164 @@
-<testsuites id="" name="" tests="0" failures="0" skipped="0" errors="0" time="2.202123">
+<testsuites id="" name="" tests="4" failures="0" skipped="0" errors="4" time="71.724816">
+<testsuite name="demo/04-timeline-engine.spec.ts" timestamp="2026-04-21T07:39:01.734Z" hostname="demo-videos" tests="1" failures="0" skipped="0" time="21.15" errors="1">
+<testcase name="Demo Video: Timeline Engine › should demonstrate timeline functionality" classname="demo/04-timeline-engine.spec.ts" time="21.15">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results/demo-04-timeline-engine-De-01dd9-rate-timeline-functionality-demo-videos/test-failed-1.png]]
+
+[[ATTACHMENT|test-results/demo-04-timeline-engine-De-01dd9-rate-timeline-functionality-demo-videos/video.webm]]
+
+[[ATTACHMENT|test-results/demo-04-timeline-engine-De-01dd9-rate-timeline-functionality-demo-videos/error-context.md]]
+]]>
+</system-out>
+<error message="page.waitForSelector: Timeout 10000ms exceeded." type="TimeoutError">
+<![CDATA[  [demo-videos] › demo/04-timeline-engine.spec.ts:4:3 › Demo Video: Timeline Engine › should demonstrate timeline functionality 
+
+    TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="timeline"], .timeline, #timeline') to be visible
+
+
+      4 |   test('should demonstrate timeline functionality', async ({ page }) => {
+      5 |     await page.goto('/timeline', { waitUntil: 'networkidle' });
+    > 6 |     await page.waitForSelector('[data-testid="timeline"], .timeline, #timeline', { timeout: 10000 });
+        |                ^
+      7 |
+      8 |     // Screenshot initial timeline state
+      9 |     await page.screenshot({ path: 'demo-screenshots/timeline-initial.png' });
+        at /workspaces/Open-Higgsfield-AI/tests/e2e/demo/04-timeline-engine.spec.ts:6:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/demo-04-timeline-engine-De-01dd9-rate-timeline-functionality-demo-videos/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/demo-04-timeline-engine-De-01dd9-rate-timeline-functionality-demo-videos/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/demo-04-timeline-engine-De-01dd9-rate-timeline-functionality-demo-videos/error-context.md
+]]>
+</error>
+</testcase>
+</testsuite>
+<testsuite name="demo/04-timeline-engine.spec.ts" timestamp="2026-04-21T07:39:01.734Z" hostname="demo-videos-with-server" tests="1" failures="0" skipped="0" time="11.713" errors="1">
+<testcase name="Demo Video: Timeline Engine › should demonstrate timeline functionality" classname="demo/04-timeline-engine.spec.ts" time="11.713">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results/demo-04-timeline-engine-De-01dd9-rate-timeline-functionality-demo-videos-with-server/test-failed-1.png]]
+
+[[ATTACHMENT|test-results/demo-04-timeline-engine-De-01dd9-rate-timeline-functionality-demo-videos-with-server/video.webm]]
+
+[[ATTACHMENT|test-results/demo-04-timeline-engine-De-01dd9-rate-timeline-functionality-demo-videos-with-server/error-context.md]]
+]]>
+</system-out>
+<error message="page.waitForSelector: Timeout 10000ms exceeded." type="TimeoutError">
+<![CDATA[  [demo-videos-with-server] › demo/04-timeline-engine.spec.ts:4:3 › Demo Video: Timeline Engine › should demonstrate timeline functionality 
+
+    TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="timeline"], .timeline, #timeline') to be visible
+
+
+      4 |   test('should demonstrate timeline functionality', async ({ page }) => {
+      5 |     await page.goto('/timeline', { waitUntil: 'networkidle' });
+    > 6 |     await page.waitForSelector('[data-testid="timeline"], .timeline, #timeline', { timeout: 10000 });
+        |                ^
+      7 |
+      8 |     // Screenshot initial timeline state
+      9 |     await page.screenshot({ path: 'demo-screenshots/timeline-initial.png' });
+        at /workspaces/Open-Higgsfield-AI/tests/e2e/demo/04-timeline-engine.spec.ts:6:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/demo-04-timeline-engine-De-01dd9-rate-timeline-functionality-demo-videos-with-server/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/demo-04-timeline-engine-De-01dd9-rate-timeline-functionality-demo-videos-with-server/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/demo-04-timeline-engine-De-01dd9-rate-timeline-functionality-demo-videos-with-server/error-context.md
+]]>
+</error>
+</testcase>
+</testsuite>
+<testsuite name="modules/cinegen-integration.spec.js" timestamp="2026-04-21T07:39:01.734Z" hostname="modules-chromium" tests="2" failures="0" skipped="0" time="22.753" errors="2">
+<testcase name="CineGen Module Integration › should integrate with main app timeline" classname="modules/cinegen-integration.spec.js" time="11.429">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results/modules-cinegen-integratio-80bc7-rate-with-main-app-timeline-modules-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|test-results/modules-cinegen-integratio-80bc7-rate-with-main-app-timeline-modules-chromium/video.webm]]
+
+[[ATTACHMENT|test-results/modules-cinegen-integratio-80bc7-rate-with-main-app-timeline-modules-chromium/error-context.md]]
+]]>
+</system-out>
+<error message="page.waitForSelector: Timeout 10000ms exceeded." type="TimeoutError">
+<![CDATA[  [modules-chromium] › modules/cinegen-integration.spec.js:4:3 › CineGen Module Integration › should integrate with main app timeline 
+
+    TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="app-shell"]') to be visible
+
+
+       5 |     // Navigate to main app
+       6 |     await page.goto('/');
+    >  7 |     await page.waitForSelector('[data-testid="app-shell"]');
+         |                ^
+       8 |
+       9 |     // Access CineGen through apps hub
+      10 |     await page.click('[data-route="apps"]');
+        at /workspaces/Open-Higgsfield-AI/tests/e2e/modules/cinegen-integration.spec.js:7:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/modules-cinegen-integratio-80bc7-rate-with-main-app-timeline-modules-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/modules-cinegen-integratio-80bc7-rate-with-main-app-timeline-modules-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/modules-cinegen-integratio-80bc7-rate-with-main-app-timeline-modules-chromium/error-context.md
+]]>
+</error>
+</testcase>
+<testcase name="CineGen Module Integration › should handle timeline migration workflows" classname="modules/cinegen-integration.spec.js" time="11.324">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results/modules-cinegen-integratio-69ed9-imeline-migration-workflows-modules-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|test-results/modules-cinegen-integratio-69ed9-imeline-migration-workflows-modules-chromium/video.webm]]
+
+[[ATTACHMENT|test-results/modules-cinegen-integratio-69ed9-imeline-migration-workflows-modules-chromium/error-context.md]]
+]]>
+</system-out>
+<error message="page.click: Timeout 10000ms exceeded." type="TimeoutError">
+<![CDATA[  [modules-chromium] › modules/cinegen-integration.spec.js:32:3 › CineGen Module Integration › should handle timeline migration workflows 
+
+    TimeoutError: page.click: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="new-project-btn"]')
+
+
+      33 |     // Create timeline project
+      34 |     await page.goto('/#/timeline');
+    > 35 |     await page.click('[data-testid="new-project-btn"]');
+         |                ^
+      36 |     await page.fill('[data-testid="project-name"]', 'CineGen Test Project');
+      37 |
+      38 |     // Add some basic clips
+        at /workspaces/Open-Higgsfield-AI/tests/e2e/modules/cinegen-integration.spec.js:35:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/modules-cinegen-integratio-69ed9-imeline-migration-workflows-modules-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/modules-cinegen-integratio-69ed9-imeline-migration-workflows-modules-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/modules-cinegen-integratio-69ed9-imeline-migration-workflows-modules-chromium/error-context.md
+]]>
+</error>
+</testcase>
+</testsuite>
 </testsuites>

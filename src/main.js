@@ -44,6 +44,9 @@ if (typeof document !== 'undefined') {
 // Make generation service available globally for embedded components
 window.generationService = generationService;
 
+// Initialize hybrid Supabase client (handles online/offline automatically)
+console.log('[App] 🌐 Initializing hybrid Supabase client with automatic online/offline detection and synchronization');
+
 console.log('[App] Starting initialization...');
 
 // Track initialization performance
@@ -69,6 +72,12 @@ initializeEnhancedMuAPI(muapiConfig).then(success => {
 }).catch(error => {
   console.warn('[App] Enhanced MuAPI initialization error:', error);
   showToast('AI features unavailable', 'warning', 5000);
+});
+
+// Initialize connection status indicator
+import('./components/ConnectionStatus.js').then(({ initConnectionStatus }) => {
+  initConnectionStatus();
+  console.log('[App] Connection status indicator initialized');
 });
 
 // Start memory leak detection in development
@@ -132,13 +141,23 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 
-// Online/offline detection
-window.addEventListener('online', () => {
-  showToast('Connection restored', 'success', 3000);
+// Online/offline detection with hybrid sync
+window.addEventListener('online', async () => {
+  showToast('Connection restored - syncing data...', 'success', 3000);
+
+  // Import hybrid client and trigger sync
+  try {
+    const { hybridSupabase } = await import('./lib/hybrid-supabase.js');
+    await hybridSupabase.forceSync();
+    showToast('Data synchronized successfully', 'success', 2000);
+  } catch (error) {
+    console.warn('[App] Auto-sync failed:', error);
+    showToast('Connection restored', 'info', 2000);
+  }
 });
 
 window.addEventListener('offline', () => {
-  showToast('You are offline. Some features may not work.', 'warning', 10000);
+  showToast('You are offline. Working locally with automatic sync when reconnected.', 'info', 5000);
 });
 
 try {

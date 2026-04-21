@@ -295,7 +295,7 @@ export function VideoStudio() {
     extendBanner.className = 'hidden items-center gap-2 px-4 py-2 mx-2 mt-2 bg-primary/10 border border-primary/20 rounded-xl text-xs text-primary';
     extendBanner.innerHTML = `
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        <span>Extending previous Seedance 2.0 generation — add an optional prompt to guide the continuation</span>
+        <span>Extending previous video generation — add an optional prompt to guide the continuation</span>
     `;
     bar.appendChild(extendBanner);
 

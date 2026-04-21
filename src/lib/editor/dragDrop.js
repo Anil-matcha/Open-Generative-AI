@@ -11,7 +11,7 @@
  */
 
 import { showToast } from '../loading.js';
-import { uploadFileToStorage } from '../supabase.js';
+import { uploadFileToStorage } from '../hybrid-supabase.js';
 
 // Enhanced drag state management
 const dragState = {

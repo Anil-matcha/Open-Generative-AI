@@ -3,7 +3,7 @@
 
 // Import MUAPI client and Supabase for backend integration
 import { MuapiClient } from './muapi.js';
-import { supabase } from './supabase.js';
+import { supabase } from './hybrid-supabase.js';
 
 // Storyboard presets from the React code
 const STORYBOARD_PRESETS = [

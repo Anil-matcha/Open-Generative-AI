@@ -140,15 +140,15 @@ export class EnvironmentValidator {
   }
 
   isProduction() {
-    return process.env.NODE_ENV === 'production';
+    return import.meta.env.PROD;
   }
 
   isDevelopment() {
-    return process.env.NODE_ENV === 'development';
+    return import.meta.env.DEV;
   }
 
   isTest() {
-    return process.env.NODE_ENV === 'test';
+    return import.meta.env.MODE === 'test';
   }
 }
 
@@ -180,7 +180,7 @@ export class SecureEnv {
       throw new Error('Environment configuration has not been initialized. Call initialize() first.');
     }
 
-    const value = process.env[key];
+    const value = import.meta.env[key];
     const schema = ENV_SCHEMA[key];
 
     if (schema?.sensitive && value) {
@@ -204,11 +204,11 @@ export const secureEnv = new SecureEnv();
 
 // Utility functions for common environment checks
 export function isProduction() {
-  return secureEnv.validator?.isProduction() || process.env.NODE_ENV === 'production';
+  return secureEnv.validator?.isProduction() || import.meta.env.PROD;
 }
 
 export function isDevelopment() {
-  return secureEnv.validator?.isDevelopment() || process.env.NODE_ENV === 'development';
+  return secureEnv.validator?.isDevelopment() || import.meta.env.DEV;
 }
 
 export function requireEnv(key, defaultValue = null) {

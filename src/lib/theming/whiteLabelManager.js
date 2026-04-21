@@ -1,4 +1,4 @@
-import { supabase } from '../supabase.js';
+import { supabase } from './hybrid-supabase.js';
 
 /**
  * White Label Manager - Handles multi-tenant theming and branding

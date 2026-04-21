@@ -1,4 +1,4 @@
-import { supabase, uploadFileToStorage } from '../lib/supabase.js';
+import { supabase, uploadFileToStorage } from '../lib/hybrid-supabase.js';
 import { showToast } from '../lib/loading.js';
 import { initializeTimelineDragDrop, createEnhancedClipElement, renderCompositingOverlay, renderTimelineControls, renderLayerManagement, renderPopcornElements, showTimelineContextMenu } from '../lib/editor/timelineRendererEnhanced.js';
 import { initializeMediaLibraryDragDrop, setupEnhancedTooltips } from '../lib/editor/dragDrop.js';
@@ -695,7 +695,12 @@ button, input, textarea, select { font: inherit; }
       if (saved) {
         const projectData = JSON.parse(saved);
         showToast('Project loaded from local storage', 'success');
-        return { ...createState(), ...projectData };
+        const state = { ...createState(), ...projectData };
+        // Ensure tracks is always an array
+        if (!Array.isArray(state.tracks)) {
+          state.tracks = createState().tracks;
+        }
+        return state;
       }
     } catch (err) {
       console.error('Failed to load project:', err);
@@ -1392,7 +1397,7 @@ button, input, textarea, select { font: inherit; }
     function renderTracks() {
       // Convert tracks to enhanced format
       const enhancedState = {
-        tracks: state.tracks.map(track => ({
+        tracks: (state.tracks || []).map(track => ({
           id: track.id,
           name: track.name,
           locked: track.locked,
@@ -1400,7 +1405,7 @@ button, input, textarea, select { font: inherit; }
           solo: track.solo,
           opacity: track.opacity || 1,
           blendMode: track.blendMode || 'normal',
-          items: track.items.map(clip => ({
+          items: (track.items || []).map(clip => ({
             id: clip.id,
             name: clip.name,
             text: clip.heading || clip.name,
@@ -1779,7 +1784,7 @@ button, input, textarea, select { font: inherit; }
               timelineState: {
                 playheadPercent: state.playheadPercent,
                 zoom: state.zoom,
-                tracks: state.tracks.map(track => ({
+                tracks: (state.tracks || []).map(track => ({
                   id: track.id,
                   name: track.name,
                   clipCount: track.items.length

@@ -1,12 +1,17 @@
 import { getModelById, getVideoModelById, getI2IModelById, getI2VModelById, getV2VModelById, getLipSyncModelById } from './models.js';
-import { uploadFileToStorage } from './supabase.js';
+import { uploadFileToStorage } from './hybrid-supabase.js';
+import { localAI } from './local-ai.js';
 
 export class MuapiClient {
     constructor() {
+        this.offlineMode = this.detectOfflineMode();
+        this.localAI = localAI;
+
         // Validate that Supabase URL is configured before building proxy URL
         const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
         if (!supabaseUrl) {
-            console.error('[MuapiClient] VITE_SUPABASE_URL is not configured');
+            console.log('[MuapiClient] VITE_SUPABASE_URL not configured, using offline mode');
+            this.offlineMode = true;
             this.proxyUrl = '/functions/v1/muapi-proxy'; // Fallback to relative path
         } else {
             this.proxyUrl = `${supabaseUrl}/functions/v1/muapi-proxy`;
@@ -20,6 +25,34 @@ export class MuapiClient {
             ltx: supabaseUrl ? `${supabaseUrl}/functions/v1/ltx-processor` : '/functions/v1/ltx-processor',
             cutai: supabaseUrl ? `${supabaseUrl}/functions/v1/cutai-processor` : '/functions/v1/cutai-processor'
         };
+
+        console.log(`[MuapiClient] Initialized in ${this.offlineMode ? 'offline' : 'online'} mode`);
+    }
+
+    /**
+     * Detect if we should use offline mode
+     */
+    detectOfflineMode() {
+        // Check for offline mode setting
+        const offlineSetting = localStorage.getItem('offline_mode');
+        if (offlineSetting === 'true') return true;
+
+        // Check if Supabase is configured
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+        if (!supabaseUrl || !supabaseKey) return true;
+
+        // Check network connectivity
+        return !navigator.onLine;
+    }
+
+    /**
+     * Set offline mode
+     */
+    setOfflineMode(enabled) {
+        this.offlineMode = enabled;
+        localStorage.setItem('offline_mode', enabled.toString());
+        console.log(`[MuapiClient] ${enabled ? 'Enabled' : 'Disabled'} offline mode`);
     }
 
     getKey() {
@@ -147,6 +180,12 @@ export class MuapiClient {
     }
 
     async generateImage(params, signal) {
+        // Use local AI if offline or explicitly requested
+        if (this.offlineMode || params.forceLocal) {
+            console.log('[MuapiClient] Using local AI for image generation');
+            return await this.localAI.processRequest('text-to-image', params);
+        }
+
         const modelInfo = getModelById(params.model);
         const endpoint = modelInfo?.endpoint || params.model;
 
@@ -296,6 +335,12 @@ export class MuapiClient {
     }
 
     async generateVideo(params, signal) {
+        // Use local AI if offline or explicitly requested
+        if (this.offlineMode || params.forceLocal) {
+            console.log('[MuapiClient] Using local AI for video generation');
+            return await this.localAI.processRequest('text-to-video', params);
+        }
+
         // Route LTX requests to LTX processor
         if (params.model?.includes('ltx') || params.model?.includes('text-to-video') ||
             params.model?.includes('image-to-video') || params.model?.includes('video-to-video')) {

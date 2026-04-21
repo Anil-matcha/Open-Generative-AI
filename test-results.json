@@ -10,14 +10,18 @@
     "grep": {},
     "grepInvert": null,
     "maxFailures": 0,
-    "metadata": {},
+    "metadata": {
+      "actualWorkers": 1
+    },
     "preserveOutput": "always",
     "projects": [
       {
         "outputDir": "/workspaces/Open-Higgsfield-AI/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 1
+        },
         "id": "demo-videos",
         "name": "demo-videos",
         "testDir": "/workspaces/Open-Higgsfield-AI/tests/e2e",
@@ -31,7 +35,9 @@
         "outputDir": "/workspaces/Open-Higgsfield-AI/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 1
+        },
         "id": "demo-videos-with-server",
         "name": "demo-videos-with-server",
         "testDir": "/workspaces/Open-Higgsfield-AI/tests/e2e",
@@ -45,7 +51,9 @@
         "outputDir": "/workspaces/Open-Higgsfield-AI/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 1
+        },
         "id": "main-app-chromium",
         "name": "main-app-chromium",
         "testDir": "/workspaces/Open-Higgsfield-AI/tests/e2e",
@@ -59,7 +67,9 @@
         "outputDir": "/workspaces/Open-Higgsfield-AI/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 1
+        },
         "id": "main-app-firefox",
         "name": "main-app-firefox",
         "testDir": "/workspaces/Open-Higgsfield-AI/tests/e2e",
@@ -73,7 +83,9 @@
         "outputDir": "/workspaces/Open-Higgsfield-AI/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 1
+        },
         "id": "main-app-mobile",
         "name": "main-app-mobile",
         "testDir": "/workspaces/Open-Higgsfield-AI/tests/e2e",
@@ -87,7 +99,9 @@
         "outputDir": "/workspaces/Open-Higgsfield-AI/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 1
+        },
         "id": "modules-chromium",
         "name": "modules-chromium",
         "testDir": "/workspaces/Open-Higgsfield-AI/tests/e2e",
@@ -101,7 +115,9 @@
         "outputDir": "/workspaces/Open-Higgsfield-AI/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 1
+        },
         "id": "apps-chromium",
         "name": "apps-chromium",
         "testDir": "/workspaces/Open-Higgsfield-AI/tests/e2e",
@@ -115,7 +131,9 @@
         "outputDir": "/workspaces/Open-Higgsfield-AI/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 1
+        },
         "id": "performance",
         "name": "performance",
         "testDir": "/workspaces/Open-Higgsfield-AI/tests/e2e",
@@ -129,7 +147,9 @@
         "outputDir": "/workspaces/Open-Higgsfield-AI/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 1
+        },
         "id": "accessibility",
         "name": "accessibility",
         "testDir": "/workspaces/Open-Higgsfield-AI/tests/e2e",
@@ -171,19 +191,345 @@
     "workers": 1,
     "webServer": null
   },
-  "suites": [],
-  "errors": [
+  "suites": [
     {
-      "message": "SyntaxError: /workspaces/Open-Higgsfield-AI/tests/e2e/setup/global-setup.js: Only one default export allowed per module. (11:0)\n\n   9 |\n  10 | // Global teardown for E2E tests\n> 11 | export default async function globalTeardown() {\n     | ^\n  12 |   // Clean up test environment\n  13 |   console.log('Tearing down E2E test environment...');\n  14 |",
-      "stack": "SyntaxError: /workspaces/Open-Higgsfield-AI/tests/e2e/setup/global-setup.js: Only one default export allowed per module. (11:0)\n\n   9 |\n  10 | // Global teardown for E2E tests\n> 11 | export default async function globalTeardown() {\n     | ^\n  12 |   // Clean up test environment\n  13 |   console.log('Tearing down E2E test environment...');\n  14 |"
+      "title": "demo/04-timeline-engine.spec.ts",
+      "file": "demo/04-timeline-engine.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Demo Video: Timeline Engine",
+          "file": "demo/04-timeline-engine.spec.ts",
+          "line": 3,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should demonstrate timeline functionality",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "demo-videos",
+                  "projectName": "demo-videos",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 21150,
+                      "error": {
+                        "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"timeline\"], .timeline, #timeline') to be visible\u001b[22m\n",
+                        "stack": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"timeline\"], .timeline, #timeline') to be visible\u001b[22m\n\n    at /workspaces/Open-Higgsfield-AI/tests/e2e/demo/04-timeline-engine.spec.ts:6:16",
+                        "location": {
+                          "file": "/workspaces/Open-Higgsfield-AI/tests/e2e/demo/04-timeline-engine.spec.ts",
+                          "column": 16,
+                          "line": 6
+                        },
+                        "snippet": "  4 |   test('should demonstrate timeline functionality', async ({ page }) => {\n  5 |     await page.goto('/timeline', { waitUntil: 'networkidle' });\n> 6 |     await page.waitForSelector('[data-testid=\"timeline\"], .timeline, #timeline', { timeout: 10000 });\n    |                ^\n  7 |\n  8 |     // Screenshot initial timeline state\n  9 |     await page.screenshot({ path: 'demo-screenshots/timeline-initial.png' });"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/workspaces/Open-Higgsfield-AI/tests/e2e/demo/04-timeline-engine.spec.ts",
+                            "column": 16,
+                            "line": 6
+                          },
+                          "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"timeline\"], .timeline, #timeline') to be visible\u001b[22m\n\n\n  4 |   test('should demonstrate timeline functionality', async ({ page }) => {\n  5 |     await page.goto('/timeline', { waitUntil: 'networkidle' });\n> 6 |     await page.waitForSelector('[data-testid=\"timeline\"], .timeline, #timeline', { timeout: 10000 });\n    |                ^\n  7 |\n  8 |     // Screenshot initial timeline state\n  9 |     await page.screenshot({ path: 'demo-screenshots/timeline-initial.png' });\n    at /workspaces/Open-Higgsfield-AI/tests/e2e/demo/04-timeline-engine.spec.ts:6:16"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-04-21T07:39:02.434Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/workspaces/Open-Higgsfield-AI/test-results/demo-04-timeline-engine-De-01dd9-rate-timeline-functionality-demo-videos/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/workspaces/Open-Higgsfield-AI/test-results/demo-04-timeline-engine-De-01dd9-rate-timeline-functionality-demo-videos/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/workspaces/Open-Higgsfield-AI/test-results/demo-04-timeline-engine-De-01dd9-rate-timeline-functionality-demo-videos/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/workspaces/Open-Higgsfield-AI/tests/e2e/demo/04-timeline-engine.spec.ts",
+                        "column": 16,
+                        "line": 6
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "cbbf9849a9cf2deaa2f8-746e44713673c1fe006d",
+              "file": "demo/04-timeline-engine.spec.ts",
+              "line": 4,
+              "column": 3
+            },
+            {
+              "title": "should demonstrate timeline functionality",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "demo-videos-with-server",
+                  "projectName": "demo-videos-with-server",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 11713,
+                      "error": {
+                        "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"timeline\"], .timeline, #timeline') to be visible\u001b[22m\n",
+                        "stack": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"timeline\"], .timeline, #timeline') to be visible\u001b[22m\n\n    at /workspaces/Open-Higgsfield-AI/tests/e2e/demo/04-timeline-engine.spec.ts:6:16",
+                        "location": {
+                          "file": "/workspaces/Open-Higgsfield-AI/tests/e2e/demo/04-timeline-engine.spec.ts",
+                          "column": 16,
+                          "line": 6
+                        },
+                        "snippet": "  4 |   test('should demonstrate timeline functionality', async ({ page }) => {\n  5 |     await page.goto('/timeline', { waitUntil: 'networkidle' });\n> 6 |     await page.waitForSelector('[data-testid=\"timeline\"], .timeline, #timeline', { timeout: 10000 });\n    |                ^\n  7 |\n  8 |     // Screenshot initial timeline state\n  9 |     await page.screenshot({ path: 'demo-screenshots/timeline-initial.png' });"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/workspaces/Open-Higgsfield-AI/tests/e2e/demo/04-timeline-engine.spec.ts",
+                            "column": 16,
+                            "line": 6
+                          },
+                          "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"timeline\"], .timeline, #timeline') to be visible\u001b[22m\n\n\n  4 |   test('should demonstrate timeline functionality', async ({ page }) => {\n  5 |     await page.goto('/timeline', { waitUntil: 'networkidle' });\n> 6 |     await page.waitForSelector('[data-testid=\"timeline\"], .timeline, #timeline', { timeout: 10000 });\n    |                ^\n  7 |\n  8 |     // Screenshot initial timeline state\n  9 |     await page.screenshot({ path: 'demo-screenshots/timeline-initial.png' });\n    at /workspaces/Open-Higgsfield-AI/tests/e2e/demo/04-timeline-engine.spec.ts:6:16"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-04-21T07:39:35.105Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/workspaces/Open-Higgsfield-AI/test-results/demo-04-timeline-engine-De-01dd9-rate-timeline-functionality-demo-videos-with-server/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/workspaces/Open-Higgsfield-AI/test-results/demo-04-timeline-engine-De-01dd9-rate-timeline-functionality-demo-videos-with-server/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/workspaces/Open-Higgsfield-AI/test-results/demo-04-timeline-engine-De-01dd9-rate-timeline-functionality-demo-videos-with-server/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/workspaces/Open-Higgsfield-AI/tests/e2e/demo/04-timeline-engine.spec.ts",
+                        "column": 16,
+                        "line": 6
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "cbbf9849a9cf2deaa2f8-35e564e116ebc2cc13b4",
+              "file": "demo/04-timeline-engine.spec.ts",
+              "line": 4,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "modules/cinegen-integration.spec.js",
+      "file": "modules/cinegen-integration.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "CineGen Module Integration",
+          "file": "modules/cinegen-integration.spec.js",
+          "line": 3,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should integrate with main app timeline",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "modules-chromium",
+                  "projectName": "modules-chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 11429,
+                      "error": {
+                        "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"app-shell\"]') to be visible\u001b[22m\n",
+                        "stack": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"app-shell\"]') to be visible\u001b[22m\n\n    at /workspaces/Open-Higgsfield-AI/tests/e2e/modules/cinegen-integration.spec.js:7:16",
+                        "location": {
+                          "file": "/workspaces/Open-Higgsfield-AI/tests/e2e/modules/cinegen-integration.spec.js",
+                          "column": 16,
+                          "line": 7
+                        },
+                        "snippet": "   5 |     // Navigate to main app\n   6 |     await page.goto('/');\n>  7 |     await page.waitForSelector('[data-testid=\"app-shell\"]');\n     |                ^\n   8 |\n   9 |     // Access CineGen through apps hub\n  10 |     await page.click('[data-route=\"apps\"]');"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/workspaces/Open-Higgsfield-AI/tests/e2e/modules/cinegen-integration.spec.js",
+                            "column": 16,
+                            "line": 7
+                          },
+                          "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"app-shell\"]') to be visible\u001b[22m\n\n\n   5 |     // Navigate to main app\n   6 |     await page.goto('/');\n>  7 |     await page.waitForSelector('[data-testid=\"app-shell\"]');\n     |                ^\n   8 |\n   9 |     // Access CineGen through apps hub\n  10 |     await page.click('[data-route=\"apps\"]');\n    at /workspaces/Open-Higgsfield-AI/tests/e2e/modules/cinegen-integration.spec.js:7:16"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-04-21T07:39:47.875Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/workspaces/Open-Higgsfield-AI/test-results/modules-cinegen-integratio-80bc7-rate-with-main-app-timeline-modules-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/workspaces/Open-Higgsfield-AI/test-results/modules-cinegen-integratio-80bc7-rate-with-main-app-timeline-modules-chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/workspaces/Open-Higgsfield-AI/test-results/modules-cinegen-integratio-80bc7-rate-with-main-app-timeline-modules-chromium/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/workspaces/Open-Higgsfield-AI/tests/e2e/modules/cinegen-integration.spec.js",
+                        "column": 16,
+                        "line": 7
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "d4c4dab4850ff55ed333-1a0bcc63895b5b897009",
+              "file": "modules/cinegen-integration.spec.js",
+              "line": 4,
+              "column": 3
+            },
+            {
+              "title": "should handle timeline migration workflows",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "modules-chromium",
+                  "projectName": "modules-chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 11324,
+                      "error": {
+                        "message": "TimeoutError: page.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"new-project-btn\"]')\u001b[22m\n",
+                        "stack": "TimeoutError: page.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"new-project-btn\"]')\u001b[22m\n\n    at /workspaces/Open-Higgsfield-AI/tests/e2e/modules/cinegen-integration.spec.js:35:16",
+                        "location": {
+                          "file": "/workspaces/Open-Higgsfield-AI/tests/e2e/modules/cinegen-integration.spec.js",
+                          "column": 16,
+                          "line": 35
+                        },
+                        "snippet": "  33 |     // Create timeline project\n  34 |     await page.goto('/#/timeline');\n> 35 |     await page.click('[data-testid=\"new-project-btn\"]');\n     |                ^\n  36 |     await page.fill('[data-testid=\"project-name\"]', 'CineGen Test Project');\n  37 |\n  38 |     // Add some basic clips"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/workspaces/Open-Higgsfield-AI/tests/e2e/modules/cinegen-integration.spec.js",
+                            "column": 16,
+                            "line": 35
+                          },
+                          "message": "TimeoutError: page.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"new-project-btn\"]')\u001b[22m\n\n\n  33 |     // Create timeline project\n  34 |     await page.goto('/#/timeline');\n> 35 |     await page.click('[data-testid=\"new-project-btn\"]');\n     |                ^\n  36 |     await page.fill('[data-testid=\"project-name\"]', 'CineGen Test Project');\n  37 |\n  38 |     // Add some basic clips\n    at /workspaces/Open-Higgsfield-AI/tests/e2e/modules/cinegen-integration.spec.js:35:16"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-04-21T07:40:00.778Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/workspaces/Open-Higgsfield-AI/test-results/modules-cinegen-integratio-69ed9-imeline-migration-workflows-modules-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/workspaces/Open-Higgsfield-AI/test-results/modules-cinegen-integratio-69ed9-imeline-migration-workflows-modules-chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/workspaces/Open-Higgsfield-AI/test-results/modules-cinegen-integratio-69ed9-imeline-migration-workflows-modules-chromium/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/workspaces/Open-Higgsfield-AI/tests/e2e/modules/cinegen-integration.spec.js",
+                        "column": 16,
+                        "line": 35
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "d4c4dab4850ff55ed333-66586768aac6d8ff5844",
+              "file": "modules/cinegen-integration.spec.js",
+              "line": 32,
+              "column": 3
+            }
+          ]
+        }
+      ]
     }
   ],
+  "errors": [],
   "stats": {
-    "startTime": "2026-04-18T19:53:32.882Z",
-    "duration": 2202.123,
+    "startTime": "2026-04-21T07:39:00.653Z",
+    "duration": 71724.816,
     "expected": 0,
     "skipped": 0,
-    "unexpected": 0,
+    "unexpected": 4,
     "flaky": 0
   }
 }
