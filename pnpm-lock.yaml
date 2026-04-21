@@ -97,18 +97,30 @@ importers:
         specifier: ^18.2.0
         version: 18.3.1(react@18.3.1)
     devDependencies:
+      '@testing-library/jest-dom':
+        specifier: ^6.9.1
+        version: 6.9.1
+      '@testing-library/react':
+        specifier: ^16.3.2
+        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@vitejs/plugin-react':
         specifier: ^4.3.2
         version: 4.7.0(vite@5.4.21(@types/node@25.6.0)(lightningcss@1.32.0)(terser@5.46.1))
       autoprefixer:
         specifier: ^10.4.20
         version: 10.5.0(postcss@8.5.10)
+      jsdom:
+        specifier: ^29.0.1
+        version: 29.0.2(canvas@3.2.3)
       tailwindcss:
         specifier: ^4.1.18
         version: 4.2.2
       vite:
         specifier: ^5.4.8
         version: 5.4.21(@types/node@25.6.0)(lightningcss@1.32.0)(terser@5.46.1)
+      vitest:
+        specifier: ^1.0.0
+        version: 1.6.1(@types/node@25.6.0)(@vitest/ui@1.6.1)(jsdom@29.0.2(canvas@3.2.3))(lightningcss@1.32.0)(terser@5.46.1)
 
   apps/remix-go:
     dependencies:
@@ -8136,6 +8148,16 @@ snapshots:
       dom-accessibility-api: 0.6.3
       picocolors: 1.1.1
       redent: 3.0.0
+
+  '@testing-library/react@16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@babel/runtime': 7.29.2
+      '@testing-library/dom': 10.4.1
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+    optionalDependencies:
+      '@types/react': 19.2.14
+      '@types/react-dom': 19.2.3(@types/react@19.2.14)
 
   '@testing-library/react@16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
     dependencies:
