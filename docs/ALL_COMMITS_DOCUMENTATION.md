@@ -2,9 +2,9 @@
 
 This document records the full commit history for the `Open-Higgsfield-AI` repository.
 
-- Generated on: 2026-04-10
+- Generated on: 2026-04-23
 - Source: `git log --reverse --pretty=format:'- %ad | %h | %an | %s' --date=short`
-- Total commits at generation time: 194
+- Total commits at generation time: 214
 
 ## Complete Commit List
 
@@ -202,6 +202,26 @@ This document records the full commit history for the `Open-Higgsfield-AI` repos
 - 2026-04-10 | e380108 | kiloconnect[bot] | wip
 - 2026-04-10 | cf747e5 | kiloconnect[bot] | wip
 - 2026-04-10 | e86ca83 | Developer | Merge video agent fixes from session
+- 2026-04-17 | e414b3b | Developer | fix: update Netlify build command to skip scripts and avoid lockfile conflicts
+- 2026-04-17 | fc1f251 | Developer | docs: document Netlify deployment lockfile fix in CHANGELOG.md
+- 2026-04-17 | 27a77c7 | Developer | fix: correct invalid TOML syntax in netlify.toml
+- 2026-04-17 | 04d509c | Developer | docs: update CHANGELOG.md with TOML syntax fix
+- 2026-04-17 | c48eb49 | Developer | fix: synchronize pnpm-lock.yaml with all workspace dependencies
+- 2026-04-17 | f564403 | Developer | docs: update CHANGELOG.md with lockfile synchronization fix
+- 2026-04-17 | b01926a | Developer | fix: remove problematic postinstall script from apps/vimax/package.json
+- 2026-04-17 | ce9c804 | Developer | docs: update CHANGELOG.md with postinstall script fix
+- 2026-04-17 | e2737af | Developer | feat: implement comprehensive code hardening
+- 2026-04-17 | 59a1097 | Developer | fix: resolve browser environment compatibility in environment-config.js
+- 2026-04-17 | e6187ea | Developer | docs: update CHANGELOG.md with browser compatibility fix
+- 2026-04-17 | f1597c0 | Developer | docs: add comprehensive production readiness report
+- 2026-04-17 | ce20b4a | Developer | fix: simplify bundle-analyzer.js for browser compatibility
+- 2026-04-17 | 60403d2 | Developer | Fix Netlify deployment by using pnpm consistently in build commands
+- 2026-04-17 | d3d327e | Developer | Remove superpowers submodule and directory
+- 2026-04-17 | 3e5a92c | Developer | Fix 'track is not defined' error in timeline editor
+- 2026-04-18 | 88b8e33 | Developer | Add comprehensive timeline editor testing documentation and test suites
+- 2026-04-21 | 9966923 | Developer | feat: Complete repo integrations & required APIs completion check
+- 2026-04-21 | 1e2d4f8 | Developer | feat: partial AI-VFX app implementation with basic structure
+- 2026-04-21 | 0cd3406 | Developer | feat: complete AI-VFX app implementation using Superpowers methodology
 
 ## Notes
 
