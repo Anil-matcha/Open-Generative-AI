@@ -1,83 +1,84 @@
-// VFX Effects Library for AI-VFX app
-export const vfxEffects = {
-  camera: {
-    title: 'Cinematic Camera Moves',
-    effects: [
-      { id: 'dolly-zoom', name: 'Dolly Zoom', description: 'Classic Hitchcock effect with depth shift' },
-      { id: 'crane-up', name: 'Crane Up', description: 'Rising camera movement' },
-      { id: 'pan-left', name: 'Pan Left', description: 'Horizontal camera pan' },
-      { id: 'pan-right', name: 'Pan Right', description: 'Horizontal camera pan' },
-      { id: 'tilt-up', name: 'Tilt Up', description: 'Vertical camera tilt' },
-      { id: 'tilt-down', name: 'Tilt Down', description: 'Vertical camera tilt' },
-      { id: 'orbit-left', name: 'Orbit Left', description: 'Circular camera movement' },
-      { id: 'orbit-right', name: 'Orbit Right', description: 'Circular camera movement' },
-      { id: 'truck-left', name: 'Truck Left', description: 'Lateral camera movement' },
-      { id: 'truck-right', name: 'Truck Right', description: 'Lateral camera movement' },
-      { id: 'pedestal-up', name: 'Pedestal Up', description: 'Vertical camera rise' },
-      { id: 'pedestal-down', name: 'Pedestal Down', description: 'Vertical camera drop' },
-      { id: 'zoom-in', name: 'Zoom In', description: 'Forward zoom movement' },
-      { id: 'zoom-out', name: 'Zoom Out', description: 'Backward zoom movement' },
-      { id: 'dutch-angle', name: 'Dutch Angle', description: 'Tilted camera angle' },
-      { id: 'rack-focus', name: 'Rack Focus', description: 'Focus plane shift' }
-    ]
-  },
-  vfx: {
-    title: 'Visual Effects',
-    effects: [
-      { id: 'explosion', name: 'Explosion', description: 'Dramatic explosion effect' },
-      { id: 'fire', name: 'Fire', description: 'Realistic fire simulation' },
-      { id: 'smoke', name: 'Smoke', description: 'Dynamic smoke clouds' },
-      { id: 'dust', name: 'Dust', description: 'Particle dust effect' },
-      { id: 'sparks', name: 'Sparks', description: 'Electrical spark effects' },
-      { id: 'lightning', name: 'Lightning', description: 'Thunderbolt effects' },
-      { id: 'water', name: 'Water Splash', description: 'Liquid splash simulation' },
-      { id: 'glass-shatter', name: 'Glass Shatter', description: 'Breaking glass effect' },
-      { id: 'metal-debris', name: 'Metal Debris', description: 'Flying metal fragments' },
-      { id: 'energy-wave', name: 'Energy Wave', description: 'Shockwave distortion' },
-      { id: 'portal', name: 'Portal', description: 'Sci-fi portal effect' },
-      { id: 'force-field', name: 'Force Field', description: 'Energy barrier' },
-      { id: 'hologram', name: 'Hologram', description: 'Digital projection' },
-      { id: 'matrix-code', name: 'Matrix Code', description: 'Falling code effect' },
-      { id: 'particle-field', name: 'Particle Field', description: 'Ambient particles' },
-      { id: 'chroma-shift', name: 'Chroma Shift', description: 'Color distortion' }
-    ]
-  },
-  ai: {
-    title: 'AI Effects',
-    effects: [
-      { id: 'venom', name: 'Venom', description: 'Symbiote transformation' },
-      { id: 'hulk', name: 'Hulk', description: 'Muscle expansion effect' },
-      { id: 'wolverine', name: 'Wolverine', description: 'Healing regeneration' },
-      { id: 'deadpool', name: 'Deadpool', description: 'Fourth wall break' },
-      { id: 'iron-man', name: 'Iron Man', description: 'Armor transformation' },
-      { id: 'captain-america', name: 'Captain America', description: 'Superhero pose' },
-      { id: 'thor', name: 'Thor', description: 'Godly transformation' },
-      { id: 'loki', name: 'Loki', description: 'Shape-shifting illusion' },
-      { id: 'black-widow', name: 'Black Widow', description: 'Stealth movement' },
-      { id: 'hawkeye', name: 'Hawkeye', description: 'Precision targeting' },
-      { id: 'scarlet-witch', name: 'Scarlet Witch', description: 'Reality warping' },
-      { id: 'vision', name: 'Vision', description: 'Intangibility effect' },
-      { id: 'ant-man', name: 'Ant-Man', description: 'Size manipulation' },
-      { id: 'wasp', name: 'Wasp', description: 'Flight and shrinking' },
-      { id: 'falcon', name: 'Falcon', description: 'Wing deployment' },
-      { id: 'winter-soldier', name: 'Winter Soldier', description: 'Mechanical arm' }
-    ]
-  }
+export const EFFECT_CATEGORIES = {
+  CAMERA_MOVES: 'camera_moves',
+  VISUAL_EFFECTS: 'visual_effects',
+  AI_EFFECTS: 'ai_effects'
 };
 
-export const getEffectById = (effectId) => {
-  for (const category of Object.values(vfxEffects)) {
-    const effect = category.effects.find(e => e.id === effectId);
-    if (effect) return effect;
-  }
-  return null;
-};
+export const EFFECTS = [
+  // Cinematic Camera Moves - Orbit Shots
+  { id: '360-orbit', name: '360 Orbit', category: EFFECT_CATEGORIES.CAMERA_MOVES, description: 'Full 360 degree orbit around subject' },
+  { id: 'arc-shot', name: 'Arc Shot', category: EFFECT_CATEGORIES.CAMERA_MOVES, description: 'Camera arcs around the subject' },
+  { id: 'hero-run', name: 'Hero Run', category: EFFECT_CATEGORIES.CAMERA_MOVES, description: 'Dynamic hero shot with running camera' },
 
-export const getAllEffects = () => {
-  return Object.values(vfxEffects).flatMap(category =>
-    category.effects.map(effect => ({
-      ...effect,
-      category: category.title
-    }))
-  );
-};
+  // Cinematic Camera Moves - Zoom Effects
+  { id: 'crash-zoom-in', name: 'Crash Zoom In', category: EFFECT_CATEGORIES.CAMERA_MOVES, description: 'Sudden dramatic zoom into subject' },
+  { id: 'crash-zoom-out', name: 'Crash Zoom Out', category: EFFECT_CATEGORIES.CAMERA_MOVES, description: 'Sudden dramatic zoom out from subject' },
+  { id: 'dolly-in', name: 'Dolly In', category: EFFECT_CATEGORIES.CAMERA_MOVES, description: 'Smooth push into subject' },
+  { id: 'dolly-out', name: 'Dolly Out', category: EFFECT_CATEGORIES.CAMERA_MOVES, description: 'Smooth pull away from subject' },
+
+  // Cinematic Camera Moves - Crane Movements
+  { id: 'crane-up', name: 'Crane Up', category: EFFECT_CATEGORIES.CAMERA_MOVES, description: 'Rising crane shot' },
+  { id: 'crane-down', name: 'Crane Down', category: EFFECT_CATEGORIES.CAMERA_MOVES, description: 'Descending crane shot' },
+  { id: 'overhead-crane', name: 'Overhead Crane', category: EFFECT_CATEGORIES.CAMERA_MOVES, description: 'Birdseye overhead crane movement' },
+
+  // Cinematic Camera Moves - Dynamic Shots
+  { id: 'matrix-shot', name: 'Matrix Shot', category: EFFECT_CATEGORIES.CAMERA_MOVES, description: 'Bullet time effect' },
+  { id: 'car-chase', name: 'Car Chase', category: EFFECT_CATEGORIES.CAMERA_MOVES, description: 'Dynamic car chase camera movement' },
+  { id: 'vertigo-effect', name: 'Vertigo Effect', category: EFFECT_CATEGORIES.CAMERA_MOVES, description: 'Dolly zoom effect' },
+  { id: 'spinning-orbit', name: 'Spinning Orbit', category: EFFECT_CATEGORIES.CAMERA_MOVES, description: 'Spin while orbiting subject' },
+  { id: 'tracking-shot', name: 'Tracking Shot', category: EFFECT_CATEGORIES.CAMERA_MOVES, description: 'Side tracking movement' },
+  { id: 'pedestal-shot', name: 'Pedestal Shot', category: EFFECT_CATEGORIES.CAMERA_MOVES, description: 'Vertical pedestal movement' },
+  { id: 'handheld', name: 'Handheld', category: EFFECT_CATEGORIES.CAMERA_MOVES, description: 'Shaky handheld camera effect' },
+  { id: 'steady-cam', name: 'Steady Cam', category: EFFECT_CATEGORIES.CAMERA_MOVES, description: 'Smooth steady cam movement' },
+  { id: 'drone-shot', name: 'Drone Shot', category: EFFECT_CATEGORIES.CAMERA_MOVES, description: 'Aerial drone movement' },
+  { id: 'parallax', name: 'Parallax Effect', category: EFFECT_CATEGORIES.CAMERA_MOVES, description: '3D parallax depth effect' },
+
+  // Visual Effects - Destruction
+  { id: 'disintegration', name: 'Disintegration', category: EFFECT_CATEGORIES.VISUAL_EFFECTS, description: 'Subject disintegrates into particles' },
+  { id: 'decay-time-lapse', name: 'Decay Time-Lapse', category: EFFECT_CATEGORIES.VISUAL_EFFECTS, description: 'Time-lapse decay effect' },
+  { id: 'building-explosion', name: 'Building Explosion', category: EFFECT_CATEGORIES.VISUAL_EFFECTS, description: 'Building demolition explosion' },
+  { id: 'car-explosion', name: 'Car Explosion', category: EFFECT_CATEGORIES.VISUAL_EFFECTS, description: 'Vehicle explosion effect' },
+  { id: 'huge-explosion', name: 'Huge Explosion', category: EFFECT_CATEGORIES.VISUAL_EFFECTS, description: 'Massive explosion' },
+  { id: 'debris-scatter', name: 'Debris Scatter', category: EFFECT_CATEGORIES.VISUAL_EFFECTS, description: 'Debris flying outward' },
+
+  // Visual Effects - Elements
+  { id: 'fire', name: 'Fire', category: EFFECT_CATEGORIES.VISUAL_EFFECTS, description: 'Fiery flames engulfing subject' },
+  { id: 'electricity', name: 'Electricity', category: EFFECT_CATEGORIES.VISUAL_EFFECTS, description: 'Lightning and electric effects' },
+  { id: 'tornado', name: 'Tornado', category: EFFECT_CATEGORIES.VISUAL_EFFECTS, description: 'Tornado vortex effect' },
+  { id: 'tsunami', name: 'Tsunami', category: EFFECT_CATEGORIES.VISUAL_EFFECTS, description: 'Massive wave effect' },
+  { id: 'lightning', name: 'Lightning Strike', category: EFFECT_CATEGORIES.VISUAL_EFFECTS, description: 'Dramatic lightning bolts' },
+  { id: 'water-flood', name: 'Water Flood', category: EFFECT_CATEGORIES.VISUAL_EFFECTS, description: 'Rushing water effect' },
+  { id: 'magma', name: 'Magma Flow', category: EFFECT_CATEGORIES.VISUAL_EFFECTS, description: 'Molten lava pouring' },
+  { id: 'ice-crystals', name: 'Ice Crystals', category: EFFECT_CATEGORIES.VISUAL_EFFECTS, description: 'Freezing ice effect' },
+  { id: 'wind-force', name: 'Wind Force', category: EFFECT_CATEGORIES.VISUAL_EFFECTS, description: 'Powerful wind effect' },
+
+  // Visual Effects - Supernatural
+  { id: 'levitate', name: 'Levitate', category: EFFECT_CATEGORIES.VISUAL_EFFECTS, description: 'Subject floating upward' },
+  { id: 'flying', name: 'Flying', category: EFFECT_CATEGORIES.VISUAL_EFFECTS, description: 'Subject flying through air' },
+  { id: 'invisibility', name: 'Invisibility', category: EFFECT_CATEGORIES.VISUAL_EFFECTS, description: 'Subject becoming invisible' },
+  { id: 'tentacles', name: 'Tentacles', category: EFFECT_CATEGORIES.VISUAL_EFFECTS, description: 'Tentacle emergence effect' },
+  { id: 'ghost-form', name: 'Ghost Form', category: EFFECT_CATEGORIES.VISUAL_EFFECTS, description: 'Ethereal ghost transformation' },
+  { id: 'telekinesis', name: 'Telekinesis', category: EFFECT_CATEGORIES.VISUAL_EFFECTS, description: 'Objects moving by thought' },
+  { id: 'portal', name: 'Portal Opening', category: EFFECT_CATEGORIES.VISUAL_EFFECTS, description: 'Dimensional portal effect' },
+  { id: 'soul-extraction', name: 'Soul Extraction', category: EFFECT_CATEGORIES.VISUAL_EFFECTS, description: 'Soul being pulled from body' },
+
+  // Visual Effects - Transformations
+  { id: 'robotic-face', name: 'Robotic Face Reveal', category: EFFECT_CATEGORIES.VISUAL_EFFECTS, description: 'Face transforming to robot' },
+  { id: 'turning-metal', name: 'Turning Metal', category: EFFECT_CATEGORIES.VISUAL_EFFECTS, description: 'Body turning into metal' },
+  { id: 'crystalization', name: 'Crystalization', category: EFFECT_CATEGORIES.VISUAL_EFFECTS, description: 'Body turning to crystal' },
+  { id: 'cyberpunk', name: 'Cyberpunk', category: EFFECT_CATEGORIES.VISUAL_EFFECTS, description: 'Cyberpunk transformation' },
+  { id: 'aging', name: 'Aging Effect', category: EFFECT_CATEGORIES.VISUAL_EFFECTS, description: 'Rapid aging effect' },
+  { id: 'morphing', name: 'Morphing', category: EFFECT_CATEGORIES.VISUAL_EFFECTS, description: 'Shape-shifting morph effect' },
+  { id: 'glitch', name: 'Glitch Effect', category: EFFECT_CATEGORIES.VISUAL_EFFECTS, description: 'Digital glitch distortion' },
+  { id: 'time-freeze', name: 'Time Freeze', category: EFFECT_CATEGORIES.VISUAL_EFFECTS, description: 'Time stopping effect' },
+  { id: 'time-reverse', name: 'Time Reverse', category: EFFECT_CATEGORIES.VISUAL_EFFECTS, description: 'Reverse time effect' },
+  { id: 'slow-motion', name: 'Slow Motion', category: EFFECT_CATEGORIES.VISUAL_EFFECTS, description: 'Cinematic slow motion' },
+
+  // AI Effects
+  { id: 'kiss-me-ai', name: 'Kiss Me AI', category: EFFECT_CATEGORIES.AI_EFFECTS, description: 'Romantic kiss effect' },
+  { id: 'venom', name: 'Venom', category: EFFECT_CATEGORIES.AI_EFFECTS, description: 'Venom symbiote transformation' },
+  { id: 'hulk', name: 'Hulk', category: EFFECT_CATEGORIES.AI_EFFECTS, description: 'Hulk transformation' },
+  { id: 'muscle-surge', name: 'Muscle Surge', category: EFFECT_CATEGORIES.AI_EFFECTS, description: 'Muscles bulging effect' },
+  { id: 'tiger-touch', name: 'Tiger Touch', category: EFFECT_CATEGORIES.AI_EFFECTS, description: 'Tiger transformation' },
+  { id: 'dragon-fire', name: 'Dragon Fire', category: EFFECT_CATEGORIES.AI_EFFECTS, description: 'Dragon breath effect' },
+  { id: 'zombie', name: 'Zombie

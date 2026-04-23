@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { vfxEffects } from '../lib/effects.js';
+import { EFFECTS, EFFECT_CATEGORIES, getEffectsByCategory, getAllCategories, getCategoryName } from '../lib/effects.js';
 
 function EffectGrid({ onSelect, selectedEffect }) {
-  const [activeCategory, setActiveCategory] = useState('camera');
+  const [activeCategory, setActiveCategory] = useState(EFFECT_CATEGORIES.CAMERA_MOVES);
 
-  const categories = Object.keys(vfxEffects);
+  const categories = getAllCategories();
 
   return (
     <div className="bg-gray-800 rounded-lg p-6">
@@ -14,22 +14,22 @@ function EffectGrid({ onSelect, selectedEffect }) {
       <div className="flex space-x-2 mb-6 overflow-x-auto">
         {categories.map(category => (
           <button
-            key={category}
-            onClick={() => setActiveCategory(category)}
+            key={category.id}
+            onClick={() => setActiveCategory(category.id)}
             className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
-              activeCategory === category
+              activeCategory === category.id
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
             }`}
           >
-            {vfxEffects[category].title}
+            {category.name} ({category.count})
           </button>
         ))}
       </div>
 
       {/* Effects Grid */}
       <div className="grid grid-cols-2 gap-3 max-h-96 overflow-y-auto">
-        {vfxEffects[activeCategory].effects.map(effect => (
+        {getEffectsByCategory(activeCategory).map(effect => (
           <button
             key={effect.id}
             onClick={() => onSelect(effect)}

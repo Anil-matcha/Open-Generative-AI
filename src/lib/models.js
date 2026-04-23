@@ -116,14 +116,15 @@ export const t2iModels = [
             "weight": {
               "type": "number",
               "title": "Weight",
-              "description": "A list of LoRA models to use for generation. Each item must include an `id` (e.g., \"civitai:1642876@1864626\") and a `weight` between 0 and 4. You can include up to 4 models. The `id` can be found in the Civitai model URL. These models will be applied with the specified weights by the Flux Dev system during image generation.",
+              "description": "Weight value for the LoRA model between 0 and 4.",
               "minValue": 0,
               "maxValue": 4,
               "step": 0.01,
               "default": 1
-      }
-    },
-    "description": "The unique identifier of a LoRA model hosted on Civitai, used by the Flux Dev image generation system. This ID tells Flux Dev which specific LoRA model to apply during generation. You can find the model ID in the Civitai model URL (e.g., model_id: civitai:1642876@1864626).",
+            }
+          }
+        },
+        "description": "A list of LoRA models to use for generation. Each item must include an `id` (e.g., \"civitai:1642876@1864626\") and a `weight` between 0 and 4. You can include up to 4 models. The `id` can be found in the Civitai model URL. These models will be applied with the specified weights by the Flux Dev system during image generation.",
         "maxItems": 4
       },
       "width": {
@@ -2178,7 +2179,6 @@ export const t2vModels = [
       "aspect_ratio": { "enum": ["16:9", "9:16", "1:1"], "title": "Aspect Ratio", "name": "aspect_ratio", "type": "string", "description": "Aspect ratio of the output video.", "default": "16:9" },
       "duration": { "title": "Duration", "name": "duration", "type": "int", "description": "The duration of the generated video in seconds", "default": 5 }
     }
-  }
   },
   {
     "id": "kling-o1-text-to-video",

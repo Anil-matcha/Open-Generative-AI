@@ -5,7 +5,7 @@ import EffectGrid from './EffectGrid.jsx';
 import SettingsPanel from './SettingsPanel.jsx';
 import GenerationProgress from './GenerationProgress.jsx';
 import VideoPlayer from './VideoPlayer.jsx';
-import { muapiVFX } from '../lib/muapi.js';
+import { muAPIClient } from '../lib/muapi.js';
 
 function App() {
   const [apiKey, setApiKey] = useState(localStorage.getItem('muapi_key') || '');
@@ -14,18 +14,26 @@ function App() {
   const [selectedEffect, setSelectedEffect] = useState(null);
   const [settings, setSettings] = useState({
     aspectRatio: '16:9',
-    duration: 3,
-    resolution: '720p',
-    quality: 'standard'
+    duration: 5,
+    resolution: '1080p',
+    quality: 'premium'
   });
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationProgress, setGenerationProgress] = useState(0);
   const [generatedVideo, setGeneratedVideo] = useState(null);
   const [error, setError] = useState(null);
 
+  // Initialize API client on mount
+  useEffect(() => {
+    if (apiKey) {
+      muAPIClient.setApiKey(apiKey);
+    }
+  }, [apiKey]);
+
   const handleApiKeySubmit = (key) => {
     setApiKey(key);
-    muapiVFX.setApiKey(key);
+    muAPIClient.setApiKey(key);
+    muAPIClient.saveApiKey();
     setShowApiKeyModal(false);
   };
 
@@ -59,41 +67,31 @@ function App() {
     setError(null);
 
     try {
-      // Upload image first
-      const uploadResult = await muapiVFX.uploadFile(uploadedImage.file);
-      const imageUrl = uploadResult.url;
-
-      // Start generation
+      // Start generation with image URL and effect
       const generationParams = {
-        image_url: imageUrl,
-        effect_type: selectedEffect.id,
-        aspect_ratio: settings.aspectRatio,
+        imageUrl: uploadedImage.url || uploadedImage.preview,
+        effect: selectedEffect.id,
+        aspectRatio: settings.aspectRatio,
         duration: settings.duration,
         resolution: settings.resolution,
         quality: settings.quality
       };
 
-      const result = await muapiVFX.generateVFXEffect(generationParams);
+      const result = await muAPIClient.generateVFX(generationParams);
 
-      // Poll for completion
-      const pollInterval = setInterval(async () => {
-        try {
-          const status = await muapiVFX.checkGenerationStatus(result.request_id);
+      // Poll for completion with progress updates
+      await muAPIClient.pollForCompletion(result.requestId, {
+        onProgress: (status) => {
           setGenerationProgress(status.progress || 0);
+        },
+        interval: 3000, // Check every 3 seconds
+        timeout: 300000 // 5 minute timeout
+      });
 
-          if (status.status === 'completed') {
-            clearInterval(pollInterval);
-            setGeneratedVideo(status.video_url);
-            setIsGenerating(false);
-          } else if (status.status === 'failed') {
-            clearInterval(pollInterval);
-            setError('Generation failed. Please try again.');
-            setIsGenerating(false);
-          }
-        } catch (err) {
-          console.error('Status check error:', err);
-        }
-      }, 2000);
+      // If we get here, generation completed successfully
+      const finalStatus = await muAPIClient.checkStatus(result.requestId);
+      setGeneratedVideo(finalStatus.videoUrl);
+      setIsGenerating(false);
 
     } catch (err) {
       setError(err.message);

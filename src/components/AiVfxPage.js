@@ -6,7 +6,7 @@ export function AiVfxPage() {
 
   // Loading state
   const loadingContainer = document.createElement('div');
-  loadingContainer.className = 'absolute inset-0 flex items-center justify-center bg-gray-50 z-10';
+  loadingContainer.className = 'absolute inset-0 flex items-center justify-center bg-panel-bg z-10';
   loadingContainer.innerHTML = `
     <div class="text-center">
       <div class="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
@@ -17,7 +17,7 @@ export function AiVfxPage() {
 
   // Error state container
   const errorContainer = document.createElement('div');
-  errorContainer.className = 'absolute inset-0 flex items-center justify-center bg-gray-50 z-10 hidden';
+  errorContainer.className = 'absolute inset-0 flex items-center justify-center bg-panel-bg z-10 hidden';
   errorContainer.innerHTML = `
     <div class="text-center max-w-md mx-auto p-6">
       <div class="text-red-500 mb-4">
@@ -27,9 +27,9 @@ export function AiVfxPage() {
           <line x1="9" y1="9" x2="15" y2="15"/>
         </svg>
       </div>
-      <h3 class="text-lg font-semibold mb-2">AI-VFX Studio Unavailable</h3>
+      <h3 class="text-lg font-semibold mb-2 text-white">AI-VFX Studio Unavailable</h3>
       <p class="text-secondary mb-4">The AI-VFX application is currently unavailable. Please try again later.</p>
-      <button class="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90 transition-colors" onclick="location.reload()">
+      <button class="bg-primary text-black px-4 py-2 rounded hover:bg-primary/90 transition-colors font-medium" onclick="location.reload()">
         Try Again
       </button>
     </div>
