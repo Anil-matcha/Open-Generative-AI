@@ -23,7 +23,6 @@ export class I18nService {
     // Setup locale change listeners
     this.setupListeners();
 
-    console.log('[I18nService] Initialized with locale:', this.currentLocale);
   }
 
   /**
@@ -94,7 +93,6 @@ export class I18nService {
       }
 
       this.isLoaded = true;
-      console.log('[I18nService] Loaded locale:', locale);
     } catch (error) {
       console.warn(`[I18nService] Failed to load locale ${locale}:`, error);
 
@@ -127,7 +125,6 @@ export class I18nService {
       detail: { locale }
     }));
 
-    console.log('[I18nService] Changed locale to:', locale);
   }
 
   /**

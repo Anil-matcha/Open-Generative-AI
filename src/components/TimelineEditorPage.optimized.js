@@ -87,7 +87,6 @@ const lazyLoadTracker = {
   loads: new Map(),
   trackLoad(name, startTime) {
     const duration = Date.now() - startTime;
-    console.log(`[Lazy Load] ${name} loaded in ${duration}ms`);
     this.loads.set(name, duration);
   }
 };

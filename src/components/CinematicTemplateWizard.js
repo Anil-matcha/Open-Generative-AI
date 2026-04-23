@@ -178,7 +178,6 @@ export function CinematicTemplateWizard(template, onComplete, onBack) {
     };
     
     const generateContent = () => {
-      console.log('Generating content with inputs:', inputs);
       // TODO: Implement content generation
     };
 

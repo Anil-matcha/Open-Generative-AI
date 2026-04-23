@@ -96,13 +96,11 @@ class CutAIClient {
 
   async updateScene(sceneId, data) {
     // Simple update - in real implementation would persist to database
-    console.log('Updating scene:', sceneId, data);
     return { success: true };
   }
 
   async updateShot(shotId, data) {
     // Simple update - in real implementation would persist to database
-    console.log('Updating shot:', shotId, data);
     return { success: true };
   }
 

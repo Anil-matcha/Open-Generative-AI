@@ -288,7 +288,6 @@ export function initializePerformanceHardening() {
   // Preload critical resources
   bundleOptimizer.preloadCriticalResources();
 
-  console.log('[Performance] Initialized performance hardening system');
 
   return {
     lazyLoader,

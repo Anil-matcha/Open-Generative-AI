@@ -310,7 +310,6 @@ class RuntimePlatformManager extends BaseCategoryManager {
 
   handleComponentRegistration(componentName, component) {
     // Handle runtime/platform component integration
-    console.log(`Runtime/Platform component registered: ${componentName}`);
   }
 }
 
@@ -321,7 +320,6 @@ class RouteEntryManager extends BaseCategoryManager {
 
   handleComponentRegistration(componentName, component) {
     // Handle route/screen entry component integration
-    console.log(`Route/Entry component registered: ${componentName}`);
   }
 }
 
@@ -332,7 +330,6 @@ class EditorSurfacesManager extends BaseCategoryManager {
 
   handleModalOpened(data) {
     // Handle editor surface modal interactions
-    console.log(`Editor surface modal opened: ${data.modalName}`);
   }
 }
 
@@ -343,7 +340,6 @@ class TimelineEngineManager extends BaseCategoryManager {
 
   handleStateChange(stateChange) {
     // Handle timeline engine state changes
-    console.log('Timeline engine state changed:', stateChange);
   }
 }
 
@@ -354,7 +350,6 @@ class StateLayerManager extends BaseCategoryManager {
 
   handleStateChange(stateChange) {
     // Synchronize state layer changes
-    console.log('State layer synchronized:', stateChange);
   }
 }
 
@@ -365,7 +360,6 @@ class ToolbarControlsManager extends BaseCategoryManager {
 
   handleComponentRegistration(componentName, component) {
     // Integrate toolbar controls
-    console.log(`Toolbar control registered: ${componentName}`);
   }
 }
 
@@ -376,7 +370,6 @@ class MediaIngestManager extends BaseCategoryManager {
 
   handleComponentRegistration(componentName, component) {
     // Handle media ingest component integration
-    console.log(`Media ingest component registered: ${componentName}`);
   }
 }
 
@@ -387,7 +380,6 @@ class LibraryBrowsingManager extends BaseCategoryManager {
 
   handleComponentRegistration(componentName, component) {
     // Handle library browsing component integration
-    console.log(`Library browsing component registered: ${componentName}`);
   }
 }
 
@@ -398,7 +390,6 @@ class SettingsInspectorManager extends BaseCategoryManager {
 
   handleComponentRegistration(componentName, component) {
     // Handle settings/inspector component integration
-    console.log(`Settings/Inspector component registered: ${componentName}`);
   }
 }
 
@@ -409,12 +400,10 @@ class ModalsWorkflowsManager extends BaseCategoryManager {
 
   handleModalOpened(data) {
     // Track modal workflow state
-    console.log(`Modal workflow opened: ${data.modalName}`);
   }
 
   handleModalClosed(data) {
     // Handle modal workflow completion
-    console.log(`Modal workflow closed: ${data.modalName}`);
   }
 }
 
@@ -425,7 +414,6 @@ class ImageEditingManager extends BaseCategoryManager {
 
   handleComponentRegistration(componentName, component) {
     // Handle image editing component integration
-    console.log(`Image editing component registered: ${componentName}`);
   }
 }
 
@@ -436,7 +424,6 @@ class ThumbnailGraphicsManager extends BaseCategoryManager {
 
   handleComponentRegistration(componentName, component) {
     // Handle thumbnail/graphics component integration
-    console.log(`Thumbnail/graphics component registered: ${componentName}`);
   }
 }
 
@@ -447,7 +434,6 @@ class FormInfrastructureManager extends BaseCategoryManager {
 
   handleComponentRegistration(componentName, component) {
     // Handle form/infrastructure component integration
-    console.log(`Form/Infrastructure component registered: ${componentName}`);
   }
 }
 
@@ -458,7 +444,6 @@ class PublisherDistributionManager extends BaseCategoryManager {
 
   handleComponentRegistration(componentName, component) {
     // Handle publisher/distribution component integration
-    console.log(`Publisher/Distribution component registered: ${componentName}`);
   }
 }
 

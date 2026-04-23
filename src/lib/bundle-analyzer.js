@@ -14,7 +14,6 @@ export class BundleAnalyzer {
 
   async analyzeBundles() {
     // Bundle analysis disabled in browser environment
-    console.log('[Bundle Analysis] Analysis not available in browser environment');
     return null;
   }
 
@@ -61,10 +60,7 @@ export class BundleAnalyzer {
     if (hasViolations) {
       console.warn('[Bundle Analysis] Budget violations detected:');
       report.violations.forEach(v => console.warn(`  - ${v.message}`));
-      console.log('[Bundle Analysis] Recommendations:');
-      report.recommendations.forEach(r => console.log(`  - ${r}`));
     } else {
-      console.log('[Bundle Analysis] All bundles within budget ✓');
     }
 
     return !hasViolations;

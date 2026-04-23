@@ -64,7 +64,6 @@ export const useSocketStore = (userId, userName) => {
       socketRef.current = new WebSocket(wsUrl);
 
       socketRef.current.onopen = () => {
-        console.log('WebSocket connected');
         setState(prev => ({
           ...prev,
           isConnected: true,
@@ -96,7 +95,6 @@ export const useSocketStore = (userId, userName) => {
       };
 
       socketRef.current.onclose = () => {
-        console.log('WebSocket disconnected');
         setState(prev => ({ ...prev, isConnected: false }));
 
         // Clear heartbeat
@@ -230,7 +228,6 @@ export const useSocketStore = (userId, userName) => {
         break;
 
       default:
-        console.log('Unknown message type:', type);
     }
   }, []);
 

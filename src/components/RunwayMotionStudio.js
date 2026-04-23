@@ -582,7 +582,6 @@ export function RunwayMotionStudio() {
       }]);
 
       // Handle successful generation
-      console.log('Motion effects applied:', result);
 
       // Show success message
       const successToast = document.createElement('div');

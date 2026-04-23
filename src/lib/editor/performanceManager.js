@@ -50,7 +50,6 @@ export class PerformanceManager {
       }
     }
 
-    console.log('Hardware capabilities detected:', {
       webGL: this.webGLSupported,
       webGL2: this.webGL2Supported,
       cores: this.hardwareConcurrency,
@@ -368,7 +367,6 @@ export class PerformanceManager {
     // Clear render cache
     this.renderQueue.clear();
     this.updateCacheUsage(0);
-    console.log('Render cache cleared');
   }
 
   updateCacheUsage(usage) {
@@ -382,9 +380,7 @@ export class PerformanceManager {
     // Force garbage collection if available
     if (window.gc) {
       window.gc();
-      console.log('Garbage collection forced');
     } else {
-      console.log('Garbage collection not available');
     }
     this.updateMemoryStats();
   }

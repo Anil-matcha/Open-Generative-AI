@@ -347,7 +347,6 @@ class PerformanceMonitor {
 
         // Log in development
         if (import.meta.env.DEV) {
-            console.log(`[Performance] Page "${pageName}" loaded in ${duration.toFixed(2)}ms`);
         }
     }
 
@@ -416,7 +415,6 @@ class PerformanceMonitor {
 
         // Log in development
         if (import.meta.env.DEV) {
-            console.log(`[Performance] Metric "${name}":`, value, metadata);
         }
     }
 
@@ -444,7 +442,6 @@ class PerformanceMonitor {
 
         // Log in development
         if (import.meta.env.DEV) {
-            console.log(`[Performance] Event "${name}":`, metadata);
         }
     }
 

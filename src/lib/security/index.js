@@ -219,12 +219,10 @@ export function initializeSecurity() {
   enforceHTTPS();
   setupCSPViolationReporting();
   const envStatus = validateEnvironment();
-  
-  console.log('[Security] Initialized:', {
+
+  return {
     https: document.location.protocol === 'https:',
     csp: 'Enabled',
     environment: envStatus
-  });
-  
-  return envStatus;
+  };
 }

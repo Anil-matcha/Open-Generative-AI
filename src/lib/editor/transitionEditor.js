@@ -402,7 +402,6 @@ export class TransitionEditor {
     if (!name) return;
 
     // In a real implementation, this would save to localStorage or a backend
-    console.log('Saving preset:', { name, transition: this.currentTransition.key, params: this.currentParams });
     alert(`Preset "${name}" saved!`);
   }
 

@@ -33,7 +33,6 @@ export class MonitoringService {
     // Set up performance observer
     this.setupPerformanceObserver();
     
-    console.log('[MonitoringService] Initialized');
   }
 
   /**
@@ -379,7 +378,6 @@ export class MonitoringService {
       userActions: [],
       apiCalls: []
     };
-    console.log('[MonitoringService] Data cleared');
   }
 
   /**
@@ -388,7 +386,6 @@ export class MonitoringService {
    */
   configure(config) {
     this.config = { ...this.config, ...config };
-    console.log('[MonitoringService] Configuration updated:', this.config);
   }
 }
 

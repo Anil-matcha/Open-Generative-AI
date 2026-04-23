@@ -196,18 +196,15 @@ export class TemplatePreviewModal extends BaseModal {
 
   playPreview() {
     // Template preview playback logic
-    console.log('Playing template preview...');
   }
 
   editTemplate() {
     // Open template editor
-    console.log('Opening template editor...');
     this.close();
   }
 
   useTemplate() {
     // Use this template
-    console.log('Using template...');
     this.close();
   }
 }

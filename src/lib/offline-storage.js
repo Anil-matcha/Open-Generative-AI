@@ -35,7 +35,6 @@ export class OfflineStorageService {
 
       request.onsuccess = (event) => {
         this.db = event.target.result;
-        console.log('[OfflineStorage] Database initialized successfully');
         resolve();
       };
 

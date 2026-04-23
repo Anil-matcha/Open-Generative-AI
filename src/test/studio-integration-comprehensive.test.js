@@ -386,7 +386,6 @@ describe('Studio Components Integration Tests', () => {
       expect(imageResult.images).toHaveLength(1);
       expect(audioResult.audio_url).toBeTruthy();
 
-      console.log('✅ Full video production workflow completed successfully');
     });
   });
 });

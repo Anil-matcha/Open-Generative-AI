@@ -109,7 +109,6 @@ export function TemplateCard(template, onClick, onPreview, showActions = true) {
       editBtn.onclick = (e) => {
         e.stopPropagation();
         // TODO: Implement edit template
-        console.log('Edit template:', template.id);
       };
 
       const deleteBtn = document.createElement('button');
@@ -126,7 +125,6 @@ export function TemplateCard(template, onClick, onPreview, showActions = true) {
       deleteBtn.onclick = (e) => {
         e.stopPropagation();
         // TODO: Implement delete template with confirmation
-        console.log('Delete template:', template.id);
       };
 
       actionsMenu.appendChild(editBtn);

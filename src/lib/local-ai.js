@@ -49,7 +49,6 @@ export class LocalAIService {
       });
 
       this.initialized = true;
-      console.log('[LocalAI] Initialized successfully');
     } catch (error) {
       console.warn('[LocalAI] Initialization failed:', error);
     }
@@ -74,7 +73,7 @@ export class LocalAIService {
     const { prompt, aspect_ratio = '16:9', resolution = '1024x576', quality = 'standard' } = params;
 
     // Use real MuAPI instead of mock canvas generation
-    const { muapi } = await import('./muapi.js');
+    const { muapi } = await import('./muapi-lazy.js');
 
     try {
       const result = await muapi.generateImage({
@@ -110,7 +109,7 @@ export class LocalAIService {
     const { image_url, prompt, strength = 0.6 } = params;
 
     // Use real MuAPI for image-to-image processing
-    const { muapi } = await import('./muapi.js');
+    const { muapi } = await import('./muapi-lazy.js');
 
     try {
       const result = await muapi.generateImage({
@@ -147,7 +146,7 @@ export class LocalAIService {
     const { prompt, duration = 5, aspect_ratio = '16:9', resolution = '1024x576' } = params;
 
     // Use real MuAPI for video generation
-    const { muapi } = await import('./muapi.js');
+    const { muapi } = await import('./muapi-lazy.js');
 
     try {
       const result = await muapi.generateVideo({
@@ -184,7 +183,7 @@ export class LocalAIService {
     const { video_url, action = 'process' } = params;
 
     // Use real MuAPI for video processing
-    const { muapi } = await import('./muapi.js');
+    const { muapi } = await import('./muapi-lazy.js');
 
     try {
       const result = await muapi.processVideo({

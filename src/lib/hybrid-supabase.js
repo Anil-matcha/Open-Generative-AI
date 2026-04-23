@@ -49,7 +49,6 @@ class HybridSupabaseClient {
         const { data, error } = await this.supabase.auth.getSession();
         if (!error) {
           this.connectionState = CONNECTION_STATES.ONLINE;
-          console.log('[HybridSupabase] Connected to Supabase');
           this.triggerSync();
         } else {
           throw error;
@@ -59,7 +58,6 @@ class HybridSupabaseClient {
         this.connectionState = CONNECTION_STATES.OFFLINE;
       }
     } else {
-      console.log('[HybridSupabase] Supabase not configured, using offline mode');
       this.connectionState = CONNECTION_STATES.OFFLINE;
     }
   }
@@ -67,13 +65,11 @@ class HybridSupabaseClient {
   setupNetworkListeners() {
     // Listen for online/offline events
     window.addEventListener('online', () => {
-      console.log('[HybridSupabase] Network online, attempting reconnection');
       this.connectionState = CONNECTION_STATES.RECONNECTING;
       this.attemptReconnection();
     });
 
     window.addEventListener('offline', () => {
-      console.log('[HybridSupabase] Network offline, switching to offline mode');
       this.connectionState = CONNECTION_STATES.OFFLINE;
     });
 
@@ -89,16 +85,13 @@ class HybridSupabaseClient {
     try {
       const { error } = await this.supabase.auth.getSession();
       if (!error && this.connectionState !== CONNECTION_STATES.ONLINE) {
-        console.log('[HybridSupabase] Connectivity restored');
         this.connectionState = CONNECTION_STATES.ONLINE;
         this.triggerSync();
       } else if (error && this.connectionState === CONNECTION_STATES.ONLINE) {
-        console.log('[HybridSupabase] Connection lost');
         this.connectionState = CONNECTION_STATES.OFFLINE;
       }
     } catch (error) {
       if (this.connectionState === CONNECTION_STATES.ONLINE) {
-        console.log('[HybridSupabase] Connection check failed, switching to offline');
         this.connectionState = CONNECTION_STATES.OFFLINE;
       }
     }
@@ -111,14 +104,11 @@ class HybridSupabaseClient {
       const { error } = await this.supabase.auth.getSession();
       if (!error) {
         this.connectionState = CONNECTION_STATES.ONLINE;
-        console.log('[HybridSupabase] Successfully reconnected');
         this.triggerSync();
       } else {
-        console.log('[HybridSupabase] Reconnection failed, staying offline');
         this.connectionState = CONNECTION_STATES.OFFLINE;
       }
     } catch (error) {
-      console.log('[HybridSupabase] Reconnection attempt failed:', error.message);
       this.connectionState = CONNECTION_STATES.OFFLINE;
     }
   }
@@ -138,12 +128,10 @@ class HybridSupabaseClient {
     }
 
     this.syncInProgress = true;
-    console.log('[HybridSupabase] Starting data synchronization');
 
     try {
       await this.syncOfflineData();
       this.lastSyncTime = new Date();
-      console.log('[HybridSupabase] Data synchronization completed');
     } catch (error) {
       console.error('[HybridSupabase] Data synchronization failed:', error);
     } finally {
@@ -203,7 +191,6 @@ class HybridSupabaseClient {
         // Mark as synced locally
         project.synced_at = new Date().toISOString();
         await offlineStorage.saveProject(project);
-        console.log(`[HybridSupabase] Synced project: ${project.name}`);
       }
     } catch (error) {
       console.error('[HybridSupabase] Failed to sync project:', error);
@@ -239,7 +226,6 @@ class HybridSupabaseClient {
           // Mark as synced locally
           media.synced_at = new Date().toISOString();
           await offlineStorage.saveMedia(media, file);
-          console.log(`[HybridSupabase] Synced media: ${media.name}`);
         }
       }
     } catch (error) {
@@ -265,7 +251,6 @@ class HybridSupabaseClient {
         // Mark as synced locally
         generation.synced_at = new Date().toISOString();
         await offlineStorage.saveGeneration(generation);
-        console.log(`[HybridSupabase] Synced generation: ${generation.id}`);
       }
     } catch (error) {
       console.error('[HybridSupabase] Failed to sync generation:', error);
@@ -289,7 +274,6 @@ class HybridSupabaseClient {
           if (!localProject || new Date(localProject.updated_at) < new Date(project.updated_at)) {
             project.synced_at = new Date().toISOString();
             await offlineStorage.saveProject(project);
-            console.log(`[HybridSupabase] Downloaded project: ${project.name}`);
           }
         }
       }
@@ -313,7 +297,6 @@ class HybridSupabaseClient {
               const file = new File([fileData], media.name, { type: media.type });
               media.synced_at = new Date().toISOString();
               await offlineStorage.saveMedia(media, file);
-              console.log(`[HybridSupabase] Downloaded media: ${media.name}`);
             }
           }
         }
@@ -332,7 +315,6 @@ class HybridSupabaseClient {
           if (!exists) {
             generation.synced_at = new Date().toISOString();
             await offlineStorage.saveGeneration(generation);
-            console.log(`[HybridSupabase] Downloaded generation: ${generation.id}`);
           }
         }
       }
@@ -770,7 +752,6 @@ class HybridSupabaseClient {
           }
 
           // Fallback to offline function processing
-          console.log(`[HybridSupabase] Using offline function for: ${functionName}`);
           return await this.processOfflineFunction(functionName, body);
         } catch (error) {
           console.warn(`[HybridSupabase] Online function failed, using offline:`, error.message);
@@ -799,7 +780,6 @@ class HybridSupabaseClient {
           }
 
           // Fallback to offline RPC
-          console.log(`[HybridSupabase] Using offline RPC for: ${functionName}`);
           return await this.processOfflineRpc(functionName, params);
         } catch (error) {
           console.warn(`[HybridSupabase] Online RPC failed, using offline:`, error.message);

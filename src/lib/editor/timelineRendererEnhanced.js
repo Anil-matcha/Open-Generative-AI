@@ -136,7 +136,6 @@ export function initializeTimelineEngine(state, els) {
     playButton = new PlayButton({
       onPlay: () => {
         // Handle play/pause logic
-        console.log('Play button clicked');
         // This would integrate with existing playback system
       }
     });
@@ -164,7 +163,6 @@ export function initializeTimelineEngine(state, els) {
   if (!plusButton) {
     plusButton = new PlusButton({
       onClick: () => {
-        console.log('Add element button clicked');
         // This would open element picker
       }
     });
@@ -212,7 +210,6 @@ export function initializeTimelineEngine(state, els) {
   if (!transitionButton) {
     transitionButton = new TransitionButton({
       onClick: () => {
-        console.log('Transition button clicked');
         // This would open transition picker
       }
     });
@@ -222,10 +219,6 @@ export function initializeTimelineEngine(state, els) {
   if (!contextMenu) {
     contextMenu = new ContextMenu({
       items: [
-        { label: 'Cut', action: () => console.log('Cut') },
-        { label: 'Copy', action: () => console.log('Copy') },
-        { label: 'Paste', action: () => console.log('Paste') },
-        { label: 'Delete', action: () => console.log('Delete') }
       ]
     });
   }

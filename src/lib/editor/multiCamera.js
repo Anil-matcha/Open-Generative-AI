@@ -271,6 +271,5 @@ function showToast(message) {
   if (window.showToast) {
     window.showToast(message);
   } else {
-    console.log('Toast:', message);
   }
 }

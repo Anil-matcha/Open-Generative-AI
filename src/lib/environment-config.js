@@ -171,7 +171,6 @@ export class SecureEnv {
       }
     }
 
-    console.log('[Environment] Configuration validated successfully');
     return this.validator.getConfig();
   }
 
@@ -223,7 +222,6 @@ export function requireEnv(key, defaultValue = null) {
 export function initializeEnvironmentValidation() {
   try {
     const config = secureEnv.initialize();
-    console.log('[Environment] Secure environment validation initialized');
     return config;
   } catch (error) {
     console.error('[Environment] Failed to initialize secure environment:', error);

@@ -180,7 +180,6 @@ export function DirectorPageRenderThemeRedesign() {
         storyboardFrames: directorRuntimeInstance.getFrames()
       });
 
-      console.log('[DirectorPageRenderThemeRedesign] Director runtime initialized');
     } catch (error) {
       console.error('[DirectorPageRenderThemeRedesign] Failed to initialize director runtime:', error);
     }
@@ -865,7 +864,6 @@ export function DirectorPageRenderThemeRedesign() {
         showToast(`Full video generated with ${result.clips?.length || 0} clips!`, 'success');
 
         if (result.clips && result.clips.length > 0) {
-          console.log('Generated video clips:', result.clips);
         }
       } else {
         throw new Error(result.error || 'Full video generation failed');

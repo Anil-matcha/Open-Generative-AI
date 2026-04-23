@@ -754,7 +754,6 @@ export function LipSyncStudio() {
             if (model?.hasSeed) lipsyncParams.seed = -1;
 
             const res = await muapi.processLipSync(lipsyncParams);
-            console.log('[LipSyncStudio] Response:', res);
 
             if (res && res.url) {
                 if (capturedRequestId) removePendingJob(capturedRequestId);

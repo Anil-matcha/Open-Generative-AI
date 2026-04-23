@@ -87,12 +87,10 @@ describe('Modal Integration Tests', () => {
     });
 
     // Log results
-    console.log(`📊 Results: ${results.passed}/${results.total} modals passed`);
 
     if (results.failed > 0) {
       console.error('❌ Integration test failed:', results.errors);
     } else {
-      console.log('✅ All modal components successfully integrated!');
     }
 
     expect(results.failed).toBe(0);

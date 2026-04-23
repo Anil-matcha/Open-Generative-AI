@@ -154,12 +154,10 @@ export class MediaLoader {
       video.playsInline = true;
 
       video.onloadedmetadata = () => {
-        console.log(`[Video] Metadata loaded: ${video.duration}s`);
         onProgress?.(0.2);
       };
 
       video.oncanplay = () => {
-        console.log(`[Video] Can play: ${src}`);
         onCanPlay?.(video);
         onProgress?.(0.5);
         resolve(video);
@@ -273,7 +271,6 @@ export class MediaLoader {
         this.cache.delete(key);
       }
 
-      console.log(`[Media Cache] Cleaned up ${sortedByAge.length} items`);
     }
   }
 

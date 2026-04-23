@@ -326,7 +326,6 @@ export class VoiceModal extends BaseModal {
 
   playVoiceSample(voiceId) {
     // Implement voice sample playback
-    console.log('Playing sample for voice:', voiceId);
     this.isPlayingSample = !this.isPlayingSample;
 
     // Update button states
@@ -370,7 +369,6 @@ export class VoiceModal extends BaseModal {
       return;
     }
 
-    console.log('Previewing text with selected voice:', this.selectedVoice.name);
     // Implement text preview functionality
   }
 
@@ -380,7 +378,6 @@ export class VoiceModal extends BaseModal {
       return;
     }
 
-    console.log('Testing selected voice:', this.selectedVoice.name);
     // Implement voice test functionality
   }
 

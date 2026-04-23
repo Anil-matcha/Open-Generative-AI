@@ -184,7 +184,6 @@ export function AuthModal(onSuccess) {
                 removeModal();
                 if (onSuccess) onSuccess();
 
-                console.log('[AuthModal] API key saved securely');
             } catch (error) {
                 console.error('[AuthModal] Failed to save key:', error);
                 btn.disabled = false;

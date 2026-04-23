@@ -21,7 +21,6 @@ export class AccessibilityUtils {
     // Set up keyboard event handlers
     this.setupKeyboardHandlers();
     
-    console.log('[AccessibilityUtils] Initialized');
   }
 
   /**

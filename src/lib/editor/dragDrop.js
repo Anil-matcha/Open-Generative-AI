@@ -12,6 +12,7 @@
 
 import { showToast } from '../loading.js';
 import { uploadFileToStorage } from '../hybrid-supabase.js';
+import { mediaWorker } from '../media-worker-manager.js';
 
 // Enhanced drag state management
 const dragState = {
@@ -255,16 +256,16 @@ async function createAssetFromFile(file, type, publicUrl, state) {
     metadata: {}
   };
 
-  // Extract metadata for media files
+  // Extract metadata for media files using Web Worker
   if (type === 'video' || type === 'audio') {
     try {
-      asset.duration = await getMediaDuration(file);
+      asset.duration = await mediaWorker.getMediaDuration(file);
     } catch (error) {
       console.warn(`[DragDrop] Could not extract duration for ${file.name}:`, error);
     }
   } else if (type === 'image') {
     try {
-      const dimensions = await getImageDimensions(file);
+      const dimensions = await mediaWorker.getImageDimensions(file);
       asset.metadata = { ...asset.metadata, ...dimensions };
     } catch (error) {
       console.warn(`[DragDrop] Could not extract dimensions for ${file.name}:`, error);
@@ -369,43 +370,7 @@ function getDefaultDuration(assetType) {
 }
 
 // Media utilities
-async function getMediaDuration(file) {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file);
-    const media = document.createElement(file.type.startsWith('video/') ? 'video' : 'audio');
 
-    media.addEventListener('loadedmetadata', () => {
-      URL.revokeObjectURL(url);
-      resolve(media.duration);
-    });
-
-    media.addEventListener('error', () => {
-      URL.revokeObjectURL(url);
-      reject(new Error('Could not load media metadata'));
-    });
-
-    media.src = url;
-  });
-}
-
-async function getImageDimensions(file) {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file);
-    const img = new Image();
-
-    img.onload = () => {
-      URL.revokeObjectURL(url);
-      resolve({ width: img.naturalWidth, height: img.naturalHeight });
-    };
-
-    img.onerror = () => {
-      URL.revokeObjectURL(url);
-      reject(new Error('Could not load image'));
-    };
-
-    img.src = url;
-  });
-}
 
 // Progress indicators
 function createUploadProgress(uploadId, fileName, fileSize) {
@@ -567,11 +532,9 @@ export function removeTooltip() {
 
 // Advanced drag and drop initialization
 export function initializeAdvancedDragDrop(state, els) {
-  console.log('[DragDrop] Initializing advanced drag and drop functionality');
 
   // Prevent multiple initializations
   if (dragState.initialized) {
-    console.log('[DragDrop] Already initialized, skipping');
     return;
   }
 
@@ -585,12 +548,10 @@ export function initializeAdvancedDragDrop(state, els) {
   initializePerformanceOptimization();
 
   dragState.initialized = true;
-  console.log('[DragDrop] Advanced drag and drop initialized successfully');
 }
 
 // File system drag and drop (external files)
 export function initializeFileSystemDragDrop(state) {
-  console.log('[DragDrop] Initializing file system drag and drop');
 
   // Global drag event handlers for external files
   document.addEventListener('dragenter', handleFileDragEnter, false);
@@ -601,7 +562,6 @@ export function initializeFileSystemDragDrop(state) {
   // Setup drop zones throughout the interface
   setupAdvancedDropZones(state);
 
-  console.log('[DragDrop] File system drag and drop initialized');
 }
 
 // Handle external file drag enter
@@ -655,7 +615,6 @@ function handleFileDrop(e, state) {
   const files = e.dataTransfer.files;
   const dropZone = getDropZoneFromPoint(e.clientX, e.clientY);
 
-  console.log(`[DragDrop] Dropped ${files.length} external files`);
 
   // Process the files
   processMultipleFiles(files, dropZone, state);
@@ -835,7 +794,6 @@ export function removeAssetPreview() {
 
 // Clip drag and drop functionality
 export function initializeClipDragDrop(state, els) {
-  console.log('[DragDrop] Initializing clip drag and drop functionality');
 
   // Add drag listeners to existing clips
   document.addEventListener('mousedown', handleClipMouseDown);
@@ -845,14 +803,12 @@ export function initializeClipDragDrop(state, els) {
   // Setup drop zones for tracks
   setupTrackDropZones(state, els);
 
-  console.log('[DragDrop] Clip drag and drop initialized successfully');
 }
 
 function handleClipMouseDown(e) {
   const clipEl = e.target.closest('.clip');
   if (!clipEl || e.button !== 0) return; // Only left mouse button
 
-  console.log('[DragDrop] Clip mousedown detected on clip:', clipEl.dataset.itemId);
 
   const rect = clipEl.getBoundingClientRect();
   const offsetX = e.clientX - rect.left;
@@ -870,13 +826,6 @@ function handleClipMouseDown(e) {
     trackId: clipEl.dataset.trackId
   };
 
-  console.log('[DragDrop] Drag state initialized:', {
-    itemId: clipEl.dataset.itemId,
-    trackId: clipEl.dataset.trackId,
-    startX: e.clientX,
-    startY: e.clientY
-  });
-
   // Prevent text selection during drag
   e.preventDefault();
 }
@@ -889,7 +838,6 @@ function handleClipMouseMove(e) {
 
   // Start dragging only if moved more than threshold
   if (!dragState.isDragging && (deltaX > 5 || deltaY > 5)) {
-    console.log('[DragDrop] Starting drag after threshold exceeded:', { deltaX, deltaY });
     startClipDrag();
   }
 
@@ -899,13 +847,11 @@ function handleClipMouseMove(e) {
 }
 
 function startClipDrag() {
-  console.log('[DragDrop] Starting clip drag');
   dragState.isDragging = true;
 
   const clipEl = dragState.draggedElement;
   const rect = clipEl.getBoundingClientRect();
 
-  console.log('[DragDrop] Creating ghost element for clip:', rect);
 
   // Create ghost element
   dragState.ghostElement = clipEl.cloneNode(true);
@@ -918,18 +864,15 @@ function startClipDrag() {
   dragState.ghostElement.style.opacity = '0.8';
 
   document.body.appendChild(dragState.ghostElement);
-  console.log('[DragDrop] Ghost element added to DOM');
 
   // Hide original element
   clipEl.style.opacity = '0.3';
-  console.log('[DragDrop] Original clip opacity set to 0.3');
 
   // Show tooltip with clip info
   const itemId = dragState.dragData.itemId;
   const trackId = dragState.dragData.trackId;
   const tooltipContent = createTooltipContent('clip', { itemId, trackId });
   createTooltip(tooltipContent, { x: dragState.dragData.startX, y: dragState.dragData.startY });
-  console.log('[DragDrop] Tooltip created');
 }
 
 function updateClipDrag(e) {
@@ -948,13 +891,7 @@ function updateClipDrag(e) {
 }
 
 function handleClipMouseUp(e) {
-  console.log('[DragDrop] Mouse up event, checking drag state:', {
-    isDragging: dragState.isDragging,
-    dragType: dragState.dragType
-  });
-
   if (!dragState.isDragging || dragState.dragType !== 'clip') {
-    console.log('[DragDrop] Not dragging or wrong type, resetting state');
     dragState.draggedElement = null;
     dragState.dragType = null;
     return;
@@ -962,13 +899,11 @@ function handleClipMouseUp(e) {
 
   // Find drop target
   const dropTarget = findDropTarget(e);
-  console.log('[DragDrop] Drop target found:', dropTarget);
 
   if (dropTarget) {
     handleClipDrop(dropTarget, e);
   } else {
     // Cancel drag - restore original position
-    console.log('[DragDrop] No drop target, cancelling drag');
     cancelClipDrag();
   }
 
@@ -985,7 +920,6 @@ function findDropTarget(e) {
 }
 
 function handleClipDrop(dropTarget, e) {
-  console.log('[DragDrop] Handling clip drop on target:', dropTarget.className, dropTarget.dataset);
 
   const itemId = dragState.dragData.itemId;
   const originalTrackId = dragState.dragData.trackId;
@@ -995,7 +929,6 @@ function handleClipDrop(dropTarget, e) {
 
   if (dropTarget.classList.contains('track-lane') || dropTarget.classList.contains('track-row')) {
     newTrackId = dropTarget.dataset.trackId || dropTarget.querySelector('.track-lane')?.dataset.trackId;
-    console.log('[DragDrop] New track ID:', newTrackId);
 
     // Calculate new start time based on drop position
     if (dropTarget.classList.contains('track-lane')) {
@@ -1003,14 +936,12 @@ function handleClipDrop(dropTarget, e) {
       const relativeX = e.clientX - rect.left;
       const percent = relativeX / rect.width;
       newStartTime = percent * 60; // Assuming 60 second timeline, should get from state
-      console.log('[DragDrop] Calculated new start time:', newStartTime, 'from relative X:', relativeX, 'percent:', percent);
     }
   }
 
   // Here we would update the state with new position/track
   // For now, just show a toast
   const message = `Moved clip ${itemId} to track ${newTrackId}${newStartTime ? ` at ${newStartTime.toFixed(1)}s` : ''}`;
-  console.log('[DragDrop] Drop result:', message);
   showToast(message);
 }
 
@@ -1022,39 +953,32 @@ function cancelClipDrag() {
 }
 
 function cleanupDrag() {
-  console.log('[DragDrop] Cleaning up drag state');
 
   // Remove ghost element
   if (dragState.ghostElement) {
     dragState.ghostElement.remove();
     dragState.ghostElement = null;
-    console.log('[DragDrop] Ghost element removed');
   }
 
   // Restore original element
   if (dragState.draggedElement) {
     dragState.draggedElement.style.opacity = '';
     dragState.draggedElement = null;
-    console.log('[DragDrop] Original element opacity restored');
   }
 
   // Remove tooltip
   removeTooltip();
-  console.log('[DragDrop] Tooltip removed');
 
   // Reset drag state
   dragState.isDragging = false;
   dragState.dragType = null;
   dragState.dragData = null;
-  console.log('[DragDrop] Drag state reset');
 }
 
 // Media library drag and drop
 export function initializeMediaLibraryDragDrop(state, mediaContainer) {
-  console.log('[DragDrop] Initializing media library drag and drop');
 
   if (!mediaContainer) {
-    console.log('[DragDrop] No media container provided, skipping initialization');
     return;
   }
 
@@ -1067,7 +991,6 @@ export function initializeMediaLibraryDragDrop(state, mediaContainer) {
 
   // Setup timeline as drop zone for media items
   setupTimelineDropZones(state);
-  console.log('[DragDrop] Media library drag and drop initialized');
 }
 
 // The initializeClipDragDrop function is now replaced by initializeAdvancedDragDrop
@@ -1077,7 +1000,6 @@ function handleMediaMouseDown(e) {
   const mediaItem = e.target.closest('.media-item');
   if (!mediaItem || e.button !== 0) return;
 
-  console.log('[DragDrop] Media item mousedown detected on:', mediaItem.querySelector('.media-label')?.textContent);
 
   const rect = mediaItem.getBoundingClientRect();
   const offsetX = e.clientX - rect.left;
@@ -1098,14 +1020,6 @@ function handleMediaMouseDown(e) {
     startY: e.clientY
   };
 
-  console.log('[DragDrop] Media drag state initialized:', {
-    label: mediaItem.querySelector('.media-label')?.textContent,
-    startX: e.clientX,
-    startY: e.clientY,
-    offsetX,
-    offsetY
-  });
-
   e.preventDefault();
 }
 
@@ -1125,13 +1039,11 @@ function handleMediaMouseMove(e) {
 }
 
 function startMediaDrag() {
-  console.log('[DragDrop] Starting media drag');
   dragState.isDragging = true;
 
   const mediaItem = dragState.draggedElement;
   const rect = mediaItem.getBoundingClientRect();
 
-  console.log('[DragDrop] Creating ghost element for media item:', rect);
 
   // Create ghost element
   dragState.ghostElement = mediaItem.cloneNode(true);
@@ -1144,12 +1056,10 @@ function startMediaDrag() {
   dragState.ghostElement.style.opacity = '0.8';
 
   document.body.appendChild(dragState.ghostElement);
-  console.log('[DragDrop] Media ghost element added to DOM');
 
   // Show tooltip
   const tooltipContent = createTooltipContent('media', dragState.dragData.mediaData);
   createTooltip(tooltipContent, { x: dragState.dragData.startX, y: dragState.dragData.startY });
-  console.log('[DragDrop] Media tooltip created');
 }
 
 function updateMediaDrag(e) {
@@ -1449,7 +1359,6 @@ function handleElementOut(e) {
 
 // Accessibility features
 export function initializeAccessibilityFeatures() {
-  console.log('[DragDrop] Initializing accessibility features');
 
   // Keyboard navigation for drag and drop
   document.addEventListener('keydown', handleKeyDown);
@@ -1462,7 +1371,6 @@ export function initializeAccessibilityFeatures() {
   initializeFocusManagement();
 
   dragState.accessibilityMode = true;
-  console.log('[DragDrop] Accessibility features initialized');
 }
 
 // Keyboard navigation handlers
@@ -1509,7 +1417,6 @@ function cancelAllDrags() {
 // Simulate drop at current position
 function simulateDrop() {
   // This would need to be implemented based on current drag context
-  console.log('[DragDrop] Simulating drop via keyboard');
 }
 
 // Move drag preview with keyboard
@@ -1586,7 +1493,6 @@ function handleFocusOut(e) {
 
 // Performance optimization
 export function initializePerformanceOptimization() {
-  console.log('[DragDrop] Initializing performance optimization');
 
   // Memory management
   initializeMemoryManagement();
@@ -1595,7 +1501,6 @@ export function initializePerformanceOptimization() {
   initializeThrottledUpdates();
 
   dragState.performanceMode = true;
-  console.log('[DragDrop] Performance optimization initialized');
 }
 
 // Memory management for large files
@@ -1675,13 +1580,11 @@ function throttle(func, limit) {
 
 // Video playback controls in clips
 export function initializeVideoPlaybackControls() {
-  console.log('[DragDrop] Initializing video playback controls');
 
   // Add playback controls to video clips
   document.addEventListener('dblclick', handleVideoClipDoubleClick);
   document.addEventListener('contextmenu', handleVideoClipContextMenu);
 
-  console.log('[DragDrop] Video playback controls initialized');
 }
 
 function handleVideoClipDoubleClick(e) {

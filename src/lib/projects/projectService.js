@@ -315,7 +315,6 @@ export class ProjectIntegrationService {
    * @param {Object} appConfig - App configuration
    */
   registerApp(appId, appConfig = {}) {
-    console.log(`[ProjectIntegration] Registered app: ${appId}`, appConfig);
     // Store app configuration for compatibility checking
     this.appConfig = this.appConfig || {};
     this.appConfig[appId] = {
@@ -377,7 +376,6 @@ export class ProjectIntegrationService {
         appState: { ...appState }
       });
 
-      console.log(`[ProjectIntegration] Created project ${project.id} for app ${appId}`);
       return project;
     } catch (error) {
       console.error('[ProjectIntegration] Failed to create app project:', error);
@@ -425,7 +423,6 @@ export class ProjectIntegrationService {
         appState: { ...migratedAppData }
       });
 
-      console.log(`[ProjectIntegration] Loaded project ${projectId} for app ${appId}`);
       return {
         ...project,
         appData: migratedAppData,
@@ -480,7 +477,6 @@ export class ProjectIntegrationService {
       // Notify listeners
       this.notifyChangeListeners(projectId, 'saved', { isAutoSave });
 
-      console.log(`[ProjectIntegration] ${isAutoSave ? 'Auto-' : ''}Saved project ${projectId} for app ${session.appId}`);
       return saveResult;
     } catch (error) {
       console.error('[ProjectIntegration] Failed to save app project:', error);
@@ -532,7 +528,6 @@ export class ProjectIntegrationService {
     }, intervalMs);
 
     this.autoSaveIntervals.set(projectId, intervalId);
-    console.log(`[ProjectIntegration] Enabled auto-save for project ${projectId} (${intervalMs}ms)`);
   }
 
   /**
@@ -544,7 +539,6 @@ export class ProjectIntegrationService {
     if (intervalId) {
       clearInterval(intervalId);
       this.autoSaveIntervals.delete(projectId);
-      console.log(`[ProjectIntegration] Disabled auto-save for project ${projectId}`);
     }
   }
 
@@ -570,7 +564,6 @@ export class ProjectIntegrationService {
     this.activeProjects.delete(projectId);
     this.changeListeners.delete(projectId);
 
-    console.log(`[ProjectIntegration] Closed project ${projectId}`);
   }
 
   /**
@@ -743,7 +736,6 @@ export class ProjectIntegrationService {
       if (handler) {
         try {
           migratedData = await handler(migratedData, fromVersion, toVersion);
-          console.log(`[ProjectIntegration] Migrated ${appId} data from ${fromVersion} to ${version}`);
         } catch (error) {
           console.error(`[ProjectIntegration] Migration failed for ${appId} ${version}:`, error);
           throw error;

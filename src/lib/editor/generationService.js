@@ -105,7 +105,6 @@ class LtxProvider {
 
     const generationId = `gen_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-    console.log(`[LtxProvider] Starting generation ${generationId} for mode: ${request.mode}`);
 
     try {
       let endpoint = '';

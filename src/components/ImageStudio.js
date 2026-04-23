@@ -1073,7 +1073,6 @@ export function ImageStudio() {
                 res = await muapi.generateImage(genParams);
             }
 
-            console.log('[ImageStudio] Full response:', res);
 
             if (res && res.url) {
                 // Add to history

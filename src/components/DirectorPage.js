@@ -66,7 +66,6 @@ export function DirectorPage() {
         try {
             directorRuntimeInstance = new directorRuntime.constructor();
             await directorRuntimeInstance.initialize();
-            console.log('[DirectorPage] Director runtime initialized');
         } catch (error) {
             console.error('[DirectorPage] Failed to initialize director runtime:', error);
         }

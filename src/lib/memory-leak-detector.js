@@ -47,7 +47,7 @@ export class MemoryLeakDetector {
       this.snapshots.shift();
     }
 
-    console.log(`[Memory] Snapshot taken: ${label}`, {
+    this.snapshots.push({
       usedMB: Math.round(snapshot.memory.used / 1024 / 1024),
       nodes: snapshot.nodes,
       listeners: snapshot.eventListeners
@@ -124,9 +124,7 @@ export class MemoryLeakDetector {
   forceGarbageCollection() {
     if (window.gc) {
       window.gc();
-      console.log('[Memory] Forced garbage collection');
     } else {
-      console.log('[Memory] Garbage collection not available');
     }
   }
 

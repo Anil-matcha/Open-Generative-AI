@@ -702,7 +702,6 @@ export class MotionGraphicsTools {
     // Store shadow effect properties
     const shadowProps = { distance, blur, color };
     // This would be applied to the clip's rendering
-    console.log('Shadow effect:', shadowProps);
   }
 
   updateGlowEffect() {
@@ -715,7 +714,6 @@ export class MotionGraphicsTools {
     // Store glow effect properties
     const glowProps = { intensity, color };
     // This would be applied to the clip's rendering
-    console.log('Glow effect:', glowProps);
   }
 
   // Integration with timeline

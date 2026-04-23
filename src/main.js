@@ -19,6 +19,7 @@ import { enforceHTTPS, validateEnvironment, generateCSPHeader } from './lib/secu
 import { escapeHtml, safeHtml } from './lib/security.js';
 import { initializeEnhancedMuAPI } from './lib/muapiEnhanced.js';
 import { loadConfig } from './lib/muapiConfig.js';
+import { errorReporter } from './lib/error-reporter.js';
 // Initialize environment validation
 const envConfig = initializeEnvironmentValidation();
 
@@ -32,7 +33,6 @@ const securityStatus = initializeSecurity();
 initializeErrorHandling();
 enforceHTTPS();
 const envStatus = validateEnvironment();
-console.log('[Security] Environment validated:', envStatus);
 
 // Set CSP header if in browser environment
 if (typeof document !== 'undefined') {
@@ -45,9 +45,7 @@ if (typeof document !== 'undefined') {
 window.generationService = generationService;
 
 // Initialize hybrid Supabase client (handles online/offline automatically)
-console.log('[App] 🌐 Initializing hybrid Supabase client with automatic online/offline detection and synchronization');
 
-console.log('[App] Starting initialization...');
 
 // Track initialization performance
 const initStart = performance.now();
@@ -59,14 +57,11 @@ window.mediaLoader = mediaLoader;
 window.performanceBudget = performanceBudget;
 
 // Initialize enhanced MuAPI system
-console.log('[App] Initializing enhanced MuAPI...');
 const muapiConfig = loadConfig();
 initializeEnhancedMuAPI(muapiConfig).then(success => {
   if (success) {
-    console.log('[App] Enhanced MuAPI initialized successfully');
     showToast('Enhanced AI features enabled', 'success', 3000);
   } else {
-    console.log('[App] Enhanced MuAPI initialization failed, using basic features');
     showToast('Using basic AI features', 'info', 3000);
   }
 }).catch(error => {
@@ -77,7 +72,6 @@ initializeEnhancedMuAPI(muapiConfig).then(success => {
 // Initialize connection status indicator
 import('./components/ConnectionStatus.js').then(({ initConnectionStatus }) => {
   initConnectionStatus();
-  console.log('[App] Connection status indicator initialized');
 });
 
 // Start memory leak detection in development
@@ -87,35 +81,43 @@ if (import.meta.env.DEV) {
 
 // Global error handlers for uncaught exceptions
 window.addEventListener('error', (event) => {
-  console.error('[Global Error]', event.error);
-  
+  // Report error
+  errorReporter.captureError(event.error || new Error(event.message), {
+    filename: event.filename,
+    lineno: event.lineno,
+    colno: event.colno
+  });
+
   // Don't show error UI for known benign errors
-  if (event.message?.includes('ResizeObserver') || 
+  if (event.message?.includes('ResizeObserver') ||
       event.message?.includes('passive event listener') ||
       event.message?.includes('non-passive')) {
     return;
   }
-  
+
   // Track error
   analytics.trackError('uncaught_exception', event.message || 'Unknown error', {
     filename: event.filename,
     lineno: event.lineno
   });
-  
+
   // Show error toast notification instead of full page crash
   showToast('Something went wrong. Please refresh the page.', 'error', 10000);
 });
 
 window.addEventListener('unhandledrejection', (event) => {
-  console.error('[Unhandled Promise Rejection]', event.reason);
-  
+  // Report unhandled promise rejection
+  errorReporter.captureRejection(event.reason, {
+    type: 'unhandled_promise_rejection'
+  });
+
   // Only show UI for significant errors (not API cancellations)
-  if (event.reason?.name === 'AbortError' || 
+  if (event.reason?.name === 'AbortError' ||
       event.reason?.message?.includes('cancelled') ||
       event.reason?.message?.includes('Request cancelled')) {
     return;
   }
-  
+
   analytics.trackError('unhandled_rejection', event.reason?.message || String(event.reason));
   showToast('An operation failed. Please try again.', 'error', 5000);
 });
@@ -134,10 +136,8 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
     // Page is hidden - pause non-essential operations
-    console.log('[App] Page hidden, pausing operations');
   } else {
     // Page is visible again
-    console.log('[App] Page visible, resuming operations');
   }
 });
 
@@ -147,7 +147,7 @@ window.addEventListener('online', async () => {
 
   // Import hybrid client and trigger sync
   try {
-    const { hybridSupabase } = await import('./lib/hybrid-supabase.js');
+    const { hybridSupabase } = await import('./lib/hybrid-supabase-lazy.js');
     await hybridSupabase.forceSync();
     showToast('Data synchronized successfully', 'success', 2000);
   } catch (error) {
@@ -193,7 +193,6 @@ try {
   const initDuration = performance.now() - initStart;
   perfMonitor.trackPageLoad('initialization', initDuration);
   
-  console.log(`[App] Initialized in ${initDuration.toFixed(2)}ms`);
   
   // Navigate to initial page
   // Check URL for deep linking
@@ -212,7 +211,6 @@ try {
     initialPage = studioParam;
   }
   
-  console.log('[App] Navigating to initial page:', initialPage);
   navigate(initialPage);
   
 } catch (error) {

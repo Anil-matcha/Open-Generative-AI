@@ -71,7 +71,6 @@ export async function fetchWithRetry(url, options = {}, retries = 3, retryDelay 
             // Wait before retry with exponential backoff
             if (attempt < retries) {
                 const delay = retryDelay * Math.pow(2, attempt - 1);
-                console.log(`[Fetch] Attempt ${attempt} failed, retrying in ${delay}ms...`);
                 await new Promise(resolve => setTimeout(resolve, delay));
             }
         }

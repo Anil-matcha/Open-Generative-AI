@@ -9,7 +9,6 @@ import { offlineStorage } from './offline-storage.js';
  * Process offline function calls with mock responses
  */
 export async function processOfflineFunction(functionName, body) {
-  console.log(`[OfflineFunctions] Processing ${functionName} offline`);
 
   const functionHandlers = {
     'videoagent': handleVideoAgentOffline,

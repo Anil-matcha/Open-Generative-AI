@@ -490,7 +490,6 @@ class DirectorAgentRuntime {
         
         if (result?.url) {
           imageUrl = result.url;
-          console.log('[DirectorRuntime] Frame generated via MUAPI:', imageUrl);
         }
       } catch (error) {
         muapiError = error;
@@ -607,7 +606,6 @@ class DirectorAgentRuntime {
           console.warn('[DirectorRuntime] Supabase function call failed:', supabaseError.message);
         } else {
           result = data;
-          console.log('[DirectorRuntime] Agent command executed via videoagent:', agentId);
         }
       } catch (supabaseError) {
         error = supabaseError;

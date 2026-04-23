@@ -135,10 +135,8 @@ function log(level, message, context = {}, error = null) {
     
     switch (level) {
         case 'DEBUG':
-            console.debug(formatted);
             break;
         case 'INFO':
-            console.info(formatted);
             break;
         case 'WARN':
             console.warn(formatted);
@@ -150,7 +148,6 @@ function log(level, message, context = {}, error = null) {
             if (error) console.error(error);
             break;
         default:
-            console.log(formatted);
     }
     
     // Store for debugging
@@ -174,7 +171,6 @@ async function sendToErrorTracking(entry) {
         if (!dsn) return;
         
         // Placeholder for actual implementation
-        console.debug('[Logger] Would send to error tracking:', entry);
     } catch {
         // Silently fail - don't break the app for logging issues
     }

@@ -78,7 +78,6 @@ export function isFeatureEnabled(featureName) {
 export function enableFeature(featureName) {
   if (FEATURE_FLAGS.hasOwnProperty(featureName)) {
     FEATURE_FLAGS[featureName] = true;
-    console.log(`Feature ${featureName} enabled`);
   }
 }
 
@@ -89,7 +88,6 @@ export function enableFeature(featureName) {
 export function disableFeature(featureName) {
   if (FEATURE_FLAGS.hasOwnProperty(featureName)) {
     FEATURE_FLAGS[featureName] = false;
-    console.log(`Feature ${featureName} disabled`);
   }
 }
 

@@ -279,5 +279,4 @@ export function setupGlobalErrorHandlers() {
 // Initialize error handling system
 export function initializeErrorHandling() {
   setupGlobalErrorHandlers();
-  console.log('[Error Handling] Initialized enhanced error handling system');
 }
