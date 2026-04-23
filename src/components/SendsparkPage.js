@@ -1,5 +1,3 @@
-import React from 'react';
-
 export function SendsparkPage() {
   // For now, we'll create a simple wrapper. In the future, this could connect to
   // a proper state management system for workflows

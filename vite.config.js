@@ -13,8 +13,8 @@ function securityHeaders() {
                     "default-src 'self' https://github.dev https://*.github.dev; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://*.supabase.co " + (process.env.VITE_MUAPI_URL || 'https://api.muapi.ai') + "; media-src 'self' https: blob:; manifest-src 'self' https://github.dev https://*.github.dev;"
                 );
                 
-                // Prevent clickjacking
-                res.setHeader('X-Frame-Options', 'DENY');
+                 // Prevent clickjacking
+                 res.setHeader('X-Frame-Options', 'SAMEORIGIN');
                 
                 // Prevent MIME type sniffing
                 res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -63,26 +63,24 @@ export default defineConfig({
             'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
             'Access-Control-Allow-Headers': 'Content-Type, Authorization'
         },
-        proxy: process.env.NODE_ENV === "production" ? {
-            "/api": {
-                target: process.env.VITE_MUAPI_URL || "https://api.muapi.ai",
-                changeOrigin: true,
-                secure: true,
-                rewrite: (path) => path.replace(/^\/api/, "")
-            }
-        } : {
-            "/api": {
-                target: process.env.VITE_MUAPI_URL || "https://api.muapi.ai",
-                changeOrigin: true,
-                secure: true,
-                rewrite: (path) => path.replace(/^\/api/, "")
-            },
-            "/apps/remix-go": {
-                target: "http://localhost:5173",
-                changeOrigin: true,
-                rewrite: (path) => path.replace(/^\/apps\/remix-go/, "")
-            }
-        }
+         proxy: {
+             "/api": {
+                 target: process.env.VITE_MUAPI_URL || "https://api.muapi.ai",
+                 changeOrigin: true,
+                 secure: true,
+                 rewrite: (path) => path.replace(/^\/api/, "")
+             },
+             "/apps/remix-go": {
+                 target: "http://localhost:5173",
+                 changeOrigin: true,
+                 rewrite: (path) => path.replace(/^\/apps\/remix-go/, "")
+             },
+             "/apps/ai-vfx": {
+                 target: "http://localhost:5174",
+                 changeOrigin: true,
+                 rewrite: (path) => path.replace(/^\/apps\/ai-vfx/, "")
+             }
+         }
     },
     build: {
         target: 'esnext',
@@ -109,14 +107,14 @@ export default defineConfig({
         sourcemap: process.env.NODE_ENV !== 'production',
         chunkSizeWarningLimit: 1000
     },
-    preview: {
-        port: 3000,
-        headers: {
-            'Cache-Control': 'public, max-age=31536000',
-            'X-Frame-Options': 'DENY',
-            'X-Content-Type-Options': 'nosniff',
-            'X-XSS-Protection': '1; mode=block',
-            'Referrer-Policy': 'strict-origin-when-cross-origin'
-        }
-    }
+     preview: {
+         port: 3000,
+         headers: {
+             'Cache-Control': 'public, max-age=31536000',
+             'X-Frame-Options': 'SAMEORIGIN',
+             'X-Content-Type-Options': 'nosniff',
+             'X-XSS-Protection': '1; mode=block',
+             'Referrer-Policy': 'strict-origin-when-cross-origin'
+         }
+     }
 });
