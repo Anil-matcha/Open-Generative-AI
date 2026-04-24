@@ -70,7 +70,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.99.0",
     "@tailwindcss/postcss": "^4.1.18",
-    "@tailwindcss/vite": "^4.1.18",
+    "@tailwindcss/vite": "^4.2.4",
     "dompurify": "^3.3.3",
     "interactjs": "^1.10.27",
     "lucide-react": "^1.8.0",

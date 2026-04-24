@@ -1,0 +1,17 @@
+chardet>=5.2.0
+faiss-cpu>=1.12.0
+google-genai>=1.47.0
+langchain>=0.3.26
+langchain-community>=0.3.27
+langchain-openai>=0.3.27
+moviepy>=2.2.1
+openai>=1.95.0
+opencv-python-headless
+scenedetect[opencv]>=0.6.7.1
+fastapi>=0.104.0
+uvicorn>=0.24.0
+python-multipart>=0.0.6
+aiofiles>=23.2.1
+python-dotenv>=1.0.0
+torch
+torchaudio

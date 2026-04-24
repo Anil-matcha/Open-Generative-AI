@@ -16,6 +16,12 @@ const DEFAULT_CONFIG = {
   ltx: {
     baseUrl: 'http://localhost:8000',
     timeout: 300000, // 5 minutes
+    models: {
+      'ltx-2-pro': { name: 'LTX 2 Pro', quality: 'high', speed: 'slow' },
+      'ltx-2-fast': { name: 'LTX 2 Fast', quality: 'medium', speed: 'fast' },
+      'ltx-2-19b': { name: 'LTX 2 19B', quality: 'ultra', speed: 'slow' },
+    },
+    defaultModel: 'ltx-2-fast',
   },
   fal: {
     baseUrl: 'https://queue.fal.run',
@@ -55,6 +61,7 @@ const DEFAULT_CONFIG = {
  * @property {number} [selectedRange.start]
  * @property {number} [selectedRange.end]
  * @property {string} [stylePreset]
+ * @property {string} [model] - LTX model variant ('ltx-2-pro', 'ltx-2-fast', 'ltx-2-19b')
  * @property {Object} [metadata]
  */
 
@@ -65,6 +72,8 @@ const DEFAULT_CONFIG = {
  * @property {string[]} [assetIds]
  * @property {string} [previewUrl]
  * @property {string} [error]
+ * @property {number} [progress] - Progress percentage (0-100)
+ * @property {string} [progressMessage] - Human-readable progress message
  * @property {Object} [metadata]
  */
 
@@ -121,6 +130,7 @@ class LtxProvider {
             aspect_ratio: request.aspectRatio || '16:9',
             fps: request.fps || 24,
             style_preset: request.stylePreset || 'cinematic',
+            model: request.model || this.config.defaultModel,
           };
           break;
 
@@ -133,6 +143,7 @@ class LtxProvider {
             duration: request.duration || 5,
             aspect_ratio: request.aspectRatio || '16:9',
             fps: request.fps || 24,
+            model: request.model || this.config.defaultModel,
           };
           break;
 
@@ -146,6 +157,7 @@ class LtxProvider {
             end_time: request.selectedRange?.end || 0,
             duration: request.duration || 5,
             style_preset: request.stylePreset || 'cinematic',
+            model: request.model || this.config.defaultModel,
           };
           break;
 
@@ -155,6 +167,21 @@ class LtxProvider {
             prompt: request.prompt,
             source_video_path: request.sourceAssetId || '',
             extend_duration: request.duration || 5,
+            model: request.model || this.config.defaultModel,
+          };
+          break;
+
+        case 'audio-to-video':
+          endpoint = '/api/a2v';
+          body = {
+            prompt: request.prompt,
+            negative_prompt: request.negativePrompt || '',
+            audio_path: request.references?.[0] || '',
+            duration: request.duration || 5,
+            aspect_ratio: request.aspectRatio || '16:9',
+            fps: request.fps || 24,
+            style_preset: request.stylePreset || 'cinematic',
+            model: request.model || this.config.defaultModel,
           };
           break;
 
@@ -166,6 +193,7 @@ class LtxProvider {
             duration: request.duration || 3,
             aspect_ratio: request.aspectRatio || '16:9',
             style_preset: 'broll',
+            model: request.model || this.config.defaultModel,
           };
           break;
 
@@ -229,6 +257,8 @@ class LtxProvider {
         previewUrl: result.preview_url || result.output_path || null,
         assetIds: result.asset_ids || [],
         error: result.error || null,
+        progress: result.progress || 0,
+        progressMessage: result.progress_message || 'Processing...',
         metadata: result,
       };
     } catch (error) {
@@ -869,6 +899,22 @@ class GenerationService {
         this.activeJobs.delete(id);
       }
     }
+  }
+
+  /**
+   * Get available LTX models
+   * @returns {Object} Model configurations
+   */
+  getLtxModels() {
+    return DEFAULT_CONFIG.ltx.models;
+  }
+
+  /**
+   * Get default LTX model
+   * @returns {string} Default model key
+   */
+  getDefaultLtxModel() {
+    return DEFAULT_CONFIG.ltx.defaultModel;
   }
 
   /**
