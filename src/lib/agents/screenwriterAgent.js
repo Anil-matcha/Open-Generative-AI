@@ -127,10 +127,10 @@ export class ScreenwriterAgent extends BaseAgent {
       ? `${analysis.contentTypes.video} video clips` 
       : 'timeline content';
     
-    return `Create a {sceneCount} scene sequence description for a {analysis.totalDuration}s timeline with {contentDesc}.
-Themes detected: {analysis.themes.join(', ') || 'general content'}.
-Characters present: {analysis.characters.length > 0 ? analysis.characters.map(c => c.name).join(', ') : 'unspecified'}.
-Content types: {Object.entries(analysis.contentTypes).filter(([k,v]) => v > 0).map(([k,v]) => `${v} ${k}`).join(', ')}`;
+    return `Create a ${Math.ceil(analysis.totalDuration / 5)} scene sequence description for a ${analysis.totalDuration}s timeline with ${contentDesc}.
+Themes detected: ${analysis.themes.join(', ') || 'general content'}.
+Characters present: ${analysis.characters.length > 0 ? analysis.characters.map(c => c.name).join(', ') : 'unspecified'}.
+Content types: ${Object.entries(analysis.contentTypes).filter(([k,v]) => v > 0).map(([k,v]) => `${v} ${k}`).join(', ')}`;
   }
 
   extractKeyElements(analysis) {
