@@ -3,6 +3,7 @@ import { textModels } from '../lib/models.js';
 import { AuthModal } from './AuthModal.js';
 import { createHeroSection } from '../lib/thumbnails.js';
 import { createInlineInstructions } from './InlineInstructions.js';
+import { GTMPromptModal } from './modals/GTMPromptModal.jsx';
 
 export function ChatStudio() {
   const container = document.createElement('div');
@@ -89,6 +90,16 @@ export function ChatStudio() {
   textarea.placeholder = 'Type your message...';
   textarea.rows = 2;
   inputRow.appendChild(textarea);
+
+  // GTM Prompt Enhancer Button for chat
+  const gtmBtn = document.createElement('button');
+  gtmBtn.className = 'w-10 h-10 shrink-0 rounded-xl border bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40 transition-all flex items-center justify-center relative overflow-hidden group';
+  gtmBtn.title = 'GTM Prompt Enhancer - Create more persuasive chat messages';
+  gtmBtn.innerHTML = '🎯';
+  gtmBtn.onclick = () => {
+    openGTMPromptModal(textarea);
+  };
+  inputRow.appendChild(gtmBtn);
 
   const sendBtn = document.createElement('button');
   sendBtn.className = 'px-6 py-3 bg-primary text-black font-bold rounded-xl hover:bg-primary/90 transition-colors self-end';

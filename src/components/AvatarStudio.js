@@ -4,6 +4,7 @@ import { AuthModal } from './AuthModal.js';
 import { createUploadPicker } from './UploadPicker.js';
 import { createHeroSection } from '../lib/thumbnails.js';
 import { createInlineInstructions } from './InlineInstructions.js';
+import { GTMPromptModal } from './modals/GTMPromptModal.jsx';
 
 export function AvatarStudio() {
   const container = document.createElement('div');
@@ -99,12 +100,27 @@ export function AvatarStudio() {
   promptLabel.className = 'text-sm font-bold text-secondary';
   promptLabel.textContent = 'Prompt (optional)';
   promptGroup.appendChild(promptLabel);
+
+  const promptContainer = document.createElement('div');
+  promptContainer.className = 'relative';
   const promptInput = document.createElement('textarea');
   promptInput.className = 'w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white placeholder-white/30 focus:border-primary focus:outline-none resize-none';
   promptInput.rows = 2;
   promptInput.placeholder = 'Describe the animation you want...';
   promptInput.oninput = (e) => { prompt = e.target.value; };
-  promptGroup.appendChild(promptInput);
+  promptContainer.appendChild(promptInput);
+
+  // GTM Prompt Enhancer Button
+  const gtmBtn = document.createElement('button');
+  gtmBtn.className = 'absolute top-2 right-2 w-8 h-8 rounded-lg border bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40 transition-all flex items-center justify-center text-xs';
+  gtmBtn.title = 'GTM Prompt Enhancer - Create conversion-optimized prompts';
+  gtmBtn.innerHTML = '🎯';
+  gtmBtn.onclick = () => {
+    openGTMPromptModal(promptInput);
+  };
+  promptContainer.appendChild(gtmBtn);
+
+  promptGroup.appendChild(promptContainer);
   formCard.appendChild(promptGroup);
 
   // Generate button
@@ -193,5 +209,26 @@ export function AvatarStudio() {
 
   updateModelBtns();
   updateFormVisibility();
+
+  // GTM Prompt Modal Function
+  function openGTMPromptModal(promptTextarea) {
+    try {
+      const modal = new GTMPromptModal({
+        appTheme: 'avatar-studio',
+        onPromptGenerated: (generatedPrompt) => {
+          // Load the generated prompt into the textarea
+          promptTextarea.value = generatedPrompt;
+          promptTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+
+          console.log('GTM-optimized prompt loaded successfully!');
+        }
+      });
+      modal.open();
+    } catch (error) {
+      console.error('GTM Prompt Modal error:', error);
+      alert('Failed to open GTM Prompt Enhancer');
+    }
+  }
+
   return container;
 }

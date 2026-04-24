@@ -3,6 +3,7 @@ import { muapi } from '../lib/muapi.js';
 import { AuthModal } from './AuthModal.js';
 import { createInlineInstructions } from './InlineInstructions.js';
 import { createHeroSection } from '../lib/thumbnails.js';
+import { GTMPromptModal } from './modals/GTMPromptModal.jsx';
 
 // Toast notification system
 function showToast(message, type = 'info') {
@@ -214,13 +215,27 @@ export function StoryboardStudio() {
       nameInput.oninput = () => { char.name = nameInput.value; };
       card.appendChild(nameInput);
 
+      const traitsContainer = document.createElement('div');
+      traitsContainer.className = 'relative';
       const traitsInput = document.createElement('textarea');
       traitsInput.className = 'w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-xs placeholder:text-muted focus:outline-none focus:border-primary/50 resize-none';
       traitsInput.rows = 3;
       traitsInput.placeholder = 'Character traits and description...';
       traitsInput.value = char.traits;
       traitsInput.oninput = () => { char.traits = traitsInput.value; };
-      card.appendChild(traitsInput);
+      traitsContainer.appendChild(traitsInput);
+
+      // GTM Button for character traits
+      const gtmBtn1 = document.createElement('button');
+      gtmBtn1.className = 'absolute top-1 right-1 w-6 h-6 rounded border bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40 transition-all flex items-center justify-center text-xs';
+      gtmBtn1.title = 'GTM Prompt Enhancer - Create conversion-optimized character descriptions';
+      gtmBtn1.innerHTML = '🎯';
+      gtmBtn1.onclick = () => {
+        openGTMPromptModal(traitsInput, 'character-traits');
+      };
+      traitsContainer.appendChild(gtmBtn1);
+
+      card.appendChild(traitsContainer);
 
       const imageArea = document.createElement('div');
       imageArea.className = 'w-full aspect-square bg-white/[0.02] rounded-lg border border-white/5 flex items-center justify-center overflow-hidden';
@@ -318,13 +333,27 @@ export function StoryboardStudio() {
       titleInput.oninput = () => { scene.title = titleInput.value; };
       sceneCard.appendChild(titleInput);
 
+      const descContainer = document.createElement('div');
+      descContainer.className = 'relative';
       const descInput = document.createElement('textarea');
       descInput.className = 'w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-xs placeholder:text-muted focus:outline-none focus:border-primary/50 resize-none';
       descInput.rows = 2;
       descInput.placeholder = 'Scene description...';
       descInput.value = scene.description;
       descInput.oninput = () => { scene.description = descInput.value; };
-      sceneCard.appendChild(descInput);
+      descContainer.appendChild(descInput);
+
+      // GTM Button for scene description
+      const gtmBtn2 = document.createElement('button');
+      gtmBtn2.className = 'absolute top-1 right-1 w-6 h-6 rounded border bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40 transition-all flex items-center justify-center text-xs';
+      gtmBtn2.title = 'GTM Prompt Enhancer - Create conversion-optimized scene descriptions';
+      gtmBtn2.innerHTML = '🎯';
+      gtmBtn2.onclick = () => {
+        openGTMPromptModal(descInput, 'scene-description');
+      };
+      descContainer.appendChild(gtmBtn2);
+
+      sceneCard.appendChild(descContainer);
 
       // Shots within scene
       const shotsHeader = document.createElement('div');
@@ -365,13 +394,27 @@ export function StoryboardStudio() {
         shotSelect.onchange = () => { shot.shot = shotSelect.value; };
         shotCard.appendChild(shotSelect);
 
+        const promptContainer = document.createElement('div');
+        promptContainer.className = 'relative';
         const promptInput = document.createElement('textarea');
         promptInput.className = 'w-full bg-white/5 border border-white/10 rounded px-2 py-1 text-white text-xs placeholder:text-muted focus:outline-none focus:border-primary/50 resize-none';
         promptInput.rows = 2;
         promptInput.placeholder = 'Describe this shot...';
         promptInput.value = shot.prompt;
         promptInput.oninput = () => { shot.prompt = promptInput.value; };
-        shotCard.appendChild(promptInput);
+        promptContainer.appendChild(promptInput);
+
+        // GTM Button for shot prompt
+        const gtmBtn3 = document.createElement('button');
+        gtmBtn3.className = 'absolute top-0.5 right-0.5 w-5 h-5 rounded border bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40 transition-all flex items-center justify-center text-xs';
+        gtmBtn3.title = 'GTM Prompt Enhancer - Create conversion-optimized shot descriptions';
+        gtmBtn3.innerHTML = '🎯';
+        gtmBtn3.onclick = () => {
+          openGTMPromptModal(promptInput, 'shot-prompt');
+        };
+        promptContainer.appendChild(gtmBtn3);
+
+        shotCard.appendChild(promptContainer);
 
         const narrationInput = document.createElement('input');
         narrationInput.type = 'text';
@@ -544,5 +587,26 @@ export function StoryboardStudio() {
   }
 
   renderTabs();
+
+  // GTM Prompt Modal Function
+  function openGTMPromptModal(promptTextarea, context) {
+    try {
+      const modal = new GTMPromptModal({
+        appTheme: 'storyboard-studio',
+        onPromptGenerated: (generatedPrompt) => {
+          // Load the generated prompt into the textarea
+          promptTextarea.value = generatedPrompt;
+          promptTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+
+          console.log(`GTM-optimized prompt loaded successfully for ${context}!`);
+        }
+      });
+      modal.open();
+    } catch (error) {
+      console.error('GTM Prompt Modal error:', error);
+      showToast('Failed to open GTM Prompt Enhancer', 'error');
+    }
+  }
+
   return container;
 }
