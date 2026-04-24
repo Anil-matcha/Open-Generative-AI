@@ -22,6 +22,12 @@ export class VideoPersonalizationHub extends BaseModal {
     this.generations = [];
     this.analytics = {};
 
+    // Check for pre-loaded video from timeline editor
+    if (options.preloadedVideo) {
+      this.videos = [options.preloadedVideo];
+      this.activeTab = 'contacts'; // Skip upload, go to contacts
+    }
+
     this.workflowSteps = [
       { id: 'upload', label: 'Upload Video', icon: '📤', description: 'Upload your base video' },
       { id: 'contacts', label: 'Import Contacts', icon: '👥', description: 'Add your contact list' },

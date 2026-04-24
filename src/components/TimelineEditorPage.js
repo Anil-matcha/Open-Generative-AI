@@ -33,7 +33,9 @@ import { UrlVideoModal } from './modals/UrlVideoModal.jsx';
 import { PageShotModal } from './modals/PageShotModal.jsx';
 import { ContactImporterModal } from './modals/ContactImporterModal.jsx';
 import { AIVideoCreator } from './modals/AIVideoCreator.jsx';
-
+import { VideoPersonalizationHub } from './modals/VideoPersonalizationHub.jsx';
+import { LandingPageBuilder } from './modals/LandingPageBuilder.jsx';
+import { LeadGeneratorModal } from './modals/LeadGeneratorModal.jsx';
 // Category C Editor Surface imports removed - not implemented
 
 export function TimelineEditorPage() {
@@ -687,7 +689,7 @@ button, input, textarea, select { font: inherit; }
       ],
       generateTypes: [['✍️', 'Text'], ['🖼️', 'Image'], ['🔄', 'Retake'], ['➡️', 'Extend'], ['🎞️', 'B-Roll']],
       quickCommands: ['⚡Generate','Retake','Extend','B-Roll'],
-      railActions: [['⚡', 'Generate', true], ['✂️', 'Split'], ['🎬', 'Scenes'], ['💬', 'Subtitle'], ['🎞️', 'B-Roll'], ['⏱️', 'Speed'], ['🪄', 'Stabilize'], ['📝', 'Text'], ['🔄', 'Transitions'], ['🎬', 'AI Video'], ['🎥', 'Recorder'], ['🎙️', 'Enhanced Recorder'], ['📋', 'Templates'], ['👀', 'Preview Template'], ['📱', 'Social'], ['📧', 'Email Campaign'], ['🔗', 'URL Video'], ['📸', 'Page Shot'], ['👥', 'Contacts'], ['🎨', 'Canvas'], ['🏷️', 'Token Editor'], ['📦', 'Batch Generator'], ['🔄', 'Workflow'], ['👤', 'Personalization'], ['✏️', 'Personalization Editor']],
+      railActions: [['⚡', 'Generate', true], ['✂️', 'Split'], ['🎬', 'Scenes'], ['💬', 'Subtitle'], ['🎞️', 'B-Roll'], ['⏱️', 'Speed'], ['🪄', 'Stabilize'], ['📝', 'Text'], ['🔄', 'Transitions'], ['🎬', 'AI Video'], ['🎥', 'Recorder'], ['🎙️', 'Enhanced Recorder'], ['📋', 'Templates'], ['👀', 'Preview Template'], ['📱', 'Social'], ['📧', 'Email Campaign'], ['🔗', 'URL Video'], ['📸', 'Page Shot'], ['👥', 'Contacts'], ['🎨', 'Canvas'], ['🏷️', 'Token Editor'], ['📦', 'Batch Generator'], ['🔄', 'Workflow'], ['👤', 'Personalization'], ['✏️', 'Personalization Editor'], ['🎬', 'Personalization Suite'], ['🏠', 'Landing Pages'], ['📋', 'Lead Generator']],
       chat: [
         { role: 'user', text: 'Generate a better opening shot' },
         { role: 'ai', text: 'Opening idea ready. Use Generate or Retake.' }
@@ -2257,6 +2259,73 @@ button, input, textarea, select { font: inherit; }
       }
     }
 
+    function openVideoPersonalizationHubModal(state, showToast) {
+      try {
+        const modal = new VideoPersonalizationHub({
+          preloadedVideo: state.lastGeneratedVideo, // Pass any recently generated video
+          onComplete: (result) => {
+            // After personalization, offer landing page builder
+            if (result && result.generations && result.generations.length > 0) {
+              setTimeout(() => {
+                showToast('🎉 Personalization complete! Create landing pages?', 'info');
+                setTimeout(() => {
+                  openLandingPageBuilderModal(state, showToast);
+                }, 1500);
+              }, 1000);
+            } else {
+              showToast('Personalization Suite closed', 'success');
+            }
+          },
+          onError: (error) => showToast(`Personalization Suite error: ${error}`, 'error')
+        });
+        modal.open();
+      } catch (error) {
+        showToast('Failed to open Personalization Suite', 'error');
+      }
+    }
+
+    // Make personalization modal accessible globally for toast integration
+    window.openVideoPersonalizationHubModal = () => openVideoPersonalizationHubModal(state, showToast);
+
+    function openLandingPageBuilderModal(state, showToast) {
+      try {
+        const modal = new LandingPageBuilder({
+          onComplete: (result) => {
+            // After landing pages, offer lead generation
+            if (result && result.pages && result.pages > 0) {
+              setTimeout(() => {
+                showToast('🏠 Landing pages ready! Set up lead capture?', 'info');
+                setTimeout(() => {
+                  openLeadGeneratorModal(state, showToast);
+                }, 1500);
+              }, 1000);
+            } else {
+              showToast('Landing pages generated successfully', 'success');
+            }
+          },
+          onError: (error) => showToast(`Landing page generation failed: ${error}`, 'error')
+        });
+        modal.open();
+      } catch (error) {
+        showToast('Failed to open Landing Page Builder', 'error');
+      }
+    }
+
+    function openLeadGeneratorModal(state, showToast) {
+      try {
+        const modal = new LeadGeneratorModal({
+          onComplete: (result) => {
+            // Handle lead saving
+            showToast('Lead saved successfully', 'success');
+          },
+          onError: (error) => showToast(`Lead generation failed: ${error}`, 'error')
+        });
+        modal.open();
+      } catch (error) {
+        showToast('Failed to open Lead Generator', 'error');
+      }
+    }
+
     // Helper functions for modal integration
     function addVideoToTimeline(videoData, state) {
       const videoTrack = state.tracks.find(t => t.name === 'Video');
@@ -2329,7 +2398,38 @@ button, input, textarea, select { font: inherit; }
         const button = document.createElement('button');
         button.className = `rail-btn ${active ? 'active' : ''}`;
         button.innerHTML = `<span class="emoji">${icon}</span><span>${label}</span>`;
-        button.title = `${label} action`;
+        // Enhanced tooltips for better user experience
+        const tooltips = {
+          'Generate': 'Generate new content with AI',
+          'Split': 'Split clip at playhead position',
+          'Scenes': 'Detect and extract scene changes',
+          'Subtitle': 'Add subtitles to video',
+          'B-Roll': 'Suggest B-roll footage',
+          'Speed': 'Adjust playback speed',
+          'Stabilize': 'Stabilize shaky footage',
+          'Text': 'Add text overlay',
+          'Transitions': 'Add transition effects',
+          'AI Video': 'Create video with AI generation',
+          'Recorder': 'Record screen or webcam',
+          'Enhanced Recorder': 'Advanced recording options',
+          'Templates': 'Browse video templates',
+          'Preview Template': 'Preview template before use',
+          'Social': 'Share to social media',
+          'Email Campaign': 'Create email campaign',
+          'URL Video': 'Import video from URL',
+          'Page Shot': 'Capture webpage as image',
+          'Contacts': 'Import contact lists',
+          'Canvas': 'Open canvas editor',
+          'Token Editor': 'Edit personalization tokens',
+          'Batch Generator': 'Generate multiple videos',
+          'Workflow': 'Automate video workflows',
+          'Personalization': 'Personalize video content',
+          'Personalization Editor': 'Advanced personalization settings',
+          'Personalization Suite': 'Complete video personalization workflow',
+          'Landing Pages': 'Create personalized landing pages',
+          'Lead Generator': 'Generate and capture leads'
+        };
+        button.title = tooltips[label] || `${label} action`;
         button.setAttribute('aria-label', `${label} action`);
 
         // Add specific functionality for each rail action
@@ -2410,6 +2510,15 @@ button, input, textarea, select { font: inherit; }
               break;
             case 'Personalization Editor':
               showPersonalizationEditorPanel();
+              break;
+            case 'Personalization Suite':
+              openVideoPersonalizationHubModal(state, showToast);
+              break;
+            case 'Landing Pages':
+              openLandingPageBuilderModal(state, showToast);
+              break;
+            case 'Lead Generator':
+              openLeadGeneratorModal(state, showToast);
               break;
             default:
               showToast(`${label} action triggered`);
@@ -2799,6 +2908,84 @@ button, input, textarea, select { font: inherit; }
           });
 
           showToast(`${state.generateType} generated successfully`, 'success');
+
+          // Offer personalization suite for video generation
+          if (state.generateType !== 'Image' && state.generateType !== 'Text') {
+            // Store the generated video for personalization
+            state.lastGeneratedVideo = {
+              id: clipId,
+              name: clip.name,
+              src: generationResult.url,
+              poster: generationResult.thumbnail_url,
+              prompt: prompt,
+              generatedAt: new Date().toISOString()
+            };
+
+            setTimeout(() => {
+              // Create a toast with personalization offer
+              const toast = document.createElement('div');
+              toast.className = 'personalization-toast';
+              toast.innerHTML = `
+                <div class="toast-content">
+                  <div class="toast-icon">🎬</div>
+                  <div class="toast-text">
+                    <strong>Video Ready!</strong>
+                    <br>
+                    <small>Personalize this video for your audience?</small>
+                  </div>
+                  <div class="toast-actions">
+                    <button class="toast-btn toast-btn-secondary" onclick="this.closest('.personalization-toast').remove()">Maybe Later</button>
+                    <button class="toast-btn toast-btn-primary" onclick="window.openVideoPersonalizationHubModal(); this.closest('.personalization-toast').remove()">Personalize Now</button>
+                  </div>
+                </div>
+              `;
+
+              // Add toast styles
+              const existingToast = document.querySelector('.personalization-toast');
+              if (existingToast) existingToast.remove();
+
+              toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 10000;
+                background: var(--panel);
+                border: 1px solid var(--border);
+                border-radius: 20px;
+                box-shadow: var(--shadow);
+                padding: 20px;
+                max-width: 320px;
+                font-family: inherit;
+              `;
+
+              // Add button styles
+              const style = document.createElement('style');
+              style.textContent = `
+                .toast-content { display: flex; align-items: center; gap: 12px; }
+                .toast-icon { font-size: 24px; }
+                .toast-text { flex: 1; }
+                .toast-actions { display: flex; gap: 8px; margin-top: 12px; }
+                .toast-btn { padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; font-size: 12px; }
+                .toast-btn-primary { background: var(--cyan); color: white; }
+                .toast-btn-secondary { background: transparent; color: var(--text); }
+                .toast-btn:hover { transform: translateY(-1px); }
+              `;
+
+              if (!document.querySelector('#toast-styles')) {
+                style.id = 'toast-styles';
+                document.head.appendChild(style);
+              }
+
+              document.body.appendChild(toast);
+
+              // Auto-remove after 10 seconds
+              setTimeout(() => {
+                if (toast.parentNode) {
+                  toast.remove();
+                }
+              }, 10000);
+            }, 2000); // Show after 2 seconds
+          }
         } else {
           throw new Error('No result URL returned from generation');
         }
