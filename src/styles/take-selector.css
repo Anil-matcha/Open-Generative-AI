@@ -1,0 +1,453 @@
+/**
+ * Take Selector Styles
+ * Electric theme (#2B61FF) for multi-take clip system
+ */
+
+/* Take Selector Container */
+.take-selector {
+  background: var(--bg-panel, #18181b);
+  border: 1px solid var(--border-light, rgba(255, 255, 255, 0.1));
+  border-radius: var(--radius-md, 8px);
+  font-family: var(--font-family, 'Inter', system-ui, sans-serif);
+  color: var(--text-primary, #fff);
+  overflow: hidden;
+}
+
+.take-selector.theme-electric {
+  --color-primary: #2B61FF;
+  --color-accent: #00d4ff;
+  --bg-panel: #09090b;
+  --bg-card: #18181b;
+  --border-light: rgba(43, 97, 255, 0.3);
+  --text-primary: #ffffff;
+  --text-secondary: #a1a1aa;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --error: #ef4444;
+}
+
+/* Header */
+.take-selector-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm, 8px) var(--spacing-md, 12px);
+  background: linear-gradient(135deg, var(--color-primary) 0%, #1a4aCC 100%);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.take-selector-header h4 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+}
+
+/* Action Buttons */
+.take-actions {
+  display: flex;
+  gap: var(--spacing-xs, 4px);
+}
+
+.take-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  border-radius: var(--radius-sm, 4px);
+  color: white;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.take-action-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.take-action-btn .btn-icon {
+  font-size: 12px;
+}
+
+/* Take List */
+.take-list {
+  max-height: 200px;
+  overflow-y: auto;
+  padding: var(--spacing-sm, 8px);
+}
+
+.take-list-empty {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 12px;
+  padding: var(--spacing-md, 12px);
+}
+
+.take-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-sm, 8px);
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm, 6px);
+  margin-bottom: var(--spacing-xs, 4px);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.take-item:hover {
+  border-color: var(--color-primary);
+  background: rgba(43, 97, 255, 0.1);
+}
+
+.take-item.selected {
+  border-color: var(--color-primary);
+  background: rgba(43, 97, 255, 0.2);
+  box-shadow: 0 0 10px rgba(43, 97, 255, 0.3);
+}
+
+.take-item-main {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm, 8px);
+  flex: 1;
+}
+
+.take-number {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-primary);
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+}
+
+.take-info {
+  flex: 1;
+}
+
+.take-name {
+  font-size: 12px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.agent-badge {
+  font-size: 10px;
+}
+
+.take-meta {
+  display: flex;
+  gap: var(--spacing-sm, 8px);
+  font-size: 10px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.take-quality {
+  color: var(--success);
+}
+
+.take-model {
+  color: var(--color-accent);
+}
+
+.take-delete-btn {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: all 0.15s;
+}
+
+.take-delete-btn:hover {
+  background: var(--error);
+  color: white;
+}
+
+/* Progress UI */
+.take-generation-progress {
+  padding: var(--spacing-sm, 8px) var(--spacing-md, 12px);
+  background: var(--bg-card);
+  border-top: 1px solid var(--border-light);
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.progress-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.progress-count {
+  font-size: 11px;
+  color: var(--color-accent);
+}
+
+.progress-bar {
+  height: 4px;
+  background: var(--bg-panel);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  transition: width 0.3s ease;
+}
+
+/* Footer */
+.take-selector-footer {
+  padding: var(--spacing-sm, 8px) var(--spacing-md, 12px);
+  background: var(--bg-card);
+  border-top: 1px solid var(--border-light);
+}
+
+.take-count {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs, 4px);
+  font-size: 11px;
+}
+
+.count-label {
+  color: var(--text-secondary);
+}
+
+.count-value {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+/* Generate Dialog */
+.take-generate-dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dialog-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+}
+
+.dialog-content {
+  position: relative;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg, 12px);
+  padding: var(--spacing-lg, 16px);
+  width: 320px;
+  max-width: 90vw;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.dialog-content h3 {
+  margin: 0 0 var(--spacing-md, 12px) 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.form-group {
+  margin-bottom: var(--spacing-md, 12px);
+}
+
+.form-group label {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.form-group select {
+  width: 100%;
+  padding: var(--spacing-sm, 8px);
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm, 6px);
+  color: var(--text-primary);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.form-group select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.dialog-actions {
+  display: flex;
+  gap: var(--spacing-sm, 8px);
+  margin-top: var(--spacing-lg, 16px);
+}
+
+.dialog-btn {
+  flex: 1;
+  padding: var(--spacing-sm, 8px) var(--spacing-md, 12px);
+  border: none;
+  border-radius: var(--radius-sm, 6px);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.dialog-btn.cancel-btn {
+  background: var(--bg-card);
+  color: var(--text-secondary);
+}
+
+.dialog-btn.cancel-btn:hover {
+  background: var(--bg-panel);
+  color: var(--text-primary);
+}
+
+.dialog-btn.generate-confirm-btn {
+  background: var(--color-primary);
+  color: white;
+}
+
+.dialog-btn.generate-confirm-btn:hover {
+  background: #1a4aCC;
+  box-shadow: 0 4px 12px rgba(43, 97, 255, 0.4);
+}
+
+/* Comparison Result */
+.take-comparison-result {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--bg-panel);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg, 12px);
+  width: 400px;
+  max-width: 90vw;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  z-index: 1001;
+}
+
+.comparison-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md, 12px);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.comparison-header h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.close-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 20px;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.close-btn:hover {
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+.comparison-content {
+  padding: var(--spacing-md, 12px);
+}
+
+.recommendation-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm, 8px);
+  padding: var(--spacing-sm, 8px);
+  background: var(--bg-card);
+  border-radius: var(--radius-sm, 6px);
+  margin-bottom: var(--spacing-xs, 4px);
+}
+
+.rec-icon {
+  font-size: 14px;
+}
+
+.rec-text {
+  flex: 1;
+  font-size: 12px;
+  color: var(--text-primary);
+}
+
+.rec-action-btn {
+  padding: 4px 8px;
+  background: var(--color-primary);
+  border: none;
+  border-radius: var(--radius-sm, 4px);
+  color: white;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.rec-action-btn:hover {
+  background: #1a4aCC;
+}
+
+/* Scrollbar Styling */
+.take-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.take-list::-webkit-scrollbar-track {
+  background: var(--bg-panel);
+}
+
+.take-list::-webkit-scrollbar-thumb {
+  background: var(--border-light);
+  border-radius: 3px;
+}
+
+.take-list::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
+}
