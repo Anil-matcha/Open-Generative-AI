@@ -36,6 +36,67 @@ export class VideoPersonalizationHub extends BaseModal {
       { id: 'deliver', label: 'Create Landing Pages', icon: '🏠', description: 'Build delivery pages' },
       { id: 'analytics', label: 'View Analytics', icon: '📊', description: 'Track performance' }
     ];
+
+    // Inject additional styles for content type buttons
+    if (!document.querySelector('#personalization-hub-styles')) {
+      const style = document.createElement('style');
+      style.id = 'personalization-hub-styles';
+      style.textContent = `
+        .content-types-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
+          margin-bottom: 24px;
+        }
+
+        .content-type-btn {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 8px;
+          padding: 16px 12px;
+          border: 1px solid var(--border);
+          background: var(--panel);
+          border-radius: 12px;
+          cursor: pointer;
+          transition: all 0.15s ease;
+          text-align: center;
+        }
+
+        .content-type-btn:hover {
+          border-color: var(--cyan);
+          background: rgba(34, 211, 238, 0.1);
+          transform: translateY(-1px);
+        }
+
+        .content-icon {
+          font-size: 24px;
+          margin-bottom: 4px;
+        }
+
+        .content-name {
+          font-size: 14px;
+          font-weight: 600;
+          color: var(--text);
+        }
+
+        .content-desc {
+          font-size: 11px;
+          color: var(--muted);
+          line-height: 1.3;
+        }
+
+        .content-addition-section {
+          margin-top: 16px;
+        }
+
+        .content-addition-section .mini-btn {
+          width: 100%;
+          margin-bottom: 8px;
+        }
+      `;
+      document.head.appendChild(style);
+    }
   }
 
   renderBody() {
@@ -260,6 +321,21 @@ export class VideoPersonalizationHub extends BaseModal {
           <button class="primary-btn" ${this.contacts.length === 0 ? 'disabled' : ''}>
             ⚡ Generate ${this.contacts.length} Videos
           </button>
+
+          <div class="content-addition-section" style="margin-top: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <button class="mini-btn" onclick="window.addPersonalizationOverlay()">
+              🎭 Add Text Overlay
+            </button>
+            <button class="mini-btn" onclick="window.addPersonalizationImage()">
+              🖼️ Add Image Overlay
+            </button>
+            <button class="mini-btn" onclick="window.addPersonalizationAudio()">
+              🔊 Add Voice Narration
+            </button>
+            <button class="mini-btn" onclick="window.addLeadCapture()">
+              📝 Add Lead Form
+            </button>
+          </div>
         </div>
 
         <div class="generation-progress" style="display: none;">
@@ -277,6 +353,34 @@ export class VideoPersonalizationHub extends BaseModal {
   renderDeliverTab() {
     return `
       <div class="tab-content deliver-tab">
+        <div class="content-creation-section">
+          <h4>Add Content to Video</h4>
+          <p>Add personalized elements directly to your video timeline</p>
+
+          <div class="content-types-grid">
+            <button class="content-type-btn" onclick="window.addDynamicContent('greeting')">
+              <span class="content-icon">👋</span>
+              <span class="content-name">Greeting</span>
+              <span class="content-desc">Personal welcome message</span>
+            </button>
+            <button class="content-type-btn" onclick="window.addDynamicContent('product')">
+              <span class="content-icon">📦</span>
+              <span class="content-name">Product Offer</span>
+              <span class="content-desc">Company-specific offers</span>
+            </button>
+            <button class="content-type-btn" onclick="window.addDynamicContent('testimonial')">
+              <span class="content-icon">💬</span>
+              <span class="content-name">Testimonial</span>
+              <span class="content-desc">Personalized testimonial</span>
+            </button>
+            <button class="content-type-btn" onclick="window.addContactImport()">
+              <span class="content-icon">👥</span>
+              <span class="content-name">Import Contacts</span>
+              <span class="content-desc">Add contact database</span>
+            </button>
+          </div>
+        </div>
+
         <div class="landing-page-builder">
           <h4>Landing Page Builder</h4>
           <p>Create personalized landing pages for each contact</p>

@@ -2287,6 +2287,141 @@ button, input, textarea, select { font: inherit; }
     // Make personalization modal accessible globally for toast integration
     window.openVideoPersonalizationHubModal = () => openVideoPersonalizationHubModal(state, showToast);
 
+    // Global function to add personalization overlay to timeline
+    window.addPersonalizationOverlay = () => {
+      const overlayClip = {
+        id: Date.now(),
+        name: 'Personalization Overlay',
+        left: state.playheadPercent * 10, // Position near playhead
+        width: 8,
+        type: 'text',
+        heading: 'Hello {first_name}!',
+        body: 'Welcome to our personalized video experience.',
+        fontSize: 48,
+        color: '#ffffff',
+        backgroundColor: 'rgba(0,0,0,0.7)',
+        position: 'center'
+      };
+      insertClipIntoTrack(overlayClip, 'Text');
+      showToast('Personalization overlay added to timeline', 'success');
+    };
+
+    // Global function to add contact import functionality
+    window.addContactImport = () => {
+      openContactImporterModal(state, showToast);
+    };
+
+    // Global function to add lead generation form
+    window.addLeadCapture = () => {
+      const leadClip = {
+        id: Date.now(),
+        name: 'Lead Capture Form',
+        left: state.playheadPercent * 10,
+        width: 6,
+        type: 'text',
+        heading: 'Get Your Free Guide',
+        body: 'Enter your email to receive personalized content.',
+        formFields: ['email', 'first_name'],
+        ctaText: 'Download Now'
+      };
+      insertClipIntoTrack(leadClip, 'Text');
+      showToast('Lead capture form added to timeline', 'success');
+    };
+
+    // Global function to add personalized image overlay
+    window.addPersonalizationImage = () => {
+      const imageClip = {
+        id: Date.now(),
+        name: 'Personalized Image',
+        left: state.playheadPercent * 10,
+        width: 8,
+        type: 'image',
+        src: '', // Will be set by user
+        personalizationTokens: ['first_name', 'company'],
+        overlayText: 'Welcome {first_name} from {company}!'
+      };
+      insertClipIntoTrack(imageClip, 'Video');
+      showToast('Personalized image overlay added to timeline', 'success');
+    };
+
+    // Global function to add voice narration
+    window.addPersonalizationAudio = () => {
+      const audioClip = {
+        id: Date.now(),
+        name: 'Personalized Voice',
+        left: state.playheadPercent * 10,
+        width: 12,
+        type: 'audio',
+        src: '', // Will be generated
+        text: 'Hello {first_name}, thank you for being part of {company}.',
+        voice: 'neural-male',
+        personalizationTokens: ['first_name', 'company']
+      };
+      insertClipIntoTrack(audioClip, 'Audio');
+      showToast('Personalized voice narration added to timeline', 'success');
+    };
+
+    // Global function to add dynamic content based on contact data
+    window.addDynamicContent = (contentType) => {
+      let contentClip;
+
+      switch (contentType) {
+        case 'greeting':
+          contentClip = {
+            id: Date.now(),
+            name: 'Dynamic Greeting',
+            left: state.playheadPercent * 10,
+            width: 6,
+            type: 'text',
+            heading: 'Hello {first_name}!',
+            body: 'Welcome back to our exclusive content.',
+            personalizationTokens: ['first_name']
+          };
+          break;
+
+        case 'product':
+          contentClip = {
+            id: Date.now(),
+            name: 'Product Personalization',
+            left: state.playheadPercent * 10,
+            width: 10,
+            type: 'text',
+            heading: '{company} Special Offer',
+            body: 'As a valued {job_title} at {company}, you qualify for our premium package.',
+            personalizationTokens: ['company', 'job_title']
+          };
+          break;
+
+        case 'testimonial':
+          contentClip = {
+            id: Date.now(),
+            name: 'Personalized Testimonial',
+            left: state.playheadPercent * 10,
+            width: 8,
+            type: 'text',
+            heading: 'What {first_name} Says',
+            body: '"This solution transformed how {company} operates." - {first_name}',
+            personalizationTokens: ['first_name', 'company']
+          };
+          break;
+
+        default:
+          contentClip = {
+            id: Date.now(),
+            name: 'Custom Personalization',
+            left: state.playheadPercent * 10,
+            width: 6,
+            type: 'text',
+            heading: 'Personalized Content',
+            body: 'Custom message for {first_name}',
+            personalizationTokens: ['first_name']
+          };
+      }
+
+      insertClipIntoTrack(contentClip, 'Text');
+      showToast(`${contentType} personalized content added to timeline`, 'success');
+    };
+
     function openLandingPageBuilderModal(state, showToast) {
       try {
         const modal = new LandingPageBuilder({

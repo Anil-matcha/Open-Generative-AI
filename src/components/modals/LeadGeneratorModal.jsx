@@ -5,6 +5,7 @@
  */
 
 import { BaseModal } from './BaseModal.jsx';
+import { supabase } from '../../lib/supabase.js';
 
 export class LeadGeneratorModal extends BaseModal {
   constructor(options = {}) {
@@ -165,18 +166,54 @@ export class LeadGeneratorModal extends BaseModal {
     });
   }
 
-  handleSave() {
+  async handleSave() {
     if (!this.lead.email) {
       alert('Email is required');
       return;
     }
 
-    this.onComplete?.({
-      ...this.lead,
-      id: Date.now(),
-      createdAt: new Date().toISOString()
-    });
+    try {
+      // Send lead data to backend for email processing
+      const { data, error } = await supabase.functions.invoke('lead-processor', {
+        body: {
+          lead: {
+            ...this.lead,
+            id: Date.now(),
+            createdAt: new Date().toISOString()
+          },
+          action: 'capture',
+          personalizationData: this.personalizationData || {}
+        }
+      });
 
-    this.close();
+      if (error) throw error;
+
+      // Send welcome email if personalization data exists
+      if (this.personalizationData) {
+        await supabase.functions.invoke('email-service', {
+          body: {
+            to: this.lead.email,
+            subject: 'Your Personalized Video Experience',
+            template: 'personalized_video_welcome',
+            personalizationData: this.personalizationData,
+            leadData: this.lead
+          }
+        });
+      }
+
+      this.onComplete?.({
+        ...this.lead,
+        id: Date.now(),
+        createdAt: new Date().toISOString(),
+        emailSent: true
+      });
+
+      alert('Lead saved and welcome email sent!');
+      this.close();
+
+    } catch (error) {
+      console.error('Lead processing error:', error);
+      alert('Lead saved but email delivery failed. Please try again.');
+    }
   }
 }
