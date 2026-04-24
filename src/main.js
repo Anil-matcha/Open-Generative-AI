@@ -20,6 +20,8 @@ import { escapeHtml, safeHtml } from './lib/security.js';
 import { initializeEnhancedMuAPI } from './lib/muapiEnhanced.js';
 import { loadConfig } from './lib/muapiConfig.js';
 import { errorReporter } from './lib/error-reporter.js';
+import { setupGlobalErrorHandling } from './lib/error-boundary.js';
+import { initializeHealthChecks } from './lib/health-check.js';
 // Initialize environment validation
 const envConfig = initializeEnvironmentValidation();
 
@@ -31,6 +33,8 @@ const authTools = initializeAuthHardening();
 const performanceTools = initializePerformanceHardening();
 const securityStatus = initializeSecurity();
 initializeErrorHandling();
+setupGlobalErrorHandling();
+initializeHealthChecks();
 enforceHTTPS();
 const envStatus = validateEnvironment();
 

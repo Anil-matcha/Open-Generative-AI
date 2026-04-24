@@ -27,3 +27,9 @@ dist-ssr
 
 # Local Netlify folder
 .netlify
+
+# Playwright MCP test artifacts
+.playwright-mcp/
+
+# Vite timestamp build artifacts
+*vite.config.js.timestamp-*.mjs

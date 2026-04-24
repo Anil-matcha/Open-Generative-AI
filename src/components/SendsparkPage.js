@@ -1,42 +1,87 @@
 export function SendsparkPage() {
-  // For now, we'll create a simple wrapper. In the future, this could connect to
-  // a proper state management system for workflows
   const element = document.createElement('div');
-  element.className = 'w-full h-full p-6 bg-gray-900 overflow-y-auto';
+  element.className = 'w-full h-full relative';
+  element.style.overflow = 'hidden';
 
-  element.innerHTML = `
-    <div class="max-w-6xl mx-auto">
-      <div class="text-center mb-8">
-        <h1 class="text-4xl font-bold text-white mb-2">Sendspark Workflow Studio</h1>
-        <p class="text-gray-400">Automated video creation and publishing workflows</p>
-      </div>
-
-      <div class="bg-gray-800 rounded-lg p-8 text-center">
-        <div class="text-yellow-400 mb-4">
-          <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
-          </svg>
-        </div>
-        <h3 class="text-xl font-semibold text-white mb-4">Sendspark Integration Coming Soon</h3>
-        <p class="text-gray-400 mb-6 max-w-md mx-auto">
-          The Sendspark workflow automation features are currently being integrated.
-          This will provide automated video creation, editing, and publishing workflows.
-        </p>
-        <div class="space-y-3">
-          <div class="bg-gray-700 rounded-lg p-4 text-left">
-            <h4 class="font-medium text-white mb-2">Planned Features:</h4>
-            <ul class="text-sm text-gray-400 space-y-1">
-              <li>• Video Creation Pipelines</li>
-              <li>• Batch Processing Workflows</li>
-              <li>• Personalization Hub</li>
-              <li>• Social Media Automation</li>
-              <li>• Analytics Integration</li>
-            </ul>
-          </div>
-        </div>
-      </div>
+  // Loading state
+  const loadingContainer = document.createElement('div');
+  loadingContainer.className = 'absolute inset-0 flex items-center justify-center bg-gray-900 z-10';
+  loadingContainer.innerHTML = `
+    <div class="text-center">
+      <div class="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+      <p class="text-gray-400">Loading Sendspark Workflow Studio...</p>
     </div>
   `;
+  element.appendChild(loadingContainer);
+
+  // Error state container
+  const errorContainer = document.createElement('div');
+  errorContainer.className = 'absolute inset-0 flex items-center justify-center bg-gray-900 z-10 hidden';
+  errorContainer.innerHTML = `
+    <div class="text-center max-w-md mx-auto p-6">
+      <div class="text-red-500 mb-4">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="15" y1="9" x2="9" y2="15"/>
+          <line x1="9" y1="9" x2="15" y2="15"/>
+        </svg>
+      </div>
+      <h3 class="text-lg font-semibold mb-2 text-white">Sendspark Unavailable</h3>
+      <p class="text-gray-400 mb-4">The Sendspark application is currently unavailable. Please try again later.</p>
+      <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors" onclick="location.reload()">
+        Try Again
+      </button>
+    </div>
+  `;
+  element.appendChild(errorContainer);
+
+  // Iframe container
+  const iframe = document.createElement('iframe');
+  iframe.src = '/apps/sendspark/';
+  iframe.className = 'w-full h-full border-0';
+  iframe.style.display = 'none';
+  iframe.onload = () => {
+    loadingContainer.style.display = 'none';
+    errorContainer.style.display = 'none';
+    iframe.style.display = 'block';
+  };
+  iframe.onerror = () => {
+    loadingContainer.style.display = 'none';
+    errorContainer.classList.remove('hidden');
+  };
+
+  element.appendChild(iframe);
+
+  // Auto-retry mechanism
+  let retryCount = 0;
+  const maxRetries = 3;
+  const retryInterval = 5000; // 5 seconds
+
+  const checkAvailability = () => {
+    if (retryCount < maxRetries) {
+      setTimeout(() => {
+        const testIframe = document.createElement('iframe');
+        testIframe.src = 'http://localhost:5175';
+        testIframe.style.display = 'none';
+        testIframe.onload = () => {
+          location.reload(); // Reload to show the iframe
+        };
+        testIframe.onerror = () => {
+          retryCount++;
+          checkAvailability();
+        };
+        document.body.appendChild(testIframe);
+        setTimeout(() => document.body.removeChild(testIframe), 1000);
+      }, retryInterval);
+    }
+  };
+
+  // Start checking after initial error
+  iframe.onerror = () => {
+    loadingContainer.style.display = 'none';
+    errorContainer.classList.remove('hidden');
+    checkAvailability();
+  };
 
   return element;
 }

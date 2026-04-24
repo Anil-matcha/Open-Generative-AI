@@ -1,4 +1,4 @@
-import { supabase } from '../../lib/supabase.js';
+import { supabase } from '../../lib/hybrid-supabase.js';
 import { whiteLabelManager } from '../../lib/theming/whiteLabelManager.js';
 import { showToast } from '../../lib/loading.js';
 
