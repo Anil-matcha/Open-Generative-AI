@@ -140,7 +140,7 @@ export function extendGenerationPanel(generationContainer, state, showToast) {
     generationContainer.appendChild(ttsBtn);
   }
 
-  // Add CineGen AI Workflow button
+  // Add AI Workflow button
   const aiWorkflowBtn = document.createElement('button');
   aiWorkflowBtn.className = 'generate-type';
   aiWorkflowBtn.innerHTML = '<div class="emoji">🧠</div><div>AI Workflow</div>';
@@ -163,7 +163,7 @@ export function extendGenerationPanel(generationContainer, state, showToast) {
     document.body.appendChild(modal);
 
     const canvasContainer = modal.querySelector('#nodeCanvasContainer');
-    const nodeEditor = (await import('../lib/editor/cinegen-features/nodeWorkflow.js')).createNodeEditor(canvasContainer);
+    const nodeEditor = (await import('../lib/editor/ai-features/nodeWorkflow.js')).createNodeEditor(canvasContainer);
     nodeEditor.init();
 
     modal.querySelector('.modal-close').addEventListener('click', () => modal.remove());
@@ -173,14 +173,14 @@ export function extendGenerationPanel(generationContainer, state, showToast) {
   });
   generationContainer.appendChild(aiWorkflowBtn);
 
-  // Add CineGen AI Tools button
+  // Add AI Tools button
   const aiToolsBtn = document.createElement('button');
   aiToolsBtn.className = 'generate-type';
   aiToolsBtn.innerHTML = '<div class="emoji">⚡</div><div>AI Tools</div>';
   aiToolsBtn.title = 'Fill gaps, extend clips, generate music from video, and apply SAM3 masking using 9 video models';
   aiToolsBtn.setAttribute('data-tooltip', 'ai-tools');
   aiToolsBtn.addEventListener('click', async () => {
-    const { createModal } = await import('../lib/editor/cinegenIntegration.js');
+    const { createModal } = await import('../lib/editor/aiIntegration.js');
     const modal = createModal('AI Editing Tools', `
       <div class="ai-tools-modal">
         <div class="ai-tools-section">
@@ -268,8 +268,8 @@ export function extendGenerationPanel(generationContainer, state, showToast) {
       }
 
       try {
-        const { CineGenMuAPI } = await import('../lib/editor/cinegenMuapi.js');
-        const result = await CineGenMuAPI.generateVideo(`Fill gap of ${duration} seconds`, model);
+        const { AiMuAPI } = await import('../lib/editor/aiMuapi.js');
+        const result = await AiMuAPI.generateVideo(`Fill gap of ${duration} seconds`, model);
 
         const videoTrack = state.tracks.find(t => t.type === 'video');
         if (videoTrack) {
@@ -303,9 +303,9 @@ export function extendGenerationPanel(generationContainer, state, showToast) {
       }
 
       try {
-        const { CineGenMuAPI } = await import('../lib/editor/cinegenMuapi.js');
+        const { AiMuAPI } = await import('../lib/editor/aiMuapi.js');
         const prompt = direction === 'before' ? 'Generate footage to prepend' : 'Generate footage to append';
-        const result = await CineGenMuAPI.generateVideo(prompt, 'wan2.1-text-to-video');
+        const result = await AiMuAPI.generateVideo(prompt, 'wan2.1-text-to-video');
 
         const videoTrack = state.tracks.find(t => t.type === 'video');
         if (videoTrack) {
@@ -333,8 +333,8 @@ export function extendGenerationPanel(generationContainer, state, showToast) {
       const mood = modal.querySelector('#music-mood').value;
 
       try {
-        const { CineGenMuAPI } = await import('../lib/editor/cinegenMuapi.js');
-        const result = await CineGenMuAPI.generateMusic({ genre, mood, duration: 30 });
+        const { AiMuAPI } = await import('../lib/editor/aiMuapi.js');
+        const result = await AiMuAPI.generateMusic({ genre, mood, duration: 30 });
 
         const audioTrack = state.tracks.find(t => t.type === 'audio');
         if (audioTrack) {
@@ -404,7 +404,7 @@ export function extendTopActions(topActions, state, showToast) {
     topActions.appendChild(analyticsIcon);
   }
 
-  // Add CineGen Elements Library
+  // Add AI Elements Library
   const elementsIcon = document.createElement('button');
   elementsIcon.className = 'top-icon';
   elementsIcon.textContent = '👤';
@@ -412,7 +412,7 @@ export function extendTopActions(topActions, state, showToast) {
   elementsIcon.setAttribute('aria-label', 'Elements Library');
   elementsIcon.setAttribute('data-tooltip', 'elements-lib');
   elementsIcon.addEventListener('click', async () => {
-    const { createModal } = await import('../lib/editor/cinegenIntegration.js');
+    const { createModal } = await import('../lib/editor/aiIntegration.js');
     const modal = createModal('Elements Library', `
       <div class="elements-modal">
         <p class="modal-description">
@@ -449,7 +449,7 @@ export function extendTopActions(topActions, state, showToast) {
   });
   topActions.appendChild(elementsIcon);
 
-  // Add CineGen LLM Assistant
+  // Add AI Assistant
   const llmIcon = document.createElement('button');
   llmIcon.className = 'top-icon';
   llmIcon.textContent = '💬';
@@ -457,7 +457,7 @@ export function extendTopActions(topActions, state, showToast) {
   llmIcon.setAttribute('aria-label', 'AI Assistant');
   llmIcon.setAttribute('data-tooltip', 'llm-chat');
   llmIcon.addEventListener('click', async () => {
-    const { createModal } = await import('../lib/editor/cinegenIntegration.js');
+    const { createModal } = await import('../lib/editor/aiIntegration.js');
     const modal = createModal('AI Assistant', `
       <div class="llm-assistant-modal">
         <div class="chat-container">
@@ -537,7 +537,7 @@ export function extendTopActions(topActions, state, showToast) {
   });
   topActions.appendChild(llmIcon);
 
-  // Add CineGen Export
+  // Add AI Export
   const exportIcon = document.createElement('button');
   exportIcon.className = 'top-icon';
   exportIcon.textContent = '📤';
@@ -545,7 +545,7 @@ export function extendTopActions(topActions, state, showToast) {
   exportIcon.setAttribute('aria-label', 'Export Timeline');
   exportIcon.setAttribute('data-tooltip', 'export');
   exportIcon.addEventListener('click', async () => {
-    const { createModal } = await import('../lib/editor/cinegenIntegration.js');
+    const { createModal } = await import('../lib/editor/aiIntegration.js');
     const modal = createModal('Export Timeline', `
       <div class="export-modal">
         <div class="export-preview">

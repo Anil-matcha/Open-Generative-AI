@@ -1,5 +1,5 @@
 /**
- * Timeline State Adapter for CineGen Features
+ * Timeline State Adapter for AI Features
  * Wraps the timeline state object to provide a consistent API for AI features
  */
 

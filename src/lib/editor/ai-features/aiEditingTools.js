@@ -1,4 +1,4 @@
-import { CineGenMuAPI } from '../cinegenMuapi.js';
+import { AiMuAPI } from '../aiMuapi.js';
 import { createTimelineStateAdapter } from '../timelineStateAdapter.js';
 
 export const EDITING_TOOLS = {
@@ -246,7 +246,7 @@ export class AIEditingTools {
     const gapEnd = selectedClips[1].startTime;
     const contextPrompt = `Generate footage to fill a ${duration} second gap`;
 
-    const result = await CineGenMuAPI.generateVideo(contextPrompt, model);
+    const result = await AiMuAPI.generateVideo(contextPrompt, model);
     const clip = this.createClipFromResult(result, gapStart, duration);
 
     this.timelineState.addClip(clip);
@@ -267,7 +267,7 @@ export class AIEditingTools {
       ? `Generate footage to prepend to the clip, ${duration} seconds`
       : `Generate footage to append to the clip, ${duration} seconds`;
 
-    const result = await CineGenMuAPI.generateVideo(contextPrompt, model);
+    const result = await AiMuAPI.generateVideo(contextPrompt, model);
 
     if (direction === 'after') {
       const clip = this.createClipFromResult(result, selectedClip.endTime, duration);
@@ -295,7 +295,7 @@ export class AIEditingTools {
       ? `Based on video content starting at ${selectedClip.startTime}` 
       : 'Create original music';
 
-    const result = await CineGenMuAPI.generateMusic(
+    const result = await AiMuAPI.generateMusic(
       { context: videoContext },
       { genre, mood, duration }
     );
@@ -316,7 +316,7 @@ export class AIEditingTools {
     }
 
     const imageData = await this.extractFrameFromClip(selectedClip);
-    const result = await CineGenMuAPI.applySAM3Segmentation(imageData, {
+    const result = await AiMuAPI.applySAM3Segmentation(imageData, {
       type: promptType,
       prompt: textPrompt
     });

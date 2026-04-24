@@ -1,7 +1,7 @@
 /**
  * Unified Editor Types
  * Defines the core data structures for the AI Timeline Editor
- * Combines concepts from CineGen (editor UX) and LTX-Desktop (generation engine)
+ * Combines editor UX concepts and video generation engine capabilities
  */
 
 // ============================================================================

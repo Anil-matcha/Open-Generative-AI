@@ -1293,9 +1293,9 @@ button, input, textarea, select { font: inherit; }
       // Extend top actions with enhancement features
       extendTopActions(els.topActions, state, showToast);
 
-      // Extend with CineGen AI features
-      const { extendWithCineGenFeatures } = await import('../lib/editor/cinegenIntegration.js');
-      extendWithCineGenFeatures(state, showToast);
+      // Extend with AI features
+      const { extendWithAiFeatures } = await import('../lib/editor/aiIntegration.js');
+      extendWithAiFeatures(state, showToast);
 
       const ready = document.createElement('div');
       ready.className = 'ready-pill';

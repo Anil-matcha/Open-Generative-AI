@@ -1,25 +1,25 @@
 /**
- * CineGen Features Integration for Timeline Editor
+ * ai Features Integration for Timeline Editor
  * Follows superpowers methodology with TDD approach
  * 
- * Integrates CineGen AI features (node workflows, AI editing tools, 
+ * Integrates ai AI features (node workflows, AI editing tools, 
  * elements library, LLM assistant) into the timeline editor with
  * proper popup modals matching the editor's design system.
  */
 
 import { createTooltipSystem } from './tooltipSystem.js';
-import { createNodeEditor } from './cinegen-features/nodeWorkflow.js';
-import { AIEditingTools, EDITING_TOOLS } from './cinegen-features/aiEditingTools.js';
-import { createElementsLibrary } from './cinegen-features/elementsLibrary.js';
-import { createLLMAssistant } from './cinegen-features/llmAssistant.js';
-import { createAdvancedTimeline } from './cinegen-features/advancedTimeline.js';
-import { createExportSystem } from './cinegen-features/exportSystem.js';
+import { createNodeEditor } from './ai-features/nodeWorkflow.js';
+import { AIEditingTools, EDITING_TOOLS } from './ai-features/aiEditingTools.js';
+import { createElementsLibrary } from './ai-features/elementsLibrary.js';
+import { createLLMAssistant } from './ai-features/llmAssistant.js';
+import { createAdvancedTimeline } from './ai-features/advancedTimeline.js';
+import { createExportSystem } from './ai-features/exportSystem.js';
 import { createTimelineStateAdapter } from './timelineStateAdapter.js';
 
 /**
- * CineGen Feature Panel - Manages the side panel with all AI features
+ * ai Feature Panel - Manages the side panel with all AI features
  */
-export class CineGenFeaturePanel {
+export class AiFeaturePanel {
   constructor(container, timelineState) {
     this.container = container;
     this.state = timelineState;
@@ -36,53 +36,53 @@ export class CineGenFeaturePanel {
 
   renderPanel() {
     const panel = document.createElement('aside');
-    panel.className = 'cinegen-panel side-card';
+    panel.className = 'ai-panel side-card';
     panel.innerHTML = `
-      <div class="card-title cinegen-title">
-        <span>🎬 CineGen</span>
-        <span class="cinegen-badge">AI Features</span>
+      <div class="card-title ai-title">
+        <span>🎬 ai</span>
+        <span class="ai-badge">AI Features</span>
       </div>
       
-      <div class="cinegen-features-grid">
-        <button class="cinegen-feature-btn" data-feature="node-workflow" 
+      <div class="ai-features-grid">
+        <button class="ai-feature-btn" data-feature="node-workflow" 
                 title="AI Workflow - Create generation pipelines with 50+ models">
           <span class="feature-icon">🧠</span>
           <span class="feature-label">AI Workflow</span>
         </button>
         
-        <button class="cinegen-feature-btn" data-feature="ai-tools"
+        <button class="ai-feature-btn" data-feature="ai-tools"
                 title="AI Tools - Fill gaps, extend clips, generate music, SAM3 masking">
           <span class="feature-icon">⚡</span>
           <span class="feature-label">AI Tools</span>
         </button>
         
-        <button class="cinegen-feature-btn" data-feature="elements"
+        <button class="ai-feature-btn" data-feature="elements"
                 title="Elements Library - Characters, locations, props, vehicles">
           <span class="feature-icon">👤</span>
           <span class="feature-label">Elements</span>
         </button>
         
-        <button class="cinegen-feature-btn" data-feature="llm"
+        <button class="ai-feature-btn" data-feature="llm"
                 title="AI Assistant - Context-aware chat for editorial workflow">
           <span class="feature-icon">💬</span>
           <span class="feature-label">AI Assistant</span>
         </button>
         
-        <button class="cinegen-feature-btn" data-feature="timeline-tools"
+        <button class="ai-feature-btn" data-feature="timeline-tools"
                 title="NLE Tools - Advanced editing tools, dual viewers, timeline tabs">
           <span class="feature-icon">🎞️</span>
           <span class="feature-label">NLE Tools</span>
         </button>
         
-        <button class="cinegen-feature-btn" data-feature="export"
+        <button class="ai-feature-btn" data-feature="export"
                 title="Export - Render to MP4 with professional presets">
           <span class="feature-icon">📤</span>
           <span class="feature-label">Export</span>
         </button>
       </div>
       
-      <div class="cinegen-active-panel" id="cinegenActivePanel">
-        <p class="cinegen-hint">Select a feature to get started</p>
+      <div class="ai-active-panel" id="aiActivePanel">
+        <p class="ai-hint">Select a feature to get started</p>
       </div>
     `;
 
@@ -91,7 +91,7 @@ export class CineGenFeaturePanel {
   }
 
   setupEventListeners() {
-    this.panel.querySelectorAll('.cinegen-feature-btn').forEach(btn => {
+    this.panel.querySelectorAll('.ai-feature-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const feature = btn.dataset.feature;
         this.openFeature(feature);
@@ -107,7 +107,7 @@ export class CineGenFeaturePanel {
 
   showFeatureTooltip(btn, text) {
     const tooltip = document.createElement('div');
-    tooltip.className = 'cinegen-tooltip';
+    tooltip.className = 'ai-tooltip';
     tooltip.textContent = text;
     tooltip.style.position = 'absolute';
     tooltip.style.bottom = '100%';
@@ -121,12 +121,12 @@ export class CineGenFeaturePanel {
 
   openFeature(featureId) {
     // Update active state on buttons
-    this.panel.querySelectorAll('.cinegen-feature-btn').forEach(btn => {
+    this.panel.querySelectorAll('.ai-feature-btn').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.feature === featureId);
     });
 
     // Show loading state
-    const activePanel = this.panel.querySelector('#cinegenActivePanel');
+    const activePanel = this.panel.querySelector('#aiActivePanel');
     activePanel.innerHTML = '<div class="loading">Loading...</div>';
 
     // Open the appropriate modal
@@ -541,8 +541,8 @@ export class CineGenFeaturePanel {
     btn.textContent = 'Generating...';
     btn.disabled = true;
 
-    // Use CineGenMuAPI through the editing tools
-    const { CineGenMuAPI } = await import('./cinegenMuapi.js');
+    // Use aiMuAPI through the editing tools
+    const { aiMuAPI } = await import('./aiMuapi.js');
     
     try {
       // Simulate generation for now
@@ -807,20 +807,20 @@ function showToast(message, type = 'info') {
 }
 
 /**
- * Create CineGen feature panel
+ * Create ai feature panel
  */
-export function createCineGenFeaturePanel(container, timelineState) {
-  return new CineGenFeaturePanel(container, timelineState).init();
+export function createAiFeaturePanel(container, timelineState) {
+  return new AiFeaturePanel(container, timelineState).init();
 }
 
 /**
- * Extend timeline editor with CineGen features
+ * Extend timeline editor with ai features
  * Called from TimelineEditorPage.js
- * Note: CineGen features are now integrated as individual buttons in existing panels
+ * Note: ai features are now integrated as individual buttons in existing panels
  */
-export function extendWithCineGenFeatures(state, showToast) {
-  // CineGen features are now integrated via extendGenerationPanel in uiIntegration.js
+export function extendWithAiFeatures(state, showToast) {
+  // AI features are now integrated via extendGenerationPanel in uiIntegration.js
   // This function is kept for future expansion but currently does nothing
   // to maintain the existing integration pattern
-  console.log('CineGen features integrated via generation panel buttons');
+  console.log('AI features integrated via generation panel buttons');
 }

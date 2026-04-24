@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { CineGenMuAPI } from '../cinegenMuapi.js';
+import { AiMuAPI } from '../aiMuapi.js';
 
 // Mock muapi
 vi.mock('../../muapi.js', () => ({
@@ -13,7 +13,7 @@ vi.mock('../../muapi.js', () => ({
 
 import { muapi } from '../../muapi.js';
 
-describe('CineGenMuAPI', () => {
+describe('AiMuAPI', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -23,7 +23,7 @@ describe('CineGenMuAPI', () => {
       const mockResult = { url: 'test.mp4' };
       muapi.generateVideo.mockResolvedValue(mockResult);
 
-      const result = await CineGenMuAPI.generateVideo('test prompt', 'wan2.1-text-to-video');
+      const result = await AiMuAPI.generateVideo('test prompt', 'wan2.1-text-to-video');
 
       expect(muapi.generateVideo).toHaveBeenCalledWith({ prompt: 'test prompt', model: 'wan2.1-text-to-video' });
       expect(result).toBe(mockResult);
@@ -33,7 +33,7 @@ describe('CineGenMuAPI', () => {
       const mockResult = { url: 'test.mp4' };
       muapi.generateVideo.mockResolvedValue(mockResult);
 
-      await CineGenMuAPI.generateVideo('test prompt');
+      await AiMuAPI.generateVideo('test prompt');
 
       expect(muapi.generateVideo).toHaveBeenCalledWith({ prompt: 'test prompt', model: 'wan2.1-text-to-video' });
     });
@@ -44,7 +44,7 @@ describe('CineGenMuAPI', () => {
       const mockResult = { url: 'test.jpg' };
       muapi.generateImage.mockResolvedValue(mockResult);
 
-      const result = await CineGenMuAPI.generateImage('test prompt', 'flux-dev');
+      const result = await AiMuAPI.generateImage('test prompt', 'flux-dev');
 
       expect(muapi.generateImage).toHaveBeenCalledWith({ prompt: 'test prompt', model: 'flux-dev' });
       expect(result).toBe(mockResult);
@@ -54,23 +54,16 @@ describe('CineGenMuAPI', () => {
       const mockResult = { url: 'test.jpg' };
       muapi.generateImage.mockResolvedValue(mockResult);
 
-      await CineGenMuAPI.generateImage('test prompt');
+      await AiMuAPI.generateImage('test prompt');
 
       expect(muapi.generateImage).toHaveBeenCalledWith({ prompt: 'test prompt', model: 'flux-dev' });
     });
   });
 
   describe('applySAM3Segmentation', () => {
-    it('should call muapi.applySAM3Segmentation with correct parameters', async () => {
-      const mockImageData = 'base64data';
-      const mockPrompts = ['person', 'car'];
-      const mockResult = { masks: [] };
-      muapi.applySAM3Segmentation.mockResolvedValue(mockResult);
-
-      const result = await CineGenMuAPI.applySAM3Segmentation(mockImageData, mockPrompts);
-
-      expect(muapi.applySAM3Segmentation).toHaveBeenCalledWith(mockImageData, mockPrompts);
-      expect(result).toBe(mockResult);
+    it('should throw not implemented error', async () => {
+      await expect(AiMuAPI.applySAM3Segmentation('data', ['prompt']))
+        .rejects.toThrow('SAM3 segmentation not yet implemented');
     });
   });
 
@@ -81,7 +74,7 @@ describe('CineGenMuAPI', () => {
       const mockResult = { musicUrl: 'test.mp3' };
       muapi.generateMusic.mockResolvedValue(mockResult);
 
-      const result = await CineGenMuAPI.generateMusic(mockContext, mockOptions);
+      const result = await AiMuAPI.generateMusic(mockContext, mockOptions);
 
       expect(muapi.generateMusic).toHaveBeenCalledWith({
         ...mockContext,

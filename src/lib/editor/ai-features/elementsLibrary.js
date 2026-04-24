@@ -1,4 +1,4 @@
-import { CineGenMuAPI } from '../cinegenMuapi.js';
+import { AiMuAPI } from '../aiMuapi.js';
 
 export const ELEMENT_CATEGORIES = {
   CHARACTER: 'character',
@@ -177,7 +177,7 @@ export class ElementsLibrary {
     for (const angle of angles) {
       try {
         const prompt = `Generate a ${angle} view reference panel for a ${category}. Use consistency from reference images.`;
-        const result = await CineGenMuAPI.generateImage(prompt, 'flux-dev');
+        const result = await AiMuAPI.generateImage(prompt, 'flux-dev');
         panels.push(result.url || result);
       } catch (error) {
         console.error(`Failed to generate panel for ${angle}:`, error);
@@ -209,7 +209,7 @@ export class ElementsLibrary {
 
     try {
       const prompt = `Regenerate the ${angle} panel for a ${category}. Maintain visual consistency with the reference.`;
-      const result = await CineGenMuAPI.generateImage(prompt, 'flux-dev');
+      const result = await AiMuAPI.generateImage(prompt, 'flux-dev');
 
       element.panels[panelIndex] = result.url || result;
       this.elements.set(element.id, element);
@@ -229,7 +229,7 @@ export class ElementsLibrary {
     };
 
     if (typeof window !== 'undefined' && window.dispatchEvent) {
-      window.dispatchEvent(new CustomEvent('cinegen-element-selected', { detail: timelineData }));
+      window.dispatchEvent(new CustomEvent('ai-element-selected', { detail: timelineData }));
     }
 
     return timelineData;

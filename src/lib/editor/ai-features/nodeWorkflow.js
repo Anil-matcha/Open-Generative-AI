@@ -1,4 +1,4 @@
-import { CineGenMuAPI } from '../cinegenMuapi.js';
+import { AiMuAPI } from '../aiMuapi.js';
 
 export const NODE_TYPES = {
   PROMPT: 'prompt',
@@ -317,11 +317,11 @@ export class NodeWorkflow {
         const prompt = inputNode ? this.getNodeOutput(inputNode.id) : 'default prompt';
 
         if (node.config.category === MODEL_CATEGORIES.VIDEO) {
-          result = await CineGenMuAPI.generateVideo(prompt, node.config.model);
+          result = await AiMuAPI.generateVideo(prompt, node.config.model);
         } else if (node.config.category === MODEL_CATEGORIES.IMAGE) {
-          result = await CineGenMuAPI.generateImage(prompt, node.config.model);
+          result = await AiMuAPI.generateImage(prompt, node.config.model);
         } else if (node.config.category === MODEL_CATEGORIES.AUDIO) {
-          result = await CineGenMuAPI.generateMusic({}, { prompt });
+          result = await AiMuAPI.generateMusic({}, { prompt });
         }
       }
       this.updateNodeOutput(nodeId, result);

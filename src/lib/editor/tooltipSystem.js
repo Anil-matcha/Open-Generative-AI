@@ -19,7 +19,7 @@ export function createTooltipSystem() {
 
     // Create tooltip element
     state.tooltipElement = document.createElement('div');
-    state.tooltipElement.className = 'cinegen-tooltip';
+    state.tooltipElement.className = 'ai-tooltip';
     state.tooltipElement.textContent = text;
     state.tooltipElement.style.position = 'absolute';
     state.tooltipElement.style.left = `${position.x}px`;

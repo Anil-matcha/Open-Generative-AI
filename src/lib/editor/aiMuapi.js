@@ -1,6 +1,6 @@
 import { muapi } from '../muapi.js';
 
-export class CineGenMuAPI {
+export class AiMuAPI {
   static async generateVideo(prompt, model = 'wan2.1-text-to-video') {
     return muapi.generateVideo({ prompt, model });
   }

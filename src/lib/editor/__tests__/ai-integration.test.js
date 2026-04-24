@@ -1,14 +1,14 @@
 import { describe, it, expect } from 'vitest';
 import { createTooltipSystem } from '../tooltipSystem.js';
-import { CineGenMuAPI } from '../cinegenMuapi.js';
-import { createNodeWorkflow } from '../cinegen-features/nodeWorkflow.js';
-import { createAIEditingTools } from '../cinegen-features/aiEditingTools.js';
-import { ElementsLibrary } from '../cinegen-features/elementsLibrary.js';
-import { LLMAssistant } from '../cinegen-features/llmAssistant.js';
-import { enhanceTimelineWithNLE } from '../cinegen-features/advancedTimeline.js';
-import { createExportSystem, EXPORT_PRESETS } from '../cinegen-features/exportSystem.js';
+import { AiMuAPI } from '../aiMuapi.js';
+import { createNodeEditor } from '../ai-features/nodeWorkflow.js';
+import { AIEditingTools } from '../ai-features/aiEditingTools.js';
+import { ElementsLibrary } from '../ai-features/elementsLibrary.js';
+import { LLMAssistant } from '../ai-features/llmAssistant.js';
+import { enhanceTimelineWithNLE } from '../ai-features/advancedTimeline.js';
+import { createExportSystem, EXPORT_PRESETS } from '../ai-features/exportSystem.js';
 
-describe('CineGen Integration - Phase 1', () => {
+describe('AI Integration - Phase 1', () => {
   it('should create all core infrastructure components', () => {
     // Tooltip system
     const tooltipSystem = createTooltipSystem();
@@ -16,18 +16,18 @@ describe('CineGen Integration - Phase 1', () => {
     expect(tooltipSystem).toHaveProperty('hideTooltip');
     expect(tooltipSystem).toHaveProperty('getTooltipText');
 
-    // CineGenMuAPI
-    expect(CineGenMuAPI).toHaveProperty('generateVideo');
-    expect(CineGenMuAPI).toHaveProperty('generateImage');
-    expect(CineGenMuAPI).toHaveProperty('applySAM3Segmentation');
-    expect(CineGenMuAPI).toHaveProperty('generateMusic');
+    // AiMuAPI
+    expect(AiMuAPI).toHaveProperty('generateVideo');
+    expect(AiMuAPI).toHaveProperty('generateImage');
+    expect(AiMuAPI).toHaveProperty('applySAM3Segmentation');
+    expect(AiMuAPI).toHaveProperty('generateMusic');
 
     // Feature modules
-    const nodeWorkflow = createNodeWorkflow();
-    expect(nodeWorkflow).toHaveProperty('init');
+    const nodeEditor = createNodeEditor();
+    expect(nodeEditor).toHaveProperty('init');
 
-    const aiTools = createAIEditingTools();
-    expect(aiTools).toHaveProperty('fillGap');
+    const aiTools = new AIEditingTools();
+    expect(aiTools).toHaveProperty('selectTool');
 
     const elementsLib = new ElementsLibrary();
     expect(elementsLib).toHaveProperty('elements');
@@ -44,12 +44,12 @@ describe('CineGen Integration - Phase 1', () => {
 
   it('should provide comprehensive tooltip coverage', () => {
     const tooltipSystem = createTooltipSystem();
-    const cinegenFeatures = [
+    const aiFeatures = [
       'fill-gap', 'extend-clip', 'music-gen', 'node-workflow',
       'sam3-masking', 'elements-lib', 'llm-chat'
     ];
 
-    cinegenFeatures.forEach(feature => {
+    aiFeatures.forEach(feature => {
       const tooltip = tooltipSystem.getTooltipText(feature);
       expect(tooltip).not.toBe('');
       expect(tooltip.length).toBeGreaterThan(10);
@@ -68,9 +68,9 @@ describe('CineGen Integration - Phase 1', () => {
   it('should initialize all feature modules without errors', () => {
     expect(() => {
       createTooltipSystem();
-      CineGenMuAPI.generateVideo('test', 'wan-2.1');
-      createNodeWorkflow();
-      createAIEditingTools();
+      AiMuAPI.generateVideo('test', 'wan2.1-text-to-video');
+      createNodeEditor();
+      new AIEditingTools();
       new ElementsLibrary();
       new LLMAssistant();
       enhanceTimelineWithNLE();
