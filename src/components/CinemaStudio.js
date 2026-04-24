@@ -6,6 +6,7 @@ import { buildNanoBananaPrompt, CAMERA_MAP, LENS_MAP, FOCAL_PERSPECTIVE, APERTUR
 import { AuthModal } from './AuthModal.js';
 import { createInlineInstructions } from './InlineInstructions.js';
 import { createHeroSection } from '../lib/thumbnails.js';
+import { GTMPromptModal } from './modals/GTMPromptModal.jsx';
 
 export function CinemaStudio() {
     const container = document.createElement('div');
@@ -238,6 +239,16 @@ export function CinemaStudio() {
     }
 
     inputRow.appendChild(textarea);
+
+    // GTM Prompt Enhancer Button
+    const gtmBtn = document.createElement('button');
+    gtmBtn.className = 'w-8 h-8 shrink-0 rounded-lg border bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40 transition-all flex items-center justify-center relative overflow-hidden group';
+    gtmBtn.title = 'GTM Prompt Enhancer - Create conversion-optimized prompts';
+    gtmBtn.innerHTML = '🎯';
+    gtmBtn.onclick = () => {
+        openGTMPromptModal(textarea);
+    };
+    inputRow.appendChild(gtmBtn);
 
     leftColumn.appendChild(inputRow);
 
@@ -718,6 +729,30 @@ export function CinemaStudio() {
             generateBtn.innerHTML = `GENERATE ✨`;
         }
     };
+
+    // GTM Prompt Modal Function
+    function openGTMPromptModal(promptTextarea) {
+        try {
+            const modal = new GTMPromptModal({
+                appTheme: 'cinema-studio',
+                onPromptGenerated: (generatedPrompt) => {
+                    // Load the generated prompt into the textarea
+                    promptTextarea.value = generatedPrompt;
+                    promptTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+
+                    // Adjust textarea height
+                    promptTextarea.style.height = 'auto';
+                    promptTextarea.style.height = promptTextarea.scrollHeight + 'px';
+
+                    console.log('GTM-optimized prompt loaded successfully!');
+                }
+            });
+            modal.open();
+        } catch (error) {
+            console.error('GTM Prompt Modal error:', error);
+            alert('Failed to open GTM Prompt Enhancer');
+        }
+    }
 
     return container;
 }

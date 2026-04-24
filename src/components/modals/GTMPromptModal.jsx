@@ -67,6 +67,36 @@ export class GTMPromptModal extends BaseModal {
         accent: '#ef4444',
         secondary: '#6b7280'
       },
+      'image-studio': {
+        primary: '#f59e0b',
+        accent: '#fbbf24',
+        secondary: '#6b7280'
+      },
+      'template-studio': {
+        primary: '#10b981',
+        accent: '#34d399',
+        secondary: '#6b7280'
+      },
+      'cinema-studio': {
+        primary: '#ec4899',
+        accent: '#f472b6',
+        secondary: '#6b7280'
+      },
+      'cinema-template-studio': {
+        primary: '#be123c',
+        accent: '#dc2626',
+        secondary: '#64748b'
+      },
+      'editor-page': {
+        primary: '#06b6d4',
+        accent: '#22d3ee',
+        secondary: '#64748b'
+      },
+      'lip-sync-studio': {
+        primary: '#8b5cf6',
+        accent: '#a78bfa',
+        secondary: '#6b7280'
+      },
       'director': {
         primary: '#d97706',
         accent: '#f59e0b',
@@ -76,11 +106,6 @@ export class GTMPromptModal extends BaseModal {
         primary: '#7c3aed',
         accent: '#8b5cf6',
         secondary: '#6b7280'
-      },
-      'cinema-template-studio': {
-        primary: '#be123c',
-        accent: '#dc2626',
-        secondary: '#64748b'
       }
     };
     return schemes[theme] || schemes['timeline-editor'];

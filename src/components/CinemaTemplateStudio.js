@@ -6,6 +6,7 @@
 import { navigate } from '../lib/router.js';
 import { showToast } from '../lib/loading.js';
 import { escapeHtml } from '../lib/security.js';
+import { GTMPromptModal } from './modals/GTMPromptModal.jsx';
 import { 
   getTemplateRegistry,
   CINEMATIC_CATEGORIES,
@@ -379,6 +380,16 @@ export function CinemaTemplateStudio() {
           updatePromptPreview();
         };
         field.appendChild(textarea);
+
+        // Add GTM button for textarea fields
+        const gtmBtn = document.createElement('button');
+        gtmBtn.className = 'mt-2 w-full rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 hover:border-primary/40 transition-all flex items-center justify-center gap-2 py-2 text-xs text-muted hover:text-white';
+        gtmBtn.title = 'GTM Prompt Enhancer - Create conversion-optimized prompts';
+        gtmBtn.innerHTML = '🎯 Enhance with GTM';
+        gtmBtn.onclick = () => {
+          openGTMPromptModal(textarea, input.name);
+        };
+        field.appendChild(gtmBtn);
         break;
 
       case 'select':
@@ -910,6 +921,30 @@ export function CinemaTemplateStudio() {
       view = 'browse';
       render();
     });
+  }
+
+  // GTM Prompt Modal Function
+  function openGTMPromptModal(promptTextarea, fieldName) {
+    try {
+      const modal = new GTMPromptModal({
+        appTheme: 'cinema-template-studio',
+        onPromptGenerated: (generatedPrompt) => {
+          // Load the generated prompt into the textarea
+          promptTextarea.value = generatedPrompt;
+          promptTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+
+          // Update the current inputs
+          currentInputs[fieldName] = generatedPrompt;
+          updatePromptPreview();
+
+          console.log('GTM-optimized prompt loaded successfully!');
+        }
+      });
+      modal.open();
+    } catch (error) {
+      console.error('GTM Prompt Modal error:', error);
+      alert('Failed to open GTM Prompt Enhancer');
+    }
   }
 
   return container;

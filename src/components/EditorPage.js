@@ -4,6 +4,7 @@ import { getSupabaseUrl } from '../lib/supabase.js';
 import { escapeHtml } from '../lib/security.js';
 import { createUploadPicker } from './UploadPicker.js';
 import { createMediaPreview, createFullscreenPreview } from './MediaPreview.js';
+import { GTMPromptModal } from './modals/GTMPromptModal.jsx';
 
 const TRANSITIONS = [
     { id: 'fade', name: 'Fade', icon: '◐', duration: 0.5, tooltip: 'Gradual fade between clips' },
@@ -499,7 +500,10 @@ export function EditorPage() {
                         <div class="space-y-3">
                             <div>
                                 <label class="text-xs text-secondary block mb-2">Prompt</label>
-                                <textarea id="generate-prompt" placeholder="Describe what you want to generate..." class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-muted focus:outline-none focus:border-primary/50 resize-none" rows="3"></textarea>
+                                <div class="relative">
+                                    <textarea id="generate-prompt" placeholder="Describe what you want to generate..." class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-muted focus:outline-none focus:border-primary/50 resize-none" rows="3"></textarea>
+                                    <button class="absolute top-2 right-2 w-6 h-6 rounded border border-white/10 bg-white/5 hover:bg-white/10 hover:border-primary/40 transition-all flex items-center justify-center text-xs" title="GTM Prompt Enhancer" onclick="openGTMPromptModal(document.getElementById('generate-prompt'))">🎯</button>
+                                </div>
                             </div>
 
                             <div>
@@ -1797,6 +1801,26 @@ export function EditorPage() {
             }
         });
     });
+
+    // GTM Prompt Modal Function
+    window.openGTMPromptModal = function(promptTextarea) {
+        try {
+            const modal = new GTMPromptModal({
+                appTheme: 'editor-page',
+                onPromptGenerated: (generatedPrompt) => {
+                    // Load the generated prompt into the textarea
+                    promptTextarea.value = generatedPrompt;
+                    promptTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+
+                    console.log('GTM-optimized prompt loaded successfully!');
+                }
+            });
+            modal.open();
+        } catch (error) {
+            console.error('GTM Prompt Modal error:', error);
+            alert('Failed to open GTM Prompt Enhancer');
+        }
+    };
 
     return container;
 }

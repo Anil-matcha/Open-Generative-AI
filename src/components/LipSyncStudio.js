@@ -3,6 +3,7 @@ import { lipsyncModels, imageLipSyncModels, videoLipSyncModels, getLipSyncModelB
 import { AuthModal } from './AuthModal.js';
 import { savePendingJob, removePendingJob, getPendingJobs } from '../lib/pendingJobs.js';
 import { createHeroSection } from '../lib/thumbnails.js';
+import { GTMPromptModal } from './modals/GTMPromptModal.jsx';
 
 export function LipSyncStudio() {
     const container = document.createElement('div');
@@ -156,6 +157,17 @@ export function LipSyncStudio() {
     uploadsRow.appendChild(videoUploadBtn);
     uploadsRow.appendChild(audioUploadBtn);
     uploadsRow.appendChild(textarea);
+
+    // GTM Prompt Enhancer Button
+    const gtmBtn = document.createElement('button');
+    gtmBtn.className = 'w-8 h-8 shrink-0 rounded-lg border bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40 transition-all flex items-center justify-center relative overflow-hidden group';
+    gtmBtn.title = 'GTM Prompt Enhancer - Create conversion-optimized prompts';
+    gtmBtn.innerHTML = '🎯';
+    gtmBtn.onclick = () => {
+        openGTMPromptModal(textarea);
+    };
+    uploadsRow.appendChild(gtmBtn);
+
     bar.appendChild(uploadsRow);
 
     // ── Status labels ──
@@ -776,6 +788,26 @@ export function LipSyncStudio() {
             if (!hadError) generateBtn.innerHTML = `Generate ✨`;
         }
     };
+
+    // GTM Prompt Modal Function
+    function openGTMPromptModal(promptTextarea) {
+        try {
+            const modal = new GTMPromptModal({
+                appTheme: 'lip-sync-studio',
+                onPromptGenerated: (generatedPrompt) => {
+                    // Load the generated prompt into the textarea
+                    promptTextarea.value = generatedPrompt;
+                    promptTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+
+                    console.log('GTM-optimized prompt loaded successfully!');
+                }
+            });
+            modal.open();
+        } catch (error) {
+            console.error('GTM Prompt Modal error:', error);
+            alert('Failed to open GTM Prompt Enhancer');
+        }
+    }
 
     return container;
 }
