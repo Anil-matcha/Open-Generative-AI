@@ -5,6 +5,7 @@
  */
 
 import { agentOrchestrator } from './agents/index.js';
+import { generationService } from './editor/generationService.js';
 
 export class MultiTakeClipSystem {
   constructor() {
@@ -146,13 +147,18 @@ export class MultiTakeClipSystem {
         continue;
       }
 
+      const agentPrompt = agent.result?.prompt || this.buildPromptFromAgentResult(agent.result, context);
+      const generationResult = await this.generateVideoTake(agentPrompt, options);
+
       const takeData = {
         generatedBy: 'agent',
         agentUsed: agentType,
-        prompt: agent.result?.prompt || null,
-        model: options.model || null,
+        prompt: agentPrompt,
+        model: options.model || 'ltx-2-fast',
         quality: 0.8,
-        duration: options.duration || 5,
+        duration: generationResult.duration || options.duration || 5,
+        videoUrl: generationResult.videoUrl,
+        generationId: generationResult.generationId,
         agentResult: agent.result,
         generationContext: context
       };
@@ -164,6 +170,84 @@ export class MultiTakeClipSystem {
     this.emit('takeGenerationComplete', { clipId, takes: generatedTakes });
 
     return generatedTakes;
+  }
+
+  buildPromptFromAgentResult(result, context) {
+    if (result?.prompt) return result.prompt;
+    if (result?.formatted) return result.formatted;
+    if (result?.keyElements) {
+      return result.keyElements.map(e => `${e.type}: ${e.items.join(', ')}`).join('\n');
+    }
+    return `Generate a video take ${context.takeNumber} for timeline clip`;
+  }
+
+  async generateVideoTake(prompt, options = {}) {
+    const model = options.model || 'ltx-2-fast';
+    const duration = options.duration || 6;
+    const aspectRatio = options.aspectRatio || '16:9';
+
+    try {
+      const request = {
+        mode: 'text-to-video',
+        prompt: prompt,
+        model: model,
+        duration: duration,
+        aspectRatio: aspectRatio
+      };
+
+      const result = await generationService.submit(request, 'muapi');
+
+      return {
+        generationId: result.generationId,
+        videoUrl: result.previewUrl,
+        status: result.status,
+        duration: duration
+      };
+    } catch (error) {
+      console.error('Video generation failed:', error);
+      return {
+        generationId: null,
+        videoUrl: null,
+        status: 'failed',
+        error: error.message,
+        duration: duration
+      };
+    }
+  }
+
+  async generateImageToVideoTake(imageUrl, prompt, options = {}) {
+    const model = options.model || 'ltx-2-fast';
+    const duration = options.duration || 6;
+    const aspectRatio = options.aspectRatio || '16:9';
+
+    try {
+      const request = {
+        mode: 'image-to-video',
+        prompt: prompt,
+        model: model,
+        duration: duration,
+        aspectRatio: aspectRatio,
+        references: [imageUrl]
+      };
+
+      const result = await generationService.submit(request, 'muapi');
+
+      return {
+        generationId: result.generationId,
+        videoUrl: result.previewUrl,
+        status: result.status,
+        duration: duration
+      };
+    } catch (error) {
+      console.error('Image-to-video generation failed:', error);
+      return {
+        generationId: null,
+        videoUrl: null,
+        status: 'failed',
+        error: error.message,
+        duration: duration
+      };
+    }
   }
 
   compareTakes(clipId) {

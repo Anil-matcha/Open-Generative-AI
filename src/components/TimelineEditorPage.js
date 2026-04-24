@@ -628,6 +628,23 @@ button, input, textarea, select { font: inherit; }
     style.id = 'timeline-editor-styles';
     style.textContent = styles;
     document.head.appendChild(style);
+
+    // Load agent panel styles
+    if (!document.getElementById('agent-panel-styles')) {
+      const agentStyle = document.createElement('link');
+      agentStyle.id = 'agent-panel-styles';
+      agentStyle.rel = 'stylesheet';
+      agentStyle.href = '/src/styles/agent-panel.css';
+      document.head.appendChild(agentStyle);
+    }
+
+    if (!document.getElementById('take-selector-styles')) {
+      const takeStyle = document.createElement('link');
+      takeStyle.id = 'take-selector-styles';
+      takeStyle.rel = 'stylesheet';
+      takeStyle.href = '/src/styles/take-selector.css';
+      document.head.appendChild(takeStyle);
+    }
   }
 
   function svgDataUri(markup) {

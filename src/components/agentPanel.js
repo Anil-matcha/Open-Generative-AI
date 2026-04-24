@@ -39,6 +39,17 @@ export class AgentPanel {
   }
 
   render() {
+    const tooltips = {
+      analyze_timeline: 'Run comprehensive analysis of timeline structure, gaps, and pacing',
+      analyze_structure: 'Analyze timeline track organization and clip distribution',
+      detect_gaps: 'Identify and analyze empty spaces between clips',
+      generate_takes: 'Generate multiple AI variations of the selected clip',
+      fill_gaps: 'Automatically fill detected gaps with suggested content',
+      suggest_transitions: 'Get AI-powered transition recommendations between clips',
+      track_characters: 'Track character consistency across all clips in timeline',
+      check_consistency: 'Check visual consistency of characters throughout the video'
+    };
+
     this.container.innerHTML = `
       <div class="agent-panel theme-${this.options.theme}">
         <div class="agent-panel-header">
@@ -52,15 +63,15 @@ export class AgentPanel {
           <div class="agent-section">
             <h4>Timeline Analysis</h4>
             <div class="agent-actions">
-              <button class="agent-action-btn" data-action="analyze_timeline">
+              <button class="agent-action-btn" data-action="analyze_timeline" title="${tooltips.analyze_timeline}">
                 <span class="agent-icon">🔍</span>
                 <span class="agent-label">Full Analysis</span>
               </button>
-              <button class="agent-action-btn" data-action="analyze_structure">
+              <button class="agent-action-btn" data-action="analyze_structure" title="${tooltips.analyze_structure}">
                 <span class="agent-icon">📊</span>
                 <span class="agent-label">Structure</span>
               </button>
-              <button class="agent-action-btn" data-action="detect_gaps">
+              <button class="agent-action-btn" data-action="detect_gaps" title="${tooltips.detect_gaps}">
                 <span class="agent-icon">📏</span>
                 <span class="agent-label">Gap Detection</span>
               </button>
@@ -70,15 +81,15 @@ export class AgentPanel {
           <div class="agent-section">
             <h4>Content Generation</h4>
             <div class="agent-actions">
-              <button class="agent-action-btn" data-action="generate_takes">
+              <button class="agent-action-btn" data-action="generate_takes" title="${tooltips.generate_takes}">
                 <span class="agent-icon">🎬</span>
                 <span class="agent-label">Generate Takes</span>
               </button>
-              <button class="agent-action-btn" data-action="fill_gaps">
+              <button class="agent-action-btn" data-action="fill_gaps" title="${tooltips.fill_gaps}">
                 <span class="agent-icon">✨</span>
                 <span class="agent-label">Fill Gaps</span>
               </button>
-              <button class="agent-action-btn" data-action="suggest_transitions">
+              <button class="agent-action-btn" data-action="suggest_transitions" title="${tooltips.suggest_transitions}">
                 <span class="agent-icon">🔗</span>
                 <span class="agent-label">Transitions</span>
               </button>
@@ -88,11 +99,11 @@ export class AgentPanel {
           <div class="agent-section">
             <h4>Character Tracking</h4>
             <div class="agent-actions">
-              <button class="agent-action-btn" data-action="track_characters">
+              <button class="agent-action-btn" data-action="track_characters" title="${tooltips.track_characters}">
                 <span class="agent-icon">👤</span>
                 <span class="agent-label">Track Characters</span>
               </button>
-              <button class="agent-action-btn" data-action="check_consistency">
+              <button class="agent-action-btn" data-action="check_consistency" title="${tooltips.check_consistency}">
                 <span class="agent-icon">🎯</span>
                 <span class="agent-label">Consistency</span>
               </button>
