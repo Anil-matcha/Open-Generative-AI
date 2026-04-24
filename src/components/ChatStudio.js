@@ -274,5 +274,25 @@ export function ChatStudio() {
   // Initialize
   updateModelBtns();
 
+  // GTM Prompt Modal Function
+  function openGTMPromptModal(promptTextarea) {
+    try {
+      const modal = new GTMPromptModal({
+        appTheme: 'chat-studio',
+        onPromptGenerated: (generatedPrompt) => {
+          // Load the generated prompt into the textarea
+          promptTextarea.value = generatedPrompt;
+          promptTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+
+          console.log('GTM-optimized chat message loaded successfully!');
+        }
+      });
+      modal.open();
+    } catch (error) {
+      console.error('GTM Prompt Modal error:', error);
+      showToast('Failed to open GTM Prompt Enhancer', 'error');
+    }
+  }
+
   return container;
 }

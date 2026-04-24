@@ -2264,6 +2264,22 @@
   --app-primary-rgb: 124, 58, 237;
 }
 
+.gtm-prompt-modal[data-app="character-studio"] {
+  --app-primary-rgb: 249, 115, 22;
+}
+
+.gtm-prompt-modal[data-app="avatar-studio"] {
+  --app-primary-rgb: 6, 182, 212;
+}
+
+.gtm-prompt-modal[data-app="storyboard-studio"] {
+  --app-primary-rgb: 132, 204, 22;
+}
+
+.gtm-prompt-modal[data-app="chat-studio"] {
+  --app-primary-rgb: 236, 72, 153;
+}
+
 @keyframes spin {
   to { transform: rotate(360deg); }
 }

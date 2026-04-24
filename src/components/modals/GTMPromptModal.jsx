@@ -106,6 +106,26 @@ export class GTMPromptModal extends BaseModal {
         primary: '#7c3aed',
         accent: '#8b5cf6',
         secondary: '#6b7280'
+      },
+      'character-studio': {
+        primary: '#f97316',
+        accent: '#fb923c',
+        secondary: '#6b7280'
+      },
+      'avatar-studio': {
+        primary: '#06b6d4',
+        accent: '#22d3ee',
+        secondary: '#6b7280'
+      },
+      'storyboard-studio': {
+        primary: '#84cc16',
+        accent: '#a3e635',
+        secondary: '#6b7280'
+      },
+      'chat-studio': {
+        primary: '#ec4899',
+        accent: '#f472b6',
+        secondary: '#6b7280'
       }
     };
     return schemes[theme] || schemes['timeline-editor'];
