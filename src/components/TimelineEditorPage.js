@@ -13,6 +13,8 @@ import TIMELINE_DESIGN_SYSTEM, { enforceDesignSystem } from '../lib/designSystem
 import { createVideoPreview } from '../lib/videoPlayer.js';
 // Import rendiv animation primitives
 import { interpolate, spring, blendColors, noise2D, useSequence, useSeries } from '../lib/editor/animationControls.jsx';
+// Agent system integration
+import { initTimelineAgentIntegration } from '../timelineAgentIntegration.js';
 // ColorCorrectionSystem removed - file does not exist
 
 // Modal imports removed - app uses vanilla JS, not React
@@ -662,7 +664,7 @@ button, input, textarea, select { font: inherit; }
       ],
       tools: baseState.tools, // Use enhanced tools from baseState
       pills: ['Text to Video', 'Image to Video', 'Retake', 'Extend', 'B-Roll', 'Music Gen', 'Audio Sync', 'Fill Gap AI', 'Elements', 'Dual Viewer'],
-      topIcons: ['👁','📺','📁','⚡','🎵','🔊','🎞️','👤','🎨','💬','📋','🎬','💾','⚙️','💳','🔗','👀','▶️'],
+      topIcons: ['👁','📺','📁','⚡','🎵','🔊','🎞️','👤','🎨','💬','📋','🎬','💾','⚙️','💳','🔗','👀','▶️','🤖','🎭','📊'],
       media: [
         { icon: '🎬', label: 'Video Clip', desc: 'Insert a source shot or generated video clip.' },
         { icon: '🖼️', label: 'Image Frame', desc: 'Add still images, frames, or storyboard art.' },
@@ -1215,7 +1217,8 @@ button, input, textarea, select { font: inherit; }
         '👁': 'Toggle preview visibility tools', '📺': 'Open monitor or viewer settings', '📁': 'Open project media or files', '⚡': 'Open quick AI actions',
         '🎵': 'Open music tools', '🔊': 'Open audio controls', '🎞️': 'Open video strip or scene tools', '👤': 'Open character or profile tools',
         '🎨': 'Open color correction tools', '⚙️': 'Open editor settings', '💬': 'Open AI chat tools', '📋': 'Open project notes or clipboard actions',
-        '🎬': 'End screen elements', '💾': 'Save project', '💳': 'Billing & subscriptions', '🔗': 'Connection setup', '👀': 'Preview media', '▶️': 'Video player'
+        '🎬': 'End screen elements', '💾': 'Save project', '💳': 'Billing & subscriptions', '🔗': 'Connection setup', '👀': 'Preview media', '▶️': 'Video player',
+        '🤖': 'AI Agents - Analyze timeline and generate suggestions', '🎭': 'Character tracking and consistency', '📊': 'Timeline analysis and gap detection'
       };
       state.topIcons.forEach((icon, index) => {
         const button = document.createElement('button');
@@ -1281,6 +1284,15 @@ button, input, textarea, select { font: inherit; }
               break;
             case '▶️':
               openVideoPlayerModal(state, showToast);
+              break;
+            case '🤖':
+              openAIAgentsPanel(state, showToast);
+              break;
+            case '🎭':
+              openCharacterTrackingPanel(state, showToast);
+              break;
+            case '📊':
+              openTimelineAnalysisPanel(state, showToast);
               break;
             default:
               showToast(`${icon} action clicked`);
@@ -3129,9 +3141,90 @@ button, input, textarea, select { font: inherit; }
     // Initialize multi-camera functionality
     window.timelineState = state; // Make state globally accessible for multi-camera functions
 
+    // Initialize AI agent integration
+    initializeAgentSystem(state, showToast);
+
+    // Agent system functions
+    function initializeAgentSystem(state, showToast) {
+      // Create a simple timeline editor interface for the agent system
+      const timelineEditorInterface = {
+        getState: () => state,
+        getSelectedClips: () => {
+          const selectedClip = state.tracks.flatMap(track => track.items).find(item => item.id === state.selectedClipId);
+          return selectedClip ? [selectedClip] : [];
+        },
+        showNotification: (options) => {
+          showToast(`${options.title}: ${options.message}`);
+        },
+        on: (event, callback) => {
+          // Simple event listener for timeline events
+          if (event === 'clipSelect') {
+            // This will be called when clips are selected
+            window.addEventListener('clipSelected', (e) => callback(e.detail));
+          }
+        }
+      };
+
+      // Initialize the agent integration
+      const agentIntegration = initTimelineAgentIntegration(timelineEditorInterface, {
+        theme: 'electric',
+        autoEnableAgents: true
+      });
+
+      // Store reference for cleanup
+      root._agentIntegration = agentIntegration;
+
+      // Dispatch custom events when clips are selected
+      const originalSelectClip = window.selectClip || (() => {});
+      window.selectClip = (clipId) => {
+        originalSelectClip(clipId);
+        const clip = state.tracks.flatMap(track => track.items).find(item => item.id === clipId);
+        if (clip) {
+          window.dispatchEvent(new CustomEvent('clipSelected', { detail: clip }));
+        }
+      };
+
+      return agentIntegration;
+    }
+
+    function openAIAgentsPanel(state, showToast) {
+      showToast('Opening AI Agents panel...');
+      // The agent panel is already initialized and positioned
+      // Just toggle visibility if needed
+      const agentPanel = document.getElementById('agent-panel-container');
+      if (agentPanel) {
+        const content = agentPanel.querySelector('.agent-panel-content');
+        if (content && content.style.display === 'none') {
+          content.style.display = 'block';
+          agentPanel.querySelector('.toggle-icon').textContent = '−';
+        }
+      }
+    }
+
+    function openCharacterTrackingPanel(state, showToast) {
+      showToast('Opening Character Tracking panel...');
+      // Trigger character tracking in the agent system
+      if (root._agentIntegration) {
+        root._agentIntegration.agentPanel.emit('action', { action: 'track_characters' });
+      }
+    }
+
+    function openTimelineAnalysisPanel(state, showToast) {
+      showToast('Opening Timeline Analysis panel...');
+      // Trigger timeline analysis in the agent system
+      if (root._agentIntegration) {
+        root._agentIntegration.agentPanel.emit('action', { action: 'analyze_timeline' });
+      }
+    }
+
     return {
       destroy() {
         window.clearInterval(playbackTimer);
+
+        // Clean up agent integration
+        if (root._agentIntegration) {
+          root._agentIntegration.destroy();
+        }
         document.removeEventListener('keydown', handleKeyboardShortcuts);
         // Save final state
         saveProjectToStorage(state);
