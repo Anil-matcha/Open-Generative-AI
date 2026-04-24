@@ -17,7 +17,7 @@ describe('Unified Timeline Editor - Phase 4 Integration Testing', () => {
       // RED Phase: This test documents known issues that need to be addressed
       const knownIssues = [
         'Parse errors in some test files due to JSX in .js files',
-        'Missing dependencies for CineGen modal imports',
+        'Missing dependencies for AI modal imports',
         'Video effects features not yet implemented',
         'Some linting errors in component files'
       ];

@@ -1,0 +1,147 @@
+.workflow-manager {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #1a1a1a;
+  color: #ffffff;
+}
+
+.workflow-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: #2d2d2d;
+  border-bottom: 1px solid #404040;
+}
+
+.workflow-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.workflow-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.workflow-controls button {
+  padding: 0.5rem 1rem;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.workflow-controls button:hover {
+  background-color: #357abd;
+}
+
+.workflow-controls button:disabled {
+  background-color: #666;
+  cursor: not-allowed;
+}
+
+.workflow-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.canvas-section {
+  flex: 1;
+  padding: 1rem;
+}
+
+.canvas-editor {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.canvas-toolbar {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.canvas-toolbar button {
+  padding: 0.5rem 1rem;
+  background-color: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.canvas-toolbar button:hover {
+  background-color: #229954;
+}
+
+.sidebar-section {
+  width: 300px;
+  background-color: #2d2d2d;
+  border-left: 1px solid #404040;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.model-registry h3,
+.node-editor h3,
+.execution-results h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  border-bottom: 1px solid #404040;
+  padding-bottom: 0.5rem;
+}
+
+.model-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.model-item {
+  background-color: #1a1a1a;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #404040;
+}
+
+.node-property {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+.node-property label {
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+
+.node-property input,
+.node-property select {
+  padding: 0.5rem;
+  background-color: #1a1a1a;
+  border: 1px solid #404040;
+  border-radius: 4px;
+  color: #ffffff;
+}
+
+.data-property {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.execution-results pre {
+  background-color: #1a1a1a;
+  padding: 1rem;
+  border-radius: 4px;
+  border: 1px solid #404040;
+  overflow-x: auto;
+  font-size: 0.8rem;
+}
