@@ -185,6 +185,17 @@ export function extendTopActions(topActions, state, showToast) {
     analyticsIcon.addEventListener('click', () => openVideoAnalytics(state, showToast));
     topActions.appendChild(analyticsIcon);
   }
+
+  // Add GTM Prompt Enhancer action
+  if (isFeatureEnabled('GTM_PROMPT_ENHANCER')) {
+    const gtmIcon = document.createElement('button');
+    gtmIcon.className = 'top-icon';
+    gtmIcon.textContent = '🎯';
+    gtmIcon.title = 'GTM Prompt Enhancer - Create conversion-optimized prompts';
+    gtmIcon.setAttribute('aria-label', 'GTM Prompt Enhancer - Create conversion-optimized prompts');
+    gtmIcon.addEventListener('click', () => openGTMPromptModal(state, showToast));
+    topActions.appendChild(gtmIcon);
+  }
 }
 
 /**

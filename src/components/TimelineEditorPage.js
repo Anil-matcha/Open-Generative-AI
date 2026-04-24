@@ -36,6 +36,7 @@ import { AIVideoCreator } from './modals/AIVideoCreator.jsx';
 import { VideoPersonalizationHub } from './modals/VideoPersonalizationHub.jsx';
 import { LandingPageBuilder } from './modals/LandingPageBuilder.jsx';
 import { LeadGeneratorModal } from './modals/LeadGeneratorModal.jsx';
+import { GTMPromptModal } from './modals/GTMPromptModal.jsx';
 // Category C Editor Surface imports removed - not implemented
 
 export function TimelineEditorPage() {
@@ -2458,6 +2459,32 @@ button, input, textarea, select { font: inherit; }
         modal.open();
       } catch (error) {
         showToast('Failed to open Lead Generator', 'error');
+      }
+    }
+
+    function openGTMPromptModal(state, showToast) {
+      try {
+        const modal = new GTMPromptModal({
+          appTheme: 'timeline-editor',
+          onPromptGenerated: (generatedPrompt) => {
+            // Load the generated prompt into the generation panel
+            const promptInput = document.querySelector('#generation-prompt, textarea[placeholder*="Describe"], input[placeholder*="Describe"]');
+            if (promptInput) {
+              promptInput.value = generatedPrompt;
+              promptInput.dispatchEvent(new Event('input', { bubbles: true }));
+              showToast('GTM-optimized prompt loaded!', 'success');
+            } else {
+              // Fallback: copy to clipboard
+              navigator.clipboard.writeText(generatedPrompt).then(() => {
+                showToast('Prompt copied to clipboard!', 'success');
+              });
+            }
+          }
+        });
+        modal.open();
+      } catch (error) {
+        console.error('GTM Prompt Modal error:', error);
+        showToast('Failed to open GTM Prompt Enhancer', 'error');
       }
     }
 

@@ -5,6 +5,7 @@ import { AuthModal } from './AuthModal.js';
 import { createUploadPicker } from './UploadPicker.js';
 import { createInlineInstructions } from './InlineInstructions.js';
 import { createHeroSection } from '../lib/thumbnails.js';
+import { GTMPromptModal } from './modals/GTMPromptModal.jsx';
 
 export function VideoStudio() {
     const container = document.createElement('div');
@@ -288,6 +289,17 @@ export function VideoStudio() {
     }
 
     topRow.appendChild(textarea);
+
+    // GTM Prompt Enhancer Button
+    const gtmBtn = document.createElement('button');
+    gtmBtn.className = 'w-10 h-10 shrink-0 rounded-xl border bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40 transition-all flex items-center justify-center relative overflow-hidden mt-1.5 group';
+    gtmBtn.title = 'GTM Prompt Enhancer - Create conversion-optimized prompts';
+    gtmBtn.innerHTML = '🎯';
+    gtmBtn.onclick = () => {
+        openGTMPromptModal(textarea);
+    };
+    topRow.appendChild(gtmBtn);
+
     bar.appendChild(topRow);
 
     // Extend mode banner (shown when extend model is active, not editable by user)
@@ -1291,6 +1303,32 @@ export function VideoStudio() {
     if (wanEffectSelect) {
         wanEffectSelect.addEventListener('change', validateWanEffectSelection);
         validateWanEffectSelection(); // Initial validation
+    }
+
+    // GTM Prompt Modal Function
+    function openGTMPromptModal(promptTextarea) {
+        try {
+            const modal = new GTMPromptModal({
+                appTheme: 'video-studio',
+                onPromptGenerated: (generatedPrompt) => {
+                    // Load the generated prompt into the textarea
+                    promptTextarea.value = generatedPrompt;
+                    promptTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+
+                    // Adjust textarea height
+                    promptTextarea.style.height = 'auto';
+                    const maxHeight = window.innerWidth < 768 ? 150 : 250;
+                    promptTextarea.style.height = Math.min(promptTextarea.scrollHeight, maxHeight) + 'px';
+
+                    // Show success message (you might want to add a toast system to VideoStudio)
+                    console.log('GTM-optimized prompt loaded successfully!');
+                }
+            });
+            modal.open();
+        } catch (error) {
+            console.error('GTM Prompt Modal error:', error);
+            alert('Failed to open GTM Prompt Enhancer');
+        }
     }
 
     return container;

@@ -59,7 +59,10 @@ export const FEATURE_FLAGS = {
   LANDING_PAGE_BUILDER: false,
   THUMBNAIL_CREATIVE_ASSETS: false,
   VIDEO_ANALYTICS: false,
-  SOCIAL_PUBLISHING: false
+  SOCIAL_PUBLISHING: false,
+
+  // === GTM INTEGRATION ===
+  GTM_PROMPT_ENHANCER: true
 };
 
 /**

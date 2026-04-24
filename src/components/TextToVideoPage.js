@@ -1,5 +1,6 @@
 import { navigate } from '../lib/router.js';
 import { createHeroSection } from '../lib/thumbnails.js';
+import { GTMPromptModal } from './modals/GTMPromptModal.jsx';
 
 const TEXT_TO_VIDEO_MODELS = [
   { name: 'Kling v2.1', description: 'Kling v2.1 text-to-video', category: 'Kling' },
@@ -127,7 +128,10 @@ export function TextToVideoPage() {
           <div class="prompt-card bg-white/[0.03] border border-white/5 rounded-xl p-4 hover:border-primary/20 cursor-pointer transition-all duration-300">
             <div class="flex items-center justify-between mb-3">
               <span class="bg-primary/10 text-primary text-xs font-medium px-3 py-1 rounded-full">${p.model}</span>
-              <button class="text-xs text-muted hover:text-white transition-colors try-btn">Try this →</button>
+              <div class="flex items-center gap-2">
+                <button class="gtm-btn w-6 h-6 rounded border border-white/10 bg-white/5 hover:bg-white/10 hover:border-primary/40 transition-all flex items-center justify-center text-xs" data-prompt-index="${i}" title="Enhance with GTM">🎯</button>
+                <button class="text-xs text-muted hover:text-white transition-colors try-btn">Try this →</button>
+              </div>
             </div>
             <p class="text-sm text-gray-300 leading-relaxed">${p.prompt}</p>
           </div>
@@ -179,6 +183,40 @@ export function TextToVideoPage() {
       localStorage.setItem('prefill_prompt', prompt.prompt);
       localStorage.setItem('prefill_model', prompt.model);
       navigate('video');
+    };
+  });
+
+  container.querySelectorAll('.prompt-card .gtm-btn').forEach((btn) => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const promptIndex = parseInt(btn.dataset.promptIndex);
+      const prompt = EXAMPLE_PROMPTS[promptIndex];
+
+      try {
+        const modal = new GTMPromptModal({
+          appTheme: 'text-to-video',
+          onPromptGenerated: (generatedPrompt) => {
+            // Store the enhanced prompt and navigate to video studio
+            localStorage.setItem('prefill_prompt', generatedPrompt);
+            localStorage.setItem('prefill_model', prompt.model);
+            navigate('video');
+          }
+        });
+
+        // Pre-fill the modal with the example prompt
+        setTimeout(() => {
+          const basePromptInput = modal.content?.querySelector('#base-prompt');
+          if (basePromptInput) {
+            basePromptInput.value = prompt.prompt;
+            basePromptInput.dispatchEvent(new Event('input', { bubbles: true }));
+          }
+        }, 100);
+
+        modal.open();
+      } catch (error) {
+        console.error('GTM Prompt Modal error:', error);
+        alert('Failed to open GTM Prompt Enhancer');
+      }
     };
   });
 
