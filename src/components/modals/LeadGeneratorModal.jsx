@@ -41,27 +41,27 @@ export class LeadGeneratorModal extends BaseModal {
           <div class="form-grid">
             <div class="form-group">
               <label for="first-name">First Name</label>
-              <input type="text" id="first-name" class="form-input" placeholder="John" value="${this.lead.firstName}">
+              <input type="text" id="first-name" class="text-input" placeholder="John" value="${this.lead.firstName}">
             </div>
             <div class="form-group">
               <label for="last-name">Last Name</label>
-              <input type="text" id="last-name" class="form-input" placeholder="Smith" value="${this.lead.lastName}">
+              <input type="text" id="last-name" class="text-input" placeholder="Smith" value="${this.lead.lastName}">
             </div>
             <div class="form-group full-width">
               <label for="email">Email *</label>
-              <input type="email" id="email" class="form-input" placeholder="john@company.com" value="${this.lead.email}" required>
+              <input type="email" id="email" class="text-input" placeholder="john@company.com" value="${this.lead.email}" required>
             </div>
             <div class="form-group">
               <label for="phone">Phone</label>
-              <input type="tel" id="phone" class="form-input" placeholder="+1 555-1234" value="${this.lead.phone}">
+              <input type="tel" id="phone" class="text-input" placeholder="+1 555-1234" value="${this.lead.phone}">
             </div>
             <div class="form-group">
               <label for="company">Company</label>
-              <input type="text" id="company" class="form-input" placeholder="Acme Corp" value="${this.lead.company}">
+              <input type="text" id="company" class="text-input" placeholder="Acme Corp" value="${this.lead.company}">
             </div>
             <div class="form-group full-width">
               <label for="job-title">Job Title</label>
-              <input type="text" id="job-title" class="form-input" placeholder="Marketing Manager" value="${this.lead.jobTitle}">
+              <input type="text" id="job-title" class="text-input" placeholder="Marketing Manager" value="${this.lead.jobTitle}">
             </div>
           </div>
         </div>

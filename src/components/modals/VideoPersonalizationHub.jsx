@@ -99,7 +99,7 @@ export class VideoPersonalizationHub extends BaseModal {
           <h3>Upload Your Base Video</h3>
           <p>Drag and drop or click to browse</p>
           <input type="file" id="video-input" accept="video/*" style="display: none;">
-          <button class="upload-btn">Select Video</button>
+          <button class="primary-btn">Select Video</button>
         </div>
 
         <div class="uploaded-videos">
@@ -127,13 +127,13 @@ export class VideoPersonalizationHub extends BaseModal {
         <div class="import-section">
           <h4>Import Contacts</h4>
           <div class="import-options">
-            <button class="import-btn">
+            <button class="mini-btn">
               <span>📁</span> Import CSV
             </button>
-            <button class="import-btn">
+            <button class="mini-btn">
               <span>🔗</span> Connect CRM
             </button>
-            <button class="import-btn">
+            <button class="mini-btn">
               <span>✏️</span> Manual Entry
             </button>
           </div>
@@ -143,8 +143,8 @@ export class VideoPersonalizationHub extends BaseModal {
           <div class="contacts-header">
             <h4>Your Contacts (${this.contacts.length})</h4>
             <div class="contacts-actions">
-              <input type="search" class="search-input" placeholder="Search contacts...">
-              <button class="export-btn">Export</button>
+              <input type="search" class="text-input" placeholder="Search contacts...">
+              <button class="mini-btn">Export</button>
             </div>
           </div>
 
@@ -185,7 +185,7 @@ export class VideoPersonalizationHub extends BaseModal {
                   <span class="token-icon">🏷️</span>
                   <span class="token-name">{{${token}}}</span>
                 </div>
-                <input type="text" class="token-input" placeholder="Sample value" data-token="${token}">
+                <input type="text" class="text-input" placeholder="Sample value" data-token="${token}">
               </div>
             `).join('')}
           </div>
@@ -257,7 +257,7 @@ export class VideoPersonalizationHub extends BaseModal {
             </div>
           </div>
 
-          <button class="generate-btn" ${this.contacts.length === 0 ? 'disabled' : ''}>
+          <button class="primary-btn" ${this.contacts.length === 0 ? 'disabled' : ''}>
             ⚡ Generate ${this.contacts.length} Videos
           </button>
         </div>
