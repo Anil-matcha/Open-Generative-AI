@@ -3,7 +3,7 @@ import { showToast } from '../lib/loading.js';
 import { initializeTimelineDragDrop, createEnhancedClipElement, renderCompositingOverlay, renderTimelineControls, renderLayerManagement, renderPopcornElements, showTimelineContextMenu } from '../lib/editor/timelineRendererEnhanced.js';
 import { initializeMediaLibraryDragDrop, setupEnhancedTooltips } from '../lib/editor/dragDrop.js';
 import { renderMediaGrid, addMediaToTimeline } from '../lib/editor/mediaLibrary.js';
-import { extendClipContextMenu, extendGenerationPanel, extendMediaLibrary, extendTopActions } from '../lib/uiIntegration.js';
+import { extendClipContextMenu, extendGenerationPanel, extendMediaLibrary, extendTopActions, openAIAnalyzeModal } from '../lib/uiIntegration.js';
 import { integrateMediaIngest, GiphyIntegration, StickersLibrary, LowerThirds, VideoGallery, AnimationList } from '../lib/mediaIngest.js';
 import { renderMultiCameraToolbar, renderPipControls, renderSplitScreenControls } from '../lib/editor/multiCamera.js';
 import { createTimelineState } from '../lib/editor/timelineEditorState.js';
@@ -628,23 +628,6 @@ button, input, textarea, select { font: inherit; }
     style.id = 'timeline-editor-styles';
     style.textContent = styles;
     document.head.appendChild(style);
-
-    // Load agent panel styles
-    if (!document.getElementById('agent-panel-styles')) {
-      const agentStyle = document.createElement('link');
-      agentStyle.id = 'agent-panel-styles';
-      agentStyle.rel = 'stylesheet';
-      agentStyle.href = '/src/styles/agent-panel.css';
-      document.head.appendChild(agentStyle);
-    }
-
-    if (!document.getElementById('take-selector-styles')) {
-      const takeStyle = document.createElement('link');
-      takeStyle.id = 'take-selector-styles';
-      takeStyle.rel = 'stylesheet';
-      takeStyle.href = '/src/styles/take-selector.css';
-      document.head.appendChild(takeStyle);
-    }
   }
 
   function svgDataUri(markup) {
@@ -3161,77 +3144,48 @@ button, input, textarea, select { font: inherit; }
     // Initialize AI agent integration
     initializeAgentSystem(state, showToast);
 
-    // Agent system functions
+    // Agent system functions - integrated with MuAPI
     function initializeAgentSystem(state, showToast) {
-      // Create a simple timeline editor interface for the agent system
-      const timelineEditorInterface = {
-        getState: () => state,
-        getSelectedClips: () => {
-          const selectedClip = state.tracks.flatMap(track => track.items).find(item => item.id === state.selectedClipId);
-          return selectedClip ? [selectedClip] : [];
-        },
-        showNotification: (options) => {
-          showToast(`${options.title}: ${options.message}`);
-        },
-        on: (event, callback) => {
-          // Simple event listener for timeline events
-          if (event === 'clipSelect') {
-            // This will be called when clips are selected
-            window.addEventListener('clipSelected', (e) => callback(e.detail));
+      // Make timeline state available globally for AI analysis
+      window.timelineState = state;
+      
+      // Initialize agent hooks if available
+      if (typeof initTimelineAgentIntegration === 'function') {
+        const timelineEditorInterface = {
+          getState: () => state,
+          getSelectedClips: () => {
+            const selectedClip = state.tracks.flatMap(track => track.items).find(item => item.id === state.selectedClipId);
+            return selectedClip ? [selectedClip] : [];
+          },
+          showNotification: (options) => {
+            showToast(`${options.title}: ${options.message}`);
           }
+        };
+
+        try {
+          const agentIntegration = initTimelineAgentIntegration(timelineEditorInterface, {
+            theme: 'electric',
+            autoEnableAgents: false
+          });
+          root._agentIntegration = agentIntegration;
+        } catch (e) {
+          console.log('Agent integration skipped:', e.message);
         }
-      };
-
-      // Initialize the agent integration
-      const agentIntegration = initTimelineAgentIntegration(timelineEditorInterface, {
-        theme: 'electric',
-        autoEnableAgents: true
-      });
-
-      // Store reference for cleanup
-      root._agentIntegration = agentIntegration;
-
-      // Dispatch custom events when clips are selected
-      const originalSelectClip = window.selectClip || (() => {});
-      window.selectClip = (clipId) => {
-        originalSelectClip(clipId);
-        const clip = state.tracks.flatMap(track => track.items).find(item => item.id === clipId);
-        if (clip) {
-          window.dispatchEvent(new CustomEvent('clipSelected', { detail: clip }));
-        }
-      };
-
-      return agentIntegration;
+      }
     }
 
     function openAIAgentsPanel(state, showToast) {
-      showToast('Opening AI Agents panel...');
-      // The agent panel is already initialized and positioned
-      // Just toggle visibility if needed
-      const agentPanel = document.getElementById('agent-panel-container');
-      if (agentPanel) {
-        const content = agentPanel.querySelector('.agent-panel-content');
-        if (content && content.style.display === 'none') {
-          content.style.display = 'block';
-          agentPanel.querySelector('.toggle-icon').textContent = '−';
-        }
-      }
+      // Open AI Analysis modal
+      openAIAnalyzeModal(state, showToast);
     }
 
     function openCharacterTrackingPanel(state, showToast) {
-      showToast('Opening Character Tracking panel...');
-      // Trigger character tracking in the agent system
-      if (root._agentIntegration) {
-        root._agentIntegration.agentPanel.emit('action', { action: 'track_characters' });
-      }
+      showToast('Character tracking analyzes clips for visual consistency', 'info');
     }
 
     function openTimelineAnalysisPanel(state, showToast) {
-      showToast('Opening Timeline Analysis panel...');
-      // Trigger timeline analysis in the agent system
-      if (root._agentIntegration) {
-        root._agentIntegration.agentPanel.emit('action', { action: 'analyze_timeline' });
-      }
+      // Open AI Analysis modal directly
+      openAIAnalyzeModal(state, showToast);
     }
 
     return {
