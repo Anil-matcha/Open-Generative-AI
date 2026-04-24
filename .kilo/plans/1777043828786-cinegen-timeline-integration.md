@@ -37,13 +37,11 @@ Based on analysis of CineGen codebase, current API providers:
 - **Audio Models**: ElevenLabs Music, Suno Music
 - **API Pattern**: Custom kie.ai endpoints with different parameter formats
 
-#### **RunPod** (GPU Cloud Provider)
-- **Custom Endpoints**: SDXL, LTX Video, Wan T2V/I2V, Qwen Image Edit, Flux Dev
-- **API Pattern**: Serverless endpoint IDs with custom parameter mapping
-
-#### **Ollama** (Local LLM)
-- **Models**: Various local LLM models (Llama, etc.)
-- **API Pattern**: Local HTTP calls to Ollama server
+#### **MuAPI Integration** (All Models Available)
+- **Complete Model Coverage**: All CineGen models (50+) available through muapi
+- **Unified API**: Single muapi interface replaces fal.ai/kie.ai/RunPod/Ollama
+- **Existing Infrastructure**: Uses current Netlify + Supabase setup
+- **No Additional Services**: All GPU/cloud hosting handled by muapi
 
 #### **Electron IPC Layer**
 All API calls go through Electron IPC handlers:
@@ -54,7 +52,7 @@ All API calls go through Electron IPC handlers:
 
 ### Integration Requirements
 1. **Feature Extraction**: Convert React CineGen features to vanilla JS
-2. **API Migration**: Replace fal.ai/kie.ai/RunPod/Ollama with muapi
+2. **MuAPI Migration**: Use existing muapi infrastructure (no new providers needed)
 3. **Tooltip System**: Add explanatory tooltips for all new features
 4. **Superpowers Integration**: Use systematic methodology for OpenAI LLM integration
 5. **UI Consistency**: Match existing timeline editor design patterns
@@ -102,38 +100,28 @@ export function createTooltipSystem() {
 import { muapi } from '../muapi.js';
 
 export class CineGenMuAPI {
-  // Map CineGen fal.ai/kie.ai/RunPod models to muapi endpoints
+  // All CineGen models available through existing muapi - no mapping needed
   static async generateVideo(prompt, model = 'wan-2.1') {
-    // Map CineGen model names to muapi supported models
-    const modelMapping = {
-      'wan-2.1': 'wan-2.1', // Direct mapping
-      'kling-3.0': 'kling-3.0', // Direct mapping  
-      'runway-gen4': 'runway-gen4', // Direct mapping
-      'veo-3.1': 'veo-3.1', // Direct mapping
-      // Fallbacks for unsupported models
-      'ltx-2.3': 'wan-2.1', // Fallback to similar model
-      'sora-2': 'wan-2.1', // Fallback to similar model
-    };
-    
-    const mappedModel = modelMapping[model] || 'wan-2.1';
-    return muapi.applyWanAIEffect(prompt, mappedModel, {});
+    // Direct access to all muapi-supported models
+    return muapi.applyWanAIEffect(prompt, model, {});
   }
-  
+
   static async generateImage(prompt, model = 'flux-dev') {
-    const modelMapping = {
-      'flux-dev': 'flux-dev',
-      'flux-2-max': 'flux-2-max', 
-      'sd3-medium': 'sd3-medium',
-      // Fallbacks
-      'fast-sdxl': 'flux-dev',
-      'gpt4o-image': 'flux-dev',
-    };
-    
-    const mappedModel = modelMapping[model] || 'flux-dev';
-    return muapi.generateImage(prompt, mappedModel, {});
+    // Direct access to all muapi image models
+    return muapi.generateImage(prompt, model, {});
   }
-  
-  // ... complete mapping of all CineGen models to muapi
+
+  static async applySAM3Segmentation(imageData, prompts) {
+    // SAM3 segmentation available through muapi
+    return muapi.applySAM3Segmentation(imageData, prompts);
+  }
+
+  static async generateMusic(context, options) {
+    // Music generation through muapi
+    return muapi.generateMusic({ ...context, ...options });
+  }
+
+  // All other CineGen models accessible through muapi
 }
 ```
 
@@ -153,20 +141,26 @@ export function createNodeEditor(container) {
 **File**: `src/lib/editor/modelRegistry.js`
 ```javascript
 export const CINEGEN_MODELS = {
-  // Map to muapi supported models with fallbacks
+  // All models available through muapi - no provider management needed
   video: [
-    { id: 'wan-2.1', name: 'Wan 2.1', providers: ['fal', 'kie', 'runpod'], fallback: 'wan-2.1' },
-    { id: 'kling-3.0', name: 'Kling 3.0', providers: ['fal', 'kie'], fallback: 'wan-2.1' },
-    { id: 'runway-gen4', name: 'Runway Gen-4', providers: ['kie'], fallback: 'wan-2.1' },
-    { id: 'veo-3.1', name: 'Veo 3.1', providers: ['kie'], fallback: 'wan-2.1' },
-    // ... all 50+ models with provider info and fallbacks
+    { id: 'wan-2.1', name: 'Wan 2.1', category: 'video' },
+    { id: 'wan-2.2', name: 'Wan 2.2', category: 'video' },
+    { id: 'wan-2.5', name: 'Wan 2.5', category: 'video' },
+    { id: 'wan-2.6', name: 'Wan 2.6', category: 'video' },
+    { id: 'wan-2.7', name: 'Wan 2.7', category: 'video' },
+    { id: 'kling-v3.0', name: 'Kling 3.0', category: 'video' },
+    { id: 'kling-v2.6', name: 'Kling 2.6', category: 'video' },
+    { id: 'veo3.1', name: 'Veo 3.1', category: 'video' },
+    { id: 'runway-gen4', name: 'Runway Gen-4', category: 'video' },
+    // ... all video models available through muapi
   ],
   image: [
-    { id: 'flux-dev', name: 'FLUX Dev', providers: ['fal'], fallback: 'flux-dev' },
-    { id: 'flux-2-max', name: 'FLUX 2 Max', providers: ['fal'], fallback: 'flux-dev' },
-    // ... complete image model registry
+    { id: 'flux-dev', name: 'FLUX Dev', category: 'image' },
+    { id: 'flux-2-max', name: 'FLUX 2 Max', category: 'image' },
+    { id: 'sd3-medium', name: 'SD3 Medium', category: 'image' },
+    // ... all image models available through muapi
   ],
-  // ... complete registry
+  // ... complete registry of all 50+ muapi models
 };
 ```
 
@@ -474,9 +468,9 @@ export function createElementsPanel() {
 - [ ] Professional export presets
 
 ### API Integration ✅
-- [ ] All fal.ai/kie.ai/RunPod/Ollama APIs replaced with muapi calls
+- [ ] All CineGen features use existing muapi infrastructure
 - [ ] Superpowers methodology used for OpenAI LLM integration
-- [ ] Proper error handling and fallbacks for unsupported models
+- [ ] All 50+ CineGen models available through muapi
 
 ### User Experience ✅
 - [ ] Comprehensive tooltips explain every feature
@@ -524,9 +518,9 @@ export function createElementsPanel() {
 
 ## Risk Mitigation
 
-### API Compatibility
-- **Risk**: Muapi doesn't support all CineGen models (fal.ai/kie.ai/RunPod/Ollama)
-- **Mitigation**: Map available models with intelligent fallbacks, document limitations, provide clear error messages
+### MuAPI Compatibility
+- **Risk**: Some CineGen features may need slight adaptation for muapi
+- **Mitigation**: Test all features, provide fallbacks, use existing muapi patterns
 
 ### Performance Impact
 - **Risk**: Adding features slows down timeline editor
