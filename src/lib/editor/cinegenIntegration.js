@@ -9,11 +9,12 @@
 
 import { createTooltipSystem } from './tooltipSystem.js';
 import { createNodeEditor } from './cinegen-features/nodeWorkflow.js';
-import { createAIEditingTools } from './cinegen-features/aiEditingTools.js';
+import { AIEditingTools, EDITING_TOOLS } from './cinegen-features/aiEditingTools.js';
 import { createElementsLibrary } from './cinegen-features/elementsLibrary.js';
 import { createLLMAssistant } from './cinegen-features/llmAssistant.js';
 import { createAdvancedTimeline } from './cinegen-features/advancedTimeline.js';
 import { createExportSystem } from './cinegen-features/exportSystem.js';
+import { createTimelineStateAdapter } from './timelineStateAdapter.js';
 
 /**
  * CineGen Feature Panel - Manages the side panel with all AI features
@@ -274,13 +275,15 @@ export class CineGenFeaturePanel {
 
     document.body.appendChild(modal);
 
-    // Setup event handlers for AI tools
-    modal.querySelector('#fillGapBtn').addEventListener('click', () => this.handleFillGap(modal));
-    modal.querySelector('#extendClipBtn').addEventListener('click', () => this.handleExtendClip(modal));
-    modal.querySelector('#generateMusicBtn').addEventListener('click', () => this.handleGenerateMusic(modal));
-    modal.querySelector('#sam3MaskBtn').addEventListener('click', () => this.handleSAM3Masking(modal));
+    const aiTools = new AIEditingTools(this.state);
+    aiTools.setModal(modal);
 
-    this.panels['ai-tools'] = { modal };
+    modal.querySelector('#fillGapBtn').addEventListener('click', () => aiTools.executeTool(EDITING_TOOLS.FILL_GAP));
+    modal.querySelector('#extendClipBtn').addEventListener('click', () => aiTools.executeTool(EDITING_TOOLS.EXTEND_CLIP));
+    modal.querySelector('#generateMusicBtn').addEventListener('click', () => aiTools.executeTool(EDITING_TOOLS.GENERATE_MUSIC));
+    modal.querySelector('#sam3MaskBtn').addEventListener('click', () => aiTools.executeTool(EDITING_TOOLS.SAM3_MASKING));
+
+    this.panels['ai-tools'] = { modal, aiTools };
   }
 
   openElementsModal() {
@@ -818,6 +821,7 @@ export function extendWithCineGenFeatures(state, showToast) {
   const panelContainer = document.querySelector('.side-col');
   if (!panelContainer) return;
 
-  const cinegenPanel = createCineGenFeaturePanel(panelContainer, state);
+  const stateAdapter = createTimelineStateAdapter(state);
+  const cinegenPanel = createCineGenFeaturePanel(panelContainer, stateAdapter);
   return cinegenPanel;
 }

@@ -1,4 +1,5 @@
 import { CineGenMuAPI } from '../cinegenMuapi.js';
+import { createTimelineStateAdapter } from '../timelineStateAdapter.js';
 
 export const EDITING_TOOLS = {
   FILL_GAP: 'fill-gap',
@@ -16,44 +17,22 @@ export class AIEditingTools {
 
   init(container) {
     this.container = container;
-    this.renderToolbar();
     return this;
   }
 
-  renderToolbar() {
-    const toolbar = document.createElement('div');
-    toolbar.className = 'ai-editing-tools';
-    toolbar.innerHTML = `
-      <div class="ai-tools-section">
-        <h4>AI Editing Tools</h4>
-        <div class="ai-tools-grid">
-          <button class="ai-tool-btn" data-tool="${EDITING_TOOLS.FILL_GAP}" title="Fill Gap - AI generates footage to bridge gaps between clips">
-            <span class="ai-tool-icon">🔗</span>
-            <span class="ai-tool-label">Fill Gap</span>
-          </button>
-          <button class="ai-tool-btn" data-tool="${EDITING_TOOLS.EXTEND_CLIP}" title="Extend Clip - Generate additional footage before/after clips">
-            <span class="ai-tool-icon">↔️</span>
-            <span class="ai-tool-label">Extend</span>
-          </button>
-          <button class="ai-tool-btn" data-tool="${EDITING_TOOLS.GENERATE_MUSIC}" title="Generate Music - Create music from video context">
-            <span class="ai-tool-icon">🎵</span>
-            <span class="ai-tool-label">Music</span>
-          </button>
-          <button class="ai-tool-btn" data-tool="${EDITING_TOOLS.SAM3_MASKING}" title="SAM3 Masking - Segment objects with text, click, or box prompts">
-            <span class="ai-tool-icon">🎭</span>
-            <span class="ai-tool-label">Mask</span>
-          </button>
-        </div>
-      </div>
-    `;
+  setModal(modal) {
+    this.modal = modal;
+  }
 
-    toolbar.querySelectorAll('.ai-tool-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        this.selectTool(btn.dataset.tool);
-      });
-    });
+  getSelectedClips() {
+    if (typeof this.timelineState.getSelectedClips === 'function') {
+      return this.timelineState.getSelectedClips();
+    }
+    return [];
+  }
 
-    this.container.appendChild(toolbar);
+  getModal() {
+    return this.modal;
   }
 
   selectTool(tool) {
@@ -344,10 +323,6 @@ export class AIEditingTools {
 
     this.applyMaskToClip(selectedClip, result);
     return { success: true };
-  }
-
-  getSelectedClips() {
-    return this.timelineState.clips.filter(clip => clip.selected);
   }
 
   createClipFromResult(result, startTime, duration) {
