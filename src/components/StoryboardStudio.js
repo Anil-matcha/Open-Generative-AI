@@ -229,7 +229,7 @@ export function StoryboardStudio() {
       const gtmBtn1 = document.createElement('button');
       gtmBtn1.className = 'absolute top-1 right-1 w-6 h-6 rounded border bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40 transition-all flex items-center justify-center text-xs';
       gtmBtn1.title = 'GTM Prompt Enhancer - Create conversion-optimized character descriptions';
-      gtmBtn1.innerHTML = '🎯';
+      gtmBtn1.innerHTML = '🚀';
       gtmBtn1.onclick = () => {
         openGTMPromptModal(traitsInput, 'character-traits');
       };
@@ -347,7 +347,7 @@ export function StoryboardStudio() {
       const gtmBtn2 = document.createElement('button');
       gtmBtn2.className = 'absolute top-1 right-1 w-6 h-6 rounded border bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40 transition-all flex items-center justify-center text-xs';
       gtmBtn2.title = 'GTM Prompt Enhancer - Create conversion-optimized scene descriptions';
-      gtmBtn2.innerHTML = '🎯';
+      gtmBtn2.innerHTML = '🚀';
       gtmBtn2.onclick = () => {
         openGTMPromptModal(descInput, 'scene-description');
       };
@@ -408,7 +408,7 @@ export function StoryboardStudio() {
         const gtmBtn3 = document.createElement('button');
         gtmBtn3.className = 'absolute top-0.5 right-0.5 w-5 h-5 rounded border bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40 transition-all flex items-center justify-center text-xs';
         gtmBtn3.title = 'GTM Prompt Enhancer - Create conversion-optimized shot descriptions';
-        gtmBtn3.innerHTML = '🎯';
+        gtmBtn3.innerHTML = '🚀';
         gtmBtn3.onclick = () => {
           openGTMPromptModal(promptInput, 'shot-prompt');
         };

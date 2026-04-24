@@ -278,7 +278,8 @@ export function TemplateStudio(templateId) {
   extraWrapper.innerHTML = `
     <div class="mb-3 flex items-center justify-between gap-3">
       <div class="text-[11px] font-semibold uppercase tracking-[0.22em] text-zinc-500">Extra Instructions</div>
-      <button class="gtm-enhancer-btn rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] transition border-white/10 bg-white/[0.03] text-zinc-400 hover:bg-white/[0.06] hover:text-white" title="GTM Prompt Enhancer">🎯 GTM</button>
+      <button class="basic-enhancer-btn rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] transition border-white/10 bg-white/[0.03] text-zinc-400 hover:bg-white/[0.06] hover:text-white" title="Basic Enhancement">Enhance</button>
+      <button class="gtm-enhancer-btn rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] transition border-white/10 bg-white/[0.03] text-zinc-400 hover:bg-white/[0.06] hover:text-white" title="GTM Prompt Enhancement">🚀 GTM Boost</button>
     </div>
     <textarea class="w-full rounded-[18px] border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white outline-none transition focus:border-emerald-400/50 resize-none" rows="4" placeholder="optional cinematic instructions" data-advanced-field="extraInstructions"></textarea>
   `;
@@ -484,13 +485,31 @@ export function TemplateStudio(templateId) {
       };
     });
 
+    // Basic enhancer button handler
+    document.querySelectorAll('.basic-enhancer-btn').forEach(btn => {
+      btn.onclick = () => {
+        const fieldName = btn.dataset.field || 'extraInstructions';
+        const input = document.querySelector(`[data-advanced-field="${fieldName}"]`);
+        if (input && input.value) {
+          const enhancedValue = `${input.value}, cinematic style, professional quality, premium aesthetic`;
+          input.value = enhancedValue;
+          btn.classList.add('border-emerald-400/40', 'bg-emerald-500/15', 'text-emerald-200');
+          btn.textContent = 'Enhanced ✓';
+          setTimeout(() => {
+            btn.classList.remove('border-emerald-400/40', 'bg-emerald-500/15', 'text-emerald-200');
+            btn.textContent = 'Enhance';
+          }, 2000);
+        }
+      };
+    });
+
     // GTM Enhancer button handler
     document.querySelectorAll('.gtm-enhancer-btn').forEach(btn => {
       btn.onclick = () => {
         const fieldName = btn.dataset.field || 'extraInstructions';
         const input = document.querySelector(`[data-advanced-field="${fieldName}"]`);
         if (input) {
-          openGTMPromptModal(input);
+          openGTMPromptModal(input, fieldName);
         }
       };
     });

@@ -161,8 +161,8 @@ export function LipSyncStudio() {
     // GTM Prompt Enhancer Button
     const gtmBtn = document.createElement('button');
     gtmBtn.className = 'w-8 h-8 shrink-0 rounded-lg border bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40 transition-all flex items-center justify-center relative overflow-hidden group';
-    gtmBtn.title = 'GTM Prompt Enhancer - Create conversion-optimized prompts';
-    gtmBtn.innerHTML = '🎯';
+    gtmBtn.title = 'GTM Prompt Enhancement - Create conversion-optimized prompts';
+    gtmBtn.innerHTML = '🚀';
     gtmBtn.onclick = () => {
         openGTMPromptModal(textarea);
     };

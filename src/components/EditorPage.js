@@ -502,7 +502,7 @@ export function EditorPage() {
                                 <label class="text-xs text-secondary block mb-2">Prompt</label>
                                 <div class="relative">
                                     <textarea id="generate-prompt" placeholder="Describe what you want to generate..." class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-muted focus:outline-none focus:border-primary/50 resize-none" rows="3"></textarea>
-                                    <button class="absolute top-2 right-2 w-6 h-6 rounded border border-white/10 bg-white/5 hover:bg-white/10 hover:border-primary/40 transition-all flex items-center justify-center text-xs" title="GTM Prompt Enhancer" onclick="openGTMPromptModal(document.getElementById('generate-prompt'))">🎯</button>
+                                    <button class="absolute top-2 right-2 w-6 h-6 rounded border border-white/10 bg-white/5 hover:bg-white/10 hover:border-primary/40 transition-all flex items-center justify-center text-xs" title="GTM Prompt Enhancement" onclick="openGTMPromptModal(document.getElementById('generate-prompt'))">🚀</button>
                                 </div>
                             </div>
 

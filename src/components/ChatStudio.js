@@ -94,8 +94,8 @@ export function ChatStudio() {
   // GTM Prompt Enhancer Button for chat
   const gtmBtn = document.createElement('button');
   gtmBtn.className = 'w-10 h-10 shrink-0 rounded-xl border bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40 transition-all flex items-center justify-center relative overflow-hidden group';
-  gtmBtn.title = 'GTM Prompt Enhancer - Create more persuasive chat messages';
-  gtmBtn.innerHTML = '🎯';
+  gtmBtn.title = 'GTM Prompt Enhancement - Create more persuasive chat messages';
+  gtmBtn.innerHTML = '🚀';
   gtmBtn.onclick = () => {
     openGTMPromptModal(textarea);
   };
