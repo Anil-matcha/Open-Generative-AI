@@ -816,12 +816,11 @@ export function createCineGenFeaturePanel(container, timelineState) {
 /**
  * Extend timeline editor with CineGen features
  * Called from TimelineEditorPage.js
+ * Note: CineGen features are now integrated as individual buttons in existing panels
  */
 export function extendWithCineGenFeatures(state, showToast) {
-  const panelContainer = document.querySelector('.side-col');
-  if (!panelContainer) return;
-
-  const stateAdapter = createTimelineStateAdapter(state);
-  const cinegenPanel = createCineGenFeaturePanel(panelContainer, stateAdapter);
-  return cinegenPanel;
+  // CineGen features are now integrated via extendGenerationPanel in uiIntegration.js
+  // This function is kept for future expansion but currently does nothing
+  // to maintain the existing integration pattern
+  console.log('CineGen features integrated via generation panel buttons');
 }
