@@ -15,8 +15,24 @@ import { createVideoPreview } from '../lib/videoPlayer.js';
 import { interpolate, spring, blendColors, noise2D, useSequence, useSeries } from '../lib/editor/animationControls.jsx';
 // ColorCorrectionSystem removed - file does not exist
 
-// Modal imports removed - app uses vanilla JS, not React
-// These modals would need to be converted to vanilla JS implementations
+// Modal imports - these are vanilla JS modal implementations
+import { EndScreenModal } from './modals/EndScreenModal.jsx';
+import { SaveProjectModal } from './modals/SaveProjectModal.jsx';
+import { SettingsModal } from './modals/SettingsModal.jsx';
+import { BillingModal } from './modals/BillingModal.jsx';
+import { ConnectModal } from './modals/ConnectModal.jsx';
+import { PreviewMediaModal } from './modals/PreviewMediaModal.jsx';
+import { VideoPlayerModal } from './modals/VideoPlayerModal.jsx';
+import { RecorderModal } from './modals/RecorderModal.jsx';
+import { EnhancedRecorderModal } from './modals/EnhancedRecorderModal.jsx';
+import { TemplateGeneratorModal } from './modals/TemplateGeneratorModal.jsx';
+import { TemplatePreviewModal } from './modals/TemplatePreviewModal.jsx';
+import { SocialPublisherModal } from './modals/SocialPublisherModal.jsx';
+import { EmailCampaignModal } from './modals/EmailCampaignModal.jsx';
+import { UrlVideoModal } from './modals/UrlVideoModal.jsx';
+import { PageShotModal } from './modals/PageShotModal.jsx';
+import { ContactImporterModal } from './modals/ContactImporterModal.jsx';
+import { AIVideoCreator } from './modals/AIVideoCreator.jsx';
 
 // Category C Editor Surface imports removed - not implemented
 
