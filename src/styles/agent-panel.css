@@ -1,0 +1,238 @@
+/**
+ * Agent Panel Styles
+ * Electric theme (#2B61FF) for LTX timeline integration
+ */
+
+/* Agent Panel Container */
+.agent-panel {
+  background: var(--bg-panel, #18181b);
+  border: 1px solid var(--border-light, rgba(255, 255, 255, 0.1));
+  border-radius: var(--radius-md, 8px);
+  font-family: var(--font-family, 'Inter', system-ui, sans-serif);
+  color: var(--text-primary, #fff);
+  overflow: hidden;
+}
+
+.agent-panel.theme-electric {
+  --color-primary: #2B61FF;
+  --color-accent: #00d4ff;
+  --bg-panel: #09090b;
+  --bg-card: #18181b;
+  --border-light: rgba(43, 97, 255, 0.3);
+  --text-primary: #ffffff;
+  --text-secondary: #a1a1aa;
+}
+
+/* Header */
+.agent-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm, 8px) var(--spacing-md, 12px);
+  background: linear-gradient(135deg, var(--color-primary) 0%, #1a4aCC 100%);
+  color: white;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.agent-panel-header h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.agent-panel-toggle {
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 4px 8px;
+  font-size: 18px;
+  line-height: 1;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+
+.agent-panel-toggle:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Content */
+.agent-panel-content {
+  padding: var(--spacing-md, 12px);
+}
+
+.agent-section {
+  margin-bottom: var(--spacing-lg, 16px);
+}
+
+.agent-section h4 {
+  margin: 0 0 var(--spacing-sm, 8px) 0;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+}
+
+/* Action Buttons */
+.agent-actions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-xs, 4px);
+}
+
+.agent-action-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs, 6px);
+  padding: var(--spacing-sm, 8px);
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm, 6px);
+  color: var(--text-primary);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.agent-action-btn:hover {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(43, 97, 255, 0.4);
+}
+
+.agent-action-btn:active {
+  transform: translateY(0);
+}
+
+.agent-action-btn .agent-icon {
+  font-size: 14px;
+}
+
+.agent-action-btn .agent-label {
+  flex: 1;
+  text-align: left;
+}
+
+/* Status Display */
+.agent-status {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs, 6px);
+  padding: var(--spacing-sm, 8px);
+  background: var(--bg-card);
+  border-radius: var(--radius-sm, 6px);
+  margin-top: var(--spacing-md, 12px);
+}
+
+.status-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.status-message {
+  font-size: 12px;
+  color: var(--color-accent);
+  font-weight: 500;
+}
+
+/* Progress Bar */
+.agent-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm, 8px);
+  margin-top: var(--spacing-sm, 8px);
+}
+
+.progress-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--bg-card);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 11px;
+  color: var(--text-secondary);
+  min-width: 36px;
+  text-align: right;
+}
+
+/* Glass morphism effect for panels */
+.agent-panel.glass {
+  background: rgba(24, 24, 27, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Interactive glow effect */
+.agent-action-btn.interactive-glow:hover {
+  box-shadow: 
+    0 0 20px rgba(43, 97, 255, 0.5),
+    0 0 40px rgba(43, 97, 255, 0.2);
+}
+
+/* Agent Results Panel */
+.agent-results {
+  margin-top: var(--spacing-md, 12px);
+  padding: var(--spacing-md, 12px);
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md, 8px);
+}
+
+.agent-results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm, 8px);
+}
+
+.agent-results-header h4 {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.agent-result-item {
+  padding: var(--spacing-sm, 8px);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.agent-result-item:last-child {
+  border-bottom: none;
+}
+
+.result-type {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-primary);
+  margin-bottom: 4px;
+}
+
+.result-content {
+  font-size: 12px;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .agent-actions {
+    grid-template-columns: 1fr;
+  }
+}
