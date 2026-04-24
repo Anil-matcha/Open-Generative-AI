@@ -4,7 +4,7 @@ import { CineGenMuAPI } from '../cinegenMuapi.js';
 // Mock muapi
 vi.mock('../../muapi.js', () => ({
   muapi: {
-    applyWanAIEffect: vi.fn(),
+    generateVideo: vi.fn(),
     generateImage: vi.fn(),
     applySAM3Segmentation: vi.fn(),
     generateMusic: vi.fn()
@@ -19,44 +19,44 @@ describe('CineGenMuAPI', () => {
   });
 
   describe('generateVideo', () => {
-    it('should call muapi.applyWanAIEffect with correct parameters', async () => {
-      const mockResult = { videoUrl: 'test.mp4' };
-      muapi.applyWanAIEffect.mockResolvedValue(mockResult);
+    it('should call muapi.generateVideo with correct parameters', async () => {
+      const mockResult = { url: 'test.mp4' };
+      muapi.generateVideo.mockResolvedValue(mockResult);
 
-      const result = await CineGenMuAPI.generateVideo('test prompt', 'wan-2.1');
+      const result = await CineGenMuAPI.generateVideo('test prompt', 'wan2.1-text-to-video');
 
-      expect(muapi.applyWanAIEffect).toHaveBeenCalledWith('test prompt', 'wan-2.1', {});
+      expect(muapi.generateVideo).toHaveBeenCalledWith({ prompt: 'test prompt', model: 'wan2.1-text-to-video' });
       expect(result).toBe(mockResult);
     });
 
     it('should use default model when not specified', async () => {
-      const mockResult = { videoUrl: 'test.mp4' };
-      muapi.applyWanAIEffect.mockResolvedValue(mockResult);
+      const mockResult = { url: 'test.mp4' };
+      muapi.generateVideo.mockResolvedValue(mockResult);
 
       await CineGenMuAPI.generateVideo('test prompt');
 
-      expect(muapi.applyWanAIEffect).toHaveBeenCalledWith('test prompt', 'wan-2.1', {});
+      expect(muapi.generateVideo).toHaveBeenCalledWith({ prompt: 'test prompt', model: 'wan2.1-text-to-video' });
     });
   });
 
   describe('generateImage', () => {
     it('should call muapi.generateImage with correct parameters', async () => {
-      const mockResult = { imageUrl: 'test.jpg' };
+      const mockResult = { url: 'test.jpg' };
       muapi.generateImage.mockResolvedValue(mockResult);
 
       const result = await CineGenMuAPI.generateImage('test prompt', 'flux-dev');
 
-      expect(muapi.generateImage).toHaveBeenCalledWith('test prompt', 'flux-dev', {});
+      expect(muapi.generateImage).toHaveBeenCalledWith({ prompt: 'test prompt', model: 'flux-dev' });
       expect(result).toBe(mockResult);
     });
 
     it('should use default model when not specified', async () => {
-      const mockResult = { imageUrl: 'test.jpg' };
+      const mockResult = { url: 'test.jpg' };
       muapi.generateImage.mockResolvedValue(mockResult);
 
       await CineGenMuAPI.generateImage('test prompt');
 
-      expect(muapi.generateImage).toHaveBeenCalledWith('test prompt', 'flux-dev', {});
+      expect(muapi.generateImage).toHaveBeenCalledWith({ prompt: 'test prompt', model: 'flux-dev' });
     });
   });
 
