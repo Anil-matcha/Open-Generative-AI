@@ -144,9 +144,9 @@ export function extendGenerationPanel(generationContainer, state, showToast) {
   const aiWorkflowBtn = document.createElement('button');
   aiWorkflowBtn.className = 'generate-type';
   aiWorkflowBtn.innerHTML = '<div class="emoji">🧠</div><div>AI Workflow</div>';
-  aiWorkflowBtn.title = 'Create AI generation pipelines with 50+ models';
+  aiWorkflowBtn.title = 'Create AI generation pipelines with 50+ models including Wan, Kling, Veo, Runway, and Flux';
+  aiWorkflowBtn.setAttribute('data-tooltip', 'node-workflow');
   aiWorkflowBtn.addEventListener('click', async () => {
-    const { CineGenFeaturePanel } = await import('../lib/editor/cinegenIntegration.js');
     const modal = document.createElement('div');
     modal.className = 'modal-overlay';
     modal.innerHTML = `
@@ -177,7 +177,8 @@ export function extendGenerationPanel(generationContainer, state, showToast) {
   const aiToolsBtn = document.createElement('button');
   aiToolsBtn.className = 'generate-type';
   aiToolsBtn.innerHTML = '<div class="emoji">⚡</div><div>AI Tools</div>';
-  aiToolsBtn.title = 'AI editing tools: fill gaps, extend clips, generate music, SAM3 masking';
+  aiToolsBtn.title = 'Fill gaps, extend clips, generate music from video, and apply SAM3 masking using 9 video models';
+  aiToolsBtn.setAttribute('data-tooltip', 'ai-tools');
   aiToolsBtn.addEventListener('click', async () => {
     const { createModal } = await import('../lib/editor/cinegenIntegration.js');
     const modal = createModal('AI Editing Tools', `
@@ -407,8 +408,9 @@ export function extendTopActions(topActions, state, showToast) {
   const elementsIcon = document.createElement('button');
   elementsIcon.className = 'top-icon';
   elementsIcon.textContent = '👤';
-  elementsIcon.title = 'Elements Library - Characters, locations, props, vehicles';
+  elementsIcon.title = 'Elements Library - Browse and use reusable characters, locations, props, and vehicles in your timeline';
   elementsIcon.setAttribute('aria-label', 'Elements Library');
+  elementsIcon.setAttribute('data-tooltip', 'elements-lib');
   elementsIcon.addEventListener('click', async () => {
     const { createModal } = await import('../lib/editor/cinegenIntegration.js');
     const modal = createModal('Elements Library', `
@@ -451,8 +453,9 @@ export function extendTopActions(topActions, state, showToast) {
   const llmIcon = document.createElement('button');
   llmIcon.className = 'top-icon';
   llmIcon.textContent = '💬';
-  llmIcon.title = 'AI Assistant - Context-aware chat for editorial workflow';
+  llmIcon.title = 'AI Assistant - Get context-aware help with scriptwriting, editing suggestions, and project organization';
   llmIcon.setAttribute('aria-label', 'AI Assistant');
+  llmIcon.setAttribute('data-tooltip', 'llm-chat');
   llmIcon.addEventListener('click', async () => {
     const { createModal } = await import('../lib/editor/cinegenIntegration.js');
     const modal = createModal('AI Assistant', `
@@ -538,8 +541,9 @@ export function extendTopActions(topActions, state, showToast) {
   const exportIcon = document.createElement('button');
   exportIcon.className = 'top-icon';
   exportIcon.textContent = '📤';
-  exportIcon.title = 'Export - Render to MP4 with professional presets';
+  exportIcon.title = 'Export Timeline - Render your timeline to MP4 with quality presets (720p, 1080p, 4K)';
   exportIcon.setAttribute('aria-label', 'Export Timeline');
+  exportIcon.setAttribute('data-tooltip', 'export');
   exportIcon.addEventListener('click', async () => {
     const { createModal } = await import('../lib/editor/cinegenIntegration.js');
     const modal = createModal('Export Timeline', `
