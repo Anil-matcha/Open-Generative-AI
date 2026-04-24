@@ -64,10 +64,11 @@ export class DirectorAgent extends BaseAgent {
     
     const trackAnalysis = tracks.map(track => ({
       id: track.id,
+      name: track.name,
       type: track.type,
-      clipCount: track.clips?.length || 0,
-      totalDuration: track.clips?.reduce((sum, c) => sum + (c.duration || 0), 0) || 0,
-      clips: track.clips || []
+      clipCount: track.items?.length || 0,
+      totalDuration: track.items?.reduce((sum, c) => sum + (c.duration || 0), 0) || 0,
+      clips: track.items || []
     }));
     
     const totalClips = trackAnalysis.reduce((sum, t) => sum + t.clipCount, 0);
@@ -87,7 +88,7 @@ export class DirectorAgent extends BaseAgent {
     const tracks = timelineState?.tracks || [];
     
     tracks.forEach(track => {
-      const clips = track.clips || [];
+      const clips = track.items || [];
       
       for (let i = 1; i < clips.length; i++) {
         const prevEnd = clips[i - 1].endTime || clips[i - 1].startTime + clips[i - 1].duration;

@@ -59,7 +59,7 @@ export class ScreenwriterAgent extends BaseAgent {
   async analyzeTimelineContent(timelineState, selectedClips) {
     const clips = selectedClips.length > 0 
       ? selectedClips 
-      : timelineState?.tracks?.flatMap(t => t.clips) || [];
+      : timelineState?.tracks?.flatMap(t => t.items) || [];
     
     return {
       clipCount: clips.length,

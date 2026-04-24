@@ -65,14 +65,16 @@ export class EditorAgent extends BaseAgent {
     
     const trackSummary = tracks.map(track => ({
       id: track.id,
+      name: track.name,
       type: track.type,
-      clipCount: track.clips?.length || 0,
-      totalDuration: track.clips?.reduce((sum, c) => sum + (c.duration || 0), 0) || 0,
-      clips: track.clips?.map(clip => ({
+      clipCount: track.items?.length || 0,
+      totalDuration: track.items?.reduce((sum, c) => sum + (c.duration || 0), 0) || 0,
+      clips: track.items?.map(clip => ({
         id: clip.id,
-        startTime: clip.startTime,
-        endTime: clip.endTime || (clip.startTime + clip.duration),
-        duration: clip.duration,
+        name: clip.name,
+        startTime: clip.startTime || clip.left,
+        endTime: clip.endTime || (clip.left + clip.width),
+        duration: clip.duration || clip.width,
         type: clip.type
       })) || []
     }));

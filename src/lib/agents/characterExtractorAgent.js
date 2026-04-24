@@ -24,7 +24,7 @@ export class CharacterExtractorAgent extends BaseAgent {
       
       const clips = selectedClips.length > 0 
         ? selectedClips 
-        : timelineState?.tracks?.flatMap(t => t.clips) || [];
+        : timelineState?.tracks?.flatMap(t => t.items) || [];
       
       this.setStatus('analyzing', 40);
       
