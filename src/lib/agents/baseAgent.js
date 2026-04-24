@@ -3,8 +3,6 @@
  * Foundation for all ViMax-inspired agents integrated into timeline editor
  */
 
-import { generationService } from '../editor/generationService.js';
-
 export class BaseAgent {
   constructor(name, config = {}) {
     this.name = name;

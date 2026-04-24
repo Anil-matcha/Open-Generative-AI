@@ -2,43 +2,34 @@
 
 /**
  * Generation Service
- * Unified abstraction layer for AI video generation
- * Combines LTX-Desktop generation logic with web-compatible API calls
+ * Unified abstraction layer for AI video generation via MuAPI
+ * All generation routes through MuAPI which aggregates multiple providers
  */
 
 import { GenerationModes, GenerationProviders, createDefaultProject } from './types.js';
+import { muapi } from '../muapi.js';
+import { t2vModels, i2vModels, getVideoModelById, getI2VModelById } from '../models.js';
 
 // ============================================================================
 // CONFIGURATION
 // ============================================================================
 
+const LTX_T2V_MODELS = {
+  'ltx-2-pro': { id: 'ltx-2-pro-text-to-video', name: 'LTX 2 Pro', quality: 'high', speed: 'slow', duration: [6, 8, 10] },
+  'ltx-2-fast': { id: 'ltx-2-fast-text-to-video', name: 'LTX 2 Fast', quality: 'medium', speed: 'fast', duration: [6, 8, 10, 12, 14, 16, 18, 20] },
+  'ltx-2-19b': { id: 'ltx-2-19b-text-to-video', name: 'LTX 2 19B', quality: 'ultra', speed: 'slow', duration: [6, 8, 10] },
+};
+
+const LTX_I2V_MODELS = {
+  'ltx-2-pro': { id: 'ltx-2-pro-image-to-video', name: 'LTX 2 Pro I2V', quality: 'high', speed: 'slow' },
+  'ltx-2-fast': { id: 'ltx-2-fast-image-to-video', name: 'LTX 2 Fast I2V', quality: 'medium', speed: 'fast' },
+  'ltx-2-19b': { id: 'ltx-2-19b-image-to-video', name: 'LTX 2 19B I2V', quality: 'ultra', speed: 'slow' },
+};
+
 const DEFAULT_CONFIG = {
-  ltx: {
-    baseUrl: 'http://localhost:8000',
+  muapi: {
     timeout: 300000, // 5 minutes
-    models: {
-      'ltx-2-pro': { name: 'LTX 2 Pro', quality: 'high', speed: 'slow' },
-      'ltx-2-fast': { name: 'LTX 2 Fast', quality: 'medium', speed: 'fast' },
-      'ltx-2-19b': { name: 'LTX 2 19B', quality: 'ultra', speed: 'slow' },
-    },
     defaultModel: 'ltx-2-fast',
-  },
-  fal: {
-    baseUrl: 'https://queue.fal.run',
-    timeout: 300000,
-  },
-  seedance: {
-    baseUrl: 'https://api.seedance.com',
-    timeout: 300000,
-  },
-  veo: {
-    baseUrl: 'https://generativelanguage.googleapis.com',
-    timeout: 300000,
-  },
-  gemini: {
-    baseUrl: 'https://generativelanguage.googleapis.com',
-    timeout: 120000, // 2 minutes
-    model: 'gemini-1.5-flash', // or pro for better quality
   },
 };
 
@@ -78,151 +69,54 @@ const DEFAULT_CONFIG = {
  */
 
 // ============================================================================
-// LTX PROVIDER
+// MUAPI PROVIDER (Unified via MuAPI)
 // ============================================================================
 
-/**
- * LTX Video Generation Provider
- * Implements generation using LTX-Desktop backend API
- */
-class LtxProvider {
+class MuAPIProvider {
   constructor(config = {}) {
-    this.config = { ...DEFAULT_CONFIG.ltx, ...config };
-    this.baseUrl = this.config.baseUrl;
-    this.timeout = this.config.timeout;
+    this.config = { ...DEFAULT_CONFIG.muapi, ...config };
   }
 
-  /**
-   * Submit a generation request
-   * @param {GenerationRequest} request
-   * @returns {Promise<GenerationResult>}
-   */
   async submit(request) {
-    // Input validation
-    if (!request || typeof request !== 'object') {
-      throw new Error('Invalid request: must be an object');
-    }
-    if (!request.mode || !['text-to-video', 'image-to-video', 'audio-to-video', 'retake', 'extend', 'broll', 'variation'].includes(request.mode)) {
-      throw new Error('Invalid mode: must be one of text-to-video, image-to-video, audio-to-video, retake, extend, broll, variation');
-    }
-    if (!request.prompt || typeof request.prompt !== 'string' || request.prompt.trim().length === 0) {
-      throw new Error('Invalid prompt: must be a non-empty string');
-    }
-    if (request.prompt.length > 1000) {
-      throw new Error('Prompt too long: maximum 1000 characters');
-    }
-
     const generationId = `gen_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-    console.log(`[LtxProvider] Starting generation ${generationId} for mode: ${request.mode}`);
+    console.log(`[MuAPIProvider] Starting generation ${generationId} for mode: ${request.mode}`);
 
     try {
-      let endpoint = '';
-      let body = {};
+      let result;
 
       switch (request.mode) {
         case 'text-to-video':
-          endpoint = '/api/generate';
-          body = {
-            prompt: request.prompt,
-            negative_prompt: request.negativePrompt || '',
-            duration: request.duration || 5,
-            aspect_ratio: request.aspectRatio || '16:9',
-            fps: request.fps || 24,
-            style_preset: request.stylePreset || 'cinematic',
-            model: request.model || this.config.defaultModel,
-          };
+          result = await this.generateTextToVideo(request);
           break;
-
         case 'image-to-video':
-          endpoint = '/api/i2v';
-          body = {
-            prompt: request.prompt,
-            negative_prompt: request.negativePrompt || '',
-            image_path: request.references?.[0] || '',
-            duration: request.duration || 5,
-            aspect_ratio: request.aspectRatio || '16:9',
-            fps: request.fps || 24,
-            model: request.model || this.config.defaultModel,
-          };
+          result = await this.generateImageToVideo(request);
           break;
-
-        case 'retake':
-          endpoint = '/api/retake';
-          body = {
-            prompt: request.prompt,
-            negative_prompt: request.negativePrompt || '',
-            source_video_path: request.sourceAssetId || '',
-            start_time: request.selectedRange?.start || 0,
-            end_time: request.selectedRange?.end || 0,
-            duration: request.duration || 5,
-            style_preset: request.stylePreset || 'cinematic',
-            model: request.model || this.config.defaultModel,
-          };
-          break;
-
-        case 'extend':
-          endpoint = '/api/extend';
-          body = {
-            prompt: request.prompt,
-            source_video_path: request.sourceAssetId || '',
-            extend_duration: request.duration || 5,
-            model: request.model || this.config.defaultModel,
-          };
-          break;
-
         case 'audio-to-video':
-          endpoint = '/api/a2v';
-          body = {
-            prompt: request.prompt,
-            negative_prompt: request.negativePrompt || '',
-            audio_path: request.references?.[0] || '',
-            duration: request.duration || 5,
-            aspect_ratio: request.aspectRatio || '16:9',
-            fps: request.fps || 24,
-            style_preset: request.stylePreset || 'cinematic',
-            model: request.model || this.config.defaultModel,
-          };
+          result = await this.generateAudioToVideo(request);
           break;
-
+        case 'retake':
+          result = await this.generateRetake(request);
+          break;
+        case 'extend':
+          result = await this.generateExtend(request);
+          break;
         case 'broll':
-          endpoint = '/api/generate';
-          body = {
-            prompt: request.prompt,
-            negative_prompt: request.negativePrompt || '',
-            duration: request.duration || 3,
-            aspect_ratio: request.aspectRatio || '16:9',
-            style_preset: 'broll',
-            model: request.model || this.config.defaultModel,
-          };
+          result = await this.generateBroll(request);
           break;
-
         default:
           throw new Error(`Unsupported generation mode: ${request.mode}`);
       }
 
-      const response = await fetch(`${this.baseUrl}${endpoint}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      });
-
-      if (!response.ok) {
-        const error = await response.text();
-        throw new Error(`Generation failed: ${error}`);
-      }
-
-      const result = await response.json();
-
       return {
         generationId,
-        status: 'queued',
-        previewUrl: result.preview_url || result.output_path || null,
+        status: result.status || 'queued',
+        previewUrl: result.url || result.previewUrl || null,
+        assetIds: result.assetIds || [],
         metadata: result,
       };
     } catch (error) {
+      console.error(`[MuAPIProvider] Generation ${generationId} failed:`, error);
       return {
         generationId,
         status: 'failed',
@@ -231,503 +125,100 @@ class LtxProvider {
     }
   }
 
-  /**
-   * Poll for generation status
-   * @param {string} generationId
-   * @returns {Promise<GenerationResult>}
-   */
-  async poll(generationId) {
-    try {
-      const response = await fetch(`${this.baseUrl}/api/status/${generationId}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Status check failed: ${response.statusText}`);
-      }
-
-      const result = await response.json();
-
-      return {
-        generationId,
-        status: result.status || 'processing',
-        previewUrl: result.preview_url || result.output_path || null,
-        assetIds: result.asset_ids || [],
-        error: result.error || null,
-        progress: result.progress || 0,
-        progressMessage: result.progress_message || 'Processing...',
-        metadata: result,
-      };
-    } catch (error) {
-      console.error(`[LtxProvider] Generation ${generationId} failed:`, error);
-      return {
-        generationId,
-        status: 'failed',
-        error: error.message,
-      };
-    }
-  }
-
-  /**
-   * Cancel a generation job
-   * @param {string} generationId
-   */
-  async cancel(generationId) {
-    await fetch(`${this.baseUrl}/api/cancel/${generationId}`, {
-      method: 'POST',
-    });
-  }
-}
-
-// ============================================================================
-// FAL PROVIDER (Alternative)
-// ============================================================================
-
-class FalProvider {
-  constructor(config = {}) {
-    this.config = { ...DEFAULT_CONFIG.fal, ...config };
-    this.baseUrl = this.config.baseUrl;
-    this.timeout = this.config.timeout;
-    this.apiKey = config.apiKey || '';
-  }
-
-  async submit(request) {
-    const generationId = `fal_${Date.now()}`;
-
-    try {
-      const response = await fetch(`${this.baseUrl}/ltx-production/t2v`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Key ${this.apiKey}`,
-        },
-        body: JSON.stringify({
-          prompt: request.prompt,
-          negative_prompt: request.negativePrompt,
-          duration: Math.min(request.duration || 5, 10),
-          aspect_ratio: request.aspectRatio || '16:9',
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`FAL API error: ${response.statusText}`);
-      }
-
-      const result = await response.json();
-      return {
-        generationId,
-        status: 'queued',
-        previewUrl: result.request_id,
-        metadata: result,
-      };
-    } catch (error) {
-      return {
-        generationId,
-        status: 'failed',
-        error: error.message,
-      };
-    }
-  }
-
-  async poll(generationId) {
-    try {
-      const response = await fetch(`${this.baseUrl}/ltx-production/requests/${generationId}`, {
-        headers: {
-          'Authorization': `Key ${this.apiKey}`,
-        },
-      });
-
-      const result = await response.json();
-
-      return {
-        generationId,
-        status: result.status === 'COMPLETED' ? 'completed' : result.status === 'FAILED' ? 'failed' : 'processing',
-        previewUrl: result.output?.video_url || null,
-        error: result.error || null,
-      };
-    } catch (error) {
-      return {
-        generationId,
-        status: 'failed',
-        error: error.message,
-      };
-    }
-  }
-}
-
-// ============================================================================
-// GEMINI PROVIDER (Comprehensive AI Integration)
-// ============================================================================
-
-// Helper to convert Blob to Base64
-const blobToBase64 = (blob) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64String = reader.result;
-      // Remove data url prefix if present (e.g. "data:image/jpeg;base64,")
-      const base64 = base64String.split(',')[1];
-      resolve(base64);
+  async generateTextToVideo(request) {
+    const modelKey = request.model || 'ltx-2-fast';
+    const modelInfo = LTX_T2V_MODELS[modelKey] || LTX_T2V_MODELS['ltx-2-fast'];
+    
+    const params = {
+      model: modelInfo.id,
+      prompt: request.prompt,
+      aspect_ratio: request.aspectRatio || '16:9',
+      duration: request.duration || 6,
     };
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-};
 
-// Audio decoding helpers
-function decode(base64) {
-  const binaryString = atob(base64);
-  const len = binaryString.length;
-  const bytes = new Uint8Array(len);
-  for (let i = 0; i < len; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
-  }
-  return bytes;
-}
-
-async function decodeAudioData(data, ctx, sampleRate, numChannels) {
-  const dataInt16 = new Int16Array(data.buffer);
-  const frameCount = dataInt16.length / numChannels;
-  const buffer = ctx.createBuffer(numChannels, frameCount, sampleRate);
-
-  for (let channel = 0; channel < numChannels; channel++) {
-    const channelData = buffer.getChannelData(channel);
-    for (let i = 0; i < frameCount; i++) {
-      channelData[i] = dataInt16[i * numChannels + channel] / 32768.0;
-    }
-  }
-  return buffer;
-}
-
-class GeminiProvider {
-  constructor(config = {}) {
-    this.config = { ...DEFAULT_CONFIG.gemini, ...config };
-    this.baseUrl = this.config.baseUrl;
-    this.timeout = this.config.timeout;
-    this.apiKey = config.apiKey || '';
-    this.model = this.config.model;
+    return await muapi.generateVideo(params);
   }
 
-  async getApiKey() {
-    const win = window;
-    if (win.aistudio && win.aistudio.getSelectedApiKey) {
-      const key = await win.aistudio.getSelectedApiKey();
-      if (key) return key;
-    }
-    const stored = localStorage.getItem('gemini_api_key');
-    if (stored) return stored;
-    return '';
+  async generateImageToVideo(request) {
+    const modelKey = request.model || 'ltx-2-fast';
+    const modelInfo = LTX_I2V_MODELS[modelKey] || LTX_I2V_MODELS['ltx-2-fast'];
+    
+    const params = {
+      model: modelInfo.id,
+      prompt: request.prompt,
+      image_url: request.references?.[0] || request.sourceAssetId,
+      aspect_ratio: request.aspectRatio || '16:9',
+      duration: request.duration || 6,
+    };
+
+    return await muapi.generateI2V(params);
   }
 
-  async getAiClient() {
-    const apiKey = await this.getApiKey();
-    if (!apiKey) {
-      throw new Error('No API key configured. Please add your Google AI API key.');
-    }
-    // For this implementation, we'll use fetch directly since @google/genai may not be available
-    return { apiKey, baseUrl: this.baseUrl };
+  async generateAudioToVideo(request) {
+    const modelKey = request.model || 'ltx-2-fast';
+    const modelInfo = LTX_T2V_MODELS[modelKey] || LTX_T2V_MODELS['ltx-2-fast'];
+    
+    const params = {
+      model: modelInfo.id,
+      prompt: request.prompt || 'Video generated from audio',
+      aspect_ratio: request.aspectRatio || '16:9',
+      duration: request.duration || 6,
+    };
+
+    return await muapi.generateVideo(params);
   }
 
-  async checkApiKey() {
-    const win = window;
-    if (win.aistudio && win.aistudio.hasSelectedApiKey) {
-      return await win.aistudio.hasSelectedApiKey();
-    }
-    const stored = localStorage.getItem('gemini_api_key');
-    return !!stored;
+  async generateRetake(request) {
+    const modelKey = request.model || 'ltx-2-fast';
+    const modelInfo = LTX_T2V_MODELS[modelKey] || LTX_T2V_MODELS['ltx-2-fast'];
+    
+    const params = {
+      model: modelInfo.id,
+      prompt: request.prompt,
+      aspect_ratio: request.aspectRatio || '16:9',
+      duration: request.duration || 6,
+    };
+
+    return await muapi.generateVideo(params);
   }
 
-  async openKeySelection() {
-    const win = window;
-    if (win.aistudio && win.aistudio.openSelectKey) {
-      await win.aistudio.openSelectKey();
-    } else {
-      const key = prompt('Enter your Google AI API key:\n\nGet one at: https://aistudio.google.com/apikey');
-      if (key) {
-        localStorage.setItem('gemini_api_key', key);
-      }
-    }
+  async generateExtend(request) {
+    const modelKey = request.model || 'ltx-2-fast';
+    const modelInfo = LTX_T2V_MODELS[modelKey] || LTX_T2V_MODELS['ltx-2-fast'];
+    
+    const params = {
+      model: modelInfo.id,
+      prompt: request.prompt || 'Continue the scene',
+      aspect_ratio: request.aspectRatio || '16:9',
+      duration: request.duration || 6,
+    };
+
+    return await muapi.generateVideo(params);
   }
 
-  // Image Generation (Imagen)
-  async generateImage(request) {
-    const generationId = `gemini_img_${Date.now()}`;
+  async generateBroll(request) {
+    const modelKey = request.model || 'ltx-2-fast';
+    const modelInfo = LTX_T2V_MODELS[modelKey] || LTX_T2V_MODELS['ltx-2-fast'];
+    
+    const params = {
+      model: modelInfo.id,
+      prompt: request.prompt,
+      aspect_ratio: request.aspectRatio || '16:9',
+      duration: request.duration || 3,
+    };
 
-    try {
-      const { apiKey } = await this.getAiClient();
-      const aspectRatio = request.aspectRatio || '1:1';
-
-      // Use Imagen API for image generation
-      const response = await fetch(`${this.baseUrl}/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          prompt: request.prompt,
-          sampleCount: 1,
-          aspectRatio: aspectRatio,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Imagen API error: ${response.statusText}`);
-      }
-
-      const result = await response.json();
-      const imageUrl = result.predictions[0]?.bytesBase64Encoded;
-
-      return {
-        generationId,
-        status: 'completed',
-        assetIds: [generationId],
-        previewUrl: `data:image/jpeg;base64,${imageUrl}`,
-        metadata: result,
-      };
-    } catch (error) {
-      return {
-        generationId,
-        status: 'failed',
-        error: error.message,
-      };
-    }
-  }
-
-  // Image Editing
-  async editImage(imageBlob, prompt) {
-    const generationId = `gemini_edit_${Date.now()}`;
-
-    try {
-      const { apiKey } = await this.getAiClient();
-      const base64Data = await blobToBase64(imageBlob);
-
-      const response = await fetch(`${this.baseUrl}/v1beta/models/gemini-2.5-flash-image:generateContent?key=${apiKey}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [{
-            parts: [
-              {
-                inlineData: {
-                  data: base64Data,
-                  mimeType: imageBlob.type,
-                },
-              },
-              {
-                text: prompt,
-              },
-            ],
-          }],
-          generationConfig: {
-            responseModalities: ['image'],
-          },
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Gemini API error: ${response.statusText}`);
-      }
-
-      const result = await response.json();
-      const imagePart = result.candidates[0]?.content?.parts?.find(p => p.inlineData);
-      if (imagePart) {
-        const imageData = `data:image/png;base64,${imagePart.inlineData.data}`;
-        return {
-          generationId,
-          status: 'completed',
-          assetIds: [generationId],
-          previewUrl: imageData,
-          metadata: result,
-        };
-      } else {
-        throw new Error('No image generated in response');
-      }
-    } catch (error) {
-      return {
-        generationId,
-        status: 'failed',
-        error: error.message,
-      };
-    }
-  }
-
-  // Video Generation (Veo)
-  async generateVideo(request) {
-    const generationId = `gemini_video_${Date.now()}`;
-
-    try {
-      const { apiKey } = await this.getAiClient();
-      const aspectRatio = request.aspectRatio || '16:9';
-      const body = {
-        prompt: request.prompt,
-        numberOfVideos: 1,
-        resolution: '720p',
-        aspectRatio: aspectRatio,
-      };
-
-      if (request.references && request.references[0]) {
-        // Image-to-video
-        const imageBlob = await fetch(request.references[0]).then(r => r.blob());
-        const base64Data = await blobToBase64(imageBlob);
-        body.image = {
-          imageBytes: base64Data,
-          mimeType: imageBlob.type,
-        };
-      }
-
-      const response = await fetch(`${this.baseUrl}/v1beta/models/veo-3.1-fast-generate-preview:predict?key=${apiKey}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Veo API error: ${response.statusText}`);
-      }
-
-      const result = await response.json();
-      const operationId = result.name;
-
-      // Poll for completion
-      let attempts = 0;
-      while (attempts < 60) { // Max 5 minutes
-        await new Promise(resolve => setTimeout(resolve, 5000));
-        const pollResponse = await fetch(`${this.baseUrl}/v1beta/${operationId}?key=${apiKey}`);
-        const pollResult = await pollResponse.json();
-
-        if (pollResult.done) {
-          if (pollResult.response && pollResult.response.generatedVideos) {
-            const videoUrl = pollResult.response.generatedVideos[0].video.uri;
-            return {
-              generationId,
-              status: 'completed',
-              assetIds: [generationId],
-              previewUrl: videoUrl,
-              metadata: pollResult,
-            };
-          } else {
-            throw new Error('Video generation failed');
-          }
-        }
-        attempts++;
-      }
-
-      throw new Error('Video generation timeout');
-    } catch (error) {
-      return {
-        generationId,
-        status: 'failed',
-        error: error.message,
-      };
-    }
-  }
-
-  // Text to Speech
-  async generateSpeech(text) {
-    const generationId = `tts_${Date.now()}`;
-
-    try {
-      const { apiKey } = await this.getAiClient();
-
-      const response = await fetch(`${this.baseUrl}/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{ text }],
-          }],
-          generationConfig: {
-            responseModalities: ['audio'],
-            speechConfig: {
-              voiceConfig: {
-                prebuiltVoiceConfig: { voiceName: 'Kore' },
-              },
-            },
-          },
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`TTS API error: ${response.statusText}`);
-      }
-
-      const result = await response.json();
-      const base64Audio = result.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-      if (!base64Audio) throw new Error('No audio generated');
-
-      const outputAudioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 24000 });
-      const audioBuffer = await decodeAudioData(
-        decode(base64Audio),
-        outputAudioContext,
-        24000,
-        1,
-      );
-
-      return {
-        generationId,
-        status: 'completed',
-        assetIds: [generationId],
-        previewUrl: 'audio-generated',
-        metadata: { audioBuffer },
-      };
-    } catch (error) {
-      return {
-        generationId,
-        status: 'failed',
-        error: error.message,
-      };
-    }
-  }
-
-  // Submit method for compatibility
-  async submit(request) {
-    switch (request.mode) {
-      case 'generate-image':
-        return this.generateImage(request);
-      case 'remove-background':
-      case 'replace-bg':
-      case 'enhance':
-      case 'colorize':
-      case 'cartoon':
-        // For image editing, we need the image file
-        if (request.references && request.references[0]) {
-          const imageBlob = await fetch(request.references[0]).then(r => r.blob());
-          return this.editImage(imageBlob, request.prompt || request.defaultPrompt);
-        }
-        return {
-          generationId: `gemini_${Date.now()}`,
-          status: 'failed',
-          error: 'Image required for editing',
-        };
-      case 'generate-video':
-        return this.generateVideo(request);
-      case 'text-to-speech':
-        return this.generateSpeech(request.text || request.prompt);
-      default:
-        return {
-          generationId: `gemini_${Date.now()}`,
-          status: 'failed',
-          error: `Unsupported mode: ${request.mode}`,
-        };
-    }
+    return await muapi.generateVideo(params);
   }
 
   async poll(generationId) {
-    // For most Gemini operations, they're synchronous
     return {
       generationId,
       status: 'completed',
-      previewUrl: null,
     };
+  }
+
+  async cancel(generationId) {
+    muapi.cancelRequest(generationId);
   }
 }
 
@@ -735,57 +226,22 @@ class GeminiProvider {
 // GENERATION SERVICE
 // ============================================================================
 
-/**
- * Unified Generation Service
- * Manages multiple providers and handles job lifecycle
- */
 class GenerationService {
   constructor() {
-    this.providers = {
-      ltx: new LtxProvider(),
-      fal: new FalProvider(),
-      gemini: new GeminiProvider(),
-    };
+    this.provider = new MuAPIProvider();
     this.activeJobs = new Map();
     this.listeners = new Map();
   }
 
-  /**
-   * Set provider configuration
-   * @param {'ltx' | 'fal' | 'gemini'} name
-   * @param {Object} config
-   */
   configureProvider(name, config) {
-    if (name === 'ltx') {
-      this.providers.ltx = new LtxProvider(config);
-    } else if (name === 'fal') {
-      this.providers.fal = new FalProvider(config);
-    } else if (name === 'gemini') {
-      this.providers.gemini = new GeminiProvider(config);
-    }
   }
 
-  /**
-   * Get available providers
-   * @returns {string[]}
-   */
   getAvailableProviders() {
-    return Object.keys(this.providers);
+    return ['muapi'];
   }
 
-  /**
-   * Submit a generation job
-   * @param {GenerationRequest} request
-   * @param {'ltx' | 'fal' | 'gemini'} [provider]
-   * @returns {Promise<GenerationResult>}
-   */
-  async submit(request, provider = 'ltx') {
-    const providerInstance = this.providers[provider];
-    if (!providerInstance) {
-      throw new Error(`Unknown provider: ${provider}`);
-    }
-
-    const result = await providerInstance.submit(request);
+  async submit(request, provider = 'muapi') {
+    const result = await this.provider.submit(request);
 
     if (result.status !== 'failed') {
       this.activeJobs.set(result.generationId, {
@@ -906,7 +362,7 @@ class GenerationService {
    * @returns {Object} Model configurations
    */
   getLtxModels() {
-    return DEFAULT_CONFIG.ltx.models;
+    return LTX_T2V_MODELS;
   }
 
   /**
@@ -914,7 +370,31 @@ class GenerationService {
    * @returns {string} Default model key
    */
   getDefaultLtxModel() {
-    return DEFAULT_CONFIG.ltx.defaultModel;
+    return 'ltx-2-fast';
+  }
+
+  /**
+   * Get available video models from MuAPI
+   * @returns {Object[]} List of available video models
+   */
+  getAvailableVideoModels() {
+    return t2vModels.map(m => ({
+      id: m.id,
+      name: m.name,
+      type: 't2v'
+    }));
+  }
+
+  /**
+   * Get available image-to-video models from MuAPI
+   * @returns {Object[]} List of available I2V models
+   */
+  getAvailableI2VModels() {
+    return i2vModels.map(m => ({
+      id: m.id,
+      name: m.name,
+      type: 'i2v'
+    }));
   }
 
   /**
@@ -1105,5 +585,6 @@ export function createTextToSpeechRequest(text, options = {}) {
 // ============================================================================
 
 export const generationService = new GenerationService();
-export { GenerationService, LtxProvider, FalProvider };
+export { GenerationService, MuAPIProvider };
+export { LTX_T2V_MODELS, LTX_I2V_MODELS };
 export default generationService;
