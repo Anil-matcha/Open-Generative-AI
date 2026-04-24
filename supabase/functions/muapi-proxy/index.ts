@@ -1,7 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "https://your-production-domain.com", // Replace with actual domain
+  "Access-Control-Allow-Origin": "*", // Update for production
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
 };
@@ -31,7 +31,7 @@ function checkRateLimit(clientId: string): boolean {
 interface GenerateRequest {
   endpoint: string;
   params: Record<string, any>;
-  generationType: 'image' | 'video' | 'i2i' | 'i2v' | 'v2v';
+  generationType: 'image' | 'video' | 'i2i' | 'i2v' | 'v2v' | 'enhanced';
   studioType?: string;
 }
 
@@ -43,6 +43,7 @@ function validateEndpoint(endpoint: string): boolean {
 
   // Only allow specific endpoints to prevent SSRF
   const allowedPatterns = [
+    // MuAPI standard endpoints
     /^predictions(\/.*)?$/,
     /^image-generation(\/.*)?$/,
     /^video-generation(\/.*)?$/,
@@ -54,6 +55,25 @@ function validateEndpoint(endpoint: string): boolean {
     /^ai-image-face-swap$/,
     /^api\/storyboard\/projects$/,
     /^upload_file$/,
+    
+    // LTX Video models (via MuAPI)
+    /^ltx-2-pro-text-to-video$/,
+    /^ltx-2-fast-text-to-video$/,
+    /^ltx-2-19b-text-to-video$/,
+    /^ltx-2-pro-image-to-video$/,
+    /^ltx-2-fast-image-to-video$/,
+    /^ltx-2-19b-image-to-video$/,
+    
+    // Additional video models available on MuAPI
+    /^seedance-.+$/,
+    /^kling-.+$/,
+    /^veo3-.+$/,
+    /^wan2-.+$/,
+    /^minimax-hailuo-.+$/,
+    /^openai-sora-.+$/,
+    /^pixverse-.+$/,
+    /^runway-.+$/,
+    /^hunyuan-.+$/,
   ];
   return allowedPatterns.some(pattern => pattern.test(endpoint));
 }
@@ -130,7 +150,9 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const muapiUrl = `https://api.muapi.ai/api/v1/${endpoint}`;
+    const muapiUrl = generationType === 'poll'
+      ? `https://api.muapi.ai/api/v1/predictions/${endpoint.split('/')[1]}/result`
+      : `https://api.muapi.ai/api/v1/${endpoint}`;
 
     console.log(`[muapi-proxy] Forwarding ${generationType} request to ${endpoint}`);
 
