@@ -1,8 +1,12 @@
 /**
  * Open Higgsfield AI - Design Tokens
- * Main CSS entry point
+ * TypeScript exports for design tokens
  */
 
-@import './index.css';
-@import './layout.css';
-@import './themes.css';
+// Re-export CSS for bundling
+export {};
+
+// Note: CSS imports are handled by the build system
+// @import './index.css';
+// @import './layout.css';
+// @import './themes.css';

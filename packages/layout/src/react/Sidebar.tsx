@@ -100,12 +100,12 @@ function SidebarItemComponent({
       data-active={isActive}
       onMouseEnter={(e) => {
         if (!isActive) {
-          Object.assign(itemEl.style, structure.item as any) as any).itemHover);
+          Object.assign(itemEl.style, (structure.item as any).itemHover);
         }
       }}
       onMouseLeave={(e) => {
         if (!isActive) {
-          Object.assign(itemEl.style, structure.item as any) as any).item);
+          Object.assign(itemEl.style, (structure.item as any).item);
         }
       }}
     >
