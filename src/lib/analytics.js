@@ -45,10 +45,6 @@ class Analytics {
             }
             return `user_${Math.abs(hash).toString(36)}`;
         }
-        return `anon_${this.generateSessionId()}`;
-    }
-            return `user_${Math.abs(hash).toString(36)}`;
-        }
         return `anon_${Math.random().toString(36).substr(2, 9)}`;
     }
 

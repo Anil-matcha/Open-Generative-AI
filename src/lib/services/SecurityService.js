@@ -567,4 +567,3 @@ export class SecurityService {
 
 // Singleton instance
 export const securityService = new SecurityService();</content>
-<parameter name="filePath">src/lib/services/SecurityService.js
