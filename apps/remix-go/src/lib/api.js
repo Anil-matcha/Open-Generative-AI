@@ -1,63 +1,54 @@
-import axios from 'axios';
+import { supabase } from './supabase';
 
 class ApiClient {
   constructor() {
-    this.client = axios.create({
-      baseURL: process.env.REACT_APP_API_BASE_URL || 'http://localhost:1340',
-      timeout: 30000,
-    });
-
-    // Request interceptor for auth headers (disabled for demo)
-    this.client.interceptors.request.use(
-      (config) => {
-        // Skip authentication for demo mode
-        // Add required headers for remix-api
-        config.headers['wl-domain'] = process.env.REACT_APP_WL_DOMAIN || 'videoremix.io';
-
-        return config;
-      },
-      (error) => Promise.reject(error)
-    );
-
-    // Response interceptor for error handling
-    this.client.interceptors.response.use(
-      (response) => response,
-      (error) => {
-        if (error.response?.status === 401) {
-          // Handle unauthorized - redirect to login
-          localStorage.removeItem('apiToken');
-          localStorage.removeItem('userId');
-          window.location.href = '/login';
-        }
-        return Promise.reject(error);
-      }
-    );
+    this.supabase = supabase;
   }
 
-  // Authentication methods (disabled in demo mode)
+  // Authentication methods
   async login(credentials) {
-    // Demo mode - always succeed
-    return { user: { id: 'demo', name: 'Demo User' }, token: 'demo-token' };
+    const { data, error } = await this.supabase.auth.signInWithPassword({
+      email: credentials.email,
+      password: credentials.password,
+    });
+
+    if (error) throw error;
+    return { user: data.user, token: data.session?.access_token };
   }
 
   async register(userData) {
-    // Demo mode - always succeed
-    return { user: { id: 'demo', name: 'Demo User' }, token: 'demo-token' };
+    const { data, error } = await this.supabase.auth.signUp({
+      email: userData.email,
+      password: userData.password,
+      options: {
+        data: {
+          full_name: userData.fullName,
+        }
+      }
+    });
+
+    if (error) throw error;
+    return { user: data.user, token: data.session?.access_token };
   }
 
   async logout() {
-    // Demo mode - always succeed
+    const { error } = await this.supabase.auth.signOut();
+    if (error) throw error;
     return {};
   }
 
-  // User methods (demo mode)
+  // User methods
   async getCurrentUser() {
-    // Demo mode - return mock user
+    const { data: { user }, error } = await this.supabase.auth.getUser();
+    if (error) throw error;
+
+    if (!user) throw new Error('No authenticated user');
+
     return {
-      _id: 'demo-user',
-      username: 'demo',
-      email: 'demo@example.com',
-      fullName: 'Demo User',
+      _id: user.id,
+      username: user.email?.split('@')[0] || 'user',
+      email: user.email,
+      fullName: user.user_metadata?.full_name || 'User',
       features: {
         templates: { state: 'enabled' },
         personalization: { state: 'enabled' },
@@ -67,87 +58,98 @@ class ApiClient {
   }
 
   async updateUser(userData) {
-    // Demo mode - return updated user
-    return {
-      _id: 'demo-user',
-      ...userData,
-    };
+    const { data, error } = await this.supabase.auth.updateUser({
+      data: userData
+    });
+
+    if (error) throw error;
+    return data.user;
   }
 
   // Project/Make methods
   async getUserProjects() {
-    // Demo mode - return mock projects
-    return [
-      {
-        _id: '1',
-        title: 'Sample Project 1',
-        description: 'A sample video project',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        published: false,
-        thumbnail: '/api/placeholder/400/225',
-      },
-      {
-        _id: '2',
-        title: 'Sample Project 2',
-        description: 'Another sample video project',
-        createdAt: new Date(Date.now() - 86400000).toISOString(),
-        updatedAt: new Date(Date.now() - 86400000).toISOString(),
-        published: true,
-        thumbnail: '/api/placeholder/400/225',
-      }
-    ];
+    const { data: { user } } = await this.supabase.auth.getUser();
+    if (!user) throw new Error('No authenticated user');
+
+    const { data, error } = await this.supabase
+      .from('projects')
+      .select('*')
+      .eq('author_id', user.id)
+      .order('updated_at', { ascending: false });
+
+    if (error) throw error;
+    return data;
   }
 
   async getProject(projectId) {
-    // Demo mode - return mock project
-    return {
-      _id: projectId,
-      title: 'Demo Project',
-      description: 'A demo video project',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      published: false,
-      thumbnail: '/api/placeholder/400/225',
-      make: { _id: projectId, url: '#' },
-    };
+    const { data, error } = await this.supabase
+      .from('projects')
+      .select('*')
+      .eq('id', projectId)
+      .single();
+
+    if (error) throw error;
+    return data;
   }
 
   async updateProject(projectId, projectData) {
-    // Demo mode - return updated project
-    return {
-      _id: projectId,
-      ...projectData,
-      updatedAt: new Date().toISOString(),
-    };
+    const { data, error } = await this.supabase
+      .from('projects')
+      .update({
+        ...projectData,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', projectId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
   }
 
   async deleteProject(projectId) {
-    // Demo mode - always succeed
+    const { error } = await this.supabase
+      .from('projects')
+      .delete()
+      .eq('id', projectId);
+
+    if (error) throw error;
     return { success: true };
   }
 
   async publishProject(projectId) {
-    // Demo mode - return published project
-    return {
-      _id: projectId,
-      published: true,
-      publishedAt: new Date().toISOString(),
-      url: `https://demo.vidcloud.io/watch/${projectId}`,
-    };
+    const publishedUrl = `https://${import.meta.env.VITE_SUPABASE_URL?.replace('https://', '')}/watch/${projectId}`;
+
+    const { data, error } = await this.supabase
+      .from('projects')
+      .update({
+        status: 'published',
+        published_at: new Date().toISOString(),
+        published_url: publishedUrl,
+      })
+      .eq('id', projectId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return { ...data, url: publishedUrl };
   }
 
   async createProject(projectData) {
-    // Demo mode - return mock project data
-    const mockProject = {
-      _id: Date.now().toString(),
-      ...projectData,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      published: false,
-      thumbnail: projectData.thumbnail || '/api/placeholder/400/225',
-    };
-    return mockProject;
+    const { data: { user } } = await this.supabase.auth.getUser();
+    if (!user) throw new Error('No authenticated user');
+
+    const { data, error } = await this.supabase
+      .from('projects')
+      .insert({
+        ...projectData,
+        author_id: user.id,
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
   }
 
   async updateProject(projectId, projectData) {
@@ -167,52 +169,25 @@ class ApiClient {
 
   // Template methods
   async getTemplates() {
-    // Demo mode - return mock templates
-    return [
-      {
-        _id: 'template1',
-        title: 'Business Presentation',
-        description: 'Professional business presentation template',
-        thumbnail: 'https://via.placeholder.com/300x200/4f46e5/ffffff?text=Business+Template',
-        category: 'business',
-        duration: '2:30',
-      },
-      {
-        _id: 'template2',
-        title: 'Product Demo',
-        description: 'Showcase your product features',
-        thumbnail: 'https://via.placeholder.com/300x200/059669/ffffff?text=Product+Demo',
-        category: 'product',
-        duration: '1:45',
-      },
-      {
-        _id: 'template3',
-        title: 'Customer Story',
-        description: 'Share customer testimonials',
-        thumbnail: 'https://via.placeholder.com/300x200/dc2626/ffffff?text=Customer+Story',
-        category: 'testimonial',
-        duration: '3:15',
-      },
-      {
-        _id: 'template4',
-        title: 'Tutorial Video',
-        description: 'Educational content template',
-        thumbnail: 'https://via.placeholder.com/300x200/7c3aed/ffffff?text=Tutorial',
-        category: 'education',
-        duration: '5:20',
-      }
-    ];
+    const { data, error } = await this.supabase
+      .from('templates')
+      .select('*')
+      .eq('is_public', true)
+      .order('usage_count', { ascending: false });
+
+    if (error) throw error;
+    return data;
   }
 
   async getTemplateCategories() {
-    // Demo mode - return mock categories
-    return [
-      { _id: 'business', name: 'Business', priority: 1 },
-      { _id: 'product', name: 'Product', priority: 2 },
-      { _id: 'testimonial', name: 'Testimonials', priority: 3 },
-      { _id: 'education', name: 'Education', priority: 4 },
-      { _id: 'marketing', name: 'Marketing', priority: 5 },
-    ];
+    const { data, error } = await this.supabase
+      .from('template_categories')
+      .select('*')
+      .eq('published', true)
+      .order('priority', { ascending: false });
+
+    if (error) throw error;
+    return data;
   }
 
   // Pre-remix methods (for personalization) - demo mode
@@ -236,40 +211,59 @@ class ApiClient {
     };
   }
 
-  // Media assets - demo mode
-  async uploadMedia(file, metadata = {}) {
-    // Demo mode - simulate upload
-    await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate upload time
-    return {
-      _id: Date.now().toString(),
-      filename: file.name,
-      url: URL.createObjectURL(file),
-      size: file.size,
-      type: file.type,
-      uploadedAt: new Date().toISOString(),
-    };
+  // Media assets
+  async uploadMedia(file, type = 'media') {
+    const { data: { user } } = await this.supabase.auth.getUser();
+    if (!user) throw new Error('No authenticated user');
+
+    const folder = type === 'video' ? 'videos' : type === 'image' ? 'images' : 'media';
+    const fileName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${file.name.split('.').pop()}`;
+    const filePath = `${folder}/${fileName}`;
+
+    // Upload to Supabase Storage
+    const { data: uploadData, error: uploadError } = await this.supabase.storage
+      .from('remix-media')
+      .upload(filePath, file);
+
+    if (uploadError) throw uploadError;
+
+    // Get public URL
+    const { data: { publicUrl } } = this.supabase.storage
+      .from('remix-media')
+      .getPublicUrl(filePath);
+
+    // Save metadata to database
+    const { data: assetData, error: dbError } = await this.supabase
+      .from('media_assets')
+      .insert({
+        filename: fileName,
+        original_name: file.name,
+        url: publicUrl,
+        path: filePath,
+        size: file.size,
+        mime_type: file.type,
+        type: type,
+        user_id: user.id,
+      })
+      .select()
+      .single();
+
+    if (dbError) throw dbError;
+    return assetData;
   }
 
   async getMediaAssets() {
-    // Demo mode - return mock assets
-    return [
-      {
-        _id: 'asset1',
-        filename: 'sample-video.mp4',
-        url: '/api/placeholder/video',
-        type: 'video/mp4',
-        size: 1024000,
-        thumbnail: '/api/placeholder/300x200',
-      },
-      {
-        _id: 'asset2',
-        filename: 'sample-image.jpg',
-        url: '/api/placeholder/image',
-        type: 'image/jpeg',
-        size: 512000,
-        thumbnail: '/api/placeholder/300x200',
-      }
-    ];
+    const { data: { user } } = await this.supabase.auth.getUser();
+    if (!user) throw new Error('No authenticated user');
+
+    const { data, error } = await this.supabase
+      .from('media_assets')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data;
   }
 
   // Campaign methods
@@ -303,17 +297,20 @@ class ApiClient {
     };
   }
 
-  // Utility methods (demo mode - always authenticated)
-  setAuthToken(token, userId) {
-    // Demo mode - no token storage needed
+  // Utility methods
+  async setAuthToken(token, userId) {
+    // Supabase handles auth tokens automatically
+    localStorage.setItem('supabase_user_id', userId);
   }
 
-  clearAuthToken() {
-    // Demo mode - no token to clear
+  async clearAuthToken() {
+    // Supabase handles auth tokens automatically
+    localStorage.removeItem('supabase_user_id');
   }
 
-  isAuthenticated() {
-    return true; // Always authenticated in demo mode
+  async isAuthenticated() {
+    const { data: { user } } = await this.supabase.auth.getUser();
+    return !!user;
   }
 }
 
