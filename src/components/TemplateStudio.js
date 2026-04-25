@@ -6,6 +6,7 @@ import { AuthModal } from './AuthModal.js';
 import { createUploadPicker } from './UploadPicker.js';
 import { navigate } from '../lib/router.js';
 import { sanitizeUrl } from '../lib/security.js';
+import { securityService } from '../lib/services/SecurityService.js';
 
 export function TemplateStudio(templateId) {
   const template = getTemplateById(templateId);
@@ -490,7 +491,7 @@ export function TemplateStudio(templateId) {
 
     // SECURITY ISSUE: API keys stored in localStorage are accessible to XSS attacks
     // TODO: Replace with server-side session storage or httpOnly cookies
-    const apiKey = localStorage.getItem('muapi_key');
+    const apiKey = await securityService.getDecryptedKey();
     if (!apiKey) {
       AuthModal(() => genBtn.click());
       return;

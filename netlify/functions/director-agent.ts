@@ -1,5 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import fetch from 'node-fetch'
+import AIService from './ai-service.js'
+import { getAIConfig } from './ai-config.js'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -13,6 +15,9 @@ const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
 // VideoDB configuration
 const VIDEO_DB_API_KEY = process.env.VIDEO_DB_API_KEY
 const VIDEO_DB_BASE_URL = process.env.VIDEO_DB_BASE_URL || 'https://api.videodb.io'
+
+// Initialize AI Service with agent-specific configuration
+const aiService = new AIService(getAIConfig('agent'))
 
 export default async function handler(req, context) {
   // Handle CORS preflight requests
@@ -44,30 +49,34 @@ export default async function handler(req, context) {
 
       // Process the request based on agent type
       const agentId = agents[0] // Use first agent
-      let result = {}
 
-      switch (agentId) {
-        case 'faceless_video_creator':
-          result = await handleFacelessVideo(collection, content[0].text)
-          break
-        case 'ai_ad_films':
-          result = await handleAIAd(collection, content[0].text)
-          break
-        case 'tiktok_lyric_video':
-          result = await handleLyricVideo(collection, content[0].text)
-          break
-        case 'ai_voiceovers':
-          result = await handleVoiceover(collection, content[0].text)
-          break
-        case 'kids_storyteller':
-          result = await handleKidsStory(collection, content[0].text)
-          break
-        case 'year_in_frames':
-          result = await handlePhotoMontage(collection, content[0].text)
-          break
-        default:
-          result = { error: `Unknown agent: ${agentId}` }
+      // Create AI request
+      const aiRequest: AIRequest = {
+        agentId,
+        prompt: content[0].text,
+        options: { collection, session_id, conv_id, agents, content, actions }
       }
+
+      // Process through AI service with deduplication, caching, and rate limiting
+      const result = await aiService.processRequest(aiRequest, async (req) => {
+        const coll = req.options.collection
+        switch (req.agentId) {
+          case 'faceless_video_creator':
+            return await handleFacelessVideo(coll, req.prompt)
+          case 'ai_ad_films':
+            return await handleAIAd(coll, req.prompt)
+          case 'tiktok_lyric_video':
+            return await handleLyricVideo(coll, req.prompt)
+          case 'ai_voiceovers':
+            return await handleVoiceover(coll, req.prompt)
+          case 'kids_storyteller':
+            return await handleKidsStory(coll, req.prompt)
+          case 'year_in_frames':
+            return await handlePhotoMontage(coll, req.prompt)
+          default:
+            return { error: `Unknown agent: ${req.agentId}` }
+        }
+      })
 
       return new Response(JSON.stringify({
         status: 'success',

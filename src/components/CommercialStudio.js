@@ -3,6 +3,7 @@ import { AuthModal } from './AuthModal.js';
 import { createUploadPicker } from './UploadPicker.js';
 import { createInlineInstructions } from './InlineInstructions.js';
 import { createHeroSection } from '../lib/thumbnails.js';
+import { securityService } from '../lib/services/SecurityService.js';
 
 const SCENE_PRESETS = [
   'Studio white background', 'Luxury marble surface', 'Outdoor natural light',
@@ -157,7 +158,7 @@ export function CommercialStudio() {
 
   genBtn.onclick = async () => {
     if (!uploadedUrl) { alert('Upload a product image or video first'); return; }
-    const apiKey = localStorage.getItem('muapi_key');
+    const apiKey = await securityService.getDecryptedKey();
     if (!apiKey) { AuthModal(() => genBtn.click()); return; }
 
     genBtn.disabled = true;

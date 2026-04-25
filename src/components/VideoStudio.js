@@ -5,6 +5,7 @@ import { AuthModal } from './AuthModal.js';
 import { createUploadPicker } from './UploadPicker.js';
 import { createInlineInstructions } from './InlineInstructions.js';
 import { createHeroSection } from '../lib/thumbnails.js';
+import { securityService } from '../lib/services/SecurityService.js';
 
 export function VideoStudio() {
     const container = document.createElement('div');
@@ -186,7 +187,7 @@ export function VideoStudio() {
         const file = e.target.files[0];
         if (!file) return;
 
-        const apiKey = localStorage.getItem('muapi_key');
+        const apiKey = await securityService.getDecryptedKey();
         if (!apiKey) {
             AuthModal(() => videoFileInput.click());
             return;
@@ -1077,11 +1078,11 @@ export function VideoStudio() {
             }
         }
 
-        const apiKey = localStorage.getItem('muapi_key');
-        if (!apiKey) {
-            AuthModal(() => generateBtn.click());
-            return;
-        }
+    const apiKey = await securityService.getDecryptedKey();
+    if (!apiKey) {
+      AuthModal(() => genBtn.click());
+      return;
+    }
 
         hero.classList.add('opacity-0', 'scale-95', '-translate-y-10', 'pointer-events-none');
         generateBtn.disabled = true;

@@ -2,6 +2,7 @@ import { muapi } from '../lib/muapi.js';
 import { createSafeVideo } from '../lib/security.js';
 import { createUploadPicker } from './UploadPicker.js';
 import { createHeroSection } from '../lib/thumbnails.js';
+import { securityService } from '../lib/services/SecurityService.js';
 
 const MOTION_TYPES = [
   { id: 'zoom', name: 'Zoom', icon: '🔍', description: 'Smooth zoom in/out effects' },
@@ -565,7 +566,7 @@ export function RunwayMotionStudio() {
     generateBtn.innerHTML = '<div class="animate-spin inline-block mr-2">◌</div><span class="text-sm font-bold">Applying Effects...</span>';
 
     try {
-      const apiKey = localStorage.getItem('muapi_key');
+      const apiKey = await securityService.getDecryptedKey();
       if (!apiKey) {
         throw new Error('Please configure your MuAPI key in settings');
       }

@@ -3,6 +3,7 @@ import { audioModels } from '../lib/models.js';
 import { AuthModal } from './AuthModal.js';
 import { createHeroSection } from '../lib/thumbnails.js';
 import { createInlineInstructions } from './InlineInstructions.js';
+import { securityService } from '../lib/services/SecurityService.js';
 
 export function AudioStudio() {
   const container = document.createElement('div');
@@ -167,7 +168,7 @@ export function AudioStudio() {
       alert('Enter a prompt');
       return;
     }
-    const apiKey = localStorage.getItem('muapi_key');
+    const apiKey = await securityService.getDecryptedKey();
     if (!apiKey) { 
       AuthModal(() => genBtn.click()); 
       return; 

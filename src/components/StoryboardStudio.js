@@ -3,6 +3,7 @@ import { muapi } from '../lib/muapi.js';
 import { AuthModal } from './AuthModal.js';
 import { createInlineInstructions } from './InlineInstructions.js';
 import { createHeroSection } from '../lib/thumbnails.js';
+import { securityService } from '../lib/services/SecurityService.js';
 
 // Toast notification system
 function showToast(message, type = 'info') {
@@ -255,7 +256,7 @@ export function StoryboardStudio() {
       showToast('Please enter character traits first', 'warning');
       return;
     }
-    const apiKey = localStorage.getItem('muapi_key');
+    const apiKey = await securityService.getDecryptedKey();
     if (!apiKey) {
       AuthModal(() => generateCharacter(idx, btn, imageArea));
       return;

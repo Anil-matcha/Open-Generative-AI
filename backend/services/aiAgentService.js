@@ -4,6 +4,7 @@ const router = express.Router();
 // Import production services
 import { ErrorBoundary, defaultErrorHandlers } from '../src/lib/services/ErrorBoundary.js';
 import { MonitoringService } from '../src/lib/services/MonitoringService.js';
+import { circuitBreaker } from '../src/lib/services/CircuitBreaker.js';
 
 class AIAgentService {
   constructor() {
@@ -79,6 +80,11 @@ class AIAgentService {
         throw new Error('Rate limit exceeded. Please try again later.');
       }
 
+      // Circuit breaker check for AI agent operations
+      if (!circuitBreaker.canProceed('ai_agent')) {
+        throw new Error('AI agent service temporarily unavailable. Please try again later.');
+      }
+
       const lowerCommand = command.toLowerCase();
       this.monitoring.record('api_call', {
         type: 'ai_agent_command',
@@ -88,15 +94,22 @@ class AIAgentService {
 
       for (const [action, regex] of Object.entries(this.commands)) {
         if (regex.test(lowerCommand)) {
-          return await this.executeAction(action, command);
+          const result = await this.executeAction(action, command);
+          circuitBreaker.recordSuccess('ai_agent');
+          return result;
         }
       }
 
-      return await this.generalAIResponse(command);
+      const result = await this.generalAIResponse(command);
+      circuitBreaker.recordSuccess('ai_agent');
+      return result;
 
     }, { command }, {
       retry: false, // Agent commands don't need retry
       onError: (error, context) => {
+        // Record failure with circuit breaker
+        circuitBreaker.recordFailure('ai_agent');
+
         this.monitoring.record('error', {
           type: 'ai_agent_processing',
           error: error.message,

@@ -1,7 +1,7 @@
 import { getModelById, getVideoModelById, getI2IModelById, getI2VModelById, getV2VModelById, getLipSyncModelById } from './models.js';
 import { uploadFileToStorage } from './supabase.js';
 import { SecurityService } from './services/SecurityService.js';
-import { RetryService } from './services/RetryService.js';
+import { RetryService } from './services/RateLimiter.js';
 import { RateLimiter } from './services/RateLimiter.js';
 import { CircuitBreaker } from './services/CircuitBreaker.js';
 import { CacheService } from './services/CacheService.js';

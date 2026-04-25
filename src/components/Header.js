@@ -1,4 +1,5 @@
 import { getRouteForItem } from '../lib/router.js';
+import { securityService } from '../lib/services/SecurityService.js';
 
 export function Header(navigate) {
   const header = document.createElement('header');
@@ -236,7 +237,7 @@ export function Header(navigate) {
   keyBtn.title = 'Update API Key';
   keyBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3m-3-3l-2.25-2.25"/></svg>';
   keyBtn.onclick = () => {
-    localStorage.removeItem('muapi_key');
+    securityService.clearStoredKey();
     window.location.reload();
   };
 

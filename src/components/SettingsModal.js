@@ -1,6 +1,7 @@
 import TIMELINE_DESIGN_SYSTEM from '../lib/designSystemEnforcer.js';
+import { securityService } from '../lib/services/SecurityService.js';
 
-export function SettingsModal(onClose) {
+export async function SettingsModal(onClose) {
     // Use design system enforced modal creation
     const overlay = TIMELINE_DESIGN_SYSTEM.utils.createModal({
         title: 'Settings',
@@ -43,7 +44,7 @@ export function SettingsModal(onClose) {
         outline: none;
         transition: border-color 0.15s ease;
     `;
-    input.value = localStorage.getItem('muapi_key') || '';
+    input.value = (await securityService.getDecryptedKey()) || '';
     input.placeholder = 'sk-...';
 
     // Focus styles
@@ -71,10 +72,10 @@ export function SettingsModal(onClose) {
     const saveBtn = TIMELINE_DESIGN_SYSTEM.utils.createButton({
         type: 'primary',
         text: 'Save',
-        onClick: () => {
+        onClick: async () => {
             const key = input.value.trim();
             if (key) {
-                localStorage.setItem('muapi_key', key);
+                await securityService.storeEncryptedKey(key);
                 removeModal();
             }
         }

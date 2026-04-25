@@ -2,6 +2,7 @@ import { muapi } from '../lib/muapi.js';
 import { AuthModal } from './AuthModal.js';
 import { createUploadPicker } from './UploadPicker.js';
 import { createHeroSection } from '../lib/thumbnails.js';
+import { securityService } from '../lib/services/SecurityService.js';
 
 const STYLE_PRESETS = [
   'Realistic', 'DigitalCam', 'Quiet luxury', 'FashionShow', '90s Grain', 'Sunset beach',
@@ -131,7 +132,7 @@ export function InfluencerStudio() {
 
   genBtn.onclick = async () => {
     if (!uploadedUrl) { alert('Upload a photo first'); return; }
-    const apiKey = localStorage.getItem('muapi_key');
+    const apiKey = await securityService.getDecryptedKey();
     if (!apiKey) { AuthModal(() => genBtn.click()); return; }
 
     genBtn.disabled = true;

@@ -1,6 +1,7 @@
 import { muapi } from '../lib/muapi.js';
 import { AuthModal } from './AuthModal.js';
 import { getUploadHistory, saveUpload, removeUpload, generateThumbnail } from '../lib/uploadHistory.js';
+import { securityService } from '../lib/services/SecurityService.js';
 
 /**
  * Creates a self-contained upload picker: a trigger button + history panel.
@@ -324,7 +325,7 @@ export function createUploadPicker({ anchorContainer, onSelect, onClear, maxImag
         const files = Array.from(e.target.files);
         if (!files.length) return;
 
-        const apiKey = localStorage.getItem('muapi_key');
+        const apiKey = await securityService.getDecryptedKey();
         if (!apiKey) {
             AuthModal(() => fileInput.click());
             return;

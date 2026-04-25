@@ -4,6 +4,7 @@ import { AuthModal } from './AuthModal.js';
 import { createUploadPicker } from './UploadPicker.js';
 import { createHeroSection } from '../lib/thumbnails.js';
 import { createInlineInstructions } from './InlineInstructions.js';
+import { securityService } from '../lib/services/SecurityService.js';
 
 export function TrainingStudio() {
   const container = document.createElement('div');
@@ -186,7 +187,7 @@ export function TrainingStudio() {
       alert('Upload at least 5 training images (10-20 recommended)');
       return;
     }
-    const apiKey = localStorage.getItem('muapi_key');
+    const apiKey = await securityService.getDecryptedKey();
     if (!apiKey) { 
       AuthModal(() => trainBtn.click()); 
       return; 

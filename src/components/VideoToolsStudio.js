@@ -4,6 +4,7 @@ import { AuthModal } from './AuthModal.js';
 import { createUploadPicker } from './UploadPicker.js';
 import { createHeroSection } from '../lib/thumbnails.js';
 import { createInlineInstructions } from './InlineInstructions.js';
+import { securityService } from '../lib/services/SecurityService.js';
 
 export function VideoToolsStudio() {
   const container = document.createElement('div');
@@ -126,7 +127,7 @@ export function VideoToolsStudio() {
       alert('Upload a source video first');
       return;
     }
-    const apiKey = localStorage.getItem('muapi_key');
+    const apiKey = await securityService.getDecryptedKey();
     if (!apiKey) { 
       AuthModal(() => genBtn.click()); 
       return; 

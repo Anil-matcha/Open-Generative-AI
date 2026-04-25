@@ -1,6 +1,6 @@
 import { MuapiClient } from '../muapi.js';
 import { SecurityService } from './SecurityService.js';
-import { RetryService } from './RetryService.js';
+import { RetryService } from './RateLimiter.js';
 import { RateLimiter } from './RateLimiter.js';
 import { CircuitBreaker } from './CircuitBreaker.js';
 import { CacheService } from './CacheService.js';

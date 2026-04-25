@@ -7,6 +7,7 @@ import { createInlineInstructions } from './InlineInstructions.js';
 import { i2iModels, i2vModels } from '../lib/models.js';
 import { PIXVERSE_ADVANCED_EFFECTS } from '../lib/muapiConfig.js';
 import { createHeroSection } from '../lib/thumbnails.js';
+import { securityService } from '../lib/services/SecurityService.js';
 
 const EFFECT_TABS = [
   { id: 'image-effects', label: 'Image Effects', type: 'i2i', field: 'name' },
@@ -504,7 +505,7 @@ export function EffectsStudio() {
       return;
     }
     if (!uploadedUrl) { alert('Upload an image or video first'); return; }
-    const apiKey = localStorage.getItem('muapi_key');
+    const apiKey = await securityService.getDecryptedKey();
     if (!apiKey) { AuthModal(() => handleGenerate()); return; }
 
     generateBtn.disabled = true;

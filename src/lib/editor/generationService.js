@@ -9,6 +9,7 @@
 import { GenerationModes, GenerationProviders, createDefaultProject } from './types.js';
 import { muapi } from '../muapi.js';
 import { t2vModels, i2vModels, getVideoModelById, getI2VModelById } from '../models.js';
+import { circuitBreaker } from '../services/CircuitBreaker.js';
 
 // ============================================================================
 // CONFIGURATION
@@ -82,6 +83,14 @@ class MuAPIProvider {
 
     console.log(`[MuAPIProvider] Starting generation ${generationId} for mode: ${request.mode}`);
 
+    // Circuit breaker check for generation requests
+    const serviceName = this.getServiceNameForMode(request.mode);
+    if (!circuitBreaker.canProceed(serviceName)) {
+      const error = new Error(`${request.mode} generation service temporarily unavailable. Please try again later.`);
+      error.code = 'CIRCUIT_BREAKER_OPEN';
+      throw error;
+    }
+
     try {
       let result;
 
@@ -108,6 +117,9 @@ class MuAPIProvider {
           throw new Error(`Unsupported generation mode: ${request.mode}`);
       }
 
+      // Record success with circuit breaker
+      circuitBreaker.recordSuccess(serviceName);
+
       return {
         generationId,
         status: result.status || 'queued',
@@ -117,6 +129,12 @@ class MuAPIProvider {
       };
     } catch (error) {
       console.error(`[MuAPIProvider] Generation ${generationId} failed:`, error);
+
+      // Record failure with circuit breaker (unless it's a circuit breaker error)
+      if (error.code !== 'CIRCUIT_BREAKER_OPEN') {
+        circuitBreaker.recordFailure(serviceName);
+      }
+
       return {
         generationId,
         status: 'failed',
@@ -208,6 +226,23 @@ class MuAPIProvider {
     };
 
     return await muapi.generateVideo(params);
+  }
+
+  getServiceNameForMode(mode) {
+    // Map generation modes to circuit breaker service names
+    const serviceMap = {
+      'text-to-video': 'video_generation',
+      'image-to-video': 'video_generation',
+      'audio-to-video': 'video_generation',
+      'retake': 'video_generation',
+      'extend': 'video_generation',
+      'broll': 'video_generation',
+      'generate-image': 'image_generation',
+      'remove-background': 'background_removal',
+      'text-to-speech': 'audio_generation'
+    };
+
+    return serviceMap[mode] || 'api_request';
   }
 
   async poll(generationId) {
@@ -371,6 +406,78 @@ class GenerationService {
    */
   getDefaultLtxModel() {
     return 'ltx-2-fast';
+  }
+
+  /**
+   * Get circuit breaker status for graceful degradation
+   * @returns {Object} Circuit breaker status
+   */
+  getCircuitBreakerStatus() {
+    return circuitBreaker.getStatus();
+  }
+
+  /**
+   * Check if a generation mode is available (circuit not open)
+   * @param {string} mode - Generation mode
+   * @returns {boolean} True if available
+   */
+  isGenerationModeAvailable(mode) {
+    const serviceName = this.provider.getServiceNameForMode(mode);
+    return circuitBreaker.canProceed(serviceName);
+  }
+
+  /**
+   * Get graceful degradation options when circuit is open
+   * @param {string} mode - Generation mode
+   * @returns {Object} Degradation options
+   */
+  getDegradationOptions(mode) {
+    const serviceName = this.provider.getServiceNameForMode(mode);
+    const status = circuitBreaker.getServiceStatus(serviceName);
+
+    if (status && status.state === 'OPEN') {
+      return {
+        available: false,
+        reason: 'Service temporarily unavailable',
+        retryAfter: Math.ceil(status.timeUntilRetry / 1000),
+        alternatives: this.getAlternativeModes(mode),
+        cachedResults: this.getCachedResultsForMode(mode)
+      };
+    }
+
+    return {
+      available: true,
+      estimatedWaitTime: 0
+    };
+  }
+
+  /**
+   * Get alternative generation modes when primary mode is unavailable
+   * @param {string} mode - Original mode
+   * @returns {string[]} Alternative modes
+   */
+  getAlternativeModes(mode) {
+    const alternatives = {
+      'text-to-video': ['image-to-video', 'broll'],
+      'image-to-video': ['text-to-video', 'broll'],
+      'retake': ['text-to-video', 'extend'],
+      'extend': ['text-to-video', 'broll'],
+      'broll': ['text-to-video']
+    };
+
+    const altModes = alternatives[mode] || [];
+    return altModes.filter(altMode => this.isGenerationModeAvailable(altMode));
+  }
+
+  /**
+   * Get cached results for a mode (placeholder for future implementation)
+   * @param {string} mode - Generation mode
+   * @returns {Object[]} Cached results
+   */
+  getCachedResultsForMode(mode) {
+    // This could be implemented to return recently generated content
+    // for the same or similar prompts when the service is unavailable
+    return [];
   }
 
   /**

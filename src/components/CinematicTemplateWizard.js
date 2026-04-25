@@ -9,7 +9,8 @@ import { escapeHtml } from '../lib/security.js';
 import { muapi } from '../lib/muapi.js';
 import { AuthModal } from './AuthModal.js';
 import { createUploadPicker } from './UploadPicker.js';
-import { 
+import { securityService } from '../lib/services/SecurityService.js';
+import {
   VISUAL_STYLES,
   BRAND_VOICES,
   TARGET_AUDIENCES,
@@ -649,7 +650,7 @@ export function CinematicTemplateWizard(template, onComplete, onBack) {
     
     // SECURITY ISSUE: API keys stored in localStorage are accessible to XSS attacks
     // TODO: Replace with server-side session storage or httpOnly cookies
-    const apiKey = localStorage.getItem('muapi_key');
+    const apiKey = await securityService.getDecryptedKey();
     if (!apiKey) {
       AuthModal(() => executeGeneration(prompt));
       return;

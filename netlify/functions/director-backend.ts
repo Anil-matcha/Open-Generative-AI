@@ -1,4 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
+import AIService from './ai-service.js'
+import { getAIConfig } from './ai-config.js'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -11,6 +13,9 @@ const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
 const VIDEO_DB_API_KEY = process.env.VIDEO_DB_API_KEY
 const VIDEO_DB_BASE_URL = process.env.VIDEO_DB_BASE_URL || 'https://api.videodb.io'
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY
+
+// Initialize AI Service with production configuration
+const aiService = new AIService(getAIConfig('production'))
 
 export default async function handler(req, context) {
   // Handle CORS preflight requests
@@ -27,43 +32,47 @@ export default async function handler(req, context) {
       const agentId = agents[0] // Use first agent
       const userPrompt = content[0]?.text || ''
 
-      let result = {}
-
-      // Route to appropriate handler based on agent
-      switch (agentId) {
-        case 'faceless_video_creator':
-          result = await handleFacelessVideo(userPrompt)
-          break
-        case 'ai_ad_films':
-          result = await handleAIAd(userPrompt)
-          break
-        case 'tiktok_lyric_video':
-          result = await handleLyricVideo(userPrompt)
-          break
-        case 'ai_voiceovers':
-          result = await handleVoiceover(userPrompt)
-          break
-        case 'trailer_narration':
-          result = await handleTrailerNarration(userPrompt)
-          break
-        case 'kids_storyteller':
-          result = await handleKidsStory(userPrompt)
-          break
-        case 'year_in_frames':
-          result = await handlePhotoMontage(userPrompt)
-          break
-        case 'summarizer':
-          result = await handleVideoSummary(userPrompt)
-          break
-        case 'clipper':
-          result = await handleVideoClipping(userPrompt)
-          break
-        case 'dubbing':
-          result = await handleVideoDubbing(userPrompt)
-          break
-        default:
-          result = { error: `Unknown agent: ${agentId}` }
+      // Create AI request
+      const aiRequest: AIRequest = {
+        agentId,
+        prompt: userPrompt,
+        options: {
+          session_id,
+          conv_id,
+          agents,
+          content,
+          actions
+        }
       }
+
+      // Process through AI service with deduplication, caching, batching, and rate limiting
+      const result = await aiService.processRequest(aiRequest, async (req) => {
+        // Route to appropriate handler based on agent
+        switch (req.agentId) {
+          case 'faceless_video_creator':
+            return await handleFacelessVideo(req.prompt)
+          case 'ai_ad_films':
+            return await handleAIAd(req.prompt)
+          case 'tiktok_lyric_video':
+            return await handleLyricVideo(req.prompt)
+          case 'ai_voiceovers':
+            return await handleVoiceover(req.prompt)
+          case 'trailer_narration':
+            return await handleTrailerNarration(req.prompt)
+          case 'kids_storyteller':
+            return await handleKidsStory(req.prompt)
+          case 'year_in_frames':
+            return await handlePhotoMontage(req.prompt)
+          case 'summarizer':
+            return await handleVideoSummary(req.prompt)
+          case 'clipper':
+            return await handleVideoClipping(req.prompt)
+          case 'dubbing':
+            return await handleVideoDubbing(req.prompt)
+          default:
+            return { error: `Unknown agent: ${req.agentId}` }
+        }
+      })
 
       return new Response(JSON.stringify({
         status: 'success',

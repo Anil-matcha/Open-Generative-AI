@@ -8,8 +8,10 @@ import {
 import { ENHANCE_TAGS, QUICK_PROMPTS } from '../lib/promptUtils.js';
 import { AuthModal } from './AuthModal.js';
 import { createUploadPicker } from './UploadPicker.js';
+import { securityService } from '../lib/services/SecurityService.js';
 import { createInlineInstructions } from './InlineInstructions.js';
 import { createHeroSection } from '../lib/thumbnails.js';
+import { securityService } from '../lib/services/SecurityService.js';
 
 export function ImageStudio() {
     const container = document.createElement('div');
@@ -1021,7 +1023,7 @@ export function ImageStudio() {
             }
         }
 
-        const apiKey = localStorage.getItem('muapi_key');
+        const apiKey = await securityService.getDecryptedKey();
         if (!apiKey) {
             AuthModal(() => generateBtn.click());
             return;
