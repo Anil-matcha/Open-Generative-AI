@@ -18,6 +18,8 @@ import {
   Palette,
   Zap
 } from 'lucide-react';
+import PhaseView from '../components/PhaseView';
+import ActionsPane from '../components/ActionsPane';
 
 const PHASES = [
   { id: 'getting-started', label: 'Getting Started', icon: Settings },
@@ -27,7 +29,6 @@ const PHASES = [
 
 function Editor() {
   const navigate = useNavigate();
-  const [currentPhase, setCurrentPhase] = useState(1);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const videoRef = useRef(null);
@@ -58,23 +59,16 @@ function Editor() {
     }
   };
 
-  const handlePhaseChange = (phaseIndex) => {
-    setCurrentPhase(phaseIndex);
-  };
-
-  const handleNextPhase = () => {
-    if (currentPhase < PHASES.length) {
-      setCurrentPhase(currentPhase + 1);
-    } else {
-      navigate('/publisher');
-    }
-  };
-
-  const handlePrevPhase = () => {
-    if (currentPhase > 1) {
-      setCurrentPhase(currentPhase - 1);
-    } else {
-      navigate('/');
+  const handlePhaseChange = (element) => {
+    switch (element.key) {
+      case 'getting-started':
+        navigate('/');
+        break;
+      case 'publish':
+        navigate('/publisher');
+        break;
+      default:
+        break;
     }
   };
 
@@ -153,42 +147,52 @@ function Editor() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex">
-      {/* Phase Navigation Sidebar */}
-      <div className="w-64 bg-card border-r border-border p-6">
-        <div className="space-y-4">
-          <h2 className="text-xl font-bold text-foreground mb-6">Video Editor</h2>
+    <div className="min-h-screen bg-background">
+      {/* Phase Navigation */}
+      <PhaseView
+        elements={[
+          {
+            key: 'getting-started',
+            title: 'Choose Template',
+            active: false,
+            available: true,
+          },
+          {
+            key: 'edit',
+            title: 'Customize Video',
+            active: true,
+            available: true,
+          },
+          {
+            key: 'publish',
+            title: 'Publish & Share',
+            active: false,
+            available: true,
+          },
+        ]}
+        onPhaseChanged={handlePhaseChange}
+      />
 
-          {/* Phase Indicators */}
-          <div className="space-y-3">
-            {PHASES.map((phase, index) => {
-              const phaseNumber = index + 1;
-              const Icon = phase.icon;
-              const isActive = phaseNumber === currentPhase;
-              const isCompleted = phaseNumber < currentPhase;
+      <div className="flex flex-1">
+        {/* Stage Changer Sidebar */}
+        <div className="w-64 bg-card border-r border-border p-6">
+          <div className="space-y-4">
+            <h2 className="text-xl font-bold text-foreground mb-6">Video Editor</h2>
 
-              return (
-                <button
-                  key={phase.id}
-                  onClick={() => handlePhaseChange(phaseNumber)}
-                  className={`phase-indicator w-full justify-start ${
-                    isActive ? 'active' : isCompleted ? 'completed' : ''
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  <span className="text-sm">{phase.label}</span>
-                  {isCompleted && <Check className="w-4 h-4 ml-auto" />}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Phase Actions */}
-          <div className="mt-8 space-y-3">
-            {renderPhaseContent()}
+            {/* Stage Controls */}
+            <div className="space-y-3">
+              <button className="nav-item w-full">
+                <span className="text-sm">Caption Customize</span>
+              </button>
+              <button className="nav-item w-full">
+                <span className="text-sm">Element Edit</span>
+              </button>
+              <button className="nav-item w-full">
+                <span className="text-sm">Timeline</span>
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
       {/* Main Workspace */}
       <div className="flex-1 flex flex-col">
@@ -225,17 +229,16 @@ function Editor() {
             {/* Navigation */}
             <div className="flex items-center space-x-2">
               <button
-                onClick={handlePrevPhase}
+                onClick={() => navigate('/')}
                 className="p-2 rounded-lg hover:bg-accent/10 transition-colors"
-                disabled={currentPhase === 1}
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
               <button
-                onClick={handleNextPhase}
+                onClick={() => navigate('/publisher')}
                 className="btn-primary px-4 py-2"
               >
-                {currentPhase === PHASES.length ? 'Publish' : 'Next'}
+                Publish & Share
                 <ChevronRight className="w-4 h-4 ml-2" />
               </button>
             </div>
@@ -268,49 +271,37 @@ function Editor() {
       </div>
 
       {/* Right Actions Pane */}
-      <div className="w-80 bg-card border-l border-border p-6">
-        <div className="space-y-6">
-          <div>
-            <h3 className="text-lg font-semibold text-foreground mb-4">Actions</h3>
-            <div className="space-y-3">
-              <button className="w-full btn-secondary flex items-center gap-3">
-                <Eye className="w-4 h-4" />
-                <span>Preview</span>
-              </button>
-              <button className="w-full btn-ghost flex items-center gap-3">
-                <Share className="w-4 h-4" />
-                <span>Share</span>
-              </button>
-            </div>
-          </div>
+      <ActionsPane className="w-80">
+        <button className="go-button action-button w-full">
+          Preview
+        </button>
+        <button className="go-button action-button w-full">
+          Publish & Share
+        </button>
 
-          <div>
-            <h3 className="text-lg font-semibold text-foreground mb-4">Libraries</h3>
-            <div className="space-y-3">
-              <button className="w-full btn-ghost flex items-center gap-3">
-                <MessageSquare className="w-4 h-4" />
-                <span>CTA Library</span>
-              </button>
-              <button className="w-full btn-ghost flex items-center gap-3">
-                <Mic className="w-4 h-4" />
-                <span>Niche Scripts</span>
-              </button>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold text-foreground mb-4">Personalizer</h3>
-            <div className="space-y-3">
-              <button className="w-full btn-ghost">
-                <span>Dynamic Elements</span>
-              </button>
-              <button className="w-full btn-ghost">
-                <span>Brand Colors</span>
-              </button>
-            </div>
-          </div>
+        <div className="mt-8">
+          <h3 className="text-lg font-semibold text-foreground mb-4">Libraries</h3>
+          <button className="addon-button w-full flex items-center gap-3">
+            <MessageSquare className="w-4 h-4" />
+            <span>CTA Library</span>
+          </button>
+          <button className="addon-button w-full flex items-center gap-3">
+            <Mic className="w-4 h-4" />
+            <span>Niche Scripts</span>
+          </button>
         </div>
-      </div>
+
+        <div className="mt-8">
+          <h3 className="text-lg font-semibold text-foreground mb-4">Personalizer</h3>
+          <button className="addon-button w-full">
+            <span>Dynamic Elements</span>
+          </button>
+          <button className="addon-button w-full">
+            <span>Brand Colors</span>
+          </button>
+        </div>
+      </ActionsPane>
+    </div>
     </div>
   );
 }

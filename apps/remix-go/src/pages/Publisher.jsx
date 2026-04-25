@@ -11,6 +11,11 @@ import {
   TrendingUp,
   Calendar
 } from 'lucide-react';
+import PhaseView from '../components/PhaseView';
+import ActionsPane from '../components/ActionsPane';
+import EmailCampaign from '../components/campaigns/EmailCampaign';
+import SocialCampaign from '../components/campaigns/SocialCampaign';
+import RetargetCampaign from '../components/campaigns/RetargetCampaign';
 
 function Publisher() {
   const [projectDetails, setProjectDetails] = useState({
@@ -60,74 +65,72 @@ function Publisher() {
     if (!showModal) return null;
 
     const campaign = campaignButtons.find(c => c.id === showModal);
+    let CampaignComponent;
+
+    switch (showModal) {
+      case 'email':
+        CampaignComponent = EmailCampaign;
+        break;
+      case 'social':
+        CampaignComponent = SocialCampaign;
+        break;
+      case 'retarget':
+        CampaignComponent = RetargetCampaign;
+        break;
+      default:
+        return null;
+    }
 
     return (
       <div className="modal-overlay" onClick={() => setShowModal(null)}>
         <div className="modal-content max-w-2xl" onClick={(e) => e.stopPropagation()}>
-          <div className="flex items-center gap-3 mb-6">
-            <div className={`p-3 rounded-lg ${campaign.color.replace('hover:', '')}`}>
-              <campaign.icon className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-foreground">{campaign.title}</h2>
-              <p className="text-muted">{campaign.description}</p>
-            </div>
-          </div>
-
-          <div className="space-y-4 mb-6">
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Campaign Name
-              </label>
-              <input
-                type="text"
-                className="input-field"
-                placeholder="Enter campaign name"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Target Audience
-              </label>
-              <select className="input-field">
-                <option>All Contacts</option>
-                <option>Recent Visitors</option>
-                <option>Subscribed Users</option>
-                <option>Custom Segment</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Schedule
-              </label>
-              <input
-                type="datetime-local"
-                className="input-field"
-              />
-            </div>
-          </div>
-
-          <div className="flex justify-end gap-3">
-            <button
-              onClick={() => setShowModal(null)}
-              className="btn-secondary"
-            >
-              Cancel
-            </button>
-            <button className="btn-primary">
-              Create Campaign
-            </button>
-          </div>
+          <CampaignComponent onCampaignFinished={() => setShowModal(null)} />
         </div>
       </div>
     );
   };
 
+  const handlePhaseChange = (element) => {
+    switch (element.key) {
+      case 'getting-started':
+        navigate('/');
+        break;
+      case 'edit':
+        navigate('/editor');
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-background p-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-background">
+      {/* Phase Navigation */}
+      <PhaseView
+        elements={[
+          {
+            key: 'getting-started',
+            title: 'Choose Template',
+            active: false,
+            available: true,
+          },
+          {
+            key: 'edit',
+            title: 'Customize Video',
+            active: false,
+            available: true,
+          },
+          {
+            key: 'publish',
+            title: 'Publish & Share',
+            active: true,
+            available: true,
+          },
+        ]}
+        onPhaseChanged={handlePhaseChange}
+      />
+
+      <div className="max-w-7xl mx-auto p-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">Publish & Share</h1>
           <p className="text-muted">Share your video with the world through multiple channels</p>
@@ -138,7 +141,7 @@ function Publisher() {
           <div className="lg:col-span-2 space-y-8">
             {/* Project Details */}
             <div className="glass-card">
-              <h2 className="text-xl font-semibold text-foreground mb-6">Project Details</h2>
+              <h2 className="text-xl font-semibold text-foreground mb-6">Your project details</h2>
 
               <div className="space-y-4">
                 <div>
@@ -183,30 +186,25 @@ function Publisher() {
             {/* Video Preview */}
             <div className="glass-card">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-foreground">Video Preview</h2>
+                <h2 className="text-xl font-semibold text-foreground">Preview & Embed</h2>
                 <button className="btn-secondary flex items-center gap-2">
                   <Play className="w-4 h-4" />
                   Preview
                 </button>
               </div>
 
-              <div className="aspect-video bg-secondary/20 rounded-lg flex items-center justify-center">
+              <div className="aspect-video bg-secondary/20 rounded-lg flex items-center justify-center mb-4">
                 <div className="text-center text-muted">
                   <Play className="w-16 h-16 mx-auto mb-4 opacity-50" />
                   <p className="text-lg">Video Preview</p>
                   <p className="text-sm">Click preview to watch your video</p>
                 </div>
               </div>
-            </div>
-
-            {/* Embed Section */}
-            <div className="glass-card">
-              <h2 className="text-xl font-semibold text-foreground mb-6">Embed & Share</h2>
 
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
-                    Embed URL
+                    URL
                   </label>
                   <div className="flex gap-2">
                     <input
@@ -222,16 +220,12 @@ function Publisher() {
                       <Copy className="w-4 h-4" />
                       Copy
                     </button>
-                    <button className="btn-secondary flex items-center gap-2">
-                      <ExternalLink className="w-4 h-4" />
-                      Open
-                    </button>
                   </div>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
-                    Embed Code
+                    Embed
                   </label>
                   <div className="relative">
                     <textarea
@@ -253,35 +247,29 @@ function Publisher() {
           </div>
 
           {/* Right Column - Campaign Actions */}
-          <div className="space-y-6">
-            <div className="glass-card">
-              <h2 className="text-xl font-semibold text-foreground mb-6">Campaign Actions</h2>
-
-              <div className="space-y-4">
-                {campaignButtons.map((campaign) => {
-                  const Icon = campaign.icon;
-                  return (
-                    <button
-                      key={campaign.id}
-                      onClick={() => setShowModal(campaign.id)}
-                      className={`w-full p-4 rounded-lg transition-all duration-200 ${campaign.color} text-white`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <Icon className="w-5 h-5" />
-                        <div className="text-left">
-                          <div className="font-semibold">{campaign.title}</div>
-                          <div className="text-sm opacity-90">{campaign.description}</div>
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+          <ActionsPane className="lg:col-span-1">
+            <button
+              className="go-button action-button w-full"
+              onClick={() => setShowModal('email')}
+            >
+              Email Campaign
+            </button>
+            <button
+              className="go-button action-button w-full"
+              onClick={() => setShowModal('social')}
+            >
+              Social Campaign
+            </button>
+            <button
+              className="go-button action-button w-full"
+              onClick={() => setShowModal('retarget')}
+            >
+              Opt-In/Retarget
+            </button>
 
             {/* Social Conductor Integration */}
-            <div className="glass-card">
-              <h2 className="text-xl font-semibold text-foreground mb-6">Social Conductor</h2>
+            <div className="mt-8">
+              <h3 className="text-lg font-semibold text-foreground mb-4">Social Conductor</h3>
 
               <div className="aspect-video bg-secondary/20 rounded-lg overflow-hidden">
                 <iframe
@@ -295,38 +283,7 @@ function Publisher() {
                 Manage your social media campaigns and track performance in real-time.
               </p>
             </div>
-
-            {/* Quick Stats */}
-            <div className="glass-card">
-              <h2 className="text-xl font-semibold text-foreground mb-6">Performance</h2>
-
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Users className="w-4 h-4 text-primary" />
-                    <span className="text-sm text-muted">Views</span>
-                  </div>
-                  <span className="font-semibold text-foreground">1,234</span>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <TrendingUp className="w-4 h-4 text-green-500" />
-                    <span className="text-sm text-muted">Engagement</span>
-                  </div>
-                  <span className="font-semibold text-foreground">89%</span>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-blue-500" />
-                    <span className="text-sm text-muted">Published</span>
-                  </div>
-                  <span className="font-semibold text-foreground">2 hours ago</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          </ActionsPane>
         </div>
       </div>
 

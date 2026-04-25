@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Play, Upload, FileText, FolderOpen } from 'lucide-react';
+import { FileText, Play, Upload, FolderOpen } from 'lucide-react';
 
 const GettingStarted = () => {
   const navigate = useNavigate();
-  const [selectedTemplate, setSelectedTemplate] = useState(null);
-  const [showTemplateModal, setShowTemplateModal] = useState(false);
+  const [selectedWizard, setSelectedWizard] = useState(null);
+
+  const wizardTypes = {
+    template: { key: 'template', label: 'Choose Template' },
+    generator: { key: 'generator', label: 'Choose a Video' },
+    upload: { key: 'upload', label: 'Upload Your Video' },
+  };
 
   const options = [
     {
@@ -13,21 +18,24 @@ const GettingStarted = () => {
       title: 'Start From Template',
       description: 'Choose from pre-built video templates',
       icon: <FileText className="w-8 h-8" />,
-      action: () => navigate('/editor'),
+      action: () => handleWizardSelection('template'),
+      wizardType: wizardTypes.template,
     },
     {
       id: 'generator',
       title: 'Template Generator',
       description: 'Create custom templates with AI',
       icon: <Play className="w-8 h-8" />,
-      action: () => setShowTemplateModal(true),
+      action: () => handleWizardSelection('generator'),
+      wizardType: wizardTypes.generator,
     },
     {
       id: 'upload',
-      title: 'Upload Video',
-      description: 'Import your own video files',
+      title: 'Import Your Own Video',
+      description: 'Upload and edit your video files',
       icon: <Upload className="w-8 h-8" />,
-      action: () => navigate('/editor'),
+      action: () => handleWizardSelection('upload'),
+      wizardType: wizardTypes.upload,
     },
     {
       id: 'projects',
@@ -35,29 +43,24 @@ const GettingStarted = () => {
       description: 'Continue working on existing projects',
       icon: <FolderOpen className="w-8 h-8" />,
       action: () => navigate('/editor'),
+      external: true,
     },
   ];
 
-  const templates = [
-    { id: 'business', name: 'Business Presentation', niche: 'Corporate' },
-    { id: 'social', name: 'Social Media Story', niche: 'Marketing' },
-    { id: 'tutorial', name: 'Tutorial Video', niche: 'Education' },
-    { id: 'promo', name: 'Product Promotion', niche: 'E-commerce' },
-  ];
-
-  const handleTemplateSelect = (template) => {
-    setSelectedTemplate(template);
-    setShowTemplateModal(false);
+  const handleWizardSelection = (wizardType) => {
+    setSelectedWizard(wizardType);
+    // In a real implementation, this would create a project
+    // For now, just navigate to editor
     navigate('/editor');
   };
 
   return (
-    <div className="min-h-screen bg-background p-8">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-background">
+      <div className="max-w-6xl mx-auto p-8">
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-foreground mb-4">
-            Welcome to VideoRemix Go
+            Welcome to VideoRemix Go!
           </h1>
           <p className="text-xl text-muted max-w-2xl mx-auto">
             Create personalized videos with our lite video editor. Start from templates,
@@ -96,36 +99,30 @@ const GettingStarted = () => {
             </button>
           ))}
         </div>
-      </div>
 
-      {/* Template Generator Modal */}
-      {showTemplateModal && (
-        <div className="modal-overlay" onClick={() => setShowTemplateModal(false)}>
-          <div className="modal-content max-w-2xl" onClick={(e) => e.stopPropagation()}>
-            <h2 className="text-2xl font-bold text-foreground mb-6">Choose a Template</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              {templates.map((template) => (
-                <button
-                  key={template.id}
-                  onClick={() => handleTemplateSelect(template)}
-                  className="glass p-4 rounded-lg hover:shadow-glass-sm transition-all duration-200 text-left"
-                >
-                  <h3 className="font-semibold text-foreground mb-1">{template.name}</h3>
-                  <p className="text-muted text-sm">{template.niche}</p>
-                </button>
-              ))}
-            </div>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setShowTemplateModal(false)}
-                className="btn-secondary"
-              >
-                Cancel
-              </button>
+        {/* Phase Navigation for active wizard */}
+        {selectedWizard && (
+          <div className="mt-12 glass-card max-w-4xl mx-auto">
+            <div className="flex items-center justify-center gap-8 p-6">
+              <div className="flex items-center gap-4">
+                <div className="phase-indicator active">
+                  <span className="text-sm font-medium">
+                    {wizardTypes[selectedWizard]?.label || 'Getting Started'}
+                  </span>
+                </div>
+                <div className="w-8 h-0.5 bg-muted"></div>
+                <div className="phase-indicator">
+                  <span className="text-sm">Customize Video</span>
+                </div>
+                <div className="w-8 h-0.5 bg-muted"></div>
+                <div className="phase-indicator">
+                  <span className="text-sm">Publish & Share</span>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
