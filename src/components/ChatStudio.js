@@ -3,6 +3,7 @@ import { textModels } from '../lib/models.js';
 import { AuthModal } from './AuthModal.js';
 import { createHeroSection } from '../lib/thumbnails.js';
 import { createInlineInstructions } from './InlineInstructions.js';
+import { GTMPromptModal } from './modals/GTMPromptModal.jsx';
 
 export function ChatStudio() {
   const container = document.createElement('div');
@@ -89,6 +90,16 @@ export function ChatStudio() {
   textarea.placeholder = 'Type your message...';
   textarea.rows = 2;
   inputRow.appendChild(textarea);
+
+  // GTM Prompt Enhancer Button for chat
+  const gtmBtn = document.createElement('button');
+  gtmBtn.className = 'w-10 h-10 shrink-0 rounded-xl border bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40 transition-all flex items-center justify-center relative overflow-hidden group';
+  gtmBtn.title = 'GTM Prompt Enhancement - Create more persuasive chat messages';
+  gtmBtn.innerHTML = '🚀';
+  gtmBtn.onclick = () => {
+    openGTMPromptModal(textarea);
+  };
+  inputRow.appendChild(gtmBtn);
 
   const sendBtn = document.createElement('button');
   sendBtn.className = 'px-6 py-3 bg-primary text-black font-bold rounded-xl hover:bg-primary/90 transition-colors self-end';
@@ -262,6 +273,26 @@ export function ChatStudio() {
 
   // Initialize
   updateModelBtns();
+
+  // GTM Prompt Modal Function
+  function openGTMPromptModal(promptTextarea) {
+    try {
+      const modal = new GTMPromptModal({
+        appTheme: 'chat-studio',
+        onPromptGenerated: (generatedPrompt) => {
+          // Load the generated prompt into the textarea
+          promptTextarea.value = generatedPrompt;
+          promptTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+
+          console.log('GTM-optimized chat message loaded successfully!');
+        }
+      });
+      modal.open();
+    } catch (error) {
+      console.error('GTM Prompt Modal error:', error);
+      showToast('Failed to open GTM Prompt Enhancer', 'error');
+    }
+  }
 
   return container;
 }

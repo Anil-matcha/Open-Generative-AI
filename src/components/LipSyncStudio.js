@@ -3,7 +3,7 @@ import { lipsyncModels, imageLipSyncModels, videoLipSyncModels, getLipSyncModelB
 import { AuthModal } from './AuthModal.js';
 import { savePendingJob, removePendingJob, getPendingJobs } from '../lib/pendingJobs.js';
 import { createHeroSection } from '../lib/thumbnails.js';
-import { securityService } from '../lib/services/SecurityService.js';
+import { GTMPromptModal } from './modals/GTMPromptModal.jsx';
 
 export function LipSyncStudio() {
     const container = document.createElement('div');
@@ -157,6 +157,17 @@ export function LipSyncStudio() {
     uploadsRow.appendChild(videoUploadBtn);
     uploadsRow.appendChild(audioUploadBtn);
     uploadsRow.appendChild(textarea);
+
+    // GTM Prompt Enhancer Button
+    const gtmBtn = document.createElement('button');
+    gtmBtn.className = 'w-8 h-8 shrink-0 rounded-lg border bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40 transition-all flex items-center justify-center relative overflow-hidden group';
+    gtmBtn.title = 'GTM Prompt Enhancement - Create conversion-optimized prompts';
+    gtmBtn.innerHTML = '🚀';
+    gtmBtn.onclick = () => {
+        openGTMPromptModal(textarea);
+    };
+    uploadsRow.appendChild(gtmBtn);
+
     bar.appendChild(uploadsRow);
 
     // ── Status labels ──
@@ -450,7 +461,7 @@ export function LipSyncStudio() {
     imageFileInput.onchange = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
-        const apiKey = await securityService.getDecryptedKey();
+        const apiKey = localStorage.getItem('muapi_key');
         if (!apiKey) { AuthModal(() => imageFileInput.click()); return; }
         updateImageUploadState('loading');
         try {
@@ -476,7 +487,7 @@ export function LipSyncStudio() {
     videoFileInput.onchange = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
-        const apiKey = await securityService.getDecryptedKey();
+        const apiKey = localStorage.getItem('muapi_key');
         if (!apiKey) { AuthModal(() => videoFileInput.click()); return; }
         updateVideoUploadState('loading');
         try {
@@ -502,7 +513,7 @@ export function LipSyncStudio() {
     audioFileInput.onchange = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
-        const apiKey = await securityService.getDecryptedKey();
+        const apiKey = localStorage.getItem('muapi_key');
         if (!apiKey) { AuthModal(() => audioFileInput.click()); return; }
         updateAudioUploadState('loading');
         try {
@@ -649,7 +660,7 @@ export function LipSyncStudio() {
     (async () => {
         const pending = getPendingJobs('lipsync');
         if (!pending.length) return;
-        const apiKey = await securityService.getDecryptedKey();
+        const apiKey = localStorage.getItem('muapi_key');
         if (!apiKey) return;
         const banner = document.createElement('div');
         banner.className = 'fixed top-4 left-1/2 -translate-x-1/2 z-[200] bg-[#111] border border-white/10 text-white text-sm px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3';
@@ -718,7 +729,7 @@ export function LipSyncStudio() {
             return;
         }
 
-        const apiKey = await securityService.getDecryptedKey();
+        const apiKey = localStorage.getItem('muapi_key');
         if (!apiKey) { AuthModal(() => generateBtn.click()); return; }
 
         hero.classList.add('opacity-0', 'scale-95', '-translate-y-10', 'pointer-events-none');
@@ -777,6 +788,26 @@ export function LipSyncStudio() {
             if (!hadError) generateBtn.innerHTML = `Generate ✨`;
         }
     };
+
+    // GTM Prompt Modal Function
+    function openGTMPromptModal(promptTextarea) {
+        try {
+            const modal = new GTMPromptModal({
+                appTheme: 'lip-sync-studio',
+                onPromptGenerated: (generatedPrompt) => {
+                    // Load the generated prompt into the textarea
+                    promptTextarea.value = generatedPrompt;
+                    promptTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+
+                    console.log('GTM-optimized prompt loaded successfully!');
+                }
+            });
+            modal.open();
+        } catch (error) {
+            console.error('GTM Prompt Modal error:', error);
+            alert('Failed to open GTM Prompt Enhancer');
+        }
+    }
 
     return container;
 }

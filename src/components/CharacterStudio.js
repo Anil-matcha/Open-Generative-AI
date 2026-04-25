@@ -3,7 +3,7 @@ import { AuthModal } from './AuthModal.js';
 import { createUploadPicker } from './UploadPicker.js';
 import { createInlineInstructions } from './InlineInstructions.js';
 import { createHeroSection } from '../lib/thumbnails.js';
-import { securityService } from '../lib/services/SecurityService.js';
+import { GTMPromptModal } from './modals/GTMPromptModal.jsx';
 
 const CHARACTER_MODELS = [
   { id: 'flux-pulid', name: 'Flux PuLID', description: 'Face ID preservation with text prompt' },
@@ -83,11 +83,26 @@ export function CharacterStudio() {
   promptLabel.textContent = 'Character Description';
   formCard.appendChild(promptLabel);
 
+  const promptContainer = document.createElement('div');
+  promptContainer.className = 'relative';
+
   const promptInput = document.createElement('textarea');
   promptInput.className = 'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder:text-muted focus:outline-none focus:border-primary/50 transition-colors resize-none';
   promptInput.rows = 3;
   promptInput.placeholder = 'e.g. wearing a leather jacket, standing in a neon-lit alley, cyberpunk style';
-  formCard.appendChild(promptInput);
+  promptContainer.appendChild(promptInput);
+
+  // GTM Prompt Enhancer Button
+  const gtmBtn = document.createElement('button');
+  gtmBtn.className = 'absolute top-2 right-2 w-8 h-8 rounded-lg border bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40 transition-all flex items-center justify-center text-xs';
+  gtmBtn.title = 'GTM Prompt Enhancement - Create conversion-optimized prompts';
+  gtmBtn.innerHTML = '🚀';
+  gtmBtn.onclick = () => {
+    openGTMPromptModal(promptInput);
+  };
+  promptContainer.appendChild(gtmBtn);
+
+  formCard.appendChild(promptContainer);
 
   const genBtn = document.createElement('button');
   genBtn.className = 'w-full bg-primary text-black py-3.5 rounded-xl font-black text-sm hover:shadow-glow transition-all mt-2';
@@ -183,7 +198,7 @@ export function CharacterStudio() {
 
   genBtn.onclick = async () => {
     if (!uploadedUrl) { alert('Upload a reference face first'); return; }
-    const apiKey = await securityService.getDecryptedKey();
+    const apiKey = localStorage.getItem('muapi_key');
     if (!apiKey) { AuthModal(() => genBtn.click()); return; }
 
     genBtn.disabled = true;
@@ -222,6 +237,26 @@ export function CharacterStudio() {
       ? 'flex-1 px-4 py-3 rounded-xl text-xs font-bold transition-all border bg-primary/10 border-primary/30'
       : 'flex-1 px-4 py-3 rounded-xl text-xs font-bold transition-all border bg-white/[0.03] border-white/10 hover:border-white/20';
   });
+
+  // GTM Prompt Modal Function
+  function openGTMPromptModal(promptTextarea) {
+    try {
+      const modal = new GTMPromptModal({
+        appTheme: 'character-studio',
+        onPromptGenerated: (generatedPrompt) => {
+          // Load the generated prompt into the textarea
+          promptTextarea.value = generatedPrompt;
+          promptTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+
+          console.log('GTM-optimized prompt loaded successfully!');
+        }
+      });
+      modal.open();
+    } catch (error) {
+      console.error('GTM Prompt Modal error:', error);
+      alert('Failed to open GTM Prompt Enhancer');
+    }
+  }
 
   return container;
 }

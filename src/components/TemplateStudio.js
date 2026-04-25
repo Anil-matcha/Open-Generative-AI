@@ -6,7 +6,7 @@ import { AuthModal } from './AuthModal.js';
 import { createUploadPicker } from './UploadPicker.js';
 import { navigate } from '../lib/router.js';
 import { sanitizeUrl } from '../lib/security.js';
-import { securityService } from '../lib/services/SecurityService.js';
+import { GTMPromptModal } from './modals/GTMPromptModal.jsx';
 
 export function TemplateStudio(templateId) {
   const template = getTemplateById(templateId);
@@ -278,7 +278,8 @@ export function TemplateStudio(templateId) {
   extraWrapper.innerHTML = `
     <div class="mb-3 flex items-center justify-between gap-3">
       <div class="text-[11px] font-semibold uppercase tracking-[0.22em] text-zinc-500">Extra Instructions</div>
-      <button class="enhancer-btn rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] transition border-white/10 bg-white/[0.03] text-zinc-400 hover:bg-white/[0.06] hover:text-white" data-field="extraInstructions">Enhance</button>
+      <button class="basic-enhancer-btn rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] transition border-white/10 bg-white/[0.03] text-zinc-400 hover:bg-white/[0.06] hover:text-white" title="Basic Enhancement">Enhance</button>
+      <button class="gtm-enhancer-btn rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] transition border-white/10 bg-white/[0.03] text-zinc-400 hover:bg-white/[0.06] hover:text-white" title="GTM Prompt Enhancement">🚀 GTM Boost</button>
     </div>
     <textarea class="w-full rounded-[18px] border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white outline-none transition focus:border-emerald-400/50 resize-none" rows="4" placeholder="optional cinematic instructions" data-advanced-field="extraInstructions"></textarea>
   `;
@@ -483,6 +484,35 @@ export function TemplateStudio(templateId) {
         }
       };
     });
+
+    // Basic enhancer button handler
+    document.querySelectorAll('.basic-enhancer-btn').forEach(btn => {
+      btn.onclick = () => {
+        const fieldName = btn.dataset.field || 'extraInstructions';
+        const input = document.querySelector(`[data-advanced-field="${fieldName}"]`);
+        if (input && input.value) {
+          const enhancedValue = `${input.value}, cinematic style, professional quality, premium aesthetic`;
+          input.value = enhancedValue;
+          btn.classList.add('border-emerald-400/40', 'bg-emerald-500/15', 'text-emerald-200');
+          btn.textContent = 'Enhanced ✓';
+          setTimeout(() => {
+            btn.classList.remove('border-emerald-400/40', 'bg-emerald-500/15', 'text-emerald-200');
+            btn.textContent = 'Enhance';
+          }, 2000);
+        }
+      };
+    });
+
+    // GTM Enhancer button handler
+    document.querySelectorAll('.gtm-enhancer-btn').forEach(btn => {
+      btn.onclick = () => {
+        const fieldName = btn.dataset.field || 'extraInstructions';
+        const input = document.querySelector(`[data-advanced-field="${fieldName}"]`);
+        if (input) {
+          openGTMPromptModal(input, fieldName);
+        }
+      };
+    });
   }, 100);
 
   // Generate button handler
@@ -491,7 +521,7 @@ export function TemplateStudio(templateId) {
 
     // SECURITY ISSUE: API keys stored in localStorage are accessible to XSS attacks
     // TODO: Replace with server-side session storage or httpOnly cookies
-    const apiKey = await securityService.getDecryptedKey();
+    const apiKey = localStorage.getItem('muapi_key');
     if (!apiKey) {
       AuthModal(() => genBtn.click());
       return;
@@ -594,12 +624,30 @@ export function TemplateStudio(templateId) {
         id: Date.now().toString(),
         url,
         prompt,
-        model: template.model,
-        template: template.id,
         timestamp: new Date().toISOString(),
       });
       localStorage.setItem('muapi_history', JSON.stringify(history.slice(0, 100)));
     } catch (e) { /* ignore */ }
+  }
+
+  // GTM Prompt Modal Function
+  function openGTMPromptModal(promptTextarea) {
+    try {
+      const modal = new GTMPromptModal({
+        appTheme: 'template-studio',
+        onPromptGenerated: (generatedPrompt) => {
+          // Load the generated prompt into the textarea
+          promptTextarea.value = generatedPrompt;
+          promptTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+
+          console.log('GTM-optimized prompt loaded successfully!');
+        }
+      });
+      modal.open();
+    } catch (error) {
+      console.error('GTM Prompt Modal error:', error);
+      alert('Failed to open GTM Prompt Enhancer');
+    }
   }
 
   return container;
