@@ -6,22 +6,23 @@ const VideoPlayer = observer(({ src, className = '' }) => {
   const videoRef = useRef(null);
   const videoEditorStore = useVideoEditorStore();
 
+  // Default demo video if no src provided
+  const defaultSrc = src || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
+
   useEffect(() => {
     if (videoRef.current) {
       videoEditorStore.setVideoElement(videoRef.current);
 
-      // Load video if src provided
-      if (src) {
-        videoRef.current.src = src;
-        videoRef.current.load();
-      }
+      // Load video
+      videoRef.current.src = defaultSrc;
+      videoRef.current.load();
     }
 
     return () => {
       // Cleanup on unmount
       videoEditorStore.setVideoElement(null);
     };
-  }, [src, videoEditorStore]);
+  }, [defaultSrc, videoEditorStore]);
 
   return (
     <div className={`relative ${className}`}>

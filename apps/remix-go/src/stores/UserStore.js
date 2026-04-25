@@ -56,17 +56,16 @@ class UserStore {
   }
 
   async loadCurrentUser() {
-    if (!ApiClient.isAuthenticated()) return;
-
     this.isLoading = true;
     this.error = null;
 
     try {
+      // Demo mode - always load demo user
       const user = await ApiClient.getCurrentUser();
       this.user = user;
     } catch (error) {
       this.error = error.message;
-      this.logout(); // Clear invalid tokens
+      // Don't logout in demo mode
     } finally {
       this.isLoading = false;
     }

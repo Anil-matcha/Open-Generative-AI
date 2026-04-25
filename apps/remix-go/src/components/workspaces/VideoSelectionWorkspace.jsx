@@ -18,7 +18,8 @@ const VideoSelectionWorkspace = observer(({ onVideoSelected }) => {
       thumbnail: 'https://via.placeholder.com/300x200/4f46e5/ffffff?text=Product+Demo',
       duration: '2:30',
       category: 'product',
-      tags: ['demo', 'product', 'sales']
+      tags: ['demo', 'product', 'sales'],
+      url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' // Sample video
     },
     {
       id: '2',
@@ -26,7 +27,8 @@ const VideoSelectionWorkspace = observer(({ onVideoSelected }) => {
       thumbnail: 'https://via.placeholder.com/300x200/059669/ffffff?text=Testimonial',
       duration: '1:45',
       category: 'testimonial',
-      tags: ['customer', 'testimonial', 'review']
+      tags: ['customer', 'testimonial', 'review'],
+      url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4' // Sample video
     },
     {
       id: '3',
@@ -34,7 +36,8 @@ const VideoSelectionWorkspace = observer(({ onVideoSelected }) => {
       thumbnail: 'https://via.placeholder.com/300x200/dc2626/ffffff?text=Overview',
       duration: '3:15',
       category: 'corporate',
-      tags: ['company', 'overview', 'corporate']
+      tags: ['company', 'overview', 'corporate'],
+      url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4' // Sample video
     },
     {
       id: '4',
@@ -42,7 +45,8 @@ const VideoSelectionWorkspace = observer(({ onVideoSelected }) => {
       thumbnail: 'https://via.placeholder.com/300x200/7c3aed/ffffff?text=Tutorial',
       duration: '5:20',
       category: 'education',
-      tags: ['tutorial', 'how-to', 'education']
+      tags: ['tutorial', 'how-to', 'education'],
+      url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4' // Sample video
     }
   ]);
 

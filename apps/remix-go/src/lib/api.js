@@ -50,15 +50,28 @@ class ApiClient {
     return {};
   }
 
-  // User methods
+  // User methods (demo mode)
   async getCurrentUser() {
-    const response = await this.client.get('/api/users/me?serialized=true');
-    return response.data;
+    // Demo mode - return mock user
+    return {
+      _id: 'demo-user',
+      username: 'demo',
+      email: 'demo@example.com',
+      fullName: 'Demo User',
+      features: {
+        templates: { state: 'enabled' },
+        personalization: { state: 'enabled' },
+        campaigns: { state: 'enabled' },
+      },
+    };
   }
 
   async updateUser(userData) {
-    const response = await this.client.put('/api/users/me', userData);
-    return response.data;
+    // Demo mode - return updated user
+    return {
+      _id: 'demo-user',
+      ...userData,
+    };
   }
 
   // Project/Make methods
@@ -87,8 +100,41 @@ class ApiClient {
   }
 
   async getProject(projectId) {
-    const response = await this.client.get(`/api/users/me/makes/${projectId}`);
-    return response.data;
+    // Demo mode - return mock project
+    return {
+      _id: projectId,
+      title: 'Demo Project',
+      description: 'A demo video project',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      published: false,
+      thumbnail: '/api/placeholder/400/225',
+      make: { _id: projectId, url: '#' },
+    };
+  }
+
+  async updateProject(projectId, projectData) {
+    // Demo mode - return updated project
+    return {
+      _id: projectId,
+      ...projectData,
+      updatedAt: new Date().toISOString(),
+    };
+  }
+
+  async deleteProject(projectId) {
+    // Demo mode - always succeed
+    return { success: true };
+  }
+
+  async publishProject(projectId) {
+    // Demo mode - return published project
+    return {
+      _id: projectId,
+      published: true,
+      publishedAt: new Date().toISOString(),
+      url: `https://demo.vidcloud.io/watch/${projectId}`,
+    };
   }
 
   async createProject(projectData) {
@@ -169,36 +215,61 @@ class ApiClient {
     ];
   }
 
-  // Pre-remix methods (for personalization)
+  // Pre-remix methods (for personalization) - demo mode
   async getPreRemixData(projectId) {
-    const response = await this.client.get(`/api/users/me/makes/${projectId}/pre-remix`);
-    return response.data;
+    // Demo mode - return mock data
+    return {
+      scenario: 'hasData',
+      data: [
+        { _id: 'voice1', url: '/api/placeholder/audio', text: 'Welcome to our demo!' },
+        { _id: 'voice2', url: '/api/placeholder/audio', text: 'Thank you for trying VideoRemix Go' },
+      ]
+    };
   }
 
   async remixPersonalized(projectId, personalizationData) {
-    const response = await this.client.post(`/api/users/me/makes/${projectId}/remix-personalized`, personalizationData);
-    return response.data;
+    // Demo mode - return updated project
+    return {
+      _id: projectId,
+      personalized: true,
+      updatedAt: new Date().toISOString(),
+    };
   }
 
-  // Media assets
+  // Media assets - demo mode
   async uploadMedia(file, metadata = {}) {
-    const formData = new FormData();
-    formData.append('file', file);
-    Object.keys(metadata).forEach(key => {
-      formData.append(key, metadata[key]);
-    });
-
-    const response = await this.client.post('/api/media-assets', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-    return response.data;
+    // Demo mode - simulate upload
+    await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate upload time
+    return {
+      _id: Date.now().toString(),
+      filename: file.name,
+      url: URL.createObjectURL(file),
+      size: file.size,
+      type: file.type,
+      uploadedAt: new Date().toISOString(),
+    };
   }
 
   async getMediaAssets() {
-    const response = await this.client.get('/api/media-assets');
-    return response.data;
+    // Demo mode - return mock assets
+    return [
+      {
+        _id: 'asset1',
+        filename: 'sample-video.mp4',
+        url: '/api/placeholder/video',
+        type: 'video/mp4',
+        size: 1024000,
+        thumbnail: '/api/placeholder/300x200',
+      },
+      {
+        _id: 'asset2',
+        filename: 'sample-image.jpg',
+        url: '/api/placeholder/image',
+        type: 'image/jpeg',
+        size: 512000,
+        thumbnail: '/api/placeholder/300x200',
+      }
+    ];
   }
 
   // Campaign methods
@@ -232,19 +303,17 @@ class ApiClient {
     };
   }
 
-  // Utility methods
+  // Utility methods (demo mode - always authenticated)
   setAuthToken(token, userId) {
-    localStorage.setItem('apiToken', token);
-    localStorage.setItem('userId', userId);
+    // Demo mode - no token storage needed
   }
 
   clearAuthToken() {
-    localStorage.removeItem('apiToken');
-    localStorage.removeItem('userId');
+    // Demo mode - no token to clear
   }
 
   isAuthenticated() {
-    return !!localStorage.getItem('apiToken');
+    return true; // Always authenticated in demo mode
   }
 }
 

@@ -33,6 +33,9 @@ function Editor() {
   const [currentTime, setCurrentTime] = useState(0);
   const videoRef = useRef(null);
 
+  // Default video for demo
+  const defaultVideoSrc = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
+
   const handlePlayPause = () => {
     if (videoRef.current) {
       if (isPlaying) {
@@ -247,26 +250,10 @@ function Editor() {
 
         {/* Canvas Area */}
         <div className="flex-1 bg-secondary/20 flex items-center justify-center p-8">
-          <div className="relative max-w-4xl w-full aspect-video bg-card rounded-lg overflow-hidden shadow-glass">
-            <video
-              ref={videoRef}
-              className="w-full h-full object-contain"
-              onTimeUpdate={handleTimeUpdate}
-              onEnded={() => setIsPlaying(false)}
-            >
-              Your browser does not support the video tag.
-            </video>
-
-            {!videoRef.current?.src && (
-              <div className="absolute inset-0 flex items-center justify-center text-foreground">
-                <div className="text-center">
-                  <Upload className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                  <p className="text-xl">Import a video to start editing</p>
-                  <p className="text-sm opacity-75 mt-2">Drag and drop or click to browse</p>
-                </div>
-              </div>
-            )}
-          </div>
+          <VideoPlayer
+            src={defaultVideoSrc}
+            className="max-w-4xl w-full"
+          />
         </div>
       </div>
 
