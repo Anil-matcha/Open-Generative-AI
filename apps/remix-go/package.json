@@ -21,7 +21,11 @@
     "react-router-dom": "^6.26.2",
     "zustand": "^5.0.0",
     "clsx": "^2.1.1",
-    "tailwind-merge": "^2.5.2"
+    "tailwind-merge": "^2.5.2",
+    "axios": "^1.6.0",
+    "mobx": "^6.12.0",
+    "mobx-react": "^9.1.1",
+    "jwt-decode": "^4.0.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.11",

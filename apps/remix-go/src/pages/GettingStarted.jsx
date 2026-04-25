@@ -1,16 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Play, Upload, FolderOpen } from 'lucide-react';
+import { observer } from 'mobx-react';
+import { FileText, Play, Upload, FolderOpen, Loader2 } from 'lucide-react';
+import { useProjectStore, useUserStore } from '../stores/StoreProvider';
 
-const GettingStarted = () => {
+const GettingStarted = observer(() => {
   const navigate = useNavigate();
+  const projectStore = useProjectStore();
+  const userStore = useUserStore();
   const [selectedWizard, setSelectedWizard] = useState(null);
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
 
   const wizardTypes = {
     template: { key: 'template', label: 'Choose Template' },
     generator: { key: 'generator', label: 'Choose a Video' },
     upload: { key: 'upload', label: 'Upload Your Video' },
   };
+
+  useEffect(() => {
+    // Load templates when component mounts
+    if (userStore.isAuthenticated && projectStore.templates.length === 0) {
+      projectStore.loadTemplates();
+    }
+  }, [userStore.isAuthenticated, projectStore]);
 
   const options = [
     {
@@ -20,6 +32,7 @@ const GettingStarted = () => {
       icon: <FileText className="w-8 h-8" />,
       action: () => handleWizardSelection('template'),
       wizardType: wizardTypes.template,
+      requiresAuth: false,
     },
     {
       id: 'generator',
@@ -28,6 +41,8 @@ const GettingStarted = () => {
       icon: <Play className="w-8 h-8" />,
       action: () => handleWizardSelection('generator'),
       wizardType: wizardTypes.generator,
+      requiresAuth: true,
+      disabled: !userStore.canUsePersonalization,
     },
     {
       id: 'upload',
@@ -36,6 +51,7 @@ const GettingStarted = () => {
       icon: <Upload className="w-8 h-8" />,
       action: () => handleWizardSelection('upload'),
       wizardType: wizardTypes.upload,
+      requiresAuth: false,
     },
     {
       id: 'projects',
@@ -44,14 +60,41 @@ const GettingStarted = () => {
       icon: <FolderOpen className="w-8 h-8" />,
       action: () => navigate('/editor'),
       external: true,
+      requiresAuth: true,
     },
   ];
 
-  const handleWizardSelection = (wizardType) => {
-    setSelectedWizard(wizardType);
-    // In a real implementation, this would create a project
-    // For now, just navigate to editor
-    navigate('/editor');
+  const handleWizardSelection = async (wizardType) => {
+    if (wizardType === 'template') {
+      setSelectedWizard(wizardType);
+      return;
+    }
+
+    try {
+      // For other wizards, create a basic project
+      const projectData = {
+        title: `New Project - ${wizardTypes[wizardType].label}`,
+        wizardType,
+        createdAt: new Date().toISOString(),
+      };
+
+      const project = await projectStore.createProject(projectData);
+      navigate('/editor');
+    } catch (error) {
+      console.error('Failed to create project:', error);
+      // For now, just navigate to editor
+      navigate('/editor');
+    }
+  };
+
+  const handleTemplateSelect = async (template) => {
+    try {
+      await projectStore.createFromTemplate(template._id);
+      navigate('/editor');
+    } catch (error) {
+      console.error('Failed to create project from template:', error);
+      navigate('/editor');
+    }
   };
 
   return (
@@ -70,54 +113,112 @@ const GettingStarted = () => {
 
         {/* Main Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-          {options.map((option) => (
-            <button
-              key={option.id}
-              onClick={option.action}
-              className="glass-card hover:shadow-glass transition-all duration-300 group"
-            >
-              <div className="flex items-center gap-4 mb-4">
-                <div className="p-3 bg-primary/20 rounded-lg group-hover:bg-primary/30 transition-colors">
-                  {option.icon}
+          {options.map((option) => {
+            const isDisabled = option.requiresAuth && !userStore.isAuthenticated;
+            const isFeatureDisabled = option.disabled;
+
+            return (
+              <button
+                key={option.id}
+                onClick={option.action}
+                disabled={isDisabled || isFeatureDisabled}
+                className={`glass-card hover:shadow-glass transition-all duration-300 group ${
+                  (isDisabled || isFeatureDisabled) ? 'opacity-60 cursor-not-allowed' : ''
+                }`}
+                title={isFeatureDisabled ? 'This feature is not available with your current plan' : ''}
+              >
+                <div className="flex items-center gap-4 mb-4">
+                  <div className={`p-3 rounded-lg transition-colors ${
+                    isDisabled || isFeatureDisabled
+                      ? 'bg-muted/20'
+                      : 'bg-primary/20 group-hover:bg-primary/30'
+                  }`}>
+                    {option.icon}
+                  </div>
+                  <div className="text-left">
+                    <h3 className="text-lg font-semibold text-foreground mb-1">
+                      {option.title}
+                    </h3>
+                    <p className="text-muted text-sm">
+                      {option.description}
+                    </p>
+                    {isDisabled && (
+                      <p className="text-xs text-orange-400 mt-1">Login required</p>
+                    )}
+                    {isFeatureDisabled && (
+                      <p className="text-xs text-orange-400 mt-1">Premium feature</p>
+                    )}
+                  </div>
                 </div>
-                <div className="text-left">
-                  <h3 className="text-lg font-semibold text-foreground mb-1">
-                    {option.title}
-                  </h3>
-                  <p className="text-muted text-sm">
-                    {option.description}
-                  </p>
+                <div className="flex justify-end">
+                  <div className={`w-6 h-6 rounded-full transition-colors flex items-center justify-center ${
+                    isDisabled || isFeatureDisabled
+                      ? 'bg-muted/20'
+                      : 'bg-primary/20 group-hover:bg-primary/40'
+                  }`}>
+                    <svg className="w-3 h-3 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
                 </div>
-              </div>
-              <div className="flex justify-end">
-                <div className="w-6 h-6 rounded-full bg-primary/20 group-hover:bg-primary/40 transition-colors flex items-center justify-center">
-                  <svg className="w-3 h-3 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </div>
-              </div>
-            </button>
-          ))}
+              </button>
+            );
+          })}
         </div>
 
-        {/* Phase Navigation for active wizard */}
-        {selectedWizard && (
-          <div className="mt-12 glass-card max-w-4xl mx-auto">
-            <div className="flex items-center justify-center gap-8 p-6">
-              <div className="flex items-center gap-4">
-                <div className="phase-indicator active">
-                  <span className="text-sm font-medium">
-                    {wizardTypes[selectedWizard]?.label || 'Getting Started'}
-                  </span>
+        {/* Template Selection */}
+        {selectedWizard === 'template' && (
+          <div className="mt-12 glass-card max-w-6xl mx-auto">
+            <div className="p-6">
+              <h2 className="text-2xl font-bold text-foreground mb-6">Choose a Template</h2>
+
+              {projectStore.isLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                  <span className="ml-3 text-muted">Loading templates...</span>
                 </div>
-                <div className="w-8 h-0.5 bg-muted"></div>
-                <div className="phase-indicator">
-                  <span className="text-sm">Customize Video</span>
+              ) : projectStore.templates.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {projectStore.templates.slice(0, 6).map((template) => (
+                    <button
+                      key={template._id}
+                      onClick={() => handleTemplateSelect(template)}
+                      className="glass p-4 rounded-lg hover:shadow-glass-sm transition-all duration-200 text-left group"
+                    >
+                      <div className="aspect-video bg-secondary/20 rounded mb-3 flex items-center justify-center">
+                        {template.thumbnail ? (
+                          <img
+                            src={template.thumbnail}
+                            alt={template.title}
+                            className="w-full h-full object-cover rounded"
+                          />
+                        ) : (
+                          <FileText className="w-12 h-12 text-muted opacity-50" />
+                        )}
+                      </div>
+                      <h3 className="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">
+                        {template.title}
+                      </h3>
+                      <p className="text-muted text-sm">
+                        {template.description || 'Professional video template'}
+                      </p>
+                    </button>
+                  ))}
                 </div>
-                <div className="w-8 h-0.5 bg-muted"></div>
-                <div className="phase-indicator">
-                  <span className="text-sm">Publish & Share</span>
+              ) : (
+                <div className="text-center py-12">
+                  <FileText className="w-16 h-16 text-muted opacity-50 mx-auto mb-4" />
+                  <p className="text-muted">No templates available</p>
                 </div>
+              )}
+
+              <div className="flex justify-end mt-6">
+                <button
+                  onClick={() => setSelectedWizard(null)}
+                  className="btn-secondary"
+                >
+                  Back
+                </button>
               </div>
             </div>
           </div>
@@ -125,6 +226,6 @@ const GettingStarted = () => {
       </div>
     </div>
   );
-};
+});
 
 export default GettingStarted;
