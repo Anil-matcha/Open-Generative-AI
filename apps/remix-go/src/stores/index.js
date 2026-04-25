@@ -1,10 +1,12 @@
 import { makeAutoObservable } from 'mobx';
 import UserStore from './UserStore';
 import ProjectStore from './ProjectStore';
+import VideoEditorStore from './VideoEditorStore';
 
 class RootStore {
   userStore = new UserStore();
   projectStore = new ProjectStore();
+  videoEditorStore = new VideoEditorStore();
 
   constructor() {
     makeAutoObservable(this);
@@ -32,6 +34,7 @@ class RootStore {
     this.projectStore.templates = [];
     this.projectStore.templateCategories = [];
     this.projectStore.error = null;
+    this.videoEditorStore.dispose();
   }
 }
 

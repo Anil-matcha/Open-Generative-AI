@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { observer } from 'mobx-react';
 import { FileText, Play, Upload, FolderOpen, Loader2 } from 'lucide-react';
 import { useProjectStore, useUserStore } from '../stores/StoreProvider';
+import VideoSelectionWorkspace from '../components/workspaces/VideoSelectionWorkspace';
+import NicheScriptsWorkspace from '../components/workspaces/NicheScriptsWorkspace';
 
 const GettingStarted = observer(() => {
   const navigate = useNavigate();
@@ -70,8 +72,13 @@ const GettingStarted = observer(() => {
       return;
     }
 
+    if (wizardType === 'generator') {
+      setSelectedWizard(wizardType);
+      return;
+    }
+
     try {
-      // For other wizards, create a basic project
+      // For upload wizard, create a basic project
       const projectData = {
         title: `New Project - ${wizardTypes[wizardType].label}`,
         wizardType,
@@ -83,6 +90,47 @@ const GettingStarted = observer(() => {
     } catch (error) {
       console.error('Failed to create project:', error);
       // For now, just navigate to editor
+      navigate('/editor');
+    }
+  };
+
+  const handleVideoSelected = async (videoData) => {
+    try {
+      const projectData = {
+        title: `New Project from Video`,
+        wizardType: 'upload',
+        video: videoData,
+        createdAt: new Date().toISOString(),
+      };
+
+      const project = await projectStore.createProject(projectData);
+      setSelectedWizard(null);
+      navigate('/editor');
+    } catch (error) {
+      console.error('Failed to create project:', error);
+      navigate('/editor');
+    }
+  };
+
+  const handleScriptSelected = async (scriptData) => {
+    try {
+      // For template generator, combine video selection with script
+      if (selectedWizard === 'generator') {
+        // In real implementation, this would be handled differently
+        // For now, just create project with script
+        const projectData = {
+          title: `New Project - ${scriptData.title}`,
+          wizardType: 'generator',
+          script: scriptData,
+          createdAt: new Date().toISOString(),
+        };
+
+        const project = await projectStore.createProject(projectData);
+        setSelectedWizard(null);
+        navigate('/editor');
+      }
+    } catch (error) {
+      console.error('Failed to create project:', error);
       navigate('/editor');
     }
   };
@@ -166,59 +214,80 @@ const GettingStarted = observer(() => {
           })}
         </div>
 
-        {/* Template Selection */}
-        {selectedWizard === 'template' && (
-          <div className="mt-12 glass-card max-w-6xl mx-auto">
-            <div className="p-6">
-              <h2 className="text-2xl font-bold text-foreground mb-6">Choose a Template</h2>
-
-              {projectStore.isLoading ? (
-                <div className="flex items-center justify-center py-12">
-                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                  <span className="ml-3 text-muted">Loading templates...</span>
-                </div>
-              ) : projectStore.templates.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {projectStore.templates.slice(0, 6).map((template) => (
-                    <button
-                      key={template._id}
-                      onClick={() => handleTemplateSelect(template)}
-                      className="glass p-4 rounded-lg hover:shadow-glass-sm transition-all duration-200 text-left group"
-                    >
-                      <div className="aspect-video bg-secondary/20 rounded mb-3 flex items-center justify-center">
-                        {template.thumbnail ? (
-                          <img
-                            src={template.thumbnail}
-                            alt={template.title}
-                            className="w-full h-full object-cover rounded"
-                          />
-                        ) : (
-                          <FileText className="w-12 h-12 text-muted opacity-50" />
-                        )}
-                      </div>
-                      <h3 className="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">
-                        {template.title}
-                      </h3>
-                      <p className="text-muted text-sm">
-                        {template.description || 'Professional video template'}
-                      </p>
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <FileText className="w-16 h-16 text-muted opacity-50 mx-auto mb-4" />
-                  <p className="text-muted">No templates available</p>
-                </div>
-              )}
-
-              <div className="flex justify-end mt-6">
+        {/* Workspace Modals */}
+        {selectedWizard && (
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="glass-card max-w-6xl w-full mx-4 max-h-[90vh] overflow-hidden">
+              <div className="flex justify-between items-center p-6 border-b border-border">
+                <h2 className="text-2xl font-bold text-foreground">
+                  {selectedWizard === 'template' && 'Choose a Template'}
+                  {selectedWizard === 'generator' && 'Template Generator'}
+                </h2>
                 <button
                   onClick={() => setSelectedWizard(null)}
-                  className="btn-secondary"
+                  className="p-2 hover:bg-secondary/20 rounded-lg transition-colors"
                 >
-                  Back
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
+              </div>
+
+              <div className="max-h-[calc(90vh-120px)] overflow-y-auto">
+                {selectedWizard === 'template' && (
+                  <div className="p-6">
+                    {projectStore.isLoading ? (
+                      <div className="flex items-center justify-center py-12">
+                        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                        <span className="ml-3 text-muted">Loading templates...</span>
+                      </div>
+                    ) : projectStore.templates.length > 0 ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {projectStore.templates.slice(0, 6).map((template) => (
+                          <button
+                            key={template._id}
+                            onClick={() => handleTemplateSelect(template)}
+                            className="glass p-4 rounded-lg hover:shadow-glass-sm transition-all duration-200 text-left group"
+                          >
+                            <div className="aspect-video bg-secondary/20 rounded mb-3 flex items-center justify-center">
+                              {template.thumbnail ? (
+                                <img
+                                  src={template.thumbnail}
+                                  alt={template.title}
+                                  className="w-full h-full object-cover rounded"
+                                />
+                              ) : (
+                                <FileText className="w-12 h-12 text-muted opacity-50" />
+                              )}
+                            </div>
+                            <h3 className="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">
+                              {template.title}
+                            </h3>
+                            <p className="text-muted text-sm">
+                              {template.description || 'Professional video template'}
+                            </p>
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-12">
+                        <FileText className="w-16 h-16 text-muted opacity-50 mx-auto mb-4" />
+                        <p className="text-muted">No templates available</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {selectedWizard === 'generator' && (
+                  <div className="flex h-[600px]">
+                    <div className="w-1/2 border-r border-border">
+                      <VideoSelectionWorkspace onVideoSelected={handleVideoSelected} />
+                    </div>
+                    <div className="w-1/2">
+                      <NicheScriptsWorkspace onScriptSelected={handleScriptSelected} />
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
