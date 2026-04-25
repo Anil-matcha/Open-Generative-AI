@@ -29,3 +29,8 @@ export const useProjectStore = () => {
   const { projectStore } = useStore();
   return projectStore;
 };
+
+export const useVideoEditorStore = () => {
+  const { videoEditorStore } = useStore();
+  return videoEditorStore;
+};

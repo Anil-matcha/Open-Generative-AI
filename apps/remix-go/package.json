@@ -10,7 +10,8 @@
     "lint": "eslint src --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.99.0",
+    "@supabase/supabase-js": "^2.39.0",
+    "@supabase/storage-js": "^2.5.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "lucide-react": "^0.460.0",
