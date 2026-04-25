@@ -1,8 +1,8 @@
 /**
  * ai Features Integration for Timeline Editor
  * Follows superpowers methodology with TDD approach
- * 
- * Integrates ai AI features (node workflows, AI editing tools, 
+ *
+ * Integrates ai AI features (node workflows, AI editing tools,
  * elements library, LLM assistant) into the timeline editor with
  * proper popup modals matching the editor's design system.
  */
@@ -42,45 +42,45 @@ export class AiFeaturePanel {
         <span>🎬 ai</span>
         <span class="ai-badge">AI Features</span>
       </div>
-      
+
       <div class="ai-features-grid">
-        <button class="ai-feature-btn" data-feature="node-workflow" 
+        <button class="ai-feature-btn" data-feature="node-workflow"
                 title="AI Workflow - Create generation pipelines with 50+ models">
           <span class="feature-icon">🧠</span>
           <span class="feature-label">AI Workflow</span>
         </button>
-        
+
         <button class="ai-feature-btn" data-feature="ai-tools"
                 title="AI Tools - Fill gaps, extend clips, generate music, SAM3 masking">
           <span class="feature-icon">⚡</span>
           <span class="feature-label">AI Tools</span>
         </button>
-        
+
         <button class="ai-feature-btn" data-feature="elements"
                 title="Elements Library - Characters, locations, props, vehicles">
           <span class="feature-icon">👤</span>
           <span class="feature-label">Elements</span>
         </button>
-        
+
         <button class="ai-feature-btn" data-feature="llm"
                 title="AI Assistant - Context-aware chat for editorial workflow">
           <span class="feature-icon">💬</span>
           <span class="feature-label">AI Assistant</span>
         </button>
-        
+
         <button class="ai-feature-btn" data-feature="timeline-tools"
                 title="NLE Tools - Advanced editing tools, dual viewers, timeline tabs">
           <span class="feature-icon">🎞️</span>
           <span class="feature-label">NLE Tools</span>
         </button>
-        
+
         <button class="ai-feature-btn" data-feature="export"
                 title="Export - Render to MP4 with professional presets">
           <span class="feature-icon">📤</span>
           <span class="feature-label">Export</span>
         </button>
       </div>
-      
+
       <div class="ai-active-panel" id="aiActivePanel">
         <p class="ai-hint">Select a feature to get started</p>
       </div>
@@ -95,7 +95,7 @@ export class AiFeaturePanel {
       btn.addEventListener('click', () => {
         const feature = btn.dataset.feature;
         this.openFeature(feature);
-        
+
         // Add tooltip on hover
         const tooltip = this.tooltipSystem.getTooltipText(feature);
         if (tooltip) {
@@ -114,7 +114,7 @@ export class AiFeaturePanel {
     tooltip.style.left = '50%';
     tooltip.style.transform = 'translateX(-50%)';
     tooltip.style.marginBottom = '8px';
-    
+
     btn.appendChild(tooltip);
     setTimeout(() => tooltip.remove(), 3000);
   }
@@ -164,7 +164,7 @@ export class AiFeaturePanel {
     `);
 
     document.body.appendChild(modal);
-    
+
     const canvasContainer = modal.querySelector('#nodeCanvasContainer');
     const nodeEditor = createNodeEditor(canvasContainer);
     nodeEditor.init();
@@ -333,7 +333,7 @@ export class AiFeaturePanel {
     const modal = createModal('AI Assistant', `
       <div class="llm-modal">
         <p class="modal-description">
-          Context-aware AI assistant for editorial workflow. 
+          Context-aware AI assistant for editorial workflow.
           Ask questions, search assets, propose cuts, and analyze timeline.
         </p>
         <div class="llm-modes">
@@ -347,7 +347,7 @@ export class AiFeaturePanel {
             <div class="message message--assistant">
               <span class="message__role">Assistant</span>
               <div class="message__content">
-                Hello! I'm your AI assistant. Ask me anything about your project, 
+                Hello! I'm your AI assistant. Ask me anything about your project,
                 search for assets, propose cuts, or analyze your timeline.
               </div>
             </div>
@@ -392,7 +392,7 @@ export class AiFeaturePanel {
           Advanced timeline editing tools with 10 professional editing modes,
           dual viewers, and timeline tabs.
         </p>
-        
+
         <div class="nle-tools-section">
           <h4>Editing Tools</h4>
           <div class="nle-tools-grid">
@@ -533,103 +533,11 @@ export class AiFeaturePanel {
   }
 
   // Handler methods
-  async handleFillGap(modal) {
-    const model = modal.querySelector('#fill-gap-model').value;
-    const duration = parseInt(modal.querySelector('#fill-gap-duration').value);
-    
-    const btn = modal.querySelector('#fillGapBtn');
-    btn.textContent = 'Generating...';
-    btn.disabled = true;
-
-    // Use aiMuAPI through the editing tools
-    const { aiMuAPI } = await import('./aiMuapi.js');
-    
-    try {
-      // Simulate generation for now
-      showToast('Generating footage to fill gap...', 'info');
-      setTimeout(() => {
-        showToast('Gap filled successfully!', 'success');
-        btn.textContent = 'Fill Gap';
-        btn.disabled = false;
-      }, 2000);
-    } catch (error) {
-      showToast('Failed to fill gap: ' + error.message, 'error');
-      btn.textContent = 'Fill Gap';
-      btn.disabled = false;
-    }
-  }
-
-  async handleExtendClip(modal) {
-    const direction = modal.querySelector('#extend-direction').value;
-    const duration = parseInt(modal.querySelector('#extend-duration').value);
-    
-    const btn = modal.querySelector('#extendClipBtn');
-    btn.textContent = 'Generating...';
-    btn.disabled = true;
-
-    try {
-      showToast(`Extending clip ${direction}...`, 'info');
-      setTimeout(() => {
-        showToast('Clip extended successfully!', 'success');
-        btn.textContent = 'Extend Clip';
-        btn.disabled = false;
-      }, 2000);
-    } catch (error) {
-      showToast('Failed to extend clip: ' + error.message, 'error');
-      btn.textContent = 'Extend Clip';
-      btn.disabled = false;
-    }
-  }
-
-  async handleGenerateMusic(modal) {
-    const genre = modal.querySelector('#music-genre').value;
-    const mood = modal.querySelector('#music-mood').value;
-    
-    const btn = modal.querySelector('#generateMusicBtn');
-    btn.textContent = 'Generating...';
-    btn.disabled = true;
-
-    try {
-      showToast(`Generating ${mood} ${genre} music...`, 'info');
-      setTimeout(() => {
-        showToast('Music generated and added to timeline!', 'success');
-        btn.textContent = 'Generate Music';
-        btn.disabled = false;
-      }, 2500);
-    } catch (error) {
-      showToast('Failed to generate music: ' + error.message, 'error');
-      btn.textContent = 'Generate Music';
-      btn.disabled = false;
-    }
-  }
-
-  async handleSAM3Masking(modal) {
-    const promptType = modal.querySelector('#mask-prompt-type').value;
-    const textPrompt = modal.querySelector('#mask-text-prompt').value;
-    
-    const btn = modal.querySelector('#sam3MaskBtn');
-    btn.textContent = 'Processing...';
-    btn.disabled = true;
-
-    try {
-      showToast('Segmenting objects with SAM3...', 'info');
-      setTimeout(() => {
-        showToast('Mask applied successfully!', 'success');
-        btn.textContent = 'Apply Mask';
-        btn.disabled = false;
-      }, 2000);
-    } catch (error) {
-      showToast('Failed to apply mask: ' + error.message, 'error');
-      btn.textContent = 'Apply Mask';
-      btn.disabled = false;
-    }
-  }
-
   async handleLLMMessage(message, modal) {
     if (!message.trim()) return;
 
     const messagesContainer = modal.querySelector('.llm-messages');
-    
+
     // Add user message
     const userMsg = document.createElement('div');
     userMsg.className = 'message message--user';
@@ -649,7 +557,7 @@ export class AiFeaturePanel {
     try {
       // Simulate LLM response
       setTimeout(() => {
-        assistantMsg.querySelector('.message__content').innerHTML = 
+        assistantMsg.querySelector('.message__content').innerHTML =
           `I can help you with that. Based on your project timeline, here are some suggestions...`;
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
       }, 1500);
@@ -749,7 +657,7 @@ export class AiFeaturePanel {
 function createModal(title, content, parentModal = null) {
   const overlay = document.createElement('div');
   overlay.className = 'modal-overlay';
-  
+
   const modalContent = document.createElement('div');
   modalContent.className = 'modal-content';
   modalContent.innerHTML = `

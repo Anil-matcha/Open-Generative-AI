@@ -1,5 +1,13 @@
 import { getModelById, getVideoModelById, getI2IModelById, getI2VModelById, getV2VModelById, getLipSyncModelById } from './models.js';
 import { uploadFileToStorage } from './supabase.js';
+import { SecurityService } from './services/SecurityService.js';
+import { RetryService } from './services/RetryService.js';
+import { RateLimiter } from './services/RateLimiter.js';
+import { CircuitBreaker } from './services/CircuitBreaker.js';
+import { CacheService } from './services/CacheService.js';
+import { WebSocketService } from './services/WebSocketService.js';
+import { MonitoringService } from './services/MonitoringService.js';
+import { ErrorBoundary } from './services/ErrorBoundary.js';
 
 export class MuapiClient {
     constructor() {
@@ -11,62 +19,158 @@ export class MuapiClient {
         } else {
             this.proxyUrl = `${supabaseUrl}/functions/v1/muapi-proxy`;
         }
+
+        // Initialize production-ready services
+        this.security = new SecurityService();
+        this.retry = new RetryService();
+        this.rateLimiter = new RateLimiter();
+        this.circuitBreaker = new CircuitBreaker();
+        this.cache = new CacheService();
+        this.websocket = new WebSocketService();
+        this.monitoring = new MonitoringService();
+        this.errorBoundary = new ErrorBoundary();
+
         this.activeControllers = new Map(); // For request cancellation
+        this.requestIds = new Set(); // For deduplication
+
+        this.initialize();
     }
 
-    getKey() {
-        const key = localStorage.getItem('muapi_key');
+    async initialize() {
+        try {
+            await this.security.initialize();
+            await this.websocket.connect();
+            this.monitoring.start();
+        } catch (error) {
+            console.error('[MuapiClient] Initialization failed:', error);
+        }
+    }
+
+    async getKey() {
+        const key = await this.security.getDecryptedKey();
         if (!key) {
             console.warn('[MuapiClient] No API key configured. Please set your API key in settings.');
             throw new Error('API key not configured. Please set your API key in the application settings.');
         }
-        // Validate key format (basic check)
-        if (key.length < 20) {
-            console.warn('[MuapiClient] API key appears to be invalid (too short).');
-            throw new Error('Invalid API key format. Please check your API key.');
+
+        // Validate key format
+        const validation = this.security.validateApiKey(key);
+        if (!validation.valid) {
+            console.warn('[MuapiClient] API key validation failed:', validation.reason);
+            throw new Error(`Invalid API key: ${validation.reason}`);
         }
+
         return key;
     }
 
-    // Generic makeRequest method for enhanced API calls
-    async makeRequest(endpoint, params = {}) {
+    async setApiKey(key) {
+        const validation = this.security.validateApiKey(key);
+        if (!validation.valid) {
+            throw new Error(`Invalid API key: ${validation.reason}`);
+        }
+
+        await this.security.storeEncryptedKey(key);
+    }
+
+    // Generic makeRequest method with production safeguards
+    async makeRequest(endpoint, params = {}, options = {}) {
+        const requestId = this.generateRequestId({ endpoint, params });
+
+        // Request deduplication
+        if (this.requestIds.has(requestId)) {
+            throw new Error('Duplicate request in progress');
+        }
+
+        this.requestIds.add(requestId);
+
         try {
-            const response = await fetch(this.proxyUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    endpoint,
-                    params,
-                    generationType: 'enhanced',
-                    studioType: 'enhanced'
-                })
+            return await this.errorBoundary.wrap(async () => {
+                // Rate limiting
+                await this.rateLimiter.acquire('api_request');
+
+                // Circuit breaker
+                if (!this.circuitBreaker.canProceed('api_request')) {
+                    throw new Error('Service temporarily unavailable');
+                }
+
+                // Cache check
+                const cached = this.cache.get(requestId);
+                if (cached && !options.skipCache) {
+                    this.monitoring.record('cache_hit', { type: 'api_request' });
+                    return cached;
+                }
+
+                // Execute request with retry logic
+                const result = await this.retry.execute(async () => {
+                    const controller = new AbortController();
+                    this.activeControllers.set(requestId, controller);
+
+                    try {
+                        const startTime = Date.now();
+                        const response = await fetch(this.proxyUrl, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                endpoint,
+                                params,
+                                generationType: 'enhanced',
+                                studioType: 'enhanced'
+                            }),
+                            signal: controller.signal
+                        });
+
+                        if (!response.ok) {
+                            const errText = await response.text();
+                            throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+                        }
+
+                        const data = await response.json();
+                        this.validateResponse(data, 'enhanced');
+
+                        this.monitoring.record('api_call', {
+                            type: 'api_request',
+                            duration: Date.now() - startTime,
+                            success: true
+                        });
+
+                        return data;
+
+                    } finally {
+                        this.activeControllers.delete(requestId);
+                    }
+                }, {
+                    maxAttempts: 3,
+                    baseDelay: 1000,
+                    onRetry: (attempt, error) => {
+                        this.monitoring.record('retry', { attempt, error: error.message });
+                    }
+                });
+
+                // Cache successful result
+                this.cache.set(requestId, result, 300000); // 5 minutes
+
+                this.circuitBreaker.recordSuccess('api_request');
+                return result;
+
+            }, { endpoint, params, requestId }, {
+                retry: true,
+                onError: (error) => {
+                    this.monitoring.record('error', {
+                        type: 'api_request',
+                        error: error.message,
+                        endpoint
+                    });
+                    this.circuitBreaker.recordFailure('api_request');
+                }
             });
 
-            if (!response.ok) {
-                const errText = await response.text();
-                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
-            }
-
-            const data = await response.json();
-            this.validateResponse(data, 'enhanced');
-
-            // If it's a direct result, return it
-            if (data.outputs || data.url || data.result) {
-                return data;
-            }
-
-            // If it has a request_id, poll for result
-            const requestId = data.request_id || data.id;
-            if (requestId) {
-                return await this.pollForResult(requestId, 60, 2000);
-            }
-
-            return data;
         } catch (error) {
-            console.error(`[MuapiClient] makeRequest failed for ${endpoint}:`, error);
+            this.circuitBreaker.recordFailure('api_request');
             throw error;
+        } finally {
+            this.requestIds.delete(requestId);
         }
     }
 
@@ -86,7 +190,20 @@ export class MuapiClient {
             controller.abort();
         }
         this.activeControllers.clear();
+        this.requestIds.clear();
         console.log('[MuapiClient] Cancelled all requests');
+    }
+
+    // Generate unique request ID for deduplication
+    generateRequestId(params) {
+        const key = JSON.stringify(params);
+        let hash = 0;
+        for (let i = 0; i < key.length; i++) {
+            const char = key.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash; // Convert to 32bit integer
+        }
+        return `req_${Math.abs(hash)}_${Date.now()}`;
     }
 
     // Validate API response structure
@@ -101,152 +218,219 @@ export class MuapiClient {
     }
 
     async generateImage(params, signal) {
-        const modelInfo = getModelById(params.model);
-        const endpoint = modelInfo?.endpoint || params.model;
+        const requestId = this.generateRequestId(params);
 
-        const finalPayload = {
-            prompt: params.prompt,
-        };
-
-        if (params.aspect_ratio) {
-            finalPayload.aspect_ratio = params.aspect_ratio;
+        if (this.requestIds.has(requestId)) {
+            throw new Error('Duplicate image generation request in progress');
         }
 
-        if (params.resolution) {
-            finalPayload.resolution = params.resolution;
-        }
-
-        if (params.quality) {
-            finalPayload.quality = params.quality;
-        }
-
-        if (params.image_url) {
-            finalPayload.image_url = params.image_url;
-            finalPayload.strength = params.strength || 0.6;
-        } else {
-            finalPayload.image_url = null;
-        }
-
-        if (params.seed && params.seed !== -1) {
-            finalPayload.seed = params.seed;
-        }
+        this.requestIds.add(requestId);
 
         try {
-            const response = await fetch(this.proxyUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    endpoint,
-                    params: finalPayload,
-                    generationType: 'image',
-                    studioType: params.studioType || 'image'
-                }),
-                signal
+            return await this.errorBoundary.wrap(async () => {
+                await this.rateLimiter.acquire('image_generation');
+
+                if (!this.circuitBreaker.canProceed('image_generation')) {
+                    throw new Error('Image generation service temporarily unavailable');
+                }
+
+                const cached = this.cache.get(requestId);
+                if (cached) {
+                    return cached;
+                }
+
+                const modelInfo = getModelById(params.model);
+                const endpoint = modelInfo?.endpoint || params.model;
+
+                const finalPayload = {
+                    prompt: params.prompt,
+                };
+
+                if (params.aspect_ratio) finalPayload.aspect_ratio = params.aspect_ratio;
+                if (params.resolution) finalPayload.resolution = params.resolution;
+                if (params.quality) finalPayload.quality = params.quality;
+                if (params.image_url) {
+                    finalPayload.image_url = params.image_url;
+                    finalPayload.strength = params.strength || 0.6;
+                } else {
+                    finalPayload.image_url = null;
+                }
+                if (params.seed && params.seed !== -1) finalPayload.seed = params.seed;
+
+                const result = await this.retry.execute(async () => {
+                    const controller = new AbortController();
+                    this.activeControllers.set(requestId, controller);
+
+                    try {
+                        const startTime = Date.now();
+                        const response = await fetch(this.proxyUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                endpoint,
+                                params: finalPayload,
+                                generationType: 'image',
+                                studioType: params.studioType || 'image'
+                            }),
+                            signal: controller.signal
+                        });
+
+                        if (!response.ok) {
+                            const errText = await response.text();
+                            throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+                        }
+
+                        const submitData = await response.json();
+                        this.validateResponse(submitData, 'submit');
+
+                        this.monitoring.record('api_call', {
+                            type: 'image_generation',
+                            duration: Date.now() - startTime,
+                            success: true
+                        });
+
+                        return submitData;
+
+                    } finally {
+                        this.activeControllers.delete(requestId);
+                    }
+                }, {
+                    maxAttempts: 3,
+                    baseDelay: 1000
+                });
+
+                const resultRequestId = result.request_id || result.id;
+                if (!resultRequestId) {
+                    this.cache.set(requestId, result, 300000);
+                    return result;
+                }
+
+                const finalResult = await this.pollForResult(resultRequestId, 60, 2000, signal);
+                const imageUrl = finalResult.outputs?.[0] || finalResult.url || finalResult.output?.url;
+
+                const completeResult = { ...finalResult, url: imageUrl };
+                this.cache.set(requestId, completeResult, 300000);
+
+                this.circuitBreaker.recordSuccess('image_generation');
+                return completeResult;
+
+            }, { params, requestId }, {
+                retry: true,
+                onError: (error) => {
+                    this.monitoring.record('error', {
+                        type: 'image_generation',
+                        error: error.message
+                    });
+                    this.circuitBreaker.recordFailure('image_generation');
+                }
             });
-
-            if (!response.ok) {
-                const errText = await response.text();
-                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
-            }
-
-            const submitData = await response.json();
-            this.validateResponse(submitData, 'submit');
-
-            const requestId = submitData.request_id || submitData.id;
-            if (!requestId) {
-                return submitData;
-            }
-
-            const result = await this.pollForResult(requestId, 60, 2000, signal);
-
-            // Validate output URL exists
-            const imageUrl = result.outputs?.[0] || result.url || result.output?.url;
-            if (!imageUrl) {
-                console.warn('[MuapiClient] No image URL in response, returning full result');
-            }
-            return { ...result, url: imageUrl };
 
         } catch (error) {
             if (error.name === 'AbortError') {
                 throw new Error('Request cancelled by user');
             }
             throw error;
+        } finally {
+            this.requestIds.delete(requestId);
         }
     }
 
     async pollForResult(requestId, maxAttempts = 60, baseInterval = 2000, signal) {
-        // Use exponential backoff with jitter for polling
-        const getInterval = (attempt) => {
-            const exponentialDelay = Math.min(baseInterval * Math.pow(1.5, attempt - 1), 30000); // Cap at 30s
-            const jitter = exponentialDelay * 0.2 * Math.random(); // 20% jitter
-            return exponentialDelay + jitter;
-        };
-
-        for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-            // Check if request was cancelled before sleeping
-            if (signal?.aborted) {
-                throw new Error('Request cancelled');
-            }
-
-            await new Promise(resolve => setTimeout(resolve, getInterval(attempt)));
-
-            // Check cancellation before making request
-            if (signal?.aborted) {
-                throw new Error('Request cancelled');
-            }
-
-            try {
-                const response = await fetch(this.proxyUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        endpoint: `predictions/${requestId}/result`,
-                        params: {},
-                        generationType: 'poll'
-                    }),
-                    signal
-                });
-
-                if (!response.ok) {
-                    if (response.status >= 500) continue;
-                    if (response.status === 404) {
-                        throw new Error('Request not found - may have expired');
-                    }
-                    const errText = await response.text();
-                    throw new Error(`Poll Failed: ${response.status} - ${errText.slice(0, 100)}`);
-                }
-
-                const data = await response.json();
-                this.validateResponse(data, 'poll');
-
-                const status = data.status?.toLowerCase();
-
-                if (status === 'completed' || status === 'succeeded' || status === 'success') {
-                    return data;
-                }
-
-                if (status === 'failed' || status === 'error') {
-                    throw new Error(`Generation failed: ${data.error || 'Unknown error'}`);
-                }
-
-                // Log progress for long-running tasks
-                if (attempt % 10 === 0) {
-                    console.log(`[MuapiClient] Still processing... attempt ${attempt}/${maxAttempts}`);
-                }
-
-            } catch (error) {
-                if (error.name === 'AbortError') {
-                    throw new Error('Request cancelled');
-                }
-                if (attempt === maxAttempts) throw error;
-            }
+        // Use WebSocket polling if available, fallback to HTTP polling
+        if (this.websocket.isConnected()) {
+            return await this.websocket.pollForResult(requestId, 'generation', maxAttempts, baseInterval);
         }
 
-        throw new Error('Generation timed out after polling.');
+        // Fallback HTTP polling with safeguards
+        return await this.errorBoundary.wrap(async () => {
+            const getInterval = (attempt) => {
+                const exponentialDelay = Math.min(baseInterval * Math.pow(1.5, attempt - 1), 30000);
+                const jitter = exponentialDelay * 0.2 * Math.random();
+                return exponentialDelay + jitter;
+            };
+
+            for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+                if (signal?.aborted) {
+                    throw new Error('Request cancelled');
+                }
+
+                await new Promise(resolve => setTimeout(resolve, getInterval(attempt)));
+
+                if (signal?.aborted) {
+                    throw new Error('Request cancelled');
+                }
+
+                try {
+                    const response = await fetch(this.proxyUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            endpoint: `predictions/${requestId}/result`,
+                            params: {},
+                            generationType: 'poll'
+                        }),
+                        signal
+                    });
+
+                    if (!response.ok) {
+                        if (response.status >= 500) continue;
+                        if (response.status === 404) {
+                            throw new Error('Request not found - may have expired');
+                        }
+                        const errText = await response.text();
+                        throw new Error(`Poll Failed: ${response.status} - ${errText.slice(0, 100)}`);
+                    }
+
+                    const data = await response.json();
+                    this.validateResponse(data, 'poll');
+
+                    const status = data.status?.toLowerCase();
+
+                    if (status === 'completed' || status === 'succeeded' || status === 'success') {
+                        this.monitoring.record('api_call', {
+                            type: 'poll_success',
+                            duration: Date.now() - (this.pollStartTime || Date.now()),
+                            success: true
+                        });
+                        return data;
+                    }
+
+                    if (status === 'failed' || status === 'error') {
+                        throw new Error(`Generation failed: ${data.error || 'Unknown error'}`);
+                    }
+
+                    if (attempt % 10 === 0) {
+                        console.log(`[MuapiClient] Still processing... attempt ${attempt}/${maxAttempts}`);
+                        this.monitoring.record('progress', {
+                            requestId,
+                            attempt,
+                            maxAttempts,
+                            status: data.status
+                        });
+                    }
+
+                } catch (error) {
+                    if (error.name === 'AbortError') {
+                        throw new Error('Request cancelled');
+                    }
+                    if (attempt === maxAttempts) throw error;
+                }
+            }
+
+            throw new Error('Generation timed out after polling.');
+
+        }, { requestId, maxAttempts }, {
+            retry: false, // Polling doesn't need retry
+            onError: (error) => {
+                this.monitoring.record('error', {
+                    type: 'polling',
+                    error: error.message,
+                    requestId
+                });
+            }
+        });
     }
 
     async generateVideo(params, signal) {

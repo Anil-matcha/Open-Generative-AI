@@ -1,3 +1,5 @@
+import { securityService } from './services/SecurityService.js';
+
 /**
  * Analytics and Event Tracking
  * Lightweight analytics implementation (replace with your preferred analytics service)
@@ -20,22 +22,31 @@ class Analytics {
         this.queue = [];
         this.sessionId = this.generateSessionId();
         this.sessionStart = Date.now();
-        this.userId = this.getUserId();
+        // Initialize userId asynchronously
+        this.initializeUserId();
+    }
+
+    async initializeUserId() {
+        this.userId = await this.getUserId();
     }
 
     generateSessionId() {
         return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     }
 
-    getUserId() {
+    async getUserId() {
         // Use a hash of the API key or generate an anonymous ID
-        const key = localStorage.getItem('muapi_key');
+        const key = await securityService.getDecryptedKey();
         if (key) {
             let hash = 0;
             for (let i = 0; i < key.length; i++) {
                 hash = ((hash << 5) - hash) + key.charCodeAt(i);
                 hash |= 0;
             }
+            return `user_${Math.abs(hash).toString(36)}`;
+        }
+        return `anon_${this.generateSessionId()}`;
+    }
             return `user_${Math.abs(hash).toString(36)}`;
         }
         return `anon_${Math.random().toString(36).substr(2, 9)}`;

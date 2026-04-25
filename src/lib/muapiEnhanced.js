@@ -1,12 +1,14 @@
+import { securityService } from './services/SecurityService.js';
+
 // MuAPI Configuration
 const MUAPI_BASE_URL = 'https://api.muapi.ai';
 
 /**
- * Get API key from localStorage
- * @returns {string} API key
+ * Get API key from secure storage
+ * @returns {Promise<string>} API key
  */
-function getApiKey() {
-  const key = localStorage.getItem('muapi_key');
+async function getApiKey() {
+  const key = await securityService.getDecryptedKey();
   if (!key) {
     throw new Error('MuAPI key not configured. Please set your API key in settings.');
   }
@@ -77,7 +79,7 @@ export async function generateTikTokCarousel(imageUrls, options = {}) {
   try {
     const result = await fetch(`${MUAPI_BASE_URL}/api/v1/generate_tiktok_carousel`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': getApiKey() },
+      headers: { 'Content-Type': 'application/json', 'x-api-key': await getApiKey() },
       body: JSON.stringify(payload)
     });
 
@@ -103,7 +105,7 @@ async function pollForCarouselResult(requestId) {
   for (let attempt = 0; attempt < 90; attempt++) { // 3 minutes timeout
     try {
       const result = await fetch(`${MUAPI_BASE_URL}/api/v1/predictions/${requestId}/result`, {
-        headers: { 'x-api-key': getApiKey() }
+        headers: { 'x-api-key': await getApiKey() }
       });
 
       if (result.ok) {
@@ -149,7 +151,7 @@ export async function uploadCarouselMusic(musicFile) {
 
     const result = await fetch(`${MUAPI_BASE_URL}/api/v1/upload`, {
       method: 'POST',
-      headers: { 'x-api-key': getApiKey() },
+      headers: { 'x-api-key': await getApiKey() },
       body: formData
     });
 
@@ -201,7 +203,7 @@ export async function generateCarouselPreview(imageUrls, options = {}) {
 
     const result = await fetch(`${MUAPI_BASE_URL}/api/v1/generate_carousel_preview`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': getApiKey() },
+      headers: { 'Content-Type': 'application/json', 'x-api-key': await getApiKey() },
       body: JSON.stringify(payload)
     });
 

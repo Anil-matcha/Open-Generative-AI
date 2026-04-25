@@ -53,8 +53,10 @@ export function getSupabaseAnonKey() {
   return supabaseAnonKey || '';
 }
 
-export function getUserKey() {
-  const key = localStorage.getItem('muapi_key');
+import { securityService } from './services/SecurityService.js';
+
+export async function getUserKey() {
+  const key = await securityService.getDecryptedKey();
   if (!key) return 'anonymous';
   let hash = 0;
   for (let i = 0; i < key.length; i++) {

@@ -1,0 +1,25 @@
+{
+  "name": "timeline-editor-load-testing",
+  "version": "1.0.0",
+  "description": "Load testing environment for AI agent integration",
+  "type": "module",
+  "main": "k6/scripts/main-test.js",
+  "scripts": {
+    "test:100": "k6 run --config k6/config/scale-100.json k6/scripts/main-test.js",
+    "test:1000": "k6 run --config k6/config/scale-1000.json k6/scripts/main-test.js",
+    "test:10000": "k6 run --config k6/config/scale-10000.json k6/scripts/main-test.js",
+    "error-test": "k6 run k6/scripts/error-test.js",
+    "report": "node k6/utils/reporting.js"
+  },
+  "keywords": [
+    "load-testing",
+    "k6",
+    "ai-agents",
+    "performance-testing"
+  ],
+  "author": "Kilo",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/k6": "^0.47.0"
+  }
+}

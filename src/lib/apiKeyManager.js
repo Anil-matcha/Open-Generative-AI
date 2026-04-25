@@ -1,32 +1,11 @@
+import { securityService } from './services/SecurityService.js';
+
 /**
- * Secure API Key Manager
- * 
- * Provides secure storage and retrieval of API keys.
- * Uses sessionStorage for temporary storage (cleared on tab close)
- * with optional localStorage backup that is obfuscated.
+ * API Key Manager - Wrapper around SecurityService
+ *
+ * Provides a simplified interface for API key management
+ * using the secure SecurityService for storage.
  */
-
-const API_KEY_STORAGE = 'muapi_key';
-const API_KEY_HASH_STORAGE = 'muapi_key_hash';
-
-// Simple obfuscation - NOT encryption, but adds a layer against casual reading
-const OBFUSCATION_SALT = 'muapi_2024_';
-
-function obfuscate(key) {
-    return btoa(OBFUSCATION_SALT + key);
-}
-
-function deobfuscate(obfuscated) {
-    try {
-        const decoded = atob(obfuscated);
-        if (decoded.startsWith(OBFUSCATION_SALT)) {
-            return decoded.slice(OBFUSCATION_SALT.length);
-        }
-        return null;
-    } catch {
-        return null;
-    }
-}
 
 // Hash the key for quick validation without exposing it
 async function hashKey(key) {
@@ -45,11 +24,10 @@ export class ApiKeyManager {
     }
 
     /**
-     * Set the API key
+     * Set the API key using SecurityService
      * @param {string} key - The API key
-     * @param {boolean} persist - Whether to persist to localStorage (default: true)
      */
-    async setKey(key, persist = true) {
+    async setKey(key) {
         if (!key || typeof key !== 'string') {
             throw new Error('Invalid API key');
         }
@@ -59,30 +37,32 @@ export class ApiKeyManager {
             throw new Error('API key too short');
         }
 
+        // Store using SecurityService (includes validation)
+        await securityService.storeEncryptedKey(trimmedKey);
+
         this._cachedKey = trimmedKey;
         this._cachedHash = await hashKey(trimmedKey);
-
-        // Store in sessionStorage (primary - cleared on tab close)
-        sessionStorage.setItem(API_KEY_STORAGE, obfuscate(trimmedKey));
-        sessionStorage.setItem(API_KEY_HASH_STORAGE, this._cachedHash);
-
-        // Optionally persist to localStorage with obfuscation
-        if (persist) {
-            localStorage.setItem(API_KEY_STORAGE, obfuscate(trimmedKey));
-            localStorage.setItem(API_KEY_HASH_STORAGE, this._cachedHash);
-        }
 
         this._notifyListeners();
     }
 
     /**
-     * Get the API key
-     * @returns {string|null}
+     * Get the API key from SecurityService
+     * @returns {Promise<string|null>}
      */
-    getKey() {
+    async getKey() {
         if (this._cachedKey) {
             return this._cachedKey;
         }
+
+        // Get from SecurityService
+        this._cachedKey = await securityService.getDecryptedKey();
+        if (this._cachedKey) {
+            this._cachedHash = await hashKey(this._cachedKey);
+        }
+
+        return this._cachedKey || null;
+    }
 
         // Try sessionStorage first
         const sessionKey = sessionStorage.getItem(API_KEY_STORAGE);

@@ -1,0 +1,15 @@
+# Load testing results and temporary files
+results/
+*.log
+*.tmp
+
+# Node.js dependencies (if any)
+node_modules/
+
+# k6 output files
+k6-output.json
+k6-report.html
+
+# Environment files
+.env
+.env.local

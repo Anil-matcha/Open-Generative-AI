@@ -1,0 +1,44 @@
+{
+  "options": {
+    "scenarios": {
+      "base_load_test": {
+        "executor": "ramping-vus",
+        "stages": [
+          {
+            "duration": "1m",
+            "target": 10
+          },
+          {
+            "duration": "3m",
+            "target": 50
+          },
+          {
+            "duration": "5m",
+            "target": 50
+          },
+          {
+            "duration": "1m",
+            "target": 0
+          }
+        ]
+      }
+    },
+    "thresholds": {
+      "http_req_duration": ["p(95)<3000"],
+      "http_req_failed": ["rate<0.05"],
+      "director_response_time": ["p(95)<5000"],
+      "screenwriter_response_time": ["p(95)<3000"],
+      "character_extractor_response_time": ["p(95)<4000"],
+      "camera_operator_response_time": ["p(95)<2000"],
+      "editor_response_time": ["p(95)<3000"],
+      "api_errors_total": ["rate<0.05"],
+      "auth_errors_total": ["rate<0.01"]
+    }
+  },
+  "environment": {
+    "BASE_URL": "https://api.muapi.ai",
+    "INITIAL_VUS": 10,
+    "PEAK_VUS": 50,
+    "FINAL_VUS": 0
+  }
+}
