@@ -176,7 +176,7 @@ export class AIVideoCreator extends BaseModal {
       qualitySelect.addEventListener('change', (e) => {
         this.quality = e.target.value;
       });
-    });
+    }
 
     // Footer buttons
     this.content.querySelector('[data-action="cancel"]')?.addEventListener('click', () => {

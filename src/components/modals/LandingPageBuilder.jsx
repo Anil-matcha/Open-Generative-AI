@@ -37,6 +37,10 @@ export class LandingPageBuilder extends BaseModal {
     this.generatedCode = '';
 
     // Inject styles for landing page builder
+    this.injectStyles();
+  }
+
+  injectStyles() {
     if (!document.querySelector('#landing-page-builder-styles')) {
       const style = document.createElement('style');
       style.id = 'landing-page-builder-styles';
@@ -58,21 +62,20 @@ export class LandingPageBuilder extends BaseModal {
           color: var(--muted);
           cursor: pointer;
           border-bottom: 2px solid transparent;
-          transition: all 0.15s ease;
-          font-weight: 500;
-        }
-
-        .tab-btn.active {
-          color: var(--cyan);
-          border-bottom-color: var(--cyan);
+          transition: all 0.2s ease;
         }
 
         .tab-btn:hover {
           color: var(--text);
         }
 
-        .tab-content {
-          min-height: 400px;
+        .tab-btn.active {
+          color: var(--primary);
+          border-bottom-color: var(--primary);
+        }
+
+        .builder-content {
+          padding: 24px 0;
         }
 
         .template-grid {
@@ -85,317 +88,118 @@ export class LandingPageBuilder extends BaseModal {
         .template-card {
           padding: 16px;
           border: 2px solid var(--border);
-          border-radius: 12px;
-          background: var(--panel);
+          border-radius: 8px;
           cursor: pointer;
-          transition: all 0.15s ease;
+          transition: all 0.2s ease;
           text-align: center;
         }
 
-        .template-card.selected {
-          border-color: var(--cyan);
-          background: rgba(34, 211, 238, 0.1);
-        }
-
         .template-card:hover {
-          border-color: var(--cyan);
-          transform: translateY(-2px);
+          border-color: var(--primary);
+          background: var(--panel-soft);
         }
 
-        .template-preview {
-          height: 120px;
-          border-radius: 8px;
-          margin-bottom: 12px;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          padding: 8px;
-          font-size: 12px;
-          color: var(--muted);
+        .template-card.selected {
+          border-color: var(--primary);
+          background: var(--primary-soft);
         }
 
-        .professional-preview { background: linear-gradient(135deg, #e3f2fd, #bbdefb); }
-        .corporate-preview { background: linear-gradient(135deg, #f5f5f5, #e0e0e0); }
-        .modern-preview { background: linear-gradient(135deg, #fff3e0, #ffe0b2); }
-        .minimal-preview { background: linear-gradient(135deg, #f9f9f9, #e0e0e0); }
-
-        .template-name {
-          font-weight: 600;
-          color: var(--text);
-          display: block;
-          margin-bottom: 4px;
-        }
-
-        .template-desc {
-          font-size: 11px;
-          color: var(--muted);
+        .branding-section {
+          margin-bottom: 24px;
         }
 
         .branding-options {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+          grid-template-columns: 1fr 1fr;
           gap: 16px;
+          margin-top: 12px;
         }
 
-        .branding-item {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-        }
-
-        .logo-upload-zone {
-          width: 80px;
-          height: 80px;
-          border: 2px dashed var(--border);
-          border-radius: 8px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          transition: all 0.15s ease;
-          font-size: 12px;
-          color: var(--muted);
-          text-align: center;
-        }
-
-        .logo-upload-zone:hover {
-          border-color: var(--cyan);
-          background: rgba(34, 211, 238, 0.1);
-        }
-
-        .logo-preview {
-          max-width: 100%;
-          max-height: 100%;
-          border-radius: 4px;
-        }
-
-        .color-picker {
-          width: 60px;
-          height: 40px;
-          border: none;
-          border-radius: 6px;
-          cursor: pointer;
-        }
-
-        .font-select {
-          padding: 8px;
+        .color-picker, .font-picker {
+          padding: 12px;
           border: 1px solid var(--border);
           border-radius: 6px;
           background: var(--panel);
-          color: var(--text);
         }
 
-        .content-options {
-          display: flex;
-          flex-direction: column;
-          gap: 16px;
-        }
-
-        .content-item {
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-        }
-
-        .content-item small {
-          color: var(--muted);
-          font-size: 11px;
-        }
-
-        .personalization-preview {
-          margin-top: 24px;
-          padding: 20px;
-          background: var(--panel);
-          border-radius: 12px;
-          border: 1px solid var(--border);
-        }
-
-        .preview-card {
-          text-align: center;
-        }
-
-        .preview-card h2 {
-          color: var(--text);
-          margin-bottom: 8px;
-        }
-
-        .preview-card p {
-          color: var(--muted);
-          margin-bottom: 16px;
-        }
-
-        .preview-card button {
-          background: var(--cyan);
-          color: white;
-          border: none;
-          padding: 10px 20px;
-          border-radius: 6px;
-          font-weight: 600;
-          cursor: pointer;
-        }
-
-        .components-list {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
+        .content-section {
           margin-bottom: 24px;
         }
 
-        .component-item {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          padding: 12px;
-          border: 1px solid var(--border);
-          border-radius: 8px;
-          background: var(--panel);
-          transition: all 0.15s ease;
+        .content-field {
+          margin-bottom: 16px;
         }
 
-        .component-item.active {
-          border-color: var(--cyan);
-          background: rgba(34, 211, 238, 0.05);
-        }
-
-        .component-item:hover {
-          border-color: var(--cyan);
-        }
-
-        .component-drag {
-          color: var(--muted);
-          cursor: grab;
-          font-size: 12px;
-        }
-
-        .component-info {
-          flex: 1;
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
-
-        .component-icon {
-          font-size: 20px;
-        }
-
-        .component-details {
-          display: flex;
-          flex-direction: column;
-        }
-
-        .component-name {
+        .content-field label {
+          display: block;
+          margin-bottom: 8px;
           font-weight: 500;
           color: var(--text);
         }
 
-        .component-desc {
-          font-size: 12px;
-          color: var(--muted);
-        }
-
-        .component-toggle {
-          position: relative;
-          display: inline-block;
-          width: 44px;
-          height: 24px;
-        }
-
-        .component-toggle input {
-          opacity: 0;
-          width: 0;
-          height: 0;
-        }
-
-        .toggle-slider {
-          position: absolute;
-          cursor: pointer;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background-color: var(--border);
-          transition: 0.3s;
-          border-radius: 24px;
-        }
-
-        .toggle-slider:before {
-          position: absolute;
-          content: "";
-          height: 18px;
-          width: 18px;
-          left: 3px;
-          bottom: 3px;
-          background-color: white;
-          transition: 0.3s;
-          border-radius: 50%;
-        }
-
-        input:checked + .toggle-slider {
-          background-color: var(--cyan);
-        }
-
-        input:checked + .toggle-slider:before {
-          transform: translateX(20px);
-        }
-
-        .config-section {
-          margin-bottom: 20px;
-          padding: 16px;
-          background: var(--panel);
-          border-radius: 8px;
+        .content-field input,
+        .content-field textarea {
+          width: 100%;
+          padding: 12px;
           border: 1px solid var(--border);
-        }
-
-        .config-section h5 {
-          margin-bottom: 12px;
+          border-radius: 6px;
+          background: var(--panel);
           color: var(--text);
+          font-size: 14px;
         }
 
-        .stats-grid {
+        .content-field textarea {
+          resize: vertical;
+          min-height: 80px;
+        }
+
+        .components-section {
+          margin-bottom: 24px;
+        }
+
+        .component-grid {
           display: grid;
-          grid-template-columns: 1fr 1fr;
+          grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
           gap: 12px;
+          margin-top: 12px;
         }
 
-        .stat-item {
-          display: flex;
-          gap: 8px;
+        .component-item {
+          padding: 12px;
+          border: 1px solid var(--border);
+          border-radius: 6px;
+          text-align: center;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          background: var(--panel);
         }
 
-        .stat-item input {
-          flex: 1;
+        .component-item:hover {
+          border-color: var(--primary);
+          background: var(--primary-soft);
         }
 
-        .code-section {
-          height: 500px;
-          display: flex;
-          flex-direction: column;
+        .component-item.selected {
+          border-color: var(--primary);
+          background: var(--primary-soft);
         }
 
-        .code-controls {
-          display: flex;
-          gap: 8px;
-          margin-bottom: 16px;
+        .preview-section {
+          margin-bottom: 24px;
         }
 
         .code-preview {
-          flex: 1;
-          background: #1e1e1e;
+          background: var(--panel);
+          border: 1px solid var(--border);
           border-radius: 8px;
           padding: 16px;
-          overflow: auto;
-          font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+          font-family: 'Monaco', 'Menlo', monospace;
           font-size: 12px;
           line-height: 1.4;
-        }
-
-        .code-preview code {
-          color: #d4d4d4;
-        }
-
-        .code-preview pre {
-          margin: 0;
+          max-height: 300px;
+          overflow-y: auto;
+          white-space: pre-wrap;
+          color: var(--text);
         }
 
         .code-stats {
@@ -450,6 +254,7 @@ export class LandingPageBuilder extends BaseModal {
       `;
       document.head.appendChild(style);
     }
+  }
 
   renderBody() {
     return `

@@ -51,7 +51,6 @@ export class GTMPromptModal extends BaseModal {
     this.isGenerating = false;
     this.generationStep = 0;
     this.showAdvanced = false;
-    this.showCinematicOptions = true;
 
     // Callback for when prompt is generated
     this.onPromptGenerated = options.onPromptGenerated || (() => {});
@@ -272,9 +271,10 @@ export class GTMPromptModal extends BaseModal {
   renderGenerationProgress() {
     const steps = [
       'Analyzing GTM methodologies...',
-      'Applying sales frameworks...',
+      'Applying cinematic storytelling...',
+      'Integrating visual & audio elements...',
       'Optimizing for conversion...',
-      'Finalizing prompt...'
+      'Finalizing cinematic prompt...'
     ];
 
     return `
@@ -290,7 +290,7 @@ export class GTMPromptModal extends BaseModal {
   renderGeneratedPrompt() {
     return `
       <div class="generated-prompt-section">
-        <label>Generated GTM-Optimized Prompt</label>
+        <label>Generated Cinematic Prompt</label>
         <div class="generated-prompt-container">
           <textarea readonly class="generated-prompt">${this.generatedPrompt}</textarea>
           <button class="copy-prompt-btn" data-action="copy-prompt" style="background: var(--app-primary);">
@@ -441,53 +441,6 @@ export class GTMPromptModal extends BaseModal {
     }
   }
 
-
-
-  getRoleContext(role) {
-    const contexts = {
-      sdr: '🎯 SDR/BDR Focus: Prospecting & Qualification\n• Target cold/warm leads with pain-point driven messaging\n• Focus on problem identification and solution introduction\n• End with clear next steps for engagement',
-      ae: '💼 AE Focus: Discovery & Value Proposition\n• Target qualified prospects ready for detailed solutions\n• Demonstrate ROI and business impact\n• Address specific challenges and requirements',
-      'sales-manager': '📊 Sales Manager Focus: Pipeline Acceleration\n• Showcase team capabilities and success metrics\n• Build credibility through case studies and results\n• Position as strategic partner for growth',
-      revops: '⚙️ RevOps Focus: Process Optimization\n• Highlight efficiency gains and automation benefits\n• Demonstrate data-driven decision making\n• Show scalability and operational excellence',
-      csm: '🤝 CSM Focus: Customer Success & Expansion\n• Emphasize retention, growth, and long-term value\n• Showcase support capabilities and proactive service\n• Demonstrate customer-centric approach',
-      founder: '🚀 Founder Focus: Vision & Strategy\n• Communicate big-picture vision and market opportunity\n• Build executive-level credibility and thought leadership\n• Position as strategic partner for transformation'
-    };
-    return contexts[role] || '';
-  }
-
-  getIndustryContext(industry) {
-    const contexts = {
-      saas: '🏢 SaaS Industry Context\n• Address subscription model concerns and ROI metrics\n• Focus on user adoption, scalability, and integration\n• Highlight competitive advantages and market position',
-      fintech: '💰 FinTech Industry Context\n• Emphasize security, compliance, and regulatory requirements\n• Focus on transaction processing, risk management, and innovation\n• Demonstrate financial technology expertise and reliability',
-      healthcare: '🏥 Healthcare Industry Context\n• Address HIPAA compliance and patient data security\n• Focus on clinical workflows, patient outcomes, and care quality\n• Highlight regulatory compliance and industry expertise',
-      manufacturing: '🏭 Manufacturing Industry Context\n• Address operational efficiency and production optimization\n• Focus on supply chain, quality control, and cost reduction\n• Demonstrate industry-specific manufacturing knowledge',
-      'professional-services': '💼 Professional Services Context\n• Emphasize expertise, methodology, and proven results\n• Focus on ROI, risk mitigation, and strategic value\n• Highlight service quality and relationship building'
-    };
-    return contexts[industry] || '';
-  }
-
-  getMethodologyContext(methodology) {
-    const contexts = {
-      meddpicc: '📋 MEDDPICC Framework\n• Metrics: Quantify business impact and ROI\n• Economic Buyer: Address executive-level decision making\n• Decision Criteria: Map decision-making process\n• Decision Process: Navigate complex buying committees\n• Paper Process: Handle procurement and legal requirements\n• Identify Pain: Uncover true business challenges\n• Champion: Develop internal advocates\n• Competition: Position against alternatives',
-      spin: '🔄 SPIN Selling Framework\n• Situation: Understand current business context\n• Problem: Identify challenges and pain points\n• Implication: Explore impact of unsolved problems\n• Need-payoff: Demonstrate value of proposed solutions\n• Build problems before presenting solutions\n• Focus on implications rather than features',
-      challenger: '⚔️ Challenger Framework\n• Teach: Provide unique insights and industry knowledge\n• Tailor: Customize messaging to specific situation\n• Take Control: Guide the conversation strategically\n• Build constructive tension around unsolved problems\n• Position as trusted advisor with unique perspective',
-      'gap-selling': '🎯 Gap Selling Framework\n• Current State: Assess existing situation and capabilities\n• Future State: Define desired outcomes and objectives\n• Gap Analysis: Identify difference between current and future state\n• Fill the Gap: Position solution as bridge to desired future\n• Focus on transformation and change management'
-    };
-    return contexts[methodology] || '';
-  }
-
-  getTonalityContext(tonality) {
-    const contexts = {
-      executive: '🎩 Executive Gravitas\n• Formal, authoritative language with industry expertise\n• Focus on strategic implications and business impact\n• Use sophisticated vocabulary and executive-level insights',
-      challenger: '⚡ Challenger Bold\n• Confident, assertive messaging that challenges assumptions\n• Provocative insights that make prospects think differently\n• Bold claims backed by data and unique perspectives',
-      conversational: '💬 Conversational Peer\n• Friendly, relatable tone like speaking to a colleague\n• Use "we" and "you" to build rapport and shared understanding\n• Practical, down-to-earth language and real-world examples',
-      technical: '🔧 Technical Expert\n• Demonstrate deep technical knowledge and expertise\n• Use industry-specific terminology appropriately\n• Focus on technical specifications and implementation details',
-      inspirational: '✨ Inspirational Vision\n• Paint compelling vision of future possibilities\n• Use aspirational language and motivational messaging\n• Focus on transformation and breakthrough results',
-      urgent: '🚨 Urgent Action\n• Create sense of urgency and time-sensitive opportunities\n• Use action-oriented language and clear deadlines\n• Emphasize immediate benefits and risk of inaction'
-    };
-    return contexts[tonality] || '';
-  }
-
   handleCopyPrompt() {
     if (!this.generatedPrompt) return;
 
@@ -507,5 +460,4 @@ export class GTMPromptModal extends BaseModal {
 // App-specific factory functions
 export function createGTMPromptModal(appTheme = 'timeline-editor') {
   return new GTMPromptModal({ appTheme });
-}</content>
-<parameter name="filePath">src/components/modals/GTMPromptModal.jsx
+}
