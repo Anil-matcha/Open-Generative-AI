@@ -18,11 +18,8 @@ export class DirectorAgent extends BaseAgent {
     };
   }
 
-  async execute(context) {
+  async executeInternal(context) {
     const { timelineState, options = {} } = context;
-    
-    this.reset();
-    this.setStatus('running', 0);
 
     try {
       this.setStatus('analyzing_structure', 15);

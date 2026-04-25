@@ -3,8 +3,9 @@ import { WorkflowEngine } from '../lib/workflow/WorkflowEngine';
 import { ModelRegistry } from '../lib/workflow/ModelRegistry';
 import { CanvasEditor } from './CanvasEditor';
 import { WorkflowNode, NodeType } from '../lib/workflow/WorkflowNode';
+import { EditorErrorBoundary, DashboardErrorBoundary } from './error-boundaries';
 
-export const WorkflowManager: React.FC = () => {
+const WorkflowManagerContent: React.FC = () => {
   const [engine] = useState(() => new WorkflowEngine());
   const [registry] = useState(() => {
     const reg = new ModelRegistry();
@@ -89,12 +90,22 @@ export const WorkflowManager: React.FC = () => {
 
       <div className="workflow-content">
         <div className="canvas-section">
-          <CanvasEditor
-            engine={engine}
-            registry={registry}
-            onNodeSelect={handleNodeSelect}
-            onNodeUpdate={handleNodeUpdate}
-          />
+          <EditorErrorBoundary
+            editorName="Workflow Canvas"
+            enableAutoRecovery={true}
+            recoveryDelay={2000}
+            onEditorError={(error, errorInfo, errorId) => {
+              console.error(`Workflow canvas error [${errorId}]:`, error);
+              // Could integrate with workflow-specific error tracking
+            }}
+          >
+            <CanvasEditor
+              engine={engine}
+              registry={registry}
+              onNodeSelect={handleNodeSelect}
+              onNodeUpdate={handleNodeUpdate}
+            />
+          </EditorErrorBoundary>
         </div>
 
         <div className="sidebar-section">
@@ -159,3 +170,15 @@ export const WorkflowManager: React.FC = () => {
     </div>
   );
 };
+
+export const WorkflowManager: React.FC = () => (
+  <DashboardErrorBoundary
+    dashboardName="Workflow Manager"
+    onDashboardError={(error, errorInfo, errorId) => {
+      console.error(`Workflow manager error [${errorId}]:`, error);
+      // Could integrate with workflow analytics
+    }}
+  >
+    <WorkflowManagerContent />
+  </DashboardErrorBoundary>
+);

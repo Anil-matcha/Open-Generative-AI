@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { WorkflowEngine, WorkflowNode, NodeType } from '../lib/workflow';
 import { ModelRegistry } from '../lib/workflow/ModelRegistry';
+import { ErrorBoundary } from './error-boundaries';
 
 interface CanvasEditorProps {
   engine: WorkflowEngine;
@@ -16,7 +17,7 @@ interface DragState {
   offsetY: number;
 }
 
-export const CanvasEditor: React.FC<CanvasEditorProps> = ({
+const CanvasEditorContent: React.FC<CanvasEditorProps> = ({
   engine,
   registry,
   onNodeSelect,
@@ -238,3 +239,52 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
     </div>
   );
 };
+
+export const CanvasEditor: React.FC<CanvasEditorProps> = (props) => (
+  <ErrorBoundary
+    onError={(error, errorInfo, errorId) => {
+      console.error(`Canvas editor error [${errorId}]:`, error);
+      // Could integrate with canvas-specific error tracking
+    }}
+    fallback={
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '400px',
+        padding: '20px',
+        backgroundColor: '#f8f9fa',
+        border: '2px dashed #dee2e6',
+        borderRadius: '8px',
+        textAlign: 'center'
+      }}>
+        <div style={{ fontSize: '48px', color: '#e74c3c', marginBottom: '16px' }}>
+          🎨
+        </div>
+        <h3 style={{ margin: '0 0 12px 0', color: '#495057' }}>
+          Canvas Error
+        </h3>
+        <p style={{ margin: '0 0 20px 0', color: '#6c757d' }}>
+          The canvas editor encountered an error and cannot be displayed.
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          style={{
+            padding: '8px 16px',
+            backgroundColor: '#007bff',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontSize: '14px'
+          }}
+        >
+          Reload Canvas
+        </button>
+      </div>
+    }
+  >
+    <CanvasEditorContent {...props} />
+  </ErrorBoundary>
+);

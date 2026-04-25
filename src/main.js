@@ -19,6 +19,7 @@ import { enforceHTTPS, validateEnvironment, generateCSPHeader } from './lib/secu
 import { escapeHtml, safeHtml } from './lib/security.js';
 import { initializeEnhancedMuAPI } from './lib/muapiEnhanced.js';
 import { loadConfig } from './lib/muapiConfig.js';
+import { initializeAIOptimizations } from './lib/services/aiIntegration.js';
 // Initialize environment validation
 const envConfig = initializeEnvironmentValidation();
 
@@ -58,10 +59,21 @@ window.performanceBudget = performanceBudget;
 // Initialize enhanced MuAPI system
 console.log('[App] Initializing enhanced MuAPI...');
 const muapiConfig = loadConfig();
-initializeEnhancedMuAPI(muapiConfig).then(success => {
+initializeEnhancedMuAPI(muapiConfig).then(async (success) => {
   if (success) {
     console.log('[App] Enhanced MuAPI initialized successfully');
     showToast('Enhanced AI features enabled', 'success', 3000);
+
+    // Initialize AI service optimizations after MuAPI is ready
+    console.log('[App] Initializing AI service optimizations...');
+    const aiResult = await initializeAIOptimizations();
+    if (aiResult.success) {
+      console.log('[App] AI optimizations enabled successfully');
+      showToast('AI optimizations active', 'success', 2000);
+    } else {
+      console.warn('[App] AI optimizations failed to initialize:', aiResult.error);
+      showToast('AI optimizations unavailable', 'warning', 3000);
+    }
   } else {
     console.log('[App] Enhanced MuAPI initialization failed, using basic features');
     showToast('Using basic AI features', 'info', 3000);

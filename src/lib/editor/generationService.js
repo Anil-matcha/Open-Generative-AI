@@ -10,6 +10,7 @@ import { GenerationModes, GenerationProviders, createDefaultProject } from './ty
 import { muapi } from '../muapi.js';
 import { t2vModels, i2vModels, getVideoModelById, getI2VModelById } from '../models.js';
 import { circuitBreaker } from '../services/CircuitBreaker.js';
+import { aiService } from '../services/aiService.js';
 
 // ============================================================================
 // CONFIGURATION
@@ -266,6 +267,19 @@ class GenerationService {
     this.provider = new MuAPIProvider();
     this.activeJobs = new Map();
     this.listeners = new Map();
+    this.aiService = aiService;
+    this.aiServiceEnabled = false;
+  }
+
+  /**
+   * Enable AI service optimizations
+   */
+  async enableAIOptimizations() {
+    if (!this.aiServiceEnabled) {
+      await this.aiService.initialize();
+      this.aiServiceEnabled = true;
+      console.log('[GenerationService] AI optimizations enabled');
+    }
   }
 
   configureProvider(name, config) {
@@ -276,6 +290,12 @@ class GenerationService {
   }
 
   async submit(request, provider = 'muapi') {
+    // Use AI service optimizations if enabled
+    if (this.aiServiceEnabled) {
+      return await this.submitWithAIOptimizations(request, provider);
+    }
+
+    // Fallback to direct provider submission
     const result = await this.provider.submit(request);
 
     if (result.status !== 'failed') {
@@ -294,6 +314,66 @@ class GenerationService {
     }
 
     return result;
+  }
+
+  /**
+   * Submit request with AI service optimizations
+   */
+  async submitWithAIOptimizations(request, provider = 'muapi') {
+    const aiRequest = {
+      type: request.mode,
+      params: request,
+      priority: this.determinePriority(request),
+      metadata: {
+        provider,
+        generationMode: request.mode,
+        model: request.model,
+        source: 'generationService'
+      }
+    };
+
+    try {
+      const result = await this.aiService.generate(aiRequest);
+
+      if (result.status !== 'failed') {
+        this.activeJobs.set(result.generationId, {
+          request,
+          provider,
+          status: result.status,
+          createdAt: Date.now(),
+        });
+
+        this.emit('job-created', {
+          generationId: result.generationId,
+          provider,
+          mode: request.mode,
+        });
+      }
+
+      return result;
+    } catch (error) {
+      console.warn('[GenerationService] AI service failed, falling back to direct provider:', error.message);
+      // Fallback to direct provider if AI service fails
+      return await this.submit(request, provider);
+    }
+  }
+
+  /**
+   * Determine request priority based on generation mode and context
+   */
+  determinePriority(request) {
+    const priorityMap = {
+      'text-to-video': 'medium',
+      'image-to-video': 'high',
+      'retake': 'high',
+      'extend': 'medium',
+      'broll': 'low',
+      'generate-image': 'high',
+      'remove-background': 'low',
+      'text-to-speech': 'medium'
+    };
+
+    return priorityMap[request.mode] || 'medium';
   }
 
   /**
@@ -409,6 +489,66 @@ class GenerationService {
   }
 
   /**
+   * Submit multiple requests in batch with AI optimizations
+   * @param {Array} requests - Array of generation requests
+   * @param {Object} options - Batch options
+   * @returns {Promise<Array>} Array of results
+   */
+  async submitBatch(requests, options = {}) {
+    if (!this.aiServiceEnabled) {
+      // Fallback to sequential processing
+      return await Promise.all(requests.map(req => this.submit(req)));
+    }
+
+    const aiRequests = requests.map(request => ({
+      type: request.mode,
+      params: request,
+      priority: this.determinePriority(request),
+      metadata: {
+        provider: options.provider || 'muapi',
+        generationMode: request.mode,
+        model: request.model,
+        source: 'generationService',
+        batchId: options.batchId || Date.now()
+      }
+    }));
+
+    try {
+      const batchResults = await this.aiService.generateBatch(aiRequests, options);
+
+      // Register jobs for tracking
+      batchResults.forEach(result => {
+        if (result.status !== 'failed') {
+          const originalRequest = requests.find(req =>
+            req.prompt === result.params?.prompt &&
+            req.mode === result.params?.mode
+          );
+
+          if (originalRequest) {
+            this.activeJobs.set(result.generationId, {
+              request: originalRequest,
+              provider: options.provider || 'muapi',
+              status: result.status,
+              createdAt: Date.now(),
+            });
+
+            this.emit('job-created', {
+              generationId: result.generationId,
+              provider: options.provider || 'muapi',
+              mode: originalRequest.mode,
+            });
+          }
+        }
+      });
+
+      return batchResults;
+    } catch (error) {
+      console.warn('[GenerationService] Batch processing failed, falling back to sequential:', error.message);
+      return await Promise.all(requests.map(req => this.submit(req)));
+    }
+  }
+
+  /**
    * Get circuit breaker status for graceful degradation
    * @returns {Object} Circuit breaker status
    */
@@ -478,6 +618,34 @@ class GenerationService {
     // This could be implemented to return recently generated content
     // for the same or similar prompts when the service is unavailable
     return [];
+  }
+
+  /**
+   * Get AI service optimization status
+   * @returns {Object} AI service status
+   */
+  getAIOptimizationStatus() {
+    if (!this.aiServiceEnabled) {
+      return { enabled: false };
+    }
+
+    return {
+      enabled: true,
+      health: this.aiService.getHealthStatus(),
+      cacheStats: this.aiService.intelligentCache.getStats(),
+      rateLimitStats: this.aiService.advancedRateLimiter.getStats(),
+      deduplicationStats: this.aiService.requestDeduplicator.getStats()
+    };
+  }
+
+  /**
+   * Configure AI service optimizations
+   * @param {Object} config - AI service configuration
+   */
+  configureAIOptimizations(config) {
+    if (this.aiServiceEnabled) {
+      this.aiService.configure(config);
+    }
   }
 
   /**

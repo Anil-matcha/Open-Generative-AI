@@ -1,3 +1,5 @@
+import { aiService } from '../services/aiService.js';
+
 /**
  * Base Agent Class
  * Foundation for all ViMax-inspired agents integrated into timeline editor
@@ -12,6 +14,19 @@ export class BaseAgent {
     this.result = null;
     this.error = null;
     this.listeners = [];
+    this.aiService = aiService;
+    this.aiOptimizationsEnabled = false;
+  }
+
+  /**
+   * Enable AI service optimizations for this agent
+   */
+  async enableAIOptimizations() {
+    if (!this.aiOptimizationsEnabled) {
+      await this.aiService.initialize();
+      this.aiOptimizationsEnabled = true;
+      console.log(`[${this.name}] AI optimizations enabled`);
+    }
   }
 
   on(event, callback) {
@@ -57,6 +72,76 @@ export class BaseAgent {
   async execute(context) {
     this.reset();
     this.setStatus('running', 0);
+
+    // Use AI service optimizations if enabled
+    if (this.aiOptimizationsEnabled) {
+      return await this.executeWithAIOptimizations(context);
+    }
+
+    // Continue with normal execution
+    return await this.executeInternal(context);
+  }
+
+  /**
+   * Execute with AI service optimizations
+   */
+  async executeWithAIOptimizations(context) {
+    const aiRequest = {
+      type: 'agent-execution',
+      params: {
+        agentName: this.name,
+        context
+      },
+      priority: this.determineExecutionPriority(context),
+      metadata: {
+        agent: this.name,
+        executionMode: context.mode || 'standard',
+        source: 'baseAgent'
+      }
+    };
+
+    try {
+      const result = await this.aiService.generate(aiRequest);
+
+      if (result.status === 'completed' && result.data) {
+        this.setResult(result.data);
+        return result.data;
+      } else if (result.status === 'cached') {
+        this.setResult(result.data);
+        return result.data;
+      } else {
+        throw new Error(result.error || 'AI service execution failed');
+      }
+    } catch (error) {
+      console.warn(`[${this.name}] AI service failed, falling back to direct execution:`, error.message);
+      return await this.executeInternal(context);
+    }
+  }
+
+  /**
+   * Internal execution method (to be implemented by subclasses)
+   */
+  async executeInternal(context) {
+    // Default implementation - should be overridden by subclasses
+    throw new Error('executeInternal must be implemented by subclass');
+  }
+
+  /**
+   * Determine execution priority based on context
+   */
+  determineExecutionPriority(context) {
+    // High priority for time-sensitive operations
+    if (context.urgent || context.priority === 'high') {
+      return 'high';
+    }
+
+    // Medium priority for standard operations
+    if (context.mode === 'analysis' || context.mode === 'suggestions') {
+      return 'medium';
+    }
+
+    // Low priority for background tasks
+    return 'low';
   }
 }
 

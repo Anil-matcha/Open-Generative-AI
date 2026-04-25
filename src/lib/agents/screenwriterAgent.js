@@ -18,11 +18,8 @@ export class ScreenwriterAgent extends BaseAgent {
     };
   }
 
-  async execute(context) {
+  async executeInternal(context) {
     const { timelineState, selectedClips = [], mode = 'scene' } = context;
-    
-    this.reset();
-    this.setStatus('running', 0);
 
     try {
       this.setStatus('analyzing', 20);
