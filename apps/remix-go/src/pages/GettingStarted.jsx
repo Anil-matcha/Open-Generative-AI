@@ -21,10 +21,10 @@ const GettingStarted = observer(() => {
 
   useEffect(() => {
     // Load templates when component mounts
-    if (userStore.isAuthenticated && projectStore.templates.length === 0) {
+    if (projectStore.templates.length === 0) {
       projectStore.loadTemplates();
     }
-  }, [userStore.isAuthenticated, projectStore]);
+  }, [projectStore]);
 
   const options = [
     {
@@ -34,7 +34,6 @@ const GettingStarted = observer(() => {
       icon: <FileText className="w-8 h-8" />,
       action: () => handleWizardSelection('template'),
       wizardType: wizardTypes.template,
-      requiresAuth: false,
     },
     {
       id: 'generator',
@@ -43,8 +42,6 @@ const GettingStarted = observer(() => {
       icon: <Play className="w-8 h-8" />,
       action: () => handleWizardSelection('generator'),
       wizardType: wizardTypes.generator,
-      requiresAuth: true,
-      disabled: !userStore.canUsePersonalization,
     },
     {
       id: 'upload',
@@ -53,7 +50,6 @@ const GettingStarted = observer(() => {
       icon: <Upload className="w-8 h-8" />,
       action: () => handleWizardSelection('upload'),
       wizardType: wizardTypes.upload,
-      requiresAuth: false,
     },
     {
       id: 'projects',
@@ -62,7 +58,6 @@ const GettingStarted = observer(() => {
       icon: <FolderOpen className="w-8 h-8" />,
       action: () => navigate('/editor'),
       external: true,
-      requiresAuth: true,
     },
   ];
 
@@ -161,57 +156,34 @@ const GettingStarted = observer(() => {
 
         {/* Main Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-          {options.map((option) => {
-            const isDisabled = option.requiresAuth && !userStore.isAuthenticated;
-            const isFeatureDisabled = option.disabled;
-
-            return (
-              <button
-                key={option.id}
-                onClick={option.action}
-                disabled={isDisabled || isFeatureDisabled}
-                className={`glass-card hover:shadow-glass transition-all duration-300 group ${
-                  (isDisabled || isFeatureDisabled) ? 'opacity-60 cursor-not-allowed' : ''
-                }`}
-                title={isFeatureDisabled ? 'This feature is not available with your current plan' : ''}
-              >
-                <div className="flex items-center gap-4 mb-4">
-                  <div className={`p-3 rounded-lg transition-colors ${
-                    isDisabled || isFeatureDisabled
-                      ? 'bg-muted/20'
-                      : 'bg-primary/20 group-hover:bg-primary/30'
-                  }`}>
-                    {option.icon}
-                  </div>
-                  <div className="text-left">
-                    <h3 className="text-lg font-semibold text-foreground mb-1">
-                      {option.title}
-                    </h3>
-                    <p className="text-muted text-sm">
-                      {option.description}
-                    </p>
-                    {isDisabled && (
-                      <p className="text-xs text-orange-400 mt-1">Login required</p>
-                    )}
-                    {isFeatureDisabled && (
-                      <p className="text-xs text-orange-400 mt-1">Premium feature</p>
-                    )}
-                  </div>
+          {options.map((option) => (
+            <button
+              key={option.id}
+              onClick={option.action}
+              className="glass-card hover:shadow-glass transition-all duration-300 group"
+            >
+              <div className="flex items-center gap-4 mb-4">
+                <div className="p-3 bg-primary/20 rounded-lg group-hover:bg-primary/30 transition-colors">
+                  {option.icon}
                 </div>
-                <div className="flex justify-end">
-                  <div className={`w-6 h-6 rounded-full transition-colors flex items-center justify-center ${
-                    isDisabled || isFeatureDisabled
-                      ? 'bg-muted/20'
-                      : 'bg-primary/20 group-hover:bg-primary/40'
-                  }`}>
-                    <svg className="w-3 h-3 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
+                <div className="text-left">
+                  <h3 className="text-lg font-semibold text-foreground mb-1">
+                    {option.title}
+                  </h3>
+                  <p className="text-muted text-sm">
+                    {option.description}
+                  </p>
                 </div>
-              </button>
-            );
-          })}
+              </div>
+              <div className="flex justify-end">
+                <div className="w-6 h-6 rounded-full bg-primary/20 group-hover:bg-primary/40 transition-colors flex items-center justify-center">
+                  <svg className="w-3 h-3 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </div>
+            </button>
+          ))}
         </div>
 
         {/* Workspace Modals */}

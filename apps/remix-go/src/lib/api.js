@@ -7,16 +7,11 @@ class ApiClient {
       timeout: 30000,
     });
 
-    // Request interceptor for auth headers
+    // Request interceptor for auth headers (disabled for demo)
     this.client.interceptors.request.use(
       (config) => {
-        const token = localStorage.getItem('apiToken');
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
-        }
-
+        // Skip authentication for demo mode
         // Add required headers for remix-api
-        config.headers['on-behalf'] = localStorage.getItem('userId') || 'default';
         config.headers['wl-domain'] = process.env.REACT_APP_WL_DOMAIN || 'videoremix.io';
 
         return config;
@@ -39,20 +34,20 @@ class ApiClient {
     );
   }
 
-  // Authentication methods
+  // Authentication methods (disabled in demo mode)
   async login(credentials) {
-    const response = await this.client.post('/api/auth/login', credentials);
-    return response.data;
+    // Demo mode - always succeed
+    return { user: { id: 'demo', name: 'Demo User' }, token: 'demo-token' };
   }
 
   async register(userData) {
-    const response = await this.client.post('/api/auth/register', userData);
-    return response.data;
+    // Demo mode - always succeed
+    return { user: { id: 'demo', name: 'Demo User' }, token: 'demo-token' };
   }
 
   async logout() {
-    const response = await this.client.post('/api/auth/logout');
-    return response.data;
+    // Demo mode - always succeed
+    return {};
   }
 
   // User methods
@@ -68,8 +63,27 @@ class ApiClient {
 
   // Project/Make methods
   async getUserProjects() {
-    const response = await this.client.get('/api/users/me/makes');
-    return response.data;
+    // Demo mode - return mock projects
+    return [
+      {
+        _id: '1',
+        title: 'Sample Project 1',
+        description: 'A sample video project',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        published: false,
+        thumbnail: '/api/placeholder/400/225',
+      },
+      {
+        _id: '2',
+        title: 'Sample Project 2',
+        description: 'Another sample video project',
+        createdAt: new Date(Date.now() - 86400000).toISOString(),
+        updatedAt: new Date(Date.now() - 86400000).toISOString(),
+        published: true,
+        thumbnail: '/api/placeholder/400/225',
+      }
+    ];
   }
 
   async getProject(projectId) {
@@ -78,8 +92,16 @@ class ApiClient {
   }
 
   async createProject(projectData) {
-    const response = await this.client.post('/api/users/me/makes', projectData);
-    return response.data;
+    // Demo mode - return mock project data
+    const mockProject = {
+      _id: Date.now().toString(),
+      ...projectData,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      published: false,
+      thumbnail: projectData.thumbnail || '/api/placeholder/400/225',
+    };
+    return mockProject;
   }
 
   async updateProject(projectId, projectData) {
@@ -99,13 +121,52 @@ class ApiClient {
 
   // Template methods
   async getTemplates() {
-    const response = await this.client.get('/api/makes/template-club');
-    return response.data;
+    // Demo mode - return mock templates
+    return [
+      {
+        _id: 'template1',
+        title: 'Business Presentation',
+        description: 'Professional business presentation template',
+        thumbnail: 'https://via.placeholder.com/300x200/4f46e5/ffffff?text=Business+Template',
+        category: 'business',
+        duration: '2:30',
+      },
+      {
+        _id: 'template2',
+        title: 'Product Demo',
+        description: 'Showcase your product features',
+        thumbnail: 'https://via.placeholder.com/300x200/059669/ffffff?text=Product+Demo',
+        category: 'product',
+        duration: '1:45',
+      },
+      {
+        _id: 'template3',
+        title: 'Customer Story',
+        description: 'Share customer testimonials',
+        thumbnail: 'https://via.placeholder.com/300x200/dc2626/ffffff?text=Customer+Story',
+        category: 'testimonial',
+        duration: '3:15',
+      },
+      {
+        _id: 'template4',
+        title: 'Tutorial Video',
+        description: 'Educational content template',
+        thumbnail: 'https://via.placeholder.com/300x200/7c3aed/ffffff?text=Tutorial',
+        category: 'education',
+        duration: '5:20',
+      }
+    ];
   }
 
   async getTemplateCategories() {
-    const response = await this.client.get('/api/make-categories/template-club');
-    return response.data;
+    // Demo mode - return mock categories
+    return [
+      { _id: 'business', name: 'Business', priority: 1 },
+      { _id: 'product', name: 'Product', priority: 2 },
+      { _id: 'testimonial', name: 'Testimonials', priority: 3 },
+      { _id: 'education', name: 'Education', priority: 4 },
+      { _id: 'marketing', name: 'Marketing', priority: 5 },
+    ];
   }
 
   // Pre-remix methods (for personalization)
@@ -142,18 +203,33 @@ class ApiClient {
 
   // Campaign methods
   async createEmailCampaign(campaignData) {
-    const response = await this.client.post('/api/campaigns/email', campaignData);
-    return response.data;
+    // Demo mode - return mock campaign
+    return {
+      id: Date.now().toString(),
+      ...campaignData,
+      status: 'created',
+      createdAt: new Date().toISOString(),
+    };
   }
 
   async createSocialCampaign(campaignData) {
-    const response = await this.client.post('/api/campaigns/social', campaignData);
-    return response.data;
+    // Demo mode - return mock campaign
+    return {
+      id: Date.now().toString(),
+      ...campaignData,
+      status: 'posted',
+      postedAt: new Date().toISOString(),
+    };
   }
 
   async createRetargetCampaign(campaignData) {
-    const response = await this.client.post('/api/campaigns/retarget', campaignData);
-    return response.data;
+    // Demo mode - return mock campaign
+    return {
+      id: Date.now().toString(),
+      ...campaignData,
+      status: 'active',
+      startedAt: new Date().toISOString(),
+    };
   }
 
   // Utility methods

@@ -15,11 +15,8 @@ class RootStore {
   // Initialize the app - load user data, etc.
   async initialize() {
     try {
-      await this.userStore.loadCurrentUser();
-      if (this.userStore.isAuthenticated) {
-        await this.projectStore.loadUserProjects();
-        await this.projectStore.loadTemplates();
-      }
+      // Skip user authentication - work in demo mode
+      await this.projectStore.loadTemplates();
     } catch (error) {
       console.error('Failed to initialize app:', error);
     }

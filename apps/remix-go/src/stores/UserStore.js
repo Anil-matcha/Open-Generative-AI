@@ -89,25 +89,25 @@ class UserStore {
   }
 
   get isAuthenticated() {
-    return !!this.user;
+    return true; // Always allow access in demo mode
   }
 
   get hasFeature() {
     return (featureName) => {
-      return this.user?.features?.[featureName]?.state === 'enabled';
+      return true; // All features enabled in demo mode
     };
   }
 
   get canAccessTemplates() {
-    return this.hasFeature('templates');
+    return true;
   }
 
   get canUsePersonalization() {
-    return this.hasFeature('personalization');
+    return true;
   }
 
   get canCreateCampaigns() {
-    return this.hasFeature('campaigns');
+    return true;
   }
 }
 
