@@ -8,6 +8,7 @@ import { showToast } from '../lib/loading.js';
 import { escapeHtml } from '../lib/security.js';
 import { muapi } from '../lib/muapi.js';
 import { AuthModal } from './AuthModal.js';
+import { GTMPromptModal } from './modals/GTMPromptModal.jsx';
 import { createUploadPicker } from './UploadPicker.js';
 import { 
   VISUAL_STYLES,
@@ -288,13 +289,27 @@ export function CinematicTemplateWizard(template, onComplete, onBack) {
       }
         
       case 'textarea': {
+        const textareaContainer = document.createElement('div');
+        textareaContainer.className = 'relative';
         const textarea = document.createElement('textarea');
         textarea.className = 'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder:text-muted focus:outline-none focus:border-primary/50 resize-none';
         textarea.rows = 3;
         textarea.placeholder = input.placeholder || '';
         textarea.value = inputs[input.name] || '';
         textarea.oninput = () => { inputs[input.name] = textarea.value; };
-        field.appendChild(textarea);
+        textareaContainer.appendChild(textarea);
+
+        // GTM Boost Button
+        const gtmBtn = document.createElement('button');
+        gtmBtn.className = 'absolute top-2 right-2 w-8 h-8 rounded-lg border bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40 transition-all flex items-center justify-center text-xs';
+        gtmBtn.title = '🚀 GTM Boost - Enhance prompt with cinematic elements and GTM methodologies';
+        gtmBtn.innerHTML = '🚀';
+        gtmBtn.onclick = () => {
+          openGTMPromptModal(textarea, input.name);
+        };
+        textareaContainer.appendChild(gtmBtn);
+
+        field.appendChild(textareaContainer);
         break;
       }
         
@@ -692,6 +707,29 @@ export function CinematicTemplateWizard(template, onComplete, onBack) {
       showToast(`Error: ${err.message}`, 'error');
       genBtn.disabled = false;
       genBtn.innerHTML = '✨ Start Generation';
+    }
+  }
+
+  // GTM Prompt Modal Function
+  function openGTMPromptModal(promptTextarea, fieldName) {
+    try {
+      const modal = new GTMPromptModal({
+        appTheme: 'cinematic-template-wizard',
+        onPromptGenerated: (generatedPrompt) => {
+          // Load the generated prompt into the textarea
+          promptTextarea.value = generatedPrompt;
+          promptTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+
+          // Update inputs
+          inputs[fieldName] = generatedPrompt;
+
+          console.log(`GTM-optimized prompt loaded successfully for ${fieldName}!`);
+        }
+      });
+      modal.open();
+    } catch (error) {
+      console.error('GTM Prompt Modal error:', error);
+      showToast('Failed to open GTM Prompt Enhancer', 'error');
     }
   }
 

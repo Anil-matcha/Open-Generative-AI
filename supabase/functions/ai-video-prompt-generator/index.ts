@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { basePrompt, role, industry, methodology, tonality, focus } = await req.json()
+    const { basePrompt, role, industry, methodology, tonality, focus, cinematicOptions } = await req.json()
 
     // Validate required parameters
     if (!basePrompt || !basePrompt.trim()) {
@@ -33,7 +33,8 @@ serve(async (req) => {
       industry,
       methodology,
       tonality,
-      focus
+      focus,
+      cinematicOptions
     })
 
     return new Response(
@@ -69,7 +70,8 @@ async function generateGTMPrompt({
   industry = 'general',
   methodology = 'general',
   tonality = 'professional',
-  focus = []
+  focus = [],
+  cinematicOptions = {}
 }) {
   const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY')
 
@@ -77,7 +79,7 @@ async function generateGTMPrompt({
     throw new Error('OpenAI API key not configured')
   }
 
-  const systemPrompt = buildSystemPrompt(role, industry, methodology, tonality, focus)
+  const systemPrompt = buildSystemPrompt(role, industry, methodology, tonality, focus, cinematicOptions)
   const userPrompt = `Base prompt: "${basePrompt}"
 
 Please enhance this prompt using the specified GTM methodologies and create a comprehensive, conversion-optimized prompt for video generation.`
@@ -117,16 +119,17 @@ Please enhance this prompt using the specified GTM methodologies and create a co
 /**
  * Build system prompt for OpenAI
  */
-function buildSystemPrompt(role, industry, methodology, tonality, focus) {
+function buildSystemPrompt(role, industry, methodology, tonality, focus, cinematicOptions = {}) {
   const roleContext = getRoleContext(role)
   const industryContext = getIndustryContext(industry)
   const methodologyContext = getMethodologyContext(methodology)
   const tonalityContext = getTonalityContext(tonality)
   const focusContext = getFocusContext(focus)
+  const cinematicContext = getCinematicContext(cinematicOptions)
 
-  return `You are a senior sales enablement expert specializing in GTM (Go-To-Market) methodologies and conversion-optimized content creation.
+  return `You are a master cinematic video director and senior sales enablement expert specializing in GTM (Go-To-Market) methodologies and conversion-optimized content creation.
 
-Your task is to enhance video generation prompts by applying enterprise sales frameworks and GTM best practices.
+Your task is to transform basic video prompts into professional cinematic masterpieces that incorporate enterprise sales frameworks, cinematic storytelling techniques, and conversion optimization.
 
 ROLE CONTEXT: ${roleContext}
 
@@ -138,17 +141,19 @@ TONALITY CONTEXT: ${tonalityContext}
 
 FOCUS AREAS: ${focusContext}
 
-INSTRUCTIONS:
-- Create prompts that incorporate sales methodologies naturally
-- Optimize for conversion and engagement
-- Use the specified tonality and writing style
-- Include industry-specific terminology and pain points
-- Structure prompts to drive specific outcomes based on target role
-- Ensure prompts are comprehensive and actionable
-- Focus on storytelling and emotional connection
-- Include specific visual and narrative elements that support sales goals
+CINEMATIC ELEMENTS: ${cinematicContext}
 
-Format the enhanced prompt as a complete, ready-to-use video generation prompt.`
+INSTRUCTIONS:
+- Create comprehensive cinematic video prompts that incorporate ALL selected cinematic elements
+- Apply GTM sales methodologies naturally throughout the video structure
+- Optimize for conversion using psychological triggers and emotional engagement
+- Use professional cinematography terminology and techniques
+- Structure prompts with clear sections for each cinematic element
+- Include specific visual, audio, pacing, and editing instructions
+- Focus on storytelling arcs that build emotional connection
+- Integrate CTAs seamlessly within the cinematic narrative flow
+
+Format the enhanced prompt as a complete, professional cinematic video prompt with clearly labeled sections for each element.`
 }
 
 /**
@@ -352,14 +357,51 @@ function getFocusContext(focus) {
 }
 
 /**
+ * Get cinematic context based on selected options
+ */
+function getCinematicContext(cinematicOptions = {}) {
+  const enabledElements = [];
+
+  if (cinematicOptions.openingHook) {
+    enabledElements.push('OPENING HOOKS: Include attention-grabbing hooks (curiosity gaps, emotional triggers, value promises, pattern interrupts) in the first 5 seconds');
+  }
+
+  if (cinematicOptions.storytellingStructure) {
+    enabledElements.push('STORYTELLING STRUCTURE: Apply 3-act structure (Hook 0-15s, Conflict/Build 15-75s, Resolution 75-100s) with hero\'s journey, transformation arcs, and emotional payoffs');
+  }
+
+  if (cinematicOptions.visualElements) {
+    enabledElements.push('VISUAL CINEMATOGRAPHY: Professional lighting (three-point setup), dynamic composition (rule of thirds, leading lines), camera work (dolly zooms, tracking shots), color grading for mood');
+  }
+
+  if (cinematicOptions.audioElements) {
+    enabledElements.push('AUDIO EXCELLENCE: Sound design (foley effects, ambient atmosphere), emotional music scoring, clear voiceover with varied pacing, strategic silence for emphasis');
+  }
+
+  if (cinematicOptions.pacingEditing) {
+    enabledElements.push('PACING & EDITING: Visual rhythm (5-15 second cuts), pacing shifts (speed ramping), montage sequences, attention control through editing patterns');
+  }
+
+  if (cinematicOptions.emotionalEngagement) {
+    enabledElements.push('EMOTIONAL ENGAGEMENT: Authentic reactions, relatable challenges, emotional arcs (low→peak→payoff), empathy building, show-don\'t-tell demonstrations');
+  }
+
+  if (cinematicOptions.ctaIntegration) {
+    enabledElements.push('CTA INTEGRATION: Strategic timing (after value delivery), narrative flow integration, multi-touchpoints (subscribe/like/share/contact), emotional momentum utilization');
+  }
+
+  return enabledElements.length > 0 ? enabledElements.join('; ') : 'Include basic cinematic elements for professional video production';
+}
+
+/**
  * Format the enhanced prompt
  */
 function formatEnhancedPrompt(enhancedPrompt, basePrompt) {
-  return `🎯 GTM-Optimized Video Prompt
+  return `🎬 CINEMATIC VIDEO PROMPT - GTM OPTIMIZED
 
 ${enhancedPrompt}
 
 ---
 Original Concept: ${basePrompt}
-Generated with GTM methodologies for maximum conversion impact.`
+Generated with GTM methodologies and cinematic techniques for maximum engagement and conversion impact.`
 }

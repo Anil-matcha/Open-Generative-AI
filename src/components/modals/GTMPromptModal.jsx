@@ -11,12 +11,12 @@ import { supabase } from '../../lib/supabase.js';
 export class GTMPromptModal extends BaseModal {
   constructor(options = {}) {
     super({
-      title: 'GTM Prompt Enhancer',
+      title: '🚀 GTM Boost - Cinematic Prompt Enhancement',
       size: 'large',
       showFooter: true,
       footerContent: `
         <button class="modal-btn modal-btn-secondary" data-action="cancel">Cancel</button>
-        <button class="modal-btn modal-btn-primary" data-action="generate">Generate Prompt</button>
+        <button class="modal-btn modal-btn-primary" data-action="generate">🚀 Generate Cinematic Prompt</button>
       `,
       ...options
     });
@@ -33,6 +33,17 @@ export class GTMPromptModal extends BaseModal {
     this.basePrompt = '';
     this.generatedPrompt = '';
 
+    // Cinematic Enhancement Options
+    this.cinematicOptions = {
+      openingHook: true,
+      storytellingStructure: true,
+      visualElements: true,
+      audioElements: true,
+      pacingEditing: true,
+      emotionalEngagement: true,
+      ctaIntegration: true
+    };
+
     // Advanced options
     this.focusAreas = [];
 
@@ -40,6 +51,7 @@ export class GTMPromptModal extends BaseModal {
     this.isGenerating = false;
     this.generationStep = 0;
     this.showAdvanced = false;
+    this.showCinematicOptions = true;
 
     // Callback for when prompt is generated
     this.onPromptGenerated = options.onPromptGenerated || (() => {});
@@ -126,6 +138,16 @@ export class GTMPromptModal extends BaseModal {
         primary: '#ec4899',
         accent: '#f472b6',
         secondary: '#6b7280'
+      },
+      'audio-studio': {
+        primary: '#a855f7',
+        accent: '#c084fc',
+        secondary: '#6b7280'
+      },
+      'cinematic-template-wizard': {
+        primary: '#7c3aed',
+        accent: '#a78bfa',
+        secondary: '#6b7280'
       }
     };
     return schemes[theme] || schemes['timeline-editor'];
@@ -135,10 +157,10 @@ export class GTMPromptModal extends BaseModal {
     return `
       <div class="gtm-prompt-modal" style="--app-primary: ${this.appColors.primary}; --app-accent: ${this.appColors.accent}; --app-secondary: ${this.appColors.secondary}">
         <div class="gtm-header">
-          <div class="gtm-icon">🎯</div>
+          <div class="gtm-icon">🚀</div>
           <div class="gtm-intro">
-            <h3>GTM-Powered Prompt Enhancement</h3>
-            <p>Create conversion-optimized video prompts using enterprise sales methodologies</p>
+            <h3>🚀 GTM Boost - Cinematic Prompt Enhancement</h3>
+            <p>Transform basic prompts into professional cinematic videos with GTM methodologies and storytelling mastery</p>
           </div>
         </div>
 
@@ -221,6 +243,19 @@ export class GTMPromptModal extends BaseModal {
                   <label><input type="checkbox" name="focus" value="awareness" ${this.focusAreas.includes('awareness') ? 'checked' : ''}> Brand Awareness</label>
                   <label><input type="checkbox" name="focus" value="education" ${this.focusAreas.includes('education') ? 'checked' : ''}> Education</label>
                   <label><input type="checkbox" name="focus" value="demo" ${this.focusAreas.includes('demo') ? 'checked' : ''}> Product Demo</label>
+                </div>
+              </div>
+
+              <div class="option-group">
+                <label>Cinematic Enhancement Elements</label>
+                <div class="checkbox-group">
+                  <label><input type="checkbox" name="cinematic" value="openingHook" ${this.cinematicOptions.openingHook ? 'checked' : ''}> Opening Hooks</label>
+                  <label><input type="checkbox" name="cinematic" value="storytellingStructure" ${this.cinematicOptions.storytellingStructure ? 'checked' : ''}> Storytelling Structure</label>
+                  <label><input type="checkbox" name="cinematic" value="visualElements" ${this.cinematicOptions.visualElements ? 'checked' : ''}> Visual Cinematography</label>
+                  <label><input type="checkbox" name="cinematic" value="audioElements" ${this.cinematicOptions.audioElements ? 'checked' : ''}> Audio Excellence</label>
+                  <label><input type="checkbox" name="cinematic" value="pacingEditing" ${this.cinematicOptions.pacingEditing ? 'checked' : ''}> Pacing & Editing</label>
+                  <label><input type="checkbox" name="cinematic" value="emotionalEngagement" ${this.cinematicOptions.emotionalEngagement ? 'checked' : ''}> Emotional Engagement</label>
+                  <label><input type="checkbox" name="cinematic" value="ctaIntegration" ${this.cinematicOptions.ctaIntegration ? 'checked' : ''}> CTA Integration</label>
                 </div>
               </div>
             </div>
@@ -312,6 +347,15 @@ export class GTMPromptModal extends BaseModal {
       });
     });
 
+    // Cinematic enhancement checkboxes
+    const cinematicCheckboxes = this.content.querySelectorAll('input[name="cinematic"]');
+    cinematicCheckboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', (e) => {
+        const value = e.target.value;
+        this.cinematicOptions[value] = e.target.checked;
+      });
+    });
+
     // Footer buttons
     this.content.querySelector('[data-action="cancel"]')?.addEventListener('click', () => {
       this.close();
@@ -339,7 +383,13 @@ export class GTMPromptModal extends BaseModal {
 
     try {
       // Update progress steps
-      const steps = ['Analyzing GTM methodologies...', 'Applying sales frameworks...', 'Optimizing for conversion...', 'Finalizing prompt...'];
+      const steps = [
+        'Analyzing GTM methodologies...',
+        'Applying cinematic storytelling...',
+        'Integrating visual & audio elements...',
+        'Optimizing for conversion...',
+        'Finalizing cinematic prompt...'
+      ];
 
       for (let i = 0; i < steps.length; i++) {
         this.generationStep = i;
@@ -348,14 +398,15 @@ export class GTMPromptModal extends BaseModal {
       }
 
       // Generate the optimized prompt using Supabase Edge Function
-      const { data, error } = await supabase.functions.invoke('ai-video-prompt-generator', {
+      const { data, error } = await supabase.functions.invoke('ai-cinematic-prompt-generator', {
         body: {
           basePrompt: this.basePrompt,
           role: this.selectedRole,
           industry: this.selectedIndustry,
           methodology: this.selectedMethodology,
           tonality: this.selectedTonality,
-          focus: this.focusAreas
+          focus: this.focusAreas,
+          cinematicOptions: this.cinematicOptions
         }
       });
 

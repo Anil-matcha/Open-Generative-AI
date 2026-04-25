@@ -2280,6 +2280,14 @@
   --app-primary-rgb: 236, 72, 153;
 }
 
+.gtm-prompt-modal[data-app="audio-studio"] {
+  --app-primary-rgb: 168, 85, 247;
+}
+
+.gtm-prompt-modal[data-app="cinematic-template-wizard"] {
+  --app-primary-rgb: 124, 58, 237;
+}
+
 @keyframes spin {
   to { transform: rotate(360deg); }
 }

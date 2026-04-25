@@ -31,13 +31,14 @@ class OpenAIService {
     industry,
     methodology,
     tonality,
-    focus = []
+    focus = [],
+    cinematicOptions = {}
   }) {
     if (!this.apiKey) {
       throw new Error('OpenAI API key not configured');
     }
 
-    const systemPrompt = this.buildSystemPrompt(role, industry, methodology, tonality, focus);
+    const systemPrompt = this.buildSystemPrompt(role, industry, methodology, tonality, focus, cinematicOptions);
     const userPrompt = `Base prompt: "${basePrompt}"
 
 Please enhance this prompt using the specified GTM methodologies and create a comprehensive, conversion-optimized prompt for video generation.`;
@@ -91,16 +92,17 @@ Please enhance this prompt using the specified GTM methodologies and create a co
   /**
    * Build system prompt for OpenAI based on GTM parameters
    */
-  buildSystemPrompt(role, industry, methodology, tonality, focus) {
+  buildSystemPrompt(role, industry, methodology, tonality, focus, cinematicOptions = {}) {
     const roleContext = this.getRoleContext(role);
     const industryContext = this.getIndustryContext(industry);
     const methodologyContext = this.getMethodologyContext(methodology);
     const tonalityContext = this.getTonalityContext(tonality);
     const focusContext = this.getFocusContext(focus);
+    const cinematicContext = this.getCinematicContext(cinematicOptions);
 
-    return `You are a senior sales enablement expert specializing in GTM (Go-To-Market) methodologies and conversion-optimized content creation.
+    return `You are a master cinematic video director and senior sales enablement expert specializing in GTM (Go-To-Market) methodologies and conversion-optimized content creation.
 
-Your task is to enhance video generation prompts by applying enterprise sales frameworks and GTM best practices.
+Your task is to transform basic video prompts into professional cinematic masterpieces that incorporate enterprise sales frameworks, cinematic storytelling techniques, and conversion optimization.
 
 ROLE CONTEXT: ${roleContext}
 
@@ -112,17 +114,19 @@ TONALITY CONTEXT: ${tonalityContext}
 
 FOCUS AREAS: ${focusContext}
 
-INSTRUCTIONS:
-- Create prompts that incorporate sales methodologies naturally
-- Optimize for conversion and engagement
-- Use the specified tonality and writing style
-- Include industry-specific terminology and pain points
-- Structure prompts to drive specific outcomes based on target role
-- Ensure prompts are comprehensive and actionable
-- Focus on storytelling and emotional connection
-- Include specific visual and narrative elements that support sales goals
+CINEMATIC ELEMENTS: ${cinematicContext}
 
-Format the enhanced prompt as a complete, ready-to-use video generation prompt.`;
+INSTRUCTIONS:
+- Create comprehensive cinematic video prompts that incorporate ALL selected cinematic elements
+- Apply GTM sales methodologies naturally throughout the video structure
+- Optimize for conversion using psychological triggers and emotional engagement
+- Use professional cinematography terminology and techniques
+- Structure prompts with clear sections for each cinematic element
+- Include specific visual, audio, pacing, and editing instructions
+- Focus on storytelling arcs that build emotional connection
+- Integrate CTAs seamlessly within the cinematic narrative flow
+
+Format the enhanced prompt as a complete, professional cinematic video prompt with clearly labeled sections for each element.`;
   }
 
   /**
@@ -329,16 +333,50 @@ Include qualification elements and risk mitigation`
    * Get focus area context
    */
   getFocusContext(focus) {
-    if (!focus || focus.length === 0) return 'General conversion optimization';
+    if (!focus || focus.length === 0) return 'General conversion optimization'
 
     const focusContexts = {
       'lead-gen': 'Lead Generation Focus: Optimize for capturing contact information and qualifying prospects',
       awareness: 'Brand Awareness Focus: Optimize for building recognition and consideration',
-      education: 'Education Focus: Optimize for teaching and knowledge transfer',
+      education: 'Education Focus: Optimize for teaching and knowledge sharing',
       demo: 'Product Demo Focus: Optimize for showcasing capabilities and benefits'
-    };
+    }
 
-    return focus.map(area => focusContexts[area]).filter(Boolean).join('; ');
+    return focus.map(area => focusContexts[area]).filter(Boolean).join('; ')
+  }
+
+  getCinematicContext(cinematicOptions = {}) {
+    const enabledElements = [];
+
+    if (cinematicOptions.openingHook) {
+      enabledElements.push('OPENING HOOKS: Include attention-grabbing hooks (curiosity gaps, emotional triggers, value promises, pattern interrupts) in the first 5 seconds');
+    }
+
+    if (cinematicOptions.storytellingStructure) {
+      enabledElements.push('STORYTELLING STRUCTURE: Apply 3-act structure (Hook 0-15s, Conflict/Build 15-75s, Resolution 75-100s) with hero\'s journey, transformation arcs, and emotional payoffs');
+    }
+
+    if (cinematicOptions.visualElements) {
+      enabledElements.push('VISUAL CINEMATOGRAPHY: Professional lighting (three-point setup), dynamic composition (rule of thirds, leading lines), camera work (dolly zooms, tracking shots), color grading for mood');
+    }
+
+    if (cinematicOptions.audioElements) {
+      enabledElements.push('AUDIO EXCELLENCE: Sound design (foley effects, ambient atmosphere), emotional music scoring, clear voiceover with varied pacing, strategic silence for emphasis');
+    }
+
+    if (cinematicOptions.pacingEditing) {
+      enabledElements.push('PACING & EDITING: Visual rhythm (5-15 second cuts), pacing shifts (speed ramping), montage sequences, attention control through editing patterns');
+    }
+
+    if (cinematicOptions.emotionalEngagement) {
+      enabledElements.push('EMOTIONAL ENGAGEMENT: Authentic reactions, relatable challenges, emotional arcs (low→peak→payoff), empathy building, show-don\'t-tell demonstrations');
+    }
+
+    if (cinematicOptions.ctaIntegration) {
+      enabledElements.push('CTA INTEGRATION: Strategic timing (after value delivery), narrative flow integration, multi-touchpoints (subscribe/like/share/contact), emotional momentum utilization');
+    }
+
+    return enabledElements.length > 0 ? enabledElements.join('; ') : 'Include basic cinematic elements for professional video production';
   }
 
   /**
