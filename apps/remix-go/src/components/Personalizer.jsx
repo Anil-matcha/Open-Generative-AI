@@ -20,6 +20,7 @@ const Personalizer = observer(({ onTokenChosen }) => {
         { key: '{{full_name}}', label: 'Full Name', example: 'John Doe' },
         { key: '{{email}}', label: 'Email', example: 'john@example.com' },
         { key: '{{phone}}', label: 'Phone', example: '(555) 123-4567' },
+        { key: '{{demo_user}}', label: 'Demo User', example: 'Demo User' },
       ]
     },
     {

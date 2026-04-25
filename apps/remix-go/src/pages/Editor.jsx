@@ -249,11 +249,26 @@ function Editor() {
         </div>
 
         {/* Canvas Area */}
-        <div className="flex-1 bg-secondary/20 flex items-center justify-center p-8">
-          <VideoPlayer
-            src={defaultVideoSrc}
-            className="max-w-4xl w-full"
-          />
+        <div className="flex-1 bg-secondary/20 p-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 h-full">
+            {/* Video Player */}
+            <div className="lg:col-span-2 flex items-center justify-center">
+              <VideoPlayer
+                src={defaultVideoSrc}
+                className="w-full max-w-4xl"
+              />
+            </div>
+
+            {/* Element Toolbar */}
+            <div className="lg:col-span-1">
+              <ElementToolbar />
+            </div>
+          </div>
+
+          {/* Timeline */}
+          <div className="mt-8">
+            <Timeline />
+          </div>
         </div>
       </div>
 
@@ -262,7 +277,10 @@ function Editor() {
         <button className="go-button action-button w-full">
           Preview
         </button>
-        <button className="go-button action-button w-full">
+        <button
+          onClick={() => navigate('/publisher')}
+          className="go-button action-button w-full"
+        >
           Publish & Share
         </button>
 
@@ -279,12 +297,18 @@ function Editor() {
         </div>
 
         <div className="mt-8">
-          <h3 className="text-lg font-semibold text-foreground mb-4">Personalizer</h3>
-          <button className="addon-button w-full">
-            <span>Dynamic Elements</span>
+          <h3 className="text-lg font-semibold text-foreground mb-4">Tools</h3>
+          <button className="addon-button w-full flex items-center gap-3">
+            <Palette className="w-4 h-4" />
+            <span>Add Text</span>
           </button>
-          <button className="addon-button w-full">
-            <span>Brand Colors</span>
+          <button className="addon-button w-full flex items-center gap-3">
+            <Image className="w-4 h-4" />
+            <span>Add Image</span>
+          </button>
+          <button className="addon-button w-full flex items-center gap-3">
+            <Settings className="w-4 h-4" />
+            <span>Personalizer</span>
           </button>
         </div>
       </ActionsPane>

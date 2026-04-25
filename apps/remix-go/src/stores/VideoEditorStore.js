@@ -28,6 +28,41 @@ class VideoEditorStore {
 
   constructor() {
     makeAutoObservable(this);
+    this.initializeDemoContent();
+  }
+
+  initializeDemoContent() {
+    // Add a demo text element after canvas is initialized
+    setTimeout(() => {
+      if (this.canvas) {
+        this.addTextElement({
+          text: 'Welcome to VideoRemix Go!',
+          left: 100,
+          top: 100,
+          fontSize: 32,
+          fill: '#ffffff',
+          stroke: '#000000',
+          strokeWidth: 2,
+        });
+      }
+    }, 2000);
+  }
+
+  initializeDemoContent() {
+    // Add a demo text element after canvas is initialized
+    setTimeout(() => {
+      if (this.canvas) {
+        this.addTextElement({
+          text: 'Welcome to VideoRemix Go!',
+          left: 100,
+          top: 100,
+          fontSize: 32,
+          fill: '#ffffff',
+          stroke: '#000000',
+          strokeWidth: 2,
+        });
+      }
+    }, 2000);
   }
 
   // Video methods

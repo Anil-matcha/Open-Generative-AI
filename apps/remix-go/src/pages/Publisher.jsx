@@ -19,9 +19,9 @@ import RetargetCampaign from '../components/campaigns/RetargetCampaign';
 
 function Publisher() {
   const [projectDetails, setProjectDetails] = useState({
-    title: 'My Video Project',
-    description: 'A personalized video created with VideoRemix Go',
-    tags: 'marketing, video, personalized'
+    title: 'Demo Video Project',
+    description: 'A personalized video created with VideoRemix Go - now ready to share with your audience!',
+    tags: 'marketing, video, personalized, demo'
   });
 
   const [embedUrl, setEmbedUrl] = useState('https://vidcloud.com/embed/abc123');
