@@ -4,6 +4,7 @@ import { createUploadPicker } from './UploadPicker.js';
 import { createInlineInstructions } from './InlineInstructions.js';
 import { createHeroSection } from '../lib/thumbnails.js';
 import { securityService } from '../lib/services/SecurityService.js';
+import { t2iModels } from '../lib/models.js';
 
 const SCENE_PRESETS = [
   'Studio white background', 'Luxury marble surface', 'Outdoor natural light',
@@ -48,28 +49,25 @@ export function CommercialStudio() {
   modelLabel.textContent = 'Model';
   formCard.appendChild(modelLabel);
 
-  const modelRow = document.createElement('div');
-  modelRow.className = 'flex gap-2';
-  [
-    { id: 'ai-product-shot', name: 'Product Shot' },
-    { id: 'ai-product-photography', name: 'Product Photography' },
-  ].forEach(m => {
-    const btn = document.createElement('button');
-    btn.className = m.id === selectedModel
-      ? 'flex-1 px-4 py-2.5 rounded-xl text-xs font-bold bg-primary text-black transition-all'
-      : 'flex-1 px-4 py-2.5 rounded-xl text-xs font-bold bg-white/5 text-secondary border border-white/10 hover:bg-white/10 transition-all';
-    btn.textContent = m.name;
-    btn.onclick = () => {
-      selectedModel = m.id;
-      modelRow.querySelectorAll('button').forEach(b => {
-        b.className = b.textContent === m.name
-          ? 'flex-1 px-4 py-2.5 rounded-xl text-xs font-bold bg-primary text-black transition-all'
-          : 'flex-1 px-4 py-2.5 rounded-xl text-xs font-bold bg-white/5 text-secondary border border-white/10 hover:bg-white/10 transition-all';
-      });
-    };
-    modelRow.appendChild(btn);
+  // Filter for MiniMax models
+  const minimaxModels = t2iModels.filter(m => m.id.includes('minimax'));
+
+  const modelSelect = document.createElement('select');
+  modelSelect.className = 'w-full px-4 py-2.5 rounded-xl text-sm bg-white/5 text-white border border-white/10 focus:border-primary focus:outline-none transition-all';
+  minimaxModels.forEach(model => {
+    const option = document.createElement('option');
+    option.value = model.id;
+    option.textContent = model.name;
+    if (model.id === selectedModel || (!selectedModel && minimaxModels.indexOf(model) === 0)) {
+      option.selected = true;
+      selectedModel = model.id;
+    }
+    modelSelect.appendChild(option);
   });
-  formCard.appendChild(modelRow);
+  modelSelect.onchange = () => {
+    selectedModel = modelSelect.value;
+  };
+  formCard.appendChild(modelSelect);
 
   const uploadLabel = document.createElement('label');
   uploadLabel.className = 'text-xs font-bold text-secondary uppercase tracking-wider';

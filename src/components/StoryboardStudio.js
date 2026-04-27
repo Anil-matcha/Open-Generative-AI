@@ -4,6 +4,7 @@ import { AuthModal } from './AuthModal.js';
 import { createInlineInstructions } from './InlineInstructions.js';
 import { createHeroSection } from '../lib/thumbnails.js';
 import { GTMPromptModal } from './modals/GTMPromptModal.jsx';
+import { t2iModels } from '../lib/models.js';
 
 // Toast notification system
 function showToast(message, type = 'info') {
@@ -246,6 +247,24 @@ export function StoryboardStudio() {
       }
       card.appendChild(imageArea);
 
+      // Model selector for character generation
+      const minimaxModels = t2iModels.filter(m => m.id.includes('minimax'));
+      if (minimaxModels.length > 0) {
+        const modelSelect = document.createElement('select');
+        modelSelect.className = 'w-full mb-2 px-3 py-1.5 rounded text-xs bg-white/5 text-white border border-white/10 focus:border-primary focus:outline-none';
+        minimaxModels.forEach(model => {
+          const option = document.createElement('option');
+          option.value = model.id;
+          option.textContent = model.name;
+          modelSelect.appendChild(option);
+        });
+        modelSelect.value = char.model || minimaxModels[0].id;
+        modelSelect.onchange = () => {
+          char.model = modelSelect.value;
+        };
+        card.appendChild(modelSelect);
+      }
+
       const genCharBtn = document.createElement('button');
       genCharBtn.className = 'w-full bg-white/10 text-white py-2 rounded-lg text-xs font-bold hover:bg-white/20 transition-all';
       genCharBtn.textContent = 'Generate Character Image';
@@ -281,7 +300,8 @@ export function StoryboardStudio() {
 
     try {
       const prompt = `Character portrait: ${char.name} - ${char.traits}, professional character design, cinematic lighting, high detail`;
-      const result = await muapi.generateImage({ model: 'flux-dev', prompt, aspect_ratio: '1:1' });
+      const selectedModel = char.model || t2iModels.find(m => m.id.includes('minimax'))?.id || 'flux-dev';
+      const result = await muapi.generateImage({ model: selectedModel, prompt, aspect_ratio: '1:1' });
       if (result?.url) {
         char.imageUrl = result.url;
         imageArea.innerHTML = `<img src="${result.url}" class="w-full h-full object-cover">`;
