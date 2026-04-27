@@ -136,7 +136,11 @@ export async function navigate(page, params = {}) {
   try {
     let element;
 
-    if (page.startsWith('template/')) {
+    if (page.startsWith('effects/template/')) {
+      const templateId = page.replace('effects/template/', '');
+      const mod = await import('../components/TemplateStudio.js');
+      element = mod.TemplateStudio(templateId);
+    } else if (page.startsWith('template/')) {
       const templateId = page.replace('template/', '');
       const mod = await import('../components/TemplateStudio.js');
       element = mod.TemplateStudio(templateId);

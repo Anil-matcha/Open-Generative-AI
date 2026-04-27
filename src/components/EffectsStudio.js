@@ -8,6 +8,8 @@ import { i2iModels, i2vModels } from '../lib/models.js';
 import { PIXVERSE_ADVANCED_EFFECTS } from '../lib/muapiConfig.js';
 import { createHeroSection } from '../lib/thumbnails.js';
 import { securityService } from '../lib/services/SecurityService.js';
+import { templates } from '../lib/templates.js';
+import { navigate } from '../lib/router.js';
 
 const EFFECT_TABS = [
   { id: 'image-effects', label: 'Image Effects', type: 'i2i', field: 'name' },
@@ -18,9 +20,15 @@ const EFFECT_TABS = [
   { id: 'motion-controls', label: 'Motion Controls', type: 'i2v', field: 'name' },
   { id: 'video-effects', label: 'Video FX v2', type: 'i2v', field: 'name' },
   { id: 'pixverse-advanced-effects', label: 'Pixverse Advanced', type: 'pixverse-advanced', field: 'name' },
+  { id: 'templates', label: 'Templates', type: 'templates', field: 'template' },
 ];
 
 function getEffectsForModel(modelId) {
+  // Special handling for templates tab
+  if (modelId === 'templates') {
+    return getEffectsTemplates();
+  }
+
   // Special handling for custom AI video effects - no preset effects needed
   if (modelId === 'custom-ai-video-effects') return [];
 
@@ -35,6 +43,17 @@ function getEffectsForModel(modelId) {
   const nameField = model.inputs?.name;
   if (nameField?.enum) return nameField.enum;
   return [];
+}
+
+// Filter templates to only include effects-related ones
+function getEffectsTemplates() {
+  return templates.filter(template => {
+    const effectsModels = [
+      'ai-video-effects', 'motion-controls', 'image-effects',
+      'flux-kontext-effects', 'video-effects', 'nano-banana-effects'
+    ];
+    return effectsModels.includes(template.model);
+  });
 }
 
 export function EffectsStudio() {
@@ -257,7 +276,7 @@ export function EffectsStudio() {
   function switchTab(tab) {
     activeTab = tab;
     selectedEffect = null;
-    selectedBadge.textContent = 'No effect selected';
+    selectedBadge.textContent = tab.id === 'templates' ? 'No template selected' : 'No effect selected';
     selectedBadge.className = 'text-xs font-bold text-muted';
 
     // Update prompt placeholders based on tab
@@ -266,6 +285,11 @@ export function EffectsStudio() {
       mobilePrompt.placeholder = 'Describe your desired video effect...';
       // Hide effects grid for custom tab
       effectsPanel.style.display = 'none';
+    } else if (tab.id === 'templates') {
+      promptInput.placeholder = 'Templates handle their own prompts...';
+      mobilePrompt.placeholder = 'Templates handle their own prompts...';
+      // Show effects grid for templates tab
+      effectsPanel.style.display = 'block';
     } else {
       promptInput.placeholder = 'Optional prompt...';
       mobilePrompt.placeholder = 'Optional prompt...';
@@ -352,6 +376,12 @@ export function EffectsStudio() {
 
   function renderEffects(filter = '') {
     effectsGrid.innerHTML = '';
+
+    // Special handling for templates tab
+    if (activeTab.id === 'templates') {
+      renderTemplates(filter);
+      return;
+    }
 
     // Special handling for custom AI video effects - no effect selection needed
     if (activeTab.id === 'custom-ai-video-effects') {
@@ -479,6 +509,77 @@ export function EffectsStudio() {
       const noResultsDiv = document.createElement('div');
       noResultsDiv.className = 'col-span-2 text-xs text-muted py-6 text-center';
       noResultsDiv.textContent = 'No effects match your search';
+      effectsGrid.appendChild(noResultsDiv);
+    }
+  }
+
+  function renderTemplates(filter = '') {
+    let templateList = getEffectsTemplates();
+
+    if (filter) {
+      templateList = templateList.filter(template =>
+        template.name.toLowerCase().includes(filter.toLowerCase()) ||
+        template.description.toLowerCase().includes(filter.toLowerCase()) ||
+        template.category.toLowerCase().includes(filter.toLowerCase())
+      );
+    }
+
+    templateList.forEach(template => {
+      const card = document.createElement('div');
+      card.className = 'bg-white/[0.03] border border-white/5 rounded-xl p-2 cursor-pointer hover:bg-white/[0.06] hover:border-white/10 transition-all group overflow-hidden';
+
+      // Template thumbnail
+      const thumbnailDiv = document.createElement('div');
+      thumbnailDiv.className = 'relative w-full aspect-square mb-2 rounded-lg overflow-hidden bg-white/5';
+
+      // Use template icon or default
+      const iconContainer = document.createElement('div');
+      iconContainer.className = 'w-full h-full flex items-center justify-center';
+      iconContainer.innerHTML = `<span class="text-2xl">${template.icon || '🎬'}</span>`;
+      thumbnailDiv.appendChild(iconContainer);
+
+      // Template content
+      const contentDiv = document.createElement('div');
+      contentDiv.className = 'flex flex-col gap-1';
+
+      const nameDiv = document.createElement('div');
+      nameDiv.className = 'text-[10px] font-bold text-white group-hover:text-primary transition-colors truncate';
+      nameDiv.textContent = template.name;
+
+      const descDiv = document.createElement('div');
+      descDiv.className = 'text-[9px] text-muted truncate';
+      descDiv.textContent = template.category;
+
+      contentDiv.appendChild(nameDiv);
+      contentDiv.appendChild(descDiv);
+
+      card.appendChild(thumbnailDiv);
+      card.appendChild(contentDiv);
+
+      card.onclick = () => {
+        selectedEffect = template.id;
+        effectsGrid.querySelectorAll('[data-selected]').forEach(el => {
+          el.removeAttribute('data-selected');
+          el.classList.remove('border-primary/50', 'bg-primary/5');
+          el.classList.add('border-white/5');
+        });
+        card.setAttribute('data-selected', '1');
+        card.classList.remove('border-white/5');
+        card.classList.add('border-primary/50', 'bg-primary/5');
+        selectedBadge.textContent = template.name;
+        selectedBadge.className = 'text-xs font-bold text-primary';
+
+        // Navigate to template creation
+        navigate(`effects/template/${template.id}`);
+      };
+
+      effectsGrid.appendChild(card);
+    });
+
+    if (templateList.length === 0) {
+      const noResultsDiv = document.createElement('div');
+      noResultsDiv.className = 'col-span-2 text-xs text-muted py-6 text-center';
+      noResultsDiv.textContent = filter ? 'No templates match your search' : 'No effect templates available';
       effectsGrid.appendChild(noResultsDiv);
     }
   }

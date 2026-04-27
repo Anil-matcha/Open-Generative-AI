@@ -96,15 +96,18 @@ export function TemplateStudio(templateId) {
   const centeredContainer = document.createElement('div');
   centeredContainer.className = 'mx-auto max-w-[980px]';
 
-  // Hero section - centered
+  // Hero section - improved layout with Figma-inspired design
   const heroSection = document.createElement('div');
-  heroSection.className = 'flex flex-col items-center text-center';
+  heroSection.className = 'flex flex-col items-center text-center mb-12';
 
-  // Thumbnail
+  // Enhanced thumbnail with better styling
   const thumbnailUrl = getTemplateThumbnail(template.id);
+  const thumbnailContainer = document.createElement('div');
+  thumbnailContainer.className = 'relative mb-8';
+
   const thumbnailEl = document.createElement('div');
-  thumbnailEl.className = 'mb-6 h-24 w-24 rounded-[28px] border border-emerald-400/20 shadow-[0_0_40px_rgba(16,185,129,0.10)] overflow-hidden';
-  
+  thumbnailEl.className = 'h-32 w-32 rounded-[32px] border-2 border-emerald-400/30 shadow-[0_0_60px_rgba(16,185,129,0.15)] overflow-hidden ring-4 ring-emerald-400/10';
+
   if (thumbnailUrl) {
     const img = document.createElement('img');
     img.src = thumbnailUrl;
@@ -112,30 +115,46 @@ export function TemplateStudio(templateId) {
     img.className = 'w-full h-full object-cover';
     thumbnailEl.appendChild(img);
   } else {
-    thumbnailEl.className += ' bg-[radial-gradient(circle_at_50%_40%,rgba(99,102,241,0.38),transparent_45%),radial-gradient(circle_at_60%_60%,rgba(34,211,238,0.22),transparent_42%),linear-gradient(180deg,#0e0d1b,#15122a)] flex items-center justify-center text-4xl';
-    thumbnailEl.textContent = template.icon || '🎬';
+    thumbnailEl.className += ' bg-gradient-to-br from-emerald-500/20 via-blue-500/20 to-purple-500/20 flex items-center justify-center';
+    const icon = document.createElement('div');
+    icon.className = 'text-6xl';
+    icon.textContent = template.icon || '🎬';
+    thumbnailEl.appendChild(icon);
   }
-  heroSection.appendChild(thumbnailEl);
+  thumbnailContainer.appendChild(thumbnailEl);
 
-  // Title
+  // Add subtle glow effect
+  const glow = document.createElement('div');
+  glow.className = 'absolute inset-0 rounded-[32px] bg-emerald-400/5 blur-xl -z-10';
+  thumbnailContainer.appendChild(glow);
+
+  heroSection.appendChild(thumbnailContainer);
+
+  // Enhanced title with better typography
   const title = document.createElement('h1');
-  title.className = 'text-5xl font-semibold tracking-tight';
+  title.className = 'text-6xl font-bold tracking-tight bg-gradient-to-r from-white via-white to-zinc-300 bg-clip-text text-transparent mb-4';
   title.textContent = template.name;
   heroSection.appendChild(title);
 
-  // Description
+  // Improved description
   const desc = document.createElement('p');
-  desc.className = 'mt-3 text-lg text-zinc-400';
+  desc.className = 'text-xl text-zinc-300 max-w-2xl leading-relaxed';
   desc.textContent = hasSpecs && specs.uiDescription ? specs.uiDescription : template.description;
   heroSection.appendChild(desc);
 
-  // Pills
+  // Enhanced pills with better spacing and styling
   const pills = document.createElement('div');
-  pills.className = 'mt-5 flex flex-wrap gap-2 justify-center';
+  pills.className = 'mt-8 flex flex-wrap gap-3 justify-center';
   pills.innerHTML = `
-    <span class="inline-flex rounded-full border border-emerald-400/30 bg-emerald-500/12 px-3 py-1 text-xs font-medium text-emerald-100">${template.outputType === 'video' ? 'Video' : 'Image'}</span>
-    <span class="inline-flex rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-medium text-white/75">${template.category}</span>
-    ${hasSpecs && specs.coreUseCase ? `<span class="inline-flex rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-medium text-white/75">${specs.coreUseCase}</span>` : ''}
+    <span class="inline-flex items-center rounded-full border border-emerald-400/40 bg-emerald-500/15 px-4 py-2 text-sm font-medium text-emerald-200 shadow-sm">
+      <span class="w-2 h-2 rounded-full bg-emerald-400 mr-2"></span>
+      ${template.outputType === 'video' ? 'Video Generation' : 'Image Generation'}
+    </span>
+    <span class="inline-flex items-center rounded-full border border-white/20 bg-white/[0.06] px-4 py-2 text-sm font-medium text-zinc-200">
+      <span class="w-2 h-2 rounded-full bg-zinc-400 mr-2"></span>
+      ${template.category}
+    </span>
+    ${hasSpecs && specs.coreUseCase ? `<span class="inline-flex items-center rounded-full border border-white/20 bg-white/[0.06] px-4 py-2 text-sm font-medium text-zinc-200"><span class="w-2 h-2 rounded-full bg-zinc-400 mr-2"></span>${specs.coreUseCase}</span>` : ''}
   `;
   heroSection.appendChild(pills);
   centeredContainer.appendChild(heroSection);
@@ -144,29 +163,41 @@ export function TemplateStudio(templateId) {
   const grid = document.createElement('div');
   grid.className = 'mt-10 grid gap-8 xl:grid-cols-[520px_1fr] xl:items-start';
 
-  // Left panel - Form inputs
+  // Left panel - Enhanced form inputs with Figma-inspired design
   const leftPanel = document.createElement('div');
-  leftPanel.className = 'rounded-[34px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.02))] p-6 shadow-[0_20px_80px_rgba(0,0,0,0.45)]';
+  leftPanel.className = 'rounded-[40px] border border-white/15 bg-gradient-to-b from-white/[0.08] to-white/[0.04] p-8 shadow-[0_25px_100px_rgba(0,0,0,0.5)] backdrop-blur-sm';
 
-  // Build form fields
+  // Form header
+  const formHeader = document.createElement('div');
+  formHeader.className = 'mb-6';
+  formHeader.innerHTML = `
+    <h2 class="text-2xl font-bold text-white mb-2">Configuration</h2>
+    <p class="text-zinc-400 text-sm">Customize your generation parameters</p>
+  `;
+  leftPanel.appendChild(formHeader);
+
+  // Build enhanced form fields
   allInputs.forEach(input => {
     const fieldWrapper = document.createElement('div');
-    fieldWrapper.className = 'mt-6 first:mt-0';
+    fieldWrapper.className = 'mb-6 last:mb-0';
 
     const label = document.createElement('div');
-    label.className = 'mb-3 flex items-center justify-between gap-3';
+    label.className = 'mb-4 flex items-center justify-between gap-3';
     label.innerHTML = `
-      <div class="text-[11px] font-semibold uppercase tracking-[0.22em] text-zinc-500">${input.label}</div>
-      ${input.type === 'text' || input.type === 'textarea' ? `<button class="enhancer-btn rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] transition border-white/10 bg-white/[0.03] text-zinc-400 hover:bg-white/[0.06] hover:text-white" data-field="${input.name}">Enhance</button>` : ''}
+      <div class="text-sm font-semibold text-zinc-200">${input.label}</div>
+      ${input.type === 'text' || input.type === 'textarea' ? `<button class="enhancer-btn rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-200 transition hover:bg-emerald-500/20 hover:border-emerald-400/50" data-field="${input.name}">✨ Enhance</button>` : ''}
     `;
     fieldWrapper.appendChild(label);
 
     if (input.type === 'image') {
       const uploadArea = document.createElement('div');
-      uploadArea.className = 'flex h-16 items-center gap-4 rounded-[20px] border border-white/10 bg-white/[0.03] px-4 text-zinc-400 cursor-pointer hover:border-emerald-400/30 transition';
+      uploadArea.className = 'group flex h-20 items-center gap-4 rounded-[24px] border-2 border-dashed border-white/20 bg-gradient-to-r from-white/[0.02] to-white/[0.01] px-6 text-zinc-400 cursor-pointer transition hover:border-emerald-400/40 hover:bg-emerald-500/5 hover:text-emerald-300';
       uploadArea.innerHTML = `
-        <div class="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-lg">↑</div>
-        <span class="text-sm">Click to upload an image</span>
+        <div class="flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-white/[0.03] text-xl group-hover:border-emerald-400/40 group-hover:bg-emerald-500/10 transition">📁</div>
+        <div class="flex-1">
+          <div class="text-sm font-medium text-zinc-300 group-hover:text-emerald-200">Upload Image</div>
+          <div class="text-xs text-zinc-500 group-hover:text-emerald-300/80">Click to browse or drag and drop</div>
+        </div>
       `;
       uploadArea.onclick = () => {
         const picker = createUploadPicker({
@@ -174,7 +205,8 @@ export function TemplateStudio(templateId) {
           onSelect: ({ url }) => {
             uploadedUrl = url;
             formState[input.name] = url;
-            uploadArea.innerHTML = `<div class="flex h-10 w-10 items-center justify-center rounded-full border border-emerald-400/30 bg-emerald-500/10 text-lg">✓</div><span class="text-sm text-emerald-200">Image uploaded</span>`;
+            uploadArea.innerHTML = `<div class="flex h-12 w-12 items-center justify-center rounded-full border border-emerald-400/40 bg-emerald-500/15 text-xl">✓</div><div class="flex-1"><div class="text-sm font-medium text-emerald-200">Image Uploaded</div><div class="text-xs text-emerald-300/80">Ready to generate</div></div>`;
+            uploadArea.className = uploadArea.className.replace('border-dashed border-white/20', 'border-solid border-emerald-400/40');
           },
           onClear: () => {
             uploadedUrl = null;
@@ -186,22 +218,25 @@ export function TemplateStudio(templateId) {
       fieldWrapper.appendChild(uploadArea);
     } else if (input.type === 'text' || input.type === 'textarea') {
       const el = document.createElement(input.type === 'textarea' ? 'textarea' : 'input');
-      el.className = 'h-11 w-full rounded-[18px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] px-4 text-sm text-white outline-none transition focus:border-emerald-400/50';
+      el.className = 'w-full rounded-[20px] border border-white/20 bg-gradient-to-b from-white/[0.08] to-white/[0.04] px-5 py-4 text-sm text-white placeholder-zinc-500 outline-none transition focus:border-emerald-400/60 focus:ring-2 focus:ring-emerald-400/20';
       if (input.type === 'textarea') {
-        el.className = 'w-full rounded-[18px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] px-4 py-3 text-sm text-white outline-none transition focus:border-emerald-400/50 resize-none';
-        el.rows = 3;
+        el.className += ' resize-none';
+        el.rows = 4;
+        el.style.minHeight = '100px';
+      } else {
+        el.className += ' h-12';
       }
       el.placeholder = input.placeholder || '';
       el.oninput = () => { formState[input.name] = el.value; };
       fieldWrapper.appendChild(el);
     } else if (input.type === 'select') {
       const select = document.createElement('select');
-      select.className = 'h-11 w-full rounded-[18px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] px-4 text-sm text-white outline-none transition focus:border-emerald-400/50 appearance-none cursor-pointer';
+      select.className = 'h-12 w-full rounded-[20px] border border-white/20 bg-gradient-to-b from-white/[0.08] to-white/[0.04] px-5 text-sm text-white outline-none transition focus:border-emerald-400/60 focus:ring-2 focus:ring-emerald-400/20 appearance-none cursor-pointer';
       (input.options || []).forEach(opt => {
         const option = document.createElement('option');
         option.value = opt;
         option.textContent = opt;
-        option.className = 'bg-zinc-950 text-white';
+        option.className = 'bg-zinc-900 text-white';
         select.appendChild(option);
       });
       if (input.options && input.options.length > 0) {
@@ -214,25 +249,33 @@ export function TemplateStudio(templateId) {
     leftPanel.appendChild(fieldWrapper);
   });
 
-  // AI Enhancer section
+  // Enhanced AI Enhancer section
   const enhancerSection = document.createElement('div');
-  enhancerSection.className = 'mt-6 rounded-[24px] border border-emerald-400/15 bg-[linear-gradient(180deg,rgba(16,185,129,0.10),rgba(99,102,241,0.05))] p-4';
+  enhancerSection.className = 'mt-8 rounded-[32px] border border-emerald-400/25 bg-gradient-to-br from-emerald-500/10 via-blue-500/5 to-purple-500/5 p-6 shadow-[0_0_40px_rgba(16,185,129,0.1)]';
   enhancerSection.innerHTML = `
-    <div class="flex items-center justify-between gap-4">
-      <div>
-        <div class="text-sm font-semibold text-white">AI Enhancer</div>
-        <div class="mt-1 text-xs leading-6 text-zinc-400">
-          Keeps the simple template flow, but auto-detects niche, applies cinematic prompt expansion, scene logic, and cleanup in the background.
+    <div class="flex items-start justify-between gap-4 mb-4">
+      <div class="flex-1">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center">
+            <span class="text-lg">✨</span>
+          </div>
+          <div class="text-lg font-bold text-white">AI Enhancement</div>
+        </div>
+        <div class="text-sm text-zinc-300 leading-relaxed">
+          Automatically optimizes your prompts with cinematic techniques, niche detection, and professional enhancement for premium results.
         </div>
       </div>
-      <button id="enhancerToggle" class="relative h-7 w-12 rounded-full transition bg-emerald-400">
-        <span class="absolute top-1 h-5 w-5 rounded-full bg-black transition left-6" id="enhancerToggleKnob"></span>
+      <button id="enhancerToggle" class="relative h-8 w-14 rounded-full transition bg-emerald-400 shadow-lg">
+        <span class="absolute top-1 h-6 w-6 rounded-full bg-white transition left-7" id="enhancerToggleKnob"></span>
       </button>
     </div>
-    <button id="advancedToggle" class="mt-4 text-sm font-medium text-emerald-200 transition hover:text-emerald-100">
-      Show Advanced Controls
-    </button>
-    <div id="advancedControls" class="mt-5 grid gap-4 md:grid-cols-2 hidden"></div>
+    <div class="flex items-center justify-between">
+      <div class="text-xs text-emerald-200/80 font-medium">Enhancement Active</div>
+      <button id="advancedToggle" class="text-sm font-semibold text-emerald-300 transition hover:text-emerald-200 px-4 py-2 rounded-full border border-emerald-400/30 hover:border-emerald-400/50 hover:bg-emerald-500/10">
+        Advanced Settings →
+      </button>
+    </div>
+    <div id="advancedControls" class="mt-6 grid gap-5 md:grid-cols-2 hidden"></div>
   `;
   leftPanel.appendChild(enhancerSection);
 
@@ -285,10 +328,15 @@ export function TemplateStudio(templateId) {
   `;
   advancedControls.appendChild(extraWrapper);
 
-  // Generate button
+  // Enhanced Generate button
   const genBtn = document.createElement('button');
-  genBtn.className = 'mt-6 flex h-14 w-full items-center justify-center rounded-[20px] bg-white text-lg font-semibold text-black shadow-xl transition hover:opacity-90';
-  genBtn.textContent = 'Generate';
+  genBtn.className = 'mt-8 flex h-16 w-full items-center justify-center rounded-[28px] bg-gradient-to-r from-emerald-400 to-emerald-500 text-xl font-bold text-white shadow-[0_0_40px_rgba(16,185,129,0.3)] transition hover:from-emerald-500 hover:to-emerald-600 hover:shadow-[0_0_60px_rgba(16,185,129,0.4)] transform hover:scale-[1.02] active:scale-[0.98]';
+  genBtn.innerHTML = `
+    <span class="flex items-center gap-3">
+      <span class="text-2xl">🚀</span>
+      <span>Generate Content</span>
+    </span>
+  `;
   leftPanel.appendChild(genBtn);
 
   // Creative Intelligence section
@@ -329,28 +377,44 @@ export function TemplateStudio(templateId) {
 
   grid.appendChild(leftPanel);
 
-  // Right panel - Preview and Output
+  // Right panel - Enhanced Preview and Output
   const rightPanel = document.createElement('div');
-  rightPanel.className = 'space-y-5';
+  rightPanel.className = 'space-y-6';
 
-  // Preview section
+  // Enhanced Preview section
   const previewSection = document.createElement('div');
-  previewSection.className = 'rounded-[30px] border border-white/10 bg-white/[0.03] p-5 shadow-[0_20px_80px_rgba(0,0,0,0.45)]';
+  previewSection.className = 'rounded-[40px] border border-white/15 bg-gradient-to-b from-white/[0.08] to-white/[0.04] p-6 shadow-[0_25px_100px_rgba(0,0,0,0.5)] backdrop-blur-sm';
   previewSection.innerHTML = `
-    <div class="mb-4 flex flex-wrap items-center gap-2">
-      <span class="inline-flex rounded-full border border-emerald-400/30 bg-emerald-500/12 px-3 py-1 text-xs font-medium text-emerald-100">${template.outputType === 'video' ? 'Video' : 'Image'}</span>
-      <span class="inline-flex rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-medium text-white/75">${template.category}</span>
-      <span class="inline-flex rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-medium text-white/75">${template.aspectRatio || '16:9'}</span>
+    <div class="mb-6 flex items-center justify-between">
+      <h3 class="text-xl font-bold text-white">Live Preview</h3>
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="inline-flex items-center rounded-full border border-emerald-400/40 bg-emerald-500/15 px-3 py-1.5 text-xs font-medium text-emerald-200">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-2 animate-pulse"></span>
+          ${template.outputType === 'video' ? 'Video' : 'Image'}
+        </span>
+        <span class="inline-flex rounded-full border border-white/20 bg-white/[0.06] px-3 py-1.5 text-xs font-medium text-zinc-300">${template.category}</span>
+        <span class="inline-flex rounded-full border border-white/20 bg-white/[0.06] px-3 py-1.5 text-xs font-medium text-zinc-300">${template.aspectRatio || '16:9'}</span>
+      </div>
     </div>
-    <div class="rounded-[26px] border border-white/10 bg-[radial-gradient(circle_at_50%_35%,rgba(16,185,129,0.14),transparent_40%),radial-gradient(circle_at_70%_20%,rgba(99,102,241,0.12),transparent_36%),linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] p-5">
-      <div class="aspect-[16/10] rounded-[22px] border border-white/10 bg-black/50 p-4">
-        <div class="flex h-full flex-col rounded-[18px] border border-white/10 bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.10),transparent_55%),radial-gradient(circle_at_70%_20%,rgba(99,102,241,0.10),transparent_38%)] p-4">
-          <div class="mb-3 flex items-center justify-between text-[11px] uppercase tracking-[0.18em] text-zinc-500">
-            <span>Preview / Output Panel</span>
-            <span>Standby State</span>
+    <div class="rounded-[32px] border border-white/20 bg-gradient-to-br from-black/60 to-black/40 p-6 shadow-[inset_0_0_40px_rgba(0,0,0,0.5)]">
+      <div class="aspect-[16/10] rounded-[24px] border border-white/10 bg-gradient-to-br from-zinc-900/80 to-black/80 p-6">
+        <div class="flex h-full flex-col rounded-[20px] border border-white/15 bg-gradient-to-br from-white/[0.03] to-transparent p-6">
+          <div class="mb-4 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-2 h-2 rounded-full bg-zinc-500"></div>
+              <span class="text-xs font-medium text-zinc-400 uppercase tracking-wider">Preview Panel</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+              <span class="text-xs font-medium text-emerald-300">Ready</span>
+            </div>
           </div>
-          <div id="previewArea" class="flex flex-1 items-center justify-center rounded-[16px] border border-dashed border-white/10 bg-white/[0.02] text-center text-sm leading-6 text-zinc-400">
-            Upload an image and click Generate to see results
+          <div id="previewArea" class="flex flex-1 items-center justify-center rounded-[16px] border-2 border-dashed border-zinc-600 bg-gradient-to-br from-zinc-900/50 to-black/50 text-center transition hover:border-emerald-400/50 hover:bg-emerald-500/5">
+            <div class="text-center">
+              <div class="text-4xl mb-3 opacity-50">🎯</div>
+              <div class="text-sm text-zinc-400 mb-1">Upload media and configure settings</div>
+              <div class="text-xs text-zinc-500">Your generated content will appear here</div>
+            </div>
           </div>
         </div>
       </div>
@@ -358,23 +422,40 @@ export function TemplateStudio(templateId) {
   `;
   rightPanel.appendChild(previewSection);
 
-  // Output tabs section
+  // Enhanced Output tabs section
   const outputTabs = ['Enhanced Prompt', 'Scene Beats', 'Voiceover', 'Negative Prompt'];
   const outputSection = document.createElement('div');
-  outputSection.className = 'rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.018))] p-5';
+  outputSection.className = 'rounded-[40px] border border-white/15 bg-gradient-to-b from-white/[0.08] to-white/[0.04] p-6 shadow-[0_25px_100px_rgba(0,0,0,0.5)] backdrop-blur-sm';
 
-  // Tab buttons
+  // Section header
+  const outputHeader = document.createElement('div');
+  outputHeader.className = 'mb-6';
+  outputHeader.innerHTML = `
+    <h3 class="text-xl font-bold text-white mb-2">Generated Content</h3>
+    <p class="text-zinc-400 text-sm">AI-enhanced outputs and creative assets</p>
+  `;
+  outputSection.appendChild(outputHeader);
+
+  // Enhanced tab buttons
   const tabRow = document.createElement('div');
-  tabRow.className = 'mb-4 flex flex-wrap gap-2';
+  tabRow.className = 'mb-6 flex flex-wrap gap-3';
   tabRow.id = 'outputTabs';
   outputTabs.forEach(tab => {
     const tabBtn = document.createElement('button');
-    tabBtn.className = `rounded-full px-3 py-2 text-xs font-medium transition ${tab === activeTab ? 'border border-emerald-400/30 bg-emerald-500/12 text-emerald-100' : 'border border-white/10 bg-white/[0.04] text-zinc-100 hover:bg-white/[0.08]'}`;
+    tabBtn.className = `rounded-full px-4 py-2.5 text-sm font-medium transition ${
+      tab === activeTab
+        ? 'border border-emerald-400/50 bg-emerald-500/20 text-emerald-200 shadow-sm'
+        : 'border border-white/20 bg-white/[0.04] text-zinc-300 hover:bg-white/[0.08] hover:border-white/30'
+    }`;
     tabBtn.textContent = tab;
     tabBtn.onclick = () => {
       activeTab = tab;
       document.querySelectorAll('#outputTabs button').forEach(b => {
-        b.className = `rounded-full px-3 py-2 text-xs font-medium transition ${b.textContent === activeTab ? 'border border-emerald-400/30 bg-emerald-500/12 text-emerald-100' : 'border border-white/10 bg-white/[0.04] text-zinc-100 hover:bg-white/[0.08]'}`;
+        b.className = `rounded-full px-4 py-2.5 text-sm font-medium transition ${
+          b.textContent === activeTab
+            ? 'border border-emerald-400/50 bg-emerald-500/20 text-emerald-200 shadow-sm'
+            : 'border border-white/20 bg-white/[0.04] text-zinc-300 hover:bg-white/[0.08] hover:border-white/30'
+        }`;
       });
       updateOutputContent();
     };
@@ -382,15 +463,17 @@ export function TemplateStudio(templateId) {
   });
   outputSection.appendChild(tabRow);
 
-  // Output content area with wand button
+  // Enhanced output content area
   const outputContent = document.createElement('div');
-  outputContent.className = 'rounded-[22px] border border-white/10 bg-black/40 p-4';
+  outputContent.className = 'rounded-[24px] border border-white/20 bg-gradient-to-b from-black/60 to-black/40 p-5';
   outputContent.innerHTML = `
-    <div class="mb-3 flex items-center justify-between gap-3">
-      <div class="text-xs uppercase tracking-[0.18em] text-zinc-500">Editable Output</div>
-      <button id="wandBtn" class="flex h-8 w-8 items-center justify-center rounded-full border border-emerald-400/30 bg-emerald-500/12 text-emerald-200 transition hover:bg-emerald-500/18" title="Enhance with AI">✨</button>
+    <div class="mb-4 flex items-center justify-between gap-3">
+      <div class="text-sm font-medium text-zinc-300">Editable Output</div>
+      <button id="wandBtn" class="flex h-10 w-10 items-center justify-center rounded-full border border-emerald-400/40 bg-emerald-500/15 text-emerald-300 transition hover:bg-emerald-500/25 hover:border-emerald-400/60 shadow-sm" title="Enhance with AI">
+        <span class="text-lg">✨</span>
+      </button>
     </div>
-    <textarea id="outputTextarea" class="w-full rounded-[18px] border border-white/10 bg-white/[0.03] px-4 py-3 text-sm leading-7 text-zinc-200 outline-none transition focus:border-emerald-400/50 resize-none" rows="12">${specs.enhancerKeywords || 'Click Generate to create an enhanced prompt...'}</textarea>
+    <textarea id="outputTextarea" class="w-full rounded-[20px] border border-white/20 bg-gradient-to-b from-white/[0.06] to-white/[0.03] px-5 py-4 text-sm leading-7 text-zinc-200 placeholder-zinc-500 outline-none transition focus:border-emerald-400/60 focus:ring-2 focus:ring-emerald-400/20 resize-none" rows="14">${specs.enhancerKeywords || 'Click Generate to create an enhanced prompt...'}</textarea>
   `;
   outputSection.appendChild(outputContent);
   rightPanel.appendChild(outputSection);

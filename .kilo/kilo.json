@@ -10,6 +10,10 @@
         "--access-token",
         "sbp_3ab297f40b43777b9668e557e4d4efb6947164b1"
       ]
+    },
+    "Figma Desktop": {
+      "type": "remote",
+      "url": "http://127.0.0.1:3845/mcp"
     }
   }
 }
