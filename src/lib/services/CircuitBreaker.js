@@ -390,5 +390,5 @@ export class CircuitBreaker {
 }
 
 // Export singleton instance
-export const circuitBreaker = new CircuitBreaker();</content>
-<parameter name="filePath">src/lib/services/CircuitBreaker.js
+export const circuitBreaker = new CircuitBreaker();
+export const circuitbreaker = new CircuitBreaker();

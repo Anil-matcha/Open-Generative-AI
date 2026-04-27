@@ -566,4 +566,5 @@ export class SecurityService {
 }
 
 // Singleton instance
-export const securityService = new SecurityService();</content>
+export const securityService = new SecurityService();
+export const securityservice = new SecurityService();

@@ -1,7 +1,7 @@
 /**
  * WebSocket Service - Handles real-time polling and updates for long-running AI tasks
  */
-export class WebSocketService {
+export class MonitoringService {
   constructor() {
     this.ws = null;
     this.connected = false;
@@ -382,5 +382,5 @@ export class WebSocketService {
     this.reconnectAttempts = 0;
     this.connect();
   }
-}</content>
-<parameter name="filePath">src/lib/services/WebSocketService.js
+}
+export const monitoringService = new MonitoringService();

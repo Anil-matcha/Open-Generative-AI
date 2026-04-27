@@ -68,4 +68,3 @@ export const aiServiceConfig = {
   }
 };
 
-export default aiServiceConfig;

@@ -80,7 +80,6 @@ export default defineConfig({
             "/apps/remix-go": {
                 target: "http://localhost:5173",
                 changeOrigin: true,
-                rewrite: (path) => path.replace(/^\/apps\/remix-go/, "")
             }
         }
     },

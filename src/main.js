@@ -86,6 +86,34 @@ initializeEnhancedMuAPI(muapiConfig).then(async (success) => {
 // Start memory leak detection in development
 if (import.meta.env.DEV) {
   memoryLeakDetector.startDetection();
+
+  // Add OpenHiggsfield service health checks
+  setTimeout(() => {
+    console.log('[Health Check] Running OpenHiggsfield service diagnostics...');
+
+    // Check aiIntegration
+    if (window.__openhiggsfield_aiIntegration) {
+      console.log('✅ aiIntegration singleton initialized');
+    } else {
+      console.warn('⚠️ aiIntegration singleton not found');
+    }
+
+    // Check muapi instance
+    if (window.muapi) {
+      console.log('✅ muapi instance available globally');
+    } else {
+      console.warn('⚠️ muapi instance not available globally');
+    }
+
+    // Check enhanced performance monitor
+    if (window.enhancedPerfMonitor) {
+      console.log('✅ Enhanced performance monitor initialized');
+    } else {
+      console.warn('⚠️ Enhanced performance monitor not initialized');
+    }
+
+    console.log('[Health Check] Diagnostics complete');
+  }, 2000);
 }
 
 // Global error handlers for uncaught exceptions

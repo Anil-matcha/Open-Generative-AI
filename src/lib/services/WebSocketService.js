@@ -1,7 +1,7 @@
 /**
  * Cache Service - In-memory LRU cache with TTL support for API responses
  */
-export class CacheService {
+export class WebSocketService {
   constructor(maxSize = 100) {
     this.maxSize = maxSize;
     this.cache = new Map();
@@ -278,5 +278,8 @@ export class CacheService {
       this.cleanupInterval = null;
     }
   }
-}</content>
-<parameter name="filePath">src/lib/services/CacheService.js
+  async connect() {
+    // WebSocket connection logic - placeholder
+  }
+}
+export const websocketservice = new WebSocketService();

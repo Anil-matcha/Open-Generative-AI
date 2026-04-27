@@ -27,13 +27,49 @@ export class MuapiClient {
         this.circuitBreaker = new CircuitBreaker();
         this.cache = new CacheService();
         this.websocket = new WebSocketService();
-        this.monitoring = new MonitoringService();
+        this.monitoring = this.createMonitoringAdapter();
         this.errorBoundary = new ErrorBoundary();
 
         this.activeControllers = new Map(); // For request cancellation
         this.requestIds = new Set(); // For deduplication
 
         this.initialize();
+    }
+
+    createMonitoringAdapter() {
+        const monitoring = new MonitoringService();
+        const noop = () => {};
+
+        const devWarn = (method) => {
+            if (import.meta.env?.DEV) {
+                console.warn(`[MuapiClient] monitoring.${method} missing. Using no-op fallback.`);
+            }
+        };
+
+        const bindOrFallback = (primary, aliases = []) => {
+            if (typeof monitoring?.[primary] === "function") {
+                return monitoring[primary].bind(monitoring);
+            }
+
+            for (const alias of aliases) {
+                if (typeof monitoring?.[alias] === "function") {
+                    return monitoring[alias].bind(monitoring);
+                }
+            }
+
+            devWarn(primary);
+            return noop;
+        };
+
+        return {
+            start: bindOrFallback("start", ["init", "initialize", "connect"]),
+            stop: bindOrFallback("stop", ["destroy", "shutdown", "disconnect"]),
+            track: bindOrFallback("track", ["event", "logEvent", "record"]),
+            error: bindOrFallback("error", ["logError", "captureException"]),
+            log: bindOrFallback("log", ["debug", "info"]),
+            metric: bindOrFallback("metric", ["measure", "recordMetric"]),
+            timing: bindOrFallback("timing", ["measureTiming", "recordTiming"]),
+        };
     }
 
     async initialize() {

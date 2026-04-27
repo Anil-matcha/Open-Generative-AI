@@ -1017,5 +1017,4 @@ class GracefulDegrader {
 }
 
 // Singleton instance
-export const aiService = new AIService();</content>
-<parameter name="filePath">src/lib/services/aiService.js
+export const aiService = new AIService();

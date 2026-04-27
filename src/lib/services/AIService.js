@@ -406,5 +406,5 @@ export class AIService {
 }
 
 // Singleton instance
-export const aiService = new AIService();</content>
-<parameter name="filePath">src/lib/services/AIService.js
+export const aiService = new AIService();
+export const aiservice = new AIService();

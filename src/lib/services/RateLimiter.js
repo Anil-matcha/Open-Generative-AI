@@ -1,7 +1,7 @@
 /**
  * Retry Service - Implements exponential backoff retry logic with jitter
  */
-export class RetryService {
+export class RateLimiter {
   constructor() {
     this.maxAttempts = 3;
     this.baseDelay = 1000; // 1 second
@@ -200,5 +200,6 @@ export class RetryService {
       jitterFactor: this.jitterFactor
     };
   }
-}</content>
-<parameter name="filePath">src/lib/services/RetryService.js
+}
+export const RetryService = RateLimiter;
+export const ratelimiter = new RateLimiter();

@@ -8,37 +8,91 @@ import { directorAgent, screenwriterAgent } from '../agents/index.js';
 import { aiService } from './aiService.js';
 
 /**
+ * AIIntegration singleton class
+ */
+class AIIntegration {
+  constructor() {
+    this.initialized = false;
+  }
+
+  async initialize() {
+    if (this.initialized) return this;
+
+    try {
+      // Initialize AI service
+      await aiService.initialize();
+
+      // Enable optimizations in generation service
+      await generationService.enableAIOptimizations();
+
+      // Enable optimizations in AI agents
+      await directorAgent.enableAIOptimizations();
+      await screenwriterAgent.enableAIOptimizations();
+
+      console.log('[AI Integration] AI optimizations successfully enabled');
+      this.initialized = true;
+      return this;
+    } catch (error) {
+      console.error('[AI Integration] Failed to initialize AI optimizations:', error);
+      throw error;
+    }
+  }
+
+  async getOptimizationStatus() {
+    return {
+      aiService: aiService.getHealthStatus(),
+      generationService: generationService.getAIOptimizationStatus(),
+      agents: {
+        director: {
+          enabled: directorAgent.aiOptimizationsEnabled
+        },
+        screenwriter: {
+          enabled: screenwriterAgent.aiOptimizationsEnabled
+        }
+      }
+    };
+  }
+
+  disableOptimizations() {
+    console.log('[AI Integration] Disabling AI optimizations...');
+    // Services automatically fall back to direct processing
+  }
+
+  configure(config) {
+    aiService.configure(config);
+    generationService.configureAIOptimizations(config);
+    console.log('[AI Integration] AI optimizations reconfigured');
+  }
+}
+
+// Create singleton instance
+const globalKey = "__openhiggsfield_aiIntegration";
+const aiIntegration = window[globalKey] || new AIIntegration();
+window[globalKey] = aiIntegration;
+
+/**
  * Initialize AI service optimizations across all services
  */
 export async function initializeAIOptimizations(options = {}) {
   console.log('[AI Integration] Initializing AI service optimizations...');
 
   try {
-    // Initialize AI service
-    await aiService.initialize();
+    await aiIntegration.initialize();
 
-    // Enable optimizations in generation service
-    await generationService.enableAIOptimizations();
-
-    // Enable optimizations in AI agents
-    await directorAgent.enableAIOptimizations();
-    await screenwriterAgent.enableAIOptimizations();
-
-    // Configure AI service if options provided
+    // Configure if options provided
     if (options.config) {
-      aiService.configure(options.config);
-      generationService.configureAIOptimizations(options.config);
+      aiIntegration.configure(options.config);
     }
 
     // Set up monitoring hooks
     setupMonitoringHooks();
 
-    console.log('[AI Integration] AI optimizations successfully enabled');
+    const status = await aiIntegration.getOptimizationStatus();
 
     return {
       success: true,
       services: ['generationService', 'directorAgent', 'screenwriterAgent'],
-      aiService: aiService.getHealthStatus()
+      aiService: status.aiService
     };
 
   } catch (error) {
@@ -79,45 +133,28 @@ function setupMonitoringHooks() {
  * Get comprehensive AI optimization status
  */
 export function getAIOptimizationStatus() {
-  return {
-    aiService: aiService.getHealthStatus(),
-    generationService: generationService.getAIOptimizationStatus(),
-    agents: {
-      director: {
-        enabled: directorAgent.aiOptimizationsEnabled
-      },
-      screenwriter: {
-        enabled: screenwriterAgent.aiOptimizationsEnabled
-      }
-    }
-  };
+  return aiIntegration.getOptimizationStatus();
 }
 
 /**
  * Disable AI optimizations (fallback to direct processing)
  */
 export function disableAIOptimizations() {
-  console.log('[AI Integration] Disabling AI optimizations...');
-
-  // Note: Services will automatically fall back to direct processing
-  // No explicit disable needed as they check the enabled flags
+  aiIntegration.disableOptimizations();
 }
 
 /**
  * Configure AI optimizations dynamically
  */
 export function configureAIOptimizations(config) {
-  aiService.configure(config);
-  generationService.configureAIOptimizations(config);
-
-  console.log('[AI Integration] AI optimizations reconfigured');
+  aiIntegration.configure(config);
 }
 
 /**
  * Generate AI optimization report
  */
-export function generateOptimizationReport() {
-  const status = getAIOptimizationStatus();
+export async function generateOptimizationReport() {
+  const status = await getAIOptimizationStatus();
 
   return {
     timestamp: new Date().toISOString(),
@@ -157,10 +194,6 @@ function generateRecommendations(status) {
   return recommendations;
 }
 
-export default {
-  initializeAIOptimizations,
-  getAIOptimizationStatus,
-  disableAIOptimizations,
-  configureAIOptimizations,
-  generateOptimizationReport
-};
+// Export singleton instance
+export { aiIntegration };
+export default aiIntegration;

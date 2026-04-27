@@ -64,26 +64,6 @@ export class ApiKeyManager {
         return this._cachedKey || null;
     }
 
-        // Try sessionStorage first
-        const sessionKey = sessionStorage.getItem(API_KEY_STORAGE);
-        if (sessionKey) {
-            this._cachedKey = deobfuscate(sessionKey);
-            return this._cachedKey;
-        }
-
-        // Fall back to localStorage
-        const localKey = localStorage.getItem(API_KEY_STORAGE);
-        if (localKey) {
-            this._cachedKey = deobfuscate(localKey);
-            if (this._cachedKey) {
-                // Restore to sessionStorage
-                sessionStorage.setItem(API_KEY_STORAGE, localKey);
-                return this._cachedKey;
-            }
-        }
-
-        return null;
-    }
 
     /**
      * Check if API key exists (sync, fast)

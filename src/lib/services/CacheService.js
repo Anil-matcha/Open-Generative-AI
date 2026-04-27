@@ -1,7 +1,7 @@
 /**
  * Circuit Breaker - Prevents cascading failures by temporarily stopping requests to failing services
  */
-export class CircuitBreaker {
+export class CacheService {
   constructor() {
     this.services = new Map();
     this.defaultConfig = {
@@ -222,5 +222,6 @@ export class CircuitBreaker {
       throw error;
     }
   }
-}</content>
-<parameter name="filePath">src/lib/services/CircuitBreaker.js
+}
+export const cacheService = new CacheService();
+export const cacheservice = new CacheService();

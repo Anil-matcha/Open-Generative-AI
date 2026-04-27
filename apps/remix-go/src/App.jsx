@@ -13,7 +13,7 @@ function App() {
 
   return (
     <ModalProvider>
-      <Router>
+      <Router basename="/apps/remix-go">
         <div className="min-h-screen bg-gray-50">
           <Header 
             onMenuClick={() => setSidebarOpen(!sidebarOpen)}

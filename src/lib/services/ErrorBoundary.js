@@ -1,7 +1,7 @@
 /**
  * Monitoring Service - Collects metrics and performance data for AI operations
  */
-export class MonitoringService {
+export class ErrorBoundary {
   constructor() {
     this.metrics = new Map();
     this.startTime = Date.now();
@@ -384,5 +384,5 @@ export class MonitoringService {
   setEnabled(enabled) {
     this.enabled = enabled;
   }
-}</content>
-<parameter name="filePath">src/lib/services/MonitoringService.js
+}
+export const errorboundary = new ErrorBoundary();
