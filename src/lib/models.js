@@ -2502,6 +2502,29 @@ export const t2vModels = [
       "duration": { "title": "Duration", "name": "duration", "type": "int", "description": "The duration of the generated video in seconds", "default": 5 },
       "resolution": { "enum": ["480p", "720p", "1080p"], "title": "Resolution", "name": "resolution", "type": "string", "description": "The resolution of the generated video.", "default": "720p" }
     }
+  },
+  {
+    "id": "veo-3.1-lite",
+    "name": "Veo 3.1 Lite",
+    "endpoint": "veo-3.1-lite",
+    "family": "veo",
+    "inputs": {
+      "prompt": { "type": "string", "title": "Prompt", "name": "prompt", "description": "Text prompt describing the video." },
+      "aspect_ratio": { "enum": ["16:9", "9:16"], "title": "Aspect Ratio", "name": "aspect_ratio", "type": "string", "description": "Aspect ratio of the output video.", "default": "16:9" },
+      "duration": { "title": "Duration", "name": "duration", "type": "int", "description": "Duration of the generated video in seconds.", "default": 8 }
+    }
+  },
+  {
+    "id": "grok-imagine-t2v",
+    "name": "Grok Imagine",
+    "endpoint": "grok-imagine-t2v",
+    "family": "grok",
+    "inputs": {
+      "prompt": { "type": "string", "title": "Prompt", "name": "prompt", "description": "Text prompt describing the video." },
+      "aspect_ratio": { "enum": ["16:9", "9:16", "1:1"], "title": "Aspect Ratio", "name": "aspect_ratio", "type": "string", "description": "Aspect ratio of the output video.", "default": "16:9" },
+      "duration": { "enum": [6, 10, 15], "title": "Duration", "name": "duration", "type": "int", "description": "Duration of the generated video in seconds.", "default": 6 },
+      "mode": { "enum": ["fun", "normal", "spicy"], "title": "Mode", "name": "mode", "type": "string", "description": "Creativity and edginess level.", "default": "normal" }
+    }
   }
 ];
 
@@ -7920,13 +7943,69 @@ export const i2vModels = [
         "default": 5
       },
       "quality": {
-        "type": "string",
+        "enum": ["basic", "high"],
         "title": "Quality",
         "name": "quality",
-        "description": "Quality of the generated video.",
-        "enum": ["high", "basic"],
+        "type": "string",
+        "description": "Quality of the output image.",
         "default": "basic"
       }
+    }
+  },
+  {
+    "id": "minimax-image-01",
+    "name": "MiniMax Image 01",
+    "endpoint": "minimax-image-01",
+    "family": "minimax",
+    "inputs": {
+      "prompt": {
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "description": "Text prompt describing the image (max 1500 characters)."
+      },
+      "aspect_ratio": {
+        "enum": ["16:9", "9:16", "1:1", "4:3", "3:4", "3:2", "2:3", "21:9"],
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "type": "string",
+        "description": "Aspect ratio of the output image.",
+        "default": "1:1"
+      },
+      "num_images": {
+        "title": "Number of Images",
+        "name": "num_images",
+        "type": "int",
+        "description": "Number of images to generate.",
+        "default": 1,
+        "minValue": 1,
+        "maxValue": 4
+      }
+    }
+  },
+  {
+    "id": "veo-3.1-lite-i2v",
+    "name": "Veo 3.1 Lite I2V",
+    "endpoint": "veo-3.1-lite-i2v",
+    "family": "veo",
+    "inputs": {
+      "prompt": { "type": "string", "title": "Prompt", "name": "prompt", "description": "Text prompt describing the video." },
+      "image_url": { "type": "string", "title": "Image URL", "name": "image_url", "description": "URL of the input image." },
+      "aspect_ratio": { "enum": ["16:9", "9:16"], "title": "Aspect Ratio", "name": "aspect_ratio", "type": "string", "description": "Aspect ratio of the output video.", "default": "16:9" },
+      "duration": { "title": "Duration", "name": "duration", "type": "int", "description": "Duration of the generated video in seconds.", "default": 8 }
+    }
+  },
+  {
+    "id": "grok-imagine-i2v",
+    "name": "Grok Imagine I2V",
+    "endpoint": "grok-imagine-i2v",
+    "family": "grok",
+    "inputs": {
+      "prompt": { "type": "string", "title": "Prompt", "name": "prompt", "description": "Text prompt describing the video." },
+      "image_url": { "type": "string", "title": "Image URL", "name": "image_url", "description": "URL of the input image." },
+      "aspect_ratio": { "enum": ["16:9", "9:16", "1:1"], "title": "Aspect Ratio", "name": "aspect_ratio", "type": "string", "description": "Aspect ratio of the output video.", "default": "16:9" },
+      "duration": { "enum": [6, 10, 15], "title": "Duration", "name": "duration", "type": "int", "description": "Duration of the generated video in seconds.", "default": 6 },
+      "mode": { "enum": ["fun", "normal", "spicy"], "title": "Mode", "name": "mode", "type": "string", "description": "Creativity and edginess level.", "default": "normal" }
     }
   }
 ];
@@ -8022,6 +8101,28 @@ export const v2vModels = [
     "videoField": "video_url",
     "hasPrompt": false,
     "description": "Remove watermarks, logos, captions, and unwanted text from videos."
+  },
+  {
+    "id": "kling-v2.6-motion-control",
+    "name": "Kling 2.6 Motion Control",
+    "endpoint": "kling-v2.6-motion-control",
+    "family": "kling",
+    "inputs": {
+      "prompt": { "type": "string", "title": "Prompt", "name": "prompt", "description": "Text prompt describing the video." },
+      "image_url": { "type": "string", "title": "Image URL", "name": "image_url", "description": "URL of the reference image." },
+      "video_url": { "type": "string", "title": "Video URL", "name": "video_url", "description": "URL of the input video." }
+    }
+  },
+  {
+    "id": "kling-v3.0-motion-control",
+    "name": "Kling 3.0 Motion Control",
+    "endpoint": "kling-v3.0-motion-control",
+    "family": "kling",
+    "inputs": {
+      "prompt": { "type": "string", "title": "Prompt", "name": "prompt", "description": "Text prompt describing the video." },
+      "image_url": { "type": "string", "title": "Image URL", "name": "image_url", "description": "URL of the reference image." },
+      "video_url": { "type": "string", "title": "Video URL", "name": "video_url", "description": "URL of the input video." }
+    }
   }
 ];
 

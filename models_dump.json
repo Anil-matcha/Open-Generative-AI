@@ -2001,6 +2001,35 @@
           "step": 0.01
         }
       }
+    },
+    {
+      "id": "minimax-image-01",
+      "name": "MiniMax Image 01",
+      "inputs": {
+        "prompt": {
+          "description": "Text prompt describing the image (max 1500 characters)",
+          "type": "string",
+          "title": "Prompt",
+          "name": "prompt"
+        },
+        "aspect_ratio": {
+          "enum": ["16:9", "9:16", "1:1", "4:3", "3:4", "3:2", "2:3", "21:9"],
+          "title": "Aspect Ratio",
+          "name": "aspect_ratio",
+          "type": "string",
+          "description": "Aspect ratio of the output image",
+          "default": "1:1"
+        },
+        "num_images": {
+          "title": "Number of Images",
+          "name": "num_images",
+          "type": "int",
+          "description": "Number of images to generate",
+          "default": 1,
+          "minValue": 1,
+          "maxValue": 4
+        }
+      }
     }
   ]
 }
