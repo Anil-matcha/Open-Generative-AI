@@ -9,6 +9,7 @@ const ROUTE_MAP = {
   'Character': 'character',
 
   'Vibe Motion': 'effects',
+  'VFX': 'vfx',
   'Cinema Studio': 'cinema',
   'AI Influencer': 'influencer',
   'Apps': 'apps',
@@ -30,6 +31,7 @@ const pageLoaders = {
   apps: () => import('../components/AppsHub.js').then(m => m.AppsHub()),
   templates: () => import('../components/TemplatesPage.js').then(m => m.TemplatesPage()),
   effects: () => import('../components/EffectsStudio.js').then(m => m.EffectsStudio()),
+  vfx: () => import('../components/EffectsStudio.js').then(m => m.EffectsStudio()),
   edit: () => import('../components/EditStudio.js').then(m => m.EditStudio()),
   upscale: () => import('../components/UpscaleStudio.js').then(m => m.UpscaleStudio()),
   library: () => import('../components/LibraryPage.js').then(m => m.LibraryPage()),
