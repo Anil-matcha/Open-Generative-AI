@@ -34,13 +34,13 @@ export function CinemaTemplateStudio() {
   container.className = 'w-full h-full flex flex-col bg-black overflow-hidden';
 
   // State
-  let registry = getTemplateRegistry();
-  let currentTemplate = null;
-  let currentMode = 'quick'; // 'quick' or 'advanced'
-  let currentInputs = {};
-  let sceneBuilder = null;
-  let storyboardBuilder = null;
-  let view = 'browse'; // 'browse', 'create', 'storyboard', 'preview'
+  const registry = getTemplateRegistry();
+  const currentTemplate = null;
+  const currentMode = 'quick'; // 'quick' or 'advanced'
+  const currentInputs = {};
+  const sceneBuilder = null;
+  const storyboardBuilder = null;
+  const view = 'browse'; // 'browse', 'create', 'storyboard', 'preview'
 
   // Initialize
   render();

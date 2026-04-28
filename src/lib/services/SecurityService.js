@@ -42,7 +42,7 @@ export class SecurityService {
    */
   async initializeMasterKey() {
     try {
-      let masterKeyData = localStorage.getItem(this.masterKeyName);
+      const masterKeyData = localStorage.getItem(this.masterKeyName);
 
       if (masterKeyData) {
         const { key, created, version } = JSON.parse(masterKeyData);

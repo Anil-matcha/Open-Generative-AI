@@ -3,6 +3,8 @@
  * Handles media input, drag-and-drop, galleries, and asset management
  */
 
+import { showToast } from './loading.js';
+
 // Animation List Component
 export function AnimationList() {
   const container = document.createElement('div');

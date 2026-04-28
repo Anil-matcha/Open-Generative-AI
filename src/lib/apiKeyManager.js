@@ -7,6 +7,10 @@ import { securityService } from './services/SecurityService.js';
  * using the secure SecurityService for storage.
  */
 
+// Storage keys
+const API_KEY_STORAGE = 'openhiggsfield_api_key';
+const API_KEY_HASH_STORAGE = 'openhiggsfield_api_key_hash';
+
 // Hash the key for quick validation without exposing it
 async function hashKey(key) {
     const encoder = new TextEncoder();

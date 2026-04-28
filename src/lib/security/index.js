@@ -73,16 +73,21 @@ export function createSecureIframe(src, options = {}) {
 
 // Environment validation
 export function validateEnvironment() {
+  // Handle both Node.js and browser environments
+  const env = typeof process !== 'undefined' && process.env ? process.env :
+             (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env : {});
+
+  const nodeEnv = env.NODE_ENV || env.MODE || 'development';
   const requiredVars = ['NODE_ENV'];
-  const missing = requiredVars.filter(varName => !process.env[varName]);
-  
+  const missing = requiredVars.filter(varName => !env[varName] && !env.MODE);
+
   if (missing.length > 0) {
     console.warn('Missing required environment variables:', missing);
   }
-  
+
   return {
-    isProduction: process.env.NODE_ENV === 'production',
-    isDevelopment: process.env.NODE_ENV === 'development',
+    isProduction: nodeEnv === 'production',
+    isDevelopment: nodeEnv === 'development',
     missingVars: missing
   };
 }

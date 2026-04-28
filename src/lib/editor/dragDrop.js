@@ -1643,7 +1643,7 @@ function cleanupMemory() {
 
 // Throttled updates for smooth performance
 function initializeThrottledUpdates() {
-  let lastUpdate = 0;
+  const lastUpdate = 0;
 
   // Throttle drag updates
   const throttledUpdateDrag = throttle((e) => {

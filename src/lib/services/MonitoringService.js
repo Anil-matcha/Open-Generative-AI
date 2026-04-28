@@ -15,6 +15,20 @@ export class MonitoringService {
   }
 
   /**
+   * Start the monitoring service
+   */
+  async start() {
+    // Skip WebSocket connection in development
+    if (typeof import.meta !== 'undefined' && import.meta.env?.DEV) {
+      console.log('[MonitoringService] Skipping WebSocket connection in development mode');
+      return;
+    }
+
+    // Only connect in production or when explicitly needed
+    await this.connect();
+  }
+
+  /**
    * Connect to WebSocket server
    */
   async connect(url = null) {

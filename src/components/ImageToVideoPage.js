@@ -313,7 +313,7 @@ export function ImageToVideoPage() {
   const closeAdvancedBtn = container.querySelector('#close-advanced-btn');
 
   // State for advanced options
-  let veoOptions = {
+  const veoOptions = {
     motionStrength: 5,
     cameraMovement: 'none',
     promptEnhancement: false,

@@ -3,10 +3,15 @@ import js from '@eslint/js';
 export default [
   js.configs.recommended,
   {
-    files: ['src/**/*.{js,ts}'],
+    files: ['src/**/*.{js,jsx}'],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'module',
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true
+        }
+      },
       globals: {
         console: 'readonly',
         window: 'readonly',
@@ -51,7 +56,114 @@ export default [
         XMLHttpRequest: 'readonly',
         alert: 'readonly',
         confirm: 'readonly',
-        prompt: 'readonly'
+        prompt: 'readonly',
+        // Additional browser APIs
+        WebSocket: 'readonly',
+        PerformanceObserver: 'readonly',
+        Worker: 'readonly',
+        getComputedStyle: 'readonly',
+        HTMLMediaElement: 'readonly',
+        MediaError: 'readonly',
+        IntersectionObserver: 'readonly',
+        MutationObserver: 'readonly',
+        Node: 'readonly',
+        KeyboardEvent: 'readonly',
+        ErrorEvent: 'readonly',
+        DocumentFragment: 'readonly',
+        Component: 'readonly',
+        PropTypes: 'readonly'
+      }
+    },
+    rules: {
+      'no-unused-vars': 'warn',
+      'no-console': 'off',
+      'prefer-const': 'error',
+      'no-var': 'error',
+      'no-dupe-keys': 'error',
+      'no-dupe-class-members': 'error',
+      'no-empty': 'warn',
+      'no-case-declarations': 'error',
+      'preserve-caught-error': 'warn'
+    }
+  },
+  {
+    files: ['src/**/*.test.{js,jsx}', 'tests/**/*.{js,jsx}'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true
+        }
+      },
+      globals: {
+        // Test framework globals
+        describe: 'readonly',
+        it: 'readonly',
+        test: 'readonly',
+        expect: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+        beforeAll: 'readonly',
+        afterAll: 'readonly',
+        vi: 'readonly',
+        global: 'readonly',
+        require: 'readonly',
+        // Browser globals
+        console: 'readonly',
+        window: 'readonly',
+        document: 'readonly',
+        fetch: 'readonly',
+        URL: 'readonly',
+        URLSearchParams: 'readonly',
+        FormData: 'readonly',
+        Blob: 'readonly',
+        File: 'readonly',
+        Response: 'readonly',
+        Request: 'readonly',
+        Headers: 'readonly',
+        navigator: 'readonly',
+        location: 'readonly',
+        process: 'readonly',
+        globalThis: 'readonly',
+        localStorage: 'readonly',
+        sessionStorage: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        requestAnimationFrame: 'readonly',
+        cancelAnimationFrame: 'readonly',
+        performance: 'readonly',
+        crypto: 'readonly',
+        btoa: 'readonly',
+        atob: 'readonly',
+        TextEncoder: 'readonly',
+        TextDecoder: 'readonly',
+        AbortController: 'readonly',
+        AbortSignal: 'readonly',
+        CustomEvent: 'readonly',
+        Event: 'readonly',
+        HTMLElement: 'readonly',
+        HTMLInputElement: 'readonly',
+        HTMLCanvasElement: 'readonly',
+        HTMLImageElement: 'readonly',
+        Image: 'readonly',
+        XMLHttpRequest: 'readonly',
+        WebSocket: 'readonly',
+        PerformanceObserver: 'readonly',
+        Worker: 'readonly',
+        getComputedStyle: 'readonly',
+        HTMLMediaElement: 'readonly',
+        MediaError: 'readonly',
+        IntersectionObserver: 'readonly',
+        MutationObserver: 'readonly',
+        Node: 'readonly',
+        KeyboardEvent: 'readonly',
+        ErrorEvent: 'readonly',
+        DocumentFragment: 'readonly',
+        Component: 'readonly',
+        PropTypes: 'readonly'
       }
     },
     rules: {

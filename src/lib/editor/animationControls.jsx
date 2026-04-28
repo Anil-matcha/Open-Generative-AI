@@ -58,7 +58,7 @@ export function spring({ frame, fps, config = {} }) {
 
   let position = 0;
   let velocity = 0;
-  let target = 1;
+  const target = 1;
 
   for (let f = 0; f <= frame; f++) {
     const Fspring = k * (position - target);

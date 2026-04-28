@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import PropTypes from 'prop-types';
 import { observer } from 'mobx-react-lite';
 
 const TokenEditor = ({

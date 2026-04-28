@@ -3,6 +3,9 @@
  * Handles rendering of tracks, media, pills, and UI elements
  */
 
+import { showToast } from '../loading.js';
+import { updatePlaybackUI, panState, handlePanMove, handlePanUp, handleItemMouseDown } from './timelinePlayback.js';
+
 export function renderTopActions(state, els) {
   els.topActions.innerHTML = '';
   state.topIcons.forEach((icon, i) => {

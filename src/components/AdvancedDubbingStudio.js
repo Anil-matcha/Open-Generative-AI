@@ -17,10 +17,10 @@ export function AdvancedDubbingStudio() {
     let targetLanguage = 'es';
     let selectedVoice = null;
     let availableVoices = [];
-    let isTranslating = false;
-    let isDubbing = false;
+    const isTranslating = false;
+    const isDubbing = false;
     let previewAudioUrl = null;
-    let currentJobId = null;
+    const currentJobId = null;
 
     // Voice cloning options
     let voiceCloneEnabled = false;

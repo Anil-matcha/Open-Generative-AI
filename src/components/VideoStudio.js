@@ -1,5 +1,6 @@
 import { muapi } from '../lib/muapi.js';
 import { createSafeVideo } from '../lib/security.js';
+import { showToast } from '../lib/loading.js';
 import { t2vModels, getAspectRatiosForVideoModel, getDurationsForModel, getResolutionsForVideoModel, i2vModels, getAspectRatiosForI2VModel, getDurationsForI2VModel, getResolutionsForI2VModel, v2vModels } from '../lib/models.js';
 import { AuthModal } from './AuthModal.js';
 import { createUploadPicker } from './UploadPicker.js';

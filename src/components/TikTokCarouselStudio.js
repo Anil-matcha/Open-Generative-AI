@@ -26,7 +26,7 @@ export function TikTokCarouselStudio() {
   let backgroundMusicUrl = null;
   let totalDuration = 5;
   let isGenerating = false;
-  let previewUrl = null;
+  const previewUrl = null;
 
   // ==========================================
   // 1. HERO SECTION

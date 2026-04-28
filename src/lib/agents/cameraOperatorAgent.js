@@ -148,7 +148,8 @@ export class CameraOperatorAgent extends BaseAgent {
 
   calculateAngleScore(angle, clipAnalysis, options) {
     let score = 0.5;
-    
+    const sceneType = clipAnalysis.sceneType;
+
     switch (angle.id) {
       case 'wide':
         if (sceneType === 'exterior' || sceneType === 'establishing') score += 0.3;

@@ -14,12 +14,12 @@ export function createVideoAgentWorkspace(runtime = null) {
   // 0. STATE MANAGEMENT
   // ==========================================
   let uploadedVideoUrl = null;
-  let isDragOver = false;
+  const isDragOver = false;
 
   // Processing results state
-  let processingResults = {};
+  const processingResults = {};
   let sceneData = [];
-  let generatedVideos = [];
+  const generatedVideos = [];
   let captions = [];
   let metadata = {};
   let currentVideoIndex = 0; // 0 = original, 1+ = processed versions
