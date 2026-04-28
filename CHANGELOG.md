@@ -46,6 +46,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **VFX Navigation**: Added dedicated VFX menu item in sidebar
+  - VFX effects now accessible via dedicated menu option
+  - Added VFX routing and page loader configuration
+- **Build Compatibility**: Fixed timeline playback module exports
+  - Resolved panState export issue preventing successful builds
+  - Improved module compatibility across the application
 ### Fixed
 - **Development Console Errors**: Resolved critical runtime errors preventing app startup
   - Fixed "process is not defined" ReferenceError in browser environment validation
