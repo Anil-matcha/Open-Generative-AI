@@ -46,6 +46,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Development Console Errors**: Resolved critical runtime errors preventing app startup
+  - Fixed "process is not defined" ReferenceError in browser environment validation
+  - Added development mode check to MonitoringService to prevent WebSocket connection failures
+  - Eliminated repeated WebSocket timeout errors and reconnection attempts in development
+
 ## [1.0.2] - 2026-04-17
 
 ### Added
