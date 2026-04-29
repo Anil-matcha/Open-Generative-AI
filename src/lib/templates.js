@@ -922,5 +922,8 @@ export function getTemplatesByCategory(category) {
 export function getAllCategories() {
   return [...new Set(allTemplates.map(t => t.category))];
 }
+export function getVFXTemplates() {
+  return getTemplatesByCategory(TEMPLATE_CATEGORIES.VFX);
+}
 
 export { ALL_NICHE_TEMPLATES, RESTAURANT_TEMPLATES, MED_SPA_TEMPLATES, SALON_TEMPLATES, FITNESS_TEMPLATES, REAL_ESTATE_TEMPLATES, DENTAL_TEMPLATES, CHIROPRACTIC_TEMPLATES, LEGAL_TEMPLATES, AUTOMOTIVE_TEMPLATES, FASHION_TEMPLATES, EVENT_TEMPLATES, LUXURY_TEMPLATES, MATRIX_TEMPLATES };

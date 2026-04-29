@@ -7,7 +7,7 @@
 export class MuAPIConnection {
   constructor(config = {}) {
     this.baseURL = config.baseURL || 'https://muapi.ai/api/v1';
-    this.apiKey = config.apiKey || process.env.MUAPI_API_KEY;
+    this.apiKey = config.apiKey || (typeof process !== 'undefined' && process.env ? process.env.MUAPI_API_KEY : null);
     this.retryConfig = {
       maxRetries: config.maxRetries || 3,
       backoff: config.backoff || 1000,

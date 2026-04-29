@@ -219,14 +219,23 @@ try {
   // Navigate to initial page
   // Check URL for deep linking
   const path = window.location.pathname;
+  const hash = window.location.hash;
   let initialPage = 'image';
-  
+
   if (path === '/' || path === '') {
     initialPage = 'image';
   } else if (path.startsWith('/')) {
     initialPage = path.slice(1);
   }
-  
+
+  // Handle hash-based routing (e.g., #/ai-vfx)
+  if (hash && hash.startsWith('#/')) {
+    const hashPage = hash.slice(2); // Remove #/
+    if (hashPage) {
+      initialPage = hashPage;
+    }
+  }
+
   // Handle studio query param
   const studioParam = new URLSearchParams(window.location.search).get('studio');
   if (studioParam) {

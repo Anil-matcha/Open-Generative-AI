@@ -4,11 +4,19 @@
  */
 
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY; // Will be set via environment
 
 class OpenAIService {
   constructor() {
-    this.apiKey = OPENAI_API_KEY;
+    // Safely get API key from environment, handling browser vs Node.js
+    this.apiKey = null;
+    try {
+      if (typeof process !== 'undefined' && process.env) {
+        this.apiKey = process.env.OPENAI_API_KEY;
+      }
+    } catch (e) {
+      // In browser environment, process might not be available
+      this.apiKey = null;
+    }
     this.model = 'gpt-4'; // Can be configured
     this.maxTokens = 2000;
     this.temperature = 0.7;

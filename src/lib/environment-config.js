@@ -140,15 +140,27 @@ export class EnvironmentValidator {
   }
 
   isProduction() {
-    return process.env.NODE_ENV === 'production';
+    try {
+      return typeof process !== 'undefined' && process.env ? process.env.NODE_ENV === 'production' : false;
+    } catch (e) {
+      return false;
+    }
   }
 
   isDevelopment() {
-    return process.env.NODE_ENV === 'development';
+    try {
+      return typeof process !== 'undefined' && process.env ? process.env.NODE_ENV === 'development' : true;
+    } catch (e) {
+      return true;
+    }
   }
 
   isTest() {
-    return process.env.NODE_ENV === 'test';
+    try {
+      return typeof process !== 'undefined' && process.env ? process.env.NODE_ENV === 'test' : false;
+    } catch (e) {
+      return false;
+    }
   }
 }
 
@@ -180,7 +192,12 @@ export class SecureEnv {
       throw new Error('Environment configuration has not been initialized. Call initialize() first.');
     }
 
-    const value = process.env[key];
+    let value = null;
+    try {
+      value = typeof process !== 'undefined' && process.env ? process.env[key] : null;
+    } catch (e) {
+      value = null;
+    }
     const schema = ENV_SCHEMA[key];
 
     if (schema?.sensitive && value) {
@@ -204,11 +221,19 @@ export const secureEnv = new SecureEnv();
 
 // Utility functions for common environment checks
 export function isProduction() {
-  return secureEnv.validator?.isProduction() || process.env.NODE_ENV === 'production';
+  try {
+    return secureEnv.validator?.isProduction() || (typeof process !== 'undefined' && process.env ? process.env.NODE_ENV === 'production' : false);
+  } catch (e) {
+    return false;
+  }
 }
 
 export function isDevelopment() {
-  return secureEnv.validator?.isDevelopment() || process.env.NODE_ENV === 'development';
+  try {
+    return secureEnv.validator?.isDevelopment() || (typeof process !== 'undefined' && process.env ? process.env.NODE_ENV === 'development' : true);
+  } catch (e) {
+    return true;
+  }
 }
 
 export function requireEnv(key, defaultValue = null) {

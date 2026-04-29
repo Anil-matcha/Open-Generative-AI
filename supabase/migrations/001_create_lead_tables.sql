@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS leads (
   status TEXT DEFAULT 'new',
   tags TEXT[] DEFAULT '{}',
   personalization_data JSONB DEFAULT '{}',
+  created_by UUID REFERENCES auth.users(id),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -27,6 +28,7 @@ CREATE TABLE IF NOT EXISTS contacts (
   country TEXT,
   tags TEXT[] DEFAULT '{}',
   lead_id INTEGER REFERENCES leads(id),
+  created_by UUID REFERENCES auth.users(id),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -40,6 +42,7 @@ CREATE TABLE IF NOT EXISTS email_sends (
   personalization_data JSONB DEFAULT '{}',
   lead_data JSONB DEFAULT '{}',
   status TEXT DEFAULT 'sent',
+  created_by UUID REFERENCES auth.users(id),
   sent_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   opened_at TIMESTAMP WITH TIME ZONE,
   clicked_at TIMESTAMP WITH TIME ZONE
@@ -61,20 +64,20 @@ ALTER TABLE email_sends ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for authenticated users
 CREATE POLICY "Users can view their own leads" ON leads
-  FOR SELECT USING (auth.uid()::text = created_by OR created_by IS NULL);
+  FOR SELECT USING (auth.uid() = created_by OR created_by IS NULL);
 
 CREATE POLICY "Users can insert leads" ON leads
-  FOR INSERT WITH CHECK (auth.uid()::text = created_by OR created_by IS NULL);
+  FOR INSERT WITH CHECK (auth.uid() = created_by OR created_by IS NULL);
 
 CREATE POLICY "Users can update their own leads" ON leads
-  FOR UPDATE USING (auth.uid()::text = created_by OR created_by IS NULL);
+  FOR UPDATE USING (auth.uid() = created_by OR created_by IS NULL);
 
 -- Similar policies for contacts and email_sends tables
 CREATE POLICY "Users can view their own contacts" ON contacts
-  FOR SELECT USING (auth.uid()::text = created_by OR created_by IS NULL);
+  FOR SELECT USING (auth.uid() = created_by OR created_by IS NULL);
 
 CREATE POLICY "Users can insert contacts" ON contacts
-  FOR INSERT WITH CHECK (auth.uid()::text = created_by OR created_by IS NULL);
+  FOR INSERT WITH CHECK (auth.uid() = created_by OR created_by IS NULL);
 
 CREATE POLICY "Users can view their own email sends" ON email_sends
-  FOR SELECT USING (auth.uid()::text = created_by OR created_by IS NULL);
+  FOR SELECT USING (auth.uid() = created_by OR created_by IS NULL);

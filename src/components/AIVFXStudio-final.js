@@ -2,6 +2,7 @@ import { muapi } from '../lib/muapi.js';
 import { showToast } from '../lib/loading.js';
 
 export function AIVFXStudio() {
+  // Cache bust version: 2026-04-28-07:50
   // State management
   let activeFilter = 'AI Effects';
   let showInputBar = true;

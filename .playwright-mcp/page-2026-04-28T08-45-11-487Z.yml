@@ -1,0 +1,583 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - img [ref=e8] [cursor=pointer]
+        - navigation [ref=e12]:
+          - generic [ref=e13] [cursor=pointer]: Explore
+          - generic [ref=e14] [cursor=pointer]: Image
+          - generic [ref=e15] [cursor=pointer]: Video
+          - generic [ref=e16] [cursor=pointer]: Tools
+          - generic [ref=e17] [cursor=pointer]: Storyboard
+          - generic [ref=e18] [cursor=pointer]: Edit
+          - generic [ref=e19] [cursor=pointer]: Character
+          - generic [ref=e20] [cursor=pointer]: Vibe Motion
+          - generic [ref=e21] [cursor=pointer]: Cinema Studio
+          - generic [ref=e22] [cursor=pointer]: AI Influencer
+          - generic [ref=e23] [cursor=pointer]: Apps
+          - generic [ref=e24] [cursor=pointer]: Templates
+          - generic [ref=e25] [cursor=pointer]: Assist
+          - generic [ref=e26] [cursor=pointer]: Community
+      - button "Update API Key" [ref=e28]:
+        - img [ref=e29]
+  - generic [ref=e31]:
+    - complementary [ref=e32]:
+      - generic [ref=e33]:
+        - generic [ref=e34] [cursor=pointer]:
+          - button [ref=e35]:
+            - img [ref=e36]
+          - generic [ref=e41]: Apps
+        - generic [ref=e42] [cursor=pointer]:
+          - button [ref=e43]:
+            - img [ref=e44]
+          - generic [ref=e48]: Image
+        - generic [ref=e49] [cursor=pointer]:
+          - button [ref=e50]:
+            - img [ref=e51]
+          - generic [ref=e54]: Video
+        - generic [ref=e55] [cursor=pointer]:
+          - button [ref=e56]:
+            - img [ref=e57]
+          - generic [ref=e59]: Cinema
+        - generic [ref=e60] [cursor=pointer]:
+          - button [ref=e61]:
+            - img [ref=e62]
+          - generic [ref=e65]: Character
+        - generic [ref=e66] [cursor=pointer]:
+          - button [ref=e67]:
+            - img [ref=e68]
+          - generic [ref=e71]: AI-VFX
+        - generic [ref=e72] [cursor=pointer]:
+          - button [ref=e73]:
+            - img [ref=e74]
+          - generic [ref=e76]: Influencer
+        - generic [ref=e77] [cursor=pointer]:
+          - button [ref=e78]:
+            - img [ref=e79]
+          - generic [ref=e86]: Storyboard
+        - generic [ref=e87] [cursor=pointer]:
+          - button [ref=e88]:
+            - img [ref=e89]
+          - generic [ref=e91]: Effects
+        - generic [ref=e92] [cursor=pointer]:
+          - button [ref=e93]:
+            - img [ref=e94]
+          - generic [ref=e96]: VFX
+        - generic [ref=e97] [cursor=pointer]:
+          - button [ref=e98]:
+            - img [ref=e99]
+          - generic [ref=e102]: Edit
+        - generic [ref=e103] [cursor=pointer]:
+          - button [ref=e104]:
+            - img [ref=e105]
+          - generic [ref=e110]: Upscale
+        - generic [ref=e111] [cursor=pointer]:
+          - button [ref=e112]:
+            - img [ref=e113]
+          - generic [ref=e117]: Audio
+        - generic [ref=e118] [cursor=pointer]:
+          - button [ref=e119]:
+            - img [ref=e120]
+          - generic [ref=e124]: Avatar
+        - generic [ref=e125] [cursor=pointer]:
+          - button [ref=e126]:
+            - img [ref=e127]
+          - generic [ref=e131]: Training
+        - generic [ref=e132] [cursor=pointer]:
+          - button [ref=e133]:
+            - img [ref=e134]
+          - generic [ref=e137]: Video Tools
+        - generic [ref=e138] [cursor=pointer]:
+          - button [ref=e139]:
+            - img [ref=e140]
+          - generic [ref=e142]: Render
+        - generic [ref=e143] [cursor=pointer]:
+          - button [ref=e144]:
+            - img [ref=e145]
+          - generic [ref=e149]: Video Agent
+        - generic [ref=e150] [cursor=pointer]:
+          - button [ref=e151]:
+            - img [ref=e152]
+          - generic [ref=e155]: Director
+        - generic [ref=e156] [cursor=pointer]:
+          - button [ref=e157]:
+            - img [ref=e158]
+          - generic [ref=e163]: Timeline
+        - generic [ref=e164] [cursor=pointer]:
+          - button [ref=e165]:
+            - img [ref=e166]
+          - generic [ref=e168]: Chat
+        - generic [ref=e169] [cursor=pointer]:
+          - button [ref=e170]:
+            - img [ref=e171]
+          - generic [ref=e174]: Commercial
+        - generic [ref=e175] [cursor=pointer]:
+          - button [ref=e176]:
+            - img [ref=e177]
+          - generic [ref=e179]: Templates
+        - generic [ref=e180] [cursor=pointer]:
+          - button [ref=e181]:
+            - img [ref=e182]
+          - generic [ref=e185]: Explore
+        - generic [ref=e186] [cursor=pointer]:
+          - button [ref=e187]:
+            - img [ref=e188]
+          - generic [ref=e191]: Library
+        - generic [ref=e192] [cursor=pointer]:
+          - button [ref=e193]:
+            - img [ref=e194]
+          - generic [ref=e199]: Community
+        - generic [ref=e200] [cursor=pointer]:
+          - button [ref=e201]:
+            - img [ref=e202]
+          - generic [ref=e206]: Assist
+        - generic [ref=e207] [cursor=pointer]:
+          - button [ref=e208]:
+            - img [ref=e209]
+          - generic [ref=e212]: Commits (0)
+        - generic [ref=e213] [cursor=pointer]:
+          - button [ref=e214]:
+            - img [ref=e215]
+          - generic [ref=e219]: Remix Go
+      - generic [ref=e221] [cursor=pointer]:
+        - button [ref=e222]:
+          - img [ref=e223]
+        - generic [ref=e226]: Settings
+    - main [ref=e227]:
+      - generic [ref=e229]:
+        - generic [ref=e230]:
+          - heading "AI-VFX Studio" [level=1] [ref=e231]
+          - paragraph [ref=e232]: Apply AI-powered visual effects and transformations to your videos and images with 85+ cinematic effects.
+        - generic [ref=e233]:
+          - button "⭐ AI Effects" [ref=e234]:
+            - generic [ref=e235]: ⭐
+            - generic [ref=e236]: AI Effects
+          - button "🎬 Motion Controls" [ref=e237]:
+            - generic [ref=e238]: 🎬
+            - generic [ref=e239]: Motion Controls
+          - button "⭐ VFX" [ref=e240]:
+            - generic [ref=e241]: ⭐
+            - generic [ref=e242]: VFX
+          - button "⚡ Pika Effects" [ref=e243]:
+            - generic [ref=e244]: ⚡
+            - generic [ref=e245]: Pika Effects
+          - button "🎭 April Fools" [ref=e246]:
+            - generic [ref=e247]: 🎭
+            - generic [ref=e248]: April Fools
+        - generic [ref=e249]:
+          - generic [ref=e250]:
+            - generic [ref=e251]: ⭐
+            - heading "AI Effects" [level=2] [ref=e252]
+          - generic [ref=e253]:
+            - generic [ref=e254] [cursor=pointer]:
+              - generic [ref=e255]:
+                - img "Kiss Me AI" [ref=e256]
+                - img [ref=e259]
+              - paragraph [ref=e261]: Kiss Me AI
+            - generic [ref=e262] [cursor=pointer]:
+              - generic [ref=e263]:
+                - img "Kiss" [ref=e264]
+                - img [ref=e267]
+              - paragraph [ref=e269]: Kiss
+            - generic [ref=e270] [cursor=pointer]:
+              - generic [ref=e271]:
+                - img "Venom" [ref=e272]
+                - img [ref=e275]
+              - paragraph [ref=e277]: Venom
+            - generic [ref=e278] [cursor=pointer]:
+              - generic [ref=e279]:
+                - img "Hulk" [ref=e280]
+                - img [ref=e283]
+              - paragraph [ref=e285]: Hulk
+            - generic [ref=e286] [cursor=pointer]:
+              - generic [ref=e287]:
+                - img "Muscle Surge" [ref=e288]
+                - img [ref=e291]
+              - paragraph [ref=e293]: Muscle Surge
+            - generic [ref=e294] [cursor=pointer]:
+              - generic [ref=e295]:
+                - img "The Tiger Touch" [ref=e296]
+                - img [ref=e299]
+              - paragraph [ref=e301]: The Tiger Touch
+            - generic [ref=e302] [cursor=pointer]:
+              - generic [ref=e303]:
+                - img "Anything, Robot" [ref=e304]
+                - img [ref=e307]
+              - paragraph [ref=e309]: Anything, Robot
+            - generic [ref=e310] [cursor=pointer]:
+              - generic [ref=e311]:
+                - img "Warmth of Jesus" [ref=e312]
+                - img [ref=e315]
+              - paragraph [ref=e317]: Warmth of Jesus
+            - generic [ref=e318] [cursor=pointer]:
+              - generic [ref=e319]:
+                - img "Holy Wings" [ref=e320]
+                - img [ref=e323]
+              - paragraph [ref=e325]: Holy Wings
+            - generic [ref=e326] [cursor=pointer]:
+              - generic [ref=e327]:
+                - img "Microwave" [ref=e328]
+                - img [ref=e331]
+              - paragraph [ref=e333]: Microwave
+        - generic [ref=e334]:
+          - generic [ref=e335]:
+            - generic [ref=e336]: 🎬
+            - heading "Motion Controls" [level=2] [ref=e337]
+          - generic [ref=e338]:
+            - generic [ref=e339] [cursor=pointer]:
+              - img "360 Orbit" [ref=e341]
+              - paragraph [ref=e342]: 360 Orbit
+            - generic [ref=e343] [cursor=pointer]:
+              - img "Hero Run" [ref=e345]
+              - paragraph [ref=e346]: Hero Run
+            - generic [ref=e347] [cursor=pointer]:
+              - img "Arc Shot" [ref=e349]
+              - paragraph [ref=e350]: Arc Shot
+            - generic [ref=e351] [cursor=pointer]:
+              - img "Matrix Shot" [ref=e353]
+              - paragraph [ref=e354]: Matrix Shot
+            - generic [ref=e355] [cursor=pointer]:
+              - img "Car Chase" [ref=e357]
+              - paragraph [ref=e358]: Car Chase
+            - generic [ref=e359] [cursor=pointer]:
+              - img "Crane Down" [ref=e361]
+              - paragraph [ref=e362]: Crane Down
+            - generic [ref=e363] [cursor=pointer]:
+              - img "Crane Overhead" [ref=e365]
+              - paragraph [ref=e366]: Crane Overhead
+            - generic [ref=e367] [cursor=pointer]:
+              - img "Crane Up" [ref=e369]
+              - paragraph [ref=e370]: Crane Up
+            - generic [ref=e371] [cursor=pointer]:
+              - img "Crash Zoom In" [ref=e373]
+              - paragraph [ref=e374]: Crash Zoom In
+            - generic [ref=e375] [cursor=pointer]:
+              - img "Crash Zoom Out" [ref=e377]
+              - paragraph [ref=e378]: Crash Zoom Out
+        - generic [ref=e379]:
+          - generic [ref=e380]:
+            - generic [ref=e381]: ⭐
+            - heading "VFX Controls" [level=2] [ref=e382]
+          - generic [ref=e383]:
+            - generic [ref=e384] [cursor=pointer]:
+              - img "Levitate" [ref=e386]
+              - paragraph [ref=e387]: Levitate
+            - generic [ref=e388] [cursor=pointer]:
+              - img "Disintegration" [ref=e390]
+              - paragraph [ref=e391]: Disintegration
+            - generic [ref=e392] [cursor=pointer]:
+              - img "Flying" [ref=e394]
+              - paragraph [ref=e395]: Flying
+            - generic [ref=e396] [cursor=pointer]:
+              - img "Car Explosion" [ref=e398]
+              - paragraph [ref=e399]: Car Explosion
+            - generic [ref=e400] [cursor=pointer]:
+              - img "Tornado" [ref=e402]
+              - paragraph [ref=e403]: Tornado
+            - generic [ref=e404] [cursor=pointer]:
+              - img "Electricity" [ref=e406]
+              - paragraph [ref=e407]: Electricity
+            - generic [ref=e408] [cursor=pointer]:
+              - img "Huge Explosion" [ref=e410]
+              - paragraph [ref=e411]: Huge Explosion
+            - generic [ref=e412] [cursor=pointer]:
+              - img "Decay Time-Lapse" [ref=e414]
+              - paragraph [ref=e415]: Decay Time-Lapse
+            - generic [ref=e416] [cursor=pointer]:
+              - img "Tsunami" [ref=e418]
+              - paragraph [ref=e419]: Tsunami
+            - generic [ref=e420] [cursor=pointer]:
+              - img "Fire" [ref=e422]
+              - paragraph [ref=e423]: Fire
+            - generic [ref=e424] [cursor=pointer]:
+              - img "Robotic Face Reveal" [ref=e426]
+              - paragraph [ref=e427]: Robotic Face Reveal
+            - generic [ref=e428] [cursor=pointer]:
+              - img "Building Explosion" [ref=e430]
+              - paragraph [ref=e431]: Building Explosion
+        - generic [ref=e432]:
+          - generic [ref=e433]:
+            - generic [ref=e434]: ⚡
+            - heading "Pika Effects" [level=2] [ref=e435]
+          - generic [ref=e436]:
+            - generic [ref=e437] [cursor=pointer]:
+              - generic [ref=e438]:
+                - img "Explode" [ref=e439]
+                - img [ref=e442]
+              - paragraph [ref=e444]: Explode
+            - generic [ref=e445] [cursor=pointer]:
+              - generic [ref=e446]:
+                - img "Eye-pop" [ref=e447]
+                - img [ref=e450]
+              - paragraph [ref=e452]: Eye-pop
+            - generic [ref=e453] [cursor=pointer]:
+              - generic [ref=e454]:
+                - img "Melt" [ref=e455]
+                - img [ref=e458]
+              - paragraph [ref=e460]: Melt
+            - generic [ref=e461] [cursor=pointer]:
+              - generic [ref=e462]:
+                - img "Dissolve" [ref=e463]
+                - img [ref=e466]
+              - paragraph [ref=e468]: Dissolve
+            - generic [ref=e469] [cursor=pointer]:
+              - generic [ref=e470]:
+                - img "Poke" [ref=e471]
+                - img [ref=e474]
+              - paragraph [ref=e476]: Poke
+            - generic [ref=e477] [cursor=pointer]:
+              - generic [ref=e478]:
+                - img "Ta-da" [ref=e479]
+                - img [ref=e482]
+              - paragraph [ref=e484]: Ta-da
+            - generic [ref=e485] [cursor=pointer]:
+              - generic [ref=e486]:
+                - img "Crumble" [ref=e487]
+                - img [ref=e490]
+              - paragraph [ref=e492]: Crumble
+            - generic [ref=e493] [cursor=pointer]:
+              - generic [ref=e494]:
+                - img "Peel" [ref=e495]
+                - img [ref=e498]
+              - paragraph [ref=e500]: Peel
+            - generic [ref=e501] [cursor=pointer]:
+              - generic [ref=e502]:
+                - img "Tear" [ref=e503]
+                - img [ref=e506]
+              - paragraph [ref=e508]: Tear
+            - generic [ref=e509] [cursor=pointer]:
+              - generic [ref=e510]:
+                - img "Decapitate" [ref=e511]
+                - img [ref=e514]
+              - paragraph [ref=e516]: Decapitate
+        - generic [ref=e517]:
+          - generic [ref=e518]:
+            - generic [ref=e519]: 🎭
+            - heading "April Fools Pranks" [level=2] [ref=e520]
+          - generic [ref=e521]:
+            - generic [ref=e522] [cursor=pointer]:
+              - generic [ref=e523]:
+                - img "Animal Head" [ref=e524]
+                - img [ref=e527]
+              - paragraph [ref=e529]: Animal Head
+            - generic [ref=e530] [cursor=pointer]:
+              - generic [ref=e531]:
+                - img "Big Ears" [ref=e532]
+                - img [ref=e535]
+              - paragraph [ref=e537]: Big Ears
+            - generic [ref=e538] [cursor=pointer]:
+              - generic [ref=e539]:
+                - img "Big Nose" [ref=e540]
+                - img [ref=e543]
+              - paragraph [ref=e545]: Big Nose
+            - generic [ref=e546] [cursor=pointer]:
+              - generic [ref=e547]:
+                - img "Black Hole Face" [ref=e548]
+                - img [ref=e551]
+              - paragraph [ref=e553]: Black Hole Face
+            - generic [ref=e554] [cursor=pointer]:
+              - generic [ref=e555]:
+                - img "Bobblehead" [ref=e556]
+                - img [ref=e559]
+              - paragraph [ref=e561]: Bobblehead
+            - generic [ref=e562] [cursor=pointer]:
+              - generic [ref=e563]:
+                - img "Clown Nose" [ref=e564]
+                - img [ref=e567]
+              - paragraph [ref=e569]: Clown Nose
+            - generic [ref=e570] [cursor=pointer]:
+              - generic [ref=e571]:
+                - img "Clown Outfit" [ref=e572]
+                - img [ref=e575]
+              - paragraph [ref=e577]: Clown Outfit
+            - generic [ref=e578] [cursor=pointer]:
+              - generic [ref=e579]:
+                - img "Crazy Hair" [ref=e580]
+                - img [ref=e583]
+              - paragraph [ref=e585]: Crazy Hair
+            - generic [ref=e586] [cursor=pointer]:
+              - generic [ref=e587]:
+                - img "Creepy Photobomb" [ref=e588]
+                - img [ref=e591]
+              - paragraph [ref=e593]: Creepy Photobomb
+            - generic [ref=e594] [cursor=pointer]:
+              - generic [ref=e595]:
+                - img "Crossed Eyes" [ref=e596]
+                - img [ref=e599]
+              - paragraph [ref=e601]: Crossed Eyes
+            - generic [ref=e602] [cursor=pointer]:
+              - generic [ref=e603]:
+                - img "Deal With It" [ref=e604]
+                - img [ref=e607]
+              - paragraph [ref=e609]: Deal With It
+            - generic [ref=e610] [cursor=pointer]:
+              - generic [ref=e611]:
+                - img "Dirty Teeth" [ref=e612]
+                - img [ref=e615]
+              - paragraph [ref=e617]: Dirty Teeth
+            - generic [ref=e618] [cursor=pointer]:
+              - generic [ref=e619]:
+                - img "Energy Drink" [ref=e620]
+                - img [ref=e623]
+              - paragraph [ref=e625]: Energy Drink
+            - generic [ref=e626] [cursor=pointer]:
+              - generic [ref=e627]:
+                - img "Extra Head" [ref=e628]
+                - img [ref=e631]
+              - paragraph [ref=e633]: Extra Head
+            - generic [ref=e634] [cursor=pointer]:
+              - generic [ref=e635]:
+                - img "Fake News" [ref=e636]
+                - img [ref=e639]
+              - paragraph [ref=e641]: Fake News
+            - generic [ref=e642] [cursor=pointer]:
+              - generic [ref=e643]:
+                - img "Frizzy Hair" [ref=e644]
+                - img [ref=e647]
+              - paragraph [ref=e649]: Frizzy Hair
+            - generic [ref=e650] [cursor=pointer]:
+              - generic [ref=e651]:
+                - img "Fruit Head" [ref=e652]
+                - img [ref=e655]
+              - paragraph [ref=e657]: Fruit Head
+            - generic [ref=e658] [cursor=pointer]:
+              - generic [ref=e659]:
+                - img "Giant Baby" [ref=e660]
+                - img [ref=e663]
+              - paragraph [ref=e665]: Giant Baby
+            - generic [ref=e666] [cursor=pointer]:
+              - generic [ref=e667]:
+                - img "Glitch Face" [ref=e668]
+                - img [ref=e671]
+              - paragraph [ref=e673]: Glitch Face
+            - generic [ref=e674] [cursor=pointer]:
+              - generic [ref=e675]:
+                - img "Green Skin" [ref=e676]
+                - img [ref=e679]
+              - paragraph [ref=e681]: Green Skin
+            - generic [ref=e682] [cursor=pointer]:
+              - generic [ref=e683]:
+                - img "Invisible Food" [ref=e684]
+                - img [ref=e687]
+              - paragraph [ref=e689]: Invisible Food
+            - generic [ref=e690] [cursor=pointer]:
+              - generic [ref=e691]:
+                - img "Jell-O Body" [ref=e692]
+                - img [ref=e695]
+              - paragraph [ref=e697]: Jell-O Body
+            - generic [ref=e698] [cursor=pointer]:
+              - generic [ref=e699]:
+                - img "Meme Face" [ref=e700]
+                - img [ref=e703]
+              - paragraph [ref=e705]: Meme Face
+            - generic [ref=e706] [cursor=pointer]:
+              - generic [ref=e707]:
+                - img "Messy Hair" [ref=e708]
+                - img [ref=e711]
+              - paragraph [ref=e713]: Messy Hair
+            - generic [ref=e714] [cursor=pointer]:
+              - generic [ref=e715]:
+                - img "Mirror Glitch" [ref=e716]
+                - img [ref=e719]
+              - paragraph [ref=e721]: Mirror Glitch
+            - generic [ref=e722] [cursor=pointer]:
+              - generic [ref=e723]:
+                - img "Mixed-Up Face" [ref=e724]
+                - img [ref=e727]
+              - paragraph [ref=e729]: Mixed-Up Face
+            - generic [ref=e730] [cursor=pointer]:
+              - generic [ref=e731]:
+                - img "Noodle Hair" [ref=e732]
+                - img [ref=e735]
+              - paragraph [ref=e737]: Noodle Hair
+            - generic [ref=e738] [cursor=pointer]:
+              - generic [ref=e739]:
+                - img "Old Cyborg" [ref=e740]
+                - img [ref=e743]
+              - paragraph [ref=e745]: Old Cyborg
+            - generic [ref=e746] [cursor=pointer]:
+              - generic [ref=e747]:
+                - img "Oversized Bowtie" [ref=e748]
+                - img [ref=e751]
+              - paragraph [ref=e753]: Oversized Bowtie
+            - generic [ref=e754] [cursor=pointer]:
+              - generic [ref=e755]:
+                - img "Shocked Face" [ref=e756]
+                - img [ref=e759]
+              - paragraph [ref=e761]: Shocked Face
+            - generic [ref=e762] [cursor=pointer]:
+              - generic [ref=e763]:
+                - img "Sleep Deprived" [ref=e764]
+                - img [ref=e767]
+              - paragraph [ref=e769]: Sleep Deprived
+            - generic [ref=e770] [cursor=pointer]:
+              - generic [ref=e771]:
+                - img "Space Suit" [ref=e772]
+                - img [ref=e775]
+              - paragraph [ref=e777]: Space Suit
+            - generic [ref=e778] [cursor=pointer]:
+              - generic [ref=e779]:
+                - img "Steam Ears" [ref=e780]
+                - img [ref=e783]
+              - paragraph [ref=e785]: Steam Ears
+            - generic [ref=e786] [cursor=pointer]:
+              - generic [ref=e787]:
+                - img "Superhero Cape" [ref=e788]
+                - img [ref=e791]
+              - paragraph [ref=e793]: Superhero Cape
+            - generic [ref=e794] [cursor=pointer]:
+              - generic [ref=e795]:
+                - img "Thick Glasses" [ref=e796]
+                - img [ref=e799]
+              - paragraph [ref=e801]: Thick Glasses
+            - generic [ref=e802] [cursor=pointer]:
+              - generic [ref=e803]:
+                - img "Third Eye" [ref=e804]
+                - img [ref=e807]
+              - paragraph [ref=e809]: Third Eye
+            - generic [ref=e810] [cursor=pointer]:
+              - generic [ref=e811]:
+                - img "Tiny Mustache" [ref=e812]
+                - img [ref=e815]
+              - paragraph [ref=e817]: Tiny Mustache
+            - generic [ref=e818] [cursor=pointer]:
+              - generic [ref=e819]:
+                - img "Trapped in Tv" [ref=e820]
+                - img [ref=e823]
+              - paragraph [ref=e825]: Trapped in Tv
+            - generic [ref=e826] [cursor=pointer]:
+              - generic [ref=e827]:
+                - img "Ugly Sweater" [ref=e828]
+                - img [ref=e831]
+              - paragraph [ref=e833]: Ugly Sweater
+        - generic [ref=e835]:
+          - button "×" [ref=e836]
+          - button "Image URL" [ref=e838]:
+            - img [ref=e839]
+            - text: Image URL
+          - generic [ref=e842]:
+            - textbox "Enter your prompt here" [ref=e843]
+            - button [ref=e844]:
+              - img [ref=e845]
+          - generic [ref=e847]:
+            - generic [ref=e848]:
+              - generic [ref=e849]: Aspect Ratio
+              - combobox [ref=e850]:
+                - option "16:9"
+                - option "9:16" [selected]
+                - option "1:1"
+            - generic [ref=e851]:
+              - generic [ref=e852]: Duration
+              - combobox [ref=e853]:
+                - option "5s" [selected]
+                - option "10s"
+            - generic [ref=e854]:
+              - generic [ref=e855]: Resolution
+              - combobox [ref=e856]:
+                - option "480p" [selected]
+                - option "720p"
+            - generic [ref=e857]:
+              - generic [ref=e858]: Quality
+              - combobox [ref=e859]:
+                - option "Medium" [selected]
+                - option "High"

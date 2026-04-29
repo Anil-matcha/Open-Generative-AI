@@ -1,10 +1,16 @@
 [build]
   publish = "dist"
   # Use pnpm for better monorepo support
-  command = "pnpm install --ignore-scripts && pnpm run build:all"
+  command = "pnpm install --ignore-scripts && pnpm run build:all && pnpm run build:storyboarder"
 
 [functions]
   directory = "netlify/functions/dist"
+
+# AI Storyboarder specific build
+[[redirects]]
+  from = "/apps/storyboarder/*"
+  to = "/apps/storyboarder/index.html"
+  status = 200
 
 [build.environment]
   NODE_VERSION = "20"

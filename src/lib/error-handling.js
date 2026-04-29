@@ -137,7 +137,8 @@ class ErrorLogger {
 
   reportCriticalError(error) {
     // In production, send to error reporting service
-    if (process.env.NODE_ENV === 'production') {
+    const isProduction = typeof process !== 'undefined' && process.env ? process.env.NODE_ENV === 'production' : false;
+    if (isProduction) {
       // Example: send to error reporting service
       // errorReportingService.report(error);
       console.error('CRITICAL ERROR REPORTED:', error);

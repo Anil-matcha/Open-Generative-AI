@@ -13,7 +13,7 @@ export class MuAPIIntegrationManager {
   constructor(config = {}) {
     // Load configuration from environment or defaults
     this.config = {
-      apiKey: config.apiKey || process.env.MUAPI_API_KEY,
+      apiKey: config.apiKey || (typeof process !== 'undefined' && process.env ? process.env.MUAPI_API_KEY : null),
       baseURL: config.baseURL || 'https://muapi.ai/api/v1',
       enableAIEnhancement: config.enableAIEnhancement !== false,
       enableBatchProcessing: config.enableBatchProcessing !== false,

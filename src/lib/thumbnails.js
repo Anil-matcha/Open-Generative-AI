@@ -14,6 +14,7 @@ const STUDIO_THUMBNAILS = {
   videotools: '/thumbnails/studios/videotools.webp',
   chat: '/thumbnails/studios/chat.webp',
   'advanced-dubbing': '/thumbnails/studios/advanced-dubbing.webp',
+  'ai-vfx': '/thumbnails/studios/ai-vfx.webp',
 };
 
 const HERO_THUMBNAILS = {
@@ -37,6 +38,7 @@ const HERO_THUMBNAILS = {
   chat: '/thumbnails/heroes/chat.webp',
   'advanced-dubbing': '/thumbnails/heroes/advanced-dubbing.webp',
   templates: '/thumbnails/heroes/templates.webp',
+  'ai-vfx': '/thumbnails/heroes/ai-vfx.webp',
 };
 
 const TOOL_THUMBNAILS = {

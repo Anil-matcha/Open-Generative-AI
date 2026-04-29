@@ -57,7 +57,8 @@ export function createSecureIframe(src, options = {}) {
   const iframe = document.createElement('iframe');
   
   // Only allow HTTPS URLs in production
-  if (process.env.NODE_ENV === 'production' && src && !src.startsWith('https://')) {
+  const isProduction = typeof process !== 'undefined' && process.env ? process.env.NODE_ENV === 'production' : false;
+  if (isProduction && src && !src.startsWith('https://')) {
     throw new Error('Insecure iframe source not allowed in production');
   }
   
@@ -156,7 +157,8 @@ export function setupCSPViolationReporting() {
       });
       
       // In production, you might want to send this to a logging service
-      if (process.env.NODE_ENV === 'production') {
+      const isProduction = typeof process !== 'undefined' && process.env ? process.env.NODE_ENV === 'production' : false;
+      if (isProduction) {
         // analytics.track('csp_violation', {
         //   directive: event.violatedDirective,
         //   blockedURI: event.blockedURI
@@ -193,7 +195,8 @@ export async function secureApiRequest(url, options = {}) {
   }
   
   // Ensure HTTPS in production
-  if (process.env.NODE_ENV === 'production' && !url.startsWith('https://')) {
+  const isProduction = typeof process !== 'undefined' && process.env ? process.env.NODE_ENV === 'production' : false;
+  if (isProduction && !url.startsWith('https://')) {
     throw new Error('Insecure API requests not allowed in production');
   }
   
