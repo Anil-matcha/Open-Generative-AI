@@ -503,7 +503,7 @@ button, input, textarea, select { font: inherit; }
               </div>
             </div>
           </div>
-          <input type="file" id="uploadInput" accept="video/*,image/*,audio/*,.txt" hidden />
+          <input type="file" id="uploadInput" accept="video/*,image/*,audio/*,.txt" hidden data-testid="file-input" />
           <div class="preview-overlay">
             <div class="time-row">
               <span id="currentTime">00:12.40</span>
@@ -518,7 +518,7 @@ button, input, textarea, select { font: inherit; }
           </div>
         </section>
       </div>
-      <section class="timeline-card">
+      <section class="timeline-card" data-testid="timeline-container">
         <div class="timeline-top">
           <div class="toolbar-left">
             <div class="tool-group" id="toolGroup"></div>
@@ -3164,19 +3164,23 @@ button, input, textarea, select { font: inherit; }
           throw new Error('No result URL returned from generation');
         }
 
-      } catch (error) {
-        console.error('Generation error:', error);
-        // Provide user-friendly error messages
-        if (error.message?.includes('401') || error.message?.includes('auth')) {
-          showToast('Generation requires authentication. Please sign in.', 'warning');
-        } else if (error.message?.includes('Supabase')) {
-          showToast('Generation features require Supabase setup', 'warning');
-        } else if (error.message?.includes('fetch') || error.message?.includes('network')) {
-          showToast('Network error - please check connection', 'error');
-        } else {
-          showToast(`Generation failed: ${error.message}`, 'error');
-        }
-      } finally {
+       } catch (error) {
+         console.error('Generation error:', error);
+         // Provide user-friendly error messages
+         const msg = error.message || '';
+         
+         if (msg.includes('401') || msg.includes('auth')) {
+           showToast('Generation requires authentication. Please sign in.', 'warning');
+         } else if (msg.includes('Supabase') || msg.includes('configuration')) {
+           showToast('AI features require setup. Please check your environment configuration.', 'warning');
+         } else if (msg.includes('fetch') || msg.includes('network') || msg.includes('Network')) {
+           showToast('Network error - please check connection', 'error');
+         } else if (msg.includes('API key not configured') || msg.includes('service is not configured')) {
+           showToast('AI service not configured. Please set up your API keys in Supabase edge function settings.', 'error');
+         } else {
+           showToast(`Generation failed: ${msg}`, 'error');
+         }
+       } finally {
         state.isProcessing = false;
         // Save project state after generation
         saveProjectToStorage(state);

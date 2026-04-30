@@ -1,4 +1,5 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi, type Mock } from 'vitest';
+import type { RouteChangeEvent } from '@higgsfield/navigation';
 
 // Mock CustomEvent
 global.CustomEvent = vi.fn((type: string, options?: any) => ({
@@ -34,7 +35,7 @@ describe('Route Events Unit Tests', () => {
 
   describe('dispatchRouteChange', () => {
     it('should dispatch route change event with page and params', async () => {
-      const { dispatchRouteChange } = await import('../../../packages/navigation/src/route-events.js');
+      const { dispatchRouteChange } = await import('@higgsfield/navigation');
 
       const page = 'timeline';
       const params = { tab: 'settings', view: 'advanced' };
@@ -52,7 +53,7 @@ describe('Route Events Unit Tests', () => {
     });
 
     it('should dispatch event without params when none provided', async () => {
-      const { dispatchRouteChange } = await import('../../../packages/navigation/src/route-events.js');
+      const { dispatchRouteChange } = await import('@higgsfield/navigation');
 
       dispatchRouteChange(mockElement, 'library');
 
@@ -64,7 +65,7 @@ describe('Route Events Unit Tests', () => {
     });
 
     it('should handle empty params object', async () => {
-      const { dispatchRouteChange } = await import('../../../packages/navigation/src/route-events.js');
+      const { dispatchRouteChange } = await import('@higgsfield/navigation');
 
       dispatchRouteChange(mockElement, 'settings', {});
 
@@ -77,7 +78,7 @@ describe('Route Events Unit Tests', () => {
 
   describe('onRouteChange', () => {
     it('should add event listener for route changes', async () => {
-      const { onRouteChange } = await import('../../../packages/navigation/src/route-events.js');
+      const { onRouteChange } = await import('@higgsfield/navigation');
 
       const callback = vi.fn();
 
@@ -98,7 +99,7 @@ describe('Route Events Unit Tests', () => {
     });
 
     it('should handle events without params', async () => {
-      const { onRouteChange } = await import('../../../packages/navigation/src/route-events.js');
+      const { onRouteChange } = await import('@higgsfield/navigation');
 
       const callback = vi.fn();
 
@@ -115,7 +116,7 @@ describe('Route Events Unit Tests', () => {
     });
 
     it('should return unsubscribe function that removes event listener', async () => {
-      const { onRouteChange } = await import('../../../packages/navigation/src/route-events.js');
+      const { onRouteChange } = await import('@higgsfield/navigation');
 
       const callback = vi.fn();
 
@@ -131,7 +132,7 @@ describe('Route Events Unit Tests', () => {
     });
 
     it('should handle multiple event listeners', async () => {
-      const { onRouteChange } = await import('../../../packages/navigation/src/route-events.js');
+      const { onRouteChange } = await import('@higgsfield/navigation');
 
       const callback1 = vi.fn();
       const callback2 = vi.fn();
@@ -162,14 +163,11 @@ describe('Route Events Unit Tests', () => {
     });
   });
 
-  describe('RouteChangeEvent Type', () => {
-    it('should have correct type structure', async () => {
-      const { RouteChangeEvent } = await import('../../../packages/navigation/src/route-events.js');
+   describe('RouteChangeEvent Type', () => {
+     it('should have correct type structure', async () => {
+       // RouteChangeEvent imported as type at top of file
 
-      // RouteChangeEvent is a type, so we test the interface structure
-      // by creating a mock event that matches the interface
-
-      const mockRouteChangeEvent: typeof RouteChangeEvent = {
+       const mockRouteChangeEvent: RouteChangeEvent = {
         detail: {
           page: 'timeline',
           params: { tab: 'clips' }
@@ -195,7 +193,7 @@ describe('Route Events Unit Tests', () => {
 
   describe('Event Bubbling and Composition', () => {
     it('should create events that bubble and are composed', async () => {
-      const { dispatchRouteChange } = await import('../../../packages/navigation/src/route-events.js');
+      const { dispatchRouteChange } = await import('@higgsfield/navigation');
 
       dispatchRouteChange(mockElement, 'settings');
 
@@ -206,7 +204,7 @@ describe('Route Events Unit Tests', () => {
     });
 
     it('should allow events to bubble up the DOM tree', async () => {
-      const { onRouteChange } = await import('../../../packages/navigation/src/route-events.js');
+      const { onRouteChange } = await import('@higgsfield/navigation');
 
       const parentElement = new MockHTMLElement() as any;
       const childElement = new MockHTMLElement() as any;
@@ -236,7 +234,7 @@ describe('Route Events Unit Tests', () => {
 
   describe('Event Handler Error Handling', () => {
     it('should handle callback errors gracefully', async () => {
-      const { onRouteChange } = await import('../../../packages/navigation/src/route-events.js');
+      const { onRouteChange } = await import('@higgsfield/navigation');
 
       const failingCallback = vi.fn(() => {
         throw new Error('Callback failed');
@@ -258,7 +256,7 @@ describe('Route Events Unit Tests', () => {
     });
 
     it('should handle malformed events', async () => {
-      const { onRouteChange } = await import('../../../packages/navigation/src/route-events.js');
+      const { onRouteChange } = await import('@higgsfield/navigation');
 
       const callback = vi.fn();
 
@@ -280,7 +278,7 @@ describe('Route Events Unit Tests', () => {
 
   describe('Memory Management', () => {
     it('should not leak event listeners when unsubscribed', async () => {
-      const { onRouteChange } = await import('../../../packages/navigation/src/route-events.js');
+      const { onRouteChange } = await import('@higgsfield/navigation');
 
       const callback = vi.fn();
 
@@ -300,7 +298,7 @@ describe('Route Events Unit Tests', () => {
     });
 
     it('should handle multiple unsubscribe calls safely', async () => {
-      const { onRouteChange } = await import('../../../packages/navigation/src/route-events.js');
+      const { onRouteChange } = await import('@higgsfield/navigation');
 
       const callback = vi.fn();
 

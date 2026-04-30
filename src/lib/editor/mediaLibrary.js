@@ -11,6 +11,7 @@ export function renderMediaGrid(mediaItems, container, onMediaSelect, showToast,
     const item = document.createElement('button');
     item.className = 'media-item drag-ready';
     item.dataset.mediaIndex = index;
+    item.setAttribute('data-testid', 'media-item');
     item.innerHTML = `
       <span class="media-icon">${media.icon}</span>
       <span class="media-copy">

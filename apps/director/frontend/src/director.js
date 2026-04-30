@@ -1,11 +1,20 @@
+/**
+ * Director App - Vanilla JS Entry Point
+ * Converted from Vue architecture, preserves original logic exactly
+ */
+
 import './styles.css';
 import axios from 'axios';
 import { io } from 'socket.io-client';
 
+// ==================== MODULE SCOPE (original main.js top-level code) ====================
+
+const BACKEND_URL = import.meta.env.VITE_APP_BACKEND_URL || 'http://localhost:8000';
+
 // Backend connection setup
 const socket = io();
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000'
+  baseURL: BACKEND_URL
 });
 
 // Backend integration functions
@@ -125,6 +134,61 @@ function formatTimeFromPercent(percent, totalSeconds) {
   const seconds = Math.floor(current % 60);
   const hundredths = Math.floor((current % 1) * 100);
   return String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0') + '.' + String(hundredths).padStart(2, '0');
+}
+
+function updatePlaybackUI() {
+  els.progressFill.style.width = state.playheadPercent + '%';
+  els.playheadLine.style.left = state.playheadPercent + '%';
+  els.playheadKnob.style.left = 'calc(' + state.playheadPercent + '% - 4px)';
+  els.currentTime.textContent = formatTimeFromPercent(state.playheadPercent, state.timelineSeconds);
+  els.totalTime.textContent = formatTimeFromPercent(100, state.timelineSeconds);
+  els.playBtn.textContent = state.playing ? '❚❚' : '▶';
+}
+
+function togglePlayback() {
+  state.playing = !state.playing;
+  if (state.playing) {
+    playbackTimer = setInterval(() => {
+      state.playheadPercent += 0.6;
+      if (state.playheadPercent >= 100) {
+        state.playheadPercent = 100;
+        state.playing = false;
+        clearInterval(playbackTimer);
+      }
+      updatePlaybackUI();
+    }, 120);
+  } else {
+    clearInterval(playbackTimer);
+  }
+  updatePlaybackUI();
+}
+
+function stopPlayback() {
+  state.playing = false;
+  clearInterval(playbackTimer);
+  state.playheadPercent = 0;
+  updatePlaybackUI();
+}
+
+function rewindPlayback() {
+  state.playing = false;
+  clearInterval(playbackTimer);
+  state.playheadPercent = Math.max(0, state.playheadPercent - 10);
+  updatePlaybackUI();
+}
+
+function updatePreview(clip) {
+  const selected = clip || state.tracks.flatMap(t => t.clips).find(c => c.id === state.selectedClipId);
+  els.projectTitle.textContent = state.projectTitle;
+  if (selected) {
+    els.previewTitle.textContent = selected.name;
+    els.previewSubtitle.textContent = state.selectedTool + ' tool active • ' + state.generateType + ' generation ready';
+    els.previewEmoji.textContent = selected.type === 'audio' ? '🎵' : selected.type === 'text' ? '📝' : selected.type === 'broll' ? '🎞️' : '🎥';
+  } else {
+    els.previewTitle.textContent = 'Center Preview';
+    els.previewSubtitle.textContent = 'Glow preview styled like the render page';
+    els.previewEmoji.textContent = '🎥';
+  }
 }
 
 function renderTopActions() {
@@ -304,121 +368,57 @@ function renderRail() {
   });
 }
 
-function updatePreview(clip) {
-  const selected = clip || state.tracks.flatMap(t => t.clips).find(c => c.id === state.selectedClipId);
-  els.projectTitle.textContent = state.projectTitle;
-  if (selected) {
-    els.previewTitle.textContent = selected.name;
-    els.previewSubtitle.textContent = state.selectedTool + ' tool active • ' + state.generateType + ' generation ready';
-    els.previewEmoji.textContent = selected.type === 'audio' ? '🎵' : selected.type === 'text' ? '📝' : selected.type === 'broll' ? '🎞️' : '🎥';
-  } else {
-    els.previewTitle.textContent = 'Center Preview';
-    els.previewSubtitle.textContent = 'Glow preview styled like the render page';
-    els.previewEmoji.textContent = '🎥';
+async function generateClip() {
+  const prompt = els.promptInput.value.trim() || (state.generateType + ' cinematic shot');
+  const negativePrompt = els.negativeInput.value.trim();
+  const duration = els.durationSelect.value;
+  const aspect = els.aspectSelect.value;
+  const style = els.styleSelect.value;
+
+  try {
+    showToast('Starting generation...');
+    const response = await api.post('/generate', {
+      type: state.generateType.toLowerCase(),
+      prompt,
+      negativePrompt,
+      duration,
+      aspect,
+      style
+    });
+
+    state.chat.push({ role: 'user', text: state.generateType + ' generate: ' + prompt });
+    state.chat.push({ role: 'ai', text: 'Generation started. This may take a few minutes...' });
+    renderChat();
+  } catch (error) {
+    console.error('Generation failed:', error);
+    showToast('Generation failed. Please try again.');
+    state.chat.push({ role: 'ai', text: 'Generation failed. Please check your settings and try again.' });
+    renderChat();
   }
 }
 
-function updatePlaybackUI() {
-  els.progressFill.style.width = state.playheadPercent + '%';
-  els.playheadLine.style.left = state.playheadPercent + '%';
-  els.playheadKnob.style.left = 'calc(' + state.playheadPercent + '% - 4px)';
-  els.currentTime.textContent = formatTimeFromPercent(state.playheadPercent, state.timelineSeconds);
-  els.totalTime.textContent = formatTimeFromPercent(100, state.timelineSeconds);
-  els.playBtn.textContent = state.playing ? '❚❚' : '▶';
-}
+async function handleChatSubmit() {
+  const text = els.chatInput.value.trim();
+  if (!text) return;
 
-function togglePlayback() {
-  state.playing = !state.playing;
-  if (state.playing) {
-    playbackTimer = setInterval(() => {
-      state.playheadPercent += 0.6;
-      if (state.playheadPercent >= 100) {
-        state.playheadPercent = 100;
-        state.playing = false;
-        clearInterval(playbackTimer);
-      }
-      updatePlaybackUI();
-    }, 120);
-  } else {
-    clearInterval(playbackTimer);
+  state.chat.push({ role: 'user', text });
+
+  try {
+    const response = await api.post('/chat', { message: text });
+    state.chat.push({ role: 'ai', text: response.data.reply });
+  } catch (error) {
+    let reply = 'Command processed.';
+    if (/generate/i.test(text)) reply = 'Generate command staged. Use the Generate panel to create the clip.';
+    if (/retake/i.test(text)) reply = 'Retake command staged for the selected clip.';
+    if (/extend/i.test(text)) reply = 'Extend command queued for the selected clip.';
+    if (/b-roll|broll/i.test(text)) reply = 'B-Roll suggestion added to the sequence.';
+    state.chat.push({ role: 'ai', text: reply });
   }
-  updatePlaybackUI();
+
+  els.chatInput.value = '';
+  renderChat();
+  showToast('AI command processed');
 }
-
-function stopPlayback() {
-  state.playing = false;
-  clearInterval(playbackTimer);
-  state.playheadPercent = 0;
-  updatePlaybackUI();
-}
-
-function rewindPlayback() {
-  state.playing = false;
-  clearInterval(playbackTimer);
-  state.playheadPercent = Math.max(0, state.playheadPercent - 10);
-  updatePlaybackUI();
-}
-
-    async function generateClip() {
-      const prompt = els.promptInput.value.trim() || (state.generateType + ' cinematic shot');
-      const negativePrompt = els.negativeInput.value.trim();
-      const duration = els.durationSelect.value;
-      const aspect = els.aspectSelect.value;
-      const style = els.styleSelect.value;
-
-      try {
-        showToast('Starting generation...');
-
-        // Send to backend
-        const response = await api.post('/generate', {
-          type: state.generateType.toLowerCase(),
-          prompt,
-          negativePrompt,
-          duration,
-          aspect,
-          style
-        });
-
-        // Add to chat
-        state.chat.push({ role: 'user', text: state.generateType + ' generate: ' + prompt });
-        state.chat.push({ role: 'ai', text: 'Generation started. This may take a few minutes...' });
-        renderChat();
-
-        // Backend will handle the rest via socket events
-
-      } catch (error) {
-        console.error('Generation failed:', error);
-        showToast('Generation failed. Please try again.');
-        state.chat.push({ role: 'ai', text: 'Generation failed. Please check your settings and try again.' });
-        renderChat();
-      }
-    }
-
-    async function handleChatSubmit() {
-      const text = els.chatInput.value.trim();
-      if (!text) return;
-
-      state.chat.push({ role: 'user', text });
-
-      try {
-        // Send to AI backend for processing
-        const response = await api.post('/chat', { message: text });
-
-        state.chat.push({ role: 'ai', text: response.data.reply });
-      } catch (error) {
-        // Fallback to local processing
-        let reply = 'Command processed.';
-        if (/generate/i.test(text)) reply = 'Generate command staged. Use the Generate panel to create the clip.';
-        if (/retake/i.test(text)) reply = 'Retake command staged for the selected clip.';
-        if (/extend/i.test(text)) reply = 'Extend command queued for the selected clip.';
-        if (/b-roll|broll/i.test(text)) reply = 'B-Roll suggestion added to the sequence.';
-        state.chat.push({ role: 'ai', text: reply });
-      }
-
-      els.chatInput.value = '';
-      renderChat();
-      showToast('AI command processed');
-    }
 
 function addTrack(type) {
   const id = type.toLowerCase() + '-' + Date.now();
@@ -446,8 +446,14 @@ function bindEvents() {
     state.zoom = Math.max(0.5, state.zoom - 0.1);
     showToast('Zoom ' + state.zoom.toFixed(1) + 'x');
   }));
-  document.getElementById('uploadBtn').addEventListener('click', () => showToast('Upload flow placeholder triggered'));
-  document.getElementById('backBtn').addEventListener('click', () => showToast('Back action clicked'));
+  const uploadBtn = document.getElementById('uploadBtn');
+  if (uploadBtn) {
+    uploadBtn.addEventListener('click', () => showToast('Upload flow placeholder triggered'));
+  }
+  const backBtn = document.getElementById('backBtn');
+  if (backBtn) {
+    backBtn.addEventListener('click', () => showToast('Back action clicked'));
+  }
 }
 
 function renderAll() {
@@ -464,7 +470,25 @@ function renderAll() {
   updatePlaybackUI();
 }
 
-connectToBackend();
-renderAll();
-bindEvents();
+// ==================== EXPORTS ====================
 
+/**
+ * Initialize Director application
+ * Call this after DOM is ready
+ */
+export function initDirector() {
+  connectToBackend();
+  renderAll();
+  bindEvents();
+  console.log('🎬 Director initialized');
+}
+
+// Auto-initialize when script loads directly (not as module)
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initDirector);
+} else {
+  initDirector();
+}
+
+// Export for testing
+export { state, els, showToast, renderAll, renderTracks, togglePlayback };

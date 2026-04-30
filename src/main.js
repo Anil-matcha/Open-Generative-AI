@@ -20,6 +20,31 @@ import { escapeHtml, safeHtml } from './lib/security.js';
 import { initializeEnhancedMuAPI } from './lib/muapiEnhanced.js';
 import { loadConfig } from './lib/muapiConfig.js';
 import { initializeAIOptimizations } from './lib/services/aiIntegration.js';
+
+// Show configuration warning banner if critical env vars missing
+if (typeof document !== 'undefined') {
+  const checkConfigAndShowBanner = () => {
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    if (!supabaseUrl || !supabaseKey) {
+      const banner = document.createElement('div');
+      banner.id = 'config-warning-banner';
+      banner.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; background: #dc2626; color: white; text-align: center; padding: 12px; z-index: 10000; font-family: system-ui, -apple-system, sans-serif; box-shadow: 0 2px 8px rgba(0,0,0,0.15);';
+      banner.innerHTML = `
+        <strong>⚠️ Configuration Required:</strong> Supabase credentials are missing.
+        Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env file.
+        <button onclick="document.getElementById('config-warning-banner').remove();" style="margin-left: 12px; padding: 4px 12px; background: white; color: #dc2626; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Dismiss</button>
+      `;
+      document.body.insertBefore(banner, document.body.firstChild);
+    }
+  };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', checkConfigAndShowBanner);
+  } else {
+    checkConfigAndShowBanner();
+  }
+}
+
 // Initialize environment validation
 const envConfig = initializeEnvironmentValidation();
 

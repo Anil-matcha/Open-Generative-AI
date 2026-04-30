@@ -28,17 +28,17 @@ export default defineConfig({
     {
       name: 'main-app-chromium',
       use: { ...devices['Desktop Chrome'], headless: true },
-      testMatch: '**/main-app/**/*.spec.js'
+      testMatch: '**/main-app/**/*.{spec,spec.js,spec.ts}'
     },
     {
       name: 'main-app-firefox',
       use: { ...devices['Desktop Firefox'], headless: true },
-      testMatch: '**/main-app/**/*.spec.js'
+      testMatch: '**/main-app/**/*.{spec,spec.js,spec.ts}'
     },
     {
       name: 'main-app-mobile',
       use: { ...devices['Pixel 5'], headless: true },
-      testMatch: '**/main-app/**/*.spec.js'
+      testMatch: '**/main-app/**/*.{spec,spec.js,spec.ts}'
     },
 
     // Module integration testing
@@ -70,27 +70,30 @@ export default defineConfig({
     }
   ],
 
-  webServer: [
-    {
-      command: 'npm run dev',
-      url: 'http://localhost:8080',
-      reuseExistingServer: !process.env.CI,
-      timeout: 120000
-    },
-    // Module servers for integration testing
-    {
-      command: 'cd modules/CineGen && npm run dev',
-      url: 'http://localhost:8081',
-      reuseExistingServer: !process.env.CI,
-      timeout: 60000
-    },
-    {
-      command: 'cd apps/director && npm run dev',
-      url: 'http://localhost:8082',
-      reuseExistingServer: !process.env.CI,
-      timeout: 60000
-    }
-  ],
+   webServer: [
+     {
+       command: 'npm run dev',
+       url: 'http://localhost:8080',
+       reuseExistingServer: !process.env.CI,
+       timeout: 120000
+     }
+     // Temporarily disabled module servers due to Electron installation issues
+     /*
+     // Module servers for integration testing
+     {
+       command: 'cd modules/CineGen && npm run dev',
+       url: 'http://localhost:8081',
+       reuseExistingServer: !process.env.CI,
+       timeout: 60000
+     },
+     {
+       command: 'cd apps/director && npm run dev',
+       url: 'http://localhost:8082',
+       reuseExistingServer: !process.env.CI,
+       timeout: 60000
+     }
+     */
+   ],
 
   globalSetup: './tests/e2e/setup/global-setup.js',
   globalTeardown: './tests/e2e/setup/global-teardown.js'

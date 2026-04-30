@@ -68,6 +68,9 @@ export function Sidebar(navigate) {
       navigate(item.id);
     };
 
+    // Add data attributes for testing
+    container.setAttribute('data-route', item.id);
+
     container.appendChild(iconBtn);
     container.appendChild(label);
     buttons[item.id] = { iconBtn, label };

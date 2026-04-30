@@ -370,6 +370,7 @@ export function renderTracks(state, els, showToast) {
     const row = document.createElement('div');
     row.className = `track-row ${track.locked ? 'locked' : ''} ${track.muted ? 'muted' : ''} ${track.solo ? 'solo' : ''}`;
     row.dataset.trackId = track.id;
+    row.setAttribute('data-testid', 'timeline-track');
 
     // Enhanced track header with layer management and blending controls
     const meta = document.createElement('div');
@@ -522,6 +523,9 @@ export function renderTracks(state, els, showToast) {
       } else {
         itemEl = createEnhancedClipElement(item, track, state, timelineZoom);
       }
+
+      // Add test ID for E2E tests
+      itemEl.setAttribute('data-testid', 'timeline-clip');
 
       // Add context menu handler
       itemEl.addEventListener('contextmenu', (e) => {
