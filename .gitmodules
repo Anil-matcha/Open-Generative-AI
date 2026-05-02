@@ -16,3 +16,9 @@
 [submodule "temp_vfx_repo"]
 	path = temp_vfx_repo
 	url = https://github.com/deangilmoreremix/videoremixai-vfx.git
+[submodule "videoremixai-vfx"]
+	path = videoremixai-vfx
+	url = https://github.com/deangilmoreremix/videoremixai-vfx.git
+[submodule "videoremixai-vfx-source"]
+	path = videoremixai-vfx-source
+	url = https://github.com/deangilmoreremix/videoremixai-vfx.git
