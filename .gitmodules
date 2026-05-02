@@ -13,3 +13,6 @@
 [submodule "modules/CutAI"]
 	path = modules/CutAI
 	url = https://github.com/deangilmoreremix/CutAI.git
+[submodule "temp_vfx_repo"]
+	path = temp_vfx_repo
+	url = https://github.com/deangilmoreremix/videoremixai-vfx.git
