@@ -1,0 +1,6 @@
+
+> open-higgsfield-ai@1.0.0 test
+> vitest --reporter=json
+
+Cannot parse /workspaces/Open-Higgsfield-AI/tests/unit/image-generation-api-integration.test.js:
+Expression expected

@@ -1,10 +1,29 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "https://open-higgsfield-ai.vercel.app",
-  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
-};
+// Configure CORS - dynamic origin support
+const ALLOWED_ORIGINS = Deno.env.get('MUAPI_ALLOWED_ORIGINS')?.split(',')?.map(o => o.trim()) || ['*'];
+const isProduction = Deno.env.get('ENV') === 'production';
+
+function getCorsHeaders(req: Request): Record<string, string> {
+  const origin = req.headers.get('Origin') || '*';
+  
+  // In production, only allow specific origins
+  if (isProduction && ALLOWED_ORIGINS[0] !== '*') {
+    const allowed = ALLOWED_ORIGINS.some(allowedOrigin => 
+      origin === allowedOrigin || origin.endsWith('.' + allowedOrigin)
+    );
+    if (!allowed) {
+      return { "Access-Control-Allow-Origin": ALLOWED_ORIGINS[0] }; // Return first allowed as default
+    }
+  }
+  
+  return {
+    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
+    "Access-Control-Allow-Credentials": "true"
+  };
+}
 
 // Rate limiting - simple in-memory store (use Redis for multi-instance deployments)
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
@@ -94,6 +113,8 @@ function getClientId(req: Request): string {
 }
 
 Deno.serve(async (req: Request) => {
+  const corsHeaders = getCorsHeaders(req);
+  
   if (req.method === "OPTIONS") {
     return new Response(null, {
       status: 200,
@@ -139,16 +160,20 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const muapiKey = Deno.env.get('MUAPI_API_KEY');
-    if (!muapiKey) {
-      return new Response(
-        JSON.stringify({ error: 'Server configuration error: API key not set' }),
-        {
-          status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
-    }
+     const muapiKey = Deno.env.get('MUAPI_API_KEY');
+     if (!muapiKey) {
+       console.error('[muapi-proxy] MUAPI_API_KEY environment variable is not set in Supabase edge function configuration');
+       return new Response(
+         JSON.stringify({ 
+           error: 'AI service is not configured',
+           details: 'MUAPI_API_KEY environment variable is missing. Please configure it in your Supabase edge function settings (Settings > Edge Functions > Environment Variables).'
+         }),
+         {
+           status: 503,
+           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+         }
+       );
+     }
 
     const muapiUrl = generationType === 'poll'
       ? `https://api.muapi.ai/api/v1/predictions/${endpoint.split('/')[1]}/result`

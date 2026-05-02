@@ -3,6 +3,7 @@ import { muapi } from '../lib/muapi.js';
 import { createSafeImage } from '../lib/security.js';
 import { CameraControls } from './CameraControls.js';
 import { buildNanoBananaPrompt, CAMERA_MAP, LENS_MAP, FOCAL_PERSPECTIVE, APERTURE_EFFECT } from '../lib/promptUtils.js';
+import { securityService } from '../lib/services/SecurityService.js';
 import { AuthModal } from './AuthModal.js';
 import { createInlineInstructions } from './InlineInstructions.js';
 import { createHeroSection } from '../lib/thumbnails.js';
@@ -677,7 +678,7 @@ export function CinemaStudio() {
         const basePrompt = textarea.value.trim();
         if (!basePrompt) return;
 
-        const apiKey = localStorage.getItem('muapi_key');
+        const apiKey = await securityService.getDecryptedKey();
         if (!apiKey) {
             AuthModal(() => generateBtn.click());
             return;

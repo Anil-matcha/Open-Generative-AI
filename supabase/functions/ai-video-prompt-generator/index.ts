@@ -73,11 +73,12 @@ async function generateGTMPrompt({
   focus = [],
   cinematicOptions = {}
 }) {
-  const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY')
+   const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY')
 
-  if (!OPENAI_API_KEY) {
-    throw new Error('OpenAI API key not configured')
-  }
+   if (!OPENAI_API_KEY) {
+     console.error('[ai-video-prompt-generator] OPENAI_API_KEY environment variable is not set in Supabase edge function configuration');
+     throw new Error('AI prompt enhancement service is not configured. Please set OPENAI_API_KEY in your Supabase edge function environment variables (Settings > Edge Functions > Environment Variables).')
+   }
 
   const systemPrompt = buildSystemPrompt(role, industry, methodology, tonality, focus, cinematicOptions)
   const userPrompt = `Base prompt: "${basePrompt}"

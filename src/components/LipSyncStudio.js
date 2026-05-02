@@ -1,5 +1,6 @@
 import { muapi } from '../lib/muapi.js';
 import { lipsyncModels, imageLipSyncModels, videoLipSyncModels, getLipSyncModelById, getResolutionsForLipSyncModel } from '../lib/models.js';
+import { securityService } from '../lib/services/SecurityService.js';
 import { AuthModal } from './AuthModal.js';
 import { savePendingJob, removePendingJob, getPendingJobs } from '../lib/pendingJobs.js';
 import { createHeroSection } from '../lib/thumbnails.js';
@@ -461,7 +462,7 @@ export function LipSyncStudio() {
     imageFileInput.onchange = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
-        const apiKey = localStorage.getItem('muapi_key');
+        const apiKey = await securityService.getDecryptedKey();
         if (!apiKey) { AuthModal(() => imageFileInput.click()); return; }
         updateImageUploadState('loading');
         try {
@@ -487,7 +488,7 @@ export function LipSyncStudio() {
     videoFileInput.onchange = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
-        const apiKey = localStorage.getItem('muapi_key');
+        const apiKey = await securityService.getDecryptedKey();
         if (!apiKey) { AuthModal(() => videoFileInput.click()); return; }
         updateVideoUploadState('loading');
         try {
@@ -513,7 +514,7 @@ export function LipSyncStudio() {
     audioFileInput.onchange = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
-        const apiKey = localStorage.getItem('muapi_key');
+        const apiKey = await securityService.getDecryptedKey();
         if (!apiKey) { AuthModal(() => audioFileInput.click()); return; }
         updateAudioUploadState('loading');
         try {
@@ -660,7 +661,7 @@ export function LipSyncStudio() {
     (async () => {
         const pending = getPendingJobs('lipsync');
         if (!pending.length) return;
-        const apiKey = localStorage.getItem('muapi_key');
+        const apiKey = await securityService.getDecryptedKey();
         if (!apiKey) return;
         const banner = document.createElement('div');
         banner.className = 'fixed top-4 left-1/2 -translate-x-1/2 z-[200] bg-[#111] border border-white/10 text-white text-sm px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3';
@@ -729,7 +730,7 @@ export function LipSyncStudio() {
             return;
         }
 
-        const apiKey = localStorage.getItem('muapi_key');
+        const apiKey = await securityService.getDecryptedKey();
         if (!apiKey) { AuthModal(() => generateBtn.click()); return; }
 
         hero.classList.add('opacity-0', 'scale-95', '-translate-y-10', 'pointer-events-none');

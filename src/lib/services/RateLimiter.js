@@ -1,55 +1,140 @@
 /**
- * Retry Service - Implements exponential backoff retry logic with jitter
+ * Rate Limiter Service - Token bucket algorithm
+ * Limits API calls to respect Pexels API rate limits (200 requests/hour for free, 10000/hour for paid)
  */
 export class RateLimiter {
-  constructor() {
-    this.maxAttempts = 3;
-    this.baseDelay = 1000; // 1 second
-    this.maxDelay = 30000; // 30 seconds
-    this.jitterFactor = 0.2; // 20% jitter
+  constructor(options = {}) {
+    this.rate = options.rate || 200; // tokens per duration
+    this.duration = options.duration || 3600000; // 1 hour in ms
+    this.tokens = options.initialTokens || this.rate;
+    this.lastRefill = Date.now();
+    this.queue = [];
+    this.maxQueueSize = options.maxQueueSize || 100;
+  }
+  
+  /**
+   * Refill tokens based on elapsed time
+   */
+  refresh() {
+    const now = Date.now();
+    const elapsed = now - this.lastRefill;
+    const tokensToAdd = (elapsed / this.duration) * this.rate;
+    
+    this.tokens = Math.min(this.rate, this.tokens + tokensToAdd);
+    this.lastRefill = now;
+  }
+  
+  /**
+   * Acquire tokens to make a request
+   * @param {number} weight - Number of tokens needed (default 1)
+   * @param {number} timeout - Max time to wait in ms (default 0 = no wait)
+   * @returns {Promise<boolean>} - True if tokens acquired
+   */
+  async acquire(weight = 1, timeout = 0) {
+    const startTime = Date.now();
+    
+    return new Promise((resolve, reject) => {
+      const attemptAcquire = () => {
+        this.refresh();
+        
+        if (this.tokens >= weight) {
+          this.tokens -= weight;
+          resolve(true);
+        } else if (timeout > 0 && (Date.now() - startTime) >= timeout) {
+          reject(new Error('Rate limit timeout'));
+        } else {
+          // Queue for later
+          if (this.queue.length >= this.maxQueueSize) {
+            reject(new Error('Rate limit queue full'));
+            return;
+          }
+          
+          setTimeout(attemptAcquire, 100);
+        }
+      };
+      
+      attemptAcquire();
+    });
+  }
+  
+  /**
+   * Check if we can proceed without waiting (non-blocking)
+   */
+  canProceed(weight = 1) {
+    this.refresh();
+    return this.tokens >= weight;
+  }
+  
+  /**
+   * Get current token count
+   */
+  getAvailableTokens() {
+    this.refresh();
+    return this.tokens;
+  }
+  
+  /**
+   * Get time until next token available
+   */
+  getTimeToNextToken(weight = 1) {
+    this.refresh();
+    if (this.tokens >= weight) return 0;
+    
+    const deficit = weight - this.tokens;
+    const timePerToken = this.duration / this.rate;
+    return deficit * timePerToken;
+  }
+  
+  /**
+   * Reset to full capacity
+   */
+  reset() {
+    this.tokens = this.rate;
+    this.lastRefill = Date.now();
+    this.queue = [];
+  }
+}
+
+/**
+ * Retry Service - Exponential backoff retry logic
+ */
+export class RetryService {
+  constructor(options = {}) {
+    this.maxRetries = options.maxRetries || 3;
+    this.baseDelay = options.baseDelay || 1000; // 1 second
+    this.maxDelay = options.maxDelay || 30000; // 30 seconds
+    this.backoffFactor = options.backoffFactor || 2;
   }
 
   /**
-   * Execute function with retry logic
+   * Execute a function with retry logic
    */
   async execute(fn, options = {}) {
-    const {
-      maxAttempts = this.maxAttempts,
-      baseDelay = this.baseDelay,
-      maxDelay = this.maxDelay,
-      jitterFactor = this.jitterFactor,
-      onRetry = null,
-      retryCondition = null
-    } = options;
-
     let lastError;
 
-    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
       try {
         return await fn();
       } catch (error) {
         lastError = error;
 
-        // Check if we should retry this error
-        if (!this.shouldRetry(error, retryCondition)) {
-          throw error;
-        }
+        // Don't retry on the last attempt
+        if (attempt === this.maxRetries) break;
 
-        // Don't retry on last attempt
-        if (attempt === maxAttempts) {
-          break;
-        }
+        // Check if error is retryable
+        if (!this.isRetryableError(error)) break;
 
-        // Calculate delay with exponential backoff and jitter
-        const delay = this.calculateDelay(attempt, baseDelay, maxDelay, jitterFactor);
+        // Calculate delay with exponential backoff
+        const delay = Math.min(
+          this.baseDelay * Math.pow(this.backoffFactor, attempt),
+          this.maxDelay
+        );
 
-        // Call retry callback if provided
-        if (onRetry) {
-          onRetry(attempt, error);
-        }
+        // Add jitter to prevent thundering herd
+        const jitter = Math.random() * 0.1 * delay;
+        const finalDelay = delay + jitter;
 
-        // Wait before retrying
-        await this.sleep(delay);
+        await new Promise(resolve => setTimeout(resolve, finalDelay));
       }
     }
 
@@ -57,149 +142,18 @@ export class RateLimiter {
   }
 
   /**
-   * Determine if an error should be retried
+   * Check if an error is retryable
    */
-  shouldRetry(error, customCondition = null) {
-    // Use custom condition if provided
-    if (customCondition) {
-      return customCondition(error);
-    }
-
-    // Default retry conditions
-    const retryableErrors = [
-      'NetworkError',
-      'TimeoutError',
-      'AbortError',
-      'TypeError', // Often network-related
-    ];
-
-    // Retry on network errors
-    if (retryableErrors.includes(error.name)) {
-      return true;
-    }
-
-    // Retry on HTTP 5xx errors
-    if (error.message && error.message.includes('500') ||
-        error.message.includes('502') ||
-        error.message.includes('503') ||
-        error.message.includes('504')) {
-      return true;
-    }
-
-    // Retry on rate limiting (429)
-    if (error.message && error.message.includes('429')) {
-      return true;
-    }
-
-    // Don't retry on client errors (4xx) except rate limiting
-    if (error.message && /^4\d{2}/.test(error.message)) {
-      return false;
-    }
-
-    // Retry on timeout errors
-    if (error.message && error.message.toLowerCase().includes('timeout')) {
-      return true;
-    }
-
-    // Retry on connection errors
-    if (error.message && error.message.toLowerCase().includes('connection')) {
-      return true;
-    }
+  isRetryableError(error) {
+    // Retry on network errors, 5xx errors, timeouts
+    if (error.name === 'NetworkError' || error.name === 'TimeoutError') return true;
+    if (error.status >= 500) return true;
+    if (error.code === 'ECONNRESET' || error.code === 'ETIMEDOUT') return true;
 
     return false;
   }
-
-  /**
-   * Calculate delay with exponential backoff and jitter
-   */
-  calculateDelay(attempt, baseDelay, maxDelay, jitterFactor) {
-    // Exponential backoff: baseDelay * (2 ^ (attempt - 1))
-    const exponentialDelay = Math.min(baseDelay * Math.pow(2, attempt - 1), maxDelay);
-
-    // Add jitter to prevent thundering herd
-    const jitter = exponentialDelay * jitterFactor * Math.random();
-    const delay = exponentialDelay + jitter;
-
-    return Math.floor(delay);
-  }
-
-  /**
-   * Sleep for specified milliseconds
-   */
-  sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
-  /**
-   * Execute with circuit breaker integration
-   */
-  async executeWithBreaker(fn, breaker, serviceName, options = {}) {
-    try {
-      const result = await this.execute(fn, options);
-      breaker.recordSuccess(serviceName);
-      return result;
-    } catch (error) {
-      breaker.recordFailure(serviceName);
-      throw error;
-    }
-  }
-
-  /**
-   * Batch retry for multiple operations
-   */
-  async executeBatch(operations, options = {}) {
-    const results = [];
-    const errors = [];
-
-    const {
-      concurrency = 3,
-      continueOnError = true
-    } = options;
-
-    // Process operations in chunks to control concurrency
-    const chunks = this.chunkArray(operations, concurrency);
-
-    for (const chunk of chunks) {
-      const promises = chunk.map(async (operation) => {
-        try {
-          const result = await this.execute(operation.fn, operation.options || options);
-          results.push(result);
-        } catch (error) {
-          errors.push({ operation, error });
-          if (!continueOnError) {
-            throw error;
-          }
-        }
-      });
-
-      await Promise.all(promises);
-    }
-
-    return { results, errors };
-  }
-
-  /**
-   * Utility method to chunk arrays
-   */
-  chunkArray(array, size) {
-    const chunks = [];
-    for (let i = 0; i < array.length; i += size) {
-      chunks.push(array.slice(i, i + size));
-    }
-    return chunks;
-  }
-
-  /**
-   * Get retry statistics (for monitoring)
-   */
-  getStats() {
-    return {
-      maxAttempts: this.maxAttempts,
-      baseDelay: this.baseDelay,
-      maxDelay: this.maxDelay,
-      jitterFactor: this.jitterFactor
-    };
-  }
 }
-export const RetryService = RateLimiter;
+
+export const rateLimiter = new RateLimiter();
 export const ratelimiter = new RateLimiter();
+export const retryService = new RetryService();

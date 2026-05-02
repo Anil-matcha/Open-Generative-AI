@@ -1,5 +1,6 @@
 import { muapi } from '../lib/muapi.js';
 import { audioModels } from '../lib/models.js';
+import { securityService } from '../lib/services/SecurityService.js';
 import { AuthModal } from './AuthModal.js';
 import { createHeroSection } from '../lib/thumbnails.js';
 import { createInlineInstructions } from './InlineInstructions.js';
@@ -180,16 +181,16 @@ export function AudioStudio() {
   // Generate button handler
   genBtn.onclick = async () => {
     if (!prompt && selectedModel.hasPrompt) {
-      alert('Enter a prompt');
-      return;
-    }
-    const apiKey = localStorage.getItem('muapi_key');
-    if (!apiKey) { 
-      AuthModal(() => genBtn.click()); 
-      return; 
-    }
+        alert('Enter a prompt');
+        return;
+      }
+      const apiKey = await securityService.getDecryptedKey();
+      if (!apiKey) {
+        AuthModal(() => genBtn.click());
+        return;
+      }
 
-    genBtn.disabled = true;
+      genBtn.disabled = true;
     genBtn.innerHTML = '<span class="animate-spin inline-block mr-2">&#9711;</span> Generating...';
 
     try {

@@ -51,10 +51,47 @@ export function addMediaToTimeline(media, index, state, showToast) {
   const startTime = Math.min(state.timelineSeconds - 10, 5 + targetTrack.items.length * 8);
   const duration = getDurationForMedia(media);
 
+  // Determine asset type based on media label or direct type property
+  const isPexelsAsset = media.source === 'pexels';
+  const assetType = isPexelsAsset 
+    ? media.type === 'video' ? 'video' : 'image'
+    : getTypeForMedia(media);
+
+  // Create asset entry first for non-Pexels, Pexels assets already have URL
+  const assetId = isPexelsAsset 
+    ? media.id || `asset-${Date.now()}`
+    : 'asset-' + (index + 1);
+
+  // If not Pexels, create local asset entry
+  if (!isPexelsAsset) {
+    const newAsset = {
+      id: assetId,
+      type: assetType,
+      name: `${media.label} ${targetTrack.items.length + 1}`,
+      url: null, // Local media handled differently
+      duration: duration
+    };
+    if (!state.assets) state.assets = [];
+    state.assets.push(newAsset);
+  } else {
+    // Pexels asset: add to assets list directly
+    if (!state.assets) state.assets = [];
+    state.assets.push({
+      id: assetId,
+      type: assetType,
+      name: media.alt || `Pexels ${media.type}`,
+      url: media.url,
+      thumbnail: media.thumbnail,
+      duration: media.duration || 5,
+      source: 'pexels',
+      photographer: media.photographer
+    });
+  }
+
   const newItem = {
     id: newId,
-    assetId: 'asset-' + (index + 1),
-    type: getTypeForMedia(media),
+    assetId: assetId,
+    type: assetType,
     start: startTime,
     end: startTime + duration,
     sourceStart: 0,
@@ -65,7 +102,7 @@ export function addMediaToTimeline(media, index, state, showToast) {
     volume: 1,
     playbackRate: 1,
     effects: [],
-    name: `${media.label} ${targetTrack.items.length + 1}`
+    name: `${media.label || (media.alt || 'Pexels Asset')} ${targetTrack.items.length + 1}`
   };
 
   targetTrack.items.push(newItem);

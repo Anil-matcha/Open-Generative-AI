@@ -1,4 +1,5 @@
 import { muapi } from '../lib/muapi.js';
+import { securityService } from '../lib/services/SecurityService.js';
 import { AuthModal } from './AuthModal.js';
 import { createUploadPicker } from './UploadPicker.js';
 import { createInlineInstructions } from './InlineInstructions.js';
@@ -198,7 +199,7 @@ export function CharacterStudio() {
 
   genBtn.onclick = async () => {
     if (!uploadedUrl) { alert('Upload a reference face first'); return; }
-    const apiKey = localStorage.getItem('muapi_key');
+    const apiKey = await securityService.getDecryptedKey();
     if (!apiKey) { AuthModal(() => genBtn.click()); return; }
 
     genBtn.disabled = true;

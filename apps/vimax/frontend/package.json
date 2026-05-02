@@ -3,24 +3,36 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@higgsfield/layout": "file:../../../../packages/layout",
+    "@higgsfield/navigation": "file:../../../../packages/navigation",
+    "@higgsfield/tokens": "file:../../../../packages/tokens",
+    "@supabase/supabase-js": "^2.49.8",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^13.5.0",
-    "@supabase/supabase-js": "^2.49.8",
-    "@higgsfield/layout": "file:../../../../packages/layout",
-    "@higgsfield/tokens": "file:../../../../packages/tokens",
-    "@higgsfield/navigation": "file:../../../../packages/navigation",
     "axios": "^1.13.2",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitest/coverage-v8": "^2.1.0",
+    "jsdom": "^25.0.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:vitest": "vitest run",
+    "test:vitest:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {

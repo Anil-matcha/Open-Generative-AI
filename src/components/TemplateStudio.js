@@ -2,6 +2,7 @@ import { getTemplateById } from '../lib/templates.js';
 import { getTemplateThumbnail } from '../lib/thumbnails.js';
 import { getTemplateSpecs, hasEnhancedSpecs } from '../lib/templateSpecs.js';
 import { muapi } from '../lib/muapi.js';
+import { securityService } from '../lib/services/SecurityService.js';
 import { AuthModal } from './AuthModal.js';
 import { createUploadPicker } from './UploadPicker.js';
 import { navigate } from '../lib/router.js';
@@ -598,17 +599,16 @@ export function TemplateStudio(templateId) {
     });
   }, 100);
 
-  // Generate button handler
-  genBtn.onclick = async () => {
-    if (isGenerating) return;
+   // Generate button handler
+   genBtn.onclick = async () => {
+     if (isGenerating) return;
 
-    // SECURITY ISSUE: API keys stored in localStorage are accessible to XSS attacks
-    // TODO: Replace with server-side session storage or httpOnly cookies
-    const apiKey = localStorage.getItem('muapi_key');
-    if (!apiKey) {
-      AuthModal(() => genBtn.click());
-      return;
-    }
+     // API key check - uses encrypted storage via SecurityService
+     const apiKey = await securityService.getDecryptedKey();
+     if (!apiKey) {
+       AuthModal(() => genBtn.click());
+       return;
+     }
 
     isGenerating = true;
     genBtn.disabled = true;

@@ -1,6 +1,7 @@
 import { muapi } from '../lib/muapi.js';
 import { createSafeVideo } from '../lib/security.js';
 import { showToast } from '../lib/loading.js';
+import { securityService } from '../lib/services/SecurityService.js';
 import { t2vModels, getAspectRatiosForVideoModel, getDurationsForModel, getResolutionsForVideoModel, i2vModels, getAspectRatiosForI2VModel, getDurationsForI2VModel, getResolutionsForI2VModel, v2vModels } from '../lib/models.js';
 import { AuthModal } from './AuthModal.js';
 import { createUploadPicker } from './UploadPicker.js';
@@ -188,7 +189,7 @@ export function VideoStudio() {
         const file = e.target.files[0];
         if (!file) return;
 
-        const apiKey = localStorage.getItem('muapi_key');
+        const apiKey = await securityService.getDecryptedKey();
         if (!apiKey) {
             AuthModal(() => videoFileInput.click());
             return;
@@ -1090,7 +1091,7 @@ export function VideoStudio() {
             }
         }
 
-        const apiKey = localStorage.getItem('muapi_key');
+        const apiKey = await securityService.getDecryptedKey();
         if (!apiKey) {
             AuthModal(() => generateBtn.click());
             return;

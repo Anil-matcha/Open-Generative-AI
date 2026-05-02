@@ -2,12 +2,12 @@
   "extends": "./tsconfig.base.json",
   "include": [
     "src/**/*",
-    "packages/**/*"
+    "packages/**/*",
+    "tests/**/*"
   ],
   "exclude": [
     "node_modules",
     "dist",
-    "build",
-    "tests/**/*"
+    "build"
   ]
 }

@@ -1,5 +1,6 @@
 import { muapi } from '../lib/muapi.js';
 import { avatarModels } from '../lib/models.js';
+import { securityService } from '../lib/services/SecurityService.js';
 import { AuthModal } from './AuthModal.js';
 import { createUploadPicker } from './UploadPicker.js';
 import { createHeroSection } from '../lib/thumbnails.js';
@@ -171,10 +172,10 @@ export function AvatarStudio() {
       alert('Upload a source video or image first');
       return;
     }
-    const apiKey = localStorage.getItem('muapi_key');
-    if (!apiKey) { 
-      AuthModal(() => genBtn.click()); 
-      return; 
+    const apiKey = await securityService.getDecryptedKey();
+    if (!apiKey) {
+      AuthModal(() => genBtn.click());
+      return;
     }
 
     genBtn.disabled = true;

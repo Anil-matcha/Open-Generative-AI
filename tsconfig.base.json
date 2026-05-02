@@ -16,16 +16,7 @@
     "declarationMap": true,
     "sourceMap": true,
     "outDir": "./dist",
-    "rootDir": "./src",
-    "baseUrl": ".",
-    "paths": {
-      "@higgsfield/layout": ["./packages/layout/src"],
-      "@higgsfield/layout/*": ["./packages/layout/src/*"],
-      "@higgsfield/tokens": ["./packages/tokens/src"],
-      "@higgsfield/tokens/*": ["./packages/tokens/src/*"],
-      "@higgsfield/navigation": ["./packages/navigation/src"],
-      "@higgsfield/navigation/*": ["./packages/navigation/src/*"]
-    }
+    "ignoreDeprecations": "6.0"
   },
   "exclude": ["node_modules", "dist", "build"]
 }

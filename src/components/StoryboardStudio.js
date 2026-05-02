@@ -1,9 +1,13 @@
 import { cutai } from '../lib/cutai-api.js';
 import { muapi } from '../lib/muapi.js';
+import { securityService } from '../lib/services/SecurityService.js';
 import { AuthModal } from './AuthModal.js';
-import { createInlineInstructions } from './InlineInstructions.js';
-import { createHeroSection } from '../lib/thumbnails.js';
-import { GTMPromptModal } from './modals/GTMPromptModal.jsx';
+import { showToast } from './Toast.js';
+import { generateId } from '../lib/utils.js';
+import { createCharacterStore } from '../lib/stores/characterStore.js';
+import { createSceneStore } from '../lib/stores/sceneStore.js';
+import { promptBuilder } from '../lib/ai/promptBuilder.js';
+import { aiService } from '../lib/services/AIService.js';
 import { t2iModels } from '../lib/models.js';
 
 // Toast notification system
@@ -289,11 +293,11 @@ export function StoryboardStudio() {
       showToast('Please enter character traits first', 'warning');
       return;
     }
-    const apiKey = localStorage.getItem('muapi_key');
-    if (!apiKey) {
-      AuthModal(() => generateCharacter(idx, btn, imageArea));
-      return;
-    }
+        const apiKey = await securityService.getDecryptedKey();
+        if (!apiKey) {
+            AuthModal(() => generateCharacter(idx, btn, imageArea));
+            return;
+        }
 
     btn.disabled = true;
     btn.innerHTML = '<span class="animate-spin inline-block mr-2">&#9711;</span>';
