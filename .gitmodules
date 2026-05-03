@@ -13,18 +13,10 @@
 [submodule "modules/CutAI"]
 	path = modules/CutAI
 	url = https://github.com/deangilmoreremix/CutAI.git
-[submodule "temp_vfx_repo"]
-	path = temp_vfx_repo
-	url = https://github.com/deangilmoreremix/videoremixai-vfx.git
+
 [submodule "videoremixai-vfx"]
 	path = videoremixai-vfx
 	url = https://github.com/deangilmoreremix/videoremixai-vfx.git
-[submodule "videoremixai-vfx-source"]
-	path = videoremixai-vfx-source
-	url = https://github.com/deangilmoreremix/videoremixai-vfx.git
-[submodule "apps/ai-vfx"]
-	path = apps/ai-vfx
-	url = https://github.com/deangilmoreremix/videoremixai-vfx.git
-[submodule "apps/ai-vfx-source"]
-	path = apps/ai-vfx-source
-	url = https://github.com/deangilmoreremix/videoremixai-vfx.git
+
+
+

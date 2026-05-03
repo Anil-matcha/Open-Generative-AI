@@ -33,46 +33,41 @@ interface SubmoduleStatus {
 }
 
 /**
- * Parse .gitmodules file and extract submodule configurations
+ * Parse .gitmodules file using git config for reliability
  */
 function getConfiguredSubmodules(): Submodule[] {
-  const gitmodulesPath = path.resolve(process.cwd(), '.gitmodules');
-  
-  if (!fs.existsSync(gitmodulesPath)) {
+  try {
+    // Use git config to parse .gitmodules; quote pattern for shell safety
+    const cmd = "git config -f .gitmodules --get-regexp 'submodule\\.'";
+    const output = execSync(cmd, { encoding: 'utf-8' });
+
+    const lines = output.split('\n').filter(line => line.trim());
+    const submap = new Map<string, Submodule>();
+
+    for (const line of lines) {
+      // Format: submodule.<name>.<key> <value>
+      // Example: submodule.modules/rendiv.path modules/rendiv
+      const match = line.match(/^submodule\.([^.]+)\.(path|url)\s+(.+)$/);
+      if (!match) continue; // skip non-path/url entries (like .branch, .active)
+
+      const name = match[1];
+      const key = match[2];
+      const value = match[3];
+
+      if (!submap.has(name)) submap.set(name, { path: '', url: '' });
+      const sm = submap.get(name)!;
+      if (key === 'path') sm.path = value;
+      if (key === 'url') sm.url = value;
+    }
+
+    return Array.from(submap.values()).filter(sm => sm.path && sm.url);
+  } catch (error: any) {
+    // git config returns non-zero if no matches, that's okay
+    if (error.status && error.status !== 1) {
+      console.error('Error parsing .gitmodules:', error.message);
+    }
     return [];
   }
-
-  const content = fs.readFileSync(gitmodulesPath, 'utf-8');
-  const submodules: Submodule[] = [];
-  
-  // Parse .gitmodules format:
-  // [submodule "path"]
-  // 	path = path
-  // 	url = url
-  // 	[optional] branch = branch
-  
-  const sectionRegex = /\[submodule\s+"([^"]+)"\][\s\S]*?(?=\[submodule|\Z)/g;
-  const pathRegex = /path\s*=\s*(.+)/i;
-  const urlRegex = /url\s*=\s*(.+)/i;
-  const branchRegex = /branch\s*=\s*(.+)/i;
-  
-  let match;
-  while ((match = sectionRegex.exec(content)) !== null) {
-    const sectionContent = match[0];
-    const pathMatch = sectionContent.match(pathRegex);
-    const urlMatch = sectionContent.match(urlRegex);
-    const branchMatch = sectionContent.match(branchRegex);
-    
-    if (pathMatch && urlMatch) {
-      submodules.push({
-        path: pathMatch[1].trim(),
-        url: urlMatch[1].trim(),
-        branch: branchMatch ? branchMatch[1].trim() : undefined
-      });
-    }
-  }
-  
-  return submodules;
 }
 
 /**
