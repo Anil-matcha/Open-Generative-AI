@@ -189,10 +189,13 @@ jobs:
         name: test-results-20.x
         path: test-results/
 
-    - name: Generate comprehensive test report
+    - name: Aggregate test results
       run: |
-        npm install -g junit-report-merger
-        find test-results/ -name "*.xml" | xargs npx junit-report-merger -o test-results/combined-report.xml || echo "No test results found"
+        npx junit-report-merger \
+          --output=test-results.xml \
+          --glob="test-results/**/*.xml" \
+          --empty-ok
+        test -f test-results.xml || echo "No results"
 
     - name: Upload comprehensive report
       uses: actions/upload-artifact@v4
