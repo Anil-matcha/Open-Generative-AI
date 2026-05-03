@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@higgsfield/layout": "file:../../../../packages/layout",
-    "@higgsfield/navigation": "file:../../../../packages/navigation",
-    "@higgsfield/tokens": "file:../../../../packages/tokens",
+    "@higgsfield/layout": "workspace:*",
+    "@higgsfield/navigation": "workspace:*",
+    "@higgsfield/tokens": "workspace:*",
     "@supabase/supabase-js": "^2.49.8",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
