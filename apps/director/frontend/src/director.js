@@ -474,20 +474,18 @@ function renderAll() {
 
 /**
  * Initialize Director application
- * Call this after DOM is ready
+ * @param {HTMLElement} container - DOM element to mount director into (defaults to document.getElementById('app'))
  */
-export function initDirector() {
+export async function initDirector(container = document.getElementById('app')) {
+  if (!container) {
+    console.error('[Director] No container element found');
+    return;
+  }
+
   connectToBackend();
   renderAll();
   bindEvents();
-  console.log('🎬 Director initialized');
-}
-
-// Auto-initialize when script loads directly (not as module)
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initDirector);
-} else {
-  initDirector();
+  console.log('Director initialized');
 }
 
 // Export for testing

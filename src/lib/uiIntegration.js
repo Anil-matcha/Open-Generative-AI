@@ -13,22 +13,12 @@ export function extendClipContextMenu(clipElement, clip, track, state, showToast
   // Add enhancement options based on clip type
   const menuItems = [];
 
-  // Image clips: AdvanceImageEditorModal, ImageCropperModal, ImglyImageEditorModal
+  // Image clips: OpenAI AI Image Editor (replaces all 3 previous editors)
   if (clip.type === 'image') {
     menuItems.push({
-      label: 'Advanced Image Editor',
-      icon: '🖼️',
-      action: () => openAdvanceImageEditorModal(clip, state, showToast)
-    });
-    menuItems.push({
-      label: 'Crop Image',
-      icon: '✂️',
-      action: () => openImageCropperModal(clip, state, showToast)
-    });
-    menuItems.push({
-      label: 'Imgly Image Editor',
-      icon: '🎨',
-      action: () => openImglyImageEditorModal(clip, state, showToast)
+      label: 'AI Image Editor (OpenAI)',
+      icon: '🤖',
+      action: () => openImageEditor(clip, state, showToast)
     });
   }
 
@@ -83,7 +73,7 @@ export function extendClipContextMenu(clipElement, clip, track, state, showToast
     }
   }
 
-  return menuItems.length > 0;
+  return menuItems;
 }
 
 /**
@@ -290,16 +280,66 @@ async function openVideoPersonalizer(clip, state, showToast) {
 
 async function openImageEditor(clip, state, showToast) {
   try {
-    const modalManager = getModalManager();
-    await modalManager.openModal('AdvanceImageEditor', {
-      image: clip.src,
-      onComplete: (result) => {
-        updateClipInTimeline(clip.id, { src: result }, state);
-        showToast('Image edited successfully', 'success');
+    // Import OpenAI image editor dynamically to avoid circular dependencies
+    const { OpenAIImageEditorModal } = await import('../components/modals/OpenAIImageEditorModal.jsx');
+
+    const modal = new OpenAIImageEditorModal({
+      title: 'AI Image Editor (OpenAI)',
+      size: 'full',
+      image: clip.src, // Pass base64 data if available
+      mode: clip.src ? 'edit' : 'generate', // Default to edit if clip has image
+      onConfirm: (result) => {
+        // For editing existing clips
+        if (result && result.editedImage) {
+          updateClipInTimeline(clip.id, { src: `data:image/png;base64,${result.editedImage}` }, state);
+          showToast('Image edited with AI successfully', 'success');
+        }
+      },
+      onAddToTimeline: async (generatedImage) => {
+        // For adding new generated images to timeline
+        try {
+          const { assetImportService } = await import('./editor/assetImportService.js');
+          const metadata = {
+            name: `AI Generated Image`,
+            prompt: generatedImage.revised_prompt || 'AI generated image',
+            revisedPrompt: generatedImage.revised_prompt,
+            model: 'gpt-image-2',
+            size: '1024x1024', // Would come from modal settings
+            quality: 'standard',
+            style: 'vivid',
+            format: 'png'
+          };
+
+          const newClip = await assetImportService.importImageToTimeline(
+            generatedImage.base64,
+            metadata,
+            state
+          );
+
+          // Add the new clip to the timeline
+          if (!state.tracks) state.tracks = [];
+          const targetTrack = state.tracks.find(t => t.id === newClip.trackId) ||
+                            state.tracks[0];
+          if (targetTrack) {
+            if (!targetTrack.clips) targetTrack.clips = [];
+            targetTrack.clips.push(newClip);
+          }
+
+          showToast('AI-generated image added to timeline', 'success');
+        } catch (error) {
+          console.error('Failed to add generated image to timeline:', error);
+          throw error;
+        }
+      },
+      onCancel: () => {
+        // Modal cancelled, no action needed
       }
     });
+
+    modal.show();
   } catch (error) {
-    showToast('Failed to open Image Editor', 'error');
+    console.error('Failed to open OpenAI Image Editor:', error);
+    showToast('Failed to open AI Image Editor', 'error');
   }
 }
 

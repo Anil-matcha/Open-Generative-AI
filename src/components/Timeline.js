@@ -1,25 +1,93 @@
-export class Timeline {
-  constructor() {
+import { Component } from '../../components/base/Component.js';
+
+export class Timeline extends Component {
+  constructor(props = {}) {
+    super(props);
+
     this.state = {
       zoom: 1,
       playheadPercent: 32,
       timelineSeconds: 60,
       tracks: [
         { id: 'video-1', name: 'Video', muted: false, solo: false, locked: true, clips: [
-          { id: 1, name: 'Opening Shot', left: 8, width: 18, type: 'video' },
-          { id: 2, name: 'Generated Clip', left: 34, width: 16, type: 'video' }
-        ] },
+            { id: 1, name: 'Opening Shot', left: 8, width: 18, type: 'video' },
+            { id: 2, name: 'Generated Clip', left: 34, width: 16, type: 'video' }
+          ]},
         { id: 'audio-1', name: 'Audio', muted: false, solo: false, locked: false, clips: [
-          { id: 3, name: 'Music Bed', left: 5, width: 42, type: 'audio' }
-        ] },
+            { id: 3, name: 'Music Bed', left: 5, width: 42, type: 'audio' }
+          ]},
         { id: 'text-1', name: 'Text', muted: false, solo: false, locked: false, clips: [
-          { id: 4, name: 'Title Card', left: 14, width: 12, type: 'text' }
-        ] },
+            { id: 4, name: 'Title Card', left: 14, width: 12, type: 'text' }
+          ]},
         { id: 'broll-1', name: 'B-Roll', muted: false, solo: false, locked: false, clips: [
-          { id: 5, name: 'City Cutaway', left: 52, width: 20, type: 'broll' }
-        ] }
+            { id: 5, name: 'City Cutaway', left: 52, width: 20, type: 'broll' }
+          ]}
       ]
     };
+
+    // Bind methods to preserve context
+    this.handleZoomIn = this.handleZoomIn.bind(this);
+    this.handleZoomOut = this.handleZoomOut.bind(this);
+    this.handleAddTrack = this.handleAddTrack.bind(this);
+    this.handleToolSelect = this.handleToolSelect.bind(this);
+    this.handleClipClick = this.handleClipClick.bind(this);
+    this.handleTrackToggle = this.handleTrackToggle.bind(this);
+    this.handleMute = this.handleMute.bind(this);
+    this.handleSolo = this.handleSolo.bind(this);
+    this.handleLock = this.handleLock.bind(this);
+  }
+
+  // Zoom handlers
+  handleZoomIn() {
+    this.setState({ zoom: Math.min(2, this.state.zoom + 0.1) });
+  }
+
+  handleZoomOut() {
+    this.setState({ zoom: Math.max(0.5, this.state.zoom - 0.1) });
+  }
+
+  handleAddTrack(type) {
+    this.state.tracks.push({
+      id: `${type.toLowerCase()}-${Date.now()}`,
+      name: type,
+      muted: false,
+      solo: false,
+      locked: false,
+      clips: []
+    });
+    // Re-render track rows only (simplified)
+    const trackRows = this.element?.querySelector('#trackRows');
+    if (trackRows) {
+      this.renderTracks(trackRows);
+    }
+  }
+
+  handleToolSelect(label) {
+    this.setState({ selectedTool: label });
+  }
+
+  handleClipClick(clipId) {
+    this.setState({ selectedClipId: clipId });
+  }
+
+  handleTrackToggle(trackId, key) {
+    const track = this.state.tracks.find(t => t.id === trackId);
+    if (track) {
+      track[key] = !track[key];
+      // Re-render track rows
+      const trackRows = this.element?.querySelector('#trackRows');
+      if (trackRows) {
+        this.renderTracks(trackRows);
+      }
+    }
+  }
+
+  handleMute(trackId) { this.handleTrackToggle(trackId, 'muted'); }
+  handleSolo(trackId) { this.handleTrackToggle(trackId, 'solo'); }
+  handleLock(trackId) { this.handleTrackToggle(trackId, 'locked'); }
+
+  onUnmount() {
+    // Cleanup handled by base class
   }
 
   render() {
@@ -125,6 +193,7 @@ export class Timeline {
     this.state.tracks.forEach(track => {
       const row = document.createElement('div');
       row.className = 'track-row';
+      row.dataset.trackId = track.id;
 
       const meta = document.createElement('div');
       meta.className = 'track-meta';
@@ -138,16 +207,6 @@ export class Timeline {
         <div class="track-count">${track.clips.length} clips</div>
       `;
 
-      meta.querySelectorAll('.track-toggle').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const key = btn.dataset.toggle;
-          if (key === 'mute') track.muted = !track.muted;
-          if (key === 'solo') track.solo = !track.solo;
-          if (key === 'lock') track.locked = !track.locked;
-          this.renderTracks(container);
-        });
-      });
-
       const lane = document.createElement('div');
       lane.className = 'track-lane';
 
@@ -156,11 +215,8 @@ export class Timeline {
         clipEl.className = 'clip';
         clipEl.style.left = `${clip.left}%`;
         clipEl.style.width = `${clip.width}%`;
+        clipEl.dataset.clipId = clip.id;
         clipEl.innerHTML = `<span class="clip-label">${clip.name}</span>`;
-        clipEl.addEventListener('click', () => {
-          this.state.selectedClipId = clip.id;
-          this.renderTracks(container);
-        });
         lane.appendChild(clipEl);
       });
 
@@ -205,33 +261,66 @@ export class Timeline {
   }
 
   bindEvents(container) {
-    // Zoom buttons
-    container.querySelectorAll('[data-action="zoom-in"]').forEach(btn =>
-      btn.addEventListener('click', () => {
-        this.state.zoom = Math.min(2, this.state.zoom + 0.1);
-      })
-    );
+    // Use event delegation to handle dynamic content and simplify cleanup
 
-    container.querySelectorAll('[data-action="zoom-out"]').forEach(btn =>
-      btn.addEventListener('click', () => {
-        this.state.zoom = Math.max(0.5, this.state.zoom - 0.1);
-      })
-    );
+    // Zoom buttons
+    this.addEventListener(container, 'click', (e) => {
+      const target = e.target.closest('[data-action="zoom-in"]');
+      if (target) {
+        this.handleZoomIn();
+      }
+    });
+
+    this.addEventListener(container, 'click', (e) => {
+      const target = e.target.closest('[data-action="zoom-out"]');
+      if (target) {
+        this.handleZoomOut();
+      }
+    });
 
     // Add track buttons
-    container.querySelectorAll('[data-add-track]').forEach(btn =>
-      btn.addEventListener('click', () => {
-        const type = btn.dataset.addTrack;
-        this.state.tracks.push({
-          id: `${type.toLowerCase()}-${Date.now()}`,
-          name: type,
-          muted: false,
-          solo: false,
-          locked: false,
-          clips: []
-        });
-        this.renderTracks(container.querySelector('#trackRows'));
-      })
-    );
-  }
+    this.addEventListener(container, 'click', (e) => {
+      const btn = e.target.closest('[data-add-track]');
+      if (btn) {
+        this.handleAddTrack(btn.dataset.addTrack);
+      }
+    });
+
+    // Tool buttons
+    this.addEventListener(container, 'click', (e) => {
+      const btn = e.target.closest('.tool-btn');
+      if (btn) {
+        const label = btn.title;
+        if (label) {
+          this.handleToolSelect(label);
+        }
+      }
+    });
+
+    // Clip click
+    this.addEventListener(container, 'click', (e) => {
+      const clipEl = e.target.closest('.clip');
+      if (clipEl) {
+        const clipId = parseInt(clipEl.dataset.clipId, 10);
+        if (!isNaN(clipId)) {
+          this.handleClipClick(clipId);
+        }
+      }
+    });
+
+    // Track toggles (Mute/Solo/Lock)
+    this.addEventListener(container, 'click', (e) => {
+      const btn = e.target.closest('.track-toggle[data-toggle]');
+      if (btn) {
+        const row = btn.closest('.track-row');
+        const trackId = row?.dataset?.trackId;
+        const toggle = btn.dataset.toggle;
+        if (trackId) {
+          if (toggle === 'mute') this.handleMute(trackId);
+          else if (toggle === 'solo') this.handleSolo(trackId);
+          else if (toggle === 'lock') this.handleLock(trackId);
+        }
+      }
+    });
+   }
 }

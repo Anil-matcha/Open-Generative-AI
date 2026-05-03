@@ -3,20 +3,16 @@
  * Integrates with OpenAI API for prompt enhancement and content creation
  */
 
+import { openaiConfig } from './config/openaiConfig.js';
+
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
+const OPENAI_IMAGES_URL = 'https://api.openai.com/v1/images';
+const OPENAI_RESPONSES_URL = 'https://api.openai.com/v1/responses';
 
 class OpenAIService {
   constructor() {
-    // Safely get API key from environment, handling browser vs Node.js
-    this.apiKey = null;
-    try {
-      if (typeof process !== 'undefined' && process.env) {
-        this.apiKey = process.env.OPENAI_API_KEY;
-      }
-    } catch (e) {
-      // In browser environment, process might not be available
-      this.apiKey = null;
-    }
+    // Use centralized configuration
+    this.config = openaiConfig;
     this.model = 'gpt-4'; // Can be configured
     this.maxTokens = 2000;
     this.temperature = 0.7;
@@ -42,9 +38,7 @@ class OpenAIService {
     focus = [],
     cinematicOptions = {}
   }) {
-    if (!this.apiKey) {
-      throw new Error('OpenAI API key not configured');
-    }
+    this.config.validateApiKey();
 
     const systemPrompt = this.buildSystemPrompt(role, industry, methodology, tonality, focus, cinematicOptions);
     const userPrompt = `Base prompt: "${basePrompt}"
@@ -56,7 +50,7 @@ Please enhance this prompt using the specified GTM methodologies and create a co
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.apiKey}`
+          'Authorization': `Bearer ${this.config.getApiKey()}`
         },
         body: JSON.stringify({
           model: this.model,
@@ -472,6 +466,428 @@ Generated with GTM framework fallback (OpenAI unavailable)`;
       urgent: 'Create urgency with clear calls-to-action.'
     };
     return styles[tonality] || 'Maintain professional, engaging tone.';
+  }
+
+  // ===============================
+  // Image Generation & Editing Methods
+  // ===============================
+
+  /**
+   * Generate images from text prompts using GPT Image API
+   * @param {Object} params - Generation parameters
+   * @param {string} params.prompt - Text prompt for image generation
+   * @param {number} params.n - Number of images to generate (1-10)
+   * @param {string} params.size - Image size: "1024x1024", "1024x1792", "1792x1024"
+   * @param {string} params.quality - Quality: "standard" or "hd"
+   * @param {string} params.style - Style: "natural" or "vivid" (for gpt-image-2)
+   * @returns {Promise<Object>} Generated images with base64 data
+   */
+  async generateImage({
+    prompt,
+    n = 1,
+    size = "1024x1024",
+    quality = "auto",
+    style = "vivid",
+    background = "auto",
+    output_format = "png",
+    output_compression,
+    moderation = "auto"
+  }) {
+    this.config.validateApiKey();
+
+    try {
+      const response = await fetch(`${OPENAI_IMAGES_URL}/generations`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.config.getApiKey()}`
+        },
+         const requestBody = {
+           model: this.config.getImageModel(),
+           prompt,
+           n,
+           size,
+           quality,
+           style,
+           background,
+           output_format,
+           response_format: 'b64_json',
+           moderation
+         };
+
+        // Only include compression if specified and format supports it
+        if (output_compression !== undefined && ['jpeg', 'webp'].includes(output_format)) {
+          requestBody.output_compression = output_compression;
+        }
+
+        body: JSON.stringify(requestBody)
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(`OpenAI Image API error: ${error.error?.message || 'Unknown error'}`);
+      }
+
+      const data = await response.json();
+      return {
+        images: data.data.map(img => ({
+          base64: img.b64_json,
+          revised_prompt: img.revised_prompt
+        })),
+        usage: data.usage
+      };
+
+    } catch (error) {
+      console.error('OpenAI image generation failed:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Edit existing images using prompts and masks
+   * @param {Object} params - Edit parameters
+   * @param {string} params.image - Base64 encoded image to edit
+   * @param {string} params.mask - Base64 encoded mask (transparent areas to edit)
+   * @param {string} params.prompt - Edit instructions
+   * @param {number} params.n - Number of variations (1-10)
+   * @param {string} params.size - Image size
+   * @returns {Promise<Object>} Edited images
+   */
+  async editImage({
+    image,
+    images = [], // Array of additional reference images
+    mask,
+    prompt,
+    n = 1,
+    size = "1024x1024",
+    quality = "auto",
+    style = "vivid",
+    background = "auto",
+    output_format = "png",
+    output_compression,
+    input_fidelity = "auto",
+    moderation = "auto"
+  }) {
+    this.config.validateApiKey();
+
+    try {
+      const formData = new FormData();
+
+      // Convert base64 to blob for FormData
+      const imageBlob = this.base64ToBlob(image);
+      const maskBlob = mask ? this.base64ToBlob(mask) : null;
+
+      formData.append('model', this.config.getImageModel());
+      formData.append('image', imageBlob, 'image.png');
+
+      // Add additional reference images if provided
+      if (images && images.length > 0) {
+        images.forEach((img, index) => {
+          const imgBlob = this.base64ToBlob(img);
+          formData.append('image', imgBlob, `reference_${index}.png`);
+        });
+      }
+
+      if (maskBlob) {
+        formData.append('mask', maskBlob, 'mask.png');
+      }
+
+      formData.append('prompt', prompt);
+      formData.append('n', n.toString());
+      formData.append('size', size);
+      formData.append('quality', quality);
+      formData.append('style', style);
+      formData.append('background', background);
+       formData.append('output_format', output_format);
+       formData.append('response_format', 'b64_json');
+       formData.append('input_fidelity', input_fidelity);
+      formData.append('moderation', moderation);
+
+      // Only include compression if specified and format supports it
+      if (output_compression !== undefined && ['jpeg', 'webp'].includes(output_format)) {
+        formData.append('output_compression', output_compression.toString());
+      }
+
+      const response = await fetch(`${OPENAI_IMAGES_URL}/edits`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.config.getApiKey()}`
+        },
+        body: formData
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(`OpenAI Image Edit API error: ${error.error?.message || 'Unknown error'}`);
+      }
+
+      const data = await response.json();
+      return {
+        images: data.data.map(img => ({
+          base64: img.b64_json,
+          revised_prompt: img.revised_prompt
+        })),
+        usage: data.usage
+      };
+
+    } catch (error) {
+      console.error('OpenAI image editing failed:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Generate variations of an existing image
+   * @param {Object} params - Variation parameters
+   * @param {string} params.image - Base64 encoded image
+   * @param {number} params.n - Number of variations (1-10)
+   * @param {string} params.size - Image size
+   * @returns {Promise<Object>} Image variations
+   */
+  async generateVariations({
+    image,
+    n = 1,
+    size = "1024x1024",
+    output_format = "png",
+    output_compression
+  }) {
+    this.config.validateApiKey();
+
+    try {
+      const formData = new FormData();
+      const imageBlob = this.base64ToBlob(image);
+
+      formData.append('model', this.config.getImageModel());
+      formData.append('image', imageBlob, 'image.png');
+      formData.append('n', n.toString());
+      formData.append('size', size);
+       formData.append('output_format', output_format);
+       formData.append('response_format', 'b64_json');
+
+       // Only include compression if specified and format supports it
+      if (output_compression !== undefined && ['jpeg', 'webp'].includes(output_format)) {
+        formData.append('output_compression', output_compression.toString());
+      }
+
+      const response = await fetch(`${OPENAI_IMAGES_URL}/variations`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.config.getApiKey()}`
+        },
+        body: formData
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(`OpenAI Image Variations API error: ${error.error?.message || 'Unknown error'}`);
+      }
+
+      const data = await response.json();
+      return {
+        images: data.data.map(img => ({
+          base64: img.b64_json
+        })),
+        usage: data.usage
+      };
+
+    } catch (error) {
+      console.error('OpenAI image variations failed:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Stream image generation for real-time feedback
+   * @param {Object} params - Streaming parameters
+   * @param {string} params.prompt - Generation prompt
+   * @param {Function} params.onPartialImage - Callback for partial images
+   * @param {number} params.partialImages - Number of partial images (0-3)
+   * @returns {Promise<Object>} Final generated images
+   */
+  async streamImageGeneration({
+    prompt,
+    onPartialImage,
+    partialImages = 2,
+    size = "1024x1024",
+    quality = "auto",
+    style = "vivid",
+    background = "auto",
+    output_format = "png",
+    output_compression,
+    moderation = "auto"
+  }) {
+    this.config.validateApiKey();
+
+    try {
+      const response = await fetch(`${OPENAI_IMAGES_URL}/generations`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.config.getApiKey()}`
+        },
+         const requestBody = {
+           model: this.config.getImageModel(),
+           prompt,
+           stream: true,
+           partial_images: partialImages,
+           size,
+           quality,
+           style,
+           background,
+           output_format,
+           response_format: 'b64_json',
+           moderation
+         };
+
+        // Only include compression if specified and format supports it
+        if (output_compression !== undefined && ['jpeg', 'webp'].includes(output_format)) {
+          requestBody.output_compression = output_compression;
+        }
+
+        body: JSON.stringify(requestBody)
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(`OpenAI Streaming API error: ${error.error?.message || 'Unknown error'}`);
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let finalImages = [];
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n').filter(line => line.trim());
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6);
+            if (data === '[DONE]') continue;
+
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed.type === 'image_generation.partial_image') {
+                onPartialImage?.(parsed);
+              } else if (parsed.type === 'image_generation.complete') {
+                finalImages = parsed.data.map(img => ({
+                  base64: img.b64_json,
+                  revised_prompt: img.revised_prompt
+                }));
+              }
+            } catch (e) {
+              console.warn('Failed to parse streaming data:', e);
+            }
+          }
+        }
+      }
+
+      return { images: finalImages };
+
+    } catch (error) {
+      console.error('OpenAI streaming failed:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Multi-turn image editing using Responses API for conversational editing
+   * @param {Object} params - Multi-turn parameters
+   * @param {string} params.input - User instruction for editing
+   * @param {string} params.previousResponseId - ID from previous response (for continuation)
+   * @param {Array} params.imageInputs - Previous images in context
+   * @returns {Promise<Object>} Edited images with conversation context
+   */
+  async multiTurnImageEditing({
+    input,
+    previousResponseId,
+    imageInputs = []
+  }) {
+    this.config.validateApiKey();
+
+    try {
+      const messages = [];
+      const tools = [{ type: "image_generation" }];
+
+      // Add previous images to context
+      if (imageInputs.length > 0) {
+        messages.push({
+          role: "user",
+          content: imageInputs.map(img => ({
+            type: "image_url",
+            image_url: { url: `data:image/png;base64,${img.base64}` }
+          }))
+        });
+      }
+
+      messages.push({
+        role: "user",
+        content: [{ type: "input_text", text: input }]
+      });
+
+      const requestBody = {
+        model: "gpt-4.1", // Updated to valid model for Responses API
+        input: messages,
+        tools
+      };
+
+      if (previousResponseId) {
+        requestBody.previous_response_id = previousResponseId;
+      }
+
+      const response = await fetch(OPENAI_RESPONSES_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.config.getApiKey()}`
+        },
+        body: JSON.stringify(requestBody)
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(`OpenAI Responses API error: ${error.error?.message || 'Unknown error'}`);
+      }
+
+      const data = await response.json();
+
+      // Extract image generation results
+      const imageResults = data.output
+        .filter(output => output.type === 'image_generation_call')
+        .map(output => ({
+          base64: output.result,
+          revised_prompt: output.revised_prompt,
+          call_id: output.id
+        }));
+
+      return {
+        response_id: data.id,
+        images: imageResults,
+        conversation: data.output
+      };
+
+    } catch (error) {
+      console.error('OpenAI multi-turn editing failed:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Utility: Convert base64 string to Blob for FormData
+   * @param {string} base64 - Base64 encoded image
+   * @returns {Blob} Image blob
+   */
+  base64ToBlob(base64) {
+    const byteCharacters = atob(base64);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    return new Blob([byteArray], { type: 'image/png' });
   }
 }
 
