@@ -1,8 +1,9 @@
-import { expect, afterEach } from 'vitest';
-import { cleanup } from '@testing-library/dom';
+import { expect } from 'vitest';
+import { afterEach } from 'vitest';
 
+// Simple cleanup: reset DOM body between tests
 afterEach(() => {
-  cleanup();
+  document.body.innerHTML = '';
 });
 
 // Mock environment variables

@@ -1,11 +1,62 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { navigate, routes } from '../src/router.js';
+import { navigate, routes } from '../src/router';
 
 describe('Director Vanilla Router', () => {
   beforeEach(() => {
-    // Setup clean DOM with mount point
-    document.body.innerHTML = '<div id="app"></div>';
-    // Clear any module state if needed
+    // Setup complete DOM structure matching index.html
+    document.body.innerHTML = `
+      <div id="app">
+        <div class="app-shell">
+          <header class="header">
+            <div class="brand">
+              <button id="backBtn">←</button>
+              <div class="brand-mark">🎬</div>
+              <div>
+                <div class="brand-title">TIMELINE</div>
+                <div class="brand-sub">AI Video Editor</div>
+              </div>
+            </div>
+            <div class="project-head">
+              <div class="title" id="projectTitle">Untitled Project</div>
+              <div class="sub" id="projectSub">Working timeline preview</div>
+            </div>
+            <div id="topActions"></div>
+          </header>
+          <div class="main-grid">
+            <div class="left-col">
+              <div class="timeline-card">
+                <div class="timeline-top">
+                  <div id="toolGroup"></div>
+                  <div class="pill-row" id="pillRow"></div>
+                </div>
+                <div class="timeline-shell">
+                  <div class="timeline-body" id="timelineBody">
+                    <div id="trackRows"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="side-col">
+              <aside class="side-card">
+                <div class="card-title">📁 Media</div>
+                <button id="uploadBtn">Upload</button>
+                <div class="media-grid" id="mediaGrid"></div>
+              </aside>
+              <aside class="side-card generate">
+                <div class="generate-head">
+                  <div class="card-title cyan">⚡ Generate</div>
+                </div>
+                <div id="generateTypes"></div>
+                <textarea id="promptInput" placeholder="A cinematic shot of..."></textarea>
+                <button id="generateBtn">⚡ Generate</button>
+              </aside>
+            </div>
+          </div>
+        </div>
+        <div id="floatingRail"></div>
+        <div id="toast"></div>
+      </div>
+    `;
     vi.clearAllMocks();
   });
 
@@ -18,16 +69,15 @@ describe('Director Vanilla Router', () => {
   });
 
   it('should mount director app on /timeline navigation', async () => {
-    // Use navigate function to trigger route change
     navigate('/timeline');
-
-    // Wait for dynamic import to resolve
-    await new Promise(resolve => setTimeout(resolve, 50));
+    // Wait for dynamic import and initialization
+    await new Promise(resolve => setTimeout(resolve, 100));
 
     const app = document.getElementById('app');
     expect(app).not.toBeNull();
-    // Director should have rendered content (tracks, media grid, etc.)
-    expect(app.children.length).toBeGreaterThan(0);
+    // Director should have rendered content (check for timeline body)
+    expect(app.querySelector('.timeline-card')).not.toBeNull();
+    expect(app.querySelector('#trackRows')).not.toBeNull();
   });
 
   it('should show placeholder on /library navigation', async () => {
