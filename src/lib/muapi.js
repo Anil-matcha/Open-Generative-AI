@@ -16,11 +16,13 @@ export class MuapiClient {
         if (!supabaseUrl) {
             console.error('[MuapiClient] VITE_SUPABASE_URL is not configured');
             this.proxyUrl = '/functions/v1/muapi-proxy'; // Fallback to relative path
-        } else {
-            this.proxyUrl = `${supabaseUrl}/functions/v1/muapi-proxy`;
-        }
+         } else {
+             this.proxyUrl = `${supabaseUrl}/functions/v1/muapi-proxy`;
+         }
 
-        // Initialize production-ready services
+         this.baseUrl = 'https://api.muapi.ai';
+
+         // Initialize production-ready services
         this.security = new SecurityService();
         this.retry = new RetryService();
         this.rateLimiter = new RateLimiter();
@@ -202,12 +204,15 @@ export class MuapiClient {
                 }
             });
 
-        } catch (error) {
-            this.circuitBreaker.recordFailure('api_request');
-            throw error;
-        } finally {
-            this.requestIds.delete(requestId);
-        }
+         } catch (error) {
+             this.circuitBreaker.recordFailure('api_request');
+             if (error.name === 'AbortError') {
+                 throw new Error('Request cancelled by user');
+             }
+             throw error;
+         } finally {
+             this.requestIds.delete(requestId);
+         }
     }
 
     // Cancel a specific request
@@ -231,16 +236,17 @@ export class MuapiClient {
     }
 
     // Generate unique request ID for deduplication
-    generateRequestId(params) {
-        const key = JSON.stringify(params);
-        let hash = 0;
-        for (let i = 0; i < key.length; i++) {
-            const char = key.charCodeAt(i);
-            hash = ((hash << 5) - hash) + char;
-            hash = hash & hash; // Convert to 32bit integer
-        }
-        return `req_${Math.abs(hash)}_${Date.now()}`;
-    }
+     generateRequestId(params) {
+         const key = JSON.stringify(params);
+         let hash = 0;
+         for (let i = 0; i < key.length; i++) {
+             const char = key.charCodeAt(i);
+             hash = ((hash << 5) - hash) + char;
+             hash = hash & hash; // Convert to 32bit integer
+         }
+         const timestamp = Date.now();
+         return `req_${Math.abs(hash)}_${timestamp}`;
+     }
 
     // Validate API response structure
     validateResponse(data, expectedType) {
@@ -396,35 +402,48 @@ export class MuapiClient {
                     throw new Error('Request cancelled');
                 }
 
-                try {
-                    const response = await fetch(this.proxyUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            endpoint: `predictions/${requestId}/result`,
-                            params: {},
-                            generationType: 'poll'
-                        }),
-                        signal
-                    });
+                 try {
+                     const response = await fetch(this.proxyUrl, {
+                         method: 'POST',
+                         headers: {
+                             'Content-Type': 'application/json',
+                         },
+                         body: JSON.stringify({
+                             endpoint: `predictions/${requestId}/result`,
+                             params: {},
+                             generationType: 'poll'
+                         }),
+                         signal
+                     });
 
-                    if (!response.ok) {
-                        if (response.status >= 500) continue;
-                        if (response.status === 404) {
-                            throw new Error('Request not found - may have expired');
-                        }
-                        const errText = await response.text();
-                        throw new Error(`Poll Failed: ${response.status} - ${errText.slice(0, 100)}`);
-                    }
+                     // Check if response exists and has required properties
+                     if (!response) {
+                         continue; // Treat missing response as server error that can be retried
+                     }
 
-                    const data = await response.json();
-                    this.validateResponse(data, 'poll');
+                     if (typeof response !== 'object' || typeof response.ok === 'undefined') {
+                         continue; // Treat invalid response objects as server errors
+                     }
 
-                    const status = data.status?.toLowerCase();
+                     if (!response.ok) {
+                         if (response.status >= 500) continue;
+                         if (response.status === 404) {
+                             throw new Error('Request not found - may have expired');
+                         }
+                         const errText = await response.text();
+                         throw new Error(`Poll Failed: ${response.status} - ${errText.slice(0, 100)}`);
+                     }
 
-                    if (status === 'completed' || status === 'succeeded' || status === 'success') {
+                     const data = await response.json();
+
+                     // For polling, only validate response structure if status is not failed/error
+                     // This allows the polling logic to handle failed statuses with proper error messages
+                     const status = data.status?.toLowerCase();
+                     if (status !== 'failed' && status !== 'error') {
+                         this.validateResponse(data, 'poll');
+                     }
+
+                     if (status === 'completed' || status === 'succeeded' || status === 'success') {
                         this.monitoring.record('api_call', {
                             type: 'poll_success',
                             duration: Date.now() - (this.pollStartTime || Date.now()),
@@ -447,15 +466,15 @@ export class MuapiClient {
                         });
                     }
 
-                } catch (error) {
-                    if (error.name === 'AbortError') {
-                        throw new Error('Request cancelled');
-                    }
-                    if (attempt === maxAttempts) throw error;
-                }
-            }
+                 } catch (error) {
+                     if (error.name === 'AbortError') {
+                         throw new Error('Request cancelled');
+                     }
+                     if (attempt === maxAttempts) throw error;
+                 }
+             }
 
-            throw new Error('Generation timed out after polling.');
+             throw new Error('Generation timed out');
 
         }, { requestId, maxAttempts }, {
             retry: false, // Polling doesn't need retry
