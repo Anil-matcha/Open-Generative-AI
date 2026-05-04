@@ -73,6 +73,7 @@ const pageLoaders = {
   'runway-motion': () => import('../components/RunwayMotionStudio.js').then(m => m.RunwayMotionStudio()),
   'tiktok-carousel': () => import('../components/TikTokCarouselStudio.js').then(m => m.TikTokCarouselStudio()),
   'advanced-dubbing': () => import('../components/AdvancedDubbingStudio.js').then(m => m.AdvancedDubbingStudio()),
+  landing: () => import('../components/landing/LandingPage.jsx').then(m => m.LandingPage()),
 };
 
 let currentPage = null;

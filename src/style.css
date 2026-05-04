@@ -47,3 +47,90 @@ main {
 .custom-scrollbar::-webkit-scrollbar-track {
   background: transparent;
 }
+/* ===== LANDING PAGE STYLES - Higgsfield.ai Pattern ===== */
+
+.landing-page {
+  background: #0f1113;
+  color: #ffffff;
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Typography */
+.landing-page h1, .landing-page h2, .landing-page h3 {
+  font-family: 'Sora', sans-serif;
+}
+
+/* Feature Card Hover Video Logic */
+.feature-card .feature-video {
+  transform: scale(1);
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.feature-card:hover .feature-video {
+  transform: scale(1.05);
+}
+
+/* Grid responsive adjustments */
+.feature-grid-section .grid {
+  gap: 16px;
+}
+
+@media (max-width: 768px) {
+  .feature-grid-section .grid {
+    display: flex;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+  .feature-grid-section .grid > * {
+    min-width: 280px;
+  }
+}
+
+/* Header navigation scrollbar hide */
+#header__menu_list.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+#header__menu_list.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Primary button glow */
+button.bg-primary {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+/* Gradient text utility */
+.bg-clip-text.text-transparent {
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Container */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Badge for "New" */
+[data-new="true"] span {
+  margin-left: 4px;
+}
+
+/* Animations subtle */
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.landing-page section {
+  animation: fade-in-up 0.6s ease-out;
+}
+
+/* Dark theme force */
+.landing-page {
+  color-scheme: dark;
+}
