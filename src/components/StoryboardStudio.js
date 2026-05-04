@@ -2,26 +2,11 @@ import { cutai } from '../lib/cutai-api.js';
 import { muapi } from '../lib/muapi.js';
 import { securityService } from '../lib/services/SecurityService.js';
 import { AuthModal } from './AuthModal.js';
-import { showToast } from './Toast.js';
-import { generateId } from '../lib/utils.js';
-import { createCharacterStore } from '../lib/stores/characterStore.js';
-import { createSceneStore } from '../lib/stores/sceneStore.js';
-import { promptBuilder } from '../lib/ai/promptBuilder.js';
-import { aiService } from '../lib/services/AIService.js';
+import { showToast } from '../lib/loading.js';
 import { t2iModels } from '../lib/models.js';
+import { GTMPromptModal } from './modals/GTMPromptModal.jsx';
 
-// Toast notification system
-function showToast(message, type = 'info') {
-  const toast = document.createElement('div');
-  toast.className = `fixed top-4 right-4 px-4 py-2 rounded-lg text-white text-sm font-bold z-50 transition-all duration-300 ${
-    type === 'success' ? 'bg-green-600' :
-    type === 'error' ? 'bg-red-600' :
-    type === 'warning' ? 'bg-yellow-600' : 'bg-blue-600'
-  }`;
-  toast.textContent = message;
-  document.body.appendChild(toast);
-  setTimeout(() => toast.remove(), 3000);
-}
+
 
 const SHOT_TYPES = ['Wide Shot', 'Medium Shot', 'Close-Up', 'Extreme Close-Up', 'POV', 'Overhead', 'Low Angle'];
 

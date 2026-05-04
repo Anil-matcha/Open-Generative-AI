@@ -3,7 +3,7 @@
  * Handles importing generated images into the timeline as clips
  */
 
-import { openaiConfig } from './config/openaiConfig.js';
+import { openaiConfig } from '../config/openaiConfig.js';
 
 class AssetImportService {
   constructor() {

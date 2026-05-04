@@ -1023,5 +1023,4 @@ export class OpenAIImageEditorModal extends BaseModal {
   }
 }
 
-export default OpenAIImageEditorModal;</content>
-<parameter name="filePath">src/components/modals/OpenAIImageEditorModal.jsx
+export default OpenAIImageEditorModal;

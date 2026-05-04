@@ -495,33 +495,33 @@ Generated with GTM framework fallback (OpenAI unavailable)`;
   }) {
     this.config.validateApiKey();
 
-    try {
-      const response = await fetch(`${OPENAI_IMAGES_URL}/generations`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.config.getApiKey()}`
-        },
-         const requestBody = {
-           model: this.config.getImageModel(),
-           prompt,
-           n,
-           size,
-           quality,
-           style,
-           background,
-           output_format,
-           response_format: 'b64_json',
-           moderation
-         };
+     try {
+       const requestBody = {
+         model: this.config.getImageModel(),
+         prompt,
+         n,
+         size,
+         quality,
+         style,
+         background,
+         output_format,
+         response_format: 'b64_json',
+         moderation
+       };
 
-        // Only include compression if specified and format supports it
-        if (output_compression !== undefined && ['jpeg', 'webp'].includes(output_format)) {
-          requestBody.output_compression = output_compression;
-        }
+       // Only include compression if specified and format supports it
+       if (output_compression !== undefined && ['jpeg', 'webp'].includes(output_format)) {
+         requestBody.output_compression = output_compression;
+       }
 
-        body: JSON.stringify(requestBody)
-      });
+       const response = await fetch(`${OPENAI_IMAGES_URL}/generations`, {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json',
+           'Authorization': `Bearer ${this.config.getApiKey()}`
+         },
+         body: JSON.stringify(requestBody)
+       });
 
       if (!response.ok) {
         const error = await response.json();
@@ -718,34 +718,34 @@ Generated with GTM framework fallback (OpenAI unavailable)`;
   }) {
     this.config.validateApiKey();
 
-    try {
-      const response = await fetch(`${OPENAI_IMAGES_URL}/generations`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.config.getApiKey()}`
-        },
-         const requestBody = {
-           model: this.config.getImageModel(),
-           prompt,
-           stream: true,
-           partial_images: partialImages,
-           size,
-           quality,
-           style,
-           background,
-           output_format,
-           response_format: 'b64_json',
-           moderation
-         };
+     try {
+       const requestBody = {
+         model: this.config.getImageModel(),
+         prompt,
+         stream: true,
+         partial_images: partialImages,
+         size,
+         quality,
+         style,
+         background,
+         output_format,
+         response_format: 'b64_json',
+         moderation
+       };
 
-        // Only include compression if specified and format supports it
-        if (output_compression !== undefined && ['jpeg', 'webp'].includes(output_format)) {
-          requestBody.output_compression = output_compression;
-        }
+       // Only include compression if specified and format supports it
+       if (output_compression !== undefined && ['jpeg', 'webp'].includes(output_format)) {
+         requestBody.output_compression = output_compression;
+       }
 
-        body: JSON.stringify(requestBody)
-      });
+       const response = await fetch(`${OPENAI_IMAGES_URL}/generations`, {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json',
+           'Authorization': `Bearer ${this.config.getApiKey()}`
+         },
+         body: JSON.stringify(requestBody)
+       });
 
       if (!response.ok) {
         const error = await response.json();
