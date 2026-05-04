@@ -322,6 +322,11 @@ class RequestDeduplicator {
   constructor() {
     this.activeRequests = new Map();
     this.similarityThreshold = 0.85;
+    this.stats = {
+      totalRequests: 0,
+      duplicatesFound: 0,
+      similarRequestsFound: 0
+    };
   }
 
   async getDedupeKey(params) {
@@ -383,6 +388,13 @@ class RequestDeduplicator {
 
   unregisterRequest(key) {
     this.activeRequests.delete(key);
+  }
+
+  getStats() {
+    return {
+      ...this.stats,
+      activeRequests: this.activeRequests.size
+    };
   }
 }
 
