@@ -37,7 +37,7 @@ jobs:
       run: pnpm run lint
 
     - name: Run type checking
-      run: npm run typecheck || true  # Allow to fail if no typecheck script
+      run: pnpm run typecheck || true  # Allow to fail if no typecheck script
 
     - name: Run unit tests
       run: pnpm run test:run
