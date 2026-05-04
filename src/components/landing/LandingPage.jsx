@@ -1,7 +1,6 @@
 // Landing Page - Content sections only
 import { Hero } from './sections/Hero.jsx';
 import { LandingHeader } from './common/Header.jsx';
-import { LandingHeader } from './common/Header.jsx';
 import { FeatureGrid } from './common/FeatureGrid.jsx';
 
 const ALL_FEATURES = [
