@@ -1,26 +1,67 @@
+# Netlify Configuration - Single Source of Truth
+# This file consolidates all Netlify-specific configuration for the Open-Higgsfield-AI monorepo
+
 [build]
+  # Publish directory for built assets
   publish = "dist"
-  # Use pnpm for better monorepo support
-  command = "pnpm install --ignore-scripts && pnpm run build:all && pnpm run build:storyboarder"
+  
+  # Build command - uses pnpm with monorepo support
+  # Note: pnpm-lock.yaml is committed, ensuring reproducible builds
+  command = "pnpm run build:all"
+  
+  # Netlify Functions directory
+  functions = "netlify/functions/dist"
+
+[build.environment]
+  # Node.js version for build and functions
+  NODE_VERSION = "20"
+  
+  # Production optimizations
+  NODE_OPTIONS = "--max-old-space-size=4096"
 
 [functions]
+  # Serverless functions directory
   directory = "netlify/functions/dist"
+  
+  # Function-level configuration
+  [functions."*"]
+    # 60-second timeout for long-running AI operations
+    timeout = 60
+    # 1GB memory for video processing functions
+    memory = 1024
 
-# AI Storyboarder specific build
+# Redirects: SPA routing, API proxy, and app-specific routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://api.muapi.ai/:splat"
+  status = 200
+  force = false
+
 [[redirects]]
   from = "/apps/storyboarder/*"
   to = "/apps/storyboarder/index.html"
   status = 200
+  force = false
 
-[build.environment]
-  NODE_VERSION = "20"
+# Security Headers
+[[headers]]
+  for = "/*"
+    [headers.values]
+    # Prevent clickjacking
+    X-Frame-Options = "DENY"
+    # Prevent MIME sniffing
+    X-Content-Type-Options = "nosniff"
+    # Referrer policy
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    # Content Security Policy (adjust as needed for your assets)
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://api.muapi.ai https://supabase.co wss://*.supabase.co; frame-ancestors 'none';"
 
-# Environment variables are set via Netlify CLI or dashboard
-# Do not commit secrets to this file
-
-# Frontend Environment Variables (for local development)
-
-# Add build hooks if needed
 [build.processing]
   skip_processing = false
 
@@ -34,3 +75,18 @@
 
 [build.processing.html]
   pretty_urls = true
+
+# Plugin configuration (ensure pnpm-lock.toml consistency)
+# Network concurrency for monorepo builds
+[build.conditions]
+  netlify_condition = "build"
+
+# Pre-deploy validation reference (commented)
+# Add scripts/validate-netlify.sh with:
+#   #!/bin/bash
+#   if command -v toml-lint &> /dev/null; then
+#     toml-lint netlify.toml || exit 1
+#   fi
+#   npx netlify-cli build --dry || exit 1
+#
+# Then run: bash scripts/validate-netlify.sh
