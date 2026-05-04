@@ -20,6 +20,7 @@ import { escapeHtml, safeHtml } from './lib/security.js';
 import { initializeEnhancedMuAPI } from './lib/muapiEnhanced.js';
 import { loadConfig } from './lib/muapiConfig.js';
 import { initializeAIOptimizations } from './lib/services/aiIntegration.js';
+import { LandingPage } from './components/landing/index.js';
 
 // Show configuration warning banner if critical env vars missing
 if (typeof document !== 'undefined') {
@@ -207,69 +208,68 @@ window.addEventListener('offline', () => {
 });
 
 try {
+
   const app = document.querySelector('#app');
-  if (!app) {
-    throw new Error('App container not found');
-  }
-
+  if (!app) throw new Error('App container not found');
+  
   app.innerHTML = '';
-
-  const headerEl = Header((page) => navigate(page));
-  app.appendChild(headerEl);
-
-  const body = document.createElement('div');
-  body.className = 'flex flex-1';
-
-  const sidebar = Sidebar((page) => navigate(page));
-  body.appendChild(sidebar);
-
-  const contentArea = document.createElement('main');
-  contentArea.id = 'content-area';
-  contentArea.className = 'flex-1 relative w-full flex flex-col bg-app-bg';
-  body.appendChild(contentArea);
-
-  app.appendChild(body);
-
-  initRouter(contentArea, (page) => {
-    headerEl.dispatchEvent(new CustomEvent('route-changed', { detail: { page } }));
-    sidebar.dispatchEvent(new CustomEvent('route-changed', { detail: { page } }));
-  });
-
-  // Track initialization time
-  const initDuration = performance.now() - initStart;
-  perfMonitor.trackPageLoad('initialization', initDuration);
   
-  console.log(`[App] Initialized in ${initDuration.toFixed(2)}ms`);
-  
-  // Navigate to initial page
-  // Check URL for deep linking
+  // Determine initial page BEFORE building shell
   const path = window.location.pathname;
   const hash = window.location.hash;
-  let initialPage = 'image';
-
+  let initialPage = 'landing';
+  
   if (path === '/' || path === '') {
-    initialPage = 'image';
+    initialPage = 'landing';
   } else if (path.startsWith('/')) {
     initialPage = path.slice(1);
   }
-
-  // Handle hash-based routing (e.g., #/ai-vfx)
+  
   if (hash && hash.startsWith('#/')) {
-    const hashPage = hash.slice(2); // Remove #/
-    if (hashPage) {
-      initialPage = hashPage;
-    }
+    const hashPage = hash.slice(2);
+    if (hashPage) initialPage = hashPage;
   }
-
-  // Handle studio query param
+  
   const studioParam = new URLSearchParams(window.location.search).get('studio');
-  if (studioParam) {
-    initialPage = studioParam;
+  if (studioParam) initialPage = studioParam;
+  
+  // Landing page: full-page without app shell
+  if (initialPage === 'landing') {
+    const landingPage = LandingPage();
+    app.appendChild(landingPage);
+    console.log('[App] Landing page rendered (full-page mode)');
+  } else {
+    // Standard app shell for editor pages
+    const headerEl = Header((page) => navigate(page));
+    app.appendChild(headerEl);
+
+    const body = document.createElement('div');
+    body.className = 'flex flex-1';
+
+    const sidebar = Sidebar((page) => navigate(page));
+    body.appendChild(sidebar);
+
+    const contentArea = document.createElement('main');
+    contentArea.id = 'content-area';
+    contentArea.className = 'flex-1 relative w-full flex flex-col bg-app-bg';
+    body.appendChild(contentArea);
+
+    app.appendChild(body);
+
+    initRouter(contentArea, (page) => {
+      headerEl.dispatchEvent(new CustomEvent('route-changed', { detail: { page } }));
+      sidebar.dispatchEvent(new CustomEvent('route-changed', { detail: { page } }));
+    });
+    
+    console.log('[App] App shell rendered, navigating to:', initialPage);
+    navigate(initialPage);
   }
   
-  console.log('[App] Navigating to initial page:', initialPage);
-  navigate(initialPage);
-  
+  // Track initialization time
+  const initDuration = performance.now() - initStart;
+  perfMonitor.trackPageLoad('initialization', initDuration);
+  console.log(`[App] Initialized in ${initDuration.toFixed(2)}ms`);
+
 } catch (error) {
   console.error('[App] Fatal initialization error:', error);
   

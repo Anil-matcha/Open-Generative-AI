@@ -74,11 +74,14 @@
     "@supabase/supabase-js": "^2.99.0",
     "@tailwindcss/postcss": "^4.1.18",
     "@tailwindcss/vite": "^4.2.4",
+    "canvas-confetti": "^1.9.4",
     "dompurify": "^3.3.3",
+    "framer-motion": "^12.38.0",
     "interactjs": "^1.10.27",
     "lucide-react": "^1.8.0",
     "mobx-react-lite": "^4.1.1",
-    "moment": "^2.30.1"
+    "moment": "^2.30.1",
+    "react-intersection-observer": "^10.0.3"
   },
   "engines": {
     "node": ">=18.0.0"

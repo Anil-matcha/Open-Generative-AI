@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Dependencies
+package-lock.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -30,3 +33,7 @@ dist-ssr
 
 # AI agent development tools (not part of application)
 superpowers/
+
+# Test results
+test-results/
+coverage/
