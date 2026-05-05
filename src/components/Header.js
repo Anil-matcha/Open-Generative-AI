@@ -26,8 +26,14 @@ export function Header(navigate) {
     `;
 
     const menu = document.createElement('nav');
-    menu.className = 'hidden lg:flex items-center gap-6 text-[13px] font-bold text-secondary';
-    const items = ['Image', 'Video', 'Lip Sync', 'Cinema Studio', 'Workflows', 'Agents', 'MCP & CLI'];
+    menu.className = 'hidden lg:flex items-center gap-6 text-[13px] font-bold text-secondary overflow-x-auto';
+    const items = [
+        'Apps', 'Image', 'Video', 'Cinema Studio', 'Character', 'AI-VFX', 'Influencer', 'Storyboard',
+        'Effects', 'VFX', 'Edit', 'Upscale', 'Audio', 'Avatar', 'Training', 'Video Tools',
+        'Render', 'Video Agent', 'Director', 'Timeline', 'Motion', 'TikTok', 'Dubbing',
+        'Chat', 'Commercial', 'Templates', 'Explore', 'Library', 'Community', 'Assist',
+        'Lip Sync', 'Workflows', 'Agents', 'MCP & CLI'
+    ];
 
     items.forEach(item => {
         const link = document.createElement('a');
@@ -47,13 +53,45 @@ export function Header(navigate) {
             // Add to current
             link.classList.add('text-white');
 
-            if (item === 'Image') navigate('image');
-            else if (item === 'Video') navigate('video');
-            else if (item === 'Lip Sync') navigate('lipsync');
-            else if (item === 'Cinema Studio') navigate('cinema');
-            else if (item === 'Workflows') navigate('workflows');
-            else if (item === 'Agents') navigate('agents');
-            else if (item === 'MCP & CLI') navigate('mcp-cli');
+            const routeMap = {
+                'Apps': 'apps',
+                'Image': 'image',
+                'Video': 'video',
+                'Cinema Studio': 'cinema',
+                'Character': 'character',
+                'AI-VFX': 'ai-vfx',
+                'Influencer': 'influencer',
+                'Storyboard': 'storyboard',
+                'Effects': 'effects',
+                'VFX': 'vfx',
+                'Edit': 'edit',
+                'Upscale': 'upscale',
+                'Audio': 'audio',
+                'Avatar': 'avatar',
+                'Training': 'training',
+                'Video Tools': 'videotools',
+                'Render': 'render',
+                'Video Agent': 'video-agent',
+                'Director': 'director',
+                'Timeline': 'timeline',
+                'Motion': 'runway-motion',
+                'TikTok': 'tiktok-carousel',
+                'Dubbing': 'advanced-dubbing',
+                'Chat': 'chat',
+                'Commercial': 'commercial',
+                'Templates': 'templates',
+                'Explore': 'explore',
+                'Library': 'library',
+                'Community': 'community',
+                'Assist': 'assist',
+                'Lip Sync': 'lipsync',
+                'Workflows': 'workflows',
+                'Agents': 'agents',
+                'MCP & CLI': 'mcp-cli'
+            };
+
+            const route = routeMap[item];
+            if (route) navigate(route);
         };
 
         menu.appendChild(link);

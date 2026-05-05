@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
+  <defs>
+    <linearGradient id="grad_advanced-dubbing" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffecd2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#fcb69f;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="shine_advanced-dubbing" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.3" />
+      <stop offset="50%" style="stop-color:#ffffff;stop-opacity:0" />
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0.1" />
+    </linearGradient>
+    <filter id="glow_advanced-dubbing">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Main background -->
+  <rect width="640" height="360" rx="24" fill="url(#grad_advanced-dubbing)"/>
+
+  <!-- Subtle shine effect -->
+  <rect width="640" height="360" rx="24" fill="url(#shine_advanced-dubbing)"/>
+
+  <!-- Central icon area with glow -->
+  <circle cx="320" cy="160" r="80" fill="#ffffff" opacity="0.95" filter="url(#glow_advanced-dubbing)"/>
+  <circle cx="320" cy="160" r="75" fill="#ffffff" opacity="0.9"/>
+
+  <!-- Icon -->
+  <text x="320" y="185" text-anchor="middle" fill="#ffecd2" font-family="Arial, sans-serif" font-size="48" font-weight="bold">🎤</text>
+
+  <!-- Decorative elements -->
+  <circle cx="120" cy="80" r="20" fill="#ffffff" opacity="0.6"/>
+  <circle cx="520" cy="60" r="15" fill="#ffffff" opacity="0.4"/>
+  <circle cx="580" cy="280" r="25" fill="#ffffff" opacity="0.3"/>
+  <circle cx="60" cy="300" r="18" fill="#ffffff" opacity="0.5"/>
+
+  <!-- Subtle geometric shapes -->
+  <rect x="50" y="50" width="40" height="4" rx="2" fill="#ffffff" opacity="0.3"/>
+  <rect x="550" y="200" width="30" height="4" rx="2" fill="#ffffff" opacity="0.4"/>
+  <rect x="100" y="280" width="35" height="4" rx="2" fill="#ffffff" opacity="0.25"/>
+</svg>
