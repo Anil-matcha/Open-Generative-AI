@@ -2,6 +2,8 @@ import { cutai } from '../lib/cutai-api.js';
 import { muapi } from '../lib/muapi.js';
 import { securityService } from '../lib/services/SecurityService.js';
 import { AuthModal } from './AuthModal.js';
+import { createHeroSection } from '../lib/thumbnails.js';
+import { createInlineInstructions } from './InlineInstructions.js';
 import { showToast } from '../lib/loading.js';
 import { t2iModels } from '../lib/models.js';
 import { GTMPromptModal } from './modals/GTMPromptModal.jsx';

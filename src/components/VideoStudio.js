@@ -948,8 +948,8 @@ export function VideoStudio() {
         }
     };
 
-    // --- Wan AI Effect Application ---
-    const applySelectedWanEffect = async () => {
+    // --- Wan AI Effect Application (hoisted)
+    async function applySelectedWanEffect() {
         const effectType = document.getElementById('wan-ai-effect').value;
         if (!effectType) {
             alert('Please select a Wan AI effect first');

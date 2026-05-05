@@ -1184,7 +1184,7 @@ button, input, textarea, select { font: inherit; }
     function openPreviewMediaModal(state, showToast) {
       try {
         const modal = new PreviewMediaModal({
-          mediaData: state.tracks.flatMap(t => t.items),
+          mediaData: state.tracks.flatMap(t => t.clips),
           onComplete: (result) => {
             showToast('Media preview completed', 'success');
           },
@@ -1224,7 +1224,7 @@ button, input, textarea, select { font: inherit; }
             type: element.type || 'text',
             ...element
           };
-          videoTrack.items.push(clip);
+          videoTrack.clips.push(clip);
         });
         renderTracks();
       }
@@ -1478,11 +1478,11 @@ button, input, textarea, select { font: inherit; }
           const track = state.tracks.find(t => t.id === parseInt(lane.dataset.trackId));
 
           if (data.type === 'clip') {
-            const allClips = state.tracks.flatMap(t => t.items);
+            const allClips = state.tracks.flatMap(t => t.clips);
             const clip = allClips.find(c => c.id === data.clipId);
             if (clip && track) {
               // Remove from old track
-              state.tracks.forEach(t => t.items = t.items.filter(c => c.id !== clip.id));
+              state.tracks.forEach(t => t.clips = t.clips.filter(c => c.id !== clip.id));
               // Add to new track
               clip.left = Math.max(0, Math.min(100 - clip.width, percent));
               track.clips.push(clip);
@@ -1574,10 +1574,10 @@ button, input, textarea, select { font: inherit; }
         delete clip.start;
         delete clip.end;
       } else {
-        clip.left = Math.min(78, 8 + targetTrack.items.length * 10);
+        clip.left = Math.min(78, 8 + targetTrack.clips.length * 10);
       }
 
-      targetTrack.items.push(clip);
+      targetTrack.clips.push(clip);
       state.selectedClipId = clip.id;
       renderTracks();
       updatePreview(clip);
@@ -1665,7 +1665,7 @@ button, input, textarea, select { font: inherit; }
     }
 
     function renderClipEditor(clipId) {
-      const clip = state.tracks.flatMap(t => t.items).find(c => c.id === clipId);
+      const clip = state.tracks.flatMap(t => t.clips).find(c => c.id === clipId);
       if (!clip) {
         els.clipEditorContainer.innerHTML = '<p>Clip not found</p>';
         return;
@@ -1938,7 +1938,7 @@ button, input, textarea, select { font: inherit; }
 
       saveStateSnapshot(state);
 
-      const track = state.tracks.find(t => t.items.some(c => c.id === selectedClip.id));
+      const track = state.tracks.find(t => t.clips.some(c => c.id === selectedClip.id));
       if (!track) return;
 
       const clipIndex = track.clips.findIndex(c => c.id === selectedClip.id);
@@ -2513,7 +2513,7 @@ button, input, textarea, select { font: inherit; }
           src: videoData.src,
           poster: videoData.poster
         };
-        videoTrack.items.push(newClip);
+        videoTrack.clips.push(newClip);
         renderTracks();
       }
     }
@@ -2529,7 +2529,7 @@ button, input, textarea, select { font: inherit; }
           type: 'image',
           src: imageData.src
         };
-        videoTrack.items.push(newClip);
+        videoTrack.clips.push(newClip);
         renderTracks();
       }
     }
@@ -2545,7 +2545,7 @@ button, input, textarea, select { font: inherit; }
           type: 'audio',
           src: audioData.src
         };
-        audioTrack.items.push(newClip);
+        audioTrack.clips.push(newClip);
         renderTracks();
       }
     }
@@ -2938,7 +2938,7 @@ button, input, textarea, select { font: inherit; }
     }
 
     function renderLineDuration(clipId) {
-      const clip = state.tracks.flatMap(t => t.items).find(c => c.id === clipId);
+      const clip = state.tracks.flatMap(t => t.clips).find(c => c.id === clipId);
       if (!clip) return '';
 
       const start = (clip.left / 100) * state.timelineSeconds;

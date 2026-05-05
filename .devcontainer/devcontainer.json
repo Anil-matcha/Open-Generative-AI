@@ -1,0 +1,28 @@
+{
+  "name": "Open Higgsfield AI Development",
+  "dockerFile": "Dockerfile",
+  "context": "..",
+  "runArgs": [
+    "--cap-add=SYS_PTRACE",
+    "--security-opt",
+    "seccomp=unconfined"
+  ],
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/bash",
+    "editor.formatOnSave": true
+  },
+  "extensions": [
+    "kilocode.kilo-code"
+  ],
+  "forwardPorts": [8080, 5173],
+  "postCreateCommand": "pnpm install",
+  "remoteUser": "codespace",
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "containerEnv": {
+    "MORPH_API_KEY": "${MORPH_API_KEY}",
+    "OPENAI_API_KEY": "${OPENAI_API_KEY}",
+    "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}"
+  }
+}
