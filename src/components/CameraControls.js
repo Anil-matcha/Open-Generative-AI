@@ -3,30 +3,30 @@ import { CAMERA_MAP, LENS_MAP, FOCAL_PERSPECTIVE, APERTURE_EFFECT } from '../lib
 
 const ASSET_URLS = {
     // CAMERA
-    "Modular 8K Digital": "/assets/cinema/modular_8k_digital.webp",
-    "Full-Frame Cine Digital": "/assets/cinema/full_frame_cine_digital.webp",
-    "Grand Format 70mm Film": "/assets/cinema/grand_format_70mm_film.webp",
-    "Studio Digital S35": "/assets/cinema/studio_digital_s35.webp",
-    "Classic 16mm Film": "/assets/cinema/classic_16mm_film.webp",
-    "Premium Large Format Digital": "/assets/cinema/premium_large_format_digital.webp",
+    "Modular 8K Digital": "./assets/cinema/modular_8k_digital.webp",
+    "Full-Frame Cine Digital": "./assets/cinema/full_frame_cine_digital.webp",
+    "Grand Format 70mm Film": "./assets/cinema/grand_format_70mm_film.webp",
+    "Studio Digital S35": "./assets/cinema/studio_digital_s35.webp",
+    "Classic 16mm Film": "./assets/cinema/classic_16mm_film.webp",
+    "Premium Large Format Digital": "./assets/cinema/premium_large_format_digital.webp",
 
     // LENS
-    "Creative Tilt Lens": "/assets/cinema/creative_tilt_lens.webp",
-    "Compact Anamorphic": "/assets/cinema/compact_anamorphic.webp",
-    "Extreme Macro": "/assets/cinema/extreme_macro.webp",
-    "70s Cinema Prime": "/assets/cinema/70s_cinema_prime.webp",
-    "Classic Anamorphic": "/assets/cinema/classic_anamorphic.webp",
-    "Premium Modern Prime": "/assets/cinema/premium_modern_prime.webp",
-    "Warm Cinema Prime": "/assets/cinema/warm_cinema_prime.webp",
-    "Swirl Bokeh Portrait": "/assets/cinema/swirl_bokeh_portrait.webp",
-    "Vintage Prime": "/assets/cinema/vintage_prime.webp",
-    "Halation Diffusion": "/assets/cinema/halation_diffusion.webp",
-    "Clinical Sharp Prime": "/assets/cinema/clinical_sharp_prime.webp",
+    "Creative Tilt Lens": "./assets/cinema/creative_tilt_lens.webp",
+    "Compact Anamorphic": "./assets/cinema/compact_anamorphic.webp",
+    "Extreme Macro": "./assets/cinema/extreme_macro.webp",
+    "70s Cinema Prime": "./assets/cinema/70s_cinema_prime.webp",
+    "Classic Anamorphic": "./assets/cinema/classic_anamorphic.webp",
+    "Premium Modern Prime": "./assets/cinema/premium_modern_prime.webp",
+    "Warm Cinema Prime": "./assets/cinema/warm_cinema_prime.webp",
+    "Swirl Bokeh Portrait": "./assets/cinema/swirl_bokeh_portrait.webp",
+    "Vintage Prime": "./assets/cinema/vintage_prime.webp",
+    "Halation Diffusion": "./assets/cinema/halation_diffusion.webp",
+    "Clinical Sharp Prime": "./assets/cinema/clinical_sharp_prime.webp",
 
     // APERTURE
-    "f/1.4": "/assets/cinema/f_1_4.webp",
-    "f/4": "/assets/cinema/f_4.webp",
-    "f/11": "/assets/cinema/f_11.webp"
+    "f/1.4": "./assets/cinema/f_1_4.webp",
+    "f/4": "./assets/cinema/f_4.webp",
+    "f/11": "./assets/cinema/f_11.webp"
 };
 
 export function CameraControls(onChange) {

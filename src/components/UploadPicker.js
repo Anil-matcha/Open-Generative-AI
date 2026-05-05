@@ -1,7 +1,6 @@
 import { muapi } from '../lib/muapi.js';
 import { AuthModal } from './AuthModal.js';
 import { getUploadHistory, saveUpload, removeUpload, generateThumbnail } from '../lib/uploadHistory.js';
-import { securityService } from '../lib/services/SecurityService.js';
 
 /**
  * Creates a self-contained upload picker: a trigger button + history panel.
@@ -14,14 +13,20 @@ import { securityService } from '../lib/services/SecurityService.js';
  * @param {number} [options.maxImages=1] - Maximum number of images selectable
  * @returns {{ trigger: HTMLElement, panel: HTMLElement, reset: function, setMaxImages: function }}
  */
-export function createUploadPicker({ anchorContainer, onSelect, onClear, maxImages: initialMaxImages = 1, acceptVideo = false, onFilePreview = null }) {
+export function createUploadPicker({ anchorContainer, onSelect, onClear, maxImages: initialMaxImages = 1, uploadFn, requireApiKey }) {
+    // uploadFn(file) → Promise<string url>. Defaults to Muapi-hosted upload.
+    // requireApiKey() → boolean. Lets the caller suppress the AuthModal when
+    // the active provider doesn't need a Muapi key (e.g. local Wan2GP).
+    const doUpload = uploadFn || ((file) => muapi.uploadFile(file));
+    const needsKey = typeof requireApiKey === 'function' ? requireApiKey : () => true;
     let panelOpen = false;
     let maxImages = initialMaxImages;
-    let selectedEntries = [];
+    let selectedEntries = []; // [{ url, thumbnail }, ...]
 
+    // ── Hidden file input ─────────────────────────────────────────────────────
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
-    fileInput.accept = acceptVideo ? 'image/*,video/*' : 'image/*';
+    fileInput.accept = 'image/*';
     fileInput.className = 'hidden';
 
     // ── Trigger button ────────────────────────────────────────────────────────
@@ -93,22 +98,17 @@ export function createUploadPicker({ anchorContainer, onSelect, onClear, maxImag
             // Multiple selected — show count
             countBadge.className = 'absolute bottom-0.5 right-0.5 min-w-[16px] h-4 bg-primary rounded-full flex items-center justify-center px-0.5';
             countBadge.innerHTML = `<span class="text-[9px] font-black text-black leading-none">${count}</span>`;
-            const itemLabel = acceptVideo ? 'items' : 'images';
-            trigger.title = `${count} of ${maxImages} ${itemLabel} selected — click to manage`;
+            trigger.title = `${count} of ${maxImages} images selected — click to manage`;
         } else if (canAddMore) {
             // 1 selected, multi-mode active — show "+" to invite adding more
             countBadge.className = 'absolute bottom-0.5 right-0.5 min-w-[16px] h-4 bg-white/80 rounded-full flex items-center justify-center px-0.5 border border-primary/60';
             countBadge.innerHTML = `<span class="text-[9px] font-black text-black leading-none">+</span>`;
-            const itemLabel = acceptVideo ? 'item' : 'image';
-            const itemsLabel = acceptVideo ? 'items' : 'images';
-            trigger.title = `1 ${itemLabel} selected — click to add more (up to ${maxImages})`;
+            trigger.title = `1 image selected — click to add more (up to ${maxImages})`;
         } else {
             // Single mode or at max — show checkmark
             countBadge.className = 'absolute bottom-0.5 right-0.5 min-w-[16px] h-4 bg-primary rounded-full flex items-center justify-center px-0.5';
             countBadge.innerHTML = `<svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg>`;
-            const itemLabel = acceptVideo ? 'items' : 'images';
-            const singleLabel = acceptVideo ? 'Reference media' : 'Reference image';
-            trigger.title = count > 1 ? `${count} ${itemLabel} selected` : singleLabel;
+            trigger.title = count > 1 ? `${count} images selected` : 'Reference image';
         }
     };
 
@@ -154,13 +154,11 @@ export function createUploadPicker({ anchorContainer, onSelect, onClear, maxImag
 
         const headerLeft = document.createElement('div');
         headerLeft.className = 'flex flex-col gap-0.5';
-        const mediaLabel = acceptVideo ? 'Reference Media' : 'Reference Images';
-        headerLeft.innerHTML = `<span class="text-[10px] font-bold text-secondary uppercase tracking-widest">${mediaLabel}</span>`;
+        headerLeft.innerHTML = `<span class="text-[10px] font-bold text-secondary uppercase tracking-widest">Reference Images</span>`;
         if (isMulti) {
             const hint = document.createElement('span');
             hint.className = 'text-[9px] text-muted';
-            const itemLabel = acceptVideo ? 'items' : 'images';
-            hint.textContent = `Select up to ${maxImages} ${itemLabel}`;
+            hint.textContent = `Select up to ${maxImages} images`;
             headerLeft.appendChild(hint);
         }
         header.appendChild(headerLeft);
@@ -325,23 +323,25 @@ export function createUploadPicker({ anchorContainer, onSelect, onClear, maxImag
         const files = Array.from(e.target.files);
         if (!files.length) return;
 
-        const apiKey = await securityService.getDecryptedKey();
-        if (!apiKey) {
-            AuthModal(() => fileInput.click());
-            return;
+        if (needsKey()) {
+            const apiKey = localStorage.getItem('muapi_key');
+            if (!apiKey) {
+                AuthModal(() => fileInput.click());
+                return;
+            }
         }
-
-        if (onFilePreview) onFilePreview(files[0]);
 
         showSpinner();
 
         try {
             if (maxImages === 1) {
+                // Single mode: upload first file only, replace selection
                 const file = files[0];
-                const [uploadedUrl, thumbnail] = await Promise.all([
-                    muapi.uploadFile(file),
+                const [uploadResult, thumbnail] = await Promise.all([
+                    doUpload(file),
                     generateThumbnail(file)
                 ]);
+                const uploadedUrl = typeof uploadResult === 'string' ? uploadResult : uploadResult?.url;
                 const entry = { id: Date.now().toString(), name: file.name, uploadedUrl, thumbnail, timestamp: new Date().toISOString() };
                 saveUpload(entry);
                 selectedEntries = [{ url: uploadedUrl, thumbnail }];
@@ -354,10 +354,11 @@ export function createUploadPicker({ anchorContainer, onSelect, onClear, maxImag
 
                 // Upload all in parallel
                 const results = await Promise.all(toUpload.map(async (file) => {
-                    const [uploadedUrl, thumbnail] = await Promise.all([
-                        muapi.uploadFile(file),
+                    const [uploadResult, thumbnail] = await Promise.all([
+                        doUpload(file),
                         generateThumbnail(file)
                     ]);
+                    const uploadedUrl = typeof uploadResult === 'string' ? uploadResult : uploadResult?.url;
                     return { id: Date.now().toString() + Math.random(), name: file.name, uploadedUrl, thumbnail, timestamp: new Date().toISOString() };
                 }));
 
@@ -375,8 +376,7 @@ export function createUploadPicker({ anchorContainer, onSelect, onClear, maxImag
         } catch (err) {
             console.error('[UploadPicker] Upload failed:', err);
             updateTrigger();
-            const uploadType = acceptVideo ? 'Media' : 'Image';
-            alert(`${uploadType} upload failed: ${err.message}`);
+            alert(`Image upload failed: ${err.message}`);
         }
 
         fileInput.value = '';

@@ -18,5 +18,9 @@
 	path = videoremixai-vfx
 	url = https://github.com/deangilmoreremix/videoremixai-vfx.git
 
-
-
+[submodule "packages/Vibe-Workflow"]
+	path = packages/Vibe-Workflow
+	url = https://github.com/SamurAIGPT/Vibe-Workflow.git
+[submodule "packages/Open-Poe-AI"]
+	path = packages/Open-Poe-AI
+	url = https://github.com/Anil-matcha/Open-Poe-AI.git

@@ -1,6 +1,7 @@
 {
-  "name": "open-higgsfield-ai",
-  "description": "Open-source alternative to Higgsfield AI — AI image generation and cinema studio with 20+ models",
+  "name": "open-generative-ai",
+  "description": "Open-source alternative to Higgsfield AI — AI image, video, cinema and lip sync studio",
+  "homepage": "https://github.com/Anil-matcha/Open-Generative-AI",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -21,8 +22,6 @@
      "test": "vitest",
      "test:ui": "vitest --ui",
      "test:run": "vitest run",
-     "test:coverage": "vitest run --coverage",
-     "test:watch": "vitest --watch",
      "test:e2e": "playwright test",
      "test:e2e:ui": "playwright test --ui",
      "test:e2e:debug": "playwright test --debug",

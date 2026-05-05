@@ -1,20 +1,30 @@
 import { muapi } from '../lib/muapi.js';
-import { createSafeImage } from '../lib/security.js';
 import {
     t2iModels, getAspectRatiosForModel, getResolutionsForModel, getQualityFieldForModel,
     i2iModels, getAspectRatiosForI2IModel, getResolutionsForI2IModel, getQualityFieldForI2IModel,
     getMaxImagesForI2IModel
 } from '../lib/models.js';
+import { localAI, isLocalAIAvailable } from '../lib/localInferenceClient.js';
+import { LOCAL_MODEL_CATALOG, getLocalModelById } from '../lib/localModels.js';
 import { ENHANCE_TAGS, QUICK_PROMPTS } from '../lib/promptUtils.js';
 import { AuthModal } from './AuthModal.js';
 import { createUploadPicker } from './UploadPicker.js';
-import { GTMPromptModal } from './modals/GTMPromptModal.jsx';
-import { createInlineInstructions } from './InlineInstructions.js';
-import { createHeroSection } from '../lib/thumbnails.js';
+import { savePendingJob, removePendingJob, getPendingJobs } from '../lib/pendingJobs.js';
+
+function createInlineInstructions(type) {
+    const el = document.createElement('div');
+    el.className = 'w-full text-center text-white/30 text-sm flex flex-col items-center gap-2 py-2';
+    const icon = type === 'image' ? '🖼️' : '🎬';
+    el.innerHTML = `
+        <p>${icon} Enter a prompt above and click <span class="text-primary font-semibold">Generate</span> to create your ${type}.</p>
+        <p class="text-xs text-white/20">Tip: Be descriptive — include style, lighting, mood, and subject for best results.</p>
+    `;
+    return el;
+}
 
 export function ImageStudio() {
     const container = document.createElement('div');
-    container.className = 'w-full h-full flex flex-col items-center justify-start bg-app-bg relative p-4 md:p-6 overflow-y-auto custom-scrollbar overflow-x-hidden';
+    container.className = 'w-full h-full flex flex-col items-center justify-center bg-app-bg relative p-4 md:p-6 overflow-y-auto custom-scrollbar overflow-x-hidden';
 
     // --- State ---
     const defaultModel = t2iModels[0];
@@ -24,7 +34,15 @@ export function ImageStudio() {
     let dropdownOpen = null;
     let uploadedImageUrls = []; // array of uploaded image URLs (multi-image support)
     let imageMode = false; // false = t2i models, true = i2i models
-    
+
+    // Local inference state — only image-capable models surface here.
+    // sd.cpp uses type='sd1'|'sdxl'|'z-image'; Wan2GP image models use type='image'.
+    // Wan2GP video models (type='video') are hidden from ImageStudio.
+    const LOCAL_IMAGE_MODELS = LOCAL_MODEL_CATALOG.filter(m => m.type !== 'video');
+    let useLocalModel = false;
+    let selectedLocalModel = LOCAL_IMAGE_MODELS[0]?.id || null;
+    let localGenProgress = 0; // 0–1
+
     // Advanced parameters state
     let negativePrompt = '';
     let guidanceScale = 7.5;
@@ -33,14 +51,14 @@ export function ImageStudio() {
     let showAdvanced = false;
     let selectedStyle = 'None';
     let batchCount = 1;
-    
+
     // New advanced controls
     let customWidth = 0;  // 0 means use default (aspect ratio based)
     let customHeight = 0;
     let referenceStrength = 50;  // 0-100, for style reference models
     let selectedLora = '';  // LoRA model ID from Civitai
     let loraWeight = 1.0;
-    
+
     // Quick tools panel state
     let showToolsPanel = false;
 
@@ -53,25 +71,35 @@ export function ImageStudio() {
     // 1. HERO SECTION
     // ==========================================
     const hero = document.createElement('div');
-    hero.className = 'flex flex-col items-center mb-2 md:mb-4 animate-fade-in-up transition-all duration-700 w-full';
-    const heroBanner = createHeroSection('image', 'h-32 md:h-44 mb-3');
-    if (heroBanner) {
-        const heroContent = document.createElement('div');
-        heroContent.className = 'absolute bottom-0 left-0 right-0 p-6 z-10';
-        heroContent.innerHTML = `
-            <h1 class="text-2xl sm:text-4xl md:text-5xl font-black text-white tracking-tight mb-1">Image Studio</h1>
-            <p class="text-white/60 text-sm font-medium">Transform images with AI — upscale, stylize, animate and more</p>
-        `;
-        heroBanner.appendChild(heroContent);
-        hero.appendChild(heroBanner);
-    }
+    hero.className = 'flex flex-col items-center mb-10 md:mb-20 animate-fade-in-up transition-all duration-700';
+    hero.innerHTML = `
+        <div class="mb-10 relative group">
+             <div class="absolute inset-0 bg-primary/20 blur-[100px] rounded-full opacity-40 group-hover:opacity-70 transition-opacity duration-1000"></div>
+             <div class="relative w-24 h-24 md:w-32 md:h-32 bg-teal-900/40 rounded-3xl flex items-center justify-center border border-white/5 overflow-hidden">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="text-primary opacity-20 absolute -right-4 -bottom-4">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                </svg>
+                <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20 shadow-glow relative z-10">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-primary">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                        <polyline points="21 15 16 10 5 21"/>
+                    </svg>
+                </div>
+                <!-- Sparkles -->
+                <div class="absolute top-4 right-4 text-primary animate-pulse">✨</div>
+             </div>
+        </div>
+        <h1 class="text-2xl sm:text-4xl md:text-7xl font-black text-white tracking-widest uppercase mb-4 selection:bg-primary selection:text-black text-center px-4">Image Studio</h1>
+        <p class="text-secondary text-sm font-medium tracking-wide opacity-60">Transform images with AI — upscale, stylize, animate and more</p>
+    `;
     container.appendChild(hero);
 
     // ==========================================
     // 2. PROMPT BAR (Tailwind Refactor)
     // ==========================================
     const promptWrapper = document.createElement('div');
-    promptWrapper.className = 'w-full relative z-40 animate-fade-in-up';
+    promptWrapper.className = 'w-full max-w-4xl relative z-40 animate-fade-in-up';
     promptWrapper.style.animationDelay = '0.2s';
 
     const bar = document.createElement('div');
@@ -84,6 +112,8 @@ export function ImageStudio() {
     // --- Image Upload Picker (Image-to-Image) ---
     const picker = createUploadPicker({
         anchorContainer: container,
+        uploadFn: (file) => useLocalModel ? URL.createObjectURL(file) : muapi.uploadFile(file),
+        requireApiKey: () => !useLocalModel,
         onSelect: ({ url, urls }) => {
             uploadedImageUrls = urls || [url];
             if (!imageMode) {
@@ -130,29 +160,7 @@ export function ImageStudio() {
         textarea.style.height = Math.min(textarea.scrollHeight, maxHeight) + 'px';
     };
 
-    const prefill = localStorage.getItem('prefill_prompt');
-    if (prefill) {
-        textarea.value = prefill;
-        localStorage.removeItem('prefill_prompt');
-        requestAnimationFrame(() => {
-            textarea.style.height = 'auto';
-            const maxHeight = window.innerWidth < 768 ? 150 : 250;
-            textarea.style.height = Math.min(textarea.scrollHeight, maxHeight) + 'px';
-        });
-    }
-
     topRow.appendChild(textarea);
-
-    // GTM Prompt Enhancer Button
-    const gtmBtn = document.createElement('button');
-    gtmBtn.className = 'w-10 h-10 shrink-0 rounded-xl border bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40 transition-all flex items-center justify-center relative overflow-hidden mt-1.5 group';
-    gtmBtn.title = 'GTM Prompt Enhancement - Create conversion-optimized prompts';
-    gtmBtn.innerHTML = '🚀';
-    gtmBtn.onclick = () => {
-        openGTMPromptModal(textarea);
-    };
-    topRow.appendChild(gtmBtn);
-
     bar.appendChild(topRow);
 
     // Bottom Row: Controls
@@ -189,6 +197,37 @@ export function ImageStudio() {
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="opacity-60 text-secondary"><path d="M6 2L3 6v15a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z"/></svg>
     `, '720p', 'quality-btn', 'Set output quality');
 
+    // Local / API source toggle (only shown in Electron)
+    let localToggleBtn = null;
+    if (isLocalAIAvailable()) {
+        localToggleBtn = document.createElement('button');
+        localToggleBtn.id = 'local-toggle-btn';
+        localToggleBtn.className = 'flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all border text-xs font-bold whitespace-nowrap';
+        const updateLocalToggleStyle = () => {
+            if (useLocalModel) {
+                localToggleBtn.className = 'flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all border text-xs font-bold whitespace-nowrap bg-primary/20 border-primary/40 text-primary';
+                localToggleBtn.textContent = '⚡ Local';
+            } else {
+                localToggleBtn.className = 'flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all border text-xs font-bold whitespace-nowrap bg-white/5 border-white/5 text-white/60 hover:bg-white/10';
+                localToggleBtn.textContent = '☁ API';
+            }
+        };
+        updateLocalToggleStyle();
+        localToggleBtn.onclick = (e) => {
+            e.stopPropagation();
+            useLocalModel = !useLocalModel;
+            updateLocalToggleStyle();
+            // Reflect active model in the button label
+            if (useLocalModel) {
+                const lm = getLocalModelById(selectedLocalModel);
+                if (lm) document.getElementById('model-btn-label').textContent = lm.name;
+            } else {
+                document.getElementById('model-btn-label').textContent = selectedModelName;
+            }
+        };
+        controlsLeft.appendChild(localToggleBtn);
+    }
+
     controlsLeft.appendChild(modelBtn);
     controlsLeft.appendChild(arBtn);
     controlsLeft.appendChild(qualityBtn);
@@ -224,14 +263,40 @@ export function ImageStudio() {
     container.appendChild(promptWrapper);
 
     const inlineInstructions = createInlineInstructions('image');
-    inlineInstructions.classList.add('mt-8');
+    inlineInstructions.classList.add('max-w-4xl', 'mt-8');
     container.appendChild(inlineInstructions);
+
+    // Local generation progress bar (hidden until active)
+    const localProgressWrap = document.createElement('div');
+    localProgressWrap.className = 'w-full max-w-4xl mt-4 hidden flex-col gap-2';
+    localProgressWrap.id = 'local-progress-wrap';
+    localProgressWrap.innerHTML = `
+        <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-white/60">Generating locally...</span>
+            <span id="local-progress-pct" class="text-xs font-bold text-primary">0%</span>
+        </div>
+        <div class="h-1.5 rounded-full bg-white/10 overflow-hidden">
+            <div id="local-progress-fill" class="h-full bg-primary transition-all duration-200" style="width:0%"></div>
+        </div>
+        <div class="flex justify-end">
+            <button id="local-cancel-btn" class="text-xs text-red-400 hover:text-red-300 transition-colors">Cancel</button>
+        </div>
+    `;
+    container.appendChild(localProgressWrap);
+
+    localProgressWrap.querySelector('#local-cancel-btn')?.addEventListener('click', () => {
+        localAI.cancelGeneration();
+        localProgressWrap.classList.remove('flex');
+        localProgressWrap.classList.add('hidden');
+        generateBtn.disabled = false;
+        generateBtn.innerHTML = `Generate ✨`;
+    });
 
     // ==========================================
     // 3. QUICK TOOLS PANEL (Prompt Enhancer + Quick Starters)
     // ==========================================
     const toolsPanel = document.createElement('div');
-    toolsPanel.className = 'w-full mt-6 animate-fade-in-up hidden';
+    toolsPanel.className = 'w-full max-w-4xl mt-6 animate-fade-in-up hidden';
     toolsPanel.id = 'tools-panel';
     
     // Build tools panel HTML
@@ -300,7 +365,7 @@ export function ImageStudio() {
     const STYLE_PRESETS = ['None', 'Photorealistic', 'Anime', 'Cinematic', 'Oil Painting', 'Watercolor', 'Digital Art', 'Concept Art', 'Cyberpunk'];
     
     const advancedPanel = document.createElement('div');
-    advancedPanel.className = 'w-full mt-6 animate-fade-in-up hidden';
+    advancedPanel.className = 'w-full max-w-4xl mt-6 animate-fade-in-up hidden';
     advancedPanel.id = 'advanced-panel';
     advancedPanel.innerHTML = `
         <div class="bg-[#111]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-5 flex flex-col gap-4">
@@ -636,7 +701,6 @@ export function ImageStudio() {
             btn.classList.remove('bg-white/5', 'text-secondary');
         };
     });
-
     // ==========================================
     // 3. DROPDOWNS (Professional implementation)
     // ==========================================
@@ -667,6 +731,48 @@ export function ImageStudio() {
 
             const renderModels = (filter = '') => {
                 list.innerHTML = '';
+
+                if (useLocalModel) {
+                    // ── Local model list (Wan2GP image-capable models only) ───
+                    const filtered = LOCAL_IMAGE_MODELS.filter(m =>
+                        m.name.toLowerCase().includes(filter.toLowerCase()) ||
+                        m.id.toLowerCase().includes(filter.toLowerCase())
+                    );
+                    if (filtered.length === 0) {
+                        list.innerHTML = `<div class="text-xs text-muted text-center py-4">No local models match</div>`;
+                        return;
+                    }
+                    filtered.forEach(m => {
+                        const item = document.createElement('div');
+                        item.className = `flex items-center justify-between p-3.5 hover:bg-white/5 rounded-2xl cursor-pointer transition-all border border-transparent hover:border-white/5 ${selectedLocalModel === m.id ? 'bg-white/5 border-white/5' : ''}`;
+                        item.innerHTML = `
+                            <div class="flex items-center gap-3.5">
+                                <div class="w-10 h-10 ${m.featured ? 'bg-primary/10 text-primary' : 'bg-green-500/10 text-green-400'} border border-white/5 rounded-xl flex items-center justify-center font-black text-sm shadow-inner uppercase">${m.featured ? '⚡' : m.name.charAt(0)}</div>
+                                <div class="flex flex-col gap-0.5">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="text-xs font-bold text-white tracking-tight">${m.name}</span>
+                                        ${m.featured ? '<span class="text-[9px] font-black px-1 py-0.5 rounded bg-primary/20 text-primary">FEATURED</span>' : ''}
+                                    </div>
+                                    <span class="text-[10px] text-muted">${m.type.toUpperCase()} · ${m.family}</span>
+                                </div>
+                            </div>
+                            ${selectedLocalModel === m.id ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d9ff00" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
+                        `;
+                        item.onclick = (e) => {
+                            e.stopPropagation();
+                            selectedLocalModel = m.id;
+                            document.getElementById('model-btn-label').textContent = m.name;
+                            selectedAr = m.aspectRatios[0];
+                            document.getElementById('ar-btn-label').textContent = selectedAr;
+                            qualityBtn.style.display = 'none';
+                            closeDropdown();
+                        };
+                        list.appendChild(item);
+                    });
+                    return;
+                }
+
+                // ── Remote (API) model list ───────────────────────────────────
                 const filtered = getCurrentModels().filter(m => m.name.toLowerCase().includes(filter.toLowerCase()) || m.id.toLowerCase().includes(filter.toLowerCase()));
 
                 filtered.forEach(m => {
@@ -912,20 +1018,14 @@ export function ImageStudio() {
             const thumb = document.createElement('div');
             thumb.className = `relative group/thumb cursor-pointer rounded-xl overflow-hidden border-2 transition-all duration-300 ${idx === 0 ? 'border-primary shadow-glow' : 'border-white/10 hover:border-white/30'}`;
 
-            // Safe image creation - prevents XSS from user-provided URLs
-            const img = createSafeImage(entry.url, entry.prompt?.substring(0, 30) || 'Generated', 'w-full aspect-square object-cover');
-            thumb.appendChild(img);
-
-            // Create overlay with download button
-            const overlay = document.createElement('div');
-            overlay.className = 'absolute inset-0 bg-black/60 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center gap-1';
-            
-            const downloadBtn = document.createElement('button');
-            downloadBtn.className = 'hist-download p-1.5 bg-primary rounded-lg text-black hover:scale-110 transition-transform';
-            downloadBtn.title = 'Download';
-            downloadBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>';
-            overlay.appendChild(downloadBtn);
-            thumb.appendChild(overlay);
+            thumb.innerHTML = `
+                <img src="${entry.url}" alt="${entry.prompt?.substring(0, 30) || 'Generated'}" class="w-full aspect-square object-cover">
+                <div class="absolute inset-0 bg-black/60 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                    <button class="hist-download p-1.5 bg-primary rounded-lg text-black hover:scale-110 transition-transform" title="Download">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                    </button>
+                </div>
+            `;
 
             thumb.onclick = (e) => {
                 if (e.target.closest('.hist-download')) {
@@ -975,6 +1075,40 @@ export function ImageStudio() {
             renderHistory();
         }
     } catch (e) { /* ignore */ }
+
+    // --- Resume any pending image generations from a previous session ---
+    (async () => {
+        const pending = getPendingJobs('image');
+        if (!pending.length) return;
+
+        const apiKey = localStorage.getItem('muapi_key');
+        if (!apiKey) return; // can't poll without key; jobs remain for next time
+
+        const banner = document.createElement('div');
+        banner.className = 'fixed top-4 left-1/2 -translate-x-1/2 z-[200] bg-[#111] border border-white/10 text-white text-sm px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3';
+        banner.innerHTML = `<span class="animate-spin text-primary">◌</span> <span class="banner-text">Resuming ${pending.length} pending generation${pending.length > 1 ? 's' : ''}…</span>`;
+        document.body.appendChild(banner);
+
+        let remaining = pending.length;
+        pending.forEach(async (job) => {
+            const elapsedAttempts = Math.floor((Date.now() - job.submittedAt) / job.interval);
+            const attemptsLeft = Math.max(1, job.maxAttempts - elapsedAttempts);
+            try {
+                const result = await muapi.pollForResult(job.requestId, apiKey, attemptsLeft, job.interval);
+                const url = result.outputs?.[0] || result.url || result.output?.url;
+                if (url) {
+                    addToHistory({ id: job.requestId, url, ...job.historyMeta, timestamp: new Date().toISOString() });
+                }
+            } catch (e) {
+                console.warn('[ImageStudio] Pending job failed on resume:', job.requestId, e.message);
+            } finally {
+                removePendingJob(job.requestId);
+                remaining--;
+                if (remaining === 0) banner.remove();
+                else banner.querySelector('.banner-text').textContent = `Resuming ${remaining} pending generation${remaining > 1 ? 's' : ''}…`;
+            }
+        });
+    })();
 
     // --- Button Handlers ---
     downloadBtn.onclick = () => {
@@ -1033,7 +1167,75 @@ export function ImageStudio() {
             }
         }
 
-        const apiKey = await securityService.getDecryptedKey();
+        // ── Local inference path ──────────────────────────────────────────────
+        if (useLocalModel) {
+            const lm = getLocalModelById(selectedLocalModel);
+            if (!lm) { alert('No local model selected.'); return; }
+
+            hero.classList.add('opacity-0', 'scale-95', '-translate-y-10', 'pointer-events-none');
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = `<span class="animate-spin inline-block mr-2 text-black">◌</span> Generating...`;
+
+            const progressWrap = document.getElementById('local-progress-wrap');
+            const progressFill = document.getElementById('local-progress-fill');
+            const progressPct = document.getElementById('local-progress-pct');
+            progressWrap.classList.remove('hidden');
+            progressWrap.classList.add('flex');
+
+            const unsub = localAI.onProgress(({ progress, status }) => {
+                const pct = Math.round((progress ?? 0) * 100);
+                if (progressFill) progressFill.style.width = `${pct}%`;
+                if (progressPct) progressPct.textContent = status === 'starting' ? 'Starting...' : `${pct}%`;
+                generateBtn.innerHTML = `<span class="animate-spin inline-block mr-2 text-black">◌</span> ${status === 'starting' ? '...' : pct + '%'}`;
+            });
+
+            let hadError = false;
+            try {
+                const res = await localAI.generate({
+                    model: selectedLocalModel,
+                    prompt,
+                    negative_prompt: negativePrompt || undefined,
+                    aspect_ratio: selectedAr,
+                    steps: steps,
+                    guidance_scale: guidanceScale,
+                    seed,
+                });
+                unsub();
+                progressWrap.classList.replace('flex', 'hidden');
+                progressWrap.classList.add('hidden');
+
+                if (!res?.url) throw new Error('No output returned from local generation');
+                if (res.mediaType === 'video') {
+                    throw new Error('This model produces video — use the Video studio instead.');
+                }
+                addToHistory({
+                    id: Date.now().toString(),
+                    url: res.url,
+                    prompt,
+                    model: `local:${selectedLocalModel}`,
+                    aspect_ratio: selectedAr,
+                    seed: res.seed,
+                    timestamp: new Date().toISOString()
+                });
+                showImageInCanvas(res.url);
+            } catch (e) {
+                hadError = true;
+                unsub();
+                progressWrap.classList.add('hidden');
+                console.error('[Local] generation error:', e);
+                hero.classList.remove('opacity-0', 'scale-95', '-translate-y-10', 'pointer-events-none');
+                console.error('[Local] full error:', e.message);
+                generateBtn.innerHTML = `Error: ${e.message.slice(0, 120)}`;
+                setTimeout(() => { generateBtn.innerHTML = `Generate ✨`; }, 6000);
+            } finally {
+                generateBtn.disabled = false;
+                if (!hadError) generateBtn.innerHTML = `Generate ✨`;
+            }
+            return;
+        }
+
+        // ── Remote API path ───────────────────────────────────────────────────
+        const apiKey = localStorage.getItem('muapi_key');
         if (!apiKey) {
             AuthModal(() => generateBtn.click());
             return;
@@ -1043,6 +1245,10 @@ export function ImageStudio() {
         generateBtn.disabled = true;
         generateBtn.innerHTML = `<span class="animate-spin inline-block mr-2 text-black">◌</span> Generating...`;
 
+        let hadError = false;
+        let capturedRequestId = null;
+        const historyMeta = { prompt, model: selectedModel, aspect_ratio: selectedAr };
+
         try {
             let res;
             const qualityLabel = document.getElementById('quality-btn-label')?.textContent;
@@ -1051,18 +1257,13 @@ export function ImageStudio() {
                     model: selectedModel,
                     images_list: uploadedImageUrls,
                     image_url: uploadedImageUrls[0], // backward compat for single-image models
-                    aspect_ratio: selectedAr
+                    aspect_ratio: selectedAr,
+                    onRequestId: (rid) => {
+                        capturedRequestId = rid;
+                        savePendingJob({ requestId: rid, studioType: 'image', historyMeta, maxAttempts: 60, interval: 2000, submittedAt: Date.now() });
+                    }
                 };
                 if (prompt) genParams.prompt = prompt;
-                if (negativePrompt) genParams.negative_prompt = negativePrompt;
-                if (guidanceScale && guidanceScale !== 7.5) genParams.guidance_scale = guidanceScale;
-                if (steps && steps !== 25) genParams.steps = steps;
-                if (customWidth > 0) genParams.width = customWidth;
-                if (customHeight > 0) genParams.height = customHeight;
-                if (selectedLora) {
-                    genParams.model_id = [{ model: selectedLora, weight: loraWeight }];
-                }
-                if (seed && seed !== -1) genParams.seed = seed;
                 const qualityField = getCurrentQualityField(selectedModel);
                 if (qualityField && qualityLabel) genParams[qualityField] = qualityLabel;
                 res = await muapi.generateI2I(genParams);
@@ -1070,16 +1271,12 @@ export function ImageStudio() {
                 const genParams = {
                     model: selectedModel,
                     prompt,
-                    aspect_ratio: selectedAr
+                    aspect_ratio: selectedAr,
+                    onRequestId: (rid) => {
+                        capturedRequestId = rid;
+                        savePendingJob({ requestId: rid, studioType: 'image', historyMeta, maxAttempts: 60, interval: 2000, submittedAt: Date.now() });
+                    }
                 };
-                // Add style to prompt if selected
-                if (selectedStyle && selectedStyle !== 'None') {
-                    genParams.prompt = `${prompt}, ${selectedStyle.toLowerCase()} style`;
-                }
-                if (negativePrompt) genParams.negative_prompt = negativePrompt;
-                if (guidanceScale && guidanceScale !== 7.5) genParams.guidance_scale = guidanceScale;
-                if (steps && steps !== 25) genParams.steps = steps;
-                if (seed && seed !== -1) genParams.seed = seed;
                 const qualityField = getCurrentQualityField(selectedModel);
                 if (qualityField && qualityLabel) genParams[qualityField] = qualityLabel;
                 res = await muapi.generateImage(genParams);
@@ -1088,59 +1285,36 @@ export function ImageStudio() {
             console.log('[ImageStudio] Full response:', res);
 
             if (res && res.url) {
-                // Add to history
+                if (capturedRequestId) removePendingJob(capturedRequestId);
                 addToHistory({
-                    id: res.id || Date.now().toString(),
+                    id: res.id || capturedRequestId || Date.now().toString(),
                     url: res.url,
                     prompt: prompt,
                     model: selectedModel,
                     aspect_ratio: selectedAr,
                     timestamp: new Date().toISOString()
                 });
-
-                // Show image
                 showImageInCanvas(res.url);
             } else {
                 console.error('[ImageStudio] No image URL in response:', res);
                 throw new Error('No image URL returned by API');
             }
         } catch (e) {
-            generateBtn.innerHTML = `Error: ${e.message.slice(0, 40)}`;
+            hadError = true;
+            if (capturedRequestId) removePendingJob(capturedRequestId);
+            console.error(e);
+            // Restore hero so the page doesn't look broken after a failed generation
+            hero.classList.remove('opacity-0', 'scale-95', '-translate-y-10', 'pointer-events-none');
+            generateBtn.innerHTML = `Error: ${e.message.slice(0, 60)}`;
             setTimeout(() => {
                 generateBtn.innerHTML = `Generate ✨`;
-                generateBtn.disabled = false;
-            }, 3000);
-            return;
+            }, 4000);
+        } finally {
+            generateBtn.disabled = false;
+            // Only reset the label on success; the catch timeout handles the error case
+            if (!hadError) generateBtn.innerHTML = `Generate ✨`;
         }
-        generateBtn.disabled = false;
-        generateBtn.innerHTML = `Generate ✨`;
     };
-
-    // GTM Prompt Modal Function
-    function openGTMPromptModal(promptTextarea) {
-        try {
-            const modal = new GTMPromptModal({
-                appTheme: 'image-studio',
-                onPromptGenerated: (generatedPrompt) => {
-                    // Load the generated prompt into the textarea
-                    promptTextarea.value = generatedPrompt;
-                    promptTextarea.dispatchEvent(new Event('input', { bubbles: true }));
-
-                    // Adjust textarea height
-                    promptTextarea.style.height = 'auto';
-                    const maxHeight = window.innerWidth < 768 ? 150 : 250;
-                    promptTextarea.style.height = Math.min(promptTextarea.scrollHeight, maxHeight) + 'px';
-
-                    // Show success message (you might want to add a toast system to ImageStudio)
-                    console.log('GTM-optimized prompt loaded successfully!');
-                }
-            });
-            modal.open();
-        } catch (error) {
-            console.error('GTM Prompt Modal error:', error);
-            alert('Failed to open GTM Prompt Enhancer');
-        }
-    }
 
     return container;
 }

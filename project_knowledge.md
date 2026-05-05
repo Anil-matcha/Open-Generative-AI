@@ -1,17 +1,17 @@
-# Open Higgsfield AI: Technical Documentation & Context
+# Open Generative AI: Technical Documentation & Context
 
-This document serves as a comprehensive knowledge base for the Open Higgsfield AI project. It details the architecture, key components, API integration patterns, and state management strategies used in the application.
+This document serves as a comprehensive knowledge base for the Open Generative AI project. It details the architecture, key components, API integration patterns, and state management strategies used in the application.
 
 ## 1. Project Vision & Overview
 
-**Open Higgsfield AI** is an ambitious open-source project dedicated to **replicating the full functionality of the Higgsfield platform**.
+**Open Generative AI** is an ambitious open-source project dedicated to **replicating the full functionality of the Higgsfield platform**.
 
 - **Core Goal:** To build a feature-complete, self-hosted alternative to Higgsfield, starting with **Image Generation** (Nano) and expanding into **Video Generation** (Cinema) and other creative tools.
 - **Current State:** The Image Studio ("Nano Banana Pro" interface) is fully operational, featuring a premium dark-mode UI, history management, and multi-model support via the [Muapi.ai](https://muapi.ai) engine.
 - **Future Direction:** The architecture is designed to scale for video generation, model training interfaces, and advanced editing tools, mirroring the evolving capabilities of Higgsfield.
 
 - **Stack:** Vite, Vanilla JavaScript, Tailwind CSS v4.
-- **Repository:** `https://github.com/Anil-matcha/Open-Higgsfield-AI`
+- **Repository:** `https://github.com/Anil-matcha/Open-Generative-AI`
 - **Primary Branch:** `main`
 
 ## 2. Architecture & File Structure

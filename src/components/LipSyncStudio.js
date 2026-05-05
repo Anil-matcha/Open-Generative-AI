@@ -1,10 +1,8 @@
 import { muapi } from '../lib/muapi.js';
 import { lipsyncModels, imageLipSyncModels, videoLipSyncModels, getLipSyncModelById, getResolutionsForLipSyncModel } from '../lib/models.js';
-import { securityService } from '../lib/services/SecurityService.js';
 import { AuthModal } from './AuthModal.js';
+import { createUploadPicker } from './UploadPicker.js';
 import { savePendingJob, removePendingJob, getPendingJobs } from '../lib/pendingJobs.js';
-import { createHeroSection } from '../lib/thumbnails.js';
-import { GTMPromptModal } from './modals/GTMPromptModal.jsx';
 
 export function LipSyncStudio() {
     const container = document.createElement('div');
@@ -28,25 +26,38 @@ export function LipSyncStudio() {
     // 1. HERO SECTION
     // ==========================================
     const hero = document.createElement('div');
-    hero.className = 'flex flex-col items-center mb-4 md:mb-6 animate-fade-in-up transition-all duration-700 w-full';
-    const heroBanner = createHeroSection('lipsync', 'h-32 md:h-44 mb-6');
-    if (heroBanner) {
-        const heroContent = document.createElement('div');
-        heroContent.className = 'absolute bottom-0 left-0 right-0 p-6 z-10';
-        heroContent.innerHTML = `
-            <h1 class="text-2xl sm:text-4xl md:text-5xl font-black text-white tracking-tight mb-1">Lip Sync</h1>
-            <p class="text-white/60 text-sm font-medium">Animate portraits or sync lips to audio with AI</p>
-        `;
-        heroBanner.appendChild(heroContent);
-        hero.appendChild(heroBanner);
-    }
+    hero.className = 'flex flex-col items-center mb-10 md:mb-20 animate-fade-in-up transition-all duration-700';
+    hero.innerHTML = `
+        <div class="mb-10 relative group">
+            <div class="absolute inset-0 bg-primary/20 blur-[100px] rounded-full opacity-40 group-hover:opacity-70 transition-opacity duration-1000"></div>
+            <div class="relative w-24 h-24 md:w-32 md:h-32 bg-teal-900/40 rounded-3xl flex items-center justify-center border border-white/5 overflow-hidden">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="text-primary opacity-20 absolute -right-4 -bottom-4">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                    <line x1="12" y1="19" x2="12" y2="23"/>
+                    <line x1="8" y1="23" x2="16" y2="23"/>
+                </svg>
+                <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20 shadow-glow relative z-10">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-primary">
+                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                        <line x1="12" y1="19" x2="12" y2="23"/>
+                        <line x1="8" y1="23" x2="16" y2="23"/>
+                    </svg>
+                </div>
+                <div class="absolute top-4 right-4 text-primary animate-pulse">🎙</div>
+            </div>
+        </div>
+        <h1 class="text-2xl sm:text-4xl md:text-7xl font-black text-white tracking-widest uppercase mb-4 selection:bg-primary selection:text-black text-center px-4">Lip Sync</h1>
+        <p class="text-secondary text-sm font-medium tracking-wide opacity-60">Animate portraits or sync lips to audio with AI</p>
+    `;
     container.appendChild(hero);
 
     // ==========================================
     // 2. INPUT BAR
     // ==========================================
     const promptWrapper = document.createElement('div');
-    promptWrapper.className = 'w-full relative z-40 animate-fade-in-up';
+    promptWrapper.className = 'w-full max-w-4xl relative z-40 animate-fade-in-up';
     promptWrapper.style.animationDelay = '0.2s';
 
     const bar = document.createElement('div');
@@ -79,74 +90,161 @@ export function LipSyncStudio() {
     const uploadsRow = document.createElement('div');
     uploadsRow.className = 'flex items-start gap-3 px-2';
 
-    // ── Image Upload ──
-    const imageFileInput = document.createElement('input');
-    imageFileInput.type = 'file';
-    imageFileInput.accept = 'image/*';
-    imageFileInput.className = 'hidden';
+    // ── Image Upload — uses createUploadPicker (same as VideoStudio) ──
+    const imagePicker = createUploadPicker({
+        anchorContainer: container,
+        onSelect: ({ url }) => {
+            uploadedImageUrl = url;
+            imageStatusLabel.textContent = '✓ Image ready';
+            imageStatusLabel.className = 'text-primary';
+        },
+        onClear: () => {
+            uploadedImageUrl = null;
+            imageStatusLabel.textContent = 'No image';
+            imageStatusLabel.className = 'text-muted';
+        }
+    });
+    // Size the trigger to match our other buttons
+    imagePicker.trigger.className = imagePicker.trigger.className
+        .replace('w-10 h-10', 'w-14 h-14')
+        .replace('mt-1.5', '');
+    container.appendChild(imagePicker.panel);
 
-    const imageUploadBtn = document.createElement('button');
-    imageUploadBtn.type = 'button';
-    imageUploadBtn.title = 'Upload portrait image';
-    imageUploadBtn.className = 'flex-shrink-0 w-14 h-14 rounded-xl border transition-all flex flex-col items-center justify-center gap-1 bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40 group relative overflow-hidden';
-    imageUploadBtn.innerHTML = `
-        <div class="image-icon flex flex-col items-center gap-1">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted group-hover:text-primary transition-colors"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            <span class="text-[9px] text-muted group-hover:text-primary font-bold">IMAGE</span>
-        </div>
-        <div class="image-spinner hidden items-center justify-center w-full h-full absolute inset-0"><span class="animate-spin text-primary text-sm">◌</span></div>
-        <div class="image-ready hidden flex-col items-center gap-1 absolute inset-0 bg-primary/10 rounded-xl">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary mt-3"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/><polyline points="7 18 10 15 13 18" stroke="#d9ff00" stroke-width="2.5"/></svg>
-            <span class="text-[9px] text-primary font-bold">READY</span>
-        </div>
-    `;
-    imageUploadBtn.appendChild(imageFileInput);
-
-    // ── Video Upload ──
+    // ── Video Upload Button (VideoStudio pattern — separate state divs, file input inside btn) ──
     const videoFileInput = document.createElement('input');
     videoFileInput.type = 'file';
     videoFileInput.accept = 'video/*';
     videoFileInput.className = 'hidden';
 
-    const videoUploadBtn = document.createElement('button');
-    videoUploadBtn.type = 'button';
-    videoUploadBtn.title = 'Upload source video';
-    videoUploadBtn.className = 'flex-shrink-0 w-14 h-14 rounded-xl border transition-all flex flex-col items-center justify-center gap-1 bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40 group relative overflow-hidden hidden';
-    videoUploadBtn.innerHTML = `
-        <div class="video-icon flex flex-col items-center gap-1">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted group-hover:text-primary transition-colors"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
-            <span class="text-[9px] text-muted group-hover:text-primary font-bold">VIDEO</span>
-        </div>
-        <div class="video-spinner hidden items-center justify-center w-full h-full absolute inset-0"><span class="animate-spin text-primary text-sm">◌</span></div>
-        <div class="video-ready hidden flex-col items-center gap-1 absolute inset-0 bg-primary/10 rounded-xl">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary mt-3"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/><polyline points="7 10 10 13 15 8" stroke="#d9ff00" stroke-width="2.5"/></svg>
-            <span class="text-[9px] text-primary font-bold">READY</span>
-        </div>
-    `;
-    videoUploadBtn.appendChild(videoFileInput);
+    const videoPickerBtn = document.createElement('button');
+    videoPickerBtn.type = 'button';
+    videoPickerBtn.title = 'Upload source video';
+    videoPickerBtn.className = 'flex-shrink-0 w-14 h-14 rounded-xl border transition-all flex items-center justify-center relative overflow-hidden hidden bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40 group';
 
-    // ── Audio Upload ──
+    const videoIconEl = document.createElement('div');
+    videoIconEl.className = 'flex flex-col items-center justify-center gap-1 w-full h-full';
+    videoIconEl.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted group-hover:text-primary transition-colors"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg><span class="text-[9px] text-muted group-hover:text-primary font-bold">VIDEO</span>`;
+
+    const videoSpinnerEl = document.createElement('div');
+    videoSpinnerEl.className = 'hidden items-center justify-center w-full h-full';
+    videoSpinnerEl.innerHTML = `<span class="animate-spin text-primary text-sm">◌</span>`;
+
+    const videoReadyEl = document.createElement('div');
+    videoReadyEl.className = 'hidden flex-col items-center justify-center gap-1 w-full h-full absolute inset-0 bg-primary/10';
+    videoReadyEl.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg><span class="text-[9px] text-primary font-bold">READY</span>`;
+
+    videoPickerBtn.appendChild(videoFileInput);
+    videoPickerBtn.appendChild(videoIconEl);
+    videoPickerBtn.appendChild(videoSpinnerEl);
+    videoPickerBtn.appendChild(videoReadyEl);
+
+    const showVideoIcon = () => {
+        videoIconEl.classList.replace('hidden', 'flex');
+        videoSpinnerEl.classList.add('hidden'); videoSpinnerEl.classList.remove('flex');
+        videoReadyEl.classList.add('hidden'); videoReadyEl.classList.remove('flex');
+        videoPickerBtn.classList.remove('border-primary/60'); videoPickerBtn.classList.add('border-white/10');
+        videoPickerBtn.title = 'Upload source video';
+        mediaStatusLabel.textContent = 'No video'; mediaStatusLabel.className = 'text-muted';
+    };
+    const showVideoSpinner = () => {
+        videoIconEl.classList.add('hidden'); videoIconEl.classList.remove('flex');
+        videoSpinnerEl.classList.replace('hidden', 'flex');
+        videoReadyEl.classList.add('hidden'); videoReadyEl.classList.remove('flex');
+    };
+    const showVideoReady = (name) => {
+        videoIconEl.classList.add('hidden'); videoIconEl.classList.remove('flex');
+        videoSpinnerEl.classList.add('hidden'); videoSpinnerEl.classList.remove('flex');
+        videoReadyEl.classList.replace('hidden', 'flex');
+        videoPickerBtn.classList.remove('border-white/10'); videoPickerBtn.classList.add('border-primary/60');
+        videoPickerBtn.title = `${name} — click to clear`;
+        mediaStatusLabel.textContent = `✓ ${name}`; mediaStatusLabel.className = 'text-primary';
+    };
+
+    videoPickerBtn.onclick = (e) => {
+        e.stopPropagation();
+        if (uploadedVideoUrl) { uploadedVideoUrl = null; showVideoIcon(); return; }
+        videoFileInput.click();
+    };
+    videoFileInput.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const apiKey = localStorage.getItem('muapi_key');
+        if (!apiKey) { AuthModal(() => videoFileInput.click()); return; }
+        showVideoSpinner();
+        try {
+            uploadedVideoUrl = await muapi.uploadFile(file);
+            showVideoReady(file.name);
+        } catch (err) { showVideoIcon(); alert(`Video upload failed: ${err.message}`); }
+        videoFileInput.value = '';
+    };
+
+    // ── Audio Upload Button (same pattern as video) ──
     const audioFileInput = document.createElement('input');
     audioFileInput.type = 'file';
     audioFileInput.accept = 'audio/*';
     audioFileInput.className = 'hidden';
 
-    const audioUploadBtn = document.createElement('button');
-    audioUploadBtn.type = 'button';
-    audioUploadBtn.title = 'Upload audio file';
-    audioUploadBtn.className = 'flex-shrink-0 w-14 h-14 rounded-xl border transition-all flex flex-col items-center justify-center gap-1 bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40 group relative overflow-hidden';
-    audioUploadBtn.innerHTML = `
-        <div class="audio-icon flex flex-col items-center gap-1">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted group-hover:text-primary transition-colors"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
-            <span class="text-[9px] text-muted group-hover:text-primary font-bold">AUDIO</span>
-        </div>
-        <div class="audio-spinner hidden items-center justify-center w-full h-full absolute inset-0"><span class="animate-spin text-primary text-sm">◌</span></div>
-        <div class="audio-ready hidden flex-col items-center gap-1 absolute inset-0 bg-primary/10 rounded-xl">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary mt-3"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><polyline points="7 10 10 13 15 8" stroke="#d9ff00" stroke-width="2.5"/></svg>
-            <span class="text-[9px] text-primary font-bold">READY</span>
-        </div>
-    `;
-    audioUploadBtn.appendChild(audioFileInput);
+    const audioPickerBtn = document.createElement('button');
+    audioPickerBtn.type = 'button';
+    audioPickerBtn.title = 'Upload audio file';
+    audioPickerBtn.className = 'flex-shrink-0 w-14 h-14 rounded-xl border transition-all flex items-center justify-center relative overflow-hidden bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40 group';
+
+    const audioIconEl = document.createElement('div');
+    audioIconEl.className = 'flex flex-col items-center justify-center gap-1 w-full h-full';
+    audioIconEl.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted group-hover:text-primary transition-colors"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg><span class="text-[9px] text-muted group-hover:text-primary font-bold">AUDIO</span>`;
+
+    const audioSpinnerEl = document.createElement('div');
+    audioSpinnerEl.className = 'hidden items-center justify-center w-full h-full';
+    audioSpinnerEl.innerHTML = `<span class="animate-spin text-primary text-sm">◌</span>`;
+
+    const audioReadyEl = document.createElement('div');
+    audioReadyEl.className = 'hidden flex-col items-center justify-center gap-1 w-full h-full absolute inset-0 bg-primary/10';
+    audioReadyEl.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg><span class="text-[9px] text-primary font-bold">READY</span>`;
+
+    audioPickerBtn.appendChild(audioFileInput);
+    audioPickerBtn.appendChild(audioIconEl);
+    audioPickerBtn.appendChild(audioSpinnerEl);
+    audioPickerBtn.appendChild(audioReadyEl);
+
+    const showAudioIcon = () => {
+        audioIconEl.classList.replace('hidden', 'flex');
+        audioSpinnerEl.classList.add('hidden'); audioSpinnerEl.classList.remove('flex');
+        audioReadyEl.classList.add('hidden'); audioReadyEl.classList.remove('flex');
+        audioPickerBtn.classList.remove('border-primary/60'); audioPickerBtn.classList.add('border-white/10');
+        audioPickerBtn.title = 'Upload audio file';
+        audioStatusLabel.textContent = 'No audio'; audioStatusLabel.className = 'text-muted';
+    };
+    const showAudioSpinner = () => {
+        audioIconEl.classList.add('hidden'); audioIconEl.classList.remove('flex');
+        audioSpinnerEl.classList.replace('hidden', 'flex');
+        audioReadyEl.classList.add('hidden'); audioReadyEl.classList.remove('flex');
+    };
+    const showAudioReady = (name) => {
+        audioIconEl.classList.add('hidden'); audioIconEl.classList.remove('flex');
+        audioSpinnerEl.classList.add('hidden'); audioSpinnerEl.classList.remove('flex');
+        audioReadyEl.classList.replace('hidden', 'flex');
+        audioPickerBtn.classList.remove('border-white/10'); audioPickerBtn.classList.add('border-primary/60');
+        audioPickerBtn.title = `${name} — click to clear`;
+        audioStatusLabel.textContent = `✓ ${name}`; audioStatusLabel.className = 'text-primary';
+    };
+
+    audioPickerBtn.onclick = (e) => {
+        e.stopPropagation();
+        if (uploadedAudioUrl) { uploadedAudioUrl = null; showAudioIcon(); return; }
+        audioFileInput.click();
+    };
+    audioFileInput.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const apiKey = localStorage.getItem('muapi_key');
+        if (!apiKey) { AuthModal(() => audioFileInput.click()); return; }
+        showAudioSpinner();
+        try {
+            uploadedAudioUrl = await muapi.uploadFile(file);
+            showAudioReady(file.name);
+        } catch (err) { showAudioIcon(); alert(`Audio upload failed: ${err.message}`); }
+        audioFileInput.value = '';
+    };
 
     // ── Prompt Textarea ──
     const textarea = document.createElement('textarea');
@@ -154,36 +252,28 @@ export function LipSyncStudio() {
     textarea.className = 'flex-1 bg-transparent text-white placeholder-muted/50 text-sm resize-none outline-none min-h-[56px] leading-relaxed pt-1';
     textarea.rows = 2;
 
-    uploadsRow.appendChild(imageUploadBtn);
-    uploadsRow.appendChild(videoUploadBtn);
-    uploadsRow.appendChild(audioUploadBtn);
+    uploadsRow.appendChild(imagePicker.trigger);
+    uploadsRow.appendChild(videoPickerBtn);
+    uploadsRow.appendChild(audioPickerBtn);
     uploadsRow.appendChild(textarea);
-
-    // GTM Prompt Enhancer Button
-    const gtmBtn = document.createElement('button');
-    gtmBtn.className = 'w-8 h-8 shrink-0 rounded-lg border bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40 transition-all flex items-center justify-center relative overflow-hidden group';
-    gtmBtn.title = 'GTM Prompt Enhancement - Create conversion-optimized prompts';
-    gtmBtn.innerHTML = '🚀';
-    gtmBtn.onclick = () => {
-        openGTMPromptModal(textarea);
-    };
-    uploadsRow.appendChild(gtmBtn);
-
     bar.appendChild(uploadsRow);
 
     // ── Status labels ──
     const statusRow = document.createElement('div');
     statusRow.className = 'flex items-center gap-3 px-2 text-xs text-muted';
 
-    const imageStatusLabel = document.createElement('span');
-    imageStatusLabel.className = 'text-muted';
-    imageStatusLabel.textContent = 'No image';
+    // mediaStatusLabel: shows image or video status depending on mode
+    const mediaStatusLabel = document.createElement('span');
+    mediaStatusLabel.className = 'text-muted';
+    mediaStatusLabel.textContent = 'No image';
+
+    const imageStatusLabel = mediaStatusLabel; // alias used in imagePicker callbacks
 
     const audioStatusLabel = document.createElement('span');
     audioStatusLabel.className = 'text-muted';
     audioStatusLabel.textContent = 'No audio';
 
-    statusRow.appendChild(imageStatusLabel);
+    statusRow.appendChild(mediaStatusLabel);
     statusRow.appendChild(document.createTextNode(' · '));
     statusRow.appendChild(audioStatusLabel);
     bar.appendChild(statusRow);
@@ -315,13 +405,17 @@ export function LipSyncStudio() {
         if (inputMode === 'image') {
             imageModeBtn.className = 'px-4 py-1.5 rounded-xl text-xs font-bold transition-all border border-primary bg-primary/10 text-primary';
             videoModeBtn.className = 'px-4 py-1.5 rounded-xl text-xs font-bold transition-all border border-white/10 text-muted hover:border-white/30 hover:text-white';
-            imageUploadBtn.classList.remove('hidden');
-            videoUploadBtn.classList.add('hidden');
+            imagePicker.trigger.classList.remove('hidden');
+            videoPickerBtn.classList.add('hidden');
+            mediaStatusLabel.textContent = uploadedImageUrl ? '✓ Image ready' : 'No image';
+            mediaStatusLabel.className = uploadedImageUrl ? 'text-primary' : 'text-muted';
         } else {
             videoModeBtn.className = 'px-4 py-1.5 rounded-xl text-xs font-bold transition-all border border-primary bg-primary/10 text-primary';
             imageModeBtn.className = 'px-4 py-1.5 rounded-xl text-xs font-bold transition-all border border-white/10 text-muted hover:border-white/30 hover:text-white';
-            videoUploadBtn.classList.remove('hidden');
-            imageUploadBtn.classList.add('hidden');
+            videoPickerBtn.classList.remove('hidden');
+            imagePicker.trigger.classList.add('hidden');
+            mediaStatusLabel.textContent = uploadedVideoUrl ? '✓ Video ready' : 'No video';
+            mediaStatusLabel.className = uploadedVideoUrl ? 'text-primary' : 'text-muted';
         }
 
         // Switch to first model of new mode
@@ -347,7 +441,7 @@ export function LipSyncStudio() {
         if (inputMode === 'image') return;
         inputMode = 'image';
         uploadedVideoUrl = null;
-        updateVideoUploadState('idle');
+        showVideoIcon();
         updateUIForMode();
     };
 
@@ -355,176 +449,8 @@ export function LipSyncStudio() {
         if (inputMode === 'video') return;
         inputMode = 'video';
         uploadedImageUrl = null;
-        updateImageUploadState('idle');
+        imagePicker.reset();
         updateUIForMode();
-    };
-
-    // ==========================================
-    // 5. UPLOAD HANDLERS
-    // ==========================================
-    const updateImageUploadState = (state, filename) => {
-        const icon = imageUploadBtn.querySelector('.image-icon');
-        const spinner = imageUploadBtn.querySelector('.image-spinner');
-        const ready = imageUploadBtn.querySelector('.image-ready');
-        if (state === 'idle') {
-            icon.classList.remove('hidden'); icon.classList.add('flex');
-            spinner.classList.add('hidden'); spinner.classList.remove('flex');
-            ready.classList.add('hidden'); ready.classList.remove('flex');
-            imageUploadBtn.classList.remove('border-primary/60');
-            imageUploadBtn.classList.add('border-white/10');
-            imageUploadBtn.title = 'Upload portrait image';
-            imageStatusLabel.textContent = 'No image';
-            imageStatusLabel.className = 'text-muted';
-        } else if (state === 'loading') {
-            icon.classList.add('hidden'); icon.classList.remove('flex');
-            spinner.classList.remove('hidden'); spinner.classList.add('flex');
-            ready.classList.add('hidden'); ready.classList.remove('flex');
-        } else if (state === 'ready') {
-            icon.classList.add('hidden'); icon.classList.remove('flex');
-            spinner.classList.add('hidden'); spinner.classList.remove('flex');
-            ready.classList.remove('hidden'); ready.classList.add('flex');
-            imageUploadBtn.classList.remove('border-white/10');
-            imageUploadBtn.classList.add('border-primary/60');
-            imageUploadBtn.title = `${filename} — click to clear`;
-            imageStatusLabel.textContent = `✓ ${filename}`;
-            imageStatusLabel.className = 'text-primary';
-        }
-    };
-
-    const updateVideoUploadState = (state, filename) => {
-        const icon = videoUploadBtn.querySelector('.video-icon');
-        const spinner = videoUploadBtn.querySelector('.video-spinner');
-        const ready = videoUploadBtn.querySelector('.video-ready');
-        if (state === 'idle') {
-            icon.classList.remove('hidden'); icon.classList.add('flex');
-            spinner.classList.add('hidden'); spinner.classList.remove('flex');
-            ready.classList.add('hidden'); ready.classList.remove('flex');
-            videoUploadBtn.classList.remove('border-primary/60');
-            videoUploadBtn.classList.add('border-white/10');
-            videoUploadBtn.title = 'Upload source video';
-            imageStatusLabel.textContent = 'No video';
-            imageStatusLabel.className = 'text-muted';
-        } else if (state === 'loading') {
-            icon.classList.add('hidden'); icon.classList.remove('flex');
-            spinner.classList.remove('hidden'); spinner.classList.add('flex');
-            ready.classList.add('hidden'); ready.classList.remove('flex');
-        } else if (state === 'ready') {
-            icon.classList.add('hidden'); icon.classList.remove('flex');
-            spinner.classList.add('hidden'); spinner.classList.remove('flex');
-            ready.classList.remove('hidden'); ready.classList.add('flex');
-            videoUploadBtn.classList.remove('border-white/10');
-            videoUploadBtn.classList.add('border-primary/60');
-            videoUploadBtn.title = `${filename} — click to clear`;
-            imageStatusLabel.textContent = `✓ ${filename}`;
-            imageStatusLabel.className = 'text-primary';
-        }
-    };
-
-    const updateAudioUploadState = (state, filename) => {
-        const icon = audioUploadBtn.querySelector('.audio-icon');
-        const spinner = audioUploadBtn.querySelector('.audio-spinner');
-        const ready = audioUploadBtn.querySelector('.audio-ready');
-        if (state === 'idle') {
-            icon.classList.remove('hidden'); icon.classList.add('flex');
-            spinner.classList.add('hidden'); spinner.classList.remove('flex');
-            ready.classList.add('hidden'); ready.classList.remove('flex');
-            audioUploadBtn.classList.remove('border-primary/60');
-            audioUploadBtn.classList.add('border-white/10');
-            audioUploadBtn.title = 'Upload audio file';
-            audioStatusLabel.textContent = 'No audio';
-            audioStatusLabel.className = 'text-muted';
-        } else if (state === 'loading') {
-            icon.classList.add('hidden'); icon.classList.remove('flex');
-            spinner.classList.remove('hidden'); spinner.classList.add('flex');
-            ready.classList.add('hidden'); ready.classList.remove('flex');
-        } else if (state === 'ready') {
-            icon.classList.add('hidden'); icon.classList.remove('flex');
-            spinner.classList.add('hidden'); spinner.classList.remove('flex');
-            ready.classList.remove('hidden'); ready.classList.add('flex');
-            audioUploadBtn.classList.remove('border-white/10');
-            audioUploadBtn.classList.add('border-primary/60');
-            audioUploadBtn.title = `${filename} — click to clear`;
-            audioStatusLabel.textContent = `✓ ${filename}`;
-            audioStatusLabel.className = 'text-primary';
-        }
-    };
-
-    imageUploadBtn.onclick = async (e) => {
-        e.stopPropagation();
-        if (uploadedImageUrl) {
-            uploadedImageUrl = null;
-            updateImageUploadState('idle');
-            return;
-        }
-        imageFileInput.click();
-    };
-
-    imageFileInput.onchange = async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const apiKey = await securityService.getDecryptedKey();
-        if (!apiKey) { AuthModal(() => imageFileInput.click()); return; }
-        updateImageUploadState('loading');
-        try {
-            uploadedImageUrl = await muapi.uploadFile(file);
-            updateImageUploadState('ready', file.name);
-        } catch (err) {
-            updateImageUploadState('idle');
-            alert(`Image upload failed: ${err.message}`);
-        }
-        imageFileInput.value = '';
-    };
-
-    videoUploadBtn.onclick = async (e) => {
-        e.stopPropagation();
-        if (uploadedVideoUrl) {
-            uploadedVideoUrl = null;
-            updateVideoUploadState('idle');
-            return;
-        }
-        videoFileInput.click();
-    };
-
-    videoFileInput.onchange = async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const apiKey = await securityService.getDecryptedKey();
-        if (!apiKey) { AuthModal(() => videoFileInput.click()); return; }
-        updateVideoUploadState('loading');
-        try {
-            uploadedVideoUrl = await muapi.uploadFile(file);
-            updateVideoUploadState('ready', file.name);
-        } catch (err) {
-            updateVideoUploadState('idle');
-            alert(`Video upload failed: ${err.message}`);
-        }
-        videoFileInput.value = '';
-    };
-
-    audioUploadBtn.onclick = async (e) => {
-        e.stopPropagation();
-        if (uploadedAudioUrl) {
-            uploadedAudioUrl = null;
-            updateAudioUploadState('idle');
-            return;
-        }
-        audioFileInput.click();
-    };
-
-    audioFileInput.onchange = async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const apiKey = await securityService.getDecryptedKey();
-        if (!apiKey) { AuthModal(() => audioFileInput.click()); return; }
-        updateAudioUploadState('loading');
-        try {
-            uploadedAudioUrl = await muapi.uploadFile(file);
-            updateAudioUploadState('ready', file.name);
-        } catch (err) {
-            updateAudioUploadState('idle');
-            alert(`Audio upload failed: ${err.message}`);
-        }
-        audioFileInput.value = '';
     };
 
     // Hide resolution if first model has none
@@ -661,7 +587,7 @@ export function LipSyncStudio() {
     (async () => {
         const pending = getPendingJobs('lipsync');
         if (!pending.length) return;
-        const apiKey = await securityService.getDecryptedKey();
+        const apiKey = localStorage.getItem('muapi_key');
         if (!apiKey) return;
         const banner = document.createElement('div');
         banner.className = 'fixed top-4 left-1/2 -translate-x-1/2 z-[200] bg-[#111] border border-white/10 text-white text-sm px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3';
@@ -706,6 +632,17 @@ export function LipSyncStudio() {
         hero.classList.remove('hidden', 'opacity-0', 'scale-95', '-translate-y-10', 'pointer-events-none');
         promptWrapper.classList.remove('hidden', 'opacity-40');
         textarea.value = '';
+        // Reset uploads
+        imagePicker.reset();
+        uploadedImageUrl = null;
+        uploadedVideoUrl = null;
+        uploadedAudioUrl = null;
+        showVideoIcon();
+        showAudioIcon();
+        mediaStatusLabel.textContent = inputMode === 'image' ? 'No image' : 'No video';
+        mediaStatusLabel.className = 'text-muted';
+        audioStatusLabel.textContent = 'No audio';
+        audioStatusLabel.className = 'text-muted';
         textarea.focus();
     };
 
@@ -730,7 +667,7 @@ export function LipSyncStudio() {
             return;
         }
 
-        const apiKey = await securityService.getDecryptedKey();
+        const apiKey = localStorage.getItem('muapi_key');
         if (!apiKey) { AuthModal(() => generateBtn.click()); return; }
 
         hero.classList.add('opacity-0', 'scale-95', '-translate-y-10', 'pointer-events-none');
@@ -789,26 +726,6 @@ export function LipSyncStudio() {
             if (!hadError) generateBtn.innerHTML = `Generate ✨`;
         }
     };
-
-    // GTM Prompt Modal Function
-    function openGTMPromptModal(promptTextarea) {
-        try {
-            const modal = new GTMPromptModal({
-                appTheme: 'lip-sync-studio',
-                onPromptGenerated: (generatedPrompt) => {
-                    // Load the generated prompt into the textarea
-                    promptTextarea.value = generatedPrompt;
-                    promptTextarea.dispatchEvent(new Event('input', { bubbles: true }));
-
-                    console.log('GTM-optimized prompt loaded successfully!');
-                }
-            });
-            modal.open();
-        } catch (error) {
-            console.error('GTM Prompt Modal error:', error);
-            alert('Failed to open GTM Prompt Enhancer');
-        }
-    }
 
     return container;
 }

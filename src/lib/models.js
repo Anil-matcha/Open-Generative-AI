@@ -1824,6 +1824,50 @@ export const t2iModels = [
     }
   },
   {
+    "id": "gpt-image-2",
+    "name": "Gpt Image 2",
+    "endpoint": "gpt-image-2-text-to-image",
+    "family": "gpt-2",
+    "inputs": {
+      "prompt": {
+        "examples": [
+          "A photorealistic product photo of a luxury watch resting on a slab of black marble, dramatic cinematic lighting with a soft rim glow, ultra-detailed metallic textures, shallow depth of field, studio quality."
+        ],
+        "description": "Text prompt describing the image. Up to 20,000 characters supported.",
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt"
+      },
+      "aspect_ratio": {
+        "enum": [
+          "auto",
+          "1:1",
+          "16:9",
+          "9:16",
+          "4:3",
+          "3:4"
+        ],
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "type": "string",
+        "description": "Aspect ratio of the output image.",
+        "default": "auto"
+      },
+      "resolution": {
+        "enum": [
+          "1K",
+          "2K",
+          "4K"
+        ],
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "The target resolution of the generated image.",
+        "default": "2K"
+      }
+    }
+  },
+  {
     "id": "wan2.6-text-to-image",
     "name": "Wan2.6 Text To Image",
     "inputs": {
@@ -2089,6 +2133,50 @@ export const t2iModels = [
         "default": "basic"
       }
     }
+  },
+  {
+    "id": "minimax-image-01",
+    "name": "MiniMax Image 01",
+    "endpoint": "minimax-image-01",
+    "family": "minimax",
+    "inputs": {
+      "prompt": {
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "description": "Text prompt describing the image to generate (max 1500 characters).",
+        "examples": [
+          "A serene mountain lake at sunset with golden reflections on the water, surrounded by pine forests and snow-capped peaks, photorealistic, 8k."
+        ]
+      },
+      "aspect_ratio": {
+        "type": "string",
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "description": "Aspect ratio of the output image.",
+        "enum": [
+          "16:9",
+          "9:16",
+          "1:1",
+          "4:3",
+          "3:4",
+          "3:2",
+          "2:3",
+          "21:9"
+        ],
+        "default": "1:1"
+      },
+      "num_images": {
+        "type": "int",
+        "title": "Number of images",
+        "name": "num_images",
+        "description": "Number of images to generate in a single request.",
+        "default": 1,
+        "minValue": 1,
+        "maxValue": 4,
+        "step": 1
+      }
+    }
   }
 ];
 
@@ -2162,7 +2250,7 @@ export const t2vModels = [
   },
   {
     "id": "seedance-v2.0-t2v",
-    "name": "Seedance 2.0",
+    "name": "SD 2",
     "inputs": {
       "prompt": { "type": "string", "title": "Prompt", "name": "prompt", "description": "The prompt to generate the video" },
       "aspect_ratio": { "enum": ["16:9", "9:16", "4:3", "3:4"], "title": "Aspect Ratio", "name": "aspect_ratio", "type": "string", "description": "Aspect ratio of the output video.", "default": "16:9" },
@@ -2172,10 +2260,10 @@ export const t2vModels = [
   },
   {
     "id": "seedance-v2.0-extend",
-    "name": "Seedance 2.0 Extend",
+    "name": "SD 2 Extend",
     "requiresRequestId": true,
     "inputs": {
-      "request_id": { "type": "string", "title": "Request ID", "name": "request_id", "description": "Request ID of the original Seedance 2.0 video generation.", "placeholder": "abcdefg-123-456-789-a1b2c3d4e5f6" },
+      "request_id": { "type": "string", "title": "Request ID", "name": "request_id", "description": "Request ID of the original SD 2 video generation.", "placeholder": "abcdefg-123-456-789-a1b2c3d4e5f6" },
       "prompt": { "type": "string", "title": "Prompt", "name": "prompt", "description": "Optional prompt to guide the extension. If omitted, the model continues with the original scene." },
       "duration": { "enum": [5, 10, 15], "title": "Duration", "name": "duration", "type": "int", "description": "The duration of the generated video extension in seconds", "default": 5 },
       "quality": { "enum": ["high", "basic"], "title": "Quality", "name": "quality", "type": "string", "description": "Quality of the generated video.", "default": "basic" }
@@ -2264,6 +2352,16 @@ export const t2vModels = [
   {
     "id": "veo3.1-fast-text-to-video",
     "name": "Veo 3.1 Fast",
+    "inputs": {
+      "prompt": { "type": "string", "title": "Prompt", "name": "prompt", "description": "Text prompt describing the video." },
+      "aspect_ratio": { "enum": ["16:9", "9:16"], "title": "Aspect Ratio", "name": "aspect_ratio", "type": "string", "description": "Aspect ratio of the output video.", "default": "16:9" },
+      "duration": { "enum": [8], "title": "Duration", "name": "duration", "type": "int", "description": "The duration of the generated video in seconds", "default": 8 },
+      "resolution": { "enum": ["1080p"], "title": "Resolution", "name": "resolution", "type": "string", "description": "The resolution of the generated video.", "default": "1080p" }
+    }
+  },
+  {
+    "id": "veo3.1-lite-text-to-video",
+    "name": "Veo 3.1 Lite",
     "inputs": {
       "prompt": { "type": "string", "title": "Prompt", "name": "prompt", "description": "Text prompt describing the video." },
       "aspect_ratio": { "enum": ["16:9", "9:16"], "title": "Aspect Ratio", "name": "aspect_ratio", "type": "string", "description": "Aspect ratio of the output video.", "default": "16:9" },
@@ -2474,7 +2572,8 @@ export const t2vModels = [
     "inputs": {
       "prompt": { "type": "string", "title": "Prompt", "name": "prompt", "description": "Text prompt describing the video." },
       "aspect_ratio": { "enum": ["9:16", "16:9", "2:3", "3:2", "1:1"], "title": "Aspect Ratio", "name": "aspect_ratio", "type": "string", "description": "Aspect ratio of the output video.", "default": "1:1" },
-      "duration": { "enum": [6, 10], "title": "Duration", "name": "duration", "type": "int", "description": "The duration of the generated video in seconds.", "default": 6 }
+      "mode": { "enum": ["fun", "normal", "spicy"], "title": "Mode", "name": "mode", "type": "string", "description": "Generation style: normal = standard output; fun = more creative/expressive; spicy = edgier content (text-to-video only).", "default": "normal" },
+      "duration": { "enum": [6, 10, 15], "title": "Duration", "name": "duration", "type": "int", "description": "The duration of the generated video in seconds.", "default": 6 }
     }
   },
   {
@@ -2501,29 +2600,6 @@ export const t2vModels = [
       "aspect_ratio": { "enum": ["16:9", "9:16"], "title": "Aspect Ratio", "name": "aspect_ratio", "type": "string", "description": "The aspect ratio of the generated video", "default": "16:9" },
       "duration": { "title": "Duration", "name": "duration", "type": "int", "description": "The duration of the generated video in seconds", "default": 5 },
       "resolution": { "enum": ["480p", "720p", "1080p"], "title": "Resolution", "name": "resolution", "type": "string", "description": "The resolution of the generated video.", "default": "720p" }
-    }
-  },
-  {
-    "id": "veo-3.1-lite",
-    "name": "Veo 3.1 Lite",
-    "endpoint": "veo-3.1-lite",
-    "family": "veo",
-    "inputs": {
-      "prompt": { "type": "string", "title": "Prompt", "name": "prompt", "description": "Text prompt describing the video." },
-      "aspect_ratio": { "enum": ["16:9", "9:16"], "title": "Aspect Ratio", "name": "aspect_ratio", "type": "string", "description": "Aspect ratio of the output video.", "default": "16:9" },
-      "duration": { "title": "Duration", "name": "duration", "type": "int", "description": "Duration of the generated video in seconds.", "default": 8 }
-    }
-  },
-  {
-    "id": "grok-imagine-t2v",
-    "name": "Grok Imagine",
-    "endpoint": "grok-imagine-t2v",
-    "family": "grok",
-    "inputs": {
-      "prompt": { "type": "string", "title": "Prompt", "name": "prompt", "description": "Text prompt describing the video." },
-      "aspect_ratio": { "enum": ["16:9", "9:16", "1:1"], "title": "Aspect Ratio", "name": "aspect_ratio", "type": "string", "description": "Aspect ratio of the output video.", "default": "16:9" },
-      "duration": { "enum": [6, 10, 15], "title": "Duration", "name": "duration", "type": "int", "description": "Duration of the generated video in seconds.", "default": 6 },
-      "mode": { "enum": ["fun", "normal", "spicy"], "title": "Mode", "name": "mode", "type": "string", "description": "Creativity and edginess level.", "default": "normal" }
     }
   }
 ];
@@ -4522,6 +4598,53 @@ export const i2iModels = [
     }
   },
   {
+    "id": "gpt-image-2-edit",
+    "name": "Gpt Image 2 Edit",
+    "endpoint": "gpt-image-2-image-to-image",
+    "family": "gpt-2",
+    "imageField": "images_list",
+    "hasPrompt": true,
+    "maxImages": 16,
+    "inputs": {
+      "prompt": {
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "description": "Text prompt describing the transformation. Up to 20,000 characters supported.",
+        "examples": [
+          "Transform these product photos into a professional lifestyle scene with warm cinematic lighting, soft natural shadows, and a clean modern background; keep brand details and proportions unchanged."
+        ]
+      },
+      "aspect_ratio": {
+        "type": "string",
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "description": "Aspect ratio of the output image.",
+        "enum": [
+          "auto",
+          "1:1",
+          "16:9",
+          "9:16",
+          "4:3",
+          "3:4"
+        ],
+        "default": "auto"
+      },
+      "resolution": {
+        "type": "string",
+        "title": "Resolution",
+        "name": "resolution",
+        "description": "The target resolution of the generated image.",
+        "enum": [
+          "1K",
+          "2K",
+          "4K"
+        ],
+        "default": "2K"
+      }
+    }
+  },
+  {
     "id": "gpt-image-1.5-edit",
     "name": "Gpt Image 1.5 Edit",
     "endpoint": "gpt-image-1.5-edit",
@@ -4817,14 +4940,11 @@ export const i2iModels = [
 export const i2vModels = [
   {
     "id": "ai-video-effects",
-    "name": "AI Video Effects (Enhanced)",
+    "name": "AI Video Effects",
     "endpoint": "generate_wan_ai_effects",
     "family": "effects",
     "imageField": "image_url",
     "hasPrompt": true,
-    // Array of available WAN AI effect types that can be applied to this model
-    // These correspond to the keys in WAN_AI_EFFECTS from muapiConfig.js
-    "wanAiEffects": ["cakeify", "vhs", "samurai", "film-noir", "animal", "rotation"],
     "inputs": {
       "prompt": {
         "type": "string",
@@ -4834,15 +4954,6 @@ export const i2vModels = [
         "examples": [
           "a cute kitten"
         ]
-      },
-      // Enum for selecting the WAN AI effect type
-      // Values must match the keys in WAN_AI_EFFECTS from muapiConfig.js
-      // Mapping: lowercase keys (effectType) -> human-readable names (name enum)
-      "effectType": {
-        "type": "string",
-        "enum": ["cakeify", "vhs", "samurai", "film-noir", "animal", "rotation"],
-        "default": "cakeify",
-        "title": "Wan AI Effect Type"
       },
       "name": {
         "type": "string",
@@ -6737,6 +6848,53 @@ export const i2vModels = [
     }
   },
   {
+    "id": "veo3.1-lite-image-to-video",
+    "name": "Veo3.1 Lite Image To Video",
+    "endpoint": "veo3.1-lite-image-to-video",
+    "family": "veo3.1",
+    "imageField": "image_url",
+    "hasPrompt": true,
+    "inputs": {
+      "prompt": {
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "description": "Text prompt describing the video."
+      },
+      "aspect_ratio": {
+        "type": "string",
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "description": "Aspect ratio of the output video.",
+        "enum": [
+          "16:9",
+          "9:16"
+        ],
+        "default": "16:9"
+      },
+      "duration": {
+        "type": "int",
+        "title": "Duration",
+        "name": "duration",
+        "description": "The duration of the generated video in seconds",
+        "enum": [
+          8
+        ],
+        "default": 8
+      },
+      "resolution": {
+        "type": "string",
+        "title": "Resolution",
+        "name": "resolution",
+        "description": "The resolution of the generated video.",
+        "enum": [
+          "1080p"
+        ],
+        "default": "1080p"
+      }
+    }
+  },
+  {
     "id": "veo3.1-reference-to-video",
     "name": "Veo3.1 Reference To Video",
     "endpoint": "veo3.1-reference-to-video",
@@ -7262,7 +7420,8 @@ export const i2vModels = [
         "description": "The duration of the generated video in seconds.",
         "enum": [
           6,
-          10
+          10,
+          15
         ],
         "default": 6
       }
@@ -7914,7 +8073,7 @@ export const i2vModels = [
   },
   {
     "id": "seedance-v2.0-i2v",
-    "name": "Seedance 2.0 I2V",
+    "name": "SD 2 I2V",
     "endpoint": "seedance-v2.0-i2v",
     "family": "seedance-v2.0",
     "imageField": "images_list",
@@ -7943,69 +8102,13 @@ export const i2vModels = [
         "default": 5
       },
       "quality": {
-        "enum": ["basic", "high"],
+        "type": "string",
         "title": "Quality",
         "name": "quality",
-        "type": "string",
-        "description": "Quality of the output image.",
+        "description": "Quality of the generated video.",
+        "enum": ["high", "basic"],
         "default": "basic"
       }
-    }
-  },
-  {
-    "id": "minimax-image-01",
-    "name": "MiniMax Image 01",
-    "endpoint": "minimax-image-01",
-    "family": "minimax",
-    "inputs": {
-      "prompt": {
-        "type": "string",
-        "title": "Prompt",
-        "name": "prompt",
-        "description": "Text prompt describing the image (max 1500 characters)."
-      },
-      "aspect_ratio": {
-        "enum": ["16:9", "9:16", "1:1", "4:3", "3:4", "3:2", "2:3", "21:9"],
-        "title": "Aspect Ratio",
-        "name": "aspect_ratio",
-        "type": "string",
-        "description": "Aspect ratio of the output image.",
-        "default": "1:1"
-      },
-      "num_images": {
-        "title": "Number of Images",
-        "name": "num_images",
-        "type": "int",
-        "description": "Number of images to generate.",
-        "default": 1,
-        "minValue": 1,
-        "maxValue": 4
-      }
-    }
-  },
-  {
-    "id": "veo-3.1-lite-i2v",
-    "name": "Veo 3.1 Lite I2V",
-    "endpoint": "veo-3.1-lite-i2v",
-    "family": "veo",
-    "inputs": {
-      "prompt": { "type": "string", "title": "Prompt", "name": "prompt", "description": "Text prompt describing the video." },
-      "image_url": { "type": "string", "title": "Image URL", "name": "image_url", "description": "URL of the input image." },
-      "aspect_ratio": { "enum": ["16:9", "9:16"], "title": "Aspect Ratio", "name": "aspect_ratio", "type": "string", "description": "Aspect ratio of the output video.", "default": "16:9" },
-      "duration": { "title": "Duration", "name": "duration", "type": "int", "description": "Duration of the generated video in seconds.", "default": 8 }
-    }
-  },
-  {
-    "id": "grok-imagine-i2v",
-    "name": "Grok Imagine I2V",
-    "endpoint": "grok-imagine-i2v",
-    "family": "grok",
-    "inputs": {
-      "prompt": { "type": "string", "title": "Prompt", "name": "prompt", "description": "Text prompt describing the video." },
-      "image_url": { "type": "string", "title": "Image URL", "name": "image_url", "description": "URL of the input image." },
-      "aspect_ratio": { "enum": ["16:9", "9:16", "1:1"], "title": "Aspect Ratio", "name": "aspect_ratio", "type": "string", "description": "Aspect ratio of the output video.", "default": "16:9" },
-      "duration": { "enum": [6, 10, 15], "title": "Duration", "name": "duration", "type": "int", "description": "Duration of the generated video in seconds.", "default": 6 },
-      "mode": { "enum": ["fun", "normal", "spicy"], "title": "Mode", "name": "mode", "type": "string", "description": "Creativity and edginess level.", "default": "normal" }
     }
   }
 ];
@@ -8047,6 +8150,14 @@ export const getResolutionsForI2VModel = (modelId) => {
     if (!model) return [];
     const res = model.inputs && model.inputs.resolution;
     if (res && res.enum) return res.enum;
+    return [];
+};
+
+export const getModesForModel = (modelId) => {
+    const model = [...t2vModels, ...i2vModels].find(m => m.id === modelId);
+    if (!model) return [];
+    const modeInput = model.inputs?.mode;
+    if (modeInput?.enum) return modeInput.enum;
     return [];
 };
 
@@ -8103,33 +8214,42 @@ export const v2vModels = [
     "description": "Remove watermarks, logos, captions, and unwanted text from videos."
   },
   {
-    "id": "kling-v2.6-motion-control",
-    "name": "Kling 2.6 Motion Control",
-    "endpoint": "kling-v2.6-motion-control",
+    "id": "kling-v2.6-std-motion-control",
+    "name": "Kling 2.6 Std Motion Control",
+    "endpoint": "kling-v2.6-std-motion-control",
     "family": "kling",
-    "inputs": {
-      "prompt": { "type": "string", "title": "Prompt", "name": "prompt", "description": "Text prompt describing the video." },
-      "image_url": { "type": "string", "title": "Image URL", "name": "image_url", "description": "URL of the reference image." },
-      "video_url": { "type": "string", "title": "Video URL", "name": "video_url", "description": "URL of the input video." }
-    }
+    "videoField": "video_url",
+    "imageField": "image_url",
+    "hasPrompt": true,
+    "description": "Kling v2.6 Pro Motion Control allows precise control over camera movement, subject motion, and scene dynamics during video generation."
   },
   {
-    "id": "kling-v3.0-motion-control",
-    "name": "Kling 3.0 Motion Control",
-    "endpoint": "kling-v3.0-motion-control",
+    "id": "kling-v3.0-std-motion-control",
+    "name": "Kling 3.0 Std Motion Control",
+    "endpoint": "kling-v3.0-std-motion-control",
     "family": "kling",
-    "inputs": {
-      "prompt": { "type": "string", "title": "Prompt", "name": "prompt", "description": "Text prompt describing the video." },
-      "image_url": { "type": "string", "title": "Image URL", "name": "image_url", "description": "URL of the reference image." },
-      "video_url": { "type": "string", "title": "Video URL", "name": "video_url", "description": "URL of the input video." }
-    }
+    "videoField": "video_url",
+    "imageField": "image_url",
+    "hasPrompt": true,
+    "description": "Kling V3.0 Standard Motion Control allows for precise control over the camera and subject movement in generated videos."
+  },
+  {
+    "id": "kling-v3.0-pro-motion-control",
+    "name": "Kling 3.0 Pro Motion Control",
+    "endpoint": "kling-v3.0-pro-motion-control",
+    "family": "kling",
+    "videoField": "video_url",
+    "imageField": "image_url",
+    "hasPrompt": true,
+    "description": "Kling V3.0 Pro Motion Control provides the highest level of detail and control for video generation."
   }
 ];
 
-export const getV2VModelById = (id) => v2vModels.find(m => m.id === id);
-
 // ─── LipSync / Speech-to-Video models ────────────────────────────────────────
+// Image-based: portrait image + audio → talking video
+// Video-based: existing video + audio → lipsync video
 export const lipsyncModels = [
+  // ── Image + Audio → Video ──────────────────────────────────────────────────
   {
     "id": "infinitetalk-image-to-video",
     "name": "Infinite Talk",
@@ -8139,7 +8259,13 @@ export const lipsyncModels = [
     "hasPrompt": true,
     "description": "Animate a portrait image into a talking video driven by audio.",
     "inputs": {
-      "resolution": { "type": "string", "title": "Resolution", "name": "resolution", "enum": ["480p", "720p"], "default": "480p" }
+      "resolution": {
+        "type": "string",
+        "title": "Resolution",
+        "name": "resolution",
+        "enum": ["480p", "720p"],
+        "default": "480p"
+      }
     }
   },
   {
@@ -8151,7 +8277,13 @@ export const lipsyncModels = [
     "hasPrompt": true,
     "description": "Generate a talking portrait video from an image and audio using Wan 2.2.",
     "inputs": {
-      "resolution": { "type": "string", "title": "Resolution", "name": "resolution", "enum": ["480p", "720p"], "default": "480p" }
+      "resolution": {
+        "type": "string",
+        "title": "Resolution",
+        "name": "resolution",
+        "enum": ["480p", "720p"],
+        "default": "480p"
+      }
     }
   },
   {
@@ -8164,7 +8296,13 @@ export const lipsyncModels = [
     "hasSeed": true,
     "description": "High-quality lipsync from portrait image and audio using LTX 2.3.",
     "inputs": {
-      "resolution": { "type": "string", "title": "Resolution", "name": "resolution", "enum": ["480p", "720p", "1080p"], "default": "720p" }
+      "resolution": {
+        "type": "string",
+        "title": "Resolution",
+        "name": "resolution",
+        "enum": ["480p", "720p", "1080p"],
+        "default": "720p"
+      }
     }
   },
   {
@@ -8176,9 +8314,16 @@ export const lipsyncModels = [
     "hasPrompt": true,
     "description": "Lipsync from portrait image and audio using LTX 2 19B model.",
     "inputs": {
-      "resolution": { "type": "string", "title": "Resolution", "name": "resolution", "enum": ["480p", "720p", "1080p"], "default": "720p" }
+      "resolution": {
+        "type": "string",
+        "title": "Resolution",
+        "name": "resolution",
+        "enum": ["480p", "720p", "1080p"],
+        "default": "720p"
+      }
     }
   },
+  // ── Video + Audio → Video ──────────────────────────────────────────────────
   {
     "id": "sync-lipsync",
     "name": "Sync Lipsync",
@@ -8224,7 +8369,13 @@ export const lipsyncModels = [
     "hasPrompt": true,
     "description": "Apply audio-driven lipsync to an existing video using Infinite Talk.",
     "inputs": {
-      "resolution": { "type": "string", "title": "Resolution", "name": "resolution", "enum": ["480p", "720p"], "default": "480p" }
+      "resolution": {
+        "type": "string",
+        "title": "Resolution",
+        "name": "resolution",
+        "enum": ["480p", "720p"],
+        "default": "480p"
+      }
     }
   }
 ];
@@ -8239,442 +8390,4 @@ export const getResolutionsForLipSyncModel = (id) => {
 export const imageLipSyncModels = lipsyncModels.filter(m => m.category === 'image');
 export const videoLipSyncModels = lipsyncModels.filter(m => m.category === 'video');
 
-// ─── Audio models (Text-to-Audio, Music, Speech) ─────────────────────────────────
-export const audioModels = [
-  {
-    "id": "minimax-speech-2.6-turbo",
-    "name": "Minimax Speech Turbo",
-    "endpoint": "minimax-speech-2.6-turbo",
-    "family": "audio",
-    "type": "tts",
-    "hasPrompt": true,
-    "description": "Fast text-to-speech with natural voices",
-    "voiceOptions": true
-  },
-  {
-    "id": "minimax-speech-2.6-hd",
-    "name": "Minimax Speech HD",
-    "endpoint": "minimax-speech-2.6-hd",
-    "family": "audio",
-    "type": "tts",
-    "hasPrompt": true,
-    "description": "High-definition text-to-speech with enhanced quality",
-    "voiceOptions": true
-  },
-  {
-    "id": "minimax-voice-clone",
-    "name": "Minimax Voice Clone",
-    "endpoint": "minimax-voice-clone",
-    "family": "audio",
-    "type": "voice-clone",
-    "hasPrompt": false,
-    "description": "Clone voice from audio sample",
-    "requiresAudio": true
-  },
-  {
-    "id": "suno-create-music",
-    "name": "Suno Create Music",
-    "endpoint": "suno-create-music",
-    "family": "audio",
-    "type": "music",
-    "hasPrompt": true,
-    "description": "Generate full songs from text description",
-    "supportsStyles": true
-  },
-  {
-    "id": "suno-extend-music",
-    "name": "Suno Extend Music",
-    "endpoint": "suno-extend-music",
-    "family": "audio",
-    "type": "music",
-    "hasPrompt": true,
-    "hasAudio": true,
-    "description": "Extend existing audio tracks"
-  },
-  {
-    "id": "suno-remix-music",
-    "name": "Suno Remix Music",
-    "endpoint": "suno-remix-music",
-    "family": "audio",
-    "type": "music",
-    "hasPrompt": true,
-    "hasAudio": true,
-    "description": "Remix audio in a new style"
-  },
-  {
-    "id": "mmaudio-v2-text-to-audio",
-    "name": "MMAudio V2 Text-to-Audio",
-    "endpoint": "mmaudio-v2-text-to-audio",
-    "family": "audio",
-    "type": "tts",
-    "hasPrompt": true,
-    "description": "AI-powered text-to-audio generation"
-  }
-];
-
-export const getAudioModelById = (id) => audioModels.find(m => m.id === id);
-
-// ─── Avatar models (Audio-to-Video, Lip Sync, AI Avatars) ─────────────────────────────────
-export const avatarModels = [
-  // Lip Sync
-  {
-    "id": "ltx-2.3-lipsync",
-    "name": "LTX LipSync",
-    "endpoint": "ltx-2.3-lipsync",
-    "family": "avatar",
-    "subtype": "lipsync",
-    "hasVideo": true,
-    "hasAudio": true,
-    "hasPrompt": false,
-    "description": "Real-time lip sync from audio"
-  },
-  {
-    "id": "ltx-2-19b-lipsync",
-    "name": "LTX 19B LipSync",
-    "endpoint": "ltx-2-19b-lipsync",
-    "family": "avatar",
-    "subtype": "lipsync",
-    "hasVideo": true,
-    "hasAudio": true,
-    "hasPrompt": false,
-    "description": "High-quality lip sync with 19B model"
-  },
-  {
-    "id": "veed-lipsync",
-    "name": "VEED LipSync",
-    "endpoint": "veed-lipsync",
-    "family": "avatar",
-    "subtype": "lipsync",
-    "hasVideo": true,
-    "hasAudio": true,
-    "hasPrompt": false,
-    "description": "VEED lip sync solution"
-  },
-  {
-    "id": "creatify-lipsync",
-    "name": "Creatify LipSync",
-    "endpoint": "creatify-lipsync",
-    "family": "avatar",
-    "subtype": "lipsync",
-    "hasVideo": true,
-    "hasAudio": true,
-    "hasPrompt": false,
-    "description": "Creatify lip sync for marketing videos"
-  },
-  {
-    "id": "latent-sync",
-    "name": "LatentSync",
-    "endpoint": "latent-sync",
-    "family": "avatar",
-    "subtype": "lipsync",
-    "hasVideo": true,
-    "hasAudio": true,
-    "hasPrompt": false,
-    "description": "Advanced latent space lip synchronization"
-  },
-  // AI Avatars
-  {
-    "id": "kling-v2-avatar-pro",
-    "name": "Kling Avatar v2 Pro",
-    "endpoint": "kling-v2-avatar-pro",
-    "family": "avatar",
-    "subtype": "avatar",
-    "hasVideo": true,
-    "hasAudio": true,
-    "hasPrompt": false,
-    "description": "Professional AI avatar generation"
-  },
-  {
-    "id": "kling-v2-avatar-standard",
-    "name": "Kling Avatar v2 Standard",
-    "endpoint": "kling-v2-avatar-standard",
-    "family": "avatar",
-    "subtype": "avatar",
-    "hasVideo": true,
-    "hasAudio": true,
-    "hasPrompt": false,
-    "description": "Standard AI avatar generation"
-  },
-  {
-    "id": "kling-v1-avatar-pro",
-    "name": "Kling Avatar v1 Pro",
-    "endpoint": "kling-v1-avatar-pro",
-    "family": "avatar",
-    "subtype": "avatar",
-    "hasVideo": true,
-    "hasAudio": true,
-    "hasPrompt": false,
-    "description": "Professional AI avatar v1"
-  },
-  {
-    "id": "kling-v1-avatar-standard",
-    "name": "Kling Avatar v1 Standard",
-    "endpoint": "kling-v1-avatar-standard",
-    "family": "avatar",
-    "subtype": "avatar",
-    "hasVideo": true,
-    "hasAudio": true,
-    "hasPrompt": false,
-    "description": "Standard AI avatar v1"
-  },
-  // Speech to Video
-  {
-    "id": "wan2.2-speech-to-video",
-    "name": "WAN 2.2 Speech to Video",
-    "endpoint": "wan2.2-speech-to-video",
-    "family": "avatar",
-    "subtype": "speech-to-video",
-    "hasVideo": true,
-    "hasAudio": true,
-    "hasPrompt": false,
-    "description": "Animate image from audio speech"
-  },
-  // Talking Media
-  {
-    "id": "infinitetalk-image-to-video",
-    "name": "InfiniteTalk Image to Video",
-    "endpoint": "infinitetalk-image-to-video",
-    "family": "avatar",
-    "subtype": "talking-image",
-    "hasVideo": true,
-    "hasAudio": true,
-    "hasPrompt": false,
-    "description": "Create talking video from still image"
-  },
-  {
-    "id": "infinitetalk-video-to-video",
-    "name": "InfiniteTalk Video to Video",
-    "endpoint": "infinitetalk-video-to-video",
-    "family": "avatar",
-    "subtype": "talking-video",
-    "hasVideo": true,
-    "hasAudio": true,
-    "hasPrompt": false,
-    "description": "Lip sync video to video"
-  },
-  {
-    "id": "mmaudio-v2-video-to-video",
-    "name": "MMAudio V2 Video to Video",
-    "endpoint": "mmaudio-v2-video-to-video",
-    "family": "avatar",
-    "subtype": "audio-to-video",
-    "hasVideo": true,
-    "hasAudio": true,
-    "hasPrompt": false,
-    "description": "Generate video from audio"
-  }
-];
-
-export const getAvatarModelById = (id) => avatarModels.find(m => m.id === id);
-
-// ─── Training models (LoRA Training) ─────────────────────────────────
-export const trainingModels = [
-  {
-    "id": "sdxl-lora",
-    "name": "SDXL LoRA",
-    "endpoint": "sdxl-lora",
-    "family": "training",
-    "subtype": "sdxl",
-    "hasImages": true,
-    "hasPrompt": false,
-    "description": "Train custom LoRA model for SDXL",
-    "requiresImages": true
-  },
-  {
-    "id": "wan2.1-lora-t2v",
-    "name": "WAN 2.1 LoRA T2V",
-    "endpoint": "wan2.1-lora-t2v",
-    "family": "training",
-    "subtype": "wan-t2v",
-    "hasImages": true,
-    "hasPrompt": false,
-    "description": "Train LoRA for text-to-video generation",
-    "requiresImages": true
-  },
-  {
-    "id": "wan2.1-lora-i2v",
-    "name": "WAN 2.1 LoRA I2V",
-    "endpoint": "wan2.1-lora-i2v",
-    "family": "training",
-    "subtype": "wan-i2v",
-    "hasImages": true,
-    "hasPrompt": false,
-    "description": "Train LoRA for image-to-video generation",
-    "requiresImages": true
-  },
-  {
-    "id": "flux-dev-lora",
-    "name": "Flux LoRA",
-    "endpoint": "flux-dev-lora",
-    "family": "training",
-    "subtype": "flux",
-    "hasImages": true,
-    "hasPrompt": false,
-    "description": "Train custom LoRA for Flux models",
-    "requiresImages": true
-  }
-];
-
-export const getTrainingModelById = (id) => trainingModels.find(m => m.id === id);
-
-// ─── Video Tools models ─────────────────────────────────
-export const videoToolsModels = [
-  // Video Upscaling
-  {
-    "id": "ai-video-upscaler",
-    "name": "AI Video Upscaler",
-    "endpoint": "ai-video-upscaler",
-    "family": "videotools",
-    "subtype": "upscale",
-    "videoField": "video_url",
-    "hasPrompt": false,
-    "description": "Basic AI video upscaling"
-  },
-  {
-    "id": "ai-video-upscaler-pro",
-    "name": "AI Video Upscaler Pro",
-    "endpoint": "ai-video-upscaler-pro",
-    "family": "videotools",
-    "subtype": "upscale",
-    "videoField": "video_url",
-    "hasPrompt": false,
-    "description": "Professional AI video upscaling"
-  },
-  {
-    "id": "topaz-video-upscale",
-    "name": "Topaz Video Upscale",
-    "endpoint": "topaz-video-upscale",
-    "family": "videotools",
-    "subtype": "upscale",
-    "videoField": "video_url",
-    "hasPrompt": false,
-    "description": "Topaz-quality video enhancement"
-  },
-  // Video Editing
-  {
-    "id": "wan2.2-edit-video",
-    "name": "WAN 2.2 Edit Video",
-    "endpoint": "wan2.2-edit-video",
-    "family": "videotools",
-    "subtype": "edit",
-    "videoField": "video_url",
-    "hasPrompt": true,
-    "description": "Text-based video editing"
-  },
-  {
-    "id": "wan2.2-animate",
-    "name": "WAN 2.2 Animate",
-    "endpoint": "wan2.2-animate",
-    "family": "videotools",
-    "subtype": "animate",
-    "videoField": "video_url",
-    "hasPrompt": false,
-    "description": "Character animation from video"
-  },
-  // Video Enhancement
-  {
-    "id": "luma-flash-reframe",
-    "name": "Luma Flash Reframe",
-    "endpoint": "luma-flash-reframe",
-    "family": "videotools",
-    "subtype": "reframe",
-    "videoField": "video_url",
-    "hasPrompt": false,
-    "description": "Intelligent video resizing and reframing"
-  },
-  {
-    "id": "luma-modify-video",
-    "name": "Luma Modify Video",
-    "endpoint": "luma-modify-video",
-    "family": "videotools",
-    "subtype": "modify",
-    "videoField": "video_url",
-    "hasPrompt": true,
-    "description": "Style transformation for videos"
-  },
-  // Video Processing
-  {
-    "id": "ai-clipping",
-    "name": "AI Clipping",
-    "endpoint": "ai-clipping",
-    "family": "videotools",
-    "subtype": "clip",
-    "videoField": "video_url",
-    "hasPrompt": false,
-    "description": "Auto-clip long videos into short segments"
-  },
-  {
-    "id": "remix-video",
-    "name": "Remix Video",
-    "endpoint": "remix-video",
-    "family": "videotools",
-    "subtype": "remix",
-    "videoField": "video_url",
-    "hasPrompt": false,
-    "description": "Transform and resize video"
-  },
-  {
-    "id": "heygen-video-translate",
-    "name": "HeyGen Video Translate",
-    "endpoint": "heygen-video-translate",
-    "family": "videotools",
-    "subtype": "translate",
-    "videoField": "video_url",
-    "hasPrompt": false,
-    "description": "Translate video to multiple languages"
-  },
-  {
-    "id": "seedance-2.0-watermark-remover",
-    "name": "Seedance Watermark Remover",
-    "endpoint": "seedance-2.0-watermark-remover",
-    "family": "videotools",
-    "subtype": "watermark",
-    "videoField": "video_url",
-    "hasPrompt": false,
-    "description": "Remove watermarks from videos"
-  }
-];
-
-export const getVideoToolById = (id) => videoToolsModels.find(m => m.id === id);
-
-// ─── Text-to-Text models (LLM) ─────────────────────────────────
-export const textModels = [
-  {
-    "id": "gpt-5-mini",
-    "name": "GPT-5 Mini",
-    "endpoint": "gpt-5-mini",
-    "family": "llm",
-    "type": "chat",
-    "hasPrompt": true,
-    "description": "Fast GPT-5 model for quick responses"
-  },
-  {
-    "id": "gpt-5-nano",
-    "name": "GPT-5 Nano",
-    "endpoint": "gpt-5-nano",
-    "family": "llm",
-    "type": "chat",
-    "hasPrompt": true,
-    "description": "Ultra-fast GPT-5 for simple tasks"
-  },
-  {
-    "id": "any-llm",
-    "name": "Any LLM",
-    "endpoint": "any-llm",
-    "family": "llm",
-    "type": "chat",
-    "hasPrompt": true,
-    "description": "Universal LLM endpoint for any model"
-  },
-  {
-    "id": "openrouter-vision",
-    "name": "OpenRouter Vision",
-    "endpoint": "openrouter-vision",
-    "family": "llm",
-    "type": "vision",
-    "hasPrompt": true,
-    "description": "LLM with vision capabilities"
-  }
-];
-
-export const getTextModelById = (id) => textModels.find(m => m.id === id);
+export const getV2VModelById = (id) => v2vModels.find(m => m.id === id);

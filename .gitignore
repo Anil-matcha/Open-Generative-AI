@@ -26,10 +26,19 @@ package-lock.json
 *.sln
 *.sw?
 .env
+.env.*
+!.env.example
 .worktrees
 
 # Local Netlify folder
 .netlify
+
+# Next.js
+.next/
+out/
+
+# Misc
+*.pem
 
 # AI agent development tools (not part of application)
 superpowers/

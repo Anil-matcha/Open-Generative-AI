@@ -1,17 +1,12 @@
 
 import { muapi } from '../lib/muapi.js';
-import { createSafeImage } from '../lib/security.js';
 import { CameraControls } from './CameraControls.js';
 import { buildNanoBananaPrompt, CAMERA_MAP, LENS_MAP, FOCAL_PERSPECTIVE, APERTURE_EFFECT } from '../lib/promptUtils.js';
-import { securityService } from '../lib/services/SecurityService.js';
 import { AuthModal } from './AuthModal.js';
-import { createInlineInstructions } from './InlineInstructions.js';
-import { createHeroSection } from '../lib/thumbnails.js';
-import { GTMPromptModal } from './modals/GTMPromptModal.jsx';
 
 export function CinemaStudio() {
     const container = document.createElement('div');
-    container.className = 'w-full h-full flex flex-col items-center justify-start bg-black relative overflow-hidden';
+    container.className = 'w-full h-full flex flex-col items-center justify-center bg-black relative overflow-hidden';
 
     // --- State ---
     const currentSettings = {
@@ -30,124 +25,14 @@ export function CinemaStudio() {
     // 1. HERO SECTION (Empty State)
     // ==========================================
     const heroSection = document.createElement('div');
-    heroSection.className = 'flex flex-col items-center text-center px-4 animate-fade-in-up w-full mb-2 md:mb-4';
-    const cinemaBanner = createHeroSection('cinema', 'h-32 md:h-44 mb-3');
-    if (cinemaBanner) {
-        const bannerContent = document.createElement('div');
-        bannerContent.className = 'absolute bottom-0 left-0 right-0 p-6 z-10 text-left';
-        bannerContent.innerHTML = `
-            <div class="mb-2 text-xs font-bold text-white/40 tracking-[0.2em] uppercase">Cinema Studio 2.0</div>
-            <h1 class="text-3xl md:text-5xl font-black text-white tracking-tight leading-tight">
-                What would you shoot<br>with infinite budget?
-            </h1>
-        `;
-        cinemaBanner.appendChild(bannerContent);
-        heroSection.appendChild(cinemaBanner);
-    }
-    container.appendChild(heroSection);
-
-    const inlineInstructions = createInlineInstructions('cinema');
-    inlineInstructions.classList.add('mt-8', 'px-4');
-    container.appendChild(inlineInstructions);
-
-    // ==========================================
-    // 1.5. CINEMA PROMPT BUILDER
-    // ==========================================
-    function createSelect(label, options) {
-        const wrapper = document.createElement('div');
-        const lbl = document.createElement('label');
-        lbl.className = 'text-xs font-bold text-secondary uppercase tracking-wider block mb-1';
-        lbl.textContent = label;
-        wrapper.appendChild(lbl);
-        const select = document.createElement('select');
-        select.className = 'w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white text-xs focus:outline-none appearance-none cursor-pointer';
-        options.forEach(o => {
-            const opt = document.createElement('option');
-            opt.value = o;
-            opt.textContent = o;
-            opt.style.background = '#111';
-            select.appendChild(opt);
-        });
-        wrapper.appendChild(select);
-        return { wrapper, select };
-    }
-
-    const cineBuilderWrapper = document.createElement('div');
-    cineBuilderWrapper.className = 'w-full mt-6 px-4 animate-fade-in-up';
-    cineBuilderWrapper.style.animationDelay = '0.15s';
-
-    const cineBuilderToggle = document.createElement('button');
-    cineBuilderToggle.className = 'w-full flex items-center justify-between bg-[#111]/90 backdrop-blur-xl border border-white/10 rounded-2xl px-5 py-3.5 text-left hover:bg-white/[0.04] transition-all';
-    cineBuilderToggle.innerHTML = `
-        <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d9ff00" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/><line x1="17" y1="17" x2="22" y2="17"/></svg>
-            </div>
-            <div>
-                <div class="text-sm font-bold text-white">Cinema Prompt Builder</div>
-                <div class="text-[10px] text-muted">Build cinematic prompts with camera & lens metadata</div>
-            </div>
-        </div>
-        <svg class="cine-chevron w-4 h-4 text-muted transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    heroSection.className = 'flex flex-col items-center justify-center text-center px-4 animate-fade-in-up';
+    heroSection.innerHTML = `
+        <div class="mb-4 text-xs font-bold text-white/40 tracking-[0.2em] uppercase">Cinema Studio 2.0</div>
+        <h1 class="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-white/50 tracking-tight leading-tight mb-2">
+            What would you shoot<br>with infinite budget?
+        </h1>
     `;
-
-    const cineBuilderPanel = document.createElement('div');
-    cineBuilderPanel.className = 'hidden bg-[#111]/90 backdrop-blur-xl border border-white/10 border-t-0 rounded-b-2xl px-5 pb-5 pt-3';
-
-    const cinePrompt = document.createElement('input');
-    cinePrompt.type = 'text';
-    cinePrompt.placeholder = 'Base scene description...';
-    cinePrompt.className = 'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder:text-muted focus:outline-none focus:border-primary/50 transition-colors mb-4';
-    cineBuilderPanel.appendChild(cinePrompt);
-
-    const cineSelects = document.createElement('div');
-    cineSelects.className = 'grid grid-cols-2 gap-3 mb-4';
-    const cameraSelect = createSelect('Camera', Object.keys(CAMERA_MAP));
-    const lensSelect = createSelect('Lens', Object.keys(LENS_MAP));
-    cineSelects.appendChild(cameraSelect.wrapper);
-    cineSelects.appendChild(lensSelect.wrapper);
-    cineBuilderPanel.appendChild(cineSelects);
-
-    const cineOutput = document.createElement('div');
-    cineOutput.className = 'bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm min-h-[60px] mb-4';
-    cineOutput.textContent = 'Cinematic prompt will appear here...';
-    cineBuilderPanel.appendChild(cineOutput);
-
-    function updateCine() {
-        const base = cinePrompt.value.trim();
-        if (!base) { cineOutput.textContent = 'Cinematic prompt will appear here...'; return; }
-        cineOutput.textContent = buildNanoBananaPrompt(base, cameraSelect.select.value, lensSelect.select.value, 35, 'f/1.4');
-    }
-    cinePrompt.oninput = updateCine;
-    cameraSelect.select.onchange = updateCine;
-    lensSelect.select.onchange = updateCine;
-
-    const cineUseBtn = document.createElement('button');
-    cineUseBtn.className = 'px-5 py-2.5 bg-primary text-black rounded-xl text-xs font-bold hover:shadow-glow transition-all';
-    cineUseBtn.textContent = 'Use in Prompt';
-    cineUseBtn.onclick = () => {
-        const prompt = cineOutput.textContent;
-        if (prompt && prompt !== 'Cinematic prompt will appear here...') {
-            textarea.value = prompt;
-            textarea.style.height = 'auto';
-            textarea.style.height = Math.min(textarea.scrollHeight, 250) + 'px';
-            // Collapse builder after use
-            cineBuilderPanel.classList.add('hidden');
-            cineBuilderToggle.querySelector('.cine-chevron').style.transform = '';
-        }
-    };
-    cineBuilderPanel.appendChild(cineUseBtn);
-
-    let cineBuilderOpen = false;
-    cineBuilderToggle.onclick = () => {
-        cineBuilderOpen = !cineBuilderOpen;
-        cineBuilderPanel.classList.toggle('hidden', !cineBuilderOpen);
-        cineBuilderToggle.querySelector('.cine-chevron').style.transform = cineBuilderOpen ? 'rotate(180deg)' : '';
-    };
-
-    cineBuilderWrapper.appendChild(cineBuilderToggle);
-    cineBuilderWrapper.appendChild(cineBuilderPanel);
-    container.appendChild(cineBuilderWrapper);
+    container.appendChild(heroSection);
 
     // ==========================================
     // 2. CAMERA CONTROLS OVERLAY
@@ -157,7 +42,7 @@ export function CinemaStudio() {
 
     const overlayContent = document.createElement('div');
     // Reduced padding for mobile (p-4) and added max-height/overflow handling
-    overlayContent.className = 'w-full bg-[#141414] border border-white/10 rounded-3xl p-4 md:p-8 shadow-2xl transform scale-95 transition-transform duration-300 flex flex-col max-h-[90vh]';
+    overlayContent.className = 'w-full max-w-4xl bg-[#141414] border border-white/10 rounded-3xl p-4 md:p-8 shadow-2xl transform scale-95 transition-transform duration-300 flex flex-col max-h-[90vh]';
     overlayBackdrop.appendChild(overlayContent);
 
     // Header for Overlay
@@ -183,7 +68,7 @@ export function CinemaStudio() {
     });
     overlayContent.appendChild(cameraControls);
 
-    container.appendChild(overlayBackdrop);
+    document.body.appendChild(overlayBackdrop); // Append to body to sit above everything
 
     // Overlay Logic
     const openOverlay = () => {
@@ -204,7 +89,7 @@ export function CinemaStudio() {
     // 3. FLOATING PROMPT BAR
     // ==========================================
     const promptBarWrapper = document.createElement('div');
-    promptBarWrapper.className = 'absolute bottom-8 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:w-full z-30';
+    promptBarWrapper.className = 'absolute bottom-8 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-4xl z-30';
 
     const promptBar = document.createElement('div');
     promptBar.className = 'bg-[#1a1a1a] border border-white/10 rounded-[2rem] p-4 flex justify-between shadow-3xl items-end relative';
@@ -229,30 +114,11 @@ export function CinemaStudio() {
         this.style.height = 'auto';
         this.style.height = (this.scrollHeight) + 'px';
     };
-    const cinemaPrefill = localStorage.getItem('prefill_prompt');
-    if (cinemaPrefill) {
-        textarea.value = cinemaPrefill;
-        localStorage.removeItem('prefill_prompt');
-        requestAnimationFrame(() => {
-            textarea.style.height = 'auto';
-            textarea.style.height = textarea.scrollHeight + 'px';
-        });
-    }
-
     inputRow.appendChild(textarea);
-
-    // GTM Prompt Enhancer Button
-    const gtmBtn = document.createElement('button');
-    gtmBtn.className = 'w-8 h-8 shrink-0 rounded-lg border bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40 transition-all flex items-center justify-center relative overflow-hidden group';
-    gtmBtn.title = 'GTM Prompt Enhancement - Create conversion-optimized prompts';
-    gtmBtn.innerHTML = '🚀';
-    gtmBtn.onclick = () => {
-        openGTMPromptModal(textarea);
-    };
-    inputRow.appendChild(gtmBtn);
 
     leftColumn.appendChild(inputRow);
 
+    // 2. Settings Toolbar (Bottom Left)
     // 2. Settings Toolbar (Bottom Left)
     const settingsToolbar = document.createElement('div');
     settingsToolbar.className = 'flex items-center gap-3'; // Removed pl-11 to align left
@@ -383,7 +249,7 @@ export function CinemaStudio() {
     // 3B. CAMERA BUILDER PANEL (Collapsible)
     // ==========================================
     const cameraBuilderPanel = document.createElement('div');
-    cameraBuilderPanel.className = 'absolute bottom-8 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:w-full z-20';
+    cameraBuilderPanel.className = 'absolute bottom-8 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-4xl z-20';
     cameraBuilderPanel.style.display = 'none'; // Hidden by default
     
     const builderCard = document.createElement('div');
@@ -553,19 +419,12 @@ export function CinemaStudio() {
             const thumb = document.createElement('div');
             thumb.className = `relative group/thumb cursor-pointer rounded-lg overflow-hidden border-2 transition-all duration-300 aspect-square ${idx === 0 ? 'border-[#d9ff00] shadow-glow-sm' : 'border-white/10 hover:border-white/30'}`;
 
-            // Safe image creation - prevents XSS from user-provided URLs
-            const img = createSafeImage(entry.url, 'Generated image', 'w-full h-full object-cover opacity-80 group-hover/thumb:opacity-100 transition-opacity');
-            thumb.appendChild(img);
-
-            // Create overlay
-            const overlay = document.createElement('div');
-            overlay.className = 'absolute inset-0 bg-black/50 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center';
-            
-            const loadText = document.createElement('span');
-            loadText.className = 'text-[8px] font-bold text-white uppercase';
-            loadText.textContent = 'Load';
-            overlay.appendChild(loadText);
-            thumb.appendChild(overlay);
+            thumb.innerHTML = `
+                <img src="${entry.url}" class="w-full h-full object-cover opacity-80 group-hover/thumb:opacity-100 transition-opacity">
+                <div class="absolute inset-0 bg-black/50 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center">
+                    <span class="text-[8px] font-bold text-white uppercase">Load</span>
+                </div>
+            `;
 
             thumb.onclick = () => loadHistoryItem(entry, thumb);
             historyList.appendChild(thumb);
@@ -678,7 +537,7 @@ export function CinemaStudio() {
         const basePrompt = textarea.value.trim();
         if (!basePrompt) return;
 
-        const apiKey = await securityService.getDecryptedKey();
+        const apiKey = localStorage.getItem('muapi_key');
         if (!apiKey) {
             AuthModal(() => generateBtn.click());
             return;
@@ -730,30 +589,6 @@ export function CinemaStudio() {
             generateBtn.innerHTML = `GENERATE ✨`;
         }
     };
-
-    // GTM Prompt Modal Function
-    function openGTMPromptModal(promptTextarea) {
-        try {
-            const modal = new GTMPromptModal({
-                appTheme: 'cinema-studio',
-                onPromptGenerated: (generatedPrompt) => {
-                    // Load the generated prompt into the textarea
-                    promptTextarea.value = generatedPrompt;
-                    promptTextarea.dispatchEvent(new Event('input', { bubbles: true }));
-
-                    // Adjust textarea height
-                    promptTextarea.style.height = 'auto';
-                    promptTextarea.style.height = promptTextarea.scrollHeight + 'px';
-
-                    console.log('GTM-optimized prompt loaded successfully!');
-                }
-            });
-            modal.open();
-        } catch (error) {
-            console.error('GTM Prompt Modal error:', error);
-            alert('Failed to open GTM Prompt Enhancer');
-        }
-    }
 
     return container;
 }

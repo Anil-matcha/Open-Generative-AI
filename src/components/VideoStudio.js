@@ -1,74 +1,113 @@
 import { muapi } from '../lib/muapi.js';
-import { createSafeVideo } from '../lib/security.js';
-import { showToast } from '../lib/loading.js';
-import { securityService } from '../lib/services/SecurityService.js';
-import { t2vModels, getAspectRatiosForVideoModel, getDurationsForModel, getResolutionsForVideoModel, i2vModels, getAspectRatiosForI2VModel, getDurationsForI2VModel, getResolutionsForI2VModel, v2vModels } from '../lib/models.js';
+import { t2vModels, getAspectRatiosForVideoModel, getDurationsForModel, getResolutionsForVideoModel, i2vModels, getAspectRatiosForI2VModel, getDurationsForI2VModel, getResolutionsForI2VModel, v2vModels, getModesForModel } from '../lib/models.js';
 import { AuthModal } from './AuthModal.js';
 import { createUploadPicker } from './UploadPicker.js';
-import { createInlineInstructions } from './InlineInstructions.js';
-import { createHeroSection } from '../lib/thumbnails.js';
-import { GTMPromptModal } from './modals/GTMPromptModal.jsx';
+import { savePendingJob, removePendingJob, getPendingJobs } from '../lib/pendingJobs.js';
+import { localAI, isLocalAIAvailable } from '../lib/localInferenceClient.js';
+import { isWan2gpModelId, getLocalModelById, localT2VModels, localI2VModels } from '../lib/localModels.js';
+
+// Promotes a wan2gp catalog entry (lib/localModels.js shape) into the
+// `inputs`-shaped descriptor the Video Studio dropdowns/controls expect.
+const adaptLocalToVideoEntry = (m) => ({
+    id: m.id,
+    name: m.name,
+    provider: 'wan2gp',
+    inputs: {
+        prompt: { type: 'string', name: 'prompt', title: 'Prompt' },
+        aspect_ratio: { type: 'string', name: 'aspect_ratio', enum: m.aspectRatios || ['16:9', '1:1', '9:16'], default: (m.aspectRatios || ['16:9'])[0] },
+    },
+});
 
 export function VideoStudio() {
     const container = document.createElement('div');
-    container.className = 'w-full h-full flex flex-col items-center justify-start bg-app-bg relative p-4 md:p-6 overflow-y-auto custom-scrollbar overflow-x-hidden';
+    container.className = 'w-full h-full flex flex-col items-center justify-center bg-app-bg relative p-4 md:p-6 overflow-y-auto custom-scrollbar overflow-x-hidden';
+
+    // Merge Wan2GP video models in only when running inside Electron AND the
+    // user has a Wan2GP server configured. We can't probe synchronously, so
+    // we always include them when isLocalAIAvailable() — getCurrentModel()
+    // reads from these arrays, so they need to be present from init.
+    const localT2V = isLocalAIAvailable() ? localT2VModels.map(adaptLocalToVideoEntry) : [];
+    const localI2V = isLocalAIAvailable() ? localI2VModels.map(adaptLocalToVideoEntry) : [];
+    const allT2V = [...t2vModels, ...localT2V];
+    const allI2V = [...i2vModels, ...localI2V];
 
     // --- State ---
-    const defaultModel = t2vModels[0];
+    const defaultModel = allT2V[0];
     let selectedModel = defaultModel.id;
     let selectedModelName = defaultModel.name;
     let selectedAr = defaultModel.inputs?.aspect_ratio?.default || '16:9';
     let selectedDuration = defaultModel.inputs?.duration?.default || 5;
     let selectedResolution = defaultModel.inputs?.resolution?.default || '';
     let selectedQuality = defaultModel.inputs?.quality?.default || '';
+    let selectedMode = '';
+    let selectedEffectName = '';
     let lastGenerationId = null;
     let lastGenerationModel = null;
     let dropdownOpen = null;
     let uploadedImageUrl = null;
     let imageMode = false; // false = t2v models, true = i2v models
     let v2vMode = false;   // true = video-to-video tools mode
-    let effectsMode = false; // true = video effects mode
     let uploadedVideoUrl = null;
-    let wanAiSection = null; // Reference to Wan AI effects section
-    
-    // Advanced parameters state
-    let negativePrompt = '';
-    let seed = -1;
-    let showAdvanced = false;
 
-    const getCurrentModels = () => effectsMode ? i2vModels.filter(m => m.family === 'effects') : (v2vMode ? v2vModels : (imageMode ? i2vModels : t2vModels));
-    const getCurrentAspectRatios = (id) => imageMode ? getAspectRatiosForI2VModel(id) : getAspectRatiosForVideoModel(id);
-    const getCurrentDurations = (id) => imageMode ? getDurationsForI2VModel(id) : getDurationsForModel(id);
-    const getCurrentResolutions = (id) => imageMode ? getResolutionsForI2VModel(id) : getResolutionsForVideoModel(id);
+    const getCurrentModels = () => v2vMode ? v2vModels : (imageMode ? allI2V : allT2V);
+    // Local Wan2GP entries don't live in the Muapi-derived helpers, so we
+    // resolve aspect ratios off the catalog when the selected id is local.
+    const getCurrentAspectRatios = (id) => {
+        const local = getLocalModelById(id);
+        if (local) return local.aspectRatios || ['16:9', '1:1', '9:16'];
+        return imageMode ? getAspectRatiosForI2VModel(id) : getAspectRatiosForVideoModel(id);
+    };
+    const getCurrentDurations = (id) => {
+        if (getLocalModelById(id)) return [];
+        return imageMode ? getDurationsForI2VModel(id) : getDurationsForModel(id);
+    };
+    const getCurrentResolutions = (id) => {
+        if (getLocalModelById(id)) return [];
+        return imageMode ? getResolutionsForI2VModel(id) : getResolutionsForVideoModel(id);
+    };
+    const getCurrentModes = (id) => getModesForModel(id);
     const getCurrentModel = () => getCurrentModels().find(m => m.id === selectedModel);
     const getQualitiesForModel = (id) => {
         const model = getCurrentModels().find(m => m.id === id);
         return model?.inputs?.quality?.enum || [];
+    };
+    const getEffectNamesForModel = (id) => {
+        const model = getCurrentModels().find(m => m.id === id);
+        return model?.inputs?.name?.enum || [];
     };
 
     // ==========================================
     // 1. HERO SECTION
     // ==========================================
     const hero = document.createElement('div');
-    hero.className = 'flex flex-col items-center mb-2 md:mb-4 animate-fade-in-up transition-all duration-700 w-full';
-    const heroBanner = createHeroSection('video', 'h-32 md:h-44 mb-3');
-    if (heroBanner) {
-        const heroContent = document.createElement('div');
-        heroContent.className = 'absolute bottom-0 left-0 right-0 p-6 z-10';
-        heroContent.innerHTML = `
-            <h1 class="text-2xl sm:text-4xl md:text-5xl font-black text-white tracking-tight mb-1">Video Studio</h1>
-            <p class="text-white/60 text-sm font-medium">Animate images into stunning AI videos with motion effects</p>
-        `;
-        heroBanner.appendChild(heroContent);
-        hero.appendChild(heroBanner);
-    }
+    hero.className = 'flex flex-col items-center mb-10 md:mb-20 animate-fade-in-up transition-all duration-700';
+    hero.innerHTML = `
+        <div class="mb-10 relative group">
+             <div class="absolute inset-0 bg-primary/20 blur-[100px] rounded-full opacity-40 group-hover:opacity-70 transition-opacity duration-1000"></div>
+             <div class="relative w-24 h-24 md:w-32 md:h-32 bg-teal-900/40 rounded-3xl flex items-center justify-center border border-white/5 overflow-hidden">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="text-primary opacity-20 absolute -right-4 -bottom-4">
+                    <polygon points="23 7 16 12 23 17 23 7"/>
+                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+                </svg>
+                <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20 shadow-glow relative z-10">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-primary">
+                        <polygon points="23 7 16 12 23 17 23 7"/>
+                        <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+                    </svg>
+                </div>
+                <div class="absolute top-4 right-4 text-primary animate-pulse">✨</div>
+             </div>
+        </div>
+        <h1 class="text-2xl sm:text-4xl md:text-7xl font-black text-white tracking-widest uppercase mb-4 selection:bg-primary selection:text-black text-center px-4">Video Studio</h1>
+        <p class="text-secondary text-sm font-medium tracking-wide opacity-60">Animate images into stunning AI videos with motion effects</p>
+    `;
     container.appendChild(hero);
 
     // ==========================================
     // 2. PROMPT BAR
     // ==========================================
     const promptWrapper = document.createElement('div');
-    promptWrapper.className = 'w-full relative z-40 animate-fade-in-up';
+    promptWrapper.className = 'w-full max-w-4xl relative z-40 animate-fade-in-up';
     promptWrapper.style.animationDelay = '0.2s';
 
     const bar = document.createElement('div');
@@ -90,8 +129,8 @@ export function VideoStudio() {
             }
             if (!imageMode) {
                 imageMode = true;
-                selectedModel = i2vModels[0].id;
-                selectedModelName = i2vModels[0].name;
+                selectedModel = allI2V[0].id;
+                selectedModelName = allI2V[0].name;
                 document.getElementById('v-model-btn-label').textContent = selectedModelName;
                 updateControlsForModel(selectedModel);
             }
@@ -101,13 +140,17 @@ export function VideoStudio() {
         onClear: () => {
             uploadedImageUrl = null;
             imageMode = false;
-            selectedModel = t2vModels[0].id;
-            selectedModelName = t2vModels[0].name;
+            selectedModel = allT2V[0].id;
+            selectedModelName = allT2V[0].name;
             document.getElementById('v-model-btn-label').textContent = selectedModelName;
             updateControlsForModel(selectedModel);
             textarea.placeholder = 'Describe the video you want to create';
             textarea.disabled = false;
-        }
+        },
+        // Route the upload through the configured Wan2GP server when the active
+        // model is local; otherwise fall back to the Muapi-hosted upload.
+        uploadFn: (file) => isWan2gpModelId(selectedModel) ? localAI.uploadFileToWan2gp(file) : muapi.uploadFile(file),
+        requireApiKey: () => !isWan2gpModelId(selectedModel),
     });
     topRow.appendChild(picker.trigger);
     container.appendChild(picker.panel);
@@ -168,8 +211,8 @@ export function VideoStudio() {
         uploadedVideoUrl = null;
         v2vMode = false;
         showVideoIcon();
-        selectedModel = t2vModels[0].id;
-        selectedModelName = t2vModels[0].name;
+        selectedModel = allT2V[0].id;
+        selectedModelName = allT2V[0].name;
         document.getElementById('v-model-btn-label').textContent = selectedModelName;
         updateControlsForModel(selectedModel);
         textarea.placeholder = 'Describe the video you want to create';
@@ -189,7 +232,7 @@ export function VideoStudio() {
         const file = e.target.files[0];
         if (!file) return;
 
-        const apiKey = await securityService.getDecryptedKey();
+        const apiKey = localStorage.getItem('muapi_key');
         if (!apiKey) {
             AuthModal(() => videoFileInput.click());
             return;
@@ -224,51 +267,6 @@ export function VideoStudio() {
 
     topRow.appendChild(videoPickerBtn);
 
-    // --- Effects Mode Toggle ---
-    const effectsBtn = document.createElement('button');
-    effectsBtn.type = 'button';
-    effectsBtn.title = 'Toggle video effects mode';
-    effectsBtn.className = `w-10 h-10 shrink-0 rounded-xl border transition-all flex items-center justify-center relative overflow-hidden mt-1.5 ${effectsMode ? 'bg-primary/20 border-primary/60' : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40'} group`;
-    effectsBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted group-hover:text-primary transition-colors"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10"/></svg>`;
-
-    effectsBtn.onclick = () => {
-        effectsMode = !effectsMode;
-        if (effectsMode) {
-            // Clear other modes
-            if (v2vMode) {
-                uploadedVideoUrl = null;
-                v2vMode = false;
-                showVideoIcon();
-            }
-            if (imageMode) {
-                picker.reset();
-                uploadedImageUrl = null;
-                imageMode = false;
-            }
-            // Switch to effects model
-            selectedModel = 'ai-video-effects';
-            selectedModelName = 'AI Video Effects';
-            document.getElementById('v-model-btn-label').textContent = selectedModelName;
-            updateControlsForModel(selectedModel);
-            textarea.placeholder = 'Describe the effect you want to apply';
-            textarea.disabled = false;
-            // Show Wan AI section
-            if (wanAiSection) wanAiSection.classList.remove('hidden');
-        } else {
-            // Switch back to default
-            selectedModel = t2vModels[0].id;
-            selectedModelName = t2vModels[0].name;
-            document.getElementById('v-model-btn-label').textContent = selectedModelName;
-            updateControlsForModel(selectedModel);
-            textarea.placeholder = 'Describe the video you want to create';
-            // Hide Wan AI section
-            if (wanAiSection) wanAiSection.classList.add('hidden');
-        }
-        effectsBtn.className = `w-10 h-10 shrink-0 rounded-xl border transition-all flex items-center justify-center relative overflow-hidden mt-1.5 ${effectsMode ? 'bg-primary/20 border-primary/60' : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40'} group`;
-    };
-
-    topRow.appendChild(effectsBtn);
-
     const textarea = document.createElement('textarea');
     textarea.placeholder = 'Describe the video you want to create';
     textarea.className = 'flex-1 bg-transparent border-none text-white text-base md:text-xl placeholder:text-muted focus:outline-none resize-none pt-2.5 leading-relaxed min-h-[40px] max-h-[150px] md:max-h-[250px] overflow-y-auto custom-scrollbar';
@@ -279,29 +277,7 @@ export function VideoStudio() {
         textarea.style.height = Math.min(textarea.scrollHeight, maxHeight) + 'px';
     };
 
-    const videoPrefill = localStorage.getItem('prefill_prompt');
-    if (videoPrefill) {
-        textarea.value = videoPrefill;
-        localStorage.removeItem('prefill_prompt');
-        requestAnimationFrame(() => {
-            textarea.style.height = 'auto';
-            const maxHeight = window.innerWidth < 768 ? 150 : 250;
-            textarea.style.height = Math.min(textarea.scrollHeight, maxHeight) + 'px';
-        });
-    }
-
     topRow.appendChild(textarea);
-
-    // GTM Prompt Enhancer Button
-    const gtmBtn = document.createElement('button');
-    gtmBtn.className = 'w-10 h-10 shrink-0 rounded-xl border bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40 transition-all flex items-center justify-center relative overflow-hidden mt-1.5 group';
-    gtmBtn.title = 'GTM Prompt Enhancement - Create conversion-optimized prompts';
-    gtmBtn.innerHTML = '🚀';
-    gtmBtn.onclick = () => {
-        openGTMPromptModal(textarea);
-    };
-    topRow.appendChild(gtmBtn);
-
     bar.appendChild(topRow);
 
     // Extend mode banner (shown when extend model is active, not editable by user)
@@ -355,12 +331,21 @@ export function VideoStudio() {
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="opacity-60 text-secondary"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
     `, selectedQuality || 'basic', 'v-quality-btn', 'Set output quality');
 
+    const modeBtn = createControlBtn(`
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="opacity-60 text-secondary"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    `, selectedMode || 'normal', 'v-mode-btn');
+
+    const effectNameBtn = createControlBtn(`
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="opacity-60 text-secondary"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z"/></svg>
+    `, 'Effect', 'v-effect-btn', 'Select effect type');
+
     controlsLeft.appendChild(modelBtn);
     controlsLeft.appendChild(arBtn);
     controlsLeft.appendChild(durationBtn);
     controlsLeft.appendChild(resolutionBtn);
     controlsLeft.appendChild(qualityBtn);
-    
+    controlsLeft.appendChild(effectNameBtn);
+
     // Advanced options toggle button
     const advancedBtn = createControlBtn(`
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="opacity-60 text-secondary"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 001.82-.33 1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-1.82.33A1.65 1.65 0 0019.4 9a1.65 1.65 0 00-1.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
@@ -373,6 +358,8 @@ export function VideoStudio() {
     const initResolutions = getResolutionsForVideoModel(defaultModel.id);
     resolutionBtn.style.display = initResolutions.length > 0 ? 'flex' : 'none';
     qualityBtn.style.display = 'none';
+    modeBtn.style.display = getModesForModel(defaultModel.id).length > 0 ? 'flex' : 'none';
+    effectNameBtn.style.display = 'none';
 
     const generateBtn = document.createElement('button');
     generateBtn.className = 'bg-primary text-black px-6 md:px-8 py-3 md:py-3.5 rounded-xl md:rounded-[1.5rem] font-black text-sm md:text-base hover:shadow-glow hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2.5 w-full sm:w-auto shadow-lg';
@@ -384,114 +371,6 @@ export function VideoStudio() {
     bar.appendChild(bottomRow);
     promptWrapper.appendChild(bar);
     container.appendChild(promptWrapper);
-
-    // ==========================================
-    // WAN AI EFFECTS SECTION
-    // ==========================================
-    wanAiSection = document.createElement('div');
-    wanAiSection.className = 'w-full mt-4 hidden animate-fade-in-up';
-    wanAiSection.style.animationDelay = '0.3s';
-    wanAiSection.innerHTML = `
-        <div class="bg-[#111]/90 backdrop-blur-xl border border-purple-500/20 rounded-[1.5rem] p-4">
-            <h4 class="text-sm font-semibold text-purple-400 mb-3 flex items-center gap-2">
-                <span class="w-2 h-2 bg-purple-400 rounded-full"></span>
-                Wan AI Video Effects
-            </h4>
-            <div class="space-y-3">
-                <select id="wan-ai-effect" class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded text-sm text-white">
-                    <option value="">Select Wan AI Effect...</option>
-                    <option value="cakeify">🎨 Cakeify - Stylized Animation</option>
-                    <option value="vhs">📼 VHS Footage - Retro Video</option>
-                    <option value="samurai">⚔️ Samurai It - Character Animation</option>
-                    <option value="film-noir">🎭 Film Noir - Cinematic Style</option>
-                    <option value="animal">🐾 Animal Transformation</option>
-                    <option value="rotation">🔄 Rotation Effect</option>
-                </select>
-                <button id="apply-wan-effect" class="w-full py-2 bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/40 rounded text-sm font-medium transition-colors disabled:opacity-50 text-white">
-                    Apply Wan AI Effect
-                </button>
-            </div>
-        </div>
-    `;
-    container.appendChild(wanAiSection);
-
-    // Attach event handler to apply button
-    const applyBtn = wanAiSection.querySelector('#apply-wan-effect');
-    if (applyBtn) applyBtn.addEventListener('click', applySelectedWanEffect);
-
-    const inlineInstructions = createInlineInstructions('video');
-    inlineInstructions.classList.add('mt-8');
-    container.appendChild(inlineInstructions);
-
-    // ==========================================
-    // ADVANCED OPTIONS PANEL
-    // ==========================================
-    const advancedPanel = document.createElement('div');
-    advancedPanel.className = 'w-full mt-6 animate-fade-in-up hidden';
-    advancedPanel.id = 'v-advanced-panel';
-    advancedPanel.innerHTML = `
-        <div class="bg-[#111]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-5 flex flex-col gap-4">
-            <div class="flex items-center justify-between pb-3 border-b border-white/5">
-                <h3 class="text-sm font-bold text-white">Advanced Options</h3>
-                <button id="v-close-adv-btn" class="text-white/40 hover:text-white transition-colors">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-                </button>
-            </div>
-            
-            <!-- Negative Prompt -->
-            <div class="flex flex-col gap-2">
-                <label class="text-xs font-bold text-secondary uppercase tracking-wider">Negative Prompt</label>
-                <input type="text" id="v-negative-prompt-input" 
-                    placeholder="What to exclude from the video (e.g., blurry, distorted, watermark)"
-                    class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder:text-muted focus:outline-none focus:border-primary/50 transition-colors">
-            </div>
-            
-            <!-- Seed -->
-            <div class="flex flex-col gap-2">
-                <div class="flex items-center justify-between">
-                    <label class="text-xs font-bold text-secondary uppercase tracking-wider">Seed</label>
-                    <button id="v-randomize-seed-btn" class="text-xs font-bold text-primary hover:text-primary/80 transition-colors">Randomize</button>
-                </div>
-                <input type="number" id="v-seed-input" 
-                    placeholder="-1 for random"
-                    value="-1"
-                    class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder:text-muted focus:outline-none focus:border-primary/50 transition-colors">
-            </div>
-        </div>
-    `;
-    container.appendChild(advancedPanel);
-
-    // Advanced panel toggle logic
-    const toggleAdvanced = () => {
-        showAdvanced = !showAdvanced;
-        advancedPanel.classList.toggle('hidden', !showAdvanced);
-        document.getElementById('v-advanced-btn-label').textContent = showAdvanced ? 'Less' : 'Advanced';
-    };
-    
-    // Add advanced panel to container first
-    container.appendChild(advancedPanel);
-    
-    // Now set up event handlers after elements are in DOM
-    advancedBtn.onclick = toggleAdvanced;
-    const vCloseAdvBtn = advancedPanel.querySelector('#v-close-adv-btn');
-    if (vCloseAdvBtn) vCloseAdvBtn.onclick = toggleAdvanced;
-    
-    // Negative prompt
-    const vNegPromptInput = advancedPanel.querySelector('#v-negative-prompt-input');
-    if (vNegPromptInput) vNegPromptInput.oninput = (e) => { negativePrompt = e.target.value; };
-    
-    // Seed input
-    const vSeedInput = advancedPanel.querySelector('#v-seed-input');
-    if (vSeedInput) vSeedInput.oninput = (e) => { seed = parseInt(e.target.value) || -1; };
-    
-    // Randomize seed button
-    const vRandSeedBtn = advancedPanel.querySelector('#v-randomize-seed-btn');
-    if (vRandSeedBtn) {
-        vRandSeedBtn.onclick = () => {
-            seed = Math.floor(Math.random() * 999999999);
-            if (vSeedInput) vSeedInput.value = seed;
-        };
-    }
 
     // ==========================================
     // 3. DROPDOWNS
@@ -508,6 +387,8 @@ export function VideoStudio() {
             durationBtn.style.display = 'none';
             resolutionBtn.style.display = 'none';
             qualityBtn.style.display = 'none';
+            modeBtn.style.display = 'none';
+            effectNameBtn.style.display = 'none';
             extendBanner.classList.add('hidden');
             extendBanner.classList.remove('flex');
             return;
@@ -552,6 +433,28 @@ export function VideoStudio() {
         } else {
             selectedQuality = '';
             qualityBtn.style.display = 'none';
+        }
+
+        // Mode
+        const modes = getCurrentModes(modelId);
+        if (modes.length > 0) {
+            selectedMode = model?.inputs?.mode?.default || modes[0];
+            document.getElementById('v-mode-btn-label').textContent = selectedMode;
+            modeBtn.style.display = 'flex';
+        } else {
+            selectedMode = '';
+            modeBtn.style.display = 'none';
+        }
+
+        // Effect name (ai-video-effects / motion-controls)
+        const effectNames = getEffectNamesForModel(modelId);
+        if (effectNames.length > 0) {
+            selectedEffectName = model?.inputs?.name?.default || effectNames[0];
+            document.getElementById('v-effect-btn-label').textContent = selectedEffectName;
+            effectNameBtn.style.display = 'flex';
+        } else {
+            selectedEffectName = '';
+            effectNameBtn.style.display = 'none';
         }
 
         // Extend banner (extend model only)
@@ -638,7 +541,7 @@ export function VideoStudio() {
                 const lf = filter.toLowerCase();
 
                 // Regular generation models (always t2v or i2v, never v2v)
-                const generationModels = imageMode ? i2vModels : t2vModels;
+                const generationModels = imageMode ? allI2V : allT2V;
                 const filteredMain = generationModels
                     .filter(m => m.name.toLowerCase().includes(lf) || m.id.toLowerCase().includes(lf));
                 filteredMain.forEach(m => list.appendChild(makeModelItem(m, false)));
@@ -754,6 +657,51 @@ export function VideoStudio() {
                 list.appendChild(item);
             });
             dropdown.appendChild(list);
+
+        } else if (type === 'mode') {
+            dropdown.classList.add('max-w-[200px]');
+            dropdown.innerHTML = `<div class="text-[10px] font-bold text-secondary uppercase tracking-widest px-3 py-2 border-b border-white/5 mb-2">Mode</div>`;
+            const list = document.createElement('div');
+            list.className = 'flex flex-col gap-1';
+            getCurrentModes(selectedModel).forEach(m => {
+                const item = document.createElement('div');
+                item.className = 'flex items-center justify-between p-3.5 hover:bg-white/5 rounded-2xl cursor-pointer transition-all group';
+                item.innerHTML = `
+                    <span class="text-xs font-bold text-white opacity-80 group-hover:opacity-100 capitalize">${m}</span>
+                    ${selectedMode === m ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d9ff00" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
+                `;
+                item.onclick = (e) => {
+                    e.stopPropagation();
+                    selectedMode = m;
+                    document.getElementById('v-mode-btn-label').textContent = m;
+                    closeDropdown();
+                };
+                list.appendChild(item);
+            });
+            dropdown.appendChild(list);
+
+        } else if (type === 'effect') {
+            dropdown.classList.add('max-w-[240px]');
+            dropdown.classList.remove('max-w-[200px]');
+            dropdown.innerHTML = `<div class="text-[10px] font-bold text-secondary uppercase tracking-widest px-3 py-2 border-b border-white/5 mb-2">Effect Type</div>`;
+            const list = document.createElement('div');
+            list.className = 'flex flex-col gap-1 max-h-[50vh] overflow-y-auto custom-scrollbar';
+            getEffectNamesForModel(selectedModel).forEach(e => {
+                const item = document.createElement('div');
+                item.className = 'flex items-center justify-between p-3 hover:bg-white/5 rounded-2xl cursor-pointer transition-all group';
+                item.innerHTML = `
+                    <span class="text-xs font-bold text-white opacity-80 group-hover:opacity-100">${e}</span>
+                    ${selectedEffectName === e ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d9ff00" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
+                `;
+                item.onclick = (ev) => {
+                    ev.stopPropagation();
+                    selectedEffectName = e;
+                    document.getElementById('v-effect-btn-label').textContent = e;
+                    closeDropdown();
+                };
+                list.appendChild(item);
+            });
+            dropdown.appendChild(list);
         }
 
         // Position dropdown
@@ -786,6 +734,8 @@ export function VideoStudio() {
     durationBtn.onclick = toggleDropdown('duration', durationBtn);
     resolutionBtn.onclick = toggleDropdown('resolution', resolutionBtn);
     qualityBtn.onclick = toggleDropdown('quality', qualityBtn);
+    modeBtn.onclick = toggleDropdown('mode', modeBtn);
+    effectNameBtn.onclick = toggleDropdown('effect', effectNameBtn);
 
     window.addEventListener('click', closeDropdown);
     container.appendChild(dropdown);
@@ -888,21 +838,14 @@ export function VideoStudio() {
             const thumb = document.createElement('div');
             thumb.className = `relative group/thumb cursor-pointer rounded-xl overflow-hidden border-2 transition-all duration-300 ${idx === 0 ? 'border-primary shadow-glow' : 'border-white/10 hover:border-white/30'}`;
 
-            // Safe video creation - prevents XSS from user-provided URLs
-            const video = createSafeVideo(entry.url, 'w-full aspect-square object-cover');
-            video.preload = 'metadata';
-            thumb.appendChild(video);
-
-            // Create overlay with download button
-            const overlay = document.createElement('div');
-            overlay.className = 'absolute inset-0 bg-black/60 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center gap-1';
-            
-            const downloadBtn = document.createElement('button');
-            downloadBtn.className = 'hist-download p-1.5 bg-primary rounded-lg text-black hover:scale-110 transition-transform';
-            downloadBtn.title = 'Download';
-            downloadBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>';
-            overlay.appendChild(downloadBtn);
-            thumb.appendChild(overlay);
+            thumb.innerHTML = `
+                <video src="${entry.url}" preload="metadata" muted class="w-full aspect-square object-cover"></video>
+                <div class="absolute inset-0 bg-black/60 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                    <button class="hist-download p-1.5 bg-primary rounded-lg text-black hover:scale-110 transition-transform" title="Download">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                    </button>
+                </div>
+            `;
 
             thumb.onclick = (e) => {
                 if (e.target.closest('.hist-download')) {
@@ -948,47 +891,6 @@ export function VideoStudio() {
         }
     };
 
-    // --- Wan AI Effect Application (hoisted)
-    async function applySelectedWanEffect() {
-        const effectType = document.getElementById('wan-ai-effect').value;
-        if (!effectType) {
-            alert('Please select a Wan AI effect first');
-            return;
-        }
-
-        const currentVideo = resultVideo.src;
-        if (!currentVideo) {
-            alert('Please generate or upload a video first');
-            return;
-        }
-
-        const button = document.getElementById('apply-wan-effect');
-        const originalText = button.textContent;
-        button.disabled = true;
-        button.textContent = 'Applying Effect...';
-
-        try {
-            showProcessingIndicator('Applying Wan AI Effect...');
-
-            const result = await muapi.applyWanAIEffect(currentVideo, effectType, {
-                prompt: `Apply ${effectType} style transformation`
-            });
-
-            if (result.success) {
-                resultVideo.src = result.url;
-                showToast(`Wan AI ${effectType} effect applied successfully`, 'success');
-            } else {
-                showWanEffectError(new Error(result.error || 'Unknown error'), effectType);
-            }
-        } catch (error) {
-            showWanEffectError(error, effectType);
-        } finally {
-            button.disabled = false;
-            button.textContent = originalText;
-            hideProcessingIndicator();
-        }
-    };
-
     // --- Load history from localStorage ---
     try {
         const saved = JSON.parse(localStorage.getItem('video_history') || '[]');
@@ -999,6 +901,40 @@ export function VideoStudio() {
             renderHistory();
         }
     } catch (e) { /* ignore */ }
+
+    // --- Resume any pending video generations from a previous session ---
+    (async () => {
+        const pending = getPendingJobs('video');
+        if (!pending.length) return;
+
+        const apiKey = localStorage.getItem('muapi_key');
+        if (!apiKey) return; // can't poll without key; jobs remain for next time
+
+        const banner = document.createElement('div');
+        banner.className = 'fixed top-4 left-1/2 -translate-x-1/2 z-[200] bg-[#111] border border-white/10 text-white text-sm px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3';
+        banner.innerHTML = `<span class="animate-spin text-primary">◌</span> <span class="banner-text">Resuming ${pending.length} pending generation${pending.length > 1 ? 's' : ''}…</span>`;
+        document.body.appendChild(banner);
+
+        let remaining = pending.length;
+        pending.forEach(async (job) => {
+            const elapsedAttempts = Math.floor((Date.now() - job.submittedAt) / job.interval);
+            const attemptsLeft = Math.max(1, job.maxAttempts - elapsedAttempts);
+            try {
+                const result = await muapi.pollForResult(job.requestId, apiKey, attemptsLeft, job.interval);
+                const url = result.outputs?.[0] || result.url || result.output?.url;
+                if (url) {
+                    addToHistory({ id: job.requestId, url, ...job.historyMeta, timestamp: new Date().toISOString() });
+                }
+            } catch (e) {
+                console.warn('[VideoStudio] Pending job failed on resume:', job.requestId, e.message);
+            } finally {
+                removePendingJob(job.requestId);
+                remaining--;
+                if (remaining === 0) banner.remove();
+                else banner.querySelector('.banner-text').textContent = `Resuming ${remaining} pending generation${remaining > 1 ? 's' : ''}…`;
+            }
+        });
+    })();
 
     // --- Button Handlers ---
     downloadBtn.onclick = () => {
@@ -1026,18 +962,15 @@ export function VideoStudio() {
         picker.reset();
         uploadedImageUrl = null;
         imageMode = false;
-        effectsMode = false;
         uploadedVideoUrl = null;
         v2vMode = false;
         showVideoIcon();
-        selectedModel = t2vModels[0].id;
-        selectedModelName = t2vModels[0].name;
+        selectedModel = allT2V[0].id;
+        selectedModelName = allT2V[0].name;
         document.getElementById('v-model-btn-label').textContent = selectedModelName;
         updateControlsForModel(selectedModel);
         textarea.placeholder = 'Describe the video you want to create';
         textarea.disabled = false;
-        // Hide Wan AI section
-        if (wanAiSection) wanAiSection.classList.add('hidden');
         textarea.focus();
     };
 
@@ -1079,11 +1012,6 @@ export function VideoStudio() {
                 alert('Please upload a start frame image first.');
                 return;
             }
-        } else if (effectsMode) {
-            if (!uploadedImageUrl) {
-                alert('Please upload an image first for video effects.');
-                return;
-            }
         } else {
             if (!prompt) {
                 alert('Please enter a prompt to generate a video.');
@@ -1091,22 +1019,72 @@ export function VideoStudio() {
             }
         }
 
-        const apiKey = await securityService.getDecryptedKey();
-        if (!apiKey) {
-            AuthModal(() => generateBtn.click());
-            return;
+        const isLocal = isWan2gpModelId(selectedModel);
+
+        // Local Wan2GP generations don't go through Muapi — skip the auth gate.
+        if (!isLocal) {
+            const apiKey = localStorage.getItem('muapi_key');
+            if (!apiKey) {
+                AuthModal(() => generateBtn.click());
+                return;
+            }
         }
 
         hero.classList.add('opacity-0', 'scale-95', '-translate-y-10', 'pointer-events-none');
         generateBtn.disabled = true;
         generateBtn.innerHTML = `<span class="animate-spin inline-block mr-2 text-black">◌</span> Generating...`;
 
+        // For local generations, surface step progress in the button label.
+        let unsubscribeProgress = null;
+        if (isLocal) {
+            unsubscribeProgress = localAI.onProgress(({ status, progress }) => {
+                const pct = typeof progress === 'number' ? Math.round(progress * 100) : null;
+                generateBtn.innerHTML = `<span class="animate-spin inline-block mr-2 text-black">◌</span> ${status || 'Generating'}${pct != null ? ` ${pct}%` : '…'}`;
+            });
+        }
+
+        let hadError = false;
+        let capturedRequestId = null;
+        const historyMeta = { prompt, model: selectedModel, aspect_ratio: selectedAr, duration: selectedDuration };
+
+        const onRequestId = (rid) => {
+            capturedRequestId = rid;
+            savePendingJob({ requestId: rid, studioType: 'video', historyMeta, maxAttempts: 900, interval: 2000, submittedAt: Date.now() });
+        };
+
         try {
+            // ─── Local Wan2GP path ───────────────────────────────────────────
+            // Uploaded image URLs were minted by uploadFileToWan2gp(), so
+            // wan2gpProvider can rehydrate the Gradio file descriptor.
+            if (isLocal) {
+                const localParams = {
+                    model: selectedModel,
+                    prompt: prompt || '',
+                    aspect_ratio: selectedAr,
+                };
+                if (imageMode && uploadedImageUrl) localParams.image = uploadedImageUrl;
+                const res = await localAI.generate(localParams);
+                console.log('[VideoStudio] Local response:', res);
+                if (res && res.url) {
+                    const genId = Date.now().toString();
+                    lastGenerationId = null;
+                    lastGenerationModel = null;
+                    addToHistory({ id: genId, url: res.url, prompt, model: selectedModel, aspect_ratio: selectedAr, timestamp: new Date().toISOString() });
+                    showVideoInCanvas(res.url, selectedModel);
+                } else {
+                    throw new Error('No video URL returned by Wan2GP');
+                }
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = `Generate ✨`;
+                return;
+            }
+
             if (v2vMode) {
-                const res = await muapi.processV2V({ model: selectedModel, video_url: uploadedVideoUrl });
+                const res = await muapi.processV2V({ model: selectedModel, video_url: uploadedVideoUrl, onRequestId });
                 console.log('[VideoStudio] V2V response:', res);
                 if (res && res.url) {
-                    const genId = res.id || res.request_id || Date.now().toString();
+                    if (capturedRequestId) removePendingJob(capturedRequestId);
+                    const genId = res.id || capturedRequestId || Date.now().toString();
                     lastGenerationId = null;
                     lastGenerationModel = null;
                     addToHistory({ id: genId, url: res.url, prompt: '', model: selectedModel, timestamp: new Date().toISOString() });
@@ -1123,22 +1101,24 @@ export function VideoStudio() {
                 const i2vParams = {
                     model: selectedModel,
                     image_url: uploadedImageUrl,
+                    onRequestId,
                 };
-                if (prompt) i2vParams.prompt = prompt;
-                if (negativePrompt) i2vParams.negative_prompt = negativePrompt;
-                if (seed && seed !== -1) i2vParams.seed = seed;
+                i2vParams.prompt = prompt || '';
                 i2vParams.aspect_ratio = selectedAr;
                 const durations = getCurrentDurations(selectedModel);
                 if (durations.length > 0) i2vParams.duration = selectedDuration;
                 const resolutions = getCurrentResolutions(selectedModel);
                 if (resolutions.length > 0) i2vParams.resolution = selectedResolution;
                 if (selectedQuality) i2vParams.quality = selectedQuality;
+                if (selectedMode) i2vParams.mode = selectedMode;
+                if (selectedEffectName) i2vParams.name = selectedEffectName;
 
                 const res = await muapi.generateI2V(i2vParams);
                 console.log('[VideoStudio] I2V response:', res);
 
                 if (res && res.url) {
-                    const genId = res.id || res.request_id || Date.now().toString();
+                    if (capturedRequestId) removePendingJob(capturedRequestId);
+                    const genId = res.id || capturedRequestId || Date.now().toString();
                     if (selectedModel === 'seedance-v2.0-i2v') {
                         lastGenerationId = genId;
                         lastGenerationModel = selectedModel;
@@ -1156,40 +1136,9 @@ export function VideoStudio() {
                 return;
             }
 
-            if (effectsMode) {
-                if (!uploadedImageUrl) {
-                    alert('Please upload an image first for video effects.');
-                    return;
-                }
-                const effectsParams = {
-                    image_url: uploadedImageUrl,
-                    aspect_ratio: selectedAr,
-                    resolution: selectedResolution,
-                };
-                if (prompt) effectsParams.prompt = prompt;
-
-                const res = await muapi.generateVideoEffect(effectsParams);
-                console.log('[VideoStudio] Video Effects response:', res);
-
-                if (res && res.url) {
-                    const genId = res.id || res.request_id || Date.now().toString();
-                    lastGenerationId = null;
-                    lastGenerationModel = null;
-                    addToHistory({ id: genId, url: res.url, prompt, model: selectedModel, aspect_ratio: selectedAr, timestamp: new Date().toISOString() });
-                    showVideoInCanvas(res.url, selectedModel);
-                } else {
-                    throw new Error('No video URL returned by API');
-                }
-                generateBtn.disabled = false;
-                generateBtn.innerHTML = `Generate ✨`;
-                return;
-            }
-
-            const params = { model: selectedModel };
+            const params = { model: selectedModel, onRequestId };
 
             if (prompt) params.prompt = prompt;
-            if (negativePrompt) params.negative_prompt = negativePrompt;
-            if (seed && seed !== -1) params.seed = seed;
 
             // Extend mode: pass stored request_id, skip aspect_ratio
             if (isExtendMode) {
@@ -1205,13 +1154,15 @@ export function VideoStudio() {
             if (resolutions.length > 0) params.resolution = selectedResolution;
 
             if (selectedQuality) params.quality = selectedQuality;
+            if (selectedMode) params.mode = selectedMode;
 
             const res = await muapi.generateVideo(params);
 
             console.log('[VideoStudio] Full response:', res);
 
             if (res && res.url) {
-                const genId = res.id || res.request_id || Date.now().toString();
+                if (capturedRequestId) removePendingJob(capturedRequestId);
+                const genId = res.id || capturedRequestId || Date.now().toString();
                 // Store request_id for seedance-v2.0 models (enables Extend button)
                 if (selectedModel === 'seedance-v2.0-t2v' || selectedModel === 'seedance-v2.0-i2v') {
                     lastGenerationId = genId;
@@ -1236,102 +1187,22 @@ export function VideoStudio() {
                 throw new Error('No video URL returned by API');
             }
         } catch (e) {
-            generateBtn.innerHTML = `Error: ${e.message.slice(0, 40)}`;
+            hadError = true;
+            if (capturedRequestId) removePendingJob(capturedRequestId);
+            console.error(e);
+            // Restore hero so the page doesn't look broken after a failed generation
+            hero.classList.remove('opacity-0', 'scale-95', '-translate-y-10', 'pointer-events-none');
+            generateBtn.innerHTML = `Error: ${e.message.slice(0, 60)}`;
             setTimeout(() => {
                 generateBtn.innerHTML = `Generate ✨`;
-                generateBtn.disabled = false;
-            }, 3000);
-            return;
+            }, 4000);
+        } finally {
+            generateBtn.disabled = false;
+            if (typeof unsubscribeProgress === 'function') unsubscribeProgress();
+            // Only reset the label on success; the catch timeout handles the error case
+            if (!hadError) generateBtn.innerHTML = `Generate ✨`;
         }
-        generateBtn.disabled = false;
-        generateBtn.innerHTML = `Generate ✨`;
     };
-
-    // --- Wan AI Effects UI Helper Functions ---
-
-    function showProcessingIndicator(message = 'Processing...') {
-        const indicator = document.createElement('div');
-        indicator.id = 'wan-processing-indicator';
-        indicator.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-purple-500/90 text-white px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-3';
-        indicator.innerHTML = `
-            <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-            <span class="text-sm font-medium">${message}</span>
-        `;
-
-        document.body.appendChild(indicator);
-    }
-
-    function hideProcessingIndicator() {
-        const indicator = document.getElementById('wan-processing-indicator');
-        if (indicator) indicator.remove();
-    }
-
-    function showWanEffectError(error, effectType) {
-        const errorToast = document.createElement('div');
-        errorToast.className = 'fixed top-4 right-4 bg-red-500/90 text-white px-4 py-3 rounded-lg shadow-lg z-50 max-w-sm';
-        errorToast.innerHTML = `
-            <div class="flex items-start gap-3">
-                <div class="text-red-200 mt-0.5">🎭</div>
-                <div class="flex-1">
-                    <div class="font-semibold text-sm">Wan AI Effect Failed</div>
-                    <div class="text-xs opacity-90 mt-1">${effectType}: ${error.message.slice(0, 80)}...</div>
-                    <div class="text-xs opacity-75 mt-1">Using original video</div>
-                </div>
-            </div>
-        `;
-
-        document.body.appendChild(errorToast);
-        setTimeout(() => errorToast.remove(), 5000);
-    }
-
-    // Add validation and better UX
-    function validateWanEffectSelection() {
-        const effectSelect = document.getElementById('wan-ai-effect');
-        const applyButton = document.getElementById('apply-wan-effect');
-
-        if (effectSelect && applyButton) {
-            if (effectSelect.value) {
-                applyButton.disabled = false;
-                applyButton.classList.remove('opacity-50');
-            } else {
-                applyButton.disabled = true;
-                applyButton.classList.add('opacity-50');
-            }
-        }
-    }
-
-    // Initialize validation when Wan AI section is created
-    const wanEffectSelect = document.getElementById('wan-ai-effect');
-    if (wanEffectSelect) {
-        wanEffectSelect.addEventListener('change', validateWanEffectSelection);
-        validateWanEffectSelection(); // Initial validation
-    }
-
-    // GTM Prompt Modal Function
-    function openGTMPromptModal(promptTextarea) {
-        try {
-            const modal = new GTMPromptModal({
-                appTheme: 'video-studio',
-                onPromptGenerated: (generatedPrompt) => {
-                    // Load the generated prompt into the textarea
-                    promptTextarea.value = generatedPrompt;
-                    promptTextarea.dispatchEvent(new Event('input', { bubbles: true }));
-
-                    // Adjust textarea height
-                    promptTextarea.style.height = 'auto';
-                    const maxHeight = window.innerWidth < 768 ? 150 : 250;
-                    promptTextarea.style.height = Math.min(promptTextarea.scrollHeight, maxHeight) + 'px';
-
-                    // Show success message (you might want to add a toast system to VideoStudio)
-                    console.log('GTM-optimized prompt loaded successfully!');
-                }
-            });
-            modal.open();
-        } catch (error) {
-            console.error('GTM Prompt Modal error:', error);
-            alert('Failed to open GTM Prompt Enhancer');
-        }
-    }
 
     return container;
 }

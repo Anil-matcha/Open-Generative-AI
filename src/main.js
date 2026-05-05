@@ -45,6 +45,43 @@ if (typeof document !== 'undefined') {
     checkConfigAndShowBanner();
   }
 }
+const app = document.querySelector('#app');
+let contentArea;
+
+// Router
+function navigate(page) {
+  if (!contentArea) return;
+  contentArea.innerHTML = '';
+
+  if (page === 'image') {
+    contentArea.appendChild(ImageStudio());
+  } else if (page === 'video') {
+    import('./components/VideoStudio.js').then(({ VideoStudio }) => {
+      contentArea.appendChild(VideoStudio());
+    });
+  } else if (page === 'cinema') {
+    import('./components/CinemaStudio.js').then(({ CinemaStudio }) => {
+      contentArea.appendChild(CinemaStudio());
+    });
+  } else if (page === 'lipsync') {
+    import('./components/LipSyncStudio.js').then(({ LipSyncStudio }) => {
+      contentArea.appendChild(LipSyncStudio());
+    });
+  } else if (page === 'workflows') {
+    import('./components/WorkflowStudio.js').then(({ WorkflowStudio }) => {
+      contentArea.appendChild(WorkflowStudio());
+    });
+  } else if (page === 'agents') {
+    import('./components/AgentStudio.js').then(({ AgentStudio }) => {
+      contentArea.appendChild(AgentStudio());
+    });
+  } else if (page === 'mcp-cli') {
+    import('./components/McpCliStudio.js').then(({ McpCliStudio }) => {
+      contentArea.appendChild(McpCliStudio());
+    });
+>>>>>>> upstream/main
+  }
+}
 
 // Initialize environment validation
 const envConfig = initializeEnvironmentValidation();

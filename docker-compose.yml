@@ -1,0 +1,9 @@
+services:
+  open-generative-ai:
+    build: .
+    container_name: open-generative-ai
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped

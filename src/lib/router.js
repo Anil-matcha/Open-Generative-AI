@@ -19,6 +19,9 @@ const ROUTE_MAP = {
   'Community': 'community',
   'Avatar': 'avatar',
   'Audio': 'audio',
+  'Workflows': 'workflows',
+  'Agents': 'agents',
+  'MCP & CLI': 'mcp-cli',
 };
 
 export function getRouteForItem(item) {
@@ -47,6 +50,9 @@ const pageLoaders = {
   videotools: () => import('../components/VideoToolsStudio.js').then(m => m.VideoToolsStudio()),
   chat: () => import('../components/ChatStudio.js').then(m => m.ChatStudio()),
   lipsync: () => import('../components/LipSyncStudio.js').then(m => m.LipSyncStudio()),
+  workflows: () => import('../components/WorkflowStudio.js').then(m => m.WorkflowStudio()),
+  agents: () => import('../components/AgentStudio.js').then(m => m.AgentStudio()),
+  'mcp-cli': () => import('../components/McpCliStudio.js').then(m => m.McpCliStudio()),
 
   assist: () => import('../components/AssistPage.js').then(m => m.AssistPage()),
   community: () => import('../components/CommunityPage.js').then(m => m.CommunityPage()),

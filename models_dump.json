@@ -1820,6 +1820,50 @@
       }
     },
     {
+      "id": "gpt-image-2",
+      "name": "Gpt Image 2",
+      "endpoint": "gpt-image-2-text-to-image",
+      "family": "gpt-2",
+      "inputs": {
+        "prompt": {
+          "examples": [
+            "A photorealistic product photo of a luxury watch resting on a slab of black marble, dramatic cinematic lighting with a soft rim glow, ultra-detailed metallic textures, shallow depth of field, studio quality."
+          ],
+          "description": "Text prompt describing the image. Up to 20,000 characters supported.",
+          "type": "string",
+          "title": "Prompt",
+          "name": "prompt"
+        },
+        "aspect_ratio": {
+          "enum": [
+            "auto",
+            "1:1",
+            "16:9",
+            "9:16",
+            "4:3",
+            "3:4"
+          ],
+          "title": "Aspect Ratio",
+          "name": "aspect_ratio",
+          "type": "string",
+          "description": "Aspect ratio of the output image.",
+          "default": "auto"
+        },
+        "resolution": {
+          "enum": [
+            "1K",
+            "2K",
+            "4K"
+          ],
+          "title": "Resolution",
+          "name": "resolution",
+          "type": "string",
+          "description": "The target resolution of the generated image.",
+          "default": "2K"
+        }
+      }
+    },
+    {
       "id": "wan2.6-text-to-image",
       "name": "Wan2.6 Text To Image",
       "inputs": {
@@ -2007,27 +2051,40 @@
       "name": "MiniMax Image 01",
       "inputs": {
         "prompt": {
-          "description": "Text prompt describing the image (max 1500 characters)",
           "type": "string",
           "title": "Prompt",
-          "name": "prompt"
+          "name": "prompt",
+          "description": "Text prompt describing the image to generate (max 1500 characters).",
+          "examples": [
+            "A serene mountain lake at sunset with golden reflections on the water, surrounded by pine forests and snow-capped peaks, photorealistic, 8k."
+          ]
         },
         "aspect_ratio": {
-          "enum": ["16:9", "9:16", "1:1", "4:3", "3:4", "3:2", "2:3", "21:9"],
+          "type": "string",
           "title": "Aspect Ratio",
           "name": "aspect_ratio",
-          "type": "string",
-          "description": "Aspect ratio of the output image",
+          "description": "Aspect ratio of the output image.",
+          "enum": [
+            "16:9",
+            "9:16",
+            "1:1",
+            "4:3",
+            "3:4",
+            "3:2",
+            "2:3",
+            "21:9"
+          ],
           "default": "1:1"
         },
         "num_images": {
-          "title": "Number of Images",
-          "name": "num_images",
           "type": "int",
-          "description": "Number of images to generate",
+          "title": "Number of images",
+          "name": "num_images",
+          "description": "Number of images to generate in a single request.",
           "default": 1,
           "minValue": 1,
-          "maxValue": 4
+          "maxValue": 4,
+          "step": 1
         }
       }
     }
