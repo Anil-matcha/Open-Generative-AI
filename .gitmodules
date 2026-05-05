@@ -24,3 +24,6 @@
 [submodule "packages/Open-Poe-AI"]
 	path = packages/Open-Poe-AI
 	url = https://github.com/Anil-matcha/Open-Poe-AI.git
+[submodule "modules/impeccable"]
+	path = modules/impeccable
+	url = https://github.com/deangilmoreremix/impeccable
