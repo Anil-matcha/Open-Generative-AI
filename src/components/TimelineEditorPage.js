@@ -914,7 +914,7 @@ button, input, textarea, select { font: inherit; }
     }
 
     function findSelectedClip() {
-      return state.tracks.flatMap((track) => track.items).find((item) => item.id === state.selectedClipId);
+      return state.tracks.flatMap((track) => track.clips).find((item) => item.id === state.selectedClipId);
     }
 
     function clearPreviewStage() {
@@ -1378,7 +1378,7 @@ button, input, textarea, select { font: inherit; }
             <button class="track-toggle ${track.solo ? 'locked' : ''}" data-toggle="solo">S</button>
             <button class="track-toggle ${track.locked ? 'locked' : ''}" data-toggle="lock">L</button>
           </div>
-          <div class="track-count">${track.items.length} clips</div>
+          <div class="track-count">${track.clips.length} clips</div>
         `;
 
         meta.querySelectorAll('.track-toggle').forEach(btn => {
@@ -1395,7 +1395,7 @@ button, input, textarea, select { font: inherit; }
         lane.className = 'track-lane';
         lane.dataset.trackId = track.id;
 
-        track.items.forEach(clip => {
+        track.clips.forEach(clip => {
           const clipEl = document.createElement('button');
           clipEl.className = `clip ${state.selectedClipId === clip.id ? 'active' : ''}`;
           const leftPercent = (clip.start / state.timelineSeconds) * 100;
@@ -1431,7 +1431,7 @@ button, input, textarea, select { font: inherit; }
           solo: track.solo,
           opacity: track.opacity || 1,
           blendMode: track.blendMode || 'normal',
-          items: track.items.map(clip => ({
+          items: track.clips.map(clip => ({
             id: clip.id,
             name: clip.name,
             text: clip.heading || clip.name,
@@ -1485,9 +1485,9 @@ button, input, textarea, select { font: inherit; }
               state.tracks.forEach(t => t.items = t.items.filter(c => c.id !== clip.id));
               // Add to new track
               clip.left = Math.max(0, Math.min(100 - clip.width, percent));
-              track.items.push(clip);
+              track.clips.push(clip);
               // Sort clips by left
-              track.items.sort((a, b) => a.left - b.left);
+              track.clips.sort((a, b) => a.left - b.left);
               saveStateSnapshot(state);
               renderTracks();
               showToast(`Clip moved to ${track.name}`);
@@ -1506,7 +1506,7 @@ button, input, textarea, select { font: inherit; }
               extra.body = 'Dragged text asset.';
     }
             const newClip = { id: Date.now(), name: data.label, left: Math.max(0, percent), width: 16, type: data.mediaType, ...extra };
-            track.items.push(newClip);
+            track.clips.push(newClip);
             state.selectedClipId = newClip.id;
             saveStateSnapshot(state);
             renderTracks();
@@ -1514,7 +1514,7 @@ button, input, textarea, select { font: inherit; }
             showToast(`${data.label} added to ${track.name}`);
           }
         });
-        track.items.forEach((clip) => {
+        track.clips.forEach((clip) => {
           // Convert clip format for enhanced renderer
           const enhancedClip = {
             id: clip.id,
@@ -1813,7 +1813,7 @@ button, input, textarea, select { font: inherit; }
                 tracks: state.tracks.map(track => ({
                   id: track.id,
                   name: track.name,
-                  clipCount: track.items.length
+                  clipCount: track.clips.length
                 }))
               }
             }
@@ -1880,7 +1880,7 @@ button, input, textarea, select { font: inherit; }
         modifications.clipChanges.forEach(change => {
           const track = state.tracks.find(t => t.id === change.trackId);
           if (track) {
-            const clip = track.items.find(c => c.id === change.clipId);
+            const clip = track.clips.find(c => c.id === change.clipId);
             if (clip) {
               Object.assign(clip, change.updates);
             }
@@ -1903,7 +1903,7 @@ button, input, textarea, select { font: inherit; }
         modifications.newClips.forEach(clipData => {
           const track = state.tracks.find(t => t.name === clipData.trackName);
           if (track) {
-            track.items.push(clipData.clip);
+            track.clips.push(clipData.clip);
             state.selectedClipId = clipData.clip.id;
           }
         });
@@ -1941,7 +1941,7 @@ button, input, textarea, select { font: inherit; }
       const track = state.tracks.find(t => t.items.some(c => c.id === selectedClip.id));
       if (!track) return;
 
-      const clipIndex = track.items.findIndex(c => c.id === selectedClip.id);
+      const clipIndex = track.clips.findIndex(c => c.id === selectedClip.id);
       const splitPosition = (state.playheadPercent / 100) * 100; // Convert to clip width percentage
 
       if (splitPosition <= selectedClip.left || splitPosition >= selectedClip.left + selectedClip.width) {
@@ -1964,7 +1964,7 @@ button, input, textarea, select { font: inherit; }
       };
 
       // Replace the original clip with the two new ones
-      track.items.splice(clipIndex, 1, leftClip, rightClip);
+      track.clips.splice(clipIndex, 1, leftClip, rightClip);
       state.selectedClipId = leftClip.id;
 
       renderTracks();
@@ -2559,7 +2559,7 @@ button, input, textarea, select { font: inherit; }
         templateData.clips.forEach(clip => {
           const track = state.tracks.find(t => t.name === clip.trackType);
           if (track) {
-            track.items.push({ ...clip, id: Date.now() });
+            track.clips.push({ ...clip, id: Date.now() });
           }
         });
       }
@@ -3523,7 +3523,7 @@ button, input, textarea, select { font: inherit; }
         const timelineEditorInterface = {
           getState: () => state,
           getSelectedClips: () => {
-            const selectedClip = state.tracks.flatMap(track => track.items).find(item => item.id === state.selectedClipId);
+            const selectedClip = state.tracks.flatMap(track => track.clips).find(item => item.id === state.selectedClipId);
             return selectedClip ? [selectedClip] : [];
           },
           showNotification: (options) => {
