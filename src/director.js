@@ -20,6 +20,10 @@ import { escapeHtml, safeHtml } from './lib/security.js';
 import { initializeEnhancedMuAPI } from './lib/muapiEnhanced.js';
 import { loadConfig } from './lib/muapiConfig.js';
 import { initializeAIOptimizations } from './lib/services/aiIntegration.js';
+// Track reported errors to prevent toast spam in development
+if (typeof window !== 'undefined') {
+  window.__reportedErrors = new Set();
+}
 
 // Show configuration warning banner if critical env vars missing
 if (typeof document !== 'undefined') {
@@ -158,8 +162,15 @@ window.addEventListener('error', (event) => {
     lineno: event.lineno
   });
   
+  // Deduplicate error toasts
+  const errorKey = `${event.message}:${event.filename}:${event.lineno}`;
+  if (!window.__reportedErrors.has(errorKey)) {
+    window.__reportedErrors.add(errorKey);
+  } else {
+    return;
+  }
   // Show error toast notification instead of full page crash
-  showToast('Something went wrong. Please refresh the page.', 'error', 10000);
+  //   showToast('Something went wrong. Please refresh the page.', 'error', 10000);
 });
 
 window.addEventListener('unhandledrejection', (event) => {
@@ -173,7 +184,14 @@ window.addEventListener('unhandledrejection', (event) => {
   }
   
   analytics.trackError('unhandled_rejection', event.reason?.message || String(event.reason));
-  showToast('An operation failed. Please try again.', 'error', 5000);
+  // Deduplicate rejection toasts
+  const rejKey = event.reason?.message || String(event.reason);
+  if (!window.__reportedErrors.has(rejKey)) {
+    window.__reportedErrors.add(rejKey);
+  } else {
+    return;
+  }
+  //   showToast('An operation failed. Please try again.', 'error', 5000);
 });
 
 // Service worker registration for offline support (production)
