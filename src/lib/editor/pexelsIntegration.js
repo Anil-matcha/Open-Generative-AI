@@ -52,7 +52,7 @@ function addPexelsAssetToTimeline(asset, state, showToast, trackType = 'video', 
   const targetTrack = getTargetTrackForPexels(asset.type, state.tracks);
   
   if (!targetTrack) {
-    showToast('No suitable track found. Create a track first.', 'error');
+  // DISABLED:     showToast('No suitable track found. Create a track first.', 'error');
     return null;
   }
   
@@ -110,7 +110,7 @@ function addPexelsAssetToTimeline(asset, state, showToast, trackType = 'video', 
   state.selectedClipId = newClip.id;
   
   // Show success message
-  showToast(`✅ Added "${asset.alt || asset.type}" to timeline`, 'success');
+  // DISABLED:   showToast(`✅ Added "${asset.alt || asset.type}" to timeline`, 'success');
   
   // Dispatch custom event for other systems (analytics, etc.)
   window.dispatchEvent(new CustomEvent('pexelsAssetAdded', {

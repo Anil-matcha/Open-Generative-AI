@@ -4,32 +4,39 @@ import { AuthModal } from './AuthModal.js';
 import { createHeroSection } from '../lib/thumbnails.js';
 import { createInlineInstructions } from './InlineInstructions.js';
 import { GTMPromptModal } from './modals/GTMPromptModal.jsx';
+import { showToast } from '../lib/loading.js';
 
 export function ChatStudio() {
   const container = document.createElement('div');
-  container.className = 'w-full h-full flex flex-col items-center bg-app-bg overflow-y-auto p-6 md:p-10 relative';
+  container.className = 'w-full h-full flex flex-col bg-app-bg overflow-y-auto relative';
 
   let selectedModel = textModels[0];
   const messages = []; // Chat history
   let isGenerating = false;
 
-  // Header with hero banner
-  const header = document.createElement('div');
-  header.className = 'mb-8 animate-fade-in-up text-center w-full max-w-xl';
+  // Top bar with hero banner and inline instructions
+  const topBar = document.createElement('div');
+  topBar.className = 'px-4 md:px-8 pt-6 pb-4 shrink-0 animate-fade-in-up';
+  
   const chatBanner = createHeroSection('chat', 'h-32 md:h-44 mb-4');
   if (chatBanner) {
     const bannerText = document.createElement('div');
-    bannerText.className = 'absolute bottom-0 left-0 right-0 p-5 z-10';
+    bannerText.className = 'absolute bottom-0 left-0 right-0 p-4 z-10';
     bannerText.innerHTML = '<h1 class="text-2xl md:text-4xl font-black text-white tracking-tight mb-2">Chat Studio</h1><p class="text-white/60 text-sm">AI-powered text generation and conversation</p>';
     chatBanner.appendChild(bannerText);
-    header.appendChild(chatBanner);
+    topBar.appendChild(chatBanner);
   }
-  container.appendChild(header);
-
-  // Instructions
+  
   const inlineInstructions = createInlineInstructions('chat');
-  inlineInstructions.classList.add('max-w-2xl', 'mt-6', 'mb-8');
-  container.appendChild(inlineInstructions);
+  inlineInstructions.classList.add('px-4', 'md:px-8', 'mt-6', 'mb-8', 'max-w-2xl', 'mx-auto');
+  topBar.appendChild(inlineInstructions);
+  
+  container.appendChild(topBar);
+
+  // Main content area
+  const contentArea = document.createElement('div');
+  contentArea.className = 'flex-1 overflow-y-auto px-4 md:px-8 pb-8';
+  container.appendChild(contentArea);
 
   // Model selector
   const modelRow = document.createElement('div');
@@ -48,23 +55,23 @@ export function ChatStudio() {
     modelBtns[m.id] = btn;
     modelRow.appendChild(btn);
   });
-  container.appendChild(modelRow);
+  contentArea.appendChild(modelRow);
 
   // Chat container
   const chatContainer = document.createElement('div');
-  chatContainer.className = 'w-full max-w-2xl flex-1 overflow-y-auto mb-6 space-y-4 animate-fade-in-up';
+  chatContainer.className = 'w-full max-w-2xl mx-auto flex-1 overflow-y-auto mb-6 space-y-4 animate-fade-in-up';
   chatContainer.style.animationDelay = '0.2s';
-  container.appendChild(chatContainer);
 
-  // Empty state
   const emptyState = document.createElement('div');
   emptyState.className = 'text-center py-12 text-white/40';
   emptyState.innerHTML = '<svg class="w-16 h-16 mx-auto mb-4 opacity-50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg><p>Start a conversation</p>';
   chatContainer.appendChild(emptyState);
 
+  contentArea.appendChild(chatContainer);
+
   // Input area
   const inputArea = document.createElement('div');
-  inputArea.className = 'w-full max-w-2xl bg-[#111]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-4 flex flex-col gap-3 animate-fade-in-up';
+  inputArea.className = 'w-full max-w-2xl mx-auto bg-[#111]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-4 flex flex-col gap-3 animate-fade-in-up';
   inputArea.style.animationDelay = '0.3s';
 
   // System prompt (optional)
@@ -156,7 +163,7 @@ export function ChatStudio() {
     optionsToggle.textContent = advancedOptions.classList.contains('hidden') ? '▼ Advanced Options' : '▲ Advanced Options';
   };
 
-  container.appendChild(inputArea);
+  contentArea.appendChild(inputArea);
 
   // Helper: Update model buttons
   function updateModelBtns() {
@@ -290,7 +297,7 @@ export function ChatStudio() {
       modal.open();
     } catch (error) {
       console.error('GTM Prompt Modal error:', error);
-      showToast('Failed to open GTM Prompt Enhancer', 'error');
+  // DISABLED:       showToast('Failed to open GTM Prompt Enhancer', 'error');
     }
   }
 

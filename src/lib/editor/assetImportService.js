@@ -247,7 +247,7 @@ class AssetImportService {
     }
 
     // Find or create an image track
-    let imageTrack = timelineState.tracks.find(track => track.type === 'image');
+    const imageTrack = timelineState.tracks.find(track => track.type === 'image');
     if (!imageTrack) {
       // In a real implementation, this would create a new track
       // For now, return the first available track

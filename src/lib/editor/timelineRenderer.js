@@ -74,7 +74,7 @@ export function renderTracks(state, els, showToast) {
         if (key === 'mute') track.muted = !track.muted;
         if (key === 'lock') track.locked = !track.locked;
         renderTracks(state, els, showToast);
-        showToast(track.name + ' ' + key + ' toggled');
+  // DISABLED:         showToast(track.name + ' ' + key + ' toggled');
       });
     });
     const lane = document.createElement('div');
@@ -116,7 +116,7 @@ export function renderTracks(state, els, showToast) {
         state.selectedClipId = item.id;
         updatePreview(state, els, item);
         renderTracks(state, els, showToast);
-        showToast('Item selected');
+  // DISABLED:         showToast('Item selected');
       });
       itemEl.addEventListener('mousedown', (e) => handleItemMouseDown(e, state, els, showToast));
       if (item.type === 'caption') {
@@ -169,7 +169,7 @@ export function renderMedia(state, els, showToast) {
       state.selectedClipId = newId;
       renderTracks(state, els, showToast);
       updatePreview(state, els);
-      showToast(media.label + ' inserted into ' + targetTrack.name + ' track');
+  // DISABLED:       showToast(media.label + ' inserted into ' + targetTrack.name + ' track');
     });
     els.mediaGrid.appendChild(item);
   });

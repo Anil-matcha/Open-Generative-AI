@@ -25,7 +25,7 @@ const DIRECTIONS = [
 
 export function RunwayMotionStudio() {
   const container = document.createElement('div');
-  container.className = 'w-full h-full flex flex-col items-center justify-start bg-app-bg relative p-4 md:p-6 overflow-y-auto custom-scrollbar overflow-x-hidden';
+  container.className = 'w-full h-full flex flex-col bg-app-bg overflow-y-auto custom-scrollbar overflow-x-hidden relative';
 
   // State management
   let uploadedVideoUrl = null;
@@ -40,30 +40,36 @@ export function RunwayMotionStudio() {
   let previewInterval = null;
 
   // ==========================================
-  // 1. HERO SECTION
+  // TOP BAR WITH HERO BANNER
   // ==========================================
-  const hero = document.createElement('div');
-  hero.className = 'flex flex-col items-center mb-6 animate-fade-in-up transition-all duration-700 w-full max-w-5xl';
-
+  const topBar = document.createElement('div');
+  topBar.className = 'px-4 md:px-8 pt-6 pb-4 shrink-0 animate-fade-in-up';
+  
   const heroBanner = createHeroSection('video', 'h-32 md:h-44 mb-4');
   if (heroBanner) {
     const heroContent = document.createElement('div');
-    heroContent.className = 'absolute bottom-0 left-0 right-0 p-6 z-10';
+    heroContent.className = 'absolute bottom-0 left-0 right-0 p-4 z-10';
     heroContent.innerHTML = `
       <h1 class="text-3xl md:text-5xl font-black text-white tracking-tight mb-1">Runway Motion Controls</h1>
       <p class="text-white/60 text-sm font-medium">Advanced camera movements and motion effects for professional video production</p>
     `;
     heroBanner.appendChild(heroContent);
-    hero.appendChild(heroBanner);
+    topBar.appendChild(heroBanner);
   }
-  container.appendChild(hero);
+  
+  container.appendChild(topBar);
 
   // ==========================================
-  // 2. MAIN CONTENT
+  // MAIN CONTENT AREA
   // ==========================================
+  const contentArea = document.createElement('div');
+  contentArea.className = 'flex-1 overflow-y-auto px-4 md:px-8 pb-8';
+  container.appendChild(contentArea);
+
   const contentWrapper = document.createElement('div');
-  contentWrapper.className = 'w-full max-w-6xl relative z-40 animate-fade-in-up';
+  contentWrapper.className = 'w-full max-w-6xl mx-auto relative z-40 animate-fade-in-up';
   contentWrapper.style.animationDelay = '0.1s';
+  contentArea.appendChild(contentWrapper);
 
   // Video Upload Section
   const uploadSection = document.createElement('div');
@@ -95,6 +101,39 @@ export function RunwayMotionStudio() {
   uploadSection.appendChild(uploadPicker.panel);
   contentWrapper.appendChild(uploadSection);
 
+  // Preview Section
+  const previewSection = document.createElement('div');
+  previewSection.className = 'bg-[#111]/90 backdrop-blur-xl border border-white/10 rounded-[1.5rem] p-6 md:p-8 shadow-3xl mb-6';
+  previewSection.id = 'preview-section';
+
+  const previewTitle = document.createElement('div');
+  previewTitle.className = 'mb-6';
+  previewTitle.innerHTML = `
+    <h2 class="text-xl font-black text-white mb-1">Preview</h2>
+    <p class="text-sm text-muted">See your motion effects in action</p>
+  `;
+  previewSection.appendChild(previewTitle);
+
+  const videoPreview = document.createElement('div');
+  videoPreview.className = 'aspect-video bg-black/50 rounded-xl overflow-hidden mb-4 flex items-center justify-center';
+  videoPreview.id = 'video-preview';
+  previewSection.appendChild(videoPreview);
+
+  const previewControls = document.createElement('div');
+  previewControls.className = 'flex gap-3';
+  const playPreviewBtn = document.createElement('button');
+  playPreviewBtn.className = 'flex-1 bg-white/10 text-white py-3 rounded-xl font-bold text-sm hover:bg-white/20 transition-all disabled:opacity-50';
+  playPreviewBtn.textContent = 'Play Preview';
+  playPreviewBtn.onclick = togglePreview;
+  previewControls.appendChild(playPreviewBtn);
+  const stopPreviewBtn = document.createElement('button');
+  stopPreviewBtn.className = 'flex-1 bg-white/10 text-white py-3 rounded-xl font-bold text-sm hover:bg-white/20 transition-all';
+  stopPreviewBtn.textContent = 'Stop';
+  stopPreviewBtn.onclick = stopPreview;
+  previewControls.appendChild(stopPreviewBtn);
+  previewSection.appendChild(previewControls);
+  contentWrapper.appendChild(previewSection);
+
   // Motion Controls Section
   const controlsSection = document.createElement('div');
   controlsSection.className = 'bg-[#111]/90 backdrop-blur-xl border border-white/10 rounded-[1.5rem] p-6 md:p-8 shadow-3xl mb-6';
@@ -106,509 +145,260 @@ export function RunwayMotionStudio() {
     <h2 class="text-xl font-black text-white mb-1">Motion Controls</h2>
     <p class="text-sm text-muted">Configure advanced camera movements and effects</p>
   `;
+  controlsSection.appendChild(controlsTitle);
 
-  // Motion Type Selector
+  // Motion type selection
+  const motionTypeRow = document.createElement('div');
+  motionTypeRow.className = 'mb-6';
+  const motionTypeLabel = document.createElement('div');
+  motionTypeLabel.className = 'text-sm font-bold text-secondary mb-3';
+  motionTypeLabel.textContent = 'Motion Type';
+  motionTypeRow.appendChild(motionTypeLabel);
   const motionTypeGrid = document.createElement('div');
-  motionTypeGrid.className = 'grid grid-cols-2 md:grid-cols-5 gap-3 mb-6';
-
-  MOTION_TYPES.forEach(type => {
+  motionTypeGrid.className = 'grid grid-cols-3 md:grid-cols-5 gap-2';
+  MOTION_TYPES.forEach(motion => {
     const btn = document.createElement('button');
-    btn.className = `motion-type-btn p-4 border border-white/10 rounded-xl hover:border-primary/30 transition-all text-center ${
-      selectedMotionType === type.id ? 'border-primary bg-primary/10' : 'bg-white/[0.03]'
-    }`;
-    btn.dataset.type = type.id;
+    btn.className = `p-3 rounded-xl border transition-all ${selectedMotionType === motion.id ? 'bg-primary/10 border-primary' : 'bg-white/5 border-white/10 hover:border-white/20'}`;
     btn.innerHTML = `
-      <div class="text-2xl mb-2">${type.icon}</div>
-      <div class="text-sm font-bold text-white mb-1">${type.name}</div>
-      <div class="text-xs text-muted">${type.description}</div>
+      <div class="text-2xl mb-1">${motion.icon}</div>
+      <div class="text-xs font-bold">${motion.name}</div>
+      <div class="text-[10px] text-muted mt-1">${motion.description}</div>
     `;
-
     btn.onclick = () => {
-      document.querySelectorAll('.motion-type-btn').forEach(b => {
-        b.classList.remove('border-primary', 'bg-primary/10');
-        b.classList.add('border-white/10', 'bg-white/[0.03]');
-      });
-      btn.classList.remove('border-white/10', 'bg-white/[0.03]');
-      btn.classList.add('border-primary', 'bg-primary/10');
-      selectedMotionType = type.id;
-      updateDirectionOptions();
+      selectedMotionType = motion.id;
+      updateMotionTypeButtons();
     };
-
     motionTypeGrid.appendChild(btn);
   });
+  motionTypeRow.appendChild(motionTypeGrid);
+  controlsSection.appendChild(motionTypeRow);
 
-  // Direction Selector
-  const directionSection = document.createElement('div');
-  directionSection.className = 'mb-6';
-  directionSection.innerHTML = `
-    <label class="text-sm font-bold text-secondary uppercase tracking-wider mb-3 block">Direction</label>
-    <div id="direction-grid" class="grid grid-cols-4 md:grid-cols-8 gap-2"></div>
-  `;
+  // Direction selection
+  const directionRow = document.createElement('div');
+  directionRow.className = 'mb-6';
+  const directionLabel = document.createElement('div');
+  directionLabel.className = 'text-sm font-bold text-secondary mb-3';
+  directionLabel.textContent = 'Direction';
+  directionRow.appendChild(directionLabel);
+  const directionGrid = document.createElement('div');
+  directionGrid.className = 'grid grid-cols-4 md:grid-cols-8 gap-2';
+  DIRECTIONS.forEach(dir => {
+    const btn = document.createElement('button');
+    btn.className = `p-2 rounded-xl border transition-all ${selectedDirection === dir.id ? 'bg-primary/10 border-primary' : 'bg-white/5 border-white/10 hover:border-white/20'}`;
+    btn.innerHTML = `
+      <div class="text-lg">${dir.icon}</div>
+      <div class="text-[10px] font-bold mt-1">${dir.name}</div>
+    `;
+    btn.onclick = () => {
+      selectedDirection = dir.id;
+      updateDirectionButtons();
+    };
+    directionGrid.appendChild(btn);
+  });
+  directionRow.appendChild(directionGrid);
+  controlsSection.appendChild(directionRow);
 
-  // Parameters Section
-  const parametersSection = document.createElement('div');
-  parametersSection.className = 'grid md:grid-cols-2 gap-6 mb-6';
+  // Speed and intensity sliders
+  const slidersRow = document.createElement('div');
+  slidersRow.className = 'grid grid-cols-1 md:grid-cols-2 gap-6 mb-6';
 
-  // Speed Control
   const speedControl = document.createElement('div');
-  speedControl.className = 'flex flex-col gap-3';
   speedControl.innerHTML = `
-    <div class="flex items-center justify-between">
-      <label class="text-sm font-bold text-secondary uppercase tracking-wider">Speed</label>
-      <span id="speed-value" class="text-sm font-bold text-primary">${motionSpeed}</span>
+    <div class="flex items-center justify-between mb-2">
+      <label class="text-sm text-secondary">Speed</label>
+      <span class="text-sm font-bold text-white">${motionSpeed}</span>
     </div>
-    <input type="range" id="speed-slider" min="1" max="10" step="1" value="${motionSpeed}"
-      class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-primary">
-    <div class="flex justify-between text-xs text-muted">
-      <span>Slow</span>
-      <span>Fast</span>
-    </div>
+    <input type="range" min="1" max="10" value="${motionSpeed}" class="w-full accent-primary">
   `;
+  speedControl.querySelector('input').oninput = (e) => {
+    motionSpeed = parseInt(e.target.value);
+    speedControl.querySelector('span').textContent = motionSpeed;
+  };
+  slidersRow.appendChild(speedControl);
 
-  // Intensity Control
   const intensityControl = document.createElement('div');
-  intensityControl.className = 'flex flex-col gap-3';
   intensityControl.innerHTML = `
-    <div class="flex items-center justify-between">
-      <label class="text-sm font-bold text-secondary uppercase tracking-wider">Intensity</label>
-      <span id="intensity-value" class="text-sm font-bold text-primary">${motionIntensity}</span>
+    <div class="flex items-center justify-between mb-2">
+      <label class="text-sm text-secondary">Intensity</label>
+      <span class="text-sm font-bold text-white">${motionIntensity}</span>
     </div>
-    <input type="range" id="intensity-slider" min="1" max="10" step="1" value="${motionIntensity}"
-      class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-primary">
-    <div class="flex justify-between text-xs text-muted">
-      <span>Subtle</span>
-      <span>Extreme</span>
-    </div>
+    <input type="range" min="1" max="10" value="${motionIntensity}" class="w-full accent-primary">
   `;
+  intensityControl.querySelector('input').oninput = (e) => {
+    motionIntensity = parseInt(e.target.value);
+    intensityControl.querySelector('span').textContent = motionIntensity;
+  };
+  slidersRow.appendChild(intensityControl);
 
-  parametersSection.appendChild(speedControl);
-  parametersSection.appendChild(intensityControl);
+  controlsSection.appendChild(slidersRow);
 
-  // Effects Section
-  const effectsSection = document.createElement('div');
-  effectsSection.className = 'grid md:grid-cols-2 gap-6 mb-6';
+  // Motion blur toggle
+  const blurRow = document.createElement('div');
+  blurRow.className = 'flex items-center justify-between mb-6';
+  const blurLabel = document.createElement('span');
+  blurLabel.className = 'text-sm text-secondary';
+  blurLabel.textContent = 'Motion Blur';
+  blurRow.appendChild(blurLabel);
+  const blurToggle = document.createElement('button');
+  blurToggle.className = 'w-12 h-6 rounded-full relative transition-colors ' + (motionBlurEnabled ? 'bg-primary' : 'bg-white/20');
+  blurToggle.innerHTML = `<div class="w-4 h-4 rounded-full bg-white absolute top-1 ${motionBlurEnabled ? 'left-7' : 'left-1'} transition-all"></div>`;
+  blurToggle.onclick = () => {
+    motionBlurEnabled = !motionBlurEnabled;
+    blurToggle.className = 'w-12 h-6 rounded-full relative transition-colors ' + (motionBlurEnabled ? 'bg-primary' : 'bg-white/20');
+    blurToggle.innerHTML = `<div class="w-4 h-4 rounded-full bg-white absolute top-1 ${motionBlurEnabled ? 'left-7' : 'left-1'} transition-all"></div>`;
+  };
+  blurRow.appendChild(blurToggle);
+  controlsSection.appendChild(blurRow);
 
-  // Motion Blur
-  const blurSection = document.createElement('div');
-  blurSection.className = 'flex flex-col gap-3';
-  blurSection.innerHTML = `
-    <div class="flex items-center justify-between">
-      <label class="text-sm font-bold text-secondary uppercase tracking-wider">Motion Blur</label>
-      <label class="relative inline-flex items-center cursor-pointer">
-        <input type="checkbox" id="blur-toggle" class="sr-only peer" ${motionBlurEnabled ? 'checked' : ''}>
-        <div class="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-      </label>
-    </div>
-    <div class="flex items-center justify-between">
-      <span class="text-xs text-muted">Strength</span>
-      <span id="blur-strength-value" class="text-sm font-bold text-primary">${motionBlurStrength}</span>
-    </div>
-    <input type="range" id="blur-strength-slider" min="1" max="10" step="1" value="${motionBlurStrength}"
-      class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-primary" ${motionBlurEnabled ? '' : 'disabled'}>
-  `;
+  // Stabilization toggle
+  const stabRow = document.createElement('div');
+  stabRow.className = 'flex items-center justify-between mb-6';
+  const stabLabel = document.createElement('span');
+  stabLabel.className = 'text-sm text-secondary';
+  stabLabel.textContent = 'Video Stabilization';
+  stabRow.appendChild(stabLabel);
+  const stabToggle = document.createElement('button');
+  stabToggle.className = 'w-12 h-6 rounded-full relative transition-colors ' + (stabilizationEnabled ? 'bg-primary' : 'bg-white/20');
+  stabToggle.innerHTML = `<div class="w-4 h-4 rounded-full bg-white absolute top-1 ${stabilizationEnabled ? 'left-7' : 'left-1'} transition-all"></div>`;
+  stabToggle.onclick = () => {
+    stabilizationEnabled = !stabilizationEnabled;
+    stabToggle.className = 'w-12 h-6 rounded-full relative transition-colors ' + (stabilizationEnabled ? 'bg-primary' : 'bg-white/20');
+    stabToggle.innerHTML = `<div class="w-4 h-4 rounded-full bg-white absolute top-1 ${stabilizationEnabled ? 'left-7' : 'left-1'} transition-all"></div>`;
+  };
+  stabRow.appendChild(stabToggle);
+  controlsSection.appendChild(stabRow);
 
-  // Stabilization
-  const stabilizationSection = document.createElement('div');
-  stabilizationSection.className = 'flex flex-col gap-3';
-  stabilizationSection.innerHTML = `
-    <div class="flex items-center justify-between">
-      <label class="text-sm font-bold text-secondary uppercase tracking-wider">Stabilization</label>
-      <label class="relative inline-flex items-center cursor-pointer">
-        <input type="checkbox" id="stabilization-toggle" class="sr-only peer" ${stabilizationEnabled ? 'checked' : ''}>
-        <div class="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-      </label>
-    </div>
-    <p class="text-xs text-muted">Reduces unwanted camera shake and stabilizes motion</p>
-  `;
+  // Apply button
+  const applyBtn = document.createElement('button');
+  applyBtn.className = 'w-full bg-primary text-black py-4 rounded-xl font-black text-sm hover:shadow-glow transition-all disabled:opacity-50 disabled:cursor-not-allowed';
+  applyBtn.textContent = 'Apply Motion Effects';
+  applyBtn.onclick = handleApply;
+  applyBtn.disabled = !uploadedVideoUrl;
+  controlsSection.appendChild(applyBtn);
 
-  effectsSection.appendChild(blurSection);
-  effectsSection.appendChild(stabilizationSection);
-
-  controlsSection.appendChild(controlsTitle);
-  controlsSection.appendChild(motionTypeGrid);
-  controlsSection.appendChild(directionSection);
-  controlsSection.appendChild(parametersSection);
-  controlsSection.appendChild(effectsSection);
   contentWrapper.appendChild(controlsSection);
 
-  // Preview and Generate Section
-  const previewSection = document.createElement('div');
-  previewSection.className = 'bg-[#111]/90 backdrop-blur-xl border border-white/10 rounded-[1.5rem] p-6 md:p-8 shadow-3xl mb-6';
-
-  const previewTitle = document.createElement('div');
-  previewTitle.className = 'flex items-center justify-between mb-6';
-  previewTitle.innerHTML = `
-    <div>
-      <h2 class="text-xl font-black text-white mb-1">Motion Preview</h2>
-      <p class="text-sm text-muted">See your motion effects in real-time</p>
-    </div>
-    <button id="preview-btn" class="bg-primary/10 border border-primary/30 text-primary px-4 py-2 rounded-lg hover:bg-primary/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-      <span class="text-sm font-bold">Start Preview</span>
-    </button>
-  `;
-
-  const previewContainer = document.createElement('div');
-  previewContainer.className = 'relative bg-black/50 rounded-xl overflow-hidden mb-4';
-  previewContainer.innerHTML = `
-    <div id="preview-video-container" class="aspect-video flex items-center justify-center">
-      <div class="text-center text-muted">
-        <div class="text-4xl mb-2">🎬</div>
-        <p class="text-sm">Upload a video to start previewing motion effects</p>
-      </div>
-    </div>
-    <div id="motion-path-overlay" class="absolute inset-0 pointer-events-none opacity-30"></div>
-  `;
-
-  const generateBtn = document.createElement('button');
-  generateBtn.className = 'w-full bg-primary text-black px-6 py-3 rounded-xl font-black text-sm hover:shadow-glow hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed';
-  generateBtn.disabled = true;
-  generateBtn.innerHTML = '<span class="text-sm font-bold">Apply Motion Effects</span>';
-
-  previewSection.appendChild(previewTitle);
-  previewSection.appendChild(previewContainer);
-  previewSection.appendChild(generateBtn);
-  contentWrapper.appendChild(previewSection);
-
-  container.appendChild(contentWrapper);
-
   // ==========================================
-  // EVENT HANDLERS
+  // HELPER FUNCTIONS
   // ==========================================
-
-  function updateDirectionOptions() {
-    const directionGrid = container.querySelector('#direction-grid');
-    directionGrid.innerHTML = '';
-
-    const relevantDirections = {
-      zoom: ['in', 'out'],
-      spin: ['clockwise', 'counterclockwise'],
-      shake: [], // No direction for shake
-      orbit: ['clockwise', 'counterclockwise'],
-      pan: ['left', 'right', 'up', 'down'],
-    };
-
-    const directions = relevantDirections[selectedMotionType] || [];
-
-    if (directions.length === 0) {
-      directionGrid.innerHTML = '<p class="text-xs text-muted col-span-full">No direction options for this motion type</p>';
-      selectedDirection = 'none';
-      return;
-    }
-
-    DIRECTIONS.filter(d => directions.includes(d.id)).forEach(dir => {
-      const btn = document.createElement('button');
-      btn.className = `direction-btn p-3 border rounded-lg hover:border-primary/30 transition-all text-center ${
-        selectedDirection === dir.id ? 'border-primary bg-primary/10' : 'border-white/10 bg-white/[0.03]'
-      }`;
-      btn.dataset.direction = dir.id;
-      btn.innerHTML = `
-        <div class="text-lg mb-1">${dir.icon}</div>
-        <div class="text-xs text-muted">${dir.name}</div>
-      `;
-
-      btn.onclick = () => {
-        document.querySelectorAll('.direction-btn').forEach(b => {
-          b.classList.remove('border-primary', 'bg-primary/10');
-          b.classList.add('border-white/10', 'bg-white/[0.03]');
-        });
-        btn.classList.remove('border-white/10', 'bg-white/[0.03]');
-        btn.classList.add('border-primary', 'bg-primary/10');
-        selectedDirection = dir.id;
-      };
-
-      directionGrid.appendChild(btn);
-    });
-
-    // Set default direction if current one is not available
-    if (!directions.includes(selectedDirection)) {
-      selectedDirection = directions[0] || 'none';
-      if (directions.length > 0) {
-        directionGrid.querySelector('.direction-btn').click();
-      }
-    }
-  }
 
   function updatePreview() {
-    if (!uploadedVideoUrl) return;
-
-    const previewContainer = container.querySelector('#preview-video-container');
-    previewContainer.innerHTML = `
-      <video id="preview-video" class="w-full h-full object-contain" controls>
-        <source src="${uploadedVideoUrl}" type="video/mp4">
-      </video>
-    `;
-
-    // Add motion path visualization overlay
-    updateMotionPathVisualization();
-  }
-
-  function updateMotionPathVisualization() {
-    const overlay = container.querySelector('#motion-path-overlay');
-    overlay.innerHTML = '';
-
-    // Simple motion path visualization based on selected motion type
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('width', '100%');
-    svg.setAttribute('height', '100%');
-    svg.setAttribute('viewBox', '0 0 400 225');
-    svg.className = 'absolute inset-0';
-
-    let path = '';
-    switch (selectedMotionType) {
-      case 'zoom':
-        path = selectedDirection === 'in'
-          ? 'M200 112.5 L180 92.5 L220 92.5 Z'
-          : 'M200 112.5 L220 132.5 L180 132.5 Z';
-        break;
-      case 'pan':
-        path = selectedDirection === 'left'
-          ? 'M50 112.5 L350 112.5 M330 92.5 L350 112.5 L330 132.5'
-          : 'M350 112.5 L50 112.5 M70 92.5 L50 112.5 L70 132.5';
-        break;
-      case 'orbit':
-        path = 'M200 50 A62.5 62.5 0 1 1 199.9 50 M262.5 112.5 L275 100 L275 125 Z';
-        break;
-      case 'spin':
-        path = 'M200 50 A62.5 62.5 0 1 1 199.9 50 M262.5 112.5 L275 100 L275 125 Z';
-        break;
-      default:
-        path = 'M200 112.5 L200 112.5'; // Dot for static/shake
+    videoPreview.innerHTML = '';
+    if (!uploadedVideoUrl) {
+      videoPreview.innerHTML = '<p class="text-white/40">No video loaded</p>';
+      return;
     }
-
-    const pathElement = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    pathElement.setAttribute('d', path);
-    pathElement.setAttribute('stroke', '#3b82f6');
-    pathElement.setAttribute('stroke-width', '3');
-    pathElement.setAttribute('fill', 'none');
-    pathElement.setAttribute('stroke-dasharray', '10,5');
-
-    svg.appendChild(pathElement);
-    overlay.appendChild(svg);
-  }
-
-  function startPreview() {
-    if (!uploadedVideoUrl || isPreviewing) return;
-
-    isPreviewing = true;
-    const previewBtn = container.querySelector('#preview-btn');
-    previewBtn.innerHTML = '<span class="text-sm font-bold">Stop Preview</span>';
-    previewBtn.classList.add('bg-red-500/10', 'border-red-500/30', 'text-red-400');
-    previewBtn.classList.remove('bg-primary/10', 'border-primary/30', 'text-primary');
-
-    const video = container.querySelector('#preview-video');
-    if (video) {
-      video.currentTime = 0;
-      video.play();
-
-      // Simulate motion preview with CSS transforms
-      applyMotionEffect(video);
-    }
-  }
-
-  function stopPreview() {
-    isPreviewing = false;
-    const previewBtn = container.querySelector('#preview-btn');
-    previewBtn.innerHTML = '<span class="text-sm font-bold">Start Preview</span>';
-    previewBtn.classList.remove('bg-red-500/10', 'border-red-500/30', 'text-red-400');
-    previewBtn.classList.add('bg-primary/10', 'border-primary/30', 'text-primary');
-
-    const video = container.querySelector('#preview-video');
-    if (video) {
-      video.pause();
-      video.style.transform = '';
-      video.style.filter = '';
-    }
-
-    if (previewInterval) {
-      clearInterval(previewInterval);
-      previewInterval = null;
-    }
-  }
-
-  function applyMotionEffect(video) {
-    let frame = 0;
-    const maxFrames = 60; // 1 second at 60fps
-
-    previewInterval = setInterval(() => {
-      if (!isPreviewing || frame >= maxFrames) {
-        clearInterval(previewInterval);
-        previewInterval = null;
-        return;
-      }
-
-      const progress = frame / maxFrames;
-      let transform = '';
-      let filter = '';
-
-      switch (selectedMotionType) {
-        case 'zoom':
-          const scale = selectedDirection === 'in'
-            ? 1 + (progress * motionIntensity * 0.1)
-            : 1 + ((1 - progress) * motionIntensity * 0.1);
-          transform = `scale(${scale})`;
-          break;
-
-        case 'pan':
-          const translateX = selectedDirection === 'left'
-            ? -progress * motionIntensity * 10
-            : selectedDirection === 'right'
-              ? progress * motionIntensity * 10
-              : 0;
-          const translateY = selectedDirection === 'up'
-            ? -progress * motionIntensity * 10
-            : selectedDirection === 'down'
-              ? progress * motionIntensity * 10
-              : 0;
-          transform = `translate(${translateX}px, ${translateY}px)`;
-          break;
-
-        case 'spin':
-          const rotation = selectedDirection === 'clockwise'
-            ? progress * motionIntensity * 36
-            : -progress * motionIntensity * 36;
-          transform = `rotate(${rotation}deg)`;
-          break;
-
-        case 'shake':
-          const shakeX = (Math.random() - 0.5) * motionIntensity * 5;
-          const shakeY = (Math.random() - 0.5) * motionIntensity * 5;
-          transform = `translate(${shakeX}px, ${shakeY}px)`;
-          break;
-
-        case 'orbit':
-          const angle = progress * motionIntensity * 36;
-          const radius = 50;
-          const orbitX = Math.cos(angle * Math.PI / 180) * radius;
-          const orbitY = Math.sin(angle * Math.PI / 180) * radius;
-          transform = `translate(${orbitX}px, ${orbitY}px)`;
-          break;
-      }
-
-      if (motionBlurEnabled) {
-        filter = `blur(${motionBlurStrength * 0.5}px)`;
-      }
-
-      video.style.transform = transform;
-      video.style.filter = filter;
-      video.style.transition = 'none';
-
-      frame++;
-    }, 1000 / 60); // 60fps
+    const video = document.createElement('video');
+    video.src = uploadedVideoUrl;
+    video.controls = false;
+    video.className = 'w-full h-full object-contain';
+    videoPreview.appendChild(video);
   }
 
   function enableControls() {
-    const controlsSection = container.querySelector('#motion-controls-section');
-    controlsSection.style.opacity = '1';
-    controlsSection.style.pointerEvents = 'auto';
-
-    const previewBtn = container.querySelector('#preview-btn');
-    const generateBtn = container.querySelector('#preview-section button:last-child');
-
-    previewBtn.disabled = false;
-    generateBtn.disabled = false;
+    applyBtn.disabled = false;
   }
 
   function disableControls() {
-    const controlsSection = container.querySelector('#motion-controls-section');
-    controlsSection.style.opacity = '0.5';
-    controlsSection.style.pointerEvents = 'none';
-
-    const previewBtn = container.querySelector('#preview-btn');
-    const generateBtn = container.querySelector('#preview-section button:last-child');
-
-    previewBtn.disabled = true;
-    generateBtn.disabled = true;
+    applyBtn.disabled = true;
+    stopPreview();
   }
 
-  // Initialize direction options
-  updateDirectionOptions();
-
-  // Event listeners
-  container.querySelector('#speed-slider').oninput = (e) => {
-    motionSpeed = parseInt(e.target.value);
-    container.querySelector('#speed-value').textContent = motionSpeed;
-  };
-
-  container.querySelector('#intensity-slider').oninput = (e) => {
-    motionIntensity = parseInt(e.target.value);
-    container.querySelector('#intensity-value').textContent = motionIntensity;
-    updateMotionPathVisualization();
-  };
-
-  container.querySelector('#blur-toggle').onchange = (e) => {
-    motionBlurEnabled = e.target.checked;
-    const blurSlider = container.querySelector('#blur-strength-slider');
-    blurSlider.disabled = !motionBlurEnabled;
-  };
-
-  container.querySelector('#blur-strength-slider').oninput = (e) => {
-    motionBlurStrength = parseInt(e.target.value);
-    container.querySelector('#blur-strength-value').textContent = motionBlurStrength;
-  };
-
-  container.querySelector('#stabilization-toggle').onchange = (e) => {
-    stabilizationEnabled = e.target.checked;
-  };
-
-  container.querySelector('#preview-btn').onclick = () => {
+  function togglePreview() {
     if (isPreviewing) {
       stopPreview();
     } else {
       startPreview();
     }
-  };
+  }
 
-  container.querySelector('#preview-section button:last-child').onclick = async () => {
+  function startPreview() {
     if (!uploadedVideoUrl) return;
+    const video = videoPreview.querySelector('video');
+    if (!video) return;
+    video.currentTime = 0;
+    video.play();
+    isPreviewing = true;
+    playPreviewBtn.textContent = 'Pause';
+    playPreviewBtn.onclick = stopPreview;
+    previewInterval = setInterval(() => {
+      if (video.ended) stopPreview();
+    }, 100);
+  }
 
-    const generateBtn = container.querySelector('#preview-section button:last-child');
-    generateBtn.disabled = true;
-    generateBtn.innerHTML = '<div class="animate-spin inline-block mr-2">◌</div><span class="text-sm font-bold">Applying Effects...</span>';
+  function stopPreview() {
+    const video = videoPreview.querySelector('video');
+    if (video) video.pause();
+    isPreviewing = false;
+    playPreviewBtn.textContent = 'Play Preview';
+    playPreviewBtn.onclick = startPreview;
+    if (previewInterval) clearInterval(previewInterval);
+  }
+
+  function updateMotionTypeButtons() {
+    motionTypeGrid.querySelectorAll('button').forEach((btn, idx) => {
+      const motion = MOTION_TYPES[idx];
+      btn.className = `p-3 rounded-xl border transition-all ${selectedMotionType === motion.id ? 'bg-primary/10 border-primary' : 'bg-white/5 border-white/10 hover:border-white/20'}`;
+    });
+  }
+
+  function updateDirectionButtons() {
+    directionGrid.querySelectorAll('button').forEach((btn, idx) => {
+      const dir = DIRECTIONS[idx];
+      btn.className = `p-2 rounded-xl border transition-all ${selectedDirection === dir.id ? 'bg-primary/10 border-primary' : 'bg-white/5 border-white/10 hover:border-white/20'}`;
+    });
+  }
+
+  async function handleApply() {
+    if (!uploadedVideoUrl) {
+      alert('Please upload a video first');
+      return;
+    }
+    const apiKey = await securityService.getDecryptedKey();
+    if (!apiKey) {
+      AuthModal(() => applyBtn.click());
+      return;
+    }
+
+    applyBtn.disabled = true;
+    applyBtn.innerHTML = '<span class="animate-spin inline-block mr-2">&#9711;</span> Processing...';
 
     try {
-      const apiKey = await securityService.getDecryptedKey();
-      if (!apiKey) {
-        throw new Error('Please configure your MuAPI key in settings');
-      }
-
-      // Apply motion effects via API
-      const result = await muapi.applyVideoEffects(uploadedVideoUrl, [{
-        type: 'motion',
-        motionType: selectedMotionType,
+      const params = {
+        model: 'runway-motion-controls',
+        video_url: uploadedVideoUrl,
+        motion_type: selectedMotionType,
         direction: selectedDirection,
         speed: motionSpeed,
         intensity: motionIntensity,
-        motionBlur: motionBlurEnabled ? motionBlurStrength : 0,
+        motion_blur: motionBlurEnabled,
+        blur_strength: motionBlurStrength,
         stabilization: stabilizationEnabled,
-      }]);
+      };
 
-      // Handle successful generation
-      console.log('Motion effects applied:', result);
-
-      // Show success message
-      const successToast = document.createElement('div');
-      successToast.className = 'fixed top-4 right-4 bg-green-500/10 border border-green-500/30 text-green-400 px-4 py-2 rounded-lg z-50';
-      successToast.textContent = 'Motion effects applied successfully!';
-      document.body.appendChild(successToast);
-      setTimeout(() => document.body.removeChild(successToast), 3000);
-
-    } catch (error) {
-      console.error('Error applying motion effects:', error);
-
-      // Show error message
-      const errorToast = document.createElement('div');
-      errorToast.className = 'fixed top-4 right-4 bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-2 rounded-lg z-50';
-      errorToast.textContent = `Error: ${error.message}`;
-      document.body.appendChild(errorToast);
-      setTimeout(() => document.body.removeChild(errorToast), 5000);
+      const result = await muapi.processVideoTool(params);
+      if (result?.url) {
+        // Show result
+        videoPreview.innerHTML = '';
+        const video = document.createElement('video');
+        video.src = result.url;
+        video.controls = true;
+        video.className = 'w-full h-full object-contain';
+        videoPreview.appendChild(video);
+        // Add download link maybe?
+      }
+    } catch (err) {
+      alert(`Error: ${err.message}`);
     } finally {
-      generateBtn.disabled = false;
-      generateBtn.innerHTML = '<span class="text-sm font-bold">Apply Motion Effects</span>';
+      applyBtn.disabled = false;
+      applyBtn.textContent = 'Apply Motion Effects';
     }
-  };
+  }
 
-  // Initial state
-  disableControls();
+  // Initialize
+  updatePreview();
+  updateMotionTypeButtons();
+  updateDirectionButtons();
 
   return container;
 }

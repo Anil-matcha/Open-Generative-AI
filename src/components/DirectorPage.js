@@ -809,7 +809,7 @@ export function DirectorPage() {
         btn.onclick = async () => {
             const format = btn.dataset.format;
             try {
-                showToast(`Starting export as ${format.toUpperCase()}...`, 'info');
+  // DISABLED:                 showToast(`Starting export as ${format.toUpperCase()}...`, 'info');
 
                 const { data, error } = await supabase.functions.invoke('videoagent', {
                     body: {
@@ -824,10 +824,10 @@ export function DirectorPage() {
 
                 if (error) throw error;
 
-                showToast(`Export job started. Job ID: ${data.jobId}`, 'success');
+  // DISABLED:                 showToast(`Export job started. Job ID: ${data.jobId}`, 'success');
             } catch (error) {
                 console.error('Export failed:', error);
-                showToast(`Export failed: ${error.message}`, 'error');
+  // DISABLED:                 showToast(`Export failed: ${error.message}`, 'error');
             }
         };
     });
@@ -895,13 +895,13 @@ export function DirectorPage() {
         if (!directorRuntimeInstance) return;
 
         try {
-            showToast('Generating storyboard frame...', 'info');
+  // DISABLED:             showToast('Generating storyboard frame...', 'info');
             await directorRuntimeInstance.generateFrame(frameId);
             updateStoryboardFrames();
-            showToast('Storyboard frame generated successfully!', 'success');
+  // DISABLED:             showToast('Storyboard frame generated successfully!', 'success');
         } catch (error) {
             console.error('Frame generation failed:', error);
-            showToast(`Frame generation failed: ${error.message}`, 'error');
+  // DISABLED:             showToast(`Frame generation failed: ${error.message}`, 'error');
         }
     };
 
@@ -909,13 +909,13 @@ export function DirectorPage() {
         if (!directorRuntimeInstance) return;
 
         try {
-            showToast('Generating all storyboard frames...', 'info');
+  // DISABLED:             showToast('Generating all storyboard frames...', 'info');
             await directorRuntimeInstance.generateAllFrames();
             updateStoryboardFrames();
-            showToast('All storyboard frames generated successfully!', 'success');
+  // DISABLED:             showToast('All storyboard frames generated successfully!', 'success');
         } catch (error) {
             console.error('Batch frame generation failed:', error);
-            showToast(`Batch generation failed: ${error.message}`, 'error');
+  // DISABLED:             showToast(`Batch generation failed: ${error.message}`, 'error');
         }
     };
 
@@ -938,7 +938,7 @@ export function DirectorPage() {
                         videoElement.style.display = 'block';
                         uploadPlaceholder.style.display = 'none';
                     }
-                    showToast('Video uploaded successfully', 'success');
+  // DISABLED:                     showToast('Video uploaded successfully', 'success');
                     updateTimelinePreview();
                 },
                 onError: (errors) => {

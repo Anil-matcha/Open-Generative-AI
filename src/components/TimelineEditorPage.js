@@ -725,12 +725,12 @@ button, input, textarea, select { font: inherit; }
             return track;
           });
         }
-        showToast('Project loaded from local storage', 'success');
+  // DISABLED:         showToast('Project loaded from local storage', 'success');
         return { ...createState(), ...projectData };
       }
     } catch (err) {
       console.error('Failed to load project:', err);
-      showToast('Failed to load saved project', 'error');
+  // DISABLED:       showToast('Failed to load saved project', 'error');
     }
     return createState();
   }
@@ -750,10 +750,10 @@ button, input, textarea, select { font: inherit; }
         timestamp: Date.now()
       };
       localStorage.setItem('timeline-editor-project', JSON.stringify(projectData));
-      showToast('Project saved locally', 'success');
+  // DISABLED:       showToast('Project saved locally', 'success');
     } catch (err) {
       console.error('Failed to save project:', err);
-      showToast('Failed to save project', 'error');
+  // DISABLED:       showToast('Failed to save project', 'error');
     }
   }
 
@@ -773,7 +773,7 @@ button, input, textarea, select { font: inherit; }
 
   function undo(state) {
     if (state.undoStack.length === 0) {
-      showToast('Nothing to undo', 'warning');
+  // DISABLED:       showToast('Nothing to undo', 'warning');
       return false;
     }
     const snapshot = state.undoStack.pop();
@@ -784,13 +784,13 @@ button, input, textarea, select { font: inherit; }
       playheadPercent: state.playheadPercent
     })));
     Object.assign(state, snapshot);
-    showToast('Action undone', 'info');
+  // DISABLED:     showToast('Action undone', 'info');
     return true;
   }
 
   function redo(state) {
     if (state.redoStack.length === 0) {
-      showToast('Nothing to redo', 'warning');
+  // DISABLED:       showToast('Nothing to redo', 'warning');
       return false;
     }
     const snapshot = state.redoStack.pop();
@@ -801,7 +801,7 @@ button, input, textarea, select { font: inherit; }
       playheadPercent: state.playheadPercent
     })));
     Object.assign(state, snapshot);
-    showToast('Action redone', 'info');
+  // DISABLED:     showToast('Action redone', 'info');
     return true;
   }
 
@@ -1042,13 +1042,13 @@ button, input, textarea, select { font: inherit; }
       const previewCard = els.previewStage.closest('.preview-card');
       if (previewCard) {
         previewCard.style.display = previewCard.style.display === 'none' ? 'block' : 'none';
-        showToast('Preview visibility toggled', 'info');
+  // DISABLED:         showToast('Preview visibility toggled', 'info');
       }
     }
 
     function openMonitorSettings() {
       // Could open a modal with monitor/display settings
-      showToast('Monitor settings opened', 'info');
+  // DISABLED:       showToast('Monitor settings opened', 'info');
     }
 
     function openMediaLibrary() {
@@ -1056,7 +1056,7 @@ button, input, textarea, select { font: inherit; }
       const mediaGrid = els.mediaGrid;
       if (mediaGrid) {
         mediaGrid.scrollIntoView({ behavior: 'smooth' });
-        showToast('Media library focused', 'info');
+  // DISABLED:         showToast('Media library focused', 'info');
       }
     }
 
@@ -1065,7 +1065,7 @@ button, input, textarea, select { font: inherit; }
       const quickCommands = els.quickCommands;
       if (quickCommands) {
         quickCommands.style.display = quickCommands.style.display === 'none' ? 'flex' : 'none';
-        showToast('Quick AI actions toggled', 'info');
+  // DISABLED:         showToast('Quick AI actions toggled', 'info');
       }
     }
 
@@ -1073,43 +1073,43 @@ button, input, textarea, select { font: inherit; }
       // Focus on audio track or open music tools
       const audioTrack = state.tracks.find(t => t.name === 'Audio');
       if (audioTrack) {
-        showToast('Audio tools opened', 'info');
+  // DISABLED:         showToast('Audio tools opened', 'info');
       } else {
-        showToast('No audio track found', 'warning');
+  // DISABLED:         showToast('No audio track found', 'warning');
       }
     }
 
     function openAudioControls() {
       // Open audio mixer or controls
-      showToast('Audio controls opened', 'info');
+  // DISABLED:       showToast('Audio controls opened', 'info');
     }
 
     function openVideoTools() {
       // Open video editing tools
-      showToast('Video tools opened', 'info');
+  // DISABLED:       showToast('Video tools opened', 'info');
     }
 
     function openProfileTools() {
       // Open user profile or project settings
-      showToast('Profile tools opened', 'info');
+  // DISABLED:       showToast('Profile tools opened', 'info');
     }
 
     function openEditorSettings() {
       // Open editor preferences/settings
-      showToast('Editor settings opened', 'info');
+  // DISABLED:       showToast('Editor settings opened', 'info');
     }
 
     function focusChatInput() {
       // Focus the chat input field
       if (els.chatInput) {
         els.chatInput.focus();
-        showToast('Chat input focused', 'info');
+  // DISABLED:         showToast('Chat input focused', 'info');
       }
     }
 
     function openProjectNotes() {
       // Open project notes or clipboard
-      showToast('Project notes opened', 'info');
+  // DISABLED:       showToast('Project notes opened', 'info');
     }
 
     // Modal functions for timeline-specific triggers
@@ -1120,13 +1120,13 @@ button, input, textarea, select { font: inherit; }
           onComplete: (result) => {
             // Add end screen elements to timeline
             addEndScreenToTimeline(result, state);
-            showToast('End screen elements added successfully', 'success');
+  // DISABLED:             showToast('End screen elements added successfully', 'success');
           },
           onError: (error) => showToast(`End screen creation failed: ${error}`, 'error')
         });
         modal.open();
       } catch (error) {
-        showToast('Failed to open End Screen Modal', 'error');
+  // DISABLED:         showToast('Failed to open End Screen Modal', 'error');
       }
     }
 
@@ -1136,13 +1136,13 @@ button, input, textarea, select { font: inherit; }
           projectData: state,
           onComplete: (result) => {
             state.projectId = result.projectId;
-            showToast('Project saved successfully', 'success');
+  // DISABLED:             showToast('Project saved successfully', 'success');
           },
           onError: (error) => showToast(`Project save failed: ${error}`, 'error')
         });
         modal.open();
       } catch (error) {
-        showToast('Failed to open Save Project Modal', 'error');
+  // DISABLED:         showToast('Failed to open Save Project Modal', 'error');
       }
     }
 
@@ -1152,13 +1152,13 @@ button, input, textarea, select { font: inherit; }
           settings: state.settings || {},
           onComplete: (result) => {
             state.settings = result;
-            showToast('Settings updated successfully', 'success');
+  // DISABLED:             showToast('Settings updated successfully', 'success');
           },
           onError: (error) => showToast(`Settings update failed: ${error}`, 'error')
         });
         modal.open();
       } catch (error) {
-        showToast('Failed to open Settings Modal', 'error');
+  // DISABLED:         showToast('Failed to open Settings Modal', 'error');
       }
     }
 
@@ -1166,13 +1166,13 @@ button, input, textarea, select { font: inherit; }
       try {
         const modal = new BillingModal({
           onComplete: (result) => {
-            showToast('Billing updated successfully', 'success');
+  // DISABLED:             showToast('Billing updated successfully', 'success');
           },
           onError: (error) => showToast(`Billing update failed: ${error}`, 'error')
         });
         modal.open();
       } catch (error) {
-        showToast('Failed to open Billing Modal', 'error');
+  // DISABLED:         showToast('Failed to open Billing Modal', 'error');
       }
     }
 
@@ -1181,13 +1181,13 @@ button, input, textarea, select { font: inherit; }
         const modal = new ConnectModal({
           onComplete: (result) => {
             state.connections = result.connections;
-            showToast('Connections updated successfully', 'success');
+  // DISABLED:             showToast('Connections updated successfully', 'success');
           },
           onError: (error) => showToast(`Connection setup failed: ${error}`, 'error')
         });
         modal.open();
       } catch (error) {
-        showToast('Failed to open Connect Modal', 'error');
+  // DISABLED:         showToast('Failed to open Connect Modal', 'error');
       }
     }
 
@@ -1196,13 +1196,13 @@ button, input, textarea, select { font: inherit; }
         const modal = new PreviewMediaModal({
           mediaData: state.tracks.flatMap(t => t.clips),
           onComplete: (result) => {
-            showToast('Media preview completed', 'success');
+  // DISABLED:             showToast('Media preview completed', 'success');
           },
           onError: (error) => showToast(`Media preview failed: ${error}`, 'error')
         });
         modal.open();
       } catch (error) {
-        showToast('Failed to open Preview Media Modal', 'error');
+  // DISABLED:         showToast('Failed to open Preview Media Modal', 'error');
       }
     }
 
@@ -1211,13 +1211,13 @@ button, input, textarea, select { font: inherit; }
         const modal = new VideoPlayerModal({
           timelineData: state,
           onComplete: (result) => {
-            showToast('Video playback completed', 'success');
+  // DISABLED:             showToast('Video playback completed', 'success');
           },
           onError: (error) => showToast(`Video player error: ${error}`, 'error')
         });
         modal.open();
       } catch (error) {
-        showToast('Failed to open Video Player Modal', 'error');
+  // DISABLED:         showToast('Failed to open Video Player Modal', 'error');
       }
     }
 
@@ -1324,7 +1324,7 @@ button, input, textarea, select { font: inherit; }
               openTimelineAnalysisPanel(state, showToast);
               break;
             default:
-              showToast(`${icon} action clicked`);
+  // DISABLED:               showToast(`${icon} action clicked`);
           }
         });
 
@@ -1355,7 +1355,7 @@ button, input, textarea, select { font: inherit; }
           state.selectedTool = label;
           renderTools();
           updatePreview();
-          showToast(`${label} tool selected`);
+  // DISABLED:           showToast(`${label} tool selected`);
         });
         els.toolGroup.appendChild(button);
       });
@@ -1500,7 +1500,7 @@ button, input, textarea, select { font: inherit; }
               track.clips.sort((a, b) => a.left - b.left);
               saveStateSnapshot(state);
               renderTracks();
-              showToast(`Clip moved to ${track.name}`);
+  // DISABLED:               showToast(`Clip moved to ${track.name}`);
             }
           } else if (data.type === 'media' && track) {
             const extra = {};
@@ -1521,7 +1521,7 @@ button, input, textarea, select { font: inherit; }
             saveStateSnapshot(state);
             renderTracks();
             updatePreview(newClip);
-            showToast(`${data.label} added to ${track.name}`);
+  // DISABLED:             showToast(`${data.label} added to ${track.name}`);
           }
         });
         track.clips.forEach((clip) => {
@@ -1555,7 +1555,7 @@ button, input, textarea, select { font: inherit; }
             state.selectedClipId = clip.id;
             updatePreview(clip);
             renderTracks();
-            showToast(`${clip.name} selected`);
+  // DISABLED:             showToast(`${clip.name} selected`);
           }, true); // Use capture to override the default handler
 
           lane.appendChild(clipEl);
@@ -1612,7 +1612,7 @@ button, input, textarea, select { font: inherit; }
           clip = { id: generatedId, name: media.label, start: 0, end: 12, type: 'text', text: media.label, style: { fontSize: 24, color: '#ffffff', background: 'rgba(0,0,0,0.7)' } };
           insertClipIntoTrack(clip, 'Text');
         }
-        showToast(`${media.label} inserted into timeline`);
+  // DISABLED:         showToast(`${media.label} inserted into timeline`);
       }, showToast, state);
 
       // Extend media library with enhancement features
@@ -1655,7 +1655,7 @@ button, input, textarea, select { font: inherit; }
         button.addEventListener('click', () => {
           state.generateType = label;
           renderGenerateTypes();
-          showToast(`${label} mode selected`);
+  // DISABLED:           showToast(`${label} mode selected`);
         });
         els.generateTypes.appendChild(button);
       });
@@ -1762,7 +1762,7 @@ button, input, textarea, select { font: inherit; }
       if (!transitionEditor) {
         transitionEditor = new TransitionEditor(els.transitionEditorContainer, (transition, params, duration) => {
           // Handle transition application from editor
-          showToast(`Transition "${transition.name}" configured`, 'success');
+  // DISABLED:           showToast(`Transition "${transition.name}" configured`, 'success');
         });
       }
     }
@@ -1802,7 +1802,7 @@ button, input, textarea, select { font: inherit; }
       state.chat.push({ role: 'user', text });
       renderChat();
       els.chatInput.value = '';
-      showToast('Processing AI command...', 'info');
+  // DISABLED:       showToast('Processing AI command...', 'info');
 
       try {
         // Check if Supabase is configured before making requests
@@ -1835,10 +1835,10 @@ button, input, textarea, select { font: inherit; }
           // Handle different types of errors gracefully
           if (error.message?.includes('401') || error.message?.includes('auth')) {
             state.chat.push({ role: 'ai', text: 'AI features require authentication. Please sign in to use AI commands.' });
-            showToast('Please sign in to use AI features', 'warning');
+  // DISABLED:             showToast('Please sign in to use AI features', 'warning');
           } else {
             state.chat.push({ role: 'ai', text: `Error: ${error.message}` });
-            showToast('AI command failed', 'error');
+  // DISABLED:             showToast('AI command failed', 'error');
           }
         } else {
           // Process the AI response and apply changes
@@ -1850,20 +1850,20 @@ button, input, textarea, select { font: inherit; }
             applyAIModifications(data.modifications);
           }
 
-          showToast('AI command executed', 'success');
+  // DISABLED:           showToast('AI command executed', 'success');
         }
       } catch (err) {
         console.error('Chat submission error:', err);
         // Provide user-friendly error messages
         if (err.message?.includes('Supabase')) {
           state.chat.push({ role: 'ai', text: 'AI features are not available. Supabase configuration required.' });
-          showToast('AI features require Supabase setup', 'warning');
+  // DISABLED:           showToast('AI features require Supabase setup', 'warning');
         } else if (err.message?.includes('fetch') || err.message?.includes('network')) {
           state.chat.push({ role: 'ai', text: 'Network error. Please check your connection.' });
-          showToast('Network error - please check connection', 'error');
+  // DISABLED:           showToast('Network error - please check connection', 'error');
         } else {
           state.chat.push({ role: 'ai', text: `Error: ${err.message}` });
-          showToast('Failed to process AI command', 'error');
+  // DISABLED:           showToast('Failed to process AI command', 'error');
         }
       }
 
@@ -1942,7 +1942,7 @@ button, input, textarea, select { font: inherit; }
     function splitClipAtPlayhead() {
       const selectedClip = findSelectedClip();
       if (!selectedClip) {
-        showToast('No clip selected', 'warning');
+  // DISABLED:         showToast('No clip selected', 'warning');
         return;
       }
 
@@ -1955,7 +1955,7 @@ button, input, textarea, select { font: inherit; }
       const splitPosition = (state.playheadPercent / 100) * 100; // Convert to clip width percentage
 
       if (splitPosition <= selectedClip.left || splitPosition >= selectedClip.left + selectedClip.width) {
-        showToast('Playhead not within selected clip', 'warning');
+  // DISABLED:         showToast('Playhead not within selected clip', 'warning');
         return;
       }
 
@@ -1979,11 +1979,11 @@ button, input, textarea, select { font: inherit; }
 
       renderTracks();
       updatePreview();
-      showToast('Clip split at playhead', 'success');
+  // DISABLED:       showToast('Clip split at playhead', 'success');
     }
 
     async function detectScenes() {
-      showToast('Detecting scenes...', 'info');
+  // DISABLED:       showToast('Detecting scenes...', 'info');
 
       try {
         const { data, error } = await supabase.functions.invoke('videoagent', {
@@ -2001,22 +2001,22 @@ button, input, textarea, select { font: inherit; }
 
         if (data.scenes) {
           // Add scene markers or clips based on detection results
-          showToast(`Detected ${data.scenes.length} scenes`, 'success');
+  // DISABLED:           showToast(`Detected ${data.scenes.length} scenes`, 'success');
         }
       } catch (err) {
         console.error('Scene detection error:', err);
-        showToast('Scene detection failed', 'error');
+  // DISABLED:         showToast('Scene detection failed', 'error');
       }
     }
 
     async function generateSubtitles() {
       const selectedClip = findSelectedClip();
       if (!selectedClip || selectedClip.type !== 'video') {
-        showToast('Select a video clip first', 'warning');
+  // DISABLED:         showToast('Select a video clip first', 'warning');
         return;
       }
 
-      showToast('Generating subtitles...', 'info');
+  // DISABLED:       showToast('Generating subtitles...', 'info');
 
       try {
         const { data, error } = await supabase.functions.invoke('frame-agent', {
@@ -2032,15 +2032,15 @@ button, input, textarea, select { font: inherit; }
         if (error) throw error;
 
         // Add subtitle track or overlay
-        showToast('Subtitles generated', 'success');
+  // DISABLED:         showToast('Subtitles generated', 'success');
       } catch (err) {
         console.error('Subtitle generation error:', err);
-        showToast('Subtitle generation failed', 'error');
+  // DISABLED:         showToast('Subtitle generation failed', 'error');
       }
     }
 
     async function suggestBRoll() {
-      showToast('Analyzing for B-Roll suggestions...', 'info');
+  // DISABLED:       showToast('Analyzing for B-Roll suggestions...', 'info');
 
       try {
         const { data, error } = await supabase.functions.invoke('frame-agent', {
@@ -2057,18 +2057,18 @@ button, input, textarea, select { font: inherit; }
 
         if (data.suggestions) {
           // Add suggested B-Roll clips
-          showToast('B-Roll suggestions added', 'success');
+  // DISABLED:           showToast('B-Roll suggestions added', 'success');
         }
       } catch (err) {
         console.error('B-Roll suggestion error:', err);
-        showToast('B-Roll suggestions failed', 'error');
+  // DISABLED:         showToast('B-Roll suggestions failed', 'error');
       }
     }
 
     function adjustSpeed() {
       const selectedClip = findSelectedClip();
       if (!selectedClip) {
-        showToast('No clip selected', 'warning');
+  // DISABLED:         showToast('No clip selected', 'warning');
         return;
       }
 
@@ -2077,18 +2077,18 @@ button, input, textarea, select { font: inherit; }
       if (newSpeed && !isNaN(parseFloat(newSpeed))) {
         saveStateSnapshot(state);
         selectedClip.speed = parseFloat(newSpeed);
-        showToast(`Speed set to ${newSpeed}x`, 'success');
+  // DISABLED:         showToast(`Speed set to ${newSpeed}x`, 'success');
       }
     }
 
     async function stabilizeFootage() {
       const selectedClip = findSelectedClip();
       if (!selectedClip || selectedClip.type !== 'video') {
-        showToast('Select a video clip first', 'warning');
+  // DISABLED:         showToast('Select a video clip first', 'warning');
         return;
       }
 
-      showToast('Stabilizing footage...', 'info');
+  // DISABLED:       showToast('Stabilizing footage...', 'info');
 
       try {
         const { data, error } = await supabase.functions.invoke('frame-agent', {
@@ -2103,10 +2103,10 @@ button, input, textarea, select { font: inherit; }
 
         if (error) throw error;
 
-        showToast('Footage stabilized', 'success');
+  // DISABLED:         showToast('Footage stabilized', 'success');
       } catch (err) {
         console.error('Stabilization error:', err);
-        showToast('Stabilization failed', 'error');
+  // DISABLED:         showToast('Stabilization failed', 'error');
       }
     }
 
@@ -2125,7 +2125,7 @@ button, input, textarea, select { font: inherit; }
         };
 
         insertClipIntoTrack(clip, 'Text');
-        showToast('Text overlay added', 'success');
+  // DISABLED:         showToast('Text overlay added', 'success');
       }
     }
 
@@ -2135,13 +2135,13 @@ button, input, textarea, select { font: inherit; }
         const modal = new AIVideoCreator({
           onComplete: (result) => {
             addVideoToTimeline(result, state);
-            showToast('AI Video created successfully', 'success');
+  // DISABLED:             showToast('AI Video created successfully', 'success');
           },
           onError: (error) => showToast(`AI Video creation failed: ${error}`, 'error')
         });
         modal.open();
       } catch (error) {
-        showToast('Failed to open AI Video Creator', 'error');
+  // DISABLED:         showToast('Failed to open AI Video Creator', 'error');
       }
     }
 
@@ -2150,13 +2150,13 @@ button, input, textarea, select { font: inherit; }
         const modal = new RecorderModal({
           onComplete: (result) => {
             addVideoToTimeline(result, state);
-            showToast('Recording saved successfully', 'success');
+  // DISABLED:             showToast('Recording saved successfully', 'success');
           },
           onError: (error) => showToast(`Recording failed: ${error}`, 'error')
         });
         modal.open();
       } catch (error) {
-        showToast('Failed to open Recorder', 'error');
+  // DISABLED:         showToast('Failed to open Recorder', 'error');
       }
     }
 
@@ -2165,13 +2165,13 @@ button, input, textarea, select { font: inherit; }
         const modal = new EnhancedRecorderModal({
           onComplete: (result) => {
             addVideoToTimeline(result, state);
-            showToast('Enhanced recording saved successfully', 'success');
+  // DISABLED:             showToast('Enhanced recording saved successfully', 'success');
           },
           onError: (error) => showToast(`Enhanced recording failed: ${error}`, 'error')
         });
         modal.open();
       } catch (error) {
-        showToast('Failed to open Enhanced Recorder', 'error');
+  // DISABLED:         showToast('Failed to open Enhanced Recorder', 'error');
       }
     }
 
@@ -2181,13 +2181,13 @@ button, input, textarea, select { font: inherit; }
           onComplete: (result) => {
             // Apply template to timeline
             applyTemplateToTimeline(result, state);
-            showToast('Template applied successfully', 'success');
+  // DISABLED:             showToast('Template applied successfully', 'success');
           },
           onError: (error) => showToast(`Template generation failed: ${error}`, 'error')
         });
         modal.open();
       } catch (error) {
-        showToast('Failed to open Template Generator', 'error');
+  // DISABLED:         showToast('Failed to open Template Generator', 'error');
       }
     }
 
@@ -2196,13 +2196,13 @@ button, input, textarea, select { font: inherit; }
         const modal = new TemplatePreviewModal({
           onComplete: (result) => {
             applyTemplateToTimeline(result, state);
-            showToast('Template preview applied successfully', 'success');
+  // DISABLED:             showToast('Template preview applied successfully', 'success');
           },
           onError: (error) => showToast(`Template preview failed: ${error}`, 'error')
         });
         modal.open();
       } catch (error) {
-        showToast('Failed to open Template Preview', 'error');
+  // DISABLED:         showToast('Failed to open Template Preview', 'error');
       }
     }
 
@@ -2211,13 +2211,13 @@ button, input, textarea, select { font: inherit; }
         const modal = new SocialPublisherModal({
           projectData: state,
           onComplete: (result) => {
-            showToast('Content published successfully', 'success');
+  // DISABLED:             showToast('Content published successfully', 'success');
           },
           onError: (error) => showToast(`Publishing failed: ${error}`, 'error')
         });
         modal.open();
       } catch (error) {
-        showToast('Failed to open Social Publisher', 'error');
+  // DISABLED:         showToast('Failed to open Social Publisher', 'error');
       }
     }
 
@@ -2226,13 +2226,13 @@ button, input, textarea, select { font: inherit; }
         const modal = new EmailCampaignModal({
           projectData: state,
           onComplete: (result) => {
-            showToast('Email campaign created successfully', 'success');
+  // DISABLED:             showToast('Email campaign created successfully', 'success');
           },
           onError: (error) => showToast(`Email campaign creation failed: ${error}`, 'error')
         });
         modal.open();
       } catch (error) {
-        showToast('Failed to open Email Campaign', 'error');
+  // DISABLED:         showToast('Failed to open Email Campaign', 'error');
       }
     }
 
@@ -2241,13 +2241,13 @@ button, input, textarea, select { font: inherit; }
         const modal = new UrlVideoModal({
           onComplete: (result) => {
             addVideoToTimeline(result, state);
-            showToast('URL video added successfully', 'success');
+  // DISABLED:             showToast('URL video added successfully', 'success');
           },
           onError: (error) => showToast(`URL video import failed: ${error}`, 'error')
         });
         modal.open();
       } catch (error) {
-        showToast('Failed to open URL Video', 'error');
+  // DISABLED:         showToast('Failed to open URL Video', 'error');
       }
     }
 
@@ -2256,13 +2256,13 @@ button, input, textarea, select { font: inherit; }
         const modal = new PageShotModal({
           onComplete: (result) => {
             addImageToTimeline(result, state);
-            showToast('Page screenshot added successfully', 'success');
+  // DISABLED:             showToast('Page screenshot added successfully', 'success');
           },
           onError: (error) => showToast(`Page screenshot failed: ${error}`, 'error')
         });
         modal.open();
       } catch (error) {
-        showToast('Failed to open Page Shot', 'error');
+  // DISABLED:         showToast('Failed to open Page Shot', 'error');
       }
     }
 
@@ -2272,13 +2272,13 @@ button, input, textarea, select { font: inherit; }
           onComplete: (result) => {
             // Store contacts for personalization
             state.contacts = result.contacts;
-            showToast('Contacts imported successfully', 'success');
+  // DISABLED:             showToast('Contacts imported successfully', 'success');
           },
           onError: (error) => showToast(`Contact import failed: ${error}`, 'error')
         });
         modal.open();
       } catch (error) {
-        showToast('Failed to open Contact Importer', 'error');
+  // DISABLED:         showToast('Failed to open Contact Importer', 'error');
       }
     }
 
@@ -2290,20 +2290,20 @@ button, input, textarea, select { font: inherit; }
             // After personalization, offer landing page builder
             if (result && result.generations && result.generations.length > 0) {
               setTimeout(() => {
-                showToast('🎉 Personalization complete! Create landing pages?', 'info');
+  // DISABLED:                 showToast('🎉 Personalization complete! Create landing pages?', 'info');
                 setTimeout(() => {
                   openLandingPageBuilderModal(state, showToast);
                 }, 1500);
               }, 1000);
             } else {
-              showToast('Personalization Suite closed', 'success');
+  // DISABLED:               showToast('Personalization Suite closed', 'success');
             }
           },
           onError: (error) => showToast(`Personalization Suite error: ${error}`, 'error')
         });
         modal.open();
       } catch (error) {
-        showToast('Failed to open Personalization Suite', 'error');
+  // DISABLED:         showToast('Failed to open Personalization Suite', 'error');
       }
     }
 
@@ -2326,7 +2326,7 @@ button, input, textarea, select { font: inherit; }
         position: 'center'
       };
       insertClipIntoTrack(overlayClip, 'Text');
-      showToast('Personalization overlay added to timeline', 'success');
+  // DISABLED:       showToast('Personalization overlay added to timeline', 'success');
     };
 
     // Global function to add contact import functionality
@@ -2348,7 +2348,7 @@ button, input, textarea, select { font: inherit; }
         ctaText: 'Download Now'
       };
       insertClipIntoTrack(leadClip, 'Text');
-      showToast('Lead capture form added to timeline', 'success');
+  // DISABLED:       showToast('Lead capture form added to timeline', 'success');
     };
 
     // Global function to add personalized image overlay
@@ -2364,7 +2364,7 @@ button, input, textarea, select { font: inherit; }
         overlayText: 'Welcome {first_name} from {company}!'
       };
       insertClipIntoTrack(imageClip, 'Video');
-      showToast('Personalized image overlay added to timeline', 'success');
+  // DISABLED:       showToast('Personalized image overlay added to timeline', 'success');
     };
 
     // Global function to add voice narration
@@ -2381,7 +2381,7 @@ button, input, textarea, select { font: inherit; }
         personalizationTokens: ['first_name', 'company']
       };
       insertClipIntoTrack(audioClip, 'Audio');
-      showToast('Personalized voice narration added to timeline', 'success');
+  // DISABLED:       showToast('Personalized voice narration added to timeline', 'success');
     };
 
     // Global function to add dynamic content based on contact data
@@ -2442,7 +2442,7 @@ button, input, textarea, select { font: inherit; }
       }
 
       insertClipIntoTrack(contentClip, 'Text');
-      showToast(`${contentType} personalized content added to timeline`, 'success');
+  // DISABLED:       showToast(`${contentType} personalized content added to timeline`, 'success');
     };
 
     function openLandingPageBuilderModal(state, showToast) {
@@ -2452,20 +2452,20 @@ button, input, textarea, select { font: inherit; }
             // After landing pages, offer lead generation
             if (result && result.pages && result.pages > 0) {
               setTimeout(() => {
-                showToast('🏠 Landing pages ready! Set up lead capture?', 'info');
+  // DISABLED:                 showToast('🏠 Landing pages ready! Set up lead capture?', 'info');
                 setTimeout(() => {
                   openLeadGeneratorModal(state, showToast);
                 }, 1500);
               }, 1000);
             } else {
-              showToast('Landing pages generated successfully', 'success');
+  // DISABLED:               showToast('Landing pages generated successfully', 'success');
             }
           },
           onError: (error) => showToast(`Landing page generation failed: ${error}`, 'error')
         });
         modal.open();
       } catch (error) {
-        showToast('Failed to open Landing Page Builder', 'error');
+  // DISABLED:         showToast('Failed to open Landing Page Builder', 'error');
       }
     }
 
@@ -2474,13 +2474,13 @@ button, input, textarea, select { font: inherit; }
         const modal = new LeadGeneratorModal({
           onComplete: (result) => {
             // Handle lead saving
-            showToast('Lead saved successfully', 'success');
+  // DISABLED:             showToast('Lead saved successfully', 'success');
           },
           onError: (error) => showToast(`Lead generation failed: ${error}`, 'error')
         });
         modal.open();
       } catch (error) {
-        showToast('Failed to open Lead Generator', 'error');
+  // DISABLED:         showToast('Failed to open Lead Generator', 'error');
       }
     }
 
@@ -2494,11 +2494,11 @@ button, input, textarea, select { font: inherit; }
             if (promptInput) {
               promptInput.value = generatedPrompt;
               promptInput.dispatchEvent(new Event('input', { bubbles: true }));
-              showToast('GTM-optimized prompt loaded!', 'success');
+  // DISABLED:               showToast('GTM-optimized prompt loaded!', 'success');
             } else {
               // Fallback: copy to clipboard
               navigator.clipboard.writeText(generatedPrompt).then(() => {
-                showToast('Prompt copied to clipboard!', 'success');
+  // DISABLED:                 showToast('Prompt copied to clipboard!', 'success');
               });
             }
           }
@@ -2506,7 +2506,7 @@ button, input, textarea, select { font: inherit; }
         modal.open();
       } catch (error) {
         console.error('GTM Prompt Modal error:', error);
-        showToast('Failed to open GTM Prompt Enhancer', 'error');
+  // DISABLED:         showToast('Failed to open GTM Prompt Enhancer', 'error');
       }
     }
 
@@ -2705,7 +2705,7 @@ button, input, textarea, select { font: inherit; }
               openLeadGeneratorModal(state, showToast);
               break;
             default:
-              showToast(`${label} action triggered`);
+  // DISABLED:               showToast(`${label} action triggered`);
           }
         });
 
@@ -2716,19 +2716,19 @@ button, input, textarea, select { font: inherit; }
     function addTrack(type) {
       state.tracks.push({ id: `${type.toLowerCase()}-${Date.now()}`, name: type, muted: false, solo: false, locked: false, clips: [] });
       renderTracks();
-      showToast(`${type} track added`);
+  // DISABLED:       showToast(`${type} track added`);
     }
 
     function showClipEditor(clipId) {
       els.clipSettingsPanel.style.display = 'block';
       renderClipEditor(clipId);
-      showToast('Clip editor opened');
+  // DISABLED:       showToast('Clip editor opened');
     }
 
     function showTransitionSettings() {
       els.transitionSettingsPanel.style.display = 'block';
       // The transition editor is now initialized automatically
-      showToast('Transition settings opened');
+  // DISABLED:       showToast('Transition settings opened');
     }
 
     function openAdvancedModal(content, title = 'Advanced Editing') {
@@ -2763,7 +2763,7 @@ button, input, textarea, select { font: inherit; }
           </div>
         `;
       }
-      showToast('Canvas editor opened');
+  // DISABLED:       showToast('Canvas editor opened');
     }
 
     function showTokenEditorPanel() {
@@ -2794,7 +2794,7 @@ button, input, textarea, select { font: inherit; }
           });
         });
       }
-      showToast('Token editor opened');
+  // DISABLED:       showToast('Token editor opened');
     }
 
     function showBatchGeneratorPanel() {
@@ -2842,7 +2842,7 @@ button, input, textarea, select { font: inherit; }
           batchItems.appendChild(itemDiv);
         });
       }
-      showToast('Batch generator opened');
+  // DISABLED:       showToast('Batch generator opened');
     }
 
     function showWorkflowPanel() {
@@ -2874,7 +2874,7 @@ button, input, textarea, select { font: inherit; }
           </div>
         `;
       }
-      showToast('Workflow automation opened');
+  // DISABLED:       showToast('Workflow automation opened');
     }
 
     function showPersonalizationPanel() {
@@ -2913,7 +2913,7 @@ button, input, textarea, select { font: inherit; }
           </div>
         `;
       }
-      showToast('Personalization panel opened');
+  // DISABLED:       showToast('Personalization panel opened');
     }
 
     function showPersonalizationEditorPanel() {
@@ -2935,7 +2935,7 @@ button, input, textarea, select { font: inherit; }
           </div>
         `;
       }
-      showToast('Personalization editor opened');
+  // DISABLED:       showToast('Personalization editor opened');
     }
 
     function hideAllEditorPanels() {
@@ -2976,17 +2976,17 @@ button, input, textarea, select { font: inherit; }
       const style = els.styleSelect.value;
 
       if (!prompt) {
-        showToast('Please enter a prompt', 'warning');
+  // DISABLED:         showToast('Please enter a prompt', 'warning');
         return;
       }
 
       if (state.isProcessing) {
-        showToast('Generation already in progress', 'warning');
+  // DISABLED:         showToast('Generation already in progress', 'warning');
         return;
       }
 
       state.isProcessing = true;
-      showToast('Generating content...', 'info');
+  // DISABLED:       showToast('Generating content...', 'info');
 
       try {
         let generationResult;
@@ -3005,7 +3005,7 @@ button, input, textarea, select { font: inherit; }
             body: negativePrompt || `Generated text content for: ${prompt}`
           };
           insertClipIntoTrack(clip, 'Text');
-          showToast('Text clip created', 'success');
+  // DISABLED:           showToast('Text clip created', 'success');
           return;
         }
 
@@ -3091,7 +3091,7 @@ button, input, textarea, select { font: inherit; }
             prompt: prompt
           });
 
-          showToast(`${state.generateType} generated successfully`, 'success');
+  // DISABLED:           showToast(`${state.generateType} generated successfully`, 'success');
 
           // Offer personalization suite for video generation
           if (state.generateType !== 'Image' && state.generateType !== 'Text') {
@@ -3180,15 +3180,15 @@ button, input, textarea, select { font: inherit; }
          const msg = error.message || '';
          
          if (msg.includes('401') || msg.includes('auth')) {
-           showToast('Generation requires authentication. Please sign in.', 'warning');
+  // DISABLED:            showToast('Generation requires authentication. Please sign in.', 'warning');
          } else if (msg.includes('Supabase') || msg.includes('configuration')) {
-           showToast('AI features require setup. Please check your environment configuration.', 'warning');
+  // DISABLED:            showToast('AI features require setup. Please check your environment configuration.', 'warning');
          } else if (msg.includes('fetch') || msg.includes('network') || msg.includes('Network')) {
-           showToast('Network error - please check connection', 'error');
+  // DISABLED:            showToast('Network error - please check connection', 'error');
          } else if (msg.includes('API key not configured') || msg.includes('service is not configured')) {
-           showToast('AI service not configured. Please set up your API keys in Supabase edge function settings.', 'error');
+  // DISABLED:            showToast('AI service not configured. Please set up your API keys in Supabase edge function settings.', 'error');
          } else {
-           showToast(`Generation failed: ${msg}`, 'error');
+  // DISABLED:            showToast(`Generation failed: ${msg}`, 'error');
          }
        } finally {
         state.isProcessing = false;
@@ -3234,7 +3234,7 @@ button, input, textarea, select { font: inherit; }
     async function handleUpload(file) {
       if (!file) return;
 
-      showToast('Uploading file...', 'info');
+  // DISABLED:       showToast('Uploading file...', 'info');
 
       try {
         // Upload file to Supabase storage
@@ -3260,10 +3260,10 @@ button, input, textarea, select { font: inherit; }
         // Save project state
         saveProjectToStorage(state);
 
-        showToast(`${file.name} uploaded and added to timeline`, 'success');
+  // DISABLED:         showToast(`${file.name} uploaded and added to timeline`, 'success');
       } catch (error) {
         console.error('Upload error:', error);
-        showToast(`Upload failed: ${error.message}`, 'error');
+  // DISABLED:         showToast(`Upload failed: ${error.message}`, 'error');
       }
     }
 
@@ -3537,7 +3537,7 @@ button, input, textarea, select { font: inherit; }
             return selectedClip ? [selectedClip] : [];
           },
           showNotification: (options) => {
-            showToast(`${options.title}: ${options.message}`);
+  // DISABLED:             showToast(`${options.title}: ${options.message}`);
           }
         };
 
@@ -3559,7 +3559,7 @@ button, input, textarea, select { font: inherit; }
     }
 
     function openCharacterTrackingPanel(state, showToast) {
-      showToast('Character tracking analyzes clips for visual consistency', 'info');
+  // DISABLED:       showToast('Character tracking analyzes clips for visual consistency', 'info');
     }
 
     function openTimelineAnalysisPanel(state, showToast) {

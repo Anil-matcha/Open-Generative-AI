@@ -598,10 +598,10 @@ export class AiFeaturePanel {
     formModal.querySelector('#createElementSubmitBtn').addEventListener('click', () => {
       const name = formModal.querySelector('#element-name').value;
       if (!name) {
-        showToast('Please enter an element name', 'warning');
+  // DISABLED:         showToast('Please enter an element name', 'warning');
         return;
       }
-      showToast('Element created successfully!', 'success');
+  // DISABLED:       showToast('Element created successfully!', 'success');
       formModal.remove();
     });
   }
@@ -631,10 +631,10 @@ export class AiFeaturePanel {
         progressBar.querySelector('.progress-fill').style.width = `${i}%`;
         progressBar.querySelector('.progress-text').textContent = `Exporting... ${i}%`;
       }
-      showToast('Export completed successfully!', 'success');
+  // DISABLED:       showToast('Export completed successfully!', 'success');
       modal.remove();
     } catch (error) {
-      showToast('Export failed: ' + error.message, 'error');
+  // DISABLED:       showToast('Export failed: ' + error.message, 'error');
       btn.textContent = 'Export Video';
       btn.disabled = false;
     }

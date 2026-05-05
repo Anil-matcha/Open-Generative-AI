@@ -241,7 +241,7 @@ export function RenderPage() {
       onUpload: (file) => {
         const url = URL.createObjectURL(file);
         loadVideo(url, videoContainer);
-        showToast('Video uploaded for rendering', 'success');
+  // DISABLED:         showToast('Video uploaded for rendering', 'success');
       },
       onError: (errors) => {
         errors.forEach(error => showToast(error, 'error'));
@@ -450,13 +450,13 @@ export function RenderPage() {
       if (progressStatus) progressStatus.textContent = pipeline.statusLabel;
     }
 
-    showToast(`${action} started`);
+  // DISABLED:     showToast(`${action} started`);
 
     // Real API processing
     try {
       const result = await executeRepositoryTask(action, pipeline);
       isRunning = false;
-      showToast(`${action} completed!`);
+  // DISABLED:       showToast(`${action} completed!`);
 
       // Update outputs section with results
       updateOutputsSection(action, result);
@@ -470,7 +470,7 @@ export function RenderPage() {
     } catch (error) {
       console.error('Action failed:', error);
       isRunning = false;
-      showToast(`Action failed: ${error.message}`, 'error');
+  // DISABLED:       showToast(`Action failed: ${error.message}`, 'error');
 
       // Reset progress on error
       const progressBar = container.querySelector('#progressBar');
@@ -623,7 +623,7 @@ export function RenderPage() {
         videoMetadata.error = 'Failed to load video';
         loadingOverlay.hide();
         isVideoLoading = false;
-        showToast('Failed to load video', 'error');
+  // DISABLED:         showToast('Failed to load video', 'error');
         updateVideoStats();
       }
     });
@@ -632,7 +632,7 @@ export function RenderPage() {
     videoElement.onloadeddata = () => {
       loadingOverlay.hide();
       isVideoLoading = false;
-      showToast('Video loaded successfully');
+  // DISABLED:       showToast('Video loaded successfully');
     };
 
     videoElement.oncanplaythrough = () => {
@@ -728,7 +728,7 @@ export function RenderPage() {
       `;
     }
 
-    showToast(`Preset: ${preset}`);
+  // DISABLED:     showToast(`Preset: ${preset}`);
   }
 
   // Bind events

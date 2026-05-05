@@ -9,49 +9,40 @@ import { GTMPromptModal } from './modals/GTMPromptModal.jsx';
 
 export function AvatarStudio() {
   const container = document.createElement('div');
-  container.className = 'w-full h-full flex flex-col items-center bg-app-bg overflow-y-auto p-6 md:p-10 relative';
+  container.className = 'w-full h-full flex flex-col bg-app-bg overflow-y-auto relative';
 
   let selectedModel = avatarModels[0];
   let uploadedVideoUrl = null;
   let uploadedAudioUrl = null;
   let prompt = '';
 
-  // Header with hero banner
-  const header = document.createElement('div');
-  header.className = 'mb-8 animate-fade-in-up text-center w-full max-w-xl';
+  // Top bar with hero banner and inline instructions
+  const topBar = document.createElement('div');
+  topBar.className = 'px-4 md:px-8 pt-6 pb-4 shrink-0 animate-fade-in-up';
+  
   const avatarBanner = createHeroSection('avatar', 'h-32 md:h-44 mb-4');
   if (avatarBanner) {
     const bannerText = document.createElement('div');
-    bannerText.className = 'absolute bottom-0 left-0 right-0 p-5 z-10';
+    bannerText.className = 'absolute bottom-0 left-0 right-0 p-4 z-10';
     bannerText.innerHTML = '<h1 class="text-2xl md:text-4xl font-black text-white tracking-tight mb-2">Avatar Studio</h1><p class="text-white/60 text-sm">Create talking avatars and lip sync videos</p>';
     avatarBanner.appendChild(bannerText);
-    header.appendChild(avatarBanner);
+    topBar.appendChild(avatarBanner);
   }
-  container.appendChild(header);
+  
+  const inlineInstructions = createInlineInstructions('avatar');
+  inlineInstructions.classList.add('px-4', 'md:px-8', 'mt-2');
+  topBar.appendChild(inlineInstructions);
+  
+  container.appendChild(topBar);
 
-  // Model selector
-  const modelRow = document.createElement('div');
-  modelRow.className = 'flex gap-3 mb-6 flex-wrap justify-center animate-fade-in-up';
-  modelRow.style.animationDelay = '0.1s';
+  // Main content area
+  const contentArea = document.createElement('div');
+  contentArea.className = 'flex-1 overflow-y-auto px-4 md:px-8 pb-8';
+  container.appendChild(contentArea);
 
-  const modelBtns = {};
-  avatarModels.forEach(m => {
-    const btn = document.createElement('button');
-    btn.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all border bg-white/5 text-secondary border-white/10 hover:bg-white/10';
-    btn.textContent = m.name;
-    btn.onclick = () => {
-      selectedModel = m;
-      updateModelBtns();
-      updateFormVisibility();
-    };
-    modelBtns[m.id] = btn;
-    modelRow.appendChild(btn);
-  });
-  container.appendChild(modelRow);
-
-  // Form card
+  // Form card (centered with max-width)
   const formCard = document.createElement('div');
-  formCard.className = 'w-full max-w-md bg-[#111]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 flex flex-col gap-5 animate-fade-in-up';
+  formCard.className = 'w-full max-w-md mx-auto bg-[#111]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 flex flex-col gap-5 animate-fade-in-up';
   formCard.style.animationDelay = '0.2s';
 
   // Video/Image upload (for lip sync models)
@@ -72,7 +63,7 @@ export function AvatarStudio() {
   });
   videoUploadGroup.appendChild(videoPicker.trigger);
   formCard.appendChild(videoUploadGroup);
-  container.appendChild(videoPicker.panel);
+  contentArea.appendChild(videoPicker.panel);
 
   // Audio upload (for lip sync models)
   const audioUploadGroup = document.createElement('div');
@@ -92,7 +83,7 @@ export function AvatarStudio() {
   });
   audioUploadGroup.appendChild(audioPicker.trigger);
   formCard.appendChild(audioUploadGroup);
-  container.appendChild(audioPicker.panel);
+  contentArea.appendChild(audioPicker.panel);
 
   // Prompt input (for some avatar models)
   const promptGroup = document.createElement('div');
@@ -129,17 +120,32 @@ export function AvatarStudio() {
   genBtn.className = 'w-full bg-primary text-black py-3.5 rounded-xl font-black text-sm hover:shadow-glow transition-all';
   genBtn.textContent = 'Generate Avatar Video';
   formCard.appendChild(genBtn);
-  container.appendChild(formCard);
+  contentArea.appendChild(formCard);
 
-  // Instructions
-  const inlineInstructions = createInlineInstructions('avatar');
-  inlineInstructions.classList.add('max-w-md', 'mt-6');
-  container.appendChild(inlineInstructions);
+  // Model selector
+  const modelRow = document.createElement('div');
+  modelRow.className = 'flex gap-3 mb-6 flex-wrap justify-center animate-fade-in-up';
+  modelRow.style.animationDelay = '0.1s';
+
+  const modelBtns = {};
+  avatarModels.forEach(m => {
+    const btn = document.createElement('button');
+    btn.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all border bg-white/5 text-secondary border-white/10 hover:bg-white/10';
+    btn.textContent = m.name;
+    btn.onclick = () => {
+      selectedModel = m;
+      updateModelBtns();
+      updateFormVisibility();
+    };
+    modelBtns[m.id] = btn;
+    modelRow.appendChild(btn);
+  });
+  contentArea.insertBefore(modelRow, formCard);
 
   // Result area
   const resultArea = document.createElement('div');
-  resultArea.className = 'w-full max-w-md mt-6 hidden';
-  container.appendChild(resultArea);
+  resultArea.className = 'w-full max-w-md mx-auto mt-6 hidden';
+  contentArea.appendChild(resultArea);
 
   // Helper functions
   function updateModelBtns() {

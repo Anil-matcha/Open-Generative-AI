@@ -36,7 +36,7 @@ export function RemixGoPage() {
   `;
   element.appendChild(errorContainer);
 
-  // Iframe container
+  // Iframe container - uses same-origin path, served by main Vite server
   const iframe = document.createElement('iframe');
   iframe.src = '/apps/remix-go/';
   iframe.className = 'w-full h-full border-0';
@@ -53,36 +53,37 @@ export function RemixGoPage() {
 
   element.appendChild(iframe);
 
-  // Auto-retry mechanism
-  let retryCount = 0;
-  const maxRetries = 3;
-  const retryInterval = 5000; // 5 seconds
+  // Development-only auto-retry mechanism
+  if (import.meta.env.DEV) {
+    let retryCount = 0;
+    const maxRetries = 3;
+    const retryInterval = 5000; // 5 seconds
 
-  const checkAvailability = () => {
-    if (retryCount < maxRetries) {
-      setTimeout(() => {
-        const testIframe = createSecureIframe('http://localhost:5173');
-        testIframe.src = 'http://localhost:5173';
-        testIframe.style.display = 'none';
-        testIframe.onload = () => {
-          location.reload(); // Reload to show the iframe
-        };
-        testIframe.onerror = () => {
-          retryCount++;
-          checkAvailability();
-        };
-        document.body.appendChild(testIframe);
-        setTimeout(() => document.body.removeChild(testIframe), 1000);
-      }, retryInterval);
-    }
-  };
+    const checkAvailability = () => {
+      if (retryCount < maxRetries) {
+        setTimeout(() => {
+          const testIframe = createSecureIframe('http://localhost:5173');
+          testIframe.src = 'http://localhost:5173';
+          testIframe.style.display = 'none';
+          testIframe.onload = () => {
+            location.reload(); // Reload to show the iframe
+          };
+          testIframe.onerror = () => {
+            retryCount++;
+            checkAvailability();
+          };
+          document.body.appendChild(testIframe);
+          setTimeout(() => document.body.removeChild(testIframe), 1000);
+        }, retryInterval);
+      }
+    };
 
-  // Start checking after initial error
-  iframe.onerror = () => {
-    loadingContainer.style.display = 'none';
-    errorContainer.classList.remove('hidden');
-    checkAvailability();
-  };
+    iframe.onerror = () => {
+      loadingContainer.style.display = 'none';
+      errorContainer.classList.remove('hidden');
+      checkAvailability();
+    };
+  }
 
   return element;
 }

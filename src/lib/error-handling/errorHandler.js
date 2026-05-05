@@ -255,7 +255,7 @@ export class ErrorHandler {
       const toastType = friendlyError.category === this.errorCategories.AUTHENTICATION ? 'warning' : 'error';
       const duration = friendlyError.recoverable ? 5000 : 10000;
       
-      showToast(friendlyError.message, toastType, duration);
+  // DISABLED:       showToast(friendlyError.message, toastType, duration);
     }).catch(err => {
       console.warn('[ErrorHandler] Could not show error notification:', err);
     });

@@ -8,25 +8,36 @@ import { GTMPromptModal } from './modals/GTMPromptModal.jsx';
 
 export function AudioStudio() {
   const container = document.createElement('div');
-  container.className = 'w-full h-full flex flex-col items-center bg-app-bg overflow-y-auto p-6 md:p-10 relative';
+  container.className = 'w-full h-full flex flex-col bg-app-bg overflow-y-auto relative';
 
   let selectedModel = audioModels[0];
   let prompt = '';
   let style = '';
   let duration = '30';
 
-  // Header with hero banner
-  const header = document.createElement('div');
-  header.className = 'mb-8 animate-fade-in-up text-center w-full';
+  // Top bar with hero banner and inline instructions
+  const topBar = document.createElement('div');
+  topBar.className = 'px-4 md:px-8 pt-6 pb-4 shrink-0 animate-fade-in-up';
+  
   const audioBanner = createHeroSection('audio', 'h-32 md:h-44 mb-4');
   if (audioBanner) {
     const bannerText = document.createElement('div');
-    bannerText.className = 'absolute bottom-0 left-0 right-0 p-5 z-10';
+    bannerText.className = 'absolute bottom-0 left-0 right-0 p-4 z-10';
     bannerText.innerHTML = '<h1 class="text-2xl md:text-4xl font-black text-white tracking-tight mb-2">Audio Studio</h1><p class="text-white/60 text-sm">Generate music and speech with AI</p>';
     audioBanner.appendChild(bannerText);
-    header.appendChild(audioBanner);
+    topBar.appendChild(audioBanner);
   }
-  container.appendChild(header);
+  
+  const inlineInstructions = createInlineInstructions('audio');
+  inlineInstructions.classList.add('px-4', 'md:px-8', 'mt-2');
+  topBar.appendChild(inlineInstructions);
+  
+  container.appendChild(topBar);
+
+  // Main content area
+  const contentArea = document.createElement('div');
+  contentArea.className = 'flex-1 overflow-y-auto px-4 md:px-8 pb-8';
+  container.appendChild(contentArea);
 
   // Model selector
   const modelRow = document.createElement('div');
@@ -46,7 +57,7 @@ export function AudioStudio() {
     modelBtns[m.id] = btn;
     modelRow.appendChild(btn);
   });
-  container.appendChild(modelRow);
+  contentArea.appendChild(modelRow);
 
   // Form card
   const formCard = document.createElement('div');
@@ -135,17 +146,12 @@ export function AudioStudio() {
   genBtn.className = 'w-full bg-primary text-black py-3.5 rounded-xl font-black text-sm hover:shadow-glow transition-all';
   genBtn.textContent = 'Generate Audio';
   formCard.appendChild(genBtn);
-  container.appendChild(formCard);
-
-  // Instructions
-  const inlineInstructions = createInlineInstructions('audio');
-  inlineInstructions.classList.add('max-w-md', 'mt-6');
-  container.appendChild(inlineInstructions);
+  contentArea.appendChild(formCard);
 
   // Result area
   const resultArea = document.createElement('div');
-  resultArea.className = 'w-full max-w-md mt-6 hidden';
-  container.appendChild(resultArea);
+  resultArea.className = 'w-full max-w-md mx-auto mt-6 hidden';
+  contentArea.appendChild(resultArea);
 
   // Helper functions
   function updateModelBtns() {

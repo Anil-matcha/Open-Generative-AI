@@ -51,7 +51,7 @@ export function AnimationList() {
         detail: { name: animationName, type: animationType }
       }));
 
-      showToast(`Applied ${animationName} animation`);
+  // DISABLED:       showToast(`Applied ${animationName} animation`);
     }
   });
 
@@ -112,7 +112,7 @@ export function GiphyIntegration() {
             detail: { url: gifUrl }
           }));
 
-          showToast('GIF added to timeline');
+  // DISABLED:           showToast('GIF added to timeline');
         }
       });
     }, 1000);
@@ -162,7 +162,7 @@ export function StickersLibrary() {
         detail: { sticker: sticker }
       }));
 
-      showToast(`Added ${sticker} sticker to timeline`);
+  // DISABLED:       showToast(`Added ${sticker} sticker to timeline`);
     }
   });
 
@@ -223,7 +223,7 @@ export function LowerThirds() {
         detail: { template: template }
       }));
 
-      showToast(`Added ${template} lower third to timeline`);
+  // DISABLED:       showToast(`Added ${template} lower third to timeline`);
     }
 
     if (createBtn) {
@@ -281,7 +281,7 @@ export function VideoGallery() {
         detail: { videoId: videoId }
       }));
 
-      showToast('Video added to timeline');
+  // DISABLED:       showToast('Video added to timeline');
     }
   });
 
@@ -324,7 +324,7 @@ export function EnhancedDropZones() {
           }));
         });
 
-        showToast(`${files.length} file(s) added to timeline`);
+  // DISABLED:         showToast(`${files.length} file(s) added to timeline`);
       });
 
       track.appendChild(dropZone);
@@ -357,7 +357,7 @@ export function LineDuration() {
           window.dispatchEvent(new CustomEvent('updateClipDuration', {
             detail: { clipId: clip.id, duration: newDuration }
           }));
-          showToast(`Duration updated to ${newDuration}s`);
+  // DISABLED:           showToast(`Duration updated to ${newDuration}s`);
         }
       });
 
@@ -404,7 +404,7 @@ export function OverlayListTransitions() {
         detail: { transition: transition }
       }));
 
-      showToast(`Applied ${transition} transition overlay`);
+  // DISABLED:       showToast(`Applied ${transition} transition overlay`);
     }
   });
 

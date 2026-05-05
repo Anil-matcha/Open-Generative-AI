@@ -153,7 +153,7 @@ export function Upload(options = {}) {
 
         // Complete upload
         progressText.textContent = 'Upload complete!';
-        showToast(`${validFiles.length} file(s) uploaded successfully`, 'success');
+  // DISABLED:         showToast(`${validFiles.length} file(s) uploaded successfully`, 'success');
 
         if (onUpload) {
           onUpload(multiple ? validFiles : validFiles[0]);
@@ -169,7 +169,7 @@ export function Upload(options = {}) {
 
       } catch (error) {
         console.error('Upload error:', error);
-        showToast('Upload failed', 'error');
+  // DISABLED:         showToast('Upload failed', 'error');
         if (onError) onError([error.message]);
 
         // Reset on error

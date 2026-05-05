@@ -13,7 +13,7 @@ export function renderFloatingRail(railActions, container, onActionClick, showTo
     btn.innerHTML = `<span class="emoji">${icon}</span><span>${label}</span>`;
     btn.addEventListener('click', () => {
       onActionClick(icon, label);
-      showToast(`${label} action triggered`);
+  // DISABLED:       showToast(`${label} action triggered`);
     });
     container.appendChild(btn);
   });
@@ -23,45 +23,45 @@ export function handleRailAction(icon, label, state, showToast) {
   switch (label) {
     case 'Generate':
       // Trigger generate panel
-      showToast('Generate panel opened');
+  // DISABLED:       showToast('Generate panel opened');
       break;
 
     case 'Split':
       if (state.selectedClipId) {
         // Split selected clip
-        showToast('Clip split');
+  // DISABLED:         showToast('Clip split');
       } else {
-        showToast('Select a clip to split');
+  // DISABLED:         showToast('Select a clip to split');
       }
       break;
 
     case 'Scenes':
-      showToast('Scene management opened');
+  // DISABLED:       showToast('Scene management opened');
       break;
 
     case 'Subtitle':
       // Add subtitle track or caption
-      showToast('Subtitle tools opened');
+  // DISABLED:       showToast('Subtitle tools opened');
       break;
 
     case 'B-Roll':
-      showToast('B-Roll library opened');
+  // DISABLED:       showToast('B-Roll library opened');
       break;
 
     case 'Speed':
-      showToast('Speed adjustment opened');
+  // DISABLED:       showToast('Speed adjustment opened');
       break;
 
     case 'Stabilize':
-      showToast('Stabilization tools opened');
+  // DISABLED:       showToast('Stabilization tools opened');
       break;
 
     case 'Text':
-      showToast('Text tools opened');
+  // DISABLED:       showToast('Text tools opened');
       break;
 
     default:
-      showToast(`${label} action`);
+  // DISABLED:       showToast(`${label} action`);
   }
 }
 

@@ -1,20 +1,22 @@
 const STUDIO_THUMBNAILS = {
-  image: '/thumbnails/studios/image.webp',
-  video: '/thumbnails/studios/video.webp',
-  cinema: '/thumbnails/studios/cinema.webp',
-  storyboard: '/thumbnails/studios/storyboard.webp',
-  effects: '/thumbnails/studios/effects.webp',
-  edit: '/thumbnails/studios/edit.webp',
-  upscale: '/thumbnails/studios/upscale.webp',
-  character: '/thumbnails/studios/character.webp',
-  commercial: '/thumbnails/studios/commercial.webp',
-  audio: '/thumbnails/studios/audio.webp',
-  avatar: '/thumbnails/studios/avatar.webp',
-  training: '/thumbnails/studios/training.webp',
-  videotools: '/thumbnails/studios/videotools.webp',
-  chat: '/thumbnails/studios/chat.webp',
-  'advanced-dubbing': '/thumbnails/studios/advanced-dubbing.webp',
+  image: '/thumbnails/studios/image.webp.png',
+  video: '/thumbnails/studios/video.webp.png',
+  cinema: '/thumbnails/studios/cinema.webp.png',
+  storyboard: '/thumbnails/studios/storyboard.webp.png',
+  effects: '/thumbnails/studios/effects.webp.png',
+  edit: '/thumbnails/studios/edit.webp.png',
+  upscale: '/thumbnails/studios/upscale.webp.png',
+  character: '/thumbnails/studios/character.webp.png',
+  commercial: '/thumbnails/studios/commercial.webp.png',
+  audio: '/thumbnails/studios/audio.webp.png',
+  avatar: '/thumbnails/studios/avatar.webp.png',
+  training: '/thumbnails/studios/training.webp.png',
+  videotools: '/thumbnails/studios/videotools.webp.png',
+  chat: '/thumbnails/studios/chat.webp.png',
+  'advanced-dubbing': '/thumbnails/studios/advanced-dubbing.webp.png',
   'ai-vfx': '/thumbnails/studios/ai-vfx.webp',
+  'runway-motion': '/thumbnails/studios/runway-motion.webp.png',
+  'tiktok-carousel': '/thumbnails/studios/tiktok-carousel.webp.png',
 };
 
 const HERO_THUMBNAILS = {
@@ -118,14 +120,28 @@ export function createThumbnailImg(src, alt, className = '') {
         const parent = img.parentElement;
         if (parent) parent.classList.add('thumb-fallback');
       };
-    } else if ((src.includes('/thumbnails/heroes/') || src.includes('/thumbnails/pages/') || src.includes('/thumbnails/videoagent/') || src.includes('/thumbnails/studios/')) && src.endsWith('.webp')) {
-      // Try fallback for hero, page, videoagent, and studio thumbnails (generated as .webp.png)
+    } else if ((src.includes('/thumbnails/heroes/') || src.includes('/thumbnails/pages/') || src.includes('/thumbnails/videoagent/')) && src.endsWith('.webp')) {
+      // Try fallback for hero, page, videoagent thumbnails (generated as .webp.png)
       img.src = src + '.png';
       img.onerror = () => {
         img.style.display = 'none';
         const parent = img.parentElement;
         if (parent) parent.classList.add('thumb-fallback');
       };
+    } else if (src.includes('/thumbnails/studios/')) {
+      // Studios might be .webp, .webp.png, or .svg
+      if (src.endsWith('.webp')) {
+        img.src = src + '.png';
+        img.onerror = () => {
+          img.style.display = 'none';
+          const parent = img.parentElement;
+          if (parent) parent.classList.add('thumb-fallback');
+        };
+      } else {
+        img.style.display = 'none';
+        const parent = img.parentElement;
+        if (parent) parent.classList.add('thumb-fallback');
+      }
     } else {
       img.style.display = 'none';
       const parent = img.parentElement;

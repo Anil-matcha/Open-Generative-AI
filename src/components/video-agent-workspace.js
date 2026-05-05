@@ -818,7 +818,7 @@ export function createVideoAgentWorkspace(runtime = null) {
       // Show error in outputs section
       updateOutputsSection();
 
-      showToast(`Video processing failed: ${error.message}`, 'error');
+  // DISABLED:       showToast(`Video processing failed: ${error.message}`, 'error');
     }
   }
 
@@ -1216,7 +1216,7 @@ export function createVideoAgentWorkspace(runtime = null) {
 
       if (!uploadedVideoUrl) {
         log('Please upload a video first', 'agent');
-        showToast('Please upload a video before running actions', 'warning');
+  // DISABLED:         showToast('Please upload a video before running actions', 'warning');
         return;
       }
 
@@ -1266,12 +1266,12 @@ export function createVideoAgentWorkspace(runtime = null) {
 
   function handleVideoFile(file) {
     if (!file.type.startsWith('video/')) {
-      showToast('Please select a video file.', 'error');
+  // DISABLED:       showToast('Please select a video file.', 'error');
       return;
     }
 
     if (file.size > 2 * 1024 * 1024 * 1024) { // 2GB limit
-      showToast('File size must be less than 2GB.', 'error');
+  // DISABLED:       showToast('File size must be less than 2GB.', 'error');
       return;
     }
 
@@ -1381,7 +1381,7 @@ export function createVideoAgentWorkspace(runtime = null) {
         }
         updateVideoToggle();
       } else {
-        showToast('No AI processed videos available', 'info');
+  // DISABLED:         showToast('No AI processed videos available', 'info');
       }
     });
   }

@@ -136,11 +136,11 @@ export function processMultipleFiles(files, dropZone, state) {
   });
 
   if (errors.length > 0) {
-    showToast(`Some files were rejected:\n${errors.join('\n')}`, 'warning');
+  // DISABLED:     showToast(`Some files were rejected:\n${errors.join('\n')}`, 'warning');
   }
 
   if (validFiles.length === 0) {
-    showToast('No valid files to upload', 'error');
+  // DISABLED:     showToast('No valid files to upload', 'error');
     return;
   }
 
@@ -163,7 +163,7 @@ export async function uploadFile(fileData, dropZone, state) {
     createUploadProgress(uploadId, file.name, file.size);
 
     // Show upload started
-    showToast(`Uploading ${file.name}...`, 'info');
+  // DISABLED:     showToast(`Uploading ${file.name}...`, 'info');
 
     // Upload to storage
     const publicUrl = await uploadFileToStorage(file);
@@ -177,12 +177,12 @@ export async function uploadFile(fileData, dropZone, state) {
     // Add to timeline based on drop zone
     await addAssetToTimeline(asset, dropZone, state);
 
-    showToast(`${file.name} uploaded successfully`, 'success');
+  // DISABLED:     showToast(`${file.name} uploaded successfully`, 'success');
 
   } catch (error) {
     console.error('[DragDrop] Upload failed:', error);
     updateUploadProgress(uploadId, 0, 'error');
-    showToast(`Failed to upload ${file.name}: ${error.message}`, 'error');
+  // DISABLED:     showToast(`Failed to upload ${file.name}: ${error.message}`, 'error');
   } finally {
     // Cleanup after delay
     setTimeout(() => removeUploadProgress(uploadId), 3000);
@@ -194,7 +194,7 @@ export async function uploadMultipleFiles(filesData, dropZone, state) {
   const uploadPromises = [];
   const batchId = `batch_${Date.now()}`;
 
-  showToast(`Uploading ${filesData.length} files...`, 'info');
+  // DISABLED:   showToast(`Uploading ${filesData.length} files...`, 'info');
 
   // Create batch progress indicator
   createBatchProgress(batchId, filesData.length);
@@ -1011,7 +1011,7 @@ function handleClipDrop(dropTarget, e) {
   // For now, just show a toast
   const message = `Moved clip ${itemId} to track ${newTrackId}${newStartTime ? ` at ${newStartTime.toFixed(1)}s` : ''}`;
   console.log('[DragDrop] Drop result:', message);
-  showToast(message);
+  // DISABLED:   showToast(message);
 }
 
 function cancelClipDrag() {
@@ -1196,7 +1196,7 @@ function findTimelineDropTarget(e) {
 function handleMediaDrop() {
   // Add media to timeline at drop position
   const mediaData = dragState.dragData.mediaData;
-  showToast(`Added ${mediaData.label} to timeline`);
+  // DISABLED:   showToast(`Added ${mediaData.label} to timeline`);
 
   // Here we would call the media library function to add to timeline
   // addMediaToTimeline(mediaData, index, state, showToast);
@@ -1711,10 +1711,10 @@ function toggleVideoPlayback(clipEl, asset) {
   if (videoEl) {
     if (videoEl.paused) {
       videoEl.play();
-      showToast('Video playback started', 'info');
+  // DISABLED:       showToast('Video playback started', 'info');
     } else {
       videoEl.pause();
-      showToast('Video playback paused', 'info');
+  // DISABLED:       showToast('Video playback paused', 'info');
     }
   } else {
     // Create video element for preview
@@ -1735,7 +1735,7 @@ function createVideoPreview(clipEl, asset) {
   clipEl.appendChild(videoEl);
 
   videoEl.play();
-  showToast('Video preview loaded', 'success');
+  // DISABLED:   showToast('Video preview loaded', 'success');
 }
 
 function showVideoContextMenu(e, clipEl, asset) {

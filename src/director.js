@@ -91,25 +91,25 @@ const muapiConfig = loadConfig();
 initializeEnhancedMuAPI(muapiConfig).then(async (success) => {
   if (success) {
     console.log('[App] Enhanced MuAPI initialized successfully');
-    showToast('Enhanced AI features enabled', 'success', 3000);
+  // DISABLED:     showToast('Enhanced AI features enabled', 'success', 3000);
 
     // Initialize AI service optimizations after MuAPI is ready
     console.log('[App] Initializing AI service optimizations...');
     const aiResult = await initializeAIOptimizations();
     if (aiResult.success) {
       console.log('[App] AI optimizations enabled successfully');
-      showToast('AI optimizations active', 'success', 2000);
+  // DISABLED:       showToast('AI optimizations active', 'success', 2000);
     } else {
       console.warn('[App] AI optimizations failed to initialize:', aiResult.error);
-      showToast('AI optimizations unavailable', 'warning', 3000);
+  // DISABLED:       showToast('AI optimizations unavailable', 'warning', 3000);
     }
   } else {
     console.log('[App] Enhanced MuAPI initialization failed, using basic features');
-    showToast('Using basic AI features', 'info', 3000);
+  // DISABLED:     showToast('Using basic AI features', 'info', 3000);
   }
 }).catch(error => {
   console.warn('[App] Enhanced MuAPI initialization error:', error);
-  showToast('AI features unavailable', 'warning', 5000);
+  // DISABLED:   showToast('AI features unavailable', 'warning', 5000);
 });
 
 // Start memory leak detection in development
@@ -217,11 +217,11 @@ document.addEventListener('visibilitychange', () => {
 
 // Online/offline detection
 window.addEventListener('online', () => {
-  showToast('Connection restored', 'success', 3000);
+  // DISABLED:   showToast('Connection restored', 'success', 3000);
 });
 
 window.addEventListener('offline', () => {
-  showToast('You are offline. Some features may not work.', 'warning', 10000);
+  // DISABLED:   showToast('You are offline. Some features may not work.', 'warning', 10000);
 });
 
 try {

@@ -1,29 +1,39 @@
 :root {
-  /* Brand Colors */
-  --color-primary: #d9ff00;
-  /* Neon Yellow-Green (Higgsfield Nano) */
-  --color-primary-hover: #c4e600;
-  --color-accent: #a855f7;
-  /* Creative Purple */
-  --color-accent-hover: #9333ea;
+  /* Brand Colors - Open Generative AI */
+  --color-primary: #22d3ee;
+  /* Editorial Cyan */
+  --color-primary-hover: #06b6d4;
+  --color-secondary: #34d399;
+  /* Creative Emerald */
+  --color-accent: #34d399;
+  /* Creative Emerald */
+  --color-accent-hover: #22c55e;
   --color-danger: #ef4444;
 
-  /* Backgrounds - Strict Dark Mode */
-  --bg-app: #050505;
-  /* Deepest Black */
-  --bg-panel: #0a0a0a;
-  /* Panel Background */
-  --bg-card: #141414;
-  /* Card/Input Background */
-  --bg-glass: rgba(10, 10, 10, 0.8);
+  /* Backgrounds - Layered Dark Surfaces */
+  --bg-app: #020205;
+  /* Surface Void */
+  --bg-deep: #05070b;
+  /* Surface Deep */
+  --bg-panel: #0a0b0f;
+  /* Surface Panel */
+  --bg-card: #111318;
+  /* Surface Card */
+  --bg-elevated: #1a1d24;
+  /* Surface Elevated */
+  --bg-header: #171b24;
+  /* Surface Header */
+  --bg-glass: rgba(10, 11, 15, 0.8);
 
   /* Text */
   --text-primary: #ffffff;
-  --text-secondary: #a1a1aa;
-  --text-muted: #52525b;
+  --text-secondary: #e4e4e7;
+  --text-muted: #71717a;
+  --text-dim: #52525b;
 
   /* UI Elements */
-  --border-color: #27272a;
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-soft: rgba(255, 255, 255, 0.05);
   --border-light: rgba(255, 255, 255, 0.1);
 
   --border-radius-sm: 6px;

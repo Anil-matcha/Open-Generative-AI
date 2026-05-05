@@ -41,7 +41,7 @@ export function ImageStudio() {
     const LOCAL_IMAGE_MODELS = LOCAL_MODEL_CATALOG.filter(m => m.type !== 'video');
     let useLocalModel = false;
     let selectedLocalModel = LOCAL_IMAGE_MODELS[0]?.id || null;
-    let localGenProgress = 0; // 0–1
+    const localGenProgress = 0; // 0–1
 
     // Advanced parameters state
     let negativePrompt = '';

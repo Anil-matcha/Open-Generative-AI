@@ -13,25 +13,37 @@ const CHARACTER_MODELS = [
 
 export function CharacterStudio() {
   const container = document.createElement('div');
-  container.className = 'w-full h-full flex flex-col items-center bg-app-bg overflow-y-auto p-6 md:p-10 relative';
+  container.className = 'w-full h-full flex flex-col bg-app-bg overflow-y-auto relative';
 
   let uploadedUrl = null;
   let selectedModel = CHARACTER_MODELS[0];
 
-  const header = document.createElement('div');
-  header.className = 'mb-8 animate-fade-in-up text-center w-full max-w-lg';
+  // Top bar with hero banner and inline instructions
+  const topBar = document.createElement('div');
+  topBar.className = 'px-4 md:px-8 pt-6 pb-4 shrink-0 animate-fade-in-up';
+  
   const charBanner = createHeroSection('character', 'h-32 md:h-44 mb-4');
   if (charBanner) {
     const bannerText = document.createElement('div');
-    bannerText.className = 'absolute bottom-0 left-0 right-0 p-5 z-10';
+    bannerText.className = 'absolute bottom-0 left-0 right-0 p-4 z-10';
     bannerText.innerHTML = '<h1 class="text-2xl md:text-4xl font-black text-white tracking-tight mb-2">Character Studio</h1><p class="text-white/60 text-sm max-w-md">Generate consistent character images using face ID preservation</p>';
     charBanner.appendChild(bannerText);
-    header.appendChild(charBanner);
+    topBar.appendChild(charBanner);
   }
-  container.appendChild(header);
+  
+  const inlineInstructions = createInlineInstructions('character');
+  inlineInstructions.classList.add('px-4', 'md:px-8', 'mt-2');
+  topBar.appendChild(inlineInstructions);
+  
+  container.appendChild(topBar);
+
+  // Main content area
+  const contentArea = document.createElement('div');
+  contentArea.className = 'flex-1 overflow-y-auto px-4 md:px-8 pb-8';
+  container.appendChild(contentArea);
 
   const formCard = document.createElement('div');
-  formCard.className = 'w-full max-w-lg bg-[#111]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 flex flex-col gap-5 animate-fade-in-up';
+  formCard.className = 'w-full max-w-lg mx-auto bg-[#111]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 flex flex-col gap-5 animate-fade-in-up';
   formCard.style.animationDelay = '0.15s';
 
   const modelLabel = document.createElement('label');
@@ -77,7 +89,7 @@ export function CharacterStudio() {
   hint.textContent = 'Upload a clear face photo or video';
   uploadRow.appendChild(hint);
   formCard.appendChild(uploadRow);
-  container.appendChild(picker.panel);
+  contentArea.appendChild(picker.panel);
 
   const promptLabel = document.createElement('label');
   promptLabel.className = 'text-xs font-bold text-secondary uppercase tracking-wider';
@@ -109,17 +121,11 @@ export function CharacterStudio() {
   genBtn.className = 'w-full bg-primary text-black py-3.5 rounded-xl font-black text-sm hover:shadow-glow transition-all mt-2';
   genBtn.textContent = 'Generate Character';
   formCard.appendChild(genBtn);
-  container.appendChild(formCard);
+  contentArea.appendChild(formCard);
 
-  const inlineInstructions = createInlineInstructions('character');
-  inlineInstructions.classList.add('max-w-lg', 'mt-6');
-  container.appendChild(inlineInstructions);
-
-  // ==========================================
-  // EXPRESSION PRESETS
-  // ==========================================
+  // Expression presets
   const expressionSection = document.createElement('div');
-  expressionSection.className = 'w-full max-w-lg mt-6';
+  expressionSection.className = 'w-full max-w-lg mx-auto mt-6';
   expressionSection.innerHTML = `
     <h3 class="text-sm font-bold text-white mb-3">Expression Presets</h3>
     <div class="flex gap-2 flex-wrap">
@@ -130,7 +136,7 @@ export function CharacterStudio() {
       <button class="expr-btn px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white hover:bg-white/10 transition-all" data-expr="neutral">😐 Neutral</button>
     </div>
   `;
-  container.appendChild(expressionSection);
+  contentArea.appendChild(expressionSection);
 
   // Expression click handlers
   expressionSection.querySelectorAll('.expr-btn').forEach(btn => {
@@ -149,11 +155,9 @@ export function CharacterStudio() {
     };
   });
 
-  // ==========================================
-  // CHARACTER LIBRARY (from localStorage)
-  // ==========================================
+  // Character library
   const librarySection = document.createElement('div');
-  librarySection.className = 'w-full max-w-lg mt-6';
+  librarySection.className = 'w-full max-w-lg mx-auto mt-6';
   const savedCharacters = JSON.parse(localStorage.getItem('character_library') || '[]');
   
   librarySection.innerHTML = `
@@ -179,7 +183,7 @@ export function CharacterStudio() {
       </div>
     `}
   `;
-  container.appendChild(librarySection);
+  contentArea.appendChild(librarySection);
 
   // Character item click handlers
   librarySection.querySelectorAll('.character-item').forEach(item => {
@@ -194,8 +198,8 @@ export function CharacterStudio() {
   });
 
   const resultArea = document.createElement('div');
-  resultArea.className = 'w-full max-w-lg mt-6 hidden';
-  container.appendChild(resultArea);
+  resultArea.className = 'w-full max-w-lg mx-auto mt-6 hidden';
+  contentArea.appendChild(resultArea);
 
   genBtn.onclick = async () => {
     if (!uploadedUrl) { alert('Upload a reference face first'); return; }
@@ -249,7 +253,7 @@ export function CharacterStudio() {
           promptTextarea.value = generatedPrompt;
           promptTextarea.dispatchEvent(new Event('input', { bubbles: true }));
 
-          console.log('GTM-optimized prompt loaded successfully!');
+          console.log('GTM-optimized character prompt loaded successfully!');
         }
       });
       modal.open();

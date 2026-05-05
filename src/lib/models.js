@@ -8391,3 +8391,118 @@ export const imageLipSyncModels = lipsyncModels.filter(m => m.category === 'imag
 export const videoLipSyncModels = lipsyncModels.filter(m => m.category === 'video');
 
 export const getV2VModelById = (id) => v2vModels.find(m => m.id === id);
+
+// Audio models for Audio Studio
+export const audioModels = [
+  {
+    "id": "suno-create-music",
+    "name": "Suno Create Music",
+    "family": "suno",
+    "endpoint": "suno-create-music",
+    "hasPrompt": true,
+    "supportsStyles": true,
+    "inputs": {
+      "prompt": {
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "description": "Describe the music you want to create",
+        "examples": ["Upbeat electronic dance track with driving basslines and euphoric synths"]
+      },
+      "style": {
+        "type": "string",
+        "title": "Style",
+        "name": "style",
+        "enum": ["pop", "rock", "jazz", "classical", "electronic", "hip-hop", "ambient", "custom"]
+      },
+      "duration": {
+        "type": "int",
+        "title": "Duration (seconds)",
+        "name": "duration",
+        "enum": [15, 30, 60, 90, 120],
+        "default": 30
+      },
+      "instrumental": {
+        "type": "boolean",
+        "title": "Instrumental Only",
+        "name": "instrumental",
+        "default": false
+      }
+    }
+  }
+];
+
+// Avatar models for Avatar Studio (using lipsync models)
+export const avatarModels = [
+  {
+    "id": "lipsync-basic",
+    "name": "Lip Sync Basic",
+    "hasVideo": true,
+    "hasAudio": true,
+    "hasPrompt": false,
+    "inputs": {
+      "video": { "type": "file", "accept": "video/*" },
+      "audio": { "type": "file", "accept": "audio/*" }
+    }
+  }
+];
+
+// Helper functions
+export function getAudioModelById(id) {
+  return audioModels.find(m => m.id === id);
+}
+
+export function getAvatarModelById(id) {
+  return avatarModels.find(m => m.id === id);
+}
+
+
+// Text models for Chat Studio
+export const textModels = [
+  {
+    "id": "gpt-4",
+    "name": "GPT-4"
+  },
+  {
+    "id": "claude-3-opus",
+    "name": "Claude 3 Opus"
+  }
+];
+
+// Training models for Training Studio
+export const trainingModels = [
+  {
+    "id": "flux-lora",
+    "name": "Flux LoRA",
+    "description": "Train custom LoRA model for Flux"
+  }
+];
+
+// Video Tools models for Video Tools Studio
+export const videoToolsModels = [
+  {
+    "id": "video-upscaler",
+    "name": "Video Upscaler",
+    "videoField": "video_url",
+    "hasPrompt": false
+  },
+  {
+    "id": "video-enhancer",
+    "name": "Video Enhancer",
+    "videoField": "video_url",
+    "hasPrompt": true
+  }
+];
+
+// Helper functions
+export function getTextModelById(id) {
+  return textModels.find(m => m.id === id);
+}
+
+export function getTrainingModelById(id) {
+  return trainingModels.find(m => m.id === id);
+}
+
+export function getVideoToolModelById(id) {
+  return videoToolsModels.find(m => m.id === id);
+}

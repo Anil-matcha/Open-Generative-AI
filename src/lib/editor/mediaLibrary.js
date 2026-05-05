@@ -154,7 +154,7 @@ export function addGeneratedAssetToLibrary(asset, state) {
 
 export function handleUpload(showToast) {
   // Placeholder for upload functionality
-  showToast('Upload flow placeholder triggered');
+  // DISABLED:   showToast('Upload flow placeholder triggered');
 }
 
 export function searchMedia(query, mediaItems) {

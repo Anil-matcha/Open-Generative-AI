@@ -918,7 +918,7 @@ export function EditorPage() {
                         clip.start = Math.round(clip.start / 0.5) * 0.5;
                         renderTimelineTracks();
                         updateTimelineDuration();
-                        showToast(`${clip.name} moved to ${formatTime(clip.start)}`, 'info');
+  // DISABLED:                         showToast(`${clip.name} moved to ${formatTime(clip.start)}`, 'info');
                     };
 
                     document.addEventListener('mousemove', onMouseMove);
@@ -947,7 +947,7 @@ export function EditorPage() {
                         clip.duration = Math.max(0.5, finalWidth / (TIMELINE_CONFIG.pixelsPerSecond * timelineZoom));
                         renderTimelineTracks();
                         updateTimelineDuration();
-                        showToast(`${clip.name} duration: ${formatTime(clip.duration)}`, 'info');
+  // DISABLED:                         showToast(`${clip.name} duration: ${formatTime(clip.duration)}`, 'info');
                     };
 
                     document.addEventListener('mousemove', onMouseMove);
@@ -960,7 +960,7 @@ export function EditorPage() {
                     container.querySelectorAll('.clip').forEach(c => c.classList.remove('ring-2', 'ring-primary'));
                     clipEl.classList.add('ring-2', 'ring-primary');
                     updateClipProperties(clip);
-                    showToast(`Selected: ${clip.name}`, 'info');
+  // DISABLED:                     showToast(`Selected: ${clip.name}`, 'info');
                 });
 
                 lane.appendChild(clipEl);
@@ -983,7 +983,7 @@ export function EditorPage() {
                 timelineClips.push(newClip);
                 renderTimelineTracks();
                 updateTimelineDuration();
-                showToast(`Added ${newClip.name} at ${formatTime(newClip.start)}`, 'success');
+  // DISABLED:                 showToast(`Added ${newClip.name} at ${formatTime(newClip.start)}`, 'success');
             });
 
             row.appendChild(lane);
@@ -1059,7 +1059,7 @@ export function EditorPage() {
                 timelineClips.push(newClip);
                 renderTimelineTracks();
                 updateTimelineDuration();
-                showToast(`Added "${media.name}" to ${track?.name || 'Video'} track`, 'success');
+  // DISABLED:                 showToast(`Added "${media.name}" to ${track?.name || 'Video'} track`, 'success');
             });
             grid.appendChild(item);
         });
@@ -1095,7 +1095,7 @@ export function EditorPage() {
                 saveUndoState();
                 timelineClips.push(newClip);
                 renderTimelineTracks();
-                showToast(`Added "${audio.name}" to audio track`, 'success');
+  // DISABLED:                 showToast(`Added "${audio.name}" to audio track`, 'success');
             });
             list.appendChild(item);
         });
@@ -1122,7 +1122,7 @@ export function EditorPage() {
         },
         onSelect: ({ url }) => {
             uploadedUrl = url;
-            showToast('Media uploaded successfully', 'success');
+  // DISABLED:             showToast('Media uploaded successfully', 'success');
         },
         onClear: () => { uploadedUrl = null; },
     });
@@ -1132,7 +1132,7 @@ export function EditorPage() {
         try {
             const savedData = localStorage.getItem('editor_project');
             if (!savedData) {
-                showToast('No saved projects found', 'info');
+  // DISABLED:                 showToast('No saved projects found', 'info');
                 return;
             }
 
@@ -1146,7 +1146,7 @@ export function EditorPage() {
             }
 
             if (projects.length === 0) {
-                showToast('No valid saved projects found', 'info');
+  // DISABLED:                 showToast('No valid saved projects found', 'info');
                 return;
             }
 
@@ -1208,7 +1208,7 @@ export function EditorPage() {
                     updateTimelineDuration();
                     chatHistoryLoaded = true;
 
-                    showToast(`Loaded Project ${index + 1}`, 'success');
+  // DISABLED:                     showToast(`Loaded Project ${index + 1}`, 'success');
                     document.body.removeChild(modal);
                 });
             });
@@ -1222,14 +1222,14 @@ export function EditorPage() {
             modal.querySelector('#clear-all-btn').addEventListener('click', () => {
                 if (confirm('Are you sure you want to clear all saved projects? This cannot be undone.')) {
                     localStorage.removeItem('editor_project');
-                    showToast('All saved projects cleared', 'success');
+  // DISABLED:                     showToast('All saved projects cleared', 'success');
                     document.body.removeChild(modal);
                 }
             });
 
         } catch (error) {
             console.error('Error loading project browser:', error);
-            showToast('Error loading saved projects', 'error');
+  // DISABLED:             showToast('Error loading saved projects', 'error');
         }
     }
 
@@ -1259,7 +1259,7 @@ export function EditorPage() {
         timelineClips = JSON.parse(undoStack.pop());
         renderTimelineTracks();
         updateTimelineDuration();
-        showToast('Undo', 'info');
+  // DISABLED:         showToast('Undo', 'info');
     };
 
     container.querySelector('#redo-btn').onclick = () => {
@@ -1268,7 +1268,7 @@ export function EditorPage() {
         timelineClips = JSON.parse(redoStack.pop());
         renderTimelineTracks();
         updateTimelineDuration();
-        showToast('Redo', 'info');
+  // DISABLED:         showToast('Redo', 'info');
     };
 
     container.querySelector('#save-btn').onclick = () => {
@@ -1299,29 +1299,29 @@ export function EditorPage() {
                 localStorage.setItem('editor_project', JSON.stringify(currentProject));
             }
 
-            showToast('Project saved!', 'success');
+  // DISABLED:             showToast('Project saved!', 'success');
         } catch (err) {
-            showToast('Save failed: ' + err.message, 'error');
+  // DISABLED:             showToast('Save failed: ' + err.message, 'error');
         }
     };
 
     container.querySelector('#export-btn').onclick = () => {
         if (timelineClips.length === 0) { showToast('Add clips to the timeline before exporting', 'info'); return; }
-        showToast('Exporting video...', 'info');
+  // DISABLED:         showToast('Exporting video...', 'info');
     };
 
     const zoomInBtn = container.querySelector('#zoom-in-btn');
     if (zoomInBtn) zoomInBtn.onclick = () => {
         timelineZoom = Math.min(3, timelineZoom + 0.25);
         renderTimelineTracks();
-        showToast(`Zoom: ${timelineZoom.toFixed(2)}x`, 'info');
+  // DISABLED:         showToast(`Zoom: ${timelineZoom.toFixed(2)}x`, 'info');
     };
 
     const zoomOutBtn = container.querySelector('#zoom-out-btn');
     if (zoomOutBtn) zoomOutBtn.onclick = () => {
         timelineZoom = Math.max(0.25, timelineZoom - 0.25);
         renderTimelineTracks();
-        showToast(`Zoom: ${timelineZoom.toFixed(2)}x`, 'info');
+  // DISABLED:         showToast(`Zoom: ${timelineZoom.toFixed(2)}x`, 'info');
     };
 
     const addTrackBtn = container.querySelector('#add-track-btn');
@@ -1329,7 +1329,7 @@ export function EditorPage() {
         showTrackNameModal((name) => {
             trackDefinitions.push({ id: name.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now(), name, color: '#6B7280' });
             renderTimelineTracks();
-            showToast(`Added "${name}" track`, 'success');
+  // DISABLED:             showToast(`Added "${name}" track`, 'success');
         });
     };
 
@@ -1338,7 +1338,7 @@ export function EditorPage() {
     if (snapBtn) snapBtn.onclick = () => {
         snapEnabled = !snapEnabled;
         snapBtn.classList.toggle('bg-primary/20', snapEnabled);
-        showToast(`Snap to grid: ${snapEnabled ? 'ON' : 'OFF'}`, 'info');
+  // DISABLED:         showToast(`Snap to grid: ${snapEnabled ? 'ON' : 'OFF'}`, 'info');
     };
     
     // Tool tabs
@@ -1362,7 +1362,7 @@ export function EditorPage() {
             btn.classList.add('bg-primary/30', 'border', 'border-primary');
             selectedTransition = btn.dataset.transition;
             const trans = TRANSITIONS.find(t => t.id === selectedTransition);
-            showToast(`Selected: ${trans?.name || selectedTransition} transition`, 'info');
+  // DISABLED:             showToast(`Selected: ${trans?.name || selectedTransition} transition`, 'info');
         };
     });
 
@@ -1372,7 +1372,7 @@ export function EditorPage() {
             container.querySelectorAll('.style-btn').forEach(b => b.classList.remove('bg-primary/30'));
             btn.classList.add('bg-primary/30');
             selectedTool = 'text';
-            showToast(`Selected: ${TEXT_STYLES.find(s => s.id === btn.dataset.style)?.name || btn.dataset.style} style`, 'info');
+  // DISABLED:             showToast(`Selected: ${TEXT_STYLES.find(s => s.id === btn.dataset.style)?.name || btn.dataset.style} style`, 'info');
         };
     });
 
@@ -1382,14 +1382,14 @@ export function EditorPage() {
             container.querySelectorAll('.audio-btn').forEach(b => b.classList.remove('bg-primary/20'));
             btn.classList.add('bg-primary/20');
             selectedTool = 'audio';
-            showToast(`Selected: ${AUDIO_TRACKS.find(a => a.id === btn.dataset.audio)?.name || btn.dataset.audio} track type`, 'info');
+  // DISABLED:             showToast(`Selected: ${AUDIO_TRACKS.find(a => a.id === btn.dataset.audio)?.name || btn.dataset.audio} track type`, 'info');
         };
     });
 
     // Effect buttons
     container.querySelectorAll('.effect-btn').forEach(btn => {
         btn.onclick = () => {
-            showToast(`Applying ${EFFECTS_LIST.find(e => e.id === btn.dataset.effect)?.name || btn.dataset.effect} effect...`, 'info');
+  // DISABLED:             showToast(`Applying ${EFFECTS_LIST.find(e => e.id === btn.dataset.effect)?.name || btn.dataset.effect} effect...`, 'info');
         };
     });
 
@@ -1421,7 +1421,7 @@ export function EditorPage() {
         saveUndoState();
         timelineClips.push(newClip);
         renderTimelineTracks();
-        showToast(`Added text: "${textContent.slice(0, 20)}..."`, 'success');
+  // DISABLED:         showToast(`Added text: "${textContent.slice(0, 20)}..."`, 'success');
     };
 
     // Add audio track button
@@ -1476,10 +1476,10 @@ export function EditorPage() {
                 clipsListEl.innerHTML = clips.map(clip => `<div class="flex items-center justify-between p-2 bg-white/5 rounded-lg cursor-pointer hover:bg-white/10"><div><span class="text-xs text-white">${escapeHtml(clip.time)}</span><span class="text-[10px] text-secondary ml-2">${escapeHtml(clip.type)}</span></div><span class="text-xs text-primary">${escapeHtml(clip.confidence)}</span></div>`).join('');
                 resultsEl.classList.remove('hidden');
             }
-            showToast('Auto-clip detection complete!', 'success');
+  // DISABLED:             showToast('Auto-clip detection complete!', 'success');
         } catch (error) {
             console.error('[Auto-Clip] Error:', error);
-            showToast('Auto-clip analysis completed', 'info');
+  // DISABLED:             showToast('Auto-clip analysis completed', 'info');
         }
         btn.disabled = false;
         btn.innerHTML = 'Run Auto-Clip';
@@ -1508,10 +1508,10 @@ export function EditorPage() {
                 tagsListEl.innerHTML = tags.map(tag => `<div class="flex items-center justify-between p-2 bg-white/5 rounded-lg"><div class="flex items-center gap-2"><span class="text-lg">${escapeHtml(tag.icon || '')}</span><span class="text-sm text-white">${escapeHtml(tag.name || '')}</span></div><span class="text-xs text-primary">${escapeHtml(String(tag.count || 0))} detected</span></div>`).join('');
                 tagsSection.classList.remove('hidden');
             }
-            showToast('AI organization complete!', 'success');
+  // DISABLED:             showToast('AI organization complete!', 'success');
         } catch (error) {
             console.error('[AI Organize] Error:', error);
-            showToast('AI organization completed', 'info');
+  // DISABLED:             showToast('AI organization completed', 'info');
         }
         btn.disabled = false;
         btn.innerHTML = 'Auto-Analyze & Organize';
@@ -1668,11 +1668,11 @@ export function EditorPage() {
     generateBtn?.addEventListener('click', () => {
         const prompt = generatePrompt?.value.trim();
         if (!prompt) {
-            showToast('Please enter a prompt', 'warning');
+  // DISABLED:             showToast('Please enter a prompt', 'warning');
             return;
         }
 
-        showToast(`Generating ${selectedGenerateType} content...`, 'info');
+  // DISABLED:         showToast(`Generating ${selectedGenerateType} content...`, 'info');
 
         // Simulate generation process
         setTimeout(() => {
@@ -1689,7 +1689,7 @@ export function EditorPage() {
             timelineClips.push(newClip);
             renderTimelineTracks();
             updateTimelineDuration();
-            showToast(`${selectedGenerateType} clip added to timeline`, 'success');
+  // DISABLED:             showToast(`${selectedGenerateType} clip added to timeline`, 'success');
         }, 2000);
     });
 
@@ -1712,12 +1712,12 @@ export function EditorPage() {
                 if (validProjects.length > 0) {
                     // Load the most recent project (by timestamp or last in array)
                     projectToLoad = validProjects[validProjects.length - 1];
-                    showToast(`Loaded recent project (${validProjects.length} available)`, 'info');
+  // DISABLED:                     showToast(`Loaded recent project (${validProjects.length} available)`, 'info');
                 }
             } else if (projectData && projectData.timelineClips?.length > 0) {
                 // Single project object
                 projectToLoad = projectData;
-                showToast('Loaded saved project', 'info');
+  // DISABLED:                 showToast('Loaded saved project', 'info');
             }
 
             if (projectToLoad) {
@@ -1782,7 +1782,7 @@ export function EditorPage() {
     railButtons.forEach(btn => {
         btn.addEventListener('click', () => {
             const action = btn.id.replace('rail-', '');
-            showToast(`AI ${action} action triggered`, 'info');
+  // DISABLED:             showToast(`AI ${action} action triggered`, 'info');
 
             // Switch to generate tab for generate action
             if (action === 'generate') {

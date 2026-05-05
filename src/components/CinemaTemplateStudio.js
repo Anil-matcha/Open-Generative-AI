@@ -292,7 +292,7 @@ export function CinemaTemplateStudio() {
         inputs: currentInputs,
         mode: currentMode
       });
-      showToast('Project saved!', 'success');
+  // DISABLED:       showToast('Project saved!', 'success');
     };
 
     container.querySelector('#generate-btn').onclick = () => {
@@ -475,7 +475,7 @@ export function CinemaTemplateStudio() {
     const errors = formBuilder.validateInputs(currentInputs);
     
     if (errors.length > 0) {
-      showToast(`Please fill in required fields: ${errors.map(e => e.field).join(', ')}`, 'error');
+  // DISABLED:       showToast(`Please fill in required fields: ${errors.map(e => e.field).join(', ')}`, 'error');
       return;
     }
 
@@ -574,7 +574,7 @@ export function CinemaTemplateStudio() {
     container.querySelector('#export-btn')?.addEventListener('click', () => {
       const text = storyboardBuilder.exportAsText();
       navigator.clipboard.writeText(text);
-      showToast('Storyboard copied to clipboard!', 'success');
+  // DISABLED:       showToast('Storyboard copied to clipboard!', 'success');
     });
 
     const autoGenBtn = container.querySelector('#auto-generate-btn') || container.querySelector('#auto-generate-empty-btn');
@@ -603,7 +603,7 @@ export function CinemaTemplateStudio() {
     // Generate storyboard from scenes
     storyboardBuilder.generateFromScenes(sceneBuilder.getScenes());
     renderStoryboardPanels();
-    showToast('Storyboard generated!', 'success');
+  // DISABLED:     showToast('Storyboard generated!', 'success');
   }
 
   function renderStoryboardPanels() {
@@ -748,7 +748,7 @@ export function CinemaTemplateStudio() {
       });
       overlay.remove();
       renderStoryboardPanels();
-      showToast('Board updated!', 'success');
+  // DISABLED:       showToast('Board updated!', 'success');
     };
   }
 
@@ -912,7 +912,7 @@ export function CinemaTemplateStudio() {
     });
 
     container.querySelector('#start-btn')?.addEventListener('click', () => {
-      showToast('Starting generation process...', 'success');
+  // DISABLED:       showToast('Starting generation process...', 'success');
       // Here you would integrate with the actual video generation engine
       // For now, we just show a toast
     });

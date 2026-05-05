@@ -255,11 +255,11 @@ async function openAIVideoCreator(state, showToast) {
       onComplete: (result) => {
         // Add generated video to timeline
         addVideoToTimeline(result, state);
-        showToast('AI Video created successfully', 'success');
+  // DISABLED:         showToast('AI Video created successfully', 'success');
       }
     });
   } catch (error) {
-    showToast('Failed to open AI Video Creator', 'error');
+  // DISABLED:     showToast('Failed to open AI Video Creator', 'error');
   }
 }
 
@@ -270,11 +270,11 @@ async function openVideoPersonalizer(clip, state, showToast) {
       clip,
       onComplete: (result) => {
         updateClipInTimeline(clip.id, result, state);
-        showToast('Video personalized successfully', 'success');
+  // DISABLED:         showToast('Video personalized successfully', 'success');
       }
     });
   } catch (error) {
-    showToast('Failed to open Video Personalizer', 'error');
+  // DISABLED:     showToast('Failed to open Video Personalizer', 'error');
   }
 }
 
@@ -292,7 +292,7 @@ async function openImageEditor(clip, state, showToast) {
         // For editing existing clips
         if (result && result.editedImage) {
           updateClipInTimeline(clip.id, { src: `data:image/png;base64,${result.editedImage}` }, state);
-          showToast('Image edited with AI successfully', 'success');
+  // DISABLED:           showToast('Image edited with AI successfully', 'success');
         }
       },
       onAddToTimeline: async (generatedImage) => {
@@ -325,7 +325,7 @@ async function openImageEditor(clip, state, showToast) {
             targetTrack.clips.push(newClip);
           }
 
-          showToast('AI-generated image added to timeline', 'success');
+  // DISABLED:           showToast('AI-generated image added to timeline', 'success');
         } catch (error) {
           console.error('Failed to add generated image to timeline:', error);
           throw error;
@@ -339,7 +339,7 @@ async function openImageEditor(clip, state, showToast) {
     modal.show();
   } catch (error) {
     console.error('Failed to open OpenAI Image Editor:', error);
-    showToast('Failed to open AI Image Editor', 'error');
+  // DISABLED:     showToast('Failed to open AI Image Editor', 'error');
   }
 }
 
@@ -351,11 +351,11 @@ async function openTextToSpeech(clip, state, showToast) {
       onComplete: (audioUrl) => {
         // Add audio track with generated voice
         addAudioToTimeline(audioUrl, clip, state);
-        showToast('Voice generated successfully', 'success');
+  // DISABLED:         showToast('Voice generated successfully', 'success');
       }
     });
   } catch (error) {
-    showToast('Failed to open Text-to-Speech', 'error');
+  // DISABLED:     showToast('Failed to open Text-to-Speech', 'error');
   }
 }
 
@@ -365,11 +365,11 @@ async function openTemplateBrowser(clip, state, showToast) {
     await modalManager.openModal('Templates', {
       onSelect: (template) => {
         applyTemplateToClip(clip, template, state);
-        showToast('Template applied successfully', 'success');
+  // DISABLED:         showToast('Template applied successfully', 'success');
       }
     });
   } catch (error) {
-    showToast('Failed to open Template Browser', 'error');
+  // DISABLED:     showToast('Failed to open Template Browser', 'error');
   }
 }
 
@@ -379,11 +379,11 @@ async function openVideoRecorder(state, showToast) {
     await modalManager.openModal('VideoRecorder', {
       onComplete: (videoUrl) => {
         addVideoToTimeline({ src: videoUrl, name: 'Recorded Video' }, state);
-        showToast('Recording completed', 'success');
+  // DISABLED:         showToast('Recording completed', 'success');
       }
     });
   } catch (error) {
-    showToast('Failed to open Video Recorder', 'error');
+  // DISABLED:     showToast('Failed to open Video Recorder', 'error');
   }
 }
 
@@ -393,11 +393,11 @@ async function toggleEnhancedLibrary(mediaGrid, state, showToast) {
     await modalManager.openModal('Library', {
       onSelect: (media) => {
         addMediaToTimeline(media, state);
-        showToast('Media added to timeline', 'success');
+  // DISABLED:         showToast('Media added to timeline', 'success');
       }
     });
   } catch (error) {
-    showToast('Failed to open Enhanced Library', 'error');
+  // DISABLED:     showToast('Failed to open Enhanced Library', 'error');
   }
 }
 
@@ -407,11 +407,11 @@ async function openSocialPublisher(state, showToast) {
     await modalManager.openModal('SocialPublisherModal', {
       project: state,
       onComplete: () => {
-        showToast('Published successfully', 'success');
+  // DISABLED:         showToast('Published successfully', 'success');
       }
     });
   } catch (error) {
-    showToast('Failed to open Social Publisher', 'error');
+  // DISABLED:     showToast('Failed to open Social Publisher', 'error');
   }
 }
 
@@ -421,11 +421,11 @@ async function openVideoAnalytics(state, showToast) {
     await modalManager.openModal('VideoAnalytics', {
       project: state,
       onComplete: (analytics) => {
-        showToast('Analytics generated', 'success');
+  // DISABLED:         showToast('Analytics generated', 'success');
       }
     });
   } catch (error) {
-    showToast('Failed to open Video Analytics', 'error');
+  // DISABLED:     showToast('Failed to open Video Analytics', 'error');
   }
 }
 
@@ -437,11 +437,11 @@ async function openAdvanceImageEditorModal(clip, state, showToast) {
       image: clip.src,
       onComplete: (result) => {
         updateClipInTimeline(clip.id, { src: result }, state);
-        showToast('Image edited successfully', 'success');
+  // DISABLED:         showToast('Image edited successfully', 'success');
       }
     });
   } catch (error) {
-    showToast('Failed to open Advance Image Editor', 'error');
+  // DISABLED:     showToast('Failed to open Advance Image Editor', 'error');
   }
 }
 
@@ -452,11 +452,11 @@ async function openImageCropperModal(clip, state, showToast) {
       image: clip.src,
       onComplete: (result) => {
         updateClipInTimeline(clip.id, { src: result }, state);
-        showToast('Image cropped successfully', 'success');
+  // DISABLED:         showToast('Image cropped successfully', 'success');
       }
     });
   } catch (error) {
-    showToast('Failed to open Image Cropper', 'error');
+  // DISABLED:     showToast('Failed to open Image Cropper', 'error');
   }
 }
 
@@ -467,11 +467,11 @@ async function openImglyImageEditorModal(clip, state, showToast) {
       image: clip.src,
       onComplete: (result) => {
         updateClipInTimeline(clip.id, { src: result }, state);
-        showToast('Image edited with Imgly successfully', 'success');
+  // DISABLED:         showToast('Image edited with Imgly successfully', 'success');
       }
     });
   } catch (error) {
-    showToast('Failed to open Imgly Image Editor', 'error');
+  // DISABLED:     showToast('Failed to open Imgly Image Editor', 'error');
   }
 }
 
@@ -482,11 +482,11 @@ async function openVideoPersonalizerModal(clip, state, showToast) {
       clip,
       onComplete: (result) => {
         updateClipInTimeline(clip.id, result, state);
-        showToast('Video personalized successfully', 'success');
+  // DISABLED:         showToast('Video personalized successfully', 'success');
       }
     });
   } catch (error) {
-    showToast('Failed to open Video Personalizer', 'error');
+  // DISABLED:     showToast('Failed to open Video Personalizer', 'error');
   }
 }
 
@@ -496,11 +496,11 @@ async function openVideoAnalyticsModal(clip, state, showToast) {
     await modalManager.openModal('VideoAnalytics', {
       clip,
       onComplete: (analytics) => {
-        showToast('Video analytics completed', 'success');
+  // DISABLED:         showToast('Video analytics completed', 'success');
       }
     });
   } catch (error) {
-    showToast('Failed to open Video Analytics', 'error');
+  // DISABLED:     showToast('Failed to open Video Analytics', 'error');
   }
 }
 
@@ -512,11 +512,11 @@ async function openVoiceModalTTS(clip, state, showToast) {
       text: clip.body || clip.heading,
       onComplete: (result) => {
         addAudioToTimeline(result, state);
-        showToast('Voice generated successfully', 'success');
+  // DISABLED:         showToast('Voice generated successfully', 'success');
       }
     });
   } catch (error) {
-    showToast('Failed to open Voice Modal (TTS)', 'error');
+  // DISABLED:     showToast('Failed to open Voice Modal (TTS)', 'error');
   }
 }
 
@@ -527,11 +527,11 @@ async function openPersonalizationModal(clip, state, showToast) {
       text: clip.body || clip.heading,
       onComplete: (result) => {
         updateClipInTimeline(clip.id, { body: result.personalizedText }, state);
-        showToast('Text personalized successfully', 'success');
+  // DISABLED:         showToast('Text personalized successfully', 'success');
       }
     });
   } catch (error) {
-    showToast('Failed to open Personalization Modal', 'error');
+  // DISABLED:     showToast('Failed to open Personalization Modal', 'error');
   }
 }
 
@@ -542,11 +542,11 @@ async function openVoiceModalRecording(clip, state, showToast) {
       mode: 'recording',
       onComplete: (result) => {
         updateClipInTimeline(clip.id, { src: result.audioUrl }, state);
-        showToast('Voice recorded successfully', 'success');
+  // DISABLED:         showToast('Voice recorded successfully', 'success');
       }
     });
   } catch (error) {
-    showToast('Failed to open Voice Modal (Recording)', 'error');
+  // DISABLED:     showToast('Failed to open Voice Modal (Recording)', 'error');
   }
 }
 
@@ -624,7 +624,7 @@ function addMediaToTimeline(media, state) {
 async function openGiphyIntegration(state, showToast) {
   try {
     // For now, show a simple integration - in full implementation this would open a modal
-    showToast('Giphy integration opened - search for GIFs in the generation panel', 'info');
+  // DISABLED:     showToast('Giphy integration opened - search for GIFs in the generation panel', 'info');
 
     // Add Giphy search to generation panel
     const generationPanel = document.querySelector('.generate-panel');
@@ -645,7 +645,7 @@ async function openGiphyIntegration(state, showToast) {
         const query = input.value.trim();
         if (query) {
           window.dispatchEvent(new CustomEvent('giphySearch', { detail: { query } }));
-          showToast(`Searching for "${query}" GIFs`);
+  // DISABLED:           showToast(`Searching for "${query}" GIFs`);
         }
       };
 
@@ -655,7 +655,7 @@ async function openGiphyIntegration(state, showToast) {
       });
     }
   } catch (error) {
-    showToast('Failed to open Giphy integration', 'error');
+  // DISABLED:     showToast('Failed to open Giphy integration', 'error');
   }
 }
 
@@ -670,11 +670,11 @@ async function openTextToSpeechFromSelection(state, showToast) {
       window.dispatchEvent(new CustomEvent('generateTTS', {
         detail: { clipId: selectedClip.id, text: selectedClip.body || selectedClip.text }
       }));
-      showToast('Generating speech from text...');
+  // DISABLED:       showToast('Generating speech from text...');
     } else {
-      showToast('Please select a text clip first', 'warning');
+  // DISABLED:       showToast('Please select a text clip first', 'warning');
     }
   } catch (error) {
-    showToast('Failed to generate text-to-speech', 'error');
+  // DISABLED:     showToast('Failed to generate text-to-speech', 'error');
   }
 }

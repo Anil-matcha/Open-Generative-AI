@@ -13,7 +13,7 @@ export function renderGenerateTypes(generateTypes, selectedType, container, onTy
     btn.innerHTML = `<span class="emoji">${icon}</span><span>${label}</span>`;
     btn.addEventListener('click', () => {
       onTypeSelect(label);
-      showToast(`${label} mode selected`);
+  // DISABLED:       showToast(`${label} mode selected`);
     });
     container.appendChild(btn);
   });

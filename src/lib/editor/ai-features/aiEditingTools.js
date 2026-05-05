@@ -373,7 +373,7 @@ export class AIEditingTools {
     this.showToast(toast);
   }
 
-  showToast(toast) {
+  // DISABLED:   showToast(toast) {
     toast.style.position = 'fixed';
     toast.style.bottom = '20px';
     toast.style.right = '20px';

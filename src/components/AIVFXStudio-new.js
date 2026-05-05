@@ -5,7 +5,7 @@ export function AIVFXStudio() {
   // State management
   let activeFilter = 'AI Effects';
   let showInputBar = true;
-  let showChatButton = false;
+  const showChatButton = false;
   let selectedEffect = null;
   let selectedResolution = "";
   let selectedQuality = "";
@@ -16,7 +16,7 @@ export function AIVFXStudio() {
   let inputText = "";
   let selectedAspect = "";
   let selectedDuration = "";
-  let fileInputRef = null;
+  const fileInputRef = null;
   let aiEffectsRef = null;
   let motionControlsRef = null;
   let vfxControlsRef = null;
@@ -29,11 +29,11 @@ export function AIVFXStudio() {
   let log = [];
   let showApiKeyModal = false;
   let apiKeyInput = '';
-  let showVideoModal = false;
-  let showImageUrlModal = false;
-  let imageUrlInput = "";
-  let isMountedRef = { current: true };
-  let pollTimeoutRef = { current: null };
+  const showVideoModal = false;
+  const showImageUrlModal = false;
+  const imageUrlInput = "";
+  const isMountedRef = { current: true };
+  const pollTimeoutRef = { current: null };
   const MAX_POLL_ATTEMPTS = 180;
 
   // Container setup
@@ -101,7 +101,7 @@ export function AIVFXStudio() {
       } else {
         uploadedFile = null;
         previewUrl = null;
-        showToast('Please upload a valid image or video file.', 'error');
+  // DISABLED:         showToast('Please upload a valid image or video file.', 'error');
       }
     }
   };
@@ -868,7 +868,7 @@ export function AIVFXStudio() {
       imageUrl = url;
       updatePreview();
     } else if (url) {
-      showToast('Please enter a valid image URL (http/https)', 'error');
+  // DISABLED:       showToast('Please enter a valid image URL (http/https)', 'error');
     }
   };
 
@@ -880,11 +880,11 @@ export function AIVFXStudio() {
   const generateBtn = inputBar.querySelector('.generate-btn');
   generateBtn.onclick = () => {
     if (!selectedEffect) {
-      showToast('Please select an effect first', 'error');
+  // DISABLED:       showToast('Please select an effect first', 'error');
       return;
     }
     if (!imageUrl && !inputText.trim()) {
-      showToast('Please provide an image URL or prompt', 'error');
+  // DISABLED:       showToast('Please provide an image URL or prompt', 'error');
       return;
     }
     showApiKeyModal = true;

@@ -32,22 +32,84 @@ const ALL_FEATURES = [
 export default function LandingPage() {
   const container = document.createElement('div');
   container.className = 'landing-page';
-  
+  container.setAttribute('lang', document.documentElement.lang || 'en');
+  container.setAttribute('dir', document.documentElement.dir || 'ltr');
+
+  // Validate and sanitize features data
+  const safeFeatures = Array.isArray(ALL_FEATURES) ? ALL_FEATURES.filter(f =>
+    f && typeof f === 'object' && (f.title || f.id)
+  ) : [];
+
+  if (safeFeatures.length === 0) {
+    console.warn('No valid features found for landing page');
+    // Return minimal landing page
+    container.innerHTML = `
+      <section class="relative py-32 px-4 text-center">
+        <div class="container mx-auto max-w-3xl">
+          <h1 class="text-4xl md:text-6xl text-white mb-6">Welcome to Open Generative AI</h1>
+          <p class="text-xl text-gray-400">Features loading...</p>
+        </div>
+      </section>
+    `;
+    return container;
+  }
+
   // Core tools (excluding timeline, which is featured separately)
-  const coreFeatures = ALL_FEATURES.slice(1, 9); // 8 items: cinema, director, ai-vfx, image, video, storyboard, edit, audio
-  
-  // Featured: Timeline Editor (top promotion)
-  const featuredTimeline = [ALL_FEATURES[0]];
-  
+  const coreFeatures = safeFeatures.slice(1, Math.min(9, safeFeatures.length));
+
+  // Featured: Timeline Editor (top promotion) - handle missing timeline
+  const featuredTimeline = safeFeatures[0] ? [safeFeatures[0]] : [];
+
   // Remaining tools (excluding timeline which is featured)
-  const otherFeatures = ALL_FEATURES.slice(9); // from effects onward
-  
-  const hero = Hero();
-  const coreGrid = FeatureGrid({ features: coreFeatures, sectionTitle: 'Create videos in one click', sectionDescription: 'From viral effects to polished commercials, no editing needed', viewAllLink: '/apps', viewAllCount: ALL_FEATURES.length });
-  const featured = FeatureGrid({ features: featuredTimeline, sectionTitle: 'THE ULTIMATE VIDEO EDITOR', sectionDescription: 'Professional timeline editing with AI-powered automation', viewAllLink: '/timeline' });
-  const otherGrid = FeatureGrid({ features: otherFeatures, sectionTitle: 'Explore more features', sectionDescription: 'All the tools you need to create stunning content', viewAllLink: '/apps', viewAllCount: otherFeatures.length });
-  
-  container.append(hero, coreGrid, featured, otherGrid);
-  
+  const otherFeatures = safeFeatures.slice(9);
+
+  try {
+    const hero = Hero();
+    const coreGrid = FeatureGrid({
+      features: coreFeatures,
+      sectionTitle: 'Create videos in one click',
+      sectionDescription: 'From viral effects to polished commercials, no editing needed',
+      viewAllLink: '/apps',
+      viewAllCount: safeFeatures.length,
+      backgroundClass: 'bg-gradient-to-b from-cyan-400/5 via-transparent to-emerald-400/5'
+    });
+    const featured = featuredTimeline.length > 0 ? FeatureGrid({
+      features: featuredTimeline,
+      sectionTitle: 'THE ULTIMATE VIDEO EDITOR',
+      sectionDescription: 'Professional timeline editing with AI-powered automation',
+      viewAllLink: '/timeline',
+      backgroundClass: 'bg-gradient-to-r from-cyan-400/10 via-transparent to-cyan-400/5'
+    }) : null;
+
+    const otherGrid = otherFeatures.length > 0 ? FeatureGrid({
+      features: otherFeatures,
+      sectionTitle: 'Explore more features',
+      sectionDescription: 'All the tools you need to create stunning content',
+      viewAllLink: '/apps',
+      viewAllCount: otherFeatures.length,
+      backgroundClass: 'bg-gradient-to-b from-emerald-400/5 via-transparent to-transparent'
+    }) : null;
+
+    // Append sections, filtering out nulls
+    [hero, coreGrid, featured, otherGrid].filter(Boolean).forEach(section => {
+      container.appendChild(section);
+    });
+
+  } catch (error) {
+    console.error('Error rendering landing page:', error);
+    // Fallback minimal page
+    container.innerHTML = `
+      <section class="relative py-32 px-4 text-center bg-gray-900">
+        <div class="container mx-auto max-w-3xl">
+          <h1 class="text-4xl md:text-6xl text-white mb-6">Welcome to Open Generative AI</h1>
+          <p class="text-xl text-gray-400 mb-8">Something went wrong loading the page.</p>
+          <button onclick="window.location.reload()" class="px-6 py-3 bg-cyan-400 text-black font-semibold rounded hover:bg-cyan-300 transition">
+            Try Again
+          </button>
+        </div>
+      </section>
+    `;
+  }
+
   return container;
 }

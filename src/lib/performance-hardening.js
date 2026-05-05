@@ -35,12 +35,12 @@ export class LazyLoader {
     }
   }
 
-  async _loadComponent(componentPath) {
-    const startTime = performance.now();
-    
-    try {
-      const module = await import(componentPath);
-      const loadTime = performance.now() - startTime;
+   async _loadComponent(componentPath) {
+     const startTime = performance.now();
+     
+     try {
+       const module = await import(/* @vite-ignore */ componentPath);
+       const loadTime = performance.now() - startTime;
       
       perfMonitor.trackMetric('component_load_time', loadTime, {
         component: componentPath,

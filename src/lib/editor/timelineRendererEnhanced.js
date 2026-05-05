@@ -256,7 +256,7 @@ export function initializeTimelineEngine(state, els) {
         // Remove track logic
         state.tracks = state.tracks.filter(t => t.id !== layerItem.id);
         renderTracks(state, els, showToast);
-        showToast(`Track "${layerItem.name}" removed`);
+  // DISABLED:         showToast(`Track "${layerItem.name}" removed`);
       }
     });
   });
@@ -385,7 +385,7 @@ export function renderTracks(state, els, showToast) {
     trackName.textContent = track.name;
     trackName.onblur = () => {
       track.name = trackName.textContent.trim() || 'Track ' + (trackIndex + 1);
-      showToast(`Track renamed to "${track.name}"`);
+  // DISABLED:       showToast(`Track renamed to "${track.name}"`);
     };
 
     const trackStats = document.createElement('div');
@@ -407,7 +407,7 @@ export function renderTracks(state, els, showToast) {
     soloBtn.onclick = () => {
       track.solo = !track.solo;
       renderTracks(state, els, showToast);
-      showToast(`${track.name} ${track.solo ? 'soloed' : 'unsoloed'}`);
+  // DISABLED:       showToast(`${track.name} ${track.solo ? 'soloed' : 'unsoloed'}`);
     };
 
     // Mute button
@@ -418,7 +418,7 @@ export function renderTracks(state, els, showToast) {
     muteBtn.onclick = () => {
       track.muted = !track.muted;
       renderTracks(state, els, showToast);
-      showToast(`${track.name} ${track.muted ? 'muted' : 'unmuted'}`);
+  // DISABLED:       showToast(`${track.name} ${track.muted ? 'muted' : 'unmuted'}`);
     };
 
     // Lock button
@@ -429,7 +429,7 @@ export function renderTracks(state, els, showToast) {
     lockBtn.onclick = () => {
       track.locked = !track.locked;
       renderTracks(state, els, showToast);
-      showToast(`${track.name} ${track.locked ? 'locked' : 'unlocked'}`);
+  // DISABLED:       showToast(`${track.name} ${track.locked ? 'locked' : 'unlocked'}`);
     };
 
     trackControls.appendChild(soloBtn);
@@ -444,7 +444,7 @@ export function renderTracks(state, els, showToast) {
       layer: { ...track, blendMode: track.blendMode || 'normal' },
       onChange: (newBlendMode) => {
         track.blendMode = newBlendMode;
-        showToast(`Track blend mode set to ${newBlendMode}`);
+  // DISABLED:         showToast(`Track blend mode set to ${newBlendMode}`);
       }
     });
 
@@ -452,7 +452,7 @@ export function renderTracks(state, els, showToast) {
       layer: { ...track, opacity: track.opacity || 1 },
       onChange: (newOpacity) => {
         track.opacity = newOpacity;
-        showToast(`Track opacity set to ${(newOpacity * 100).toFixed(0)}%`);
+  // DISABLED:         showToast(`Track opacity set to ${(newOpacity * 100).toFixed(0)}%`);
       }
     });
 
@@ -635,7 +635,7 @@ export function createEnhancedClipElement(item, track, state, zoom = 1.0) {
     if (e.target.classList.contains('clip-handle')) return;
 
     // Open clip editor
-    showToast(`Opening ${item.name} in editor`);
+  // DISABLED:     showToast(`Opening ${item.name} in editor`);
   });
 
   // Add mouse enter/leave for enhanced tooltips
