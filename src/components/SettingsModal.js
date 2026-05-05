@@ -18,8 +18,17 @@ export async function SettingsModal(onClose) {
     };
 
     // Create modal content using design system
+    const infoText = document.createElement('p');
+    infoText.style.cssText = `
+        font-size: 11px;
+        color: ${TIMELINE_DESIGN_SYSTEM.variables['--muted']};
+        margin-bottom: 16px;
+        line-height: 1.5;
+    `;
+    infoText.textContent = 'Add your MuAPI API key to enable AI generation features. Get your key at muapi.ai. Your key is stored securely on this device.';
+
     const label = document.createElement('label');
-    label.textContent = 'Muapi API Key';
+    label.textContent = 'MuAPI API Key';
     label.style.cssText = `
         display: block;
         font-size: 10px;
@@ -35,7 +44,7 @@ export async function SettingsModal(onClose) {
     input.type = 'password';
     input.style.cssText = `
         width: 100%;
-        margin-bottom: 24px;
+        margin-bottom: 16px;
         background: rgba(0,0,0,0.4);
         border: 1px solid ${TIMELINE_DESIGN_SYSTEM.variables['--border']};
         border-radius: 12px;
@@ -69,21 +78,48 @@ export async function SettingsModal(onClose) {
         border-color: ${TIMELINE_DESIGN_SYSTEM.variables['--border']};
     `;
 
+    const errorMsg = document.createElement('div');
+    errorMsg.style.cssText = `
+        color: #ef4444;
+        font-size: 11px;
+        margin-bottom: 12px;
+        display: none;
+    `;
+
     const saveBtn = TIMELINE_DESIGN_SYSTEM.utils.createButton({
         type: 'primary',
         text: 'Save',
         onClick: async () => {
             const key = input.value.trim();
-            if (key) {
+            errorMsg.style.display = 'none';
+
+            if (!key) {
+                errorMsg.textContent = 'Please enter your API key';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            if (key.length < 20) {
+                errorMsg.textContent = 'API key seems too short. Please check your key.';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            try {
                 await securityService.storeEncryptedKey(key);
                 removeModal();
+            } catch (error) {
+                errorMsg.textContent = error.message || 'Failed to save API key';
+                errorMsg.style.display = 'block';
             }
         }
     });
 
     // Add content to modal body
+    modalBody.appendChild(infoText);
     modalBody.appendChild(label);
     modalBody.appendChild(input);
+    modalBody.appendChild(errorMsg);
     modalBody.appendChild(btnContainer);
     btnContainer.appendChild(cancelBtn);
     btnContainer.appendChild(saveBtn);

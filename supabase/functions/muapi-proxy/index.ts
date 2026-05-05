@@ -20,7 +20,7 @@ function getCorsHeaders(req: Request): Record<string, string> {
   return {
     "Access-Control-Allow-Origin": origin,
     "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey, X-User-Api-Key",
     "Access-Control-Allow-Credentials": "true"
   };
 }
@@ -62,18 +62,36 @@ function validateEndpoint(endpoint: string): boolean {
 
   // Only allow specific endpoints to prevent SSRF
   const allowedPatterns = [
-    // MuAPI standard endpoints
-    /^predictions(\/.*)?$/,
-    /^image-generation(\/.*)?$/,
-    /^video-generation(\/.*)?$/,
-    /^image-to-image(\/.*)?$/,
-    /^image-to-video(\/.*)?$/,
-    /^video-to-video(\/.*)?$/,
-    /^flux-dev-image$/,
-    /^generate_wan_ai_effects$/,
-    /^ai-image-face-swap$/,
-    /^api\/storyboard\/projects$/,
-    /^upload_file$/,
+  // MuAPI standard endpoints
+  /^predictions(\/.*)?$/,
+  /^image-generation(\/.*)?$/,
+  /^video-generation(\/.*)?$/,
+  /^image-to-image(\/.*)?$/,
+  /^image-to-video(\/.*)?$/,
+  /^video-to-video(\/.*)?$/,
+  /^flux-dev-image$/,
+  /^generate_wan_ai_effects$/,
+  /^ai-image-face-swap$/,
+  /^api\/storyboard\/projects$/,
+  /^upload_file$/,
+  
+  // Lip sync & audio models
+  /^sync-lipsync$/,
+  /^latentsync-video$/,
+  /^mmaudio-v2\/text-to-audio$/,
+  /^mmaudio-v2\/video-to-video$/,
+  
+  // Suno music models
+  /^suno-create-music$/,
+  /^suno-remix-music$/,
+  /^suno-extend-music$/,
+  /^suno-add-vocals$/,
+  /^suno-generate-mashup$/,
+  /^suno-generate-lyrics$/,
+  
+  // Style transfer models
+  /^ai-ghibli-style$/,
+  /^ai-anime-generator$/,
     
     // LTX Video models (via MuAPI)
     /^ltx-2-pro-text-to-video$/,
@@ -160,28 +178,28 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-     const muapiKey = Deno.env.get('MUAPI_API_KEY');
-     if (!muapiKey) {
-       console.error('[muapi-proxy] MUAPI_API_KEY environment variable is not set in Supabase edge function configuration');
-       return new Response(
-         JSON.stringify({ 
-           error: 'AI service is not configured',
-           details: 'MUAPI_API_KEY environment variable is missing. Please configure it in your Supabase edge function settings (Settings > Edge Functions > Environment Variables).'
-         }),
-         {
-           status: 503,
-           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-         }
-       );
-     }
+const muapiKey = req.headers.get('x-user-api-key');
+      if (!muapiKey) {
+        console.error('[muapi-proxy] No MuAPI key provided - x-user-api-key header is required');
+        return new Response(
+          JSON.stringify({
+            error: 'API key required',
+            details: 'Please add your MuAPI API key in the Settings. The system requires a personal API key for all AI generation requests.'
+          }),
+          {
+            status: 401,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          }
+        );
+      }
 
-    const muapiUrl = generationType === 'poll'
-      ? `https://api.muapi.ai/api/v1/predictions/${endpoint.split('/')[1]}/result`
-      : `https://api.muapi.ai/api/v1/${endpoint}`;
+console.log(`[muapi-proxy] Forwarding ${generationType} request to ${endpoint} using user-provided key`);
 
-    console.log(`[muapi-proxy] Forwarding ${generationType} request to ${endpoint}`);
+     const muapiUrl = generationType === 'poll'
+       ? `https://api.muapi.ai/api/v1/predictions/${endpoint.split('/')[1]}/result`
+       : `https://api.muapi.ai/api/v1/${endpoint}`;
 
-    const method = generationType === 'poll' ? 'GET' : 'POST';
+     const method = generationType === 'poll' ? 'GET' : 'POST';
     const fetchOptions: RequestInit = {
       method,
       headers: {

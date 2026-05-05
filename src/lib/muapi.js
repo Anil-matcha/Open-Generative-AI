@@ -87,8 +87,8 @@ export class MuapiClient {
     async getKey() {
         const key = await this.security.getDecryptedKey();
         if (!key) {
-            console.warn('[MuapiClient] No API key configured. Please set your API key in settings.');
-            throw new Error('API key not configured. Please set your API key in the application settings.');
+            console.warn('[MuapiClient] No API key configured. Users can set their own key in Settings, or use the superadmin key.');
+            throw new Error('API key not configured. Please set your API key in the application settings or contact the administrator.');
         }
 
         // Validate key format
@@ -98,6 +98,31 @@ export class MuapiClient {
             throw new Error(`Invalid API key: ${validation.reason}`);
         }
 
+        return key;
+    }
+
+    // Get user API key if available (doesn't throw if missing)
+    async getOptionalUserKey() {
+        try {
+            const key = await this.security.getDecryptedKey();
+            if (key) {
+                const validation = this.security.validateApiKey(key);
+                if (validation.valid) {
+                    return key;
+                }
+            }
+        } catch (error) {
+            console.debug('[MuapiClient] No user API key available:', error.message);
+        }
+        return null;
+    }
+
+    // Require API key to be present - throws clear error if missing
+    async requireKey() {
+        const key = await this.getOptionalUserKey();
+        if (!key) {
+            throw new Error('API key not configured. Please add your MuAPI key in Settings to use AI generation features.');
+        }
         return key;
     }
 
@@ -138,6 +163,9 @@ export class MuapiClient {
                     return cached;
                 }
 
+                // Get user key for header (optional)
+                const userKey = await this.getOptionalUserKey();
+
                 // Execute request with retry logic
                 const result = await this.retry.execute(async () => {
                     const controller = new AbortController();
@@ -149,6 +177,7 @@ export class MuapiClient {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
+                                'x-user-api-key': userKey || ''
                             },
                             body: JSON.stringify({
                                 endpoint,
@@ -204,18 +233,30 @@ export class MuapiClient {
                 }
             });
 
-         } catch (error) {
-             this.circuitBreaker.recordFailure('api_request');
-             if (error.name === 'AbortError') {
-                 throw new Error('Request cancelled by user');
-             }
-             throw error;
-         } finally {
-             this.requestIds.delete(requestId);
-         }
+        } catch (error) {
+            this.circuitBreaker.recordFailure('api_request');
+            if (error.name === 'AbortError') {
+                throw new Error('Request cancelled by user');
+            }
+            throw error;
+        } finally {
+            this.requestIds.delete(requestId);
+        }
     }
 
-    // Cancel a specific request
+    // Helper to get headers with optional user key
+    async _getHeaders(includeUserKey = true) {
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+        if (includeUserKey) {
+            const userKey = await this.getOptionalUserKey();
+            if (userKey) {
+                headers['x-user-api-key'] = userKey;
+            }
+        }
+        return headers;
+    }
     cancelRequest(requestId) {
         const controller = this.activeControllers.get(requestId);
         if (controller) {
@@ -305,9 +346,13 @@ export class MuapiClient {
 
                     try {
                         const startTime = Date.now();
+                        const userKey = await this.getOptionalUserKey();
                         const response = await fetch(this.proxyUrl, {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'x-user-api-key': userKey || ''
+                            },
                             body: JSON.stringify({
                                 endpoint,
                                 params: finalPayload,
@@ -378,8 +423,11 @@ export class MuapiClient {
     }
 
     async pollForResult(requestId, maxAttempts = 60, baseInterval = 2000, signal) {
+        // Get user key for polling requests
+        const userKey = await this.getOptionalUserKey();
+
         // Use WebSocket polling if available, fallback to HTTP polling
-        if (this.websocket.isConnected()) {
+        if (this.websocket.isConnected() && userKey) {
             return await this.websocket.pollForResult(requestId, 'generation', maxAttempts, baseInterval);
         }
 
@@ -402,19 +450,20 @@ export class MuapiClient {
                     throw new Error('Request cancelled');
                 }
 
-                 try {
-                     const response = await fetch(this.proxyUrl, {
-                         method: 'POST',
-                         headers: {
-                             'Content-Type': 'application/json',
-                         },
-                         body: JSON.stringify({
-                             endpoint: `predictions/${requestId}/result`,
-                             params: {},
-                             generationType: 'poll'
-                         }),
-                         signal
-                     });
+try {
+                      const response = await fetch(this.proxyUrl, {
+                          method: 'POST',
+                          headers: {
+                              'Content-Type': 'application/json',
+                              'x-user-api-key': userKey || ''
+                          },
+                          body: JSON.stringify({
+                              endpoint: `predictions/${requestId}/result`,
+                              params: {},
+                              generationType: 'poll'
+                          }),
+                          signal
+                      });
 
                      // Check if response exists and has required properties
                      if (!response) {
@@ -503,10 +552,12 @@ export class MuapiClient {
         if (params.image_url) finalPayload.image_url = params.image_url;
 
         try {
+            const userKey = await this.getOptionalUserKey();
             const response = await fetch(this.proxyUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'x-user-api-key': userKey || ''
                 },
                 body: JSON.stringify({
                     endpoint,
@@ -564,9 +615,13 @@ export class MuapiClient {
         if (params.quality) finalPayload.quality = params.quality;
 
         try {
+            const userKey = await this.getOptionalUserKey();
             const response = await fetch(this.proxyUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-api-key': userKey || ''
+                },
                 body: JSON.stringify({
                     endpoint,
                     params: finalPayload,
@@ -621,9 +676,13 @@ export class MuapiClient {
         if (params.quality) finalPayload.quality = params.quality;
 
         try {
+            const userKey = await this.getOptionalUserKey();
             const response = await fetch(this.proxyUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-api-key': userKey || ''
+                },
                 body: JSON.stringify({
                     endpoint,
                     params: finalPayload,
@@ -656,15 +715,22 @@ export class MuapiClient {
     }
 
     async uploadFile(file) {
+        const userKey = await this.requireKey();
+
         const formData = new FormData();
         formData.append('file', file);
 
-        const response = await fetch('https://api.muapi.ai/upload_file', {
+        const response = await fetch(this.proxyUrl, {
             method: 'POST',
             headers: {
-                'x-api-key': this.getKey()
+                'x-user-api-key': userKey
             },
-            body: formData
+            body: JSON.stringify({
+                endpoint: 'upload_file',
+                params: {},
+                fileData: await this.fileToBase64(file),
+                generationType: 'upload'
+            })
         });
 
         if (!response.ok) {
@@ -676,6 +742,15 @@ export class MuapiClient {
         return data;
     }
 
+    async fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
     async processV2V(params, signal) {
         const modelInfo = getV2VModelById(params.model);
         const endpoint = modelInfo?.endpoint || params.model;
@@ -684,9 +759,13 @@ export class MuapiClient {
         const finalPayload = { [videoField]: params.video_url };
 
         try {
+            const userKey = await this.getOptionalUserKey();
             const response = await fetch(this.proxyUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-api-key': userKey || ''
+                },
                 body: JSON.stringify({
                     endpoint,
                     params: finalPayload,
@@ -727,9 +806,13 @@ export class MuapiClient {
         if (params.prompt) finalPayload.prompt = params.prompt;
 
         try {
+            const userKey = await this.getOptionalUserKey();
             const response = await fetch(this.proxyUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-api-key': userKey || ''
+                },
                 body: JSON.stringify({
                     endpoint: 'avatar',
                     params: finalPayload,
@@ -770,9 +853,13 @@ export class MuapiClient {
         if (params.style) finalPayload.style = params.style;
 
         try {
+            const userKey = await this.getOptionalUserKey();
             const response = await fetch(this.proxyUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-api-key': userKey || ''
+                },
                 body: JSON.stringify({
                     endpoint: 'audio',
                     params: finalPayload,
@@ -814,9 +901,13 @@ export class MuapiClient {
         if (params.max_tokens) finalPayload.max_tokens = params.max_tokens;
 
         try {
+            const userKey = await this.getOptionalUserKey();
             const response = await fetch(this.proxyUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-api-key': userKey || ''
+                },
                 body: JSON.stringify({
                     endpoint: 'text',
                     params: finalPayload,
@@ -850,9 +941,13 @@ export class MuapiClient {
         if (params.epochs) finalPayload.epochs = params.epochs;
 
         try {
+            const userKey = await this.getOptionalUserKey();
             const response = await fetch(this.proxyUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-api-key': userKey || ''
+                },
                 body: JSON.stringify({
                     endpoint: 'train',
                     params: finalPayload,
@@ -891,9 +986,13 @@ export class MuapiClient {
         if (params.prompt) finalPayload.prompt = params.prompt;
 
         try {
+            const userKey = await this.getOptionalUserKey();
             const response = await fetch(this.proxyUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-api-key': userKey || ''
+                },
                 body: JSON.stringify({
                     endpoint: 'video-tool',
                     params: finalPayload,
@@ -933,9 +1032,13 @@ export class MuapiClient {
         if (params.shots) finalPayload.shots = params.shots;
 
         try {
+            const userKey = await this.getOptionalUserKey();
             const response = await fetch(this.proxyUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-api-key': userKey || ''
+                },
                 body: JSON.stringify({
                     endpoint: 'api/storyboard/projects',
                     params: finalPayload,
@@ -976,9 +1079,13 @@ export class MuapiClient {
         if (params.resolution) finalPayload.resolution = params.resolution;
 
         try {
+            const userKey = await this.getOptionalUserKey();
             const response = await fetch(this.proxyUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-api-key': userKey || ''
+                },
                 body: JSON.stringify({
                     endpoint: 'generate_wan_ai_effects',
                     params: finalPayload,
@@ -1018,9 +1125,13 @@ export class MuapiClient {
         };
 
         try {
+            const userKey = await this.getOptionalUserKey();
             const response = await fetch(this.proxyUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-api-key': userKey || ''
+                },
                 body: JSON.stringify({
                     endpoint: 'generate_wan_ai_effects',
                     params: finalPayload,
@@ -1060,9 +1171,13 @@ export class MuapiClient {
         // Add other face swap parameters as needed
 
         try {
+            const userKey = await this.getOptionalUserKey();
             const response = await fetch(this.proxyUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-api-key': userKey || ''
+                },
                 body: JSON.stringify({
                     endpoint: 'ai-image-face-swap',
                     params: finalPayload,
@@ -1101,9 +1216,13 @@ export class MuapiClient {
         if (params.scale) finalPayload.scale = params.scale;
 
         try {
+            const userKey = await this.getOptionalUserKey();
             const response = await fetch(this.proxyUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-api-key': userKey || ''
+                },
                 body: JSON.stringify({
                     endpoint: 'ai-image-upscale',
                     params: finalPayload,
@@ -1141,9 +1260,13 @@ export class MuapiClient {
         if (params.image_url) finalPayload.image_url = params.image_url;
 
         try {
+            const userKey = await this.getOptionalUserKey();
             const response = await fetch(this.proxyUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-api-key': userKey || ''
+                },
                 body: JSON.stringify({
                     endpoint: 'ai-background-remover',
                     params: finalPayload,
@@ -1182,9 +1305,13 @@ export class MuapiClient {
         if (params.mask) finalPayload.mask = params.mask;
 
         try {
+            const userKey = await this.getOptionalUserKey();
             const response = await fetch(this.proxyUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-api-key': userKey || ''
+                },
                 body: JSON.stringify({
                     endpoint: 'ai-object-eraser',
                     params: finalPayload,
@@ -1223,9 +1350,13 @@ export class MuapiClient {
         if (params.direction) finalPayload.direction = params.direction;
 
         try {
+            const userKey = await this.getOptionalUserKey();
             const response = await fetch(this.proxyUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-api-key': userKey || ''
+                },
                 body: JSON.stringify({
                     endpoint: 'ai-image-extension',
                     params: finalPayload,
@@ -1264,9 +1395,13 @@ export class MuapiClient {
         if (params.background) finalPayload.background = params.background;
 
         try {
+            const userKey = await this.getOptionalUserKey();
             const response = await fetch(this.proxyUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-api-key': userKey || ''
+                },
                 body: JSON.stringify({
                     endpoint: 'ai-product-shot',
                     params: finalPayload,
@@ -1304,9 +1439,13 @@ export class MuapiClient {
         if (params.image_url) finalPayload.image_url = params.image_url;
 
         try {
+            const userKey = await this.getOptionalUserKey();
             const response = await fetch(this.proxyUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-api-key': userKey || ''
+                },
                 body: JSON.stringify({
                     endpoint: 'ai-skin-enhancer',
                     params: finalPayload,
@@ -1344,9 +1483,13 @@ export class MuapiClient {
         if (params.image_url) finalPayload.image_url = params.image_url;
 
         try {
+            const userKey = await this.getOptionalUserKey();
             const response = await fetch(this.proxyUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-api-key': userKey || ''
+                },
                 body: JSON.stringify({
                     endpoint: 'ai-ghibli-style',
                     params: finalPayload,
@@ -1384,9 +1527,13 @@ export class MuapiClient {
         if (params.prompt) finalPayload.prompt = params.prompt;
 
         try {
+            const userKey = await this.getOptionalUserKey();
             const response = await fetch(this.proxyUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-api-key': userKey || ''
+                },
                 body: JSON.stringify({
                     endpoint: 'ai-anime-generator',
                     params: finalPayload,
@@ -1426,9 +1573,13 @@ export class MuapiClient {
         if (params.duration) finalPayload.duration = params.duration;
 
         try {
+            const userKey = await this.getOptionalUserKey();
             const response = await fetch(this.proxyUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-api-key': userKey || ''
+                },
                 body: JSON.stringify({
                     endpoint: 'suno-create-music',
                     params: finalPayload,
@@ -1467,9 +1618,13 @@ export class MuapiClient {
         if (params.prompt) finalPayload.prompt = params.prompt;
 
         try {
+            const userKey = await this.getOptionalUserKey();
             const response = await fetch(this.proxyUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-api-key': userKey || ''
+                },
                 body: JSON.stringify({
                     endpoint: 'suno-remix-music',
                     params: finalPayload,
@@ -1508,9 +1663,13 @@ export class MuapiClient {
         if (params.duration) finalPayload.duration = params.duration;
 
         try {
+            const userKey = await this.getOptionalUserKey();
             const response = await fetch(this.proxyUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-api-key': userKey || ''
+                },
                 body: JSON.stringify({
                     endpoint: 'suno-extend-music',
                     params: finalPayload,
@@ -1550,9 +1709,13 @@ export class MuapiClient {
         if (params.video_url) finalPayload.video_url = params.video_url;
 
         try {
+            const userKey = await this.getOptionalUserKey();
             const response = await fetch(this.proxyUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-api-key': userKey || ''
+                },
                 body: JSON.stringify({
                     endpoint: 'sync-lipsync',
                     params: finalPayload,
@@ -1591,9 +1754,13 @@ export class MuapiClient {
         if (params.video_url) finalPayload.video_url = params.video_url;
 
         try {
+            const userKey = await this.getOptionalUserKey();
             const response = await fetch(this.proxyUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-api-key': userKey || ''
+                },
                 body: JSON.stringify({
                     endpoint: 'latentsync-video',
                     params: finalPayload,
@@ -1632,9 +1799,13 @@ export class MuapiClient {
         if (params.voice) finalPayload.voice = params.voice;
 
         try {
+            const userKey = await this.getOptionalUserKey();
             const response = await fetch(this.proxyUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-api-key': userKey || ''
+                },
                 body: JSON.stringify({
                     endpoint: 'mmaudio-v2/text-to-audio',
                     params: finalPayload,
@@ -1673,9 +1844,13 @@ export class MuapiClient {
         if (params.audio_url) finalPayload.audio_url = params.audio_url;
 
         try {
+            const userKey = await this.getOptionalUserKey();
             const response = await fetch(this.proxyUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-api-key': userKey || ''
+                },
                 body: JSON.stringify({
                     endpoint: 'mmaudio-v2/video-to-video',
                     params: finalPayload,
@@ -1708,10 +1883,9 @@ export class MuapiClient {
     }
 
     async processLipSync(params) {
-        const key = this.getKey();
+        const userKey = await this.requireKey();
         const modelInfo = getLipSyncModelById(params.model);
         const endpoint = modelInfo?.endpoint || params.model;
-        const url = `${this.baseUrl}/api/v1/${endpoint}`;
 
         const finalPayload = {};
 
@@ -1722,15 +1896,21 @@ export class MuapiClient {
         if (params.resolution) finalPayload.resolution = params.resolution;
         if (params.seed !== undefined && params.seed !== -1) finalPayload.seed = params.seed;
 
-
-        console.log('[Muapi] LipSync Request:', url);
+        console.log('[Muapi] LipSync Request:', endpoint);
         console.log('[Muapi] LipSync Payload:', finalPayload);
 
         try {
-            const response = await fetch(url, {
+            const response = await fetch(this.proxyUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'x-api-key': key },
-                body: JSON.stringify(finalPayload)
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-api-key': userKey
+                },
+                body: JSON.stringify({
+                    endpoint,
+                    params: finalPayload,
+                    generationType: 'lipsync'
+                })
             });
 
             if (!response.ok) {
@@ -1747,7 +1927,7 @@ export class MuapiClient {
 
             if (params.onRequestId) params.onRequestId(requestId);
 
-            const result = await this.pollForResult(requestId, key, 900, 2000);
+            const result = await this.pollForResult(requestId, 900, 2000);
             const videoUrl = result.outputs?.[0] || result.url || result.output?.url;
             console.log('[Muapi] LipSync Result URL:', videoUrl);
             return { ...result, url: videoUrl };

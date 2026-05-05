@@ -1,7 +1,10 @@
 import { securityService } from './services/SecurityService.js';
+import { muapi } from './muapi.js';
 
 // MuAPI Configuration
 const MUAPI_BASE_URL = 'https://api.muapi.ai';
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const PROXY_URL = SUPABASE_URL ? `${SUPABASE_URL}/functions/v1/muapi-proxy` : '/functions/v1/muapi-proxy';
 
 /**
  * Get API key from secure storage
@@ -17,6 +20,28 @@ async function getApiKey() {
     throw new Error('Invalid MuAPI key format. Please check your API key.');
   }
   return key;
+}
+
+/**
+ * Make proxy request with user API key
+ */
+async function proxyRequest(endpoint, params, generationType = 'enhanced') {
+  const userKey = await getApiKey();
+  const response = await fetch(PROXY_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-user-api-key': userKey
+    },
+    body: JSON.stringify({ endpoint, params, generationType })
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: 'Request failed' }));
+    throw new Error(error.error || error.details || 'Proxy request failed');
+  }
+
+  return response.json();
 }
 
 /**
@@ -77,19 +102,8 @@ export async function generateTikTokCarousel(imageUrls, options = {}) {
   };
 
   try {
-    const result = await fetch(`${MUAPI_BASE_URL}/api/v1/generate_tiktok_carousel`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': await getApiKey() },
-      body: JSON.stringify(payload)
-    });
-
-    if (result.ok) {
-      const response = await result.json();
-      return await pollForCarouselResult(response.data.request_id);
-    }
-
-    const errorData = await result.json().catch(() => ({}));
-    throw new Error(errorData.message || 'Carousel generation failed');
+    const result = await proxyRequest('generate_tiktok_carousel', payload, 'carousel');
+    return await pollForCarouselResult(result.request_id || result.id);
   } catch (error) {
     console.error('[MuAPI] TikTok carousel generation failed:', error);
     return { success: false, error: error.message };
@@ -104,25 +118,19 @@ export async function generateTikTokCarousel(imageUrls, options = {}) {
 async function pollForCarouselResult(requestId) {
   for (let attempt = 0; attempt < 90; attempt++) { // 3 minutes timeout
     try {
-      const result = await fetch(`${MUAPI_BASE_URL}/api/v1/predictions/${requestId}/result`, {
-        headers: { 'x-api-key': await getApiKey() }
-      });
-
-      if (result.ok) {
-        const data = await result.json();
-        if (data.data?.status === 'completed') {
-          return {
-            success: true,
-            url: data.data.outputs?.[0],
-            data: data.data,
-            optimized: true
-          };
-        } else if (data.data?.status === 'failed') {
-          return {
-            success: false,
-            error: data.data.error || 'Carousel generation failed'
-          };
-        }
+      const result = await proxyRequest(`predictions/${requestId}/result`, {}, 'poll');
+      if (result.status === 'completed' || result.status === 'succeeded') {
+        return {
+          success: true,
+          url: result.outputs?.[0] || result.url,
+          data: result,
+          optimized: true
+        };
+      } else if (result.status === 'failed' || result.error) {
+        return {
+          success: false,
+          error: result.error || 'Carousel generation failed'
+        };
       }
     } catch (error) {
       console.warn('[MuAPI] Carousel polling error:', error.message);
@@ -145,28 +153,13 @@ export async function uploadCarouselMusic(musicFile) {
   }
 
   try {
-    const formData = new FormData();
-    formData.append('file', musicFile);
-    formData.append('type', 'carousel_music');
-
-    const result = await fetch(`${MUAPI_BASE_URL}/api/v1/upload`, {
-      method: 'POST',
-      headers: { 'x-api-key': await getApiKey() },
-      body: formData
-    });
-
-    if (result.ok) {
-      const data = await result.json();
-      return {
-        success: true,
-        url: data.url,
-        duration: data.duration,
-        format: data.format
-      };
-    }
-
-    const errorData = await result.json().catch(() => ({}));
-    throw new Error(errorData.message || 'Music upload failed');
+    const result = await proxyRequest('upload_file', { file_type: 'carousel_music' }, 'upload');
+    return {
+      success: true,
+      url: result.url || result.file_url,
+      duration: result.duration,
+      format: result.format
+    };
   } catch (error) {
     console.error('[MuAPI] Music upload failed:', error);
     return { success: false, error: error.message };
@@ -191,33 +184,23 @@ export async function generateCarouselPreview(imageUrls, options = {}) {
     height = 500 // TikTok aspect ratio
   } = options;
 
+  const payload = {
+    images: imageUrls.slice(0, 4), // Preview with first 4 images
+    layout,
+    transition_effect: transitions,
+    width,
+    height,
+    preview_only: true
+  };
+
   try {
-    const payload = {
-      images: imageUrls.slice(0, 4), // Preview with first 4 images
+    const result = await proxyRequest('generate_carousel_preview', payload, 'preview');
+    return {
+      success: true,
+      thumbnailUrl: result.thumbnail_url || result.url,
       layout,
-      transition_effect: transitions,
-      width,
-      height,
-      preview_only: true
+      imageCount: imageUrls.length
     };
-
-    const result = await fetch(`${MUAPI_BASE_URL}/api/v1/generate_carousel_preview`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': await getApiKey() },
-      body: JSON.stringify(payload)
-    });
-
-    if (result.ok) {
-      const data = await result.json();
-      return {
-        success: true,
-        thumbnailUrl: data.thumbnail_url,
-        layout,
-        imageCount: imageUrls.length
-      };
-    }
-
-    return { success: false, error: 'Preview generation failed' };
   } catch (error) {
     console.error('[MuAPI] Preview generation failed:', error);
     return { success: false, error: error.message };
@@ -227,8 +210,6 @@ export async function generateCarouselPreview(imageUrls, options = {}) {
 // =============================================================================
 // ADVANCED VIDEO TRANSLATION & DUBBING FUNCTIONS
 // =============================================================================
-
-import { muapi } from './muapi.js';
 
 // Enhanced MuAPI functions for advanced video translation and dubbing
 export class MuapiEnhancedClient {

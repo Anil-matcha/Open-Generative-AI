@@ -83,6 +83,7 @@ window.mediaLoader = mediaLoader;
 window.performanceBudget = performanceBudget;
 
 // Initialize enhanced MuAPI system
+const { validateConfig } = await import("./lib/muapiConfig.js");
 console.log('[App] Initializing enhanced MuAPI...');
 const muapiConfig = loadConfig();
 initializeEnhancedMuAPI(muapiConfig).then(async (success) => {
