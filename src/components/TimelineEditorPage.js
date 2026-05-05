@@ -715,6 +715,16 @@ button, input, textarea, select { font: inherit; }
       const saved = localStorage.getItem('timeline-editor-project');
       if (saved) {
         const projectData = JSON.parse(saved);
+        // Migrate items to clips if needed (backwards compatibility)
+        if (projectData.tracks) {
+          projectData.tracks = projectData.tracks.map(track => {
+            if (track.items && !track.clips) {
+              track.clips = track.items;
+              delete track.items;
+            }
+            return track;
+          });
+        }
         showToast('Project loaded from local storage', 'success');
         return { ...createState(), ...projectData };
       }
