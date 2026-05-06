@@ -12,6 +12,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.99.0",
     "node-fetch": "^3.0.0",
+    "openai": "^4.0.0",
     "videodb": "^0.1.0"
   },
   "devDependencies": {
