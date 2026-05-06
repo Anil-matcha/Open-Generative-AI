@@ -50,7 +50,10 @@ const pageLoaders = {
   videotools: () => import('../components/VideoToolsStudio.js').then(m => m.VideoToolsStudio()),
   chat: () => import('../components/ChatStudio.js').then(m => m.ChatStudio()),
   lipsync: () => import('../components/LipSyncStudio.js').then(m => m.LipSyncStudio()),
-  workflows: () => import('../components/WorkflowStudio.js').then(m => m.WorkflowStudio()),
+  workflows: () => import('../components/WorkflowStudio.js').then(m => m.WorkflowStudio('workflows')),
+  'workflows/editor': () => import('../components/WorkflowStudio.js').then(m => m.WorkflowStudio('workflows/editor')),
+  'workflows/history': () => import('../components/WorkflowStudio.js').then(m => m.WorkflowStudio('workflows/history')),
+  'workflows/settings': () => import('../components/WorkflowStudio.js').then(m => m.WorkflowStudio('workflows/settings')),
   agents: () => import('../components/AgentStudio.js').then(m => m.AgentStudio()),
   'mcp-cli': () => import('../components/McpCliStudio.js').then(m => m.McpCliStudio()),
 
@@ -155,6 +158,9 @@ export async function navigate(page, params = {}) {
       const templateId = page.replace('template/', '');
       const mod = await import('../components/TemplateStudio.js');
       element = mod.TemplateStudio(templateId);
+    } else if (page.startsWith('workflows/')) {
+      const mod = await import('../components/WorkflowStudio.js');
+      element = mod.WorkflowStudio(page);
     } else if (pageLoaders[page]) {
       element = await pageLoaders[page]();
     } else {
