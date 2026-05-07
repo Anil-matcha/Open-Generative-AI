@@ -1,0 +1,3 @@
+export function buildBrandDnaPrompt({ url, extractedWebsiteData }) {
+  return `Analyze this business website and return strict JSON only.\nURL: ${url}\nWebsiteData: ${JSON.stringify(extractedWebsiteData || {})}\nTasks:\n1) Analyze content, screenshot cues, colors, fonts, logo hints, copy, and positioning.\n2) Extract brand voice, audience, promise, offer, personality, visual identity.\n3) Avoid unsupported claims and include confidence notes where uncertain.\nOutput schema:\n{ businessName, websiteUrl, tagline, offerSummary, audience, industry, tone:[], personality:[], colors:{primary,secondary,accent}, fonts:[], logoUrl, keyMessages:[], products:[], competitors:[], campaignAngles:[], confidenceNotes:[] }`;
+}
