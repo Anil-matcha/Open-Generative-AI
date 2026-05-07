@@ -8,7 +8,7 @@ test.describe('Comprehensive Navigation & Routing', () => {
   const coreRoutes = [
     'explore', 'image', 'video', 'storyboard', 'edit', 'character',
     'effects', 'cinema', 'influencer', 'apps', 'templates', 'assist',
-    'community', 'avatar', 'audio', 'library', 'timeline'
+    'community', 'avatar', 'audio', 'library', 'timeline', 'headshots'
   ];
 
   const extendedRoutes = [
@@ -113,6 +113,16 @@ test.describe('Comprehensive Navigation & Routing', () => {
         expect(hasContent).toBe(true);
       });
     }
+  });
+
+
+  test.describe('Headshot Studio Smoke', () => {
+    test('should render AI Headshot Studio hero copy', async ({ page }) => {
+      await page.goto('/#/headshots');
+      await expect(page).toHaveURL(/.*#\/headshots/);
+      await expect(page.getByText('AI Headshot Studio')).toBeVisible();
+      await expect(page.getByText('Turn everyday photos into polished professional headshots, team portraits, and personal brand images.')).toBeVisible();
+    });
   });
 
   test.describe('URL Parameter Handling', () => {
