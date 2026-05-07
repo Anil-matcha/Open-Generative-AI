@@ -22,6 +22,7 @@ const ROUTE_MAP = {
   'Workflows': 'workflows',
   'Agents': 'agents',
   'MCP & CLI': 'mcp-cli',
+  'Video Outreach': 'video-outreach',
 };
 
 export function getRouteForItem(item) {
@@ -53,6 +54,7 @@ const pageLoaders = {
   workflows: () => import('../components/WorkflowStudio.js').then(m => m.WorkflowStudio()),
   agents: () => import('../components/AgentStudio.js').then(m => m.AgentStudio()),
   'mcp-cli': () => import('../components/McpCliStudio.js').then(m => m.McpCliStudio()),
+  'video-outreach': () => import('../components/VideoOutreachStudio.js').then(m => m.VideoOutreachStudio()),
 
   assist: () => import('../components/AssistPage.js').then(m => m.AssistPage()),
   community: () => import('../components/CommunityPage.js').then(m => m.CommunityPage()),
