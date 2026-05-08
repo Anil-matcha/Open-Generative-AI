@@ -1,0 +1,3 @@
+export function buildCampaignPrompt({ brandDna, campaignPreset }) {
+  return `Use the Brand DNA below and generate structured JSON only.\nBrandDNA:${JSON.stringify(brandDna)}\nCampaignPreset:${JSON.stringify(campaignPreset || {})}\nRequirements:\n- Keep concepts consistent with brand voice and positioning.\n- Produce platform-specific copy and creative directions.\n- Include image/video prompt ideas suitable for Higgsfield or MuAPI generation.\nOutput schema:\n{ campaignConcepts:[{title,angle,audienceHook,cta}], outputs:{facebookPost,instagramPost,tiktokConcept,youtubeShortConcept,emailPromo,adCopy,productImagePrompt,productVideoPrompt} }`;
+}

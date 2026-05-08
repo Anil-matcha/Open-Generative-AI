@@ -22,6 +22,7 @@ const ROUTE_MAP = {
   'Workflows': 'workflows',
   'Agents': 'agents',
   'MCP & CLI': 'mcp-cli',
+  'AI Marketing Studio': 'marketing-studio',
 };
 
 export function getRouteForItem(item) {
@@ -56,6 +57,7 @@ const pageLoaders = {
   'workflows/settings': () => import('../components/WorkflowStudio.js').then(m => m.WorkflowStudio('workflows/settings')),
   agents: () => import('../components/AgentStudio.js').then(m => m.AgentStudio()),
   'mcp-cli': () => import('../components/McpCliStudio.js').then(m => m.McpCliStudio()),
+  'marketing-studio': () => import('../components/MarketingStudioPage.js').then(m => m.MarketingStudioPage()),
 
   assist: () => import('../components/AssistPage.js').then(m => m.AssistPage()),
   community: () => import('../components/CommunityPage.js').then(m => m.CommunityPage()),
