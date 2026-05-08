@@ -10,7 +10,8 @@
     "lint": "eslint src --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.99.0",
+    "@supabase/supabase-js": "^2.39.0",
+    "@supabase/storage-js": "^2.5.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "lucide-react": "^0.460.0",
@@ -21,7 +22,16 @@
     "react-router-dom": "^6.26.2",
     "zustand": "^5.0.0",
     "clsx": "^2.1.1",
-    "tailwind-merge": "^2.5.2"
+    "tailwind-merge": "^2.5.2",
+    "axios": "^1.6.0",
+    "mobx": "^6.12.0",
+    "mobx-react": "^9.1.1",
+    "jwt-decode": "^4.0.0",
+    "fabric": "^5.3.0",
+    "socket.io-client": "^4.7.0",
+    "react-color": "^2.19.3",
+    "react-draggable": "^4.4.5",
+    "react-resizable": "^3.0.5"
   },
   "devDependencies": {
     "@types/react": "^18.3.11",
