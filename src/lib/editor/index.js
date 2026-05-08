@@ -16,6 +16,11 @@ export { ColorCorrectionSystem } from './colorCorrectionSystem.js';
 // Professional Audio Mixing
 export { AudioMixer } from './audioMixer.js';
 
+// Subtitle System
+export { SubtitleState, subtitleState } from './subtitleState.js';
+export { SubtitleTimeline } from './subtitleTimeline.js';
+export { SubtitleExporter, subtitleExporter } from './subtitleExporter.js';
+
 // Advanced Export Pipeline
 export { ExportPipeline } from './exportPipeline.js';
 

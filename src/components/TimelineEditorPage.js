@@ -9,6 +9,7 @@ import { renderMultiCameraToolbar, renderPipControls, renderSplitScreenControls 
 import { createTimelineState } from '../lib/editor/timelineEditorState.js';
 import { TransitionEditor } from '../lib/editor/transitionEditor.js';
 import { TimelineTransitions } from '../lib/editor/timelineTransitions.js';
+import { SceneDetector } from './timeline/SceneDetector.js';
 import TIMELINE_DESIGN_SYSTEM, { enforceDesignSystem } from '../lib/designSystemEnforcer.js';
 import { createVideoPreview } from '../lib/videoPlayer.js';
 // Import rendiv animation primitives
@@ -16,6 +17,12 @@ import { interpolate, spring, blendColors, noise2D, useSequence, useSeries } fro
 // Agent system integration
 import { initTimelineAgentIntegration } from '../timelineAgentIntegration.js';
 // ColorCorrectionSystem removed - file does not exist
+
+// Subtitle system integration
+import { SubtitleTimeline } from '../lib/editor/subtitleTimeline.js';
+import { SubtitleControls } from './SubtitleControls.jsx';
+import { SubtitleEditorModal } from './modals/SubtitleEditorModal.jsx';
+import { whisperService } from '../services/whisper-client.js';
 
 // Modal imports - these are vanilla JS modal implementations
 import { EndScreenModal } from './modals/EndScreenModal.jsx';
@@ -549,6 +556,9 @@ button, input, textarea, select { font: inherit; }
         <div class="media-note">Choose what you want to add to the timeline. Each tile inserts a different type of source asset.</div>
         <div class="media-grid" id="mediaGrid"></div>
       </aside>
+      <aside class="side-card" id="sceneDetectorPanel">
+        <div id="sceneDetectorContainer"></div>
+      </aside>
       <aside class="side-card generate">
         <div class="generate-head"><div class="card-title cyan">⚡ Generate</div><div style="color: rgba(255,255,255,0.4)">✕</div></div>
         <div class="generate-types" id="generateTypes"></div>
@@ -691,7 +701,7 @@ button, input, textarea, select { font: inherit; }
         { icon: '🎞️', label: 'B-Roll Asset', desc: 'Drop in cutaways, overlays, or support footage.' }
       ],
       generateTypes: [['✍️', 'Text'], ['🖼️', 'Image'], ['🔄', 'Retake'], ['➡️', 'Extend'], ['🎞️', 'B-Roll']],
-      quickCommands: ['⚡Generate','Retake','Extend','B-Roll'],
+      quickCommands: ['⚡Generate','Retake','Extend','B-Roll','🎬 Detect Scenes'],
       railActions: [['⚡', 'Generate', true], ['✂️', 'Split'], ['🎬', 'Scenes'], ['💬', 'Subtitle'], ['🎞️', 'B-Roll'], ['⏱️', 'Speed'], ['🪄', 'Stabilize'], ['📝', 'Text'], ['🔄', 'Transitions'], ['🎬', 'AI Video'], ['🎥', 'Recorder'], ['🎙️', 'Enhanced Recorder'], ['📋', 'Templates'], ['👀', 'Preview Template'], ['📱', 'Social'], ['📧', 'Email Campaign'], ['🔗', 'URL Video'], ['📸', 'Page Shot'], ['👥', 'Contacts'], ['🎨', 'Canvas'], ['🏷️', 'Token Editor'], ['📦', 'Batch Generator'], ['🔄', 'Workflow'], ['👤', 'Personalization'], ['✏️', 'Personalization Editor'], ['🎬', 'Personalization Suite'], ['🏠', 'Landing Pages'], ['📋', 'Lead Generator']],
       chat: [
         { role: 'user', text: 'Generate a better opening shot' },
@@ -813,6 +823,7 @@ button, input, textarea, select { font: inherit; }
     let playbackTimer = null;
     let transitionEditor = null;
     let timelineTransitions = null;
+    let sceneDetector = null;
     // let colorCorrectionSystem = null; // Disabled - file not found
 
     // Keyboard shortcuts for undo/redo
@@ -882,6 +893,8 @@ button, input, textarea, select { font: inherit; }
       transitionSettingsPanel: root.querySelector('#transitionSettingsPanel'),
       clipEditorContainer: root.querySelector('#clipEditorContainer'),
       transitionEditorContainer: root.querySelector('#transitionEditorContainer'),
+      sceneDetectorPanel: root.querySelector('#sceneDetectorPanel'),
+      sceneDetectorContainer: root.querySelector('#sceneDetectorContainer'),
       multiCameraPanel: root.querySelector('#multiCameraPanel'),
       multiCameraToolbar: root.querySelector('#multiCameraToolbar'),
       pipControls: root.querySelector('#pipControls'),
@@ -1768,6 +1781,22 @@ button, input, textarea, select { font: inherit; }
       }
     }
 
+    function initializeSceneDetector() {
+      if (!sceneDetector) {
+        sceneDetector = new SceneDetector(els.sceneDetectorContainer, {
+          tracks: state.tracks,
+          timelineSeconds: state.timelineSeconds,
+          seekTo: (time) => {
+            state.playheadPercent = (time / state.timelineSeconds) * 100;
+            renderPlayhead();
+            renderPreview();
+          }
+        }, {
+          showToast: showToast
+        });
+      }
+    }
+
     // function initializeColorCorrectionSystem() { // Disabled - ColorCorrectionSystem not available
     //   if (!colorCorrectionSystem) {
     //     // Create a keyframe system for color correction
@@ -1798,6 +1827,14 @@ button, input, textarea, select { font: inherit; }
       renderChat();
       els.chatInput.value = '';
   // DISABLED:       showToast('Processing AI command...', 'info');
+
+      // Handle local commands
+      if (text.toLowerCase().includes('detect scenes') || text.toLowerCase().includes('scene detection')) {
+        await detectScenes();
+        state.chat.push({ role: 'ai', text: 'Scene detection completed. Check the Scene Detection panel for results.' });
+        renderChat();
+        return;
+      }
 
       try {
         // Check if Supabase is configured before making requests
@@ -1978,29 +2015,11 @@ button, input, textarea, select { font: inherit; }
     }
 
     async function detectScenes() {
-  // DISABLED:       showToast('Detecting scenes...', 'info');
-
-      try {
-        const { data, error } = await supabase.functions.invoke('videoagent', {
-          body: {
-            action: 'scene-detection',
-            project_id: state.projectId,
-            timeline_data: {
-              tracks: state.tracks,
-              duration: state.timelineSeconds
-            }
-          }
-        });
-
-        if (error) throw error;
-
-        if (data.scenes) {
-          // Add scene markers or clips based on detection results
-  // DISABLED:           showToast(`Detected ${data.scenes.length} scenes`, 'success');
-        }
-      } catch (err) {
-        console.error('Scene detection error:', err);
-  // DISABLED:         showToast('Scene detection failed', 'error');
+      if (sceneDetector) {
+        await sceneDetector.detectScenes();
+      } else {
+        // Fallback to API call if scene detector not initialized
+        showToast('Scene detector not available', 'error');
       }
     }
 
@@ -3511,6 +3530,9 @@ button, input, textarea, select { font: inherit; }
     // Initialize transition system
     initializeTimelineTransitions();
     initializeTransitionEditor();
+
+    // Initialize scene detector
+    initializeSceneDetector();
 
     // Initialize multi-camera functionality
     window.timelineState = state; // Make state globally accessible for multi-camera functions

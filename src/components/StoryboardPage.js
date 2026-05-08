@@ -1,5 +1,6 @@
 import { navigate } from '../lib/router.js';
 import { createHeroSection } from '../lib/thumbnails.js';
+import { CINEMATIC_THEME, cx, pageShell, glassPanel, glassCard, chipButton, actionButton } from '../lib/cinematicTheme.js';
 
 const SHOT_TYPES = ['Wide Shot', 'Medium Shot', 'Close-Up', 'Extreme Close-Up', 'POV', 'Overhead', 'Low Angle'];
 
@@ -18,7 +19,7 @@ const EXAMPLE_PROMPTS = [
 
 export function StoryboardPage() {
   const container = document.createElement('div');
-  container.className = 'w-full h-full flex flex-col items-center bg-app-bg relative p-4 md:p-6 overflow-y-auto custom-scrollbar overflow-x-hidden';
+  container.className = cx(pageShell(), 'flex flex-col items-center relative p-4 md:p-6 overflow-y-auto custom-scrollbar overflow-x-hidden');
 
   // Hero
   const hero = document.createElement('div');
@@ -44,14 +45,14 @@ export function StoryboardPage() {
   contentWrapper.innerHTML = `
     <!-- Features -->
     <div class="bg-[#111]/90 backdrop-blur-xl border border-white/10 rounded-[1.5rem] p-4 md:p-6 shadow-3xl mb-6">
-      <h2 class="text-xl font-black text-white mb-1">Plan Your Vision</h2>
-      <p class="text-sm text-muted mb-6">Professional storyboard creation powered by AI</p>
+      <h2 class="${CINEMATIC_THEME.text.sectionTitle}">Plan Your Vision</h2>
+      <p class="${CINEMATIC_THEME.text.bodySoft} mb-6">Professional storyboard creation powered by AI</p>
       <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
         ${FEATURES.map(f => `
           <div class="bg-white/[0.03] border border-white/5 rounded-xl p-4 hover:border-primary/20 transition-all duration-300">
             <div class="text-3xl mb-3">${f.icon}</div>
-            <h3 class="text-base font-black text-white mb-1">${f.title}</h3>
-            <p class="text-muted text-sm">${f.description}</p>
+            <h3 class="${CINEMATIC_THEME.text.title} mb-1">${f.title}</h3>
+            <p class="${CINEMATIC_THEME.text.body}">${f.description}</p>
           </div>
         `).join('')}
       </div>
@@ -59,8 +60,8 @@ export function StoryboardPage() {
 
     <!-- Shot Types -->
     <div class="bg-[#111]/90 backdrop-blur-xl border border-white/10 rounded-[1.5rem] p-4 md:p-6 shadow-3xl mb-6">
-      <h2 class="text-xl font-black text-white mb-1">Shot Types</h2>
-      <p class="text-sm text-muted mb-6">Control your narrative with professional shot compositions</p>
+      <h2 class="${CINEMATIC_THEME.text.sectionTitle}">Shot Types</h2>
+      <p class="${CINEMATIC_THEME.text.bodySoft} mb-6">Control your narrative with professional shot compositions</p>
       <div class="flex flex-wrap gap-3">
         ${SHOT_TYPES.map(shot => `
           <span class="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white font-medium text-sm hover:border-primary/20 transition-all cursor-pointer">${shot}</span>
@@ -70,15 +71,15 @@ export function StoryboardPage() {
 
     <!-- Example Frames -->
     <div class="bg-[#111]/90 backdrop-blur-xl border border-white/10 rounded-[1.5rem] p-4 md:p-6 shadow-3xl mb-6">
-      <h2 class="text-xl font-black text-white mb-1">Example Frames</h2>
-      <p class="text-sm text-muted mb-6">Get inspired by these storyboard examples</p>
+      <h2 class="${CINEMATIC_THEME.text.sectionTitle}">Example Frames</h2>
+      <p class="${CINEMATIC_THEME.text.bodySoft} mb-6">Get inspired by these storyboard examples</p>
       <div class="grid md:grid-cols-3 gap-4">
         ${EXAMPLE_PROMPTS.map(p => `
           <div class="prompt-card bg-white/[0.03] border border-white/5 rounded-xl p-4 hover:border-primary/20 transition-all duration-300 cursor-pointer">
             <div class="mb-3">
-              <span class="text-xs font-bold px-3 py-1 rounded-lg bg-primary/10 text-primary">${p.shot}</span>
+              <span class="${activeSurface({ tone: 'indigo' })} text-xs font-bold px-3 py-1">${p.shot}</span>
             </div>
-            <p class="text-white/70 text-sm leading-relaxed">${p.prompt}</p>
+            <p class="${CINEMATIC_THEME.text.body} leading-relaxed">${p.prompt}</p>
           </div>
         `).join('')}
       </div>
@@ -86,8 +87,8 @@ export function StoryboardPage() {
 
     <!-- CTA -->
     <div class="bg-[#111]/90 backdrop-blur-xl border border-white/10 rounded-[1.5rem] p-6 md:p-8 shadow-3xl text-center">
-      <h2 class="text-xl font-black text-white mb-2">Start Your Storyboard</h2>
-      <p class="text-sm text-muted mb-6">Plan your film scenes like a pro</p>
+      <h2 class="${CINEMATIC_THEME.text.sectionTitle} mb-2">Start Your Storyboard</h2>
+      <p class="${CINEMATIC_THEME.text.bodySoft} mb-6">Plan your film scenes like a pro</p>
       <button class="cta-btn bg-primary text-black px-6 py-2.5 rounded-xl font-black text-sm hover:shadow-glow hover:scale-105 active:scale-95 transition-all">
         Get Started Free
       </button>
