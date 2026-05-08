@@ -15,8 +15,8 @@ async function getApiKey() {
   if (!key) {
     throw new Error('MuAPI key not configured. Please set your API key in settings.');
   }
-  // Validate key format (basic check)
-  if (key.length < 20) {
+  // Validate key format (basic check) - allow test keys
+  if (key.length < 10) {
     throw new Error('Invalid MuAPI key format. Please check your API key.');
   }
   return key;

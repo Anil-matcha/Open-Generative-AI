@@ -373,6 +373,212 @@ export function VideoStudio() {
     container.appendChild(promptWrapper);
 
     // ==========================================
+    // WAN AI EFFECTS FUNCTION (defined before use)
+    // ==========================================
+    const applySelectedWanEffect = async () => {
+        const effectType = document.getElementById('wan-ai-effect').value;
+        if (!effectType) {
+            alert('Please select a Wan AI effect first');
+            return;
+        }
+
+        const currentVideo = resultVideo.src;
+        if (!currentVideo) {
+            alert('Please generate or upload a video first');
+            return;
+        }
+
+        const button = document.getElementById('apply-wan-effect');
+        const originalText = button.textContent;
+        button.disabled = true;
+        button.textContent = 'Applying Effect...';
+
+        try {
+            showProcessingIndicator('Applying Wan AI Effect...');
+
+            const result = await muapi.applyWanAIEffect(currentVideo, effectType, {
+                prompt: `Apply ${effectType} style transformation`
+            });
+
+            if (result.success) {
+                resultVideo.src = result.url;
+                showToast(`Wan AI ${effectType} effect applied successfully`, 'success');
+            } else {
+                showWanEffectError(new Error(result.error || 'Unknown error'), effectType);
+            }
+        } catch (error) {
+            showWanEffectError(error, effectType);
+        } finally {
+            button.disabled = false;
+            button.textContent = originalText;
+            hideProcessingIndicator();
+        }
+    };
+
+    // ==========================================
+    // WAN AI EFFECTS SECTION
+    // ==========================================
+    wanAiSection = document.createElement('div');
+    wanAiSection.className = 'w-full mt-6 animate-fade-in-up';
+    wanAiSection.innerHTML = `
+        <div class="bg-[#111]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-5 flex flex-col gap-4">
+            <div class="flex items-center gap-3">
+                <h3 class="text-sm font-bold text-white">Wan AI Effects</h3>
+                <span class="px-2 py-1 bg-purple-500/20 text-purple-300 text-xs rounded-full font-medium">Experimental</span>
+            </div>
+
+            <div class="flex flex-col gap-3">
+                <select id="wan-ai-effect" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-purple-500/50 transition-colors">
+                    <option value="">Select an effect...</option>
+                    <option value="dreamy">💭 Dreamy Sequence - Surreal Animation</option>
+                    <option value="cyberpunk">🤖 Cyberpunk City - Sci-Fi Environment</option>
+                    <option value="fantasy">🧙 Fantasy World - Magical Realm</option>
+                    <option value="horror">👻 Horror Atmosphere - Spooky Effects</option>
+                    <option value="romantic">💕 Romantic Scene - Emotional Lighting</option>
+                    <option value="action">💥 Action Sequence - Dynamic Movement</option>
+                    <option value="documentary">📹 Documentary Style - Realistic Footage</option>
+                    <option value="music-video">🎵 Music Video - Rhythmic Editing</option>
+                    <option value="vintage">📽️ Vintage Film - Classic Cinema</option>
+                    <option value="futuristic">🚀 Futuristic Tech - Advanced Gadgets</option>
+                    <option value="nature">🌿 Nature Documentary - Wildlife Focus</option>
+                    <option value="sports">⚽ Sports Highlight - Athletic Action</option>
+                    <option value="cooking">👨‍🍳 Cooking Show - Culinary Process</option>
+                    <option value="travel">✈️ Travel Vlog - Location Exploration</option>
+                    <option value="tutorial">📚 Tutorial Video - Educational Content</option>
+                    <option value="interview">🎤 Interview Format - Conversational Style</option>
+                    <option value="product-demo">📱 Product Demo - Feature Showcase</option>
+                    <option value="fashion">👗 Fashion Show - Style Presentation</option>
+                    <option value="wedding">💒 Wedding Video - Ceremonial Moments</option>
+                    <option value="birthday">🎂 Birthday Party - Celebration Events</option>
+                    <option value="graduation">🎓 Graduation - Milestone Celebration</option>
+                    <option value="concert">🎶 Concert Performance - Live Music</option>
+                    <option value="comedy">🤣 Comedy Sketch - Humorous Content</option>
+                    <option value="drama">🎭 Dramatic Scene - Emotional Storytelling</option>
+                    <option value="thriller">🔪 Thriller Sequence - Suspense Building</option>
+                    <option value="mystery">🕵️ Mystery Plot - Intrigue Development</option>
+                    <option value="western">🤠 Western Saga - Frontier Adventure</option>
+                    <option value="superhero">🦸 Superhero Action - Heroic Feats</option>
+                    <option value="disney">🐭 Disney Magic - Animated Fantasy</option>
+                    <option value="pixar">🎨 Pixar Quality - Animated Storytelling</option>
+                    <option value="dreamworks">🐲 DreamWorks Style - Animated Adventure</option>
+                    <option value="marvel">⚡ Marvel Universe - Superhero Spectacle</option>
+                    <option value="dc">🦇 DC Universe - Comic Book Action</option>
+                    <option value="star-wars">⭐ Star Wars - Galactic Adventure</option>
+                    <option value="harry-potter">⚡ Harry Potter - Wizarding World</option>
+                    <option value="lord-rings">💍 Lord of the Rings - Epic Fantasy</option>
+                    <option value="star-trek">🖖 Star Trek - Space Exploration</option>
+                    <option value="matrix">💊 Matrix Reality - Cyberpunk Philosophy</option>
+                    <option value="inception">🌀 Inception Dreams - Mind-Bending Concepts</option>
+                    <option value="interstellar">🌌 Interstellar Space - Cosmic Wonder</option>
+                    <option value="gravity">🌍 Gravity Effects - Zero Gravity Physics</option>
+                    <option value="blade-runner">🌆 Blade Runner - Neo-Noir Futurism</option>
+                    <option value="ghost-shell">🤖 Ghost in the Shell - Cybernetic Themes</option>
+                    <option value="akira">🏍️ Akira Chaos - Post-Apocalyptic Anarchy</option>
+                    <option value="neon-genesis">🌃 Neon Genesis - Cyberpunk Evolution</option>
+                    <option value="serial-experiments">🎭 Serial Experiments - Surreal Psychology</option>
+                    <option value="paprika">💭 Paprika Dreams - Lucid Dream Worlds</option>
+                    <option value="perfect-blue">💙 Perfect Blue - Identity Crisis</option>
+                    <option value="tokyo-godfathers">👨‍👩‍👧 Tokyo Godfathers - Urban Redemption</option>
+                    <option value="grave-of-fireflies">🔥 Grave of the Fireflies - War's Innocence</option>
+                    <option value="princess-mononoke">🌿 Princess Mononoke - Nature's Spirit</option>
+                    <option value="my-neighbor-totoro">🐾 My Neighbor Totoro - Childhood Wonder</option>
+                    <option value="spirited-away">🏮 Spirited Away - Magical Journey</option>
+                    <option value="howl-moving-castle">🏰 Howl's Moving Castle - Wizard's Domain</option>
+                    <option value="castle-in-sky">🎈 Castle in the Sky - Floating Kingdoms</option>
+                    <option value="nausicaa">🌪️ Nausicaä - Post-Apocalyptic Hope</option>
+                    <option value="vhs">📼 VHS Footage - Retro Video</option>
+                    <option value="samurai">⚔️ Samurai It - Character Animation</option>
+                    <option value="film-noir">🎭 Film Noir - Cinematic Style</option>
+                    <option value="animal">🐾 Animal Transformation</option>
+                    <option value="rotation">🔄 Rotation Effect</option>
+                </select>
+                <button id="apply-wan-effect" class="w-full py-2 bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/40 rounded text-sm font-medium transition-colors disabled:opacity-50 text-white">
+                    Apply Wan AI Effect
+                </button>
+            </div>
+        </div>
+    `;
+    container.appendChild(wanAiSection);
+
+    // Attach event handler to apply button
+    const applyBtn = wanAiSection.querySelector('#apply-wan-effect');
+    if (applyBtn) applyBtn.addEventListener('click', applySelectedWanEffect);
+
+    const inlineInstructions = createInlineInstructions('video');
+    inlineInstructions.classList.add('mt-8');
+    container.appendChild(inlineInstructions);
+
+    // ==========================================
+    // ADVANCED OPTIONS PANEL
+    // ==========================================
+    const advancedPanel = document.createElement('div');
+    advancedPanel.className = 'w-full mt-6 animate-fade-in-up hidden';
+    advancedPanel.id = 'v-advanced-panel';
+    advancedPanel.innerHTML = `
+        <div class="bg-[#111]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-5 flex flex-col gap-4">
+            <div class="flex items-center justify-between pb-3 border-b border-white/5">
+                <h3 class="text-sm font-bold text-white">Advanced Options</h3>
+                <button id="v-close-adv-btn" class="text-white/40 hover:text-white transition-colors">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+            
+            <!-- Negative Prompt -->
+            <div class="flex flex-col gap-2">
+                <label class="text-xs font-bold text-secondary uppercase tracking-wider">Negative Prompt</label>
+                <input type="text" id="v-negative-prompt-input" 
+                    placeholder="What to exclude from the video (e.g., blurry, distorted, watermark)"
+                    class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder:text-muted focus:outline-none focus:border-primary/50 transition-colors">
+            </div>
+            
+            <!-- Seed -->
+            <div class="flex flex-col gap-2">
+                <div class="flex items-center justify-between">
+                    <label class="text-xs font-bold text-secondary uppercase tracking-wider">Seed</label>
+                    <button id="v-randomize-seed-btn" class="text-xs font-bold text-primary hover:text-primary/80 transition-colors">Randomize</button>
+                </div>
+                <input type="number" id="v-seed-input" 
+                    placeholder="-1 for random"
+                    value="-1"
+                    class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder:text-muted focus:outline-none focus:border-primary/50 transition-colors">
+            </div>
+        </div>
+    `;
+    container.appendChild(advancedPanel);
+
+    // Advanced panel toggle logic
+    const toggleAdvanced = () => {
+        showAdvanced = !showAdvanced;
+        advancedPanel.classList.toggle('hidden', !showAdvanced);
+        document.getElementById('v-advanced-btn-label').textContent = showAdvanced ? 'Less' : 'Advanced';
+    };
+    
+    // Add advanced panel to container first
+    container.appendChild(advancedPanel);
+    
+    // Now set up event handlers after elements are in DOM
+    advancedBtn.onclick = toggleAdvanced;
+    const vCloseAdvBtn = advancedPanel.querySelector('#v-close-adv-btn');
+    if (vCloseAdvBtn) vCloseAdvBtn.onclick = toggleAdvanced;
+    
+    // Negative prompt
+    const vNegPromptInput = advancedPanel.querySelector('#v-negative-prompt-input');
+    if (vNegPromptInput) vNegPromptInput.oninput = (e) => { negativePrompt = e.target.value; };
+    
+    // Seed input
+    const vSeedInput = advancedPanel.querySelector('#v-seed-input');
+    if (vSeedInput) vSeedInput.oninput = (e) => { seed = parseInt(e.target.value) || -1; };
+    
+    // Randomize seed button
+    const vRandSeedBtn = advancedPanel.querySelector('#v-randomize-seed-btn');
+    if (vRandSeedBtn) {
+        vRandSeedBtn.onclick = () => {
+            seed = Math.floor(Math.random() * 999999999);
+            if (vSeedInput) vSeedInput.value = seed;
+        };
+    }
+
+    // ==========================================
     // 3. DROPDOWNS
     // ==========================================
     const dropdown = document.createElement('div');
@@ -890,6 +1096,8 @@ export function VideoStudio() {
             window.open(url, '_blank');
         }
     };
+
+
 
     // --- Load history from localStorage ---
     try {

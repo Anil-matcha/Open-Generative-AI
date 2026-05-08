@@ -47,9 +47,11 @@
     "dev:director": "cd apps/director && npm run dev",
     "dev:vimax": "cd apps/vimax && npm run dev",
     "dev:remix-go": "cd apps/remix-go && npm run dev",
-    "prepare": "husky install",
-    "bootstrap": "pnpm install",
-    "dev:marketing-studio": "vite --host 0.0.0.0 --port 5173"
+    "demo:create": "node demo-scripts/create-demo-video.js",
+    "demo:automated": "node demo-scripts/automated-demo.js",
+    "demo:videos": "node demo-scripts/demo-video-runner.js",
+    "demo:view": "open demo-viewer.html",
+    "demo:full": "npm run demo:create && npm run demo:view"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

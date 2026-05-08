@@ -19,9 +19,35 @@
         "outputDir": "/workspaces/Open-Higgsfield-AI/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {
-          "actualWorkers": 4
-        },
+        "metadata": {},
+        "id": "demo-videos",
+        "name": "demo-videos",
+        "testDir": "/workspaces/Open-Higgsfield-AI/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/demo/**/*.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/workspaces/Open-Higgsfield-AI/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "demo-videos-with-server",
+        "name": "demo-videos-with-server",
+        "testDir": "/workspaces/Open-Higgsfield-AI/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/demo/**/*.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/workspaces/Open-Higgsfield-AI/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
         "id": "main-app-chromium",
         "name": "main-app-chromium",
         "testDir": "/workspaces/Open-Higgsfield-AI/tests/e2e",
@@ -159,484 +185,19 @@
     "workers": 4,
     "webServer": null
   },
-  "suites": [
+  "suites": [],
+  "errors": [
     {
-      "title": "main-app/timeline-editor.e2e.spec.ts",
-      "file": "main-app/timeline-editor.e2e.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "Media Ingest",
-          "file": "main-app/timeline-editor.e2e.spec.ts",
-          "line": 181,
-          "column": 6,
-          "specs": [
-            {
-              "title": "should drag and drop media",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "main-app-chromium",
-                  "projectName": "main-app-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 1045,
-                      "error": {
-                        "message": "TypeError: Cannot read properties of null (reading 'setInputFiles')",
-                        "stack": "TypeError: Cannot read properties of null (reading 'setInputFiles')\n    at /workspaces/Open-Higgsfield-AI/tests/e2e/main-app/timeline-editor.e2e.spec.ts:191:21",
-                        "location": {
-                          "file": "/workspaces/Open-Higgsfield-AI/tests/e2e/main-app/timeline-editor.e2e.spec.ts",
-                          "column": 21,
-                          "line": 191
-                        },
-                        "snippet": "  189 |     await page.goto('/#timeline');\n  190 |     const fileInput = await page.$('[data-testid=\"file-input\"]');\n> 191 |     await fileInput.setInputFiles('tests/samples/sample-video.mp4');\n      |                     ^\n  192 |     await page.locator('[data-testid=\"media-item\"]').dragTo(page.locator('[data-testid=\"timeline-track\"]'));\n  193 |   });\n  194 |"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/workspaces/Open-Higgsfield-AI/tests/e2e/main-app/timeline-editor.e2e.spec.ts",
-                            "column": 21,
-                            "line": 191
-                          },
-                          "message": "TypeError: Cannot read properties of null (reading 'setInputFiles')\n\n  189 |     await page.goto('/#timeline');\n  190 |     const fileInput = await page.$('[data-testid=\"file-input\"]');\n> 191 |     await fileInput.setInputFiles('tests/samples/sample-video.mp4');\n      |                     ^\n  192 |     await page.locator('[data-testid=\"media-item\"]').dragTo(page.locator('[data-testid=\"timeline-track\"]'));\n  193 |   });\n  194 |\n    at /workspaces/Open-Higgsfield-AI/tests/e2e/main-app/timeline-editor.e2e.spec.ts:191:21"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-04-28T18:41:39.847Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/workspaces/Open-Higgsfield-AI/test-results/main-app-timeline-editor.e-89712--should-drag-and-drop-media-main-app-chromium/test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "/workspaces/Open-Higgsfield-AI/test-results/main-app-timeline-editor.e-89712--should-drag-and-drop-media-main-app-chromium/video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/workspaces/Open-Higgsfield-AI/test-results/main-app-timeline-editor.e-89712--should-drag-and-drop-media-main-app-chromium/error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/workspaces/Open-Higgsfield-AI/tests/e2e/main-app/timeline-editor.e2e.spec.ts",
-                        "column": 21,
-                        "line": 191
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "688013c7eba7f59ed6f0-33b186bf59cc69a020f2",
-              "file": "main-app/timeline-editor.e2e.spec.ts",
-              "line": 188,
-              "column": 3
-            },
-            {
-              "title": "should drag and drop media",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "main-app-firefox",
-                  "projectName": "main-app-firefox",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 2,
-                      "status": "failed",
-                      "duration": 2557,
-                      "error": {
-                        "message": "TypeError: Cannot read properties of null (reading 'setInputFiles')",
-                        "stack": "TypeError: Cannot read properties of null (reading 'setInputFiles')\n    at /workspaces/Open-Higgsfield-AI/tests/e2e/main-app/timeline-editor.e2e.spec.ts:191:21",
-                        "location": {
-                          "file": "/workspaces/Open-Higgsfield-AI/tests/e2e/main-app/timeline-editor.e2e.spec.ts",
-                          "column": 21,
-                          "line": 191
-                        },
-                        "snippet": "  189 |     await page.goto('/#timeline');\n  190 |     const fileInput = await page.$('[data-testid=\"file-input\"]');\n> 191 |     await fileInput.setInputFiles('tests/samples/sample-video.mp4');\n      |                     ^\n  192 |     await page.locator('[data-testid=\"media-item\"]').dragTo(page.locator('[data-testid=\"timeline-track\"]'));\n  193 |   });\n  194 |"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/workspaces/Open-Higgsfield-AI/tests/e2e/main-app/timeline-editor.e2e.spec.ts",
-                            "column": 21,
-                            "line": 191
-                          },
-                          "message": "TypeError: Cannot read properties of null (reading 'setInputFiles')\n\n  189 |     await page.goto('/#timeline');\n  190 |     const fileInput = await page.$('[data-testid=\"file-input\"]');\n> 191 |     await fileInput.setInputFiles('tests/samples/sample-video.mp4');\n      |                     ^\n  192 |     await page.locator('[data-testid=\"media-item\"]').dragTo(page.locator('[data-testid=\"timeline-track\"]'));\n  193 |   });\n  194 |\n    at /workspaces/Open-Higgsfield-AI/tests/e2e/main-app/timeline-editor.e2e.spec.ts:191:21"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-04-28T18:41:39.801Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/workspaces/Open-Higgsfield-AI/test-results/main-app-timeline-editor.e-89712--should-drag-and-drop-media-main-app-firefox/test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "/workspaces/Open-Higgsfield-AI/test-results/main-app-timeline-editor.e-89712--should-drag-and-drop-media-main-app-firefox/video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/workspaces/Open-Higgsfield-AI/test-results/main-app-timeline-editor.e-89712--should-drag-and-drop-media-main-app-firefox/error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/workspaces/Open-Higgsfield-AI/tests/e2e/main-app/timeline-editor.e2e.spec.ts",
-                        "column": 21,
-                        "line": 191
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "688013c7eba7f59ed6f0-9581563fb80e3ddc40a4",
-              "file": "main-app/timeline-editor.e2e.spec.ts",
-              "line": 188,
-              "column": 3
-            },
-            {
-              "title": "should drag and drop media",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "main-app-mobile",
-                  "projectName": "main-app-mobile",
-                  "results": [
-                    {
-                      "workerIndex": 4,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 1219,
-                      "error": {
-                        "message": "TypeError: Cannot read properties of null (reading 'setInputFiles')",
-                        "stack": "TypeError: Cannot read properties of null (reading 'setInputFiles')\n    at /workspaces/Open-Higgsfield-AI/tests/e2e/main-app/timeline-editor.e2e.spec.ts:191:21",
-                        "location": {
-                          "file": "/workspaces/Open-Higgsfield-AI/tests/e2e/main-app/timeline-editor.e2e.spec.ts",
-                          "column": 21,
-                          "line": 191
-                        },
-                        "snippet": "  189 |     await page.goto('/#timeline');\n  190 |     const fileInput = await page.$('[data-testid=\"file-input\"]');\n> 191 |     await fileInput.setInputFiles('tests/samples/sample-video.mp4');\n      |                     ^\n  192 |     await page.locator('[data-testid=\"media-item\"]').dragTo(page.locator('[data-testid=\"timeline-track\"]'));\n  193 |   });\n  194 |"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/workspaces/Open-Higgsfield-AI/tests/e2e/main-app/timeline-editor.e2e.spec.ts",
-                            "column": 21,
-                            "line": 191
-                          },
-                          "message": "TypeError: Cannot read properties of null (reading 'setInputFiles')\n\n  189 |     await page.goto('/#timeline');\n  190 |     const fileInput = await page.$('[data-testid=\"file-input\"]');\n> 191 |     await fileInput.setInputFiles('tests/samples/sample-video.mp4');\n      |                     ^\n  192 |     await page.locator('[data-testid=\"media-item\"]').dragTo(page.locator('[data-testid=\"timeline-track\"]'));\n  193 |   });\n  194 |\n    at /workspaces/Open-Higgsfield-AI/tests/e2e/main-app/timeline-editor.e2e.spec.ts:191:21"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-04-28T18:41:41.888Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/workspaces/Open-Higgsfield-AI/test-results/main-app-timeline-editor.e-89712--should-drag-and-drop-media-main-app-mobile/test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "/workspaces/Open-Higgsfield-AI/test-results/main-app-timeline-editor.e-89712--should-drag-and-drop-media-main-app-mobile/video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/workspaces/Open-Higgsfield-AI/test-results/main-app-timeline-editor.e-89712--should-drag-and-drop-media-main-app-mobile/error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/workspaces/Open-Higgsfield-AI/tests/e2e/main-app/timeline-editor.e2e.spec.ts",
-                        "column": 21,
-                        "line": 191
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "688013c7eba7f59ed6f0-018e00b26eca9f211f55",
-              "file": "main-app/timeline-editor.e2e.spec.ts",
-              "line": 188,
-              "column": 3
-            }
-          ]
-        },
-        {
-          "title": "Clip Management Operations",
-          "file": "main-app/timeline-editor.e2e.spec.ts",
-          "line": 850,
-          "column": 6,
-          "specs": [
-            {
-              "title": "should add clip to timeline via drag and drop",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "main-app-chromium",
-                  "projectName": "main-app-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "failed",
-                      "duration": 11043,
-                      "error": {
-                        "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"timeline-container\"]') to be visible\u001b[22m\n",
-                        "stack": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"timeline-container\"]') to be visible\u001b[22m\n\n    at /workspaces/Open-Higgsfield-AI/tests/e2e/main-app/timeline-editor.e2e.spec.ts:853:16",
-                        "location": {
-                          "file": "/workspaces/Open-Higgsfield-AI/tests/e2e/main-app/timeline-editor.e2e.spec.ts",
-                          "column": 16,
-                          "line": 853
-                        },
-                        "snippet": "  851 |   test.beforeEach(async ({ page }) => {\n  852 |     await page.goto('/#timeline');\n> 853 |     await page.waitForSelector('[data-testid=\"timeline-container\"]', { timeout: 10000 });\n      |                ^\n  854 |   });\n  855 |\n  856 |   test('should add clip to timeline via drag and drop', async ({ page }) => {"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/workspaces/Open-Higgsfield-AI/tests/e2e/main-app/timeline-editor.e2e.spec.ts",
-                            "column": 16,
-                            "line": 853
-                          },
-                          "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"timeline-container\"]') to be visible\u001b[22m\n\n\n  851 |   test.beforeEach(async ({ page }) => {\n  852 |     await page.goto('/#timeline');\n> 853 |     await page.waitForSelector('[data-testid=\"timeline-container\"]', { timeout: 10000 });\n      |                ^\n  854 |   });\n  855 |\n  856 |   test('should add clip to timeline via drag and drop', async ({ page }) => {\n    at /workspaces/Open-Higgsfield-AI/tests/e2e/main-app/timeline-editor.e2e.spec.ts:853:16"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-04-28T18:41:39.859Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/workspaces/Open-Higgsfield-AI/test-results/main-app-timeline-editor.e-a8b83--timeline-via-drag-and-drop-main-app-chromium/test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "/workspaces/Open-Higgsfield-AI/test-results/main-app-timeline-editor.e-a8b83--timeline-via-drag-and-drop-main-app-chromium/video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/workspaces/Open-Higgsfield-AI/test-results/main-app-timeline-editor.e-a8b83--timeline-via-drag-and-drop-main-app-chromium/error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/workspaces/Open-Higgsfield-AI/tests/e2e/main-app/timeline-editor.e2e.spec.ts",
-                        "column": 16,
-                        "line": 853
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "688013c7eba7f59ed6f0-923b4c13f48f35e2453a",
-              "file": "main-app/timeline-editor.e2e.spec.ts",
-              "line": 856,
-              "column": 3
-            },
-            {
-              "title": "should add clip to timeline via drag and drop",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "main-app-firefox",
-                  "projectName": "main-app-firefox",
-                  "results": [
-                    {
-                      "workerIndex": 3,
-                      "parallelIndex": 3,
-                      "status": "failed",
-                      "duration": 12008,
-                      "error": {
-                        "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"timeline-container\"]') to be visible\u001b[22m\n",
-                        "stack": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"timeline-container\"]') to be visible\u001b[22m\n\n    at /workspaces/Open-Higgsfield-AI/tests/e2e/main-app/timeline-editor.e2e.spec.ts:853:16",
-                        "location": {
-                          "file": "/workspaces/Open-Higgsfield-AI/tests/e2e/main-app/timeline-editor.e2e.spec.ts",
-                          "column": 16,
-                          "line": 853
-                        },
-                        "snippet": "  851 |   test.beforeEach(async ({ page }) => {\n  852 |     await page.goto('/#timeline');\n> 853 |     await page.waitForSelector('[data-testid=\"timeline-container\"]', { timeout: 10000 });\n      |                ^\n  854 |   });\n  855 |\n  856 |   test('should add clip to timeline via drag and drop', async ({ page }) => {"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/workspaces/Open-Higgsfield-AI/tests/e2e/main-app/timeline-editor.e2e.spec.ts",
-                            "column": 16,
-                            "line": 853
-                          },
-                          "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"timeline-container\"]') to be visible\u001b[22m\n\n\n  851 |   test.beforeEach(async ({ page }) => {\n  852 |     await page.goto('/#timeline');\n> 853 |     await page.waitForSelector('[data-testid=\"timeline-container\"]', { timeout: 10000 });\n      |                ^\n  854 |   });\n  855 |\n  856 |   test('should add clip to timeline via drag and drop', async ({ page }) => {\n    at /workspaces/Open-Higgsfield-AI/tests/e2e/main-app/timeline-editor.e2e.spec.ts:853:16"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-04-28T18:41:39.815Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/workspaces/Open-Higgsfield-AI/test-results/main-app-timeline-editor.e-a8b83--timeline-via-drag-and-drop-main-app-firefox/test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "/workspaces/Open-Higgsfield-AI/test-results/main-app-timeline-editor.e-a8b83--timeline-via-drag-and-drop-main-app-firefox/video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/workspaces/Open-Higgsfield-AI/test-results/main-app-timeline-editor.e-a8b83--timeline-via-drag-and-drop-main-app-firefox/error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/workspaces/Open-Higgsfield-AI/tests/e2e/main-app/timeline-editor.e2e.spec.ts",
-                        "column": 16,
-                        "line": 853
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "688013c7eba7f59ed6f0-f8bb7b5ec3442fd41f6f",
-              "file": "main-app/timeline-editor.e2e.spec.ts",
-              "line": 856,
-              "column": 3
-            },
-            {
-              "title": "should add clip to timeline via drag and drop",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "main-app-mobile",
-                  "projectName": "main-app-mobile",
-                  "results": [
-                    {
-                      "workerIndex": 5,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 10940,
-                      "error": {
-                        "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"timeline-container\"]') to be visible\u001b[22m\n",
-                        "stack": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"timeline-container\"]') to be visible\u001b[22m\n\n    at /workspaces/Open-Higgsfield-AI/tests/e2e/main-app/timeline-editor.e2e.spec.ts:853:16",
-                        "location": {
-                          "file": "/workspaces/Open-Higgsfield-AI/tests/e2e/main-app/timeline-editor.e2e.spec.ts",
-                          "column": 16,
-                          "line": 853
-                        },
-                        "snippet": "  851 |   test.beforeEach(async ({ page }) => {\n  852 |     await page.goto('/#timeline');\n> 853 |     await page.waitForSelector('[data-testid=\"timeline-container\"]', { timeout: 10000 });\n      |                ^\n  854 |   });\n  855 |\n  856 |   test('should add clip to timeline via drag and drop', async ({ page }) => {"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/workspaces/Open-Higgsfield-AI/tests/e2e/main-app/timeline-editor.e2e.spec.ts",
-                            "column": 16,
-                            "line": 853
-                          },
-                          "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"timeline-container\"]') to be visible\u001b[22m\n\n\n  851 |   test.beforeEach(async ({ page }) => {\n  852 |     await page.goto('/#timeline');\n> 853 |     await page.waitForSelector('[data-testid=\"timeline-container\"]', { timeout: 10000 });\n      |                ^\n  854 |   });\n  855 |\n  856 |   test('should add clip to timeline via drag and drop', async ({ page }) => {\n    at /workspaces/Open-Higgsfield-AI/tests/e2e/main-app/timeline-editor.e2e.spec.ts:853:16"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-04-28T18:41:44.003Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/workspaces/Open-Higgsfield-AI/test-results/main-app-timeline-editor.e-a8b83--timeline-via-drag-and-drop-main-app-mobile/test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "/workspaces/Open-Higgsfield-AI/test-results/main-app-timeline-editor.e-a8b83--timeline-via-drag-and-drop-main-app-mobile/video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/workspaces/Open-Higgsfield-AI/test-results/main-app-timeline-editor.e-a8b83--timeline-via-drag-and-drop-main-app-mobile/error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/workspaces/Open-Higgsfield-AI/tests/e2e/main-app/timeline-editor.e2e.spec.ts",
-                        "column": 16,
-                        "line": 853
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "688013c7eba7f59ed6f0-36d786b63b583d90b44d",
-              "file": "main-app/timeline-editor.e2e.spec.ts",
-              "line": 856,
-              "column": 3
-            }
-          ]
-        }
-      ]
+      "message": "SyntaxError: /workspaces/Open-Higgsfield-AI/tests/e2e/setup/global-setup.js: Only one default export allowed per module. (11:0)\n\n   9 |\n  10 | // Global teardown for E2E tests\n> 11 | export default async function globalTeardown() {\n     | ^\n  12 |   // Clean up test environment\n  13 |   console.log('Tearing down E2E test environment...');\n  14 |",
+      "stack": "SyntaxError: /workspaces/Open-Higgsfield-AI/tests/e2e/setup/global-setup.js: Only one default export allowed per module. (11:0)\n\n   9 |\n  10 | // Global teardown for E2E tests\n> 11 | export default async function globalTeardown() {\n     | ^\n  12 |   // Clean up test environment\n  13 |   console.log('Tearing down E2E test environment...');\n  14 |"
     }
   ],
-  "errors": [],
   "stats": {
-    "startTime": "2026-04-28T18:41:37.154Z",
-    "duration": 17990.900999999998,
+    "startTime": "2026-04-18T19:53:32.882Z",
+    "duration": 2202.123,
     "expected": 0,
     "skipped": 0,
-    "unexpected": 6,
+    "unexpected": 0,
     "flaky": 0
   }
 }

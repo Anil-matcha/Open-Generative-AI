@@ -4,8 +4,12 @@ import { getMuAPIInstance } from '../../src/lib/muapi/MuAPIConnection.js';
 
 // Mock MuAPIConnection
 vi.mock('../../src/lib/muapi/MuAPIConnection.js', () => ({
-  default: vi.fn(),
-  getMuAPIInstance: vi.fn()
+  default: {
+    getMuAPIInstance: vi.fn(() => ({
+      _makeRequest: vi.fn(),
+      uploadFile: vi.fn()
+    }))
+  }
 }));
 
 describe('Media Processing Features - Comprehensive Tests', () => {
@@ -19,8 +23,8 @@ describe('Media Processing Features - Comprehensive Tests', () => {
       uploadFile: vi.fn()
     };
 
-    // Configure the mocked function to return our mock instance
-    getMuAPIInstance.mockReturnValue(mockMuapi);
+    // Mock the getMuAPIInstance to return our mock
+    MuAPIConnection.default.getMuAPIInstance = vi.fn(() => mockMuapi);
 
     effectsProcessor = new MuAPIAdvancedEffects();
   });

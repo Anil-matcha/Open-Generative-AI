@@ -2,8 +2,23 @@ import { getModelById, getVideoModelById, getI2IModelById, getI2VModelById, getV
 
 export class MuapiClient {
     constructor() {
-        // Ideally user provides this in settings
-        this.baseUrl = import.meta.env.DEV ? '' : 'https://api.muapi.ai';
+        // Validate that Supabase URL is configured before building proxy URL
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        if (!supabaseUrl) {
+            console.error('[MuapiClient] VITE_SUPABASE_URL is not configured');
+            this.proxyUrl = '/functions/v1/muapi-proxy'; // Fallback to relative path
+        } else {
+            this.proxyUrl = `${supabaseUrl}/functions/v1/muapi-proxy`;
+        }
+        this.activeControllers = new Map(); // For request cancellation
+
+        // Repository processor URLs
+        this.processorUrls = {
+            yucut: supabaseUrl ? `${supabaseUrl}/functions/v1/yucut-processor` : '/functions/v1/yucut-processor',
+            cinegen: supabaseUrl ? `${supabaseUrl}/functions/v1/cinegen-processor` : '/functions/v1/cinegen-processor',
+            ltx: supabaseUrl ? `${supabaseUrl}/functions/v1/ltx-processor` : '/functions/v1/ltx-processor',
+            cutai: supabaseUrl ? `${supabaseUrl}/functions/v1/cutai-processor` : '/functions/v1/cutai-processor'
+        };
     }
 
     getKey() {
@@ -12,20 +27,59 @@ export class MuapiClient {
         return key;
     }
 
-    /**
-     * Generates an image (Text-to-Image or Image-to-Image)
-     * @param {Object} params
-     * @param {string} params.model
-     * @param {string} params.prompt
-     * @param {string} params.negative_prompt
-     * @param {string} params.aspect_ratio
-     * @param {number} params.steps
-     * @param {number} params.guidance_scale
-     * @param {number} params.seed
-     * @param {string} [params.image_url] - If present, treats as Image-to-Image
-     */
-    async generateImage(params) {
-        const key = this.getKey();
+    // Determine which processor to use based on request parameters
+    getProcessorUrl(endpoint, params = {}) {
+        // Yucut processing (scene detection, media scraping, etc.)
+        if (endpoint.includes('scene-detection') || endpoint.includes('media-scraper') ||
+            endpoint.includes('yucut') || params.action?.includes('yucut') ||
+            params.model === 'transnet-v2') {
+            return this.processorUrls.yucut;
+        }
+
+        // CineGen processing (LLM chat, advanced export, edit tools)
+        if (endpoint.includes('cinegen') || params.action?.includes('cinegen') ||
+            params.model?.includes('cinegen') || params.context?.includes('render') ||
+            params.prompt && (params.prompt.includes('render') || params.prompt.includes('export'))) {
+            return this.processorUrls.cinegen;
+        }
+
+        // LTX processing (video generation, lip sync, voice clone)
+        if (endpoint.includes('ltx') || params.action?.includes('ltx') ||
+            params.model?.includes('ltx') || params.model?.includes('text-to-video') ||
+            params.model?.includes('image-to-video') || params.action?.includes('lip-sync') ||
+            params.action?.includes('voice-clone')) {
+            return this.processorUrls.ltx;
+        }
+
+        // CutAI processing (script generation, storyboard)
+        if (endpoint.includes('cutai') || params.action?.includes('cutai') ||
+            params.action?.includes('script') || params.action?.includes('storyboard') ||
+            params.genre || params.premise) {
+            return this.processorUrls.cutai;
+        }
+
+        // Default to MuAPI proxy for everything else
+        return this.proxyUrl;
+    }
+
+    // Generic makeRequest method for enhanced API calls
+    async makeRequest(endpoint, params = {}) {
+        try {
+            // Determine which processor to use
+            const processorUrl = this.getProcessorUrl(endpoint, params);
+
+            const response = await fetch(processorUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    endpoint,
+                    params,
+                    generationType: 'enhanced',
+                    studioType: 'enhanced'
+                })
+            });
 
         // Resolve endpoint from model definition
         const modelInfo = getModelById(params.model);
@@ -168,9 +222,43 @@ export class MuapiClient {
         throw new Error('Generation timed out after polling.');
     }
 
-    async generateVideo(params) {
-        const key = this.getKey();
+    async generateVideo(params, signal) {
+        // Route LTX requests to LTX processor
+        if (params.model?.includes('ltx') || params.model?.includes('text-to-video') ||
+            params.model?.includes('image-to-video') || params.model?.includes('video-to-video')) {
+            const processorUrl = this.processorUrls.ltx;
 
+            try {
+                const response = await fetch(processorUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: params.model.includes('text-to-video') ? 'text-to-video' :
+                               params.model.includes('image-to-video') ? 'image-to-video' :
+                               params.model.includes('video-to-video') ? 'video-to-video' : 'text-to-video',
+                        ...params
+                    }),
+                    signal
+                });
+
+                if (!response.ok) {
+                    const errText = await response.text();
+                    throw new Error(`LTX API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+                }
+
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    throw new Error('Request cancelled by user');
+                }
+                throw error;
+            }
+        }
+
+        // Default video generation through MuAPI
         const modelInfo = getVideoModelById(params.model);
         const endpoint = modelInfo?.endpoint || params.model;
         const url = `${this.baseUrl}/api/v1/${endpoint}`;
@@ -442,7 +530,1032 @@ export class MuapiClient {
             console.log('[Muapi] V2V Result URL:', videoUrl);
             return { ...result, url: videoUrl };
         } catch (error) {
-            console.error('Muapi V2V Error:', error);
+            if (error.name === 'AbortError') {
+                throw new Error('Request cancelled by user');
+            }
+            throw error;
+        }
+    }
+
+    async generateAvatar(params, signal) {
+        const finalPayload = {};
+
+        if (params.model) finalPayload.model = params.model;
+        if (params.video_url) finalPayload.video_url = params.video_url;
+        if (params.audio_url) finalPayload.audio_url = params.audio_url;
+        if (params.prompt) finalPayload.prompt = params.prompt;
+
+        try {
+            const response = await fetch(this.proxyUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    endpoint: 'avatar',
+                    params: finalPayload,
+                    generationType: 'avatar',
+                    studioType: 'avatar'
+                }),
+                signal
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+            }
+
+            const submitData = await response.json();
+            this.validateResponse(submitData, 'submit');
+
+            const requestId = submitData.request_id || submitData.id;
+            if (!requestId) return submitData;
+
+            const result = await this.pollForResult(requestId, 120, 2000, signal);
+            const videoUrl = result.outputs?.[0] || result.url || result.output?.url;
+            return { ...result, url: videoUrl };
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                throw new Error('Request cancelled by user');
+            }
+            throw error;
+        }
+    }
+
+    async generateAudio(params, signal) {
+        const finalPayload = {};
+
+        if (params.model) finalPayload.model = params.model;
+        if (params.prompt) finalPayload.prompt = params.prompt;
+        if (params.duration) finalPayload.duration = params.duration;
+        if (params.style) finalPayload.style = params.style;
+
+        try {
+            const response = await fetch(this.proxyUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    endpoint: 'audio',
+                    params: finalPayload,
+                    generationType: 'audio',
+                    studioType: 'audio'
+                }),
+                signal
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+            }
+
+            const submitData = await response.json();
+            this.validateResponse(submitData, 'submit');
+
+            const requestId = submitData.request_id || submitData.id;
+            if (!requestId) return submitData;
+
+            const result = await this.pollForResult(requestId, 120, 2000, signal);
+            const audioUrl = result.outputs?.[0] || result.url || result.output?.url;
+            return { ...result, url: audioUrl };
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                throw new Error('Request cancelled by user');
+            }
+            throw error;
+        }
+    }
+
+    async generateText(params, signal) {
+        const finalPayload = {};
+
+        if (params.model) finalPayload.model = params.model;
+        if (params.prompt) finalPayload.prompt = params.prompt;
+        if (params.system_prompt) finalPayload.system_prompt = params.system_prompt;
+        if (params.temperature) finalPayload.temperature = params.temperature;
+        if (params.max_tokens) finalPayload.max_tokens = params.max_tokens;
+
+        try {
+            const response = await fetch(this.proxyUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    endpoint: 'text',
+                    params: finalPayload,
+                    generationType: 'text',
+                    studioType: 'chat'
+                }),
+                signal
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+            }
+
+            const data = await response.json();
+            this.validateResponse(data, 'text');
+            return data;
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                throw new Error('Request cancelled by user');
+            }
+            throw error;
+        }
+    }
+
+    async trainLora(params, signal) {
+        const finalPayload = {};
+
+        if (params.images) finalPayload.images = params.images;
+        if (params.trigger_word) finalPayload.trigger_word = params.trigger_word;
+        if (params.epochs) finalPayload.epochs = params.epochs;
+
+        try {
+            const response = await fetch(this.proxyUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    endpoint: 'train',
+                    params: finalPayload,
+                    generationType: 'train',
+                    studioType: 'training'
+                }),
+                signal
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+            }
+
+            const submitData = await response.json();
+            this.validateResponse(submitData, 'submit');
+
+            const requestId = submitData.request_id || submitData.id;
+            if (!requestId) return submitData;
+
+            const result = await this.pollForResult(requestId, 300, 5000, signal);
+            return result;
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                throw new Error('Request cancelled by user');
+            }
+            throw error;
+        }
+    }
+
+    async processVideo(params, signal) {
+        // Route to appropriate processor based on task/model
+        const processorUrl = this.getProcessorUrl(params.task || params.model || 'video', params);
+
+        try {
+            const response = await fetch(processorUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    action: params.task || params.action || 'process-video',
+                    ...params
+                }),
+                signal
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+            }
+
+            const data = await response.json();
+            this.validateResponse(data, 'video');
+
+            return data;
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                throw new Error('Request cancelled by user');
+            }
+            throw error;
+        }
+    }
+
+    async processVideoTool(params, signal) {
+        const finalPayload = {};
+
+        if (params.model) finalPayload.model = params.model;
+        if (params.video_url) finalPayload.video_url = params.video_url;
+        if (params.prompt) finalPayload.prompt = params.prompt;
+
+        try {
+            const response = await fetch(this.proxyUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    endpoint: 'video-tool',
+                    params: finalPayload,
+                    generationType: 'video-tool',
+                    studioType: 'video-tools'
+                }),
+                signal
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+            }
+
+            const submitData = await response.json();
+            this.validateResponse(submitData, 'submit');
+
+            const requestId = submitData.request_id || submitData.id;
+            if (!requestId) return submitData;
+
+            const result = await this.pollForResult(requestId, 120, 2000, signal);
+            const videoUrl = result.outputs?.[0] || result.url || result.output?.url;
+            return { ...result, url: videoUrl };
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                throw new Error('Request cancelled by user');
+            }
+            throw error;
+        }
+    }
+
+    async createStoryboard(params, signal) {
+        const finalPayload = {};
+
+        if (params.characters) finalPayload.characters = params.characters;
+        if (params.scenes) finalPayload.scenes = params.scenes;
+        if (params.shots) finalPayload.shots = params.shots;
+
+        try {
+            const response = await fetch(this.proxyUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    endpoint: 'api/storyboard/projects',
+                    params: finalPayload,
+                    generationType: 'storyboard',
+                    studioType: 'storyboard'
+                }),
+                signal
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+            }
+
+            const submitData = await response.json();
+            this.validateResponse(submitData, 'submit');
+
+            const requestId = submitData.request_id || submitData.id;
+            if (!requestId) return submitData;
+
+            const result = await this.pollForResult(requestId, 300, 5000, signal); // Longer timeout for storyboards
+            return result;
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                throw new Error('Request cancelled by user');
+            }
+            throw error;
+        }
+    }
+
+    async generateVideoEffect(params, signal) {
+        const finalPayload = {};
+
+        if (params.prompt) finalPayload.prompt = params.prompt;
+        if (params.image_url) finalPayload.image_url = params.image_url;
+        if (params.name) finalPayload.name = params.name;
+        if (params.aspect_ratio) finalPayload.aspect_ratio = params.aspect_ratio;
+        if (params.resolution) finalPayload.resolution = params.resolution;
+
+        try {
+            const response = await fetch(this.proxyUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    endpoint: 'generate_wan_ai_effects',
+                    params: finalPayload,
+                    generationType: 'video-effect',
+                    studioType: 'video'
+                }),
+                signal
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+            }
+
+            const submitData = await response.json();
+            this.validateResponse(submitData, 'submit');
+
+            const requestId = submitData.request_id || submitData.id;
+            if (!requestId) return submitData;
+
+            const result = await this.pollForResult(requestId, 120, 2000, signal);
+            const videoUrl = result.outputs?.[0] || result.url || result.output?.url;
+            return { ...result, url: videoUrl };
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                throw new Error('Request cancelled by user');
+            }
+            throw error;
+        }
+    }
+
+    async applyWanAIEffect(videoUrl, effectType, options = {}, signal) {
+        const finalPayload = {
+            video_url: videoUrl,
+            effect_type: effectType,
+            prompt: options.prompt || `Apply ${effectType} style transformation`
+        };
+
+        try {
+            const response = await fetch(this.proxyUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    endpoint: 'generate_wan_ai_effects',
+                    params: finalPayload,
+                    generationType: 'video-effect',
+                    studioType: 'video'
+                }),
+                signal
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+            }
+
+            const submitData = await response.json();
+            this.validateResponse(submitData, 'submit');
+
+            const requestId = submitData.request_id || submitData.id;
+            if (!requestId) return submitData;
+
+            const result = await this.pollForResult(requestId, 120, 2000, signal);
+            const newVideoUrl = result.outputs?.[0] || result.url || result.output?.url;
+            return { success: true, url: newVideoUrl };
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                throw new Error('Request cancelled by user');
+            }
+            throw error;
+        }
+    }
+
+    async faceSwap(params, signal) {
+        const finalPayload = {};
+
+        if (params.source_image) finalPayload.source_image = params.source_image;
+        if (params.target_image) finalPayload.target_image = params.target_image;
+        // Add other face swap parameters as needed
+
+        try {
+            const response = await fetch(this.proxyUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    endpoint: 'ai-image-face-swap',
+                    params: finalPayload,
+                    generationType: 'face-swap',
+                    studioType: 'edit'
+                }),
+                signal
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+            }
+
+            const submitData = await response.json();
+            this.validateResponse(submitData, 'submit');
+
+            const requestId = submitData.request_id || submitData.id;
+            if (!requestId) return submitData;
+
+            const result = await this.pollForResult(requestId, 60, 2000, signal);
+            const imageUrl = result.outputs?.[0] || result.url || result.output?.url;
+            return { ...result, url: imageUrl };
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                throw new Error('Request cancelled by user');
+            }
+            throw error;
+        }
+    }
+
+    async upscaleImage(params, signal) {
+        const finalPayload = {};
+
+        if (params.image_url) finalPayload.image_url = params.image_url;
+        if (params.scale) finalPayload.scale = params.scale;
+
+        try {
+            const response = await fetch(this.proxyUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    endpoint: 'ai-image-upscale',
+                    params: finalPayload,
+                    generationType: 'upscale',
+                    studioType: 'upscale'
+                }),
+                signal
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+            }
+
+            const submitData = await response.json();
+            this.validateResponse(submitData, 'submit');
+
+            const requestId = submitData.request_id || submitData.id;
+            if (!requestId) return submitData;
+
+            const result = await this.pollForResult(requestId, 60, 2000, signal);
+            const imageUrl = result.outputs?.[0] || result.url || result.output?.url;
+            return { ...result, url: imageUrl };
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                throw new Error('Request cancelled by user');
+            }
+            throw error;
+        }
+    }
+
+    async removeBackground(params, signal) {
+        const finalPayload = {};
+
+        if (params.image_url) finalPayload.image_url = params.image_url;
+
+        try {
+            const response = await fetch(this.proxyUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    endpoint: 'ai-background-remover',
+                    params: finalPayload,
+                    generationType: 'background-remover',
+                    studioType: 'edit'
+                }),
+                signal
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+            }
+
+            const submitData = await response.json();
+            this.validateResponse(submitData, 'submit');
+
+            const requestId = submitData.request_id || submitData.id;
+            if (!requestId) return submitData;
+
+            const result = await this.pollForResult(requestId, 60, 2000, signal);
+            const imageUrl = result.outputs?.[0] || result.url || result.output?.url;
+            return { ...result, url: imageUrl };
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                throw new Error('Request cancelled by user');
+            }
+            throw error;
+        }
+    }
+
+    async eraseObject(params, signal) {
+        const finalPayload = {};
+
+        if (params.image_url) finalPayload.image_url = params.image_url;
+        if (params.mask) finalPayload.mask = params.mask;
+
+        try {
+            const response = await fetch(this.proxyUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    endpoint: 'ai-object-eraser',
+                    params: finalPayload,
+                    generationType: 'object-eraser',
+                    studioType: 'edit'
+                }),
+                signal
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+            }
+
+            const submitData = await response.json();
+            this.validateResponse(submitData, 'submit');
+
+            const requestId = submitData.request_id || submitData.id;
+            if (!requestId) return submitData;
+
+            const result = await this.pollForResult(requestId, 60, 2000, signal);
+            const imageUrl = result.outputs?.[0] || result.url || result.output?.url;
+            return { ...result, url: imageUrl };
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                throw new Error('Request cancelled by user');
+            }
+            throw error;
+        }
+    }
+
+    async extendImage(params, signal) {
+        const finalPayload = {};
+
+        if (params.image_url) finalPayload.image_url = params.image_url;
+        if (params.direction) finalPayload.direction = params.direction;
+
+        try {
+            const response = await fetch(this.proxyUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    endpoint: 'ai-image-extension',
+                    params: finalPayload,
+                    generationType: 'image-extension',
+                    studioType: 'edit'
+                }),
+                signal
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+            }
+
+            const submitData = await response.json();
+            this.validateResponse(submitData, 'submit');
+
+            const requestId = submitData.request_id || submitData.id;
+            if (!requestId) return submitData;
+
+            const result = await this.pollForResult(requestId, 60, 2000, signal);
+            const imageUrl = result.outputs?.[0] || result.url || result.output?.url;
+            return { ...result, url: imageUrl };
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                throw new Error('Request cancelled by user');
+            }
+            throw error;
+        }
+    }
+
+    async createProductShot(params, signal) {
+        const finalPayload = {};
+
+        if (params.image_url) finalPayload.image_url = params.image_url;
+        if (params.background) finalPayload.background = params.background;
+
+        try {
+            const response = await fetch(this.proxyUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    endpoint: 'ai-product-shot',
+                    params: finalPayload,
+                    generationType: 'product-shot',
+                    studioType: 'commercial'
+                }),
+                signal
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+            }
+
+            const submitData = await response.json();
+            this.validateResponse(submitData, 'submit');
+
+            const requestId = submitData.request_id || submitData.id;
+            if (!requestId) return submitData;
+
+            const result = await this.pollForResult(requestId, 60, 2000, signal);
+            const imageUrl = result.outputs?.[0] || result.url || result.output?.url;
+            return { ...result, url: imageUrl };
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                throw new Error('Request cancelled by user');
+            }
+            throw error;
+        }
+    }
+
+    async enhanceSkin(params, signal) {
+        const finalPayload = {};
+
+        if (params.image_url) finalPayload.image_url = params.image_url;
+
+        try {
+            const response = await fetch(this.proxyUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    endpoint: 'ai-skin-enhancer',
+                    params: finalPayload,
+                    generationType: 'skin-enhancer',
+                    studioType: 'character'
+                }),
+                signal
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+            }
+
+            const submitData = await response.json();
+            this.validateResponse(submitData, 'submit');
+
+            const requestId = submitData.request_id || submitData.id;
+            if (!requestId) return submitData;
+
+            const result = await this.pollForResult(requestId, 60, 2000, signal);
+            const imageUrl = result.outputs?.[0] || result.url || result.output?.url;
+            return { ...result, url: imageUrl };
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                throw new Error('Request cancelled by user');
+            }
+            throw error;
+        }
+    }
+
+    async stylizeGhibli(params, signal) {
+        const finalPayload = {};
+
+        if (params.image_url) finalPayload.image_url = params.image_url;
+
+        try {
+            const response = await fetch(this.proxyUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    endpoint: 'ai-ghibli-style',
+                    params: finalPayload,
+                    generationType: 'ghibli-style',
+                    studioType: 'edit'
+                }),
+                signal
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+            }
+
+            const submitData = await response.json();
+            this.validateResponse(submitData, 'submit');
+
+            const requestId = submitData.request_id || submitData.id;
+            if (!requestId) return submitData;
+
+            const result = await this.pollForResult(requestId, 60, 2000, signal);
+            const imageUrl = result.outputs?.[0] || result.url || result.output?.url;
+            return { ...result, url: imageUrl };
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                throw new Error('Request cancelled by user');
+            }
+            throw error;
+        }
+    }
+
+    async generateAnime(params, signal) {
+        const finalPayload = {};
+
+        if (params.prompt) finalPayload.prompt = params.prompt;
+
+        try {
+            const response = await fetch(this.proxyUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    endpoint: 'ai-anime-generator',
+                    params: finalPayload,
+                    generationType: 'anime-generator',
+                    studioType: 'edit'
+                }),
+                signal
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+            }
+
+            const submitData = await response.json();
+            this.validateResponse(submitData, 'submit');
+
+            const requestId = submitData.request_id || submitData.id;
+            if (!requestId) return submitData;
+
+            const result = await this.pollForResult(requestId, 60, 2000, signal);
+            const imageUrl = result.outputs?.[0] || result.url || result.output?.url;
+            return { ...result, url: imageUrl };
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                throw new Error('Request cancelled by user');
+            }
+            throw error;
+        }
+    }
+
+    async generateMusic(params, signal) {
+        const finalPayload = {};
+
+        if (params.prompt) finalPayload.prompt = params.prompt;
+        if (params.style) finalPayload.style = params.style;
+        if (params.duration) finalPayload.duration = params.duration;
+
+        try {
+            const response = await fetch(this.proxyUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    endpoint: 'suno-create-music',
+                    params: finalPayload,
+                    generationType: 'music',
+                    studioType: 'audio'
+                }),
+                signal
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+            }
+
+            const submitData = await response.json();
+            this.validateResponse(submitData, 'submit');
+
+            const requestId = submitData.request_id || submitData.id;
+            if (!requestId) return submitData;
+
+            const result = await this.pollForResult(requestId, 120, 2000, signal);
+            const audioUrl = result.outputs?.[0] || result.url || result.output?.url;
+            return { ...result, url: audioUrl };
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                throw new Error('Request cancelled by user');
+            }
+            throw error;
+        }
+    }
+
+    async remixMusic(params, signal) {
+        const finalPayload = {};
+
+        if (params.audio_url) finalPayload.audio_url = params.audio_url;
+        if (params.prompt) finalPayload.prompt = params.prompt;
+
+        try {
+            const response = await fetch(this.proxyUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    endpoint: 'suno-remix-music',
+                    params: finalPayload,
+                    generationType: 'remix',
+                    studioType: 'audio'
+                }),
+                signal
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+            }
+
+            const submitData = await response.json();
+            this.validateResponse(submitData, 'submit');
+
+            const requestId = submitData.request_id || submitData.id;
+            if (!requestId) return submitData;
+
+            const result = await this.pollForResult(requestId, 120, 2000, signal);
+            const audioUrl = result.outputs?.[0] || result.url || result.output?.url;
+            return { ...result, url: audioUrl };
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                throw new Error('Request cancelled by user');
+            }
+            throw error;
+        }
+    }
+
+    async extendMusic(params, signal) {
+        const finalPayload = {};
+
+        if (params.audio_url) finalPayload.audio_url = params.audio_url;
+        if (params.duration) finalPayload.duration = params.duration;
+
+        try {
+            const response = await fetch(this.proxyUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    endpoint: 'suno-extend-music',
+                    params: finalPayload,
+                    generationType: 'extend-music',
+                    studioType: 'audio'
+                }),
+                signal
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+            }
+
+            const submitData = await response.json();
+            this.validateResponse(submitData, 'submit');
+
+            const requestId = submitData.request_id || submitData.id;
+            if (!requestId) return submitData;
+
+            const result = await this.pollForResult(requestId, 120, 2000, signal);
+            const audioUrl = result.outputs?.[0] || result.url || result.output?.url;
+            return { ...result, url: audioUrl };
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                throw new Error('Request cancelled by user');
+            }
+            throw error;
+        }
+    }
+
+    async syncLipsync(params, signal) {
+        const finalPayload = {};
+
+        if (params.audio_url) finalPayload.audio_url = params.audio_url;
+        if (params.image_url) finalPayload.image_url = params.image_url;
+        if (params.video_url) finalPayload.video_url = params.video_url;
+
+        try {
+            const response = await fetch(this.proxyUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    endpoint: 'sync-lipsync',
+                    params: finalPayload,
+                    generationType: 'lipsync',
+                    studioType: 'avatar'
+                }),
+                signal
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+            }
+
+            const submitData = await response.json();
+            this.validateResponse(submitData, 'submit');
+
+            const requestId = submitData.request_id || submitData.id;
+            if (!requestId) return submitData;
+
+            const result = await this.pollForResult(requestId, 120, 2000, signal);
+            const videoUrl = result.outputs?.[0] || result.url || result.output?.url;
+            return { ...result, url: videoUrl };
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                throw new Error('Request cancelled by user');
+            }
+            throw error;
+        }
+    }
+
+    async latentsyncVideo(params, signal) {
+        const finalPayload = {};
+
+        if (params.audio_url) finalPayload.audio_url = params.audio_url;
+        if (params.video_url) finalPayload.video_url = params.video_url;
+
+        try {
+            const response = await fetch(this.proxyUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    endpoint: 'latentsync-video',
+                    params: finalPayload,
+                    generationType: 'latentsync',
+                    studioType: 'avatar'
+                }),
+                signal
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+            }
+
+            const submitData = await response.json();
+            this.validateResponse(submitData, 'submit');
+
+            const requestId = submitData.request_id || submitData.id;
+            if (!requestId) return submitData;
+
+            const result = await this.pollForResult(requestId, 120, 2000, signal);
+            const videoUrl = result.outputs?.[0] || result.url || result.output?.url;
+            return { ...result, url: videoUrl };
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                throw new Error('Request cancelled by user');
+            }
+            throw error;
+        }
+    }
+
+    async mmaudioTextToAudio(params, signal) {
+        const finalPayload = {};
+
+        if (params.text) finalPayload.text = params.text;
+        if (params.voice) finalPayload.voice = params.voice;
+
+        try {
+            const response = await fetch(this.proxyUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    endpoint: 'mmaudio-v2/text-to-audio',
+                    params: finalPayload,
+                    generationType: 'text-to-audio',
+                    studioType: 'audio'
+                }),
+                signal
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+            }
+
+            const submitData = await response.json();
+            this.validateResponse(submitData, 'submit');
+
+            const requestId = submitData.request_id || submitData.id;
+            if (!requestId) return submitData;
+
+            const result = await this.pollForResult(requestId, 120, 2000, signal);
+            const audioUrl = result.outputs?.[0] || result.url || result.output?.url;
+            return { ...result, url: audioUrl };
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                throw new Error('Request cancelled by user');
+            }
+            throw error;
+        }
+    }
+
+    async mmaudioVideoToVideo(params, signal) {
+        const finalPayload = {};
+
+        if (params.video_url) finalPayload.video_url = params.video_url;
+        if (params.audio_url) finalPayload.audio_url = params.audio_url;
+
+        try {
+            const response = await fetch(this.proxyUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    endpoint: 'mmaudio-v2/video-to-video',
+                    params: finalPayload,
+                    generationType: 'video-to-video',
+                    studioType: 'avatar'
+                }),
+                signal
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+            }
+
+            const submitData = await response.json();
+            this.validateResponse(submitData, 'submit');
+
+            const requestId = submitData.request_id || submitData.id;
+            if (!requestId) return submitData;
+
+            const result = await this.pollForResult(requestId, 120, 2000, signal);
+            const videoUrl = result.outputs?.[0] || result.url || result.output?.url;
+            return { ...result, url: videoUrl };
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                throw new Error('Request cancelled by user');
+            }
             throw error;
         }
     }
