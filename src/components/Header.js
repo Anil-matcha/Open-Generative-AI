@@ -1,16 +1,21 @@
+import { HeaderMegaMenu } from './HeaderMegaMenu.js';
 import { SettingsModal } from './SettingsModal.js';
+
+// Get current page from router or URL
+function getCurrentPage() {
+    return window.__currentPage || 'image';
+}
 
 export function Header(navigate) {
     const header = document.createElement('header');
     header.className = 'w-full flex flex-col z-50 sticky top-0';
-
 
     // 2. Main Navigation Bar
     const navBar = document.createElement('div');
     navBar.className = 'w-full h-16 bg-black flex items-center justify-between px-4 md:px-6 border-b border-white/5 backdrop-blur-md bg-opacity-95';
 
     const leftPart = document.createElement('div');
-    leftPart.className = 'flex items-center gap-8';
+    leftPart.className = 'flex items-center gap-6';
 
     // Logo
     const logoContainer = document.createElement('div');
@@ -25,79 +30,56 @@ export function Header(navigate) {
         </div>
     `;
 
+    // Mega Menu for Apps
+    const megaMenu = HeaderMegaMenu({ navigate, currentPage: getCurrentPage() });
+
+    // Top-level navigation items (core apps)
     const menu = document.createElement('nav');
     menu.className = 'hidden lg:flex items-center gap-6 text-[13px] font-bold text-secondary overflow-x-auto';
-    const items = [
-        'Apps', 'Image', 'Video', 'Cinema Studio', 'Character', 'AI-VFX', 'Influencer', 'Storyboard',
-        'Effects', 'VFX', 'Edit', 'Upscale', 'Audio', 'Avatar', 'Training', 'Video Tools',
-        'Render', 'Video Agent', 'Director', 'Timeline', 'Motion', 'TikTok', 'Dubbing',
-        'Chat', 'Commercial', 'Templates', 'Explore', 'Library', 'Community', 'Assist',
-        'Lip Sync', 'Workflows', 'Agents', 'MCP & CLI'
+    const topLevelItems = [
+        { label: 'Image', route: 'image' },
+        { label: 'Video', route: 'video' },
+        { label: 'Cinema', route: 'cinema' },
+        { label: 'Library', route: 'library' },
+        { label: 'Templates', route: 'templates' },
+        { label: 'Explore', route: 'explore' },
+        { label: 'Assist', route: 'assist' }
     ];
 
-    items.forEach(item => {
-        const link = document.createElement('a');
-        link.textContent = item;
-        link.className = `hover:text-white transition-all cursor-pointer relative group ${item === 'Image' ? 'text-white' : ''}`;
+    const updateActiveStates = (currentRoute) => {
+        Array.from(menu.children).forEach(child => {
+            if (child.dataset && child.dataset.route) {
+                const isActive = child.dataset.route === currentRoute;
+                child.classList.toggle('text-white', isActive);
+                // Update dot indicator
+                const dot = child.querySelector('.nav-dot');
+                if (dot) dot.style.display = isActive ? 'block' : 'none';
+            }
+        });
+    };
 
-        // Active Indicator or Dot
-        if (item === 'Image') {
-            const dot = document.createElement('div');
-            dot.className = 'absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-primary rounded-full';
-            link.appendChild(dot);
-        }
+    topLevelItems.forEach(item => {
+        const link = document.createElement('a');
+        link.textContent = item.label;
+        link.dataset.route = item.route;
+        link.className = 'hover:text-white transition-all cursor-pointer relative group text-secondary';
+
+        // Active Indicator dot
+        const dot = document.createElement('div');
+        dot.className = 'nav-dot absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-primary rounded-full';
+        dot.style.display = 'none';
+        link.appendChild(dot);
 
         link.onclick = () => {
-            // Remove active state from all
-            Array.from(menu.children).forEach(child => child.classList.remove('text-white'));
-            // Add to current
-            link.classList.add('text-white');
-
-            const routeMap = {
-                'Apps': 'apps',
-                'Image': 'image',
-                'Video': 'video',
-                'Cinema Studio': 'cinema',
-                'Character': 'character',
-                'AI-VFX': 'ai-vfx',
-                'Influencer': 'influencer',
-                'Storyboard': 'storyboard',
-                'Effects': 'effects',
-                'VFX': 'vfx',
-                'Edit': 'edit',
-                'Upscale': 'upscale',
-                'Audio': 'audio',
-                'Avatar': 'avatar',
-                'Training': 'training',
-                'Video Tools': 'videotools',
-                'Render': 'render',
-                'Video Agent': 'video-agent',
-                'Director': 'director',
-                'Timeline': 'timeline',
-                'Motion': 'runway-motion',
-                'TikTok': 'tiktok-carousel',
-                'Dubbing': 'advanced-dubbing',
-                'Chat': 'chat',
-                'Commercial': 'commercial',
-                'Templates': 'templates',
-                'Explore': 'explore',
-                'Library': 'library',
-                'Community': 'community',
-                'Assist': 'assist',
-                'Lip Sync': 'lipsync',
-                'Workflows': 'workflows',
-                'Agents': 'agents',
-                'MCP & CLI': 'mcp-cli'
-            };
-
-            const route = routeMap[item];
-            if (route) navigate(route);
+            updateActiveStates(item.route);
+            navigate(item.route);
         };
 
         menu.appendChild(link);
     });
 
     leftPart.appendChild(logoContainer);
+    leftPart.appendChild(megaMenu);
     leftPart.appendChild(menu);
 
     const rightPart = document.createElement('div');
@@ -124,5 +106,18 @@ export function Header(navigate) {
 
     header.appendChild(navBar);
 
-    return header;
+    // Return header with update method
+    return {
+        element: header,
+        updateActiveStates: (currentRoute) => {
+            Array.from(menu.children).forEach(child => {
+                if (child.dataset && child.dataset.route) {
+                    const isActive = child.dataset.route === currentRoute;
+                    child.classList.toggle('text-white', isActive);
+                    const dot = child.querySelector('.nav-dot');
+                    if (dot) dot.style.display = isActive ? 'block' : 'none';
+                }
+            });
+        }
+    };
 }

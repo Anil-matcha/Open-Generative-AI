@@ -1,4 +1,5 @@
 import './style.css';
+import './components/styles/header-mega-menu.css';
 import { Header } from './components/Header.js';
 import { Sidebar } from './components/Sidebar.js';
 import { initRouter, navigate } from './lib/router.js';
@@ -264,7 +265,9 @@ try {
     console.log('[App] Landing page rendered (full-page mode)');
   } else {
     // Standard app shell for editor pages
-    const headerEl = Header((page) => navigate(page));
+    const header = Header((page) => navigate(page));
+    const headerEl = header.element;
+    const updateHeaderActive = header.updateActiveStates;
     app.appendChild(headerEl);
 
     const body = document.createElement('div');
@@ -281,7 +284,7 @@ try {
     app.appendChild(body);
 
     initRouter(contentArea, (page) => {
-      headerEl.dispatchEvent(new CustomEvent('route-changed', { detail: { page } }));
+      updateHeaderActive(page);
       sidebar.dispatchEvent(new CustomEvent('route-changed', { detail: { page } }));
     });
     

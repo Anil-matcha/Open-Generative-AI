@@ -1,0 +1,77 @@
+/* Header Mega Menu Styles */
+
+/* Custom scrollbar for dropdown */
+[data-mega-menu] .custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+[data-mega-menu] .custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+[data-mega-menu] .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+[data-mega-menu] .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Mega menu animation */
+[data-mega-menu] > div > div:last-child {
+  animation: megaMenuFadeIn 0.2s ease-out;
+}
+
+@keyframes megaMenuFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hover effects for app cards */
+[data-mega-menu] button:hover svg {
+  color: #d9ff00;
+}
+
+/* Focus styles for search input */
+[data-mega-menu] input:focus {
+  border-color: rgba(217, 255, 0, 0.5);
+  box-shadow: 0 0 0 2px rgba(217, 255, 0, 0.1);
+}
+
+/* Active state for app cards */
+[data-mega-menu] button.bg-primary\/10 {
+  background-color: rgba(217, 255, 0, 0.1);
+}
+
+/* Badge pulse animation */
+[data-mega-menu] .bg-primary\/20 {
+  position: relative;
+}
+
+[data-mega-menu] .bg-primary\/20::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 6px;
+  height: 6px;
+  background: #d9ff00;
+  border-radius: 50%;
+  animation: badgePulse 2s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
