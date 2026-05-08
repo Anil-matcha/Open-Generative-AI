@@ -1394,7 +1394,6 @@ export class MuAPIAdvancedEffects {
 
     // For large files, apply preprocessing optimizations
     if (fileSize > 100 * 1024 * 1024) { // > 100MB
-      console.log('Large file detected, applying preprocessing optimizations');
       options.preprocess = true;
       options.chunked = true;
     }

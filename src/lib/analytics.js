@@ -51,7 +51,6 @@ class Analytics {
     track(eventType, properties = {}) {
         if (!this.enabled) {
             if (import.meta.env.DEV) {
-                console.log(`[Analytics] ${eventType}`, properties);
             }
             return;
         }
@@ -79,7 +78,6 @@ class Analytics {
 
         // Development logging
         if (import.meta.env.DEV) {
-            console.log(`[Analytics] ${eventType}`, properties);
         }
     }
 
@@ -100,7 +98,6 @@ class Analytics {
             
             // For now, just log in development
             if (import.meta.env.DEV) {
-                console.log('[Analytics] Flushed events:', events);
             }
         } catch (error) {
             // Re-add events to queue on failure

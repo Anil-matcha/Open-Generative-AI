@@ -9,16 +9,26 @@ const corsHeaders = {
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+const MUAPI_API_KEY = Deno.env.get('MUAPI_API_KEY');
+const MUAPI_BASE_URL = 'https://api.muapi.ai/api/v1';
 
 if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
   console.error('[videoagent] Missing required environment variables');
 }
 
+if (!MUAPI_API_KEY) {
+  console.error('[videoagent] Missing MUAPI_API_KEY environment variable');
+}
+
 interface ProcessRequest {
-  action: 'auto-edit' | 'create-shorts' | 'scene-detection' | 'clip-segmentation' | 'highlight-detection';
+  action: 'auto-edit' | 'create-shorts' | 'scene-detection' | 'clip-segmentation' | 'highlight-detection' | 'compile-frames';
   videoId?: string;
   videoUrl: string;
   options?: Record<string, any>;
+  frameUrls?: string[];
+  duration?: number;
+  transition?: string;
+  preset?: any;
 }
 
 interface JobRecord {
@@ -181,63 +191,257 @@ async function processJobAsync(jobId: string, action: string, videoUrl: string, 
   const job = jobsStore.get(jobId);
   if (!job) return;
 
-  const steps = PIPELINE_STEPS[action] || PIPELINE_STEPS['auto-edit'];
+  try {
+    let result: any = null;
 
-  for (let i = 0; i < steps.length; i++) {
-    job.currentStep = i + 1;
+    switch (action) {
+      case 'auto-edit':
+      case 'create-shorts':
+        result = await processVideoWithMuAPI(jobId, action, videoUrl, options);
+        break;
+      case 'scene-detection':
+        result = await detectScenesWithMuAPI(jobId, videoUrl, options);
+        break;
+      case 'clip-segmentation':
+        result = await segmentClipsWithMuAPI(jobId, videoUrl, options);
+        break;
+      case 'highlight-detection':
+        result = await detectHighlightsWithMuAPI(jobId, videoUrl, options);
+        break;
+      case 'compile-frames':
+        result = await compileFramesWithMuAPI(jobId, options?.frameUrls || [], options);
+        break;
+      default:
+        throw new Error(`Unsupported action: ${action}`);
+    }
+
+    job.status = 'completed';
+    job.result = result;
     job.updatedAt = new Date().toISOString();
     jobsStore.set(jobId, job);
 
-    console.log(`[videoagent] Job ${jobId}: Processing step ${i + 1}/${steps.length} - ${steps[i]}`);
+    console.log(`[videoagent] Job ${jobId} completed successfully`);
 
-    try {
-      await simulateProcessingStep(steps[i], videoUrl, action);
-    } catch (error) {
-      job.status = 'failed';
-      job.error = error.message;
-      job.updatedAt = new Date().toISOString();
-      jobsStore.set(jobId, job);
-      console.error(`[videoagent] Job ${jobId} failed at step ${steps[i]}:`, error);
-      return;
-    }
+  } catch (error) {
+    job.status = 'failed';
+    job.error = error.message;
+    job.updatedAt = new Date().toISOString();
+    jobsStore.set(jobId, job);
+    console.error(`[videoagent] Job ${jobId} failed:`, error);
+  }
+}
 
-    await new Promise(resolve => setTimeout(resolve, 2000));
+async function callMuAPI(endpoint: string, params: Record<string, any>): Promise<any> {
+  if (!MUAPI_API_KEY) {
+    throw new Error('MUAPI_API_KEY not configured');
   }
 
-  job.status = 'completed';
-  job.currentStep = steps.length;
-  job.result = {
-    outputUrl: videoUrl,
-    processed: true,
-    action,
-    timestamp: new Date().toISOString()
-  };
+  const url = `${MUAPI_BASE_URL}/${endpoint}`;
+
+  console.log(`[videoagent] Calling MuAPI endpoint: ${endpoint}`);
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': MUAPI_API_KEY
+    },
+    body: JSON.stringify(params)
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`MuAPI call failed: ${response.status} ${response.statusText} - ${errorText}`);
+  }
+
+  return await response.json();
+}
+
+async function processVideoWithMuAPI(jobId: string, action: string, videoUrl: string, options?: Record<string, any>): Promise<any> {
+  const job = jobsStore.get(jobId);
+  if (!job) throw new Error('Job not found');
+
+  const steps = PIPELINE_STEPS[action] || PIPELINE_STEPS['auto-edit'];
+
+  // Step 1: Scene Detection
+  job.currentStep = 1;
   job.updatedAt = new Date().toISOString();
   jobsStore.set(jobId, job);
 
-  console.log(`[videoagent] Job ${jobId} completed successfully`);
+  const sceneDetection = await callMuAPI('scene-detection', {
+    video_url: videoUrl,
+    ...options
+  });
+
+  // Step 2: Highlight Detection
+  job.currentStep = 2;
+  job.updatedAt = new Date().toISOString();
+  jobsStore.set(jobId, job);
+
+  const highlights = await callMuAPI('highlight-detection', {
+    video_url: videoUrl,
+    scenes: sceneDetection.scenes,
+    ...options
+  });
+
+  // Step 3: Clip Generation
+  job.currentStep = 3;
+  job.updatedAt = new Date().toISOString();
+  jobsStore.set(jobId, job);
+
+  const clips = await callMuAPI('clip-generation', {
+    video_url: videoUrl,
+    highlights: highlights.highlights,
+    action: action,
+    ...options
+  });
+
+  // Step 4: Subtitle Generation
+  job.currentStep = 4;
+  job.updatedAt = new Date().toISOString();
+  jobsStore.set(jobId, job);
+
+  const subtitles = await callMuAPI('subtitle-generation', {
+    video_url: videoUrl,
+    clips: clips.clips,
+    ...options
+  });
+
+  // Step 5: B-Roll & Overlays
+  job.currentStep = 5;
+  job.updatedAt = new Date().toISOString();
+  jobsStore.set(jobId, job);
+
+  const broll = await callMuAPI('b-roll-overlay', {
+    video_url: videoUrl,
+    clips: clips.clips,
+    ...options
+  });
+
+  // Step 6: Final Export
+  job.currentStep = 6;
+  job.updatedAt = new Date().toISOString();
+  jobsStore.set(jobId, job);
+
+  const finalVideo = await callMuAPI('video-export', {
+    video_url: videoUrl,
+    clips: clips.clips,
+    subtitles: subtitles.subtitles,
+    broll: broll.overlays,
+    format: options?.format || 'mp4',
+    quality: options?.quality || 'high',
+    ...options
+  });
+
+  return {
+    outputUrl: finalVideo.url,
+    scenes: sceneDetection.scenes,
+    highlights: highlights.highlights,
+    clips: clips.clips,
+    subtitles: subtitles.subtitles,
+    broll: broll.overlays,
+    format: finalVideo.format,
+    quality: finalVideo.quality,
+    duration: finalVideo.duration,
+    timestamp: new Date().toISOString()
+  };
 }
 
-async function simulateProcessingStep(stepName: string, videoUrl: string, action: string) {
-  console.log(`[videoagent] Simulating: ${stepName}`);
-  
-  if (action === 'create-shorts' && stepName.includes('Clip Generation')) {
-    return {
-      clips: [
-        { start: 0, end: 15, platform: 'tiktok' },
-        { start: 15, end: 45, platform: 'youtube_shorts' },
-        { start: 45, end: 60, platform: 'instagram_reels' }
-      ]
-    };
+async function detectScenesWithMuAPI(jobId: string, videoUrl: string, options?: Record<string, any>): Promise<any> {
+  const job = jobsStore.get(jobId);
+  if (!job) throw new Error('Job not found');
+
+  job.currentStep = 1;
+  job.updatedAt = new Date().toISOString();
+  jobsStore.set(jobId, job);
+
+  const result = await callMuAPI('scene-detection', {
+    video_url: videoUrl,
+    sensitivity: options?.sensitivity || 'medium',
+    ...options
+  });
+
+  return {
+    scenes: result.scenes || [],
+    sceneCount: result.scenes?.length || 0,
+    videoUrl: videoUrl,
+    timestamp: new Date().toISOString()
+  };
+}
+
+async function segmentClipsWithMuAPI(jobId: string, videoUrl: string, options?: Record<string, any>): Promise<any> {
+  const job = jobsStore.get(jobId);
+  if (!job) throw new Error('Job not found');
+
+  job.currentStep = 1;
+  job.updatedAt = new Date().toISOString();
+  jobsStore.set(jobId, job);
+
+  const result = await callMuAPI('clip-segmentation', {
+    video_url: videoUrl,
+    min_duration: options?.minDuration || 5,
+    max_duration: options?.maxDuration || 30,
+    ...options
+  });
+
+  return {
+    clips: result.clips || [],
+    clipCount: result.clips?.length || 0,
+    videoUrl: videoUrl,
+    timestamp: new Date().toISOString()
+  };
+}
+
+async function detectHighlightsWithMuAPI(jobId: string, videoUrl: string, options?: Record<string, any>): Promise<any> {
+  const job = jobsStore.get(jobId);
+  if (!job) throw new Error('Job not found');
+
+  job.currentStep = 1;
+  job.updatedAt = new Date().toISOString();
+  jobsStore.set(jobId, job);
+
+  const result = await callMuAPI('highlight-detection', {
+    video_url: videoUrl,
+    algorithm: options?.algorithm || 'engagement',
+    threshold: options?.threshold || 0.7,
+    ...options
+  });
+
+  return {
+    highlights: result.highlights || [],
+    highlightCount: result.highlights?.length || 0,
+    videoUrl: videoUrl,
+    timestamp: new Date().toISOString()
+  };
+}
+
+async function compileFramesWithMuAPI(jobId: string, frameUrls: string[], options?: Record<string, any>): Promise<any> {
+  const job = jobsStore.get(jobId);
+  if (!job) throw new Error('Job not found');
+
+  if (!frameUrls || frameUrls.length === 0) {
+    throw new Error('No frame URLs provided for compilation');
   }
-  
-  if (action === 'auto-edit' && stepName.includes('Final Export')) {
-    return {
-      outputUrl: videoUrl,
-      format: 'mp4',
-      quality: 'hd'
-    };
-  }
-  
-  return { success: true, step: stepName };
+
+  job.currentStep = 1;
+  job.updatedAt = new Date().toISOString();
+  jobsStore.set(jobId, job);
+
+  const result = await callMuAPI('frame-compilation', {
+    frame_urls: frameUrls,
+    duration_per_frame: options?.duration || 3,
+    transition: options?.transition || 'fade',
+    output_format: options?.format || 'mp4',
+    quality: options?.quality || 'high',
+    ...options
+  });
+
+  return {
+    compiledVideoUrl: result.url,
+    frameCount: frameUrls.length,
+    totalDuration: result.duration,
+    format: result.format,
+    quality: result.quality,
+    timestamp: new Date().toISOString()
+  };
 }

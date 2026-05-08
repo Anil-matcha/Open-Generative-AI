@@ -1,4 +1,4 @@
-import { supabase } from '../supabase.js';
+import { supabase } from './hybrid-supabase.js';
 
 /**
  * Profile Service - Manages user profile operations with Supabase
@@ -326,7 +326,6 @@ export class ProfileService {
       // Delete user from auth (this will cascade delete everything)
       // Note: In Supabase, this requires admin privileges
       // For now, we'll just mark the profile as deleted
-      console.log('[ProfileService] Account deletion requested - manual admin action required');
 
       return true;
     } catch (error) {

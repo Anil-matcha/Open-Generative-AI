@@ -590,7 +590,7 @@ export function renderMediaGrid(mediaItems, container, onMediaSelect, showToast,
 
   // Initialize drag and drop for media items
   if (state) {
-    import('./dragDrop.js').then(({ initializeMediaLibraryDragDrop }) => {
+    import('./dragDrop-lazy.js').then(({ initializeMediaLibraryDragDrop }) => {
       initializeMediaLibraryDragDrop(state, container);
     });
   }

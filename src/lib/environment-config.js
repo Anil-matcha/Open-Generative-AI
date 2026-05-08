@@ -140,27 +140,15 @@ export class EnvironmentValidator {
   }
 
   isProduction() {
-    try {
-      return typeof process !== 'undefined' && process.env ? process.env.NODE_ENV === 'production' : false;
-    } catch (e) {
-      return false;
-    }
+    return import.meta.env.PROD;
   }
 
   isDevelopment() {
-    try {
-      return typeof process !== 'undefined' && process.env ? process.env.NODE_ENV === 'development' : true;
-    } catch (e) {
-      return true;
-    }
+    return import.meta.env.DEV;
   }
 
   isTest() {
-    try {
-      return typeof process !== 'undefined' && process.env ? process.env.NODE_ENV === 'test' : false;
-    } catch (e) {
-      return false;
-    }
+    return import.meta.env.MODE === 'test';
   }
 }
 
@@ -183,7 +171,6 @@ export class SecureEnv {
       }
     }
 
-    console.log('[Environment] Configuration validated successfully');
     return this.validator.getConfig();
   }
 
@@ -192,12 +179,7 @@ export class SecureEnv {
       throw new Error('Environment configuration has not been initialized. Call initialize() first.');
     }
 
-    let value = null;
-    try {
-      value = typeof process !== 'undefined' && process.env ? process.env[key] : null;
-    } catch (e) {
-      value = null;
-    }
+    const value = import.meta.env[key];
     const schema = ENV_SCHEMA[key];
 
     if (schema?.sensitive && value) {
@@ -221,19 +203,11 @@ export const secureEnv = new SecureEnv();
 
 // Utility functions for common environment checks
 export function isProduction() {
-  try {
-    return secureEnv.validator?.isProduction() || (typeof process !== 'undefined' && process.env ? process.env.NODE_ENV === 'production' : false);
-  } catch (e) {
-    return false;
-  }
+  return secureEnv.validator?.isProduction() || import.meta.env.PROD;
 }
 
 export function isDevelopment() {
-  try {
-    return secureEnv.validator?.isDevelopment() || (typeof process !== 'undefined' && process.env ? process.env.NODE_ENV === 'development' : true);
-  } catch (e) {
-    return true;
-  }
+  return secureEnv.validator?.isDevelopment() || import.meta.env.DEV;
 }
 
 export function requireEnv(key, defaultValue = null) {
@@ -248,7 +222,6 @@ export function requireEnv(key, defaultValue = null) {
 export function initializeEnvironmentValidation() {
   try {
     const config = secureEnv.initialize();
-    console.log('[Environment] Secure environment validation initialized');
     return config;
   } catch (error) {
     console.error('[Environment] Failed to initialize secure environment:', error);

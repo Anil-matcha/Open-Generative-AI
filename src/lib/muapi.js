@@ -1,11 +1,17 @@
 import { getModelById, getVideoModelById, getI2IModelById, getI2VModelById, getV2VModelById, getLipSyncModelById } from './models.js';
+import { uploadFileToStorage } from './hybrid-supabase.js';
+import { localAI } from './local-ai.js';
+import { rateLimitedFetch, uploadRateLimiter, generationRateLimiter, muapiCircuitBreaker } from './rate-limiter.js';
 
 export class MuapiClient {
     constructor() {
+        this.offlineMode = this.detectOfflineMode();
+        this.localAI = localAI;
+
         // Validate that Supabase URL is configured before building proxy URL
         const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
         if (!supabaseUrl) {
-            console.error('[MuapiClient] VITE_SUPABASE_URL is not configured');
+            this.offlineMode = true;
             this.proxyUrl = '/functions/v1/muapi-proxy'; // Fallback to relative path
         } else {
             this.proxyUrl = `${supabaseUrl}/functions/v1/muapi-proxy`;
@@ -19,6 +25,32 @@ export class MuapiClient {
             ltx: supabaseUrl ? `${supabaseUrl}/functions/v1/ltx-processor` : '/functions/v1/ltx-processor',
             cutai: supabaseUrl ? `${supabaseUrl}/functions/v1/cutai-processor` : '/functions/v1/cutai-processor'
         };
+
+    }
+
+    /**
+     * Detect if we should use offline mode
+     */
+    detectOfflineMode() {
+        // Check for offline mode setting
+        const offlineSetting = localStorage.getItem('offline_mode');
+        if (offlineSetting === 'true') return true;
+
+        // Check if Supabase is configured
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+        if (!supabaseUrl || !supabaseKey) return true;
+
+        // Check network connectivity
+        return !navigator.onLine;
+    }
+
+    /**
+     * Set offline mode
+     */
+    setOfflineMode(enabled) {
+        this.offlineMode = enabled;
+        localStorage.setItem('offline_mode', enabled.toString());
     }
 
     getKey() {
@@ -81,7 +113,66 @@ export class MuapiClient {
                 })
             });
 
-        // Resolve endpoint from model definition
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+            }
+
+            const data = await response.json();
+            this.validateResponse(data, 'enhanced');
+
+            // If it's a direct result, return it
+            if (data.outputs || data.url || data.result) {
+                return data;
+            }
+
+            // If it has a request_id, poll for result
+            const requestId = data.request_id || data.id;
+            if (requestId) {
+                return await this.pollForResult(requestId, 60, 2000);
+            }
+
+            return data;
+        } catch (error) {
+            console.error(`[MuapiClient] makeRequest failed for ${endpoint}:`, error);
+            throw error;
+        }
+    }
+
+    // Cancel a specific request
+    cancelRequest(requestId) {
+        const controller = this.activeControllers.get(requestId);
+        if (controller) {
+            controller.abort();
+            this.activeControllers.delete(requestId);
+        }
+    }
+
+    // Cancel all active requests
+    cancelAllRequests() {
+        for (const [requestId, controller] of this.activeControllers) {
+            controller.abort();
+        }
+        this.activeControllers.clear();
+    }
+
+    // Validate API response structure
+    validateResponse(data, expectedType) {
+        if (!data || typeof data !== 'object') {
+            throw new Error('Invalid response: expected object');
+        }
+        if (data.error) {
+            throw new Error(`API Error: ${data.error}`);
+        }
+        return true;
+    }
+
+    async generateImage(params, signal) {
+        // Use local AI if offline or explicitly requested
+        if (this.offlineMode || params.forceLocal) {
+            return await this.localAI.processRequest('text-to-image', params);
+        }
+
         const modelInfo = getModelById(params.model);
         const endpoint = modelInfo?.endpoint || params.model;
         const url = `${this.baseUrl}/api/v1/${endpoint}`;
@@ -123,14 +214,20 @@ export class MuapiClient {
         console.log('[Muapi] Payload:', finalPayload);
 
         try {
-            // Step 1: Submit the task
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-api-key': key
-                },
-                body: JSON.stringify(finalPayload)
+            const response = await muapiCircuitBreaker.execute(async () => {
+                return rateLimitedFetch(this.proxyUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        endpoint,
+                        params: finalPayload,
+                        generationType: 'image',
+                        studioType: params.studioType || 'image'
+                    }),
+                    signal
+                }, generationRateLimiter);
             });
 
             if (!response.ok) {
@@ -212,7 +309,10 @@ export class MuapiClient {
                     throw new Error(`Generation failed: ${data.error || 'Unknown error'}`);
                 }
 
-                // Otherwise (processing, pending, etc.) keep polling
+                // Log progress for long-running tasks
+                if (attempt % 10 === 0) {
+                }
+
             } catch (error) {
                 if (attempt === maxAttempts) throw error;
                 console.warn('[Muapi] Poll attempt failed, retrying...', error.message);
@@ -223,6 +323,11 @@ export class MuapiClient {
     }
 
     async generateVideo(params, signal) {
+        // Use local AI if offline or explicitly requested
+        if (this.offlineMode || params.forceLocal) {
+            return await this.localAI.processRequest('text-to-video', params);
+        }
+
         // Route LTX requests to LTX processor
         if (params.model?.includes('ltx') || params.model?.includes('text-to-video') ||
             params.model?.includes('image-to-video') || params.model?.includes('video-to-video')) {
@@ -466,12 +571,14 @@ export class MuapiClient {
         const formData = new FormData();
         formData.append('file', file);
 
-        console.log('[Muapi] Uploading file:', file.name);
-
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'x-api-key': key },
-            body: formData
+        const response = await muapiCircuitBreaker.execute(async () => {
+            return rateLimitedFetch('https://api.muapi.ai/upload_file', {
+                method: 'POST',
+                headers: {
+                    'x-api-key': this.getKey()
+                },
+                body: formData
+            }, uploadRateLimiter);
         });
 
         if (!response.ok) {
@@ -1588,8 +1695,7 @@ export class MuapiClient {
         if (params.resolution) finalPayload.resolution = params.resolution;
         if (params.seed !== undefined && params.seed !== -1) finalPayload.seed = params.seed;
 
-        console.log('[Muapi] LipSync Request:', url);
-        console.log('[Muapi] LipSync Payload:', finalPayload);
+
 
         try {
             const response = await fetch(url, {
@@ -1605,7 +1711,6 @@ export class MuapiClient {
             }
 
             const submitData = await response.json();
-            console.log('[Muapi] LipSync Submit Response:', submitData);
 
             const requestId = submitData.request_id || submitData.id;
             if (!requestId) return submitData;
@@ -1614,7 +1719,6 @@ export class MuapiClient {
 
             const result = await this.pollForResult(requestId, key, 900, 2000);
             const videoUrl = result.outputs?.[0] || result.url || result.output?.url;
-            console.log('[Muapi] LipSync Result URL:', videoUrl);
             return { ...result, url: videoUrl };
         } catch (error) {
             console.error('Muapi LipSync Error:', error);

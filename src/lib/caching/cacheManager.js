@@ -44,7 +44,6 @@ export class CacheManager {
       // Set up cleanup intervals
       this.setupCleanupIntervals();
       
-      console.log('[CacheManager] Initialized');
     } catch (error) {
       console.warn('[CacheManager] Initialization error:', error);
     }
@@ -213,7 +212,6 @@ export class CacheManager {
       this.localStorageCache.clear();
       await this.clearIndexedDB();
       this.saveToLocalStorage();
-      console.log('[CacheManager] All caches cleared');
     } catch (error) {
       console.warn('[CacheManager] Clear all error:', error);
     }

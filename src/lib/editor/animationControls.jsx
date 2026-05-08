@@ -685,7 +685,6 @@ export class AnimationControls {
     if (presets[preset]) {
       // Apply preset settings
       // This would typically update the keyframe system
-      console.log(`Applying preset: ${preset}`, presets[preset]);
     }
   }
 

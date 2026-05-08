@@ -1,5 +1,5 @@
 // Task 4: Optimize TimelineEditorPage with lazy loading and code splitting
-import { supabase, uploadFileToStorage } from '../lib/supabase.js';
+import { supabase, uploadFileToStorage } from '../lib/hybrid-supabase.js';
 import { showToast } from '../lib/loading.js';
 import { initializeTimelineDragDrop, createEnhancedClipElement, renderCompositingOverlay, renderTimelineControls, renderLayerManagement, renderPopcornElements, showTimelineContextMenu } from '../lib/editor/timelineRendererEnhanced.js';
 import { initializeMediaLibraryDragDrop, setupEnhancedTooltips } from '../lib/editor/dragDrop.js';
@@ -87,7 +87,6 @@ const lazyLoadTracker = {
   loads: new Map(),
   trackLoad(name, startTime) {
     const duration = Date.now() - startTime;
-    console.log(`[Lazy Load] ${name} loaded in ${duration}ms`);
     this.loads.set(name, duration);
   }
 };

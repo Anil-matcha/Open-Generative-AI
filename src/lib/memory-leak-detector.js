@@ -47,7 +47,7 @@ export class MemoryLeakDetector {
       this.snapshots.shift();
     }
 
-    console.log(`[Memory] Snapshot taken: ${label}`, {
+    this.snapshots.push({
       usedMB: Math.round(snapshot.memory.used / 1024 / 1024),
       nodes: snapshot.nodes,
       listeners: snapshot.eventListeners
@@ -82,15 +82,18 @@ export class MemoryLeakDetector {
     const recent = this.snapshots.slice(-5);
     const baseline = this.snapshots[0];
 
+    // Only analyze snapshots that have memory data
+    const memorySnapshots = recent.filter(s => s.memory && s.memory.used !== undefined);
+
     // Check for memory growth trend
-    const memoryGrowth = recent.map(s => s.memory.used);
+    const memoryGrowth = memorySnapshots.map(s => s.memory.used);
     const isGrowing = this.detectGrowthTrend(memoryGrowth);
 
-    // Check for DOM node growth
+    // Check for DOM node growth (all snapshots have nodes)
     const nodeGrowth = recent.map(s => s.nodes);
     const nodesGrowing = this.detectGrowthTrend(nodeGrowth);
 
-    // Check for event listener growth
+    // Check for event listener growth (all snapshots have listeners)
     const listenerGrowth = recent.map(s => s.eventListeners);
     const listenersGrowing = this.detectGrowthTrend(listenerGrowth);
 
@@ -99,7 +102,7 @@ export class MemoryLeakDetector {
         memoryGrowth: isGrowing,
         nodeGrowth: nodesGrowing,
         listenerGrowth: listenersGrowing,
-        recentSnapshots: recent.map(s => ({
+        recentSnapshots: memorySnapshots.map(s => ({
           label: s.label,
           usedMB: Math.round(s.memory.used / 1024 / 1024),
           nodes: s.nodes,
@@ -124,9 +127,7 @@ export class MemoryLeakDetector {
   forceGarbageCollection() {
     if (window.gc) {
       window.gc();
-      console.log('[Memory] Forced garbage collection');
     } else {
-      console.log('[Memory] Garbage collection not available');
     }
   }
 

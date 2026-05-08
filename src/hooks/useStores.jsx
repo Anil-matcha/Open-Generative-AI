@@ -125,7 +125,6 @@ export const useStores = (options = {}) => {
   const syncTimelineWithProject = () => {
     if (project.currentProject && timeline.clips.length === 0) {
       // Could load project-specific timeline data here
-      console.log('Syncing timeline with project:', project.currentProject.title);
     }
   };
 

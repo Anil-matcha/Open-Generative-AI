@@ -55,7 +55,6 @@ export class SecureTokenManager {
       this.setupAutoRefresh(type, options.refreshInterval || 300000); // 5 minutes
     }
 
-    console.log(`[Auth] Token ${type} stored securely`);
   }
 
   // Retrieve token securely
@@ -99,7 +98,6 @@ export class SecureTokenManager {
       this.refreshTimers.delete(type);
     }
 
-    console.log(`[Auth] Token ${type} removed`);
   }
 
   // Clear all tokens
@@ -107,7 +105,6 @@ export class SecureTokenManager {
     for (const type of this.tokens.keys()) {
       this.removeToken(type);
     }
-    console.log('[Auth] All tokens cleared');
   }
 
   // Validate token format
@@ -202,7 +199,6 @@ export class SecureTokenManager {
       // });
       // return response.json().then(data => data.token);
       
-      console.log('[Auth] Token refresh attempted (not implemented)');
       return null;
     } catch (error) {
       throw new NetworkError('Token refresh failed', 0, '/api/auth/refresh');
@@ -218,7 +214,6 @@ export class SecureTokenManager {
       // });
       // return response.ok;
       
-      console.log(`[Auth] Server validation for ${type} (not implemented)`);
       return true; // Assume valid for now
     } catch (error) {
       return false;
@@ -328,7 +323,6 @@ export function initializeAuthHardening() {
     });
   }
 
-  console.log('[Auth] Authentication hardening initialized');
   return { tokenManager, apiClient };
 }
 

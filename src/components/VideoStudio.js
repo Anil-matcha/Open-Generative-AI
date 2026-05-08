@@ -285,7 +285,7 @@ export function VideoStudio() {
     extendBanner.className = 'hidden items-center gap-2 px-4 py-2 mx-2 mt-2 bg-primary/10 border border-primary/20 rounded-xl text-xs text-primary';
     extendBanner.innerHTML = `
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        <span>Extending previous Seedance 2.0 generation — add an optional prompt to guide the continuation</span>
+        <span>Extending previous video generation — add an optional prompt to guide the continuation</span>
     `;
     bar.appendChild(extendBanner);
 
@@ -1288,8 +1288,7 @@ export function VideoStudio() {
             }
 
             if (v2vMode) {
-                const res = await muapi.processV2V({ model: selectedModel, video_url: uploadedVideoUrl, onRequestId });
-                console.log('[VideoStudio] V2V response:', res);
+                const res = await muapi.processV2V({ model: selectedModel, video_url: uploadedVideoUrl });
                 if (res && res.url) {
                     if (capturedRequestId) removePendingJob(capturedRequestId);
                     const genId = res.id || capturedRequestId || Date.now().toString();
@@ -1322,7 +1321,6 @@ export function VideoStudio() {
                 if (selectedEffectName) i2vParams.name = selectedEffectName;
 
                 const res = await muapi.generateI2V(i2vParams);
-                console.log('[VideoStudio] I2V response:', res);
 
                 if (res && res.url) {
                     if (capturedRequestId) removePendingJob(capturedRequestId);
@@ -1344,7 +1342,35 @@ export function VideoStudio() {
                 return;
             }
 
-            const params = { model: selectedModel, onRequestId };
+            if (effectsMode) {
+                if (!uploadedImageUrl) {
+                    alert('Please upload an image first for video effects.');
+                    return;
+                }
+                const effectsParams = {
+                    image_url: uploadedImageUrl,
+                    aspect_ratio: selectedAr,
+                    resolution: selectedResolution,
+                };
+                if (prompt) effectsParams.prompt = prompt;
+
+                const res = await muapi.generateVideoEffect(effectsParams);
+
+                if (res && res.url) {
+                    const genId = res.id || res.request_id || Date.now().toString();
+                    lastGenerationId = null;
+                    lastGenerationModel = null;
+                    addToHistory({ id: genId, url: res.url, prompt, model: selectedModel, aspect_ratio: selectedAr, timestamp: new Date().toISOString() });
+                    showVideoInCanvas(res.url, selectedModel);
+                } else {
+                    throw new Error('No video URL returned by API');
+                }
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = `Generate ✨`;
+                return;
+            }
+
+            const params = { model: selectedModel };
 
             if (prompt) params.prompt = prompt;
 
@@ -1366,7 +1392,6 @@ export function VideoStudio() {
 
             const res = await muapi.generateVideo(params);
 
-            console.log('[VideoStudio] Full response:', res);
 
             if (res && res.url) {
                 if (capturedRequestId) removePendingJob(capturedRequestId);

@@ -463,7 +463,6 @@ export function integrateMediaIngest() {
   const animationList = AnimationList();
   // This would be added to the elements panel
 
-  console.log('✅ Media ingest components integrated');
 
   return {
     giphyIntegration,

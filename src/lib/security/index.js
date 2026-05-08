@@ -55,10 +55,9 @@ export function sanitizeURL(url) {
 // Secure iframe handling
 export function createSecureIframe(src, options = {}) {
   const iframe = document.createElement('iframe');
-  
+
   // Only allow HTTPS URLs in production
-  const isProduction = typeof process !== 'undefined' && process.env ? process.env.NODE_ENV === 'production' : false;
-  if (isProduction && src && !src.startsWith('https://')) {
+  if (import.meta.env.PROD && src && !src.startsWith('https://')) {
     throw new Error('Insecure iframe source not allowed in production');
   }
   
@@ -74,21 +73,16 @@ export function createSecureIframe(src, options = {}) {
 
 // Environment validation
 export function validateEnvironment() {
-  // Handle both Node.js and browser environments
-  const env = typeof process !== 'undefined' && process.env ? process.env :
-             (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env : {});
-
-  const nodeEnv = env.NODE_ENV || env.MODE || 'development';
-  const requiredVars = ['NODE_ENV'];
-  const missing = requiredVars.filter(varName => !env[varName] && !env.MODE);
+  const requiredVars = ['MODE'];
+  const missing = requiredVars.filter(varName => !import.meta.env[varName]);
 
   if (missing.length > 0) {
     console.warn('Missing required environment variables:', missing);
   }
 
   return {
-    isProduction: nodeEnv === 'production',
-    isDevelopment: nodeEnv === 'development',
+    isProduction: import.meta.env.PROD,
+    isDevelopment: import.meta.env.DEV,
     missingVars: missing
   };
 }
@@ -157,8 +151,7 @@ export function setupCSPViolationReporting() {
       });
       
       // In production, you might want to send this to a logging service
-      const isProduction = typeof process !== 'undefined' && process.env ? process.env.NODE_ENV === 'production' : false;
-      if (isProduction) {
+      if (import.meta.env.PROD) {
         // analytics.track('csp_violation', {
         //   directive: event.violatedDirective,
         //   blockedURI: event.blockedURI
@@ -195,8 +188,7 @@ export async function secureApiRequest(url, options = {}) {
   }
   
   // Ensure HTTPS in production
-  const isProduction = typeof process !== 'undefined' && process.env ? process.env.NODE_ENV === 'production' : false;
-  if (isProduction && !url.startsWith('https://')) {
+  if (import.meta.env.PROD && !url.startsWith('https://')) {
     throw new Error('Insecure API requests not allowed in production');
   }
   
@@ -227,12 +219,10 @@ export function initializeSecurity() {
   enforceHTTPS();
   setupCSPViolationReporting();
   const envStatus = validateEnvironment();
-  
-  console.log('[Security] Initialized:', {
+
+  return {
     https: document.location.protocol === 'https:',
     csp: 'Enabled',
     environment: envStatus
-  });
-  
-  return envStatus;
+  };
 }

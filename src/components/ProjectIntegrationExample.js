@@ -148,7 +148,6 @@ export function TimelineEditorWithProjects() {
       // Enable auto-save
       projectIntegrationService.enableAutoSave(currentProjectId);
 
-      console.log('Created new timeline project:', project.id);
     } catch (error) {
       console.error('Failed to create project:', error);
       alert('Failed to create project: ' + error.message);
@@ -173,7 +172,6 @@ export function TimelineEditorWithProjects() {
       // Enable auto-save
       projectIntegrationService.enableAutoSave(currentProjectId);
 
-      console.log('Loaded timeline project:', projectId);
     } catch (error) {
       console.error('Failed to load project:', error);
       alert('Failed to load project: ' + error.message);
@@ -201,7 +199,6 @@ export function TimelineEditorWithProjects() {
       await projectIntegrationService.saveAppProject(currentProjectId, currentState);
       hasUnsavedChanges = false;
 
-      console.log('Saved timeline project:', currentProjectId);
     } catch (error) {
       console.error('Failed to save project:', error);
       throw error;
@@ -285,7 +282,6 @@ export function TimelineEditorWithProjects() {
   // Initialize with default state if no project loaded
   if (!currentProjectId) {
     // Could show welcome screen or auto-create project
-    console.log('Timeline editor ready - no project loaded');
   }
 
   return container;

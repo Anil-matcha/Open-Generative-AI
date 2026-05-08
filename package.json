@@ -14,8 +14,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:all": "pnpm run build:remix-go && pnpm run build",
+    "build:all": "pnpm run build:remix-go && pnpm run build:ai-vfx && pnpm run build",
     "build:remix-go": "pnpm --filter remix-go run build && mkdir -p public/apps/remix-go && cp -r apps/remix-go/dist/* public/apps/remix-go/",
+    "build:ai-vfx": "pnpm --filter ai-vfx run build",
     "build:analyze": "vite build --mode analyze",
     "preview": "vite preview",
     "lint": "eslint src --ext .js,.ts",
@@ -47,6 +48,7 @@
     "dev:director": "cd apps/director && npm run dev",
     "dev:vimax": "cd apps/vimax && npm run dev",
     "dev:remix-go": "cd apps/remix-go && npm run dev",
+    "dev:ai-vfx": "cd apps/ai-vfx && npm run dev",
     "demo:create": "node demo-scripts/create-demo-video.js",
     "demo:automated": "node demo-scripts/automated-demo.js",
     "demo:videos": "node demo-scripts/demo-video-runner.js",

@@ -1,5 +1,5 @@
 import { profileService } from '../../lib/profile/profileService.js';
-import { supabase } from '../../lib/supabase.js';
+import { supabase } from '../../lib/hybrid-supabase.js';
 import { showToast } from '../../lib/loading.js';
 
 /**

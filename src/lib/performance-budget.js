@@ -170,12 +170,10 @@ export class PerformanceBudget {
 
   // CI integration method
   async runCIChecks() {
-    console.log('🔍 Running performance budget checks...');
 
     const results = await this.checkBudgets();
 
     if (results.passed) {
-      console.log('✅ All performance budgets passed!');
       return { success: true, results };
     } else {
       console.error('❌ Performance budget violations detected:');
@@ -184,9 +182,7 @@ export class PerformanceBudget {
         console.error(`${icon} ${v.message}`);
       });
 
-      console.log('💡 Recommendations:');
       results.recommendations.forEach(r => {
-        console.log(`  • ${r}`);
       });
 
       return { success: false, results };

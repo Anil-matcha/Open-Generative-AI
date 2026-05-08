@@ -1134,7 +1134,6 @@ describe('Advanced Features Integration Test Suite', () => {
       expect(metrics.memoryUsage).toBeLessThan(85);
       expect(metrics.frameRate).toBeGreaterThan(25);
 
-      console.log('✅ Full professional editing workflow completed successfully');
     });
   });
 });

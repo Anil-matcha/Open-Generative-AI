@@ -1,6 +1,6 @@
 import { showToast } from '../lib/loading.js';
 import { MuapiClient } from '../lib/muapi.js';
-import { supabase } from '../lib/supabase.js';
+import { supabase } from '../lib/hybrid-supabase.js';
 import { VideoUpload } from './common/Upload.js';
 import { Tooltip, addTooltip } from './common/Tooltip.js';
 
@@ -1456,6 +1456,9 @@ function animate(frame) {
       updateTimelineSection();
       updateInspectorSection();
       updateVideoToggle();
+
+      // Automatically switch to outputs tab to show results
+      switchToTab('outputs');
     } catch (error) {
       job.status = 'failed';
       job.error = error.message;
@@ -1463,6 +1466,9 @@ function animate(frame) {
 
       // Update UI even on failure
       updateOutputsSection();
+
+      // Switch to outputs tab to show error
+      switchToTab('outputs');
     }
   }
 
@@ -1887,18 +1893,27 @@ function animate(frame) {
   const tabButtons = container.querySelectorAll('.tab-btn');
   const tabContents = container.querySelectorAll('.tab-content');
 
+  // Function to switch tabs programmatically
+  function switchToTab(tabName) {
+    // Update button states
+    tabButtons.forEach(btn => {
+      if (btn.dataset.tab === tabName) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    // Show selected tab content
+    tabContents.forEach(content => {
+      content.style.display = content.id === tabName ? 'block' : 'none';
+    });
+  }
+
   tabButtons.forEach(button => {
     button.addEventListener('click', () => {
       const tabName = button.dataset.tab;
-
-      // Update button states
-      tabButtons.forEach(btn => btn.classList.remove('active'));
-      button.classList.add('active');
-
-      // Show selected tab content
-      tabContents.forEach(content => {
-        content.style.display = content.id === tabName ? 'block' : 'none';
-      });
+      switchToTab(tabName);
     });
   });
 

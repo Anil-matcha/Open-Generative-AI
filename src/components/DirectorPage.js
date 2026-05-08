@@ -2,7 +2,7 @@ import { navigate } from '../lib/router.js';
 import { showToast } from '../lib/loading.js';
 import { escapeHtml } from '../lib/security.js';
 import { directorRuntime } from '../lib/directorAgentRuntime.js';
-import { supabase } from '../lib/supabase.js';
+import { supabase } from '../lib/hybrid-supabase.js';
 import { VideoUpload } from './common/Upload.js';
 import { Tooltip, addTooltip } from './common/Tooltip.js';
 
@@ -66,7 +66,6 @@ export function DirectorPage() {
         try {
             directorRuntimeInstance = new directorRuntime.constructor();
             await directorRuntimeInstance.initialize();
-            console.log('[DirectorPage] Director runtime initialized');
         } catch (error) {
             console.error('[DirectorPage] Failed to initialize director runtime:', error);
         }

@@ -1,4 +1,4 @@
-import { supabase } from '../supabase.js';
+import { supabase } from './hybrid-supabase.js';
 
 /**
  * White Label Manager - Handles multi-tenant theming and branding
@@ -25,7 +25,6 @@ export class WhiteLabelManager {
       this.applyTheming();
 
       this.isInitialized = true;
-      console.log('[WhiteLabelManager] Initialized for domain:', currentDomain);
     } catch (error) {
       console.error('[WhiteLabelManager] Failed to initialize:', error);
       // Continue with default theming
@@ -52,9 +51,7 @@ export class WhiteLabelManager {
       this.currentWhiteLabel = data || null;
 
       if (this.currentWhiteLabel) {
-        console.log('[WhiteLabelManager] Loaded white label config:', this.currentWhiteLabel.name);
       } else {
-        console.log('[WhiteLabelManager] No white label config found, using defaults');
       }
     } catch (error) {
       console.error('[WhiteLabelManager] Failed to load white label config:', error);
@@ -269,7 +266,6 @@ export class WhiteLabelManager {
       favicon.href = '/favicon.ico';
     }
 
-    console.log('[WhiteLabelManager] Reset to defaults');
   }
 
   /**
@@ -280,7 +276,6 @@ export class WhiteLabelManager {
     const targetDomain = domain || window.location.hostname;
     await this.loadWhiteLabelConfig(targetDomain);
     this.applyTheming();
-    console.log('[WhiteLabelManager] Refreshed white label config');
   }
 }
 

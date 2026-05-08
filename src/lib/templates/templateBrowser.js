@@ -1,4 +1,4 @@
-import { supabase } from '../supabase.js';
+import { supabase } from './hybrid-supabase.js';
 import { templates, TEMPLATE_CATEGORIES } from '../templates.js';
 
 /**

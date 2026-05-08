@@ -195,9 +195,12 @@ export function getEnvironmentConfig() {
 export function validateConfig(config) {
   const errors = [];
 
-  // Check required fields
-  if (!config.api.apiKey && !import.meta.env.MUAPI_API_KEY) {
-    errors.push('MuAPI API key is required');
+  // Check required fields - be more lenient in development
+  const isDev = import.meta.env.DEV;
+  const hasApiKey = config.api.apiKey || import.meta.env.MUAPI_API_KEY;
+
+  if (!hasApiKey && !isDev) {
+    errors.push('MuAPI API key is required in production');
   }
 
   if (!config.api.baseURL) {

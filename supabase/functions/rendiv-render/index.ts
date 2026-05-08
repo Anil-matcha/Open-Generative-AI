@@ -12,6 +12,17 @@ const supabase = createClient(
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 );
 
+const DIRECTOR_API_BASE_URL = Deno.env.get('DIRECTOR_API_BASE_URL') || 'https://api.director.ai/v1';
+const DIRECTOR_API_KEY = Deno.env.get('DIRECTOR_API_KEY');
+
+if (!DIRECTOR_API_BASE_URL) {
+  console.error('[rendiv-render] Missing DIRECTOR_API_BASE_URL environment variable');
+}
+
+if (!DIRECTOR_API_KEY) {
+  console.error('[rendiv-render] Missing DIRECTOR_API_KEY environment variable');
+}
+
 interface RendivRenderRequest {
   action: 'export-video' | 'render-composition' | 'generate-preview';
   videoUrl?: string;
@@ -53,10 +64,17 @@ export async function handler(req: Request): Promise<Response> {
     const requestData: RendivRenderRequest = await req.json();
     const { action, videoUrl, composition, format = 'mp4', resolution = '1920x1080', duration = 10, quality = 'high' } = requestData;
 
-    // Rendiv-style rendering logic (simulated)
+    // Rendiv-style rendering logic using Director API
     switch (action) {
       case 'export-video':
-        // Simulate video rendering process
+        // Start video rendering process with Director API
+        if (!videoUrl) {
+          return new Response(
+            JSON.stringify({ error: 'Video URL is required for export' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
         const renderJob = {
           id: `render_${Date.now()}`,
           status: 'processing',
@@ -82,78 +100,129 @@ export async function handler(req: Request): Promise<Response> {
           .single();
 
         if (jobError) {
-          // If render_jobs table doesn't exist, create it
-          await supabase.rpc('create_render_jobs_table_if_not_exists');
+          console.error('[rendiv-render] Error storing render job:', jobError);
         }
 
-        // Simulate async rendering (in real implementation, this would trigger actual rendering)
-        setTimeout(async () => {
-          try {
-            // Generate a mock rendered video URL
-            const mockVideoUrl = `https://example.com/rendered/${renderJob.id}.${format}`;
+        // Call Director API for video rendering
+        try {
+          const renderResult = await callDirectorAPI('video/render', {
+            video_url: videoUrl,
+            format: format,
+            resolution: resolution,
+            quality: quality,
+            job_id: renderJob.id,
+            callback_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/render-callback`
+          });
 
-            // Update job status
-            await supabase
-              .from('render_jobs')
-              .update({
-                status: 'completed',
-                output_url: mockVideoUrl,
-                progress: 100,
-                completed_at: new Date().toISOString()
-              })
-              .eq('id', renderJob.id);
-          } catch (error) {
-            console.error('Render completion error:', error);
-          }
-        }, 1000); // Simulate 1 second processing
+          // Update job with Director API job ID
+          await supabase
+            .from('render_jobs')
+            .update({
+              external_job_id: renderResult.job_id,
+              status: 'processing'
+            })
+            .eq('id', renderJob.id);
+
+        } catch (apiError) {
+          console.error('[rendiv-render] Director API call failed:', apiError);
+
+          // Mark job as failed
+          await supabase
+            .from('render_jobs')
+            .update({
+              status: 'failed',
+              error_message: apiError.message
+            })
+            .eq('id', renderJob.id);
+
+          return new Response(
+            JSON.stringify({
+              error: 'Failed to start rendering process',
+              details: apiError.message
+            }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
 
         return new Response(
           JSON.stringify({
             jobId: renderJob.id,
             status: 'processing',
-            message: 'Video rendering started',
+            message: 'Video rendering started with Director API',
             estimatedDuration: '5 minutes'
           }),
           { status: 202, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
 
       case 'render-composition':
-        // Render a specific composition/configuration
+        // Render a specific composition/configuration using Director API
+        if (!composition) {
+          return new Response(
+            JSON.stringify({ error: 'Composition data is required' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        const compositionResult = await callDirectorAPI('composition/render', {
+          composition: composition,
+          format: format,
+          resolution: resolution,
+          duration: duration,
+          quality: quality,
+          user_id: user.id
+        });
+
         const compositionRender = {
           compositionId: `comp_${Date.now()}`,
           status: 'completed',
-          renderedUrl: `https://example.com/compositions/${composition?.id || 'default'}.${format}`,
+          renderedUrl: compositionResult.url,
           metadata: {
             format,
             resolution,
             duration,
             quality,
-            compositionData: composition
+            compositionData: composition,
+            directorJobId: compositionResult.job_id
           }
         };
 
         return new Response(
           JSON.stringify({
             renderResult: compositionRender,
-            message: 'Composition rendered successfully'
+            message: 'Composition rendered successfully with Director API'
           }),
           { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
 
       case 'generate-preview':
-        // Generate a quick preview/thumbnail
-        const preview = {
-          previewUrl: `https://example.com/previews/${Date.now()}_preview.jpg`,
-          thumbnailUrl: `https://example.com/thumbnails/${Date.now()}_thumb.jpg`,
-          duration: Math.min(duration, 5), // Preview limited to 5 seconds
+        // Generate a quick preview/thumbnail using Director API
+        if (!videoUrl) {
+          return new Response(
+            JSON.stringify({ error: 'Video URL is required for preview generation' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        const previewResult = await callDirectorAPI('video/preview', {
+          video_url: videoUrl,
+          duration: Math.min(duration || 10, 5), // Preview limited to 5 seconds
           format: 'jpg',
-          quality: 'medium'
+          quality: 'medium',
+          include_thumbnail: true
+        });
+
+        const preview = {
+          previewUrl: previewResult.preview_url,
+          thumbnailUrl: previewResult.thumbnail_url,
+          duration: previewResult.duration,
+          format: previewResult.format,
+          quality: previewResult.quality
         };
 
         return new Response(
           JSON.stringify({
             preview,
-            message: 'Preview generated successfully'
+            message: 'Preview generated successfully with Director API'
           }),
           { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
@@ -210,6 +279,33 @@ export async function handler(req: Request): Promise<Response> {
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
+}
+
+// Helper functions for API calls
+async function callDirectorAPI(endpoint: string, params: Record<string, any>): Promise<any> {
+  if (!DIRECTOR_API_BASE_URL || !DIRECTOR_API_KEY) {
+    throw new Error('Director API not configured');
+  }
+
+  const url = `${DIRECTOR_API_BASE_URL}/${endpoint}`;
+
+  console.log(`[rendiv-render] Calling Director API: ${endpoint}`);
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${DIRECTOR_API_KEY}`
+    },
+    body: JSON.stringify(params)
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Director API call failed: ${response.status} ${response.statusText} - ${errorText}`);
+  }
+
+  return await response.json();
 }
 
 Deno.serve(handler);

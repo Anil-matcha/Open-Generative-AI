@@ -33,16 +33,8 @@ package-lock.json
 # Local Netlify folder
 .netlify
 
-# Next.js
-.next/
-out/
+# Playwright MCP test artifacts
+.playwright-mcp/
 
-# Misc
-*.pem
-
-# AI agent development tools (not part of application)
-superpowers/
-
-# Test results
-test-results/
-coverage/
+# Vite timestamp build artifacts
+*vite.config.js.timestamp-*.mjs

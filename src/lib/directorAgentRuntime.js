@@ -3,7 +3,7 @@
 
 // Import MUAPI client and Supabase for backend integration
 import { MuapiClient } from './muapi.js';
-import { supabase } from './supabase.js';
+import { supabase } from './hybrid-supabase.js';
 
 // Storyboard presets from the React code
 const STORYBOARD_PRESETS = [
@@ -490,7 +490,6 @@ class DirectorAgentRuntime {
         
         if (result?.url) {
           imageUrl = result.url;
-          console.log('[DirectorRuntime] Frame generated via MUAPI:', imageUrl);
         }
       } catch (error) {
         muapiError = error;
@@ -607,7 +606,6 @@ class DirectorAgentRuntime {
           console.warn('[DirectorRuntime] Supabase function call failed:', supabaseError.message);
         } else {
           result = data;
-          console.log('[DirectorRuntime] Agent command executed via videoagent:', agentId);
         }
       } catch (supabaseError) {
         error = supabaseError;

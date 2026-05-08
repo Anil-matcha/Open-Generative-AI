@@ -47,9 +47,29 @@ export function AuthModal(onSuccess) {
     btn.onclick = () => {
         const key = input.value.trim();
         if (key) {
-            localStorage.setItem('muapi_key', key);
-            document.body.removeChild(overlay);
-            if (onSuccess) onSuccess();
+            if (key.length < 10) {
+                input.classList.add('border-red-500/50');
+                setTimeout(() => input.classList.remove('border-red-500/50'), 2000);
+                return;
+            }
+
+            try {
+                btn.disabled = true;
+                btn.textContent = 'Saving...';
+
+                // Use the secure ApiKeyManager
+                await apiKeyManager.setKey(key, true);
+
+                removeModal();
+                if (onSuccess) onSuccess();
+
+            } catch (error) {
+                console.error('[AuthModal] Failed to save key:', error);
+                btn.disabled = false;
+                btn.textContent = 'Initialize Studio';
+                input.classList.add('border-red-500/50');
+                setTimeout(() => input.classList.remove('border-red-500/50'), 2000);
+            }
         } else {
             input.classList.add('border-red-500/50');
             setTimeout(() => input.classList.remove('border-red-500/50'), 2000);

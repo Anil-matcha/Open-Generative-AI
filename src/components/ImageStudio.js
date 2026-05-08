@@ -1282,7 +1282,6 @@ export function ImageStudio() {
                 res = await muapi.generateImage(genParams);
             }
 
-            console.log('[ImageStudio] Full response:', res);
 
             if (res && res.url) {
                 if (capturedRequestId) removePendingJob(capturedRequestId);

@@ -338,7 +338,7 @@ export class TimelineTransitions {
     document.body.appendChild(modal);
 
     // Import and initialize transition editor
-    import('./transitionEditor.js').then(({ TransitionEditor }) => {
+    import('./transitionEditor-lazy.js').then(({ TransitionEditor }) => {
       const editor = new TransitionEditor(
         modal.querySelector('#transitionEditorContainer'),
         (transition, params, duration) => {

@@ -137,8 +137,7 @@ class ErrorLogger {
 
   reportCriticalError(error) {
     // In production, send to error reporting service
-    const isProduction = typeof process !== 'undefined' && process.env ? process.env.NODE_ENV === 'production' : false;
-    if (isProduction) {
+    if (import.meta.env.PROD) {
       // Example: send to error reporting service
       // errorReportingService.report(error);
       console.error('CRITICAL ERROR REPORTED:', error);
@@ -280,5 +279,4 @@ export function setupGlobalErrorHandlers() {
 // Initialize error handling system
 export function initializeErrorHandling() {
   setupGlobalErrorHandlers();
-  console.log('[Error Handling] Initialized enhanced error handling system');
 }

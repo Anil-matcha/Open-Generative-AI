@@ -38,17 +38,23 @@ export function RemixGoPage() {
 
   // Iframe container - uses same-origin path, served by main Vite server
   const iframe = document.createElement('iframe');
-  iframe.src = '/apps/remix-go/';
+  iframe.src = '/apps/remix-go/index.html';
   iframe.className = 'w-full h-full border-0';
   iframe.style.display = 'none';
+  let hasLoaded = false;
   iframe.onload = () => {
+    console.log('RemixGo iframe loaded successfully');
+    hasLoaded = true;
     loadingContainer.style.display = 'none';
     errorContainer.style.display = 'none';
     iframe.style.display = 'block';
   };
-  iframe.onerror = () => {
-    loadingContainer.style.display = 'none';
-    errorContainer.classList.remove('hidden');
+  iframe.onerror = (event) => {
+    console.error('RemixGo iframe ERROR event fired:', event, Date.now());
+    if (!hasLoaded) {
+      loadingContainer.style.display = 'none';
+      errorContainer.classList.remove('hidden');
+    }
   };
 
   element.appendChild(iframe);

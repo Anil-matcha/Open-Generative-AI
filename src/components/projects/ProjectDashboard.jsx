@@ -246,7 +246,6 @@ export function ProjectDashboard() {
   // Event handlers
   const handleProjectClick = (project) => {
     // Navigate to project editor
-    console.log('[ProjectDashboard] Opening project:', project.id);
     // TODO: Navigate to project editor with project ID
     showToast(`Opening project: ${project.title}`, 'info');
   };

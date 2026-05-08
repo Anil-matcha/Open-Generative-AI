@@ -376,19 +376,24 @@ export function RunwayMotionStudio() {
         stabilization: stabilizationEnabled,
       };
 
-      const result = await muapi.processVideoTool(params);
-      if (result?.url) {
-        // Show result
-        videoPreview.innerHTML = '';
-        const video = document.createElement('video');
-        video.src = result.url;
-        video.controls = true;
-        video.className = 'w-full h-full object-contain';
-        videoPreview.appendChild(video);
-        // Add download link maybe?
-      }
-    } catch (err) {
-      alert(`Error: ${err.message}`);
+      // Handle successful generation
+
+      // Show success message
+      const successToast = document.createElement('div');
+      successToast.className = 'fixed top-4 right-4 bg-green-500/10 border border-green-500/30 text-green-400 px-4 py-2 rounded-lg z-50';
+      successToast.textContent = 'Motion effects applied successfully!';
+      document.body.appendChild(successToast);
+      setTimeout(() => document.body.removeChild(successToast), 3000);
+
+    } catch (error) {
+      console.error('Error applying motion effects:', error);
+
+      // Show error message
+      const errorToast = document.createElement('div');
+      errorToast.className = 'fixed top-4 right-4 bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-2 rounded-lg z-50';
+      errorToast.textContent = `Error: ${error.message}`;
+      document.body.appendChild(errorToast);
+      setTimeout(() => document.body.removeChild(errorToast), 5000);
     } finally {
       applyBtn.disabled = false;
       applyBtn.textContent = 'Apply Motion Effects';

@@ -1,4 +1,4 @@
-import { supabase, uploadFileToStorage } from '../lib/supabase.js';
+import { supabase, uploadFileToStorage } from '../lib/hybrid-supabase.js';
 import { showToast } from '../lib/loading.js';
 import { initializeTimelineDragDrop, createEnhancedClipElement, renderCompositingOverlay, renderTimelineControls, renderLayerManagement, renderPopcornElements, showTimelineContextMenu } from '../lib/editor/timelineRendererEnhanced.js';
 import { initializeMediaLibraryDragDrop, setupEnhancedTooltips } from '../lib/editor/dragDrop.js';
@@ -715,18 +715,13 @@ button, input, textarea, select { font: inherit; }
       const saved = localStorage.getItem('timeline-editor-project');
       if (saved) {
         const projectData = JSON.parse(saved);
-        // Migrate items to clips if needed (backwards compatibility)
-        if (projectData.tracks) {
-          projectData.tracks = projectData.tracks.map(track => {
-            if (track.items && !track.clips) {
-              track.clips = track.items;
-              delete track.items;
-            }
-            return track;
-          });
+        showToast('Project loaded from local storage', 'success');
+        const state = { ...createState(), ...projectData };
+        // Ensure tracks is always an array
+        if (!Array.isArray(state.tracks)) {
+          state.tracks = createState().tracks;
         }
-  // DISABLED:         showToast('Project loaded from local storage', 'success');
-        return { ...createState(), ...projectData };
+        return state;
       }
     } catch (err) {
       console.error('Failed to load project:', err);
@@ -1433,7 +1428,7 @@ button, input, textarea, select { font: inherit; }
     function renderTracks() {
       // Convert tracks to enhanced format
       const enhancedState = {
-        tracks: state.tracks.map(track => ({
+        tracks: (state.tracks || []).map(track => ({
           id: track.id,
           name: track.name,
           locked: track.locked,
@@ -1441,7 +1436,7 @@ button, input, textarea, select { font: inherit; }
           solo: track.solo,
           opacity: track.opacity || 1,
           blendMode: track.blendMode || 'normal',
-          items: track.clips.map(clip => ({
+          items: (track.items || []).map(clip => ({
             id: clip.id,
             name: clip.name,
             text: clip.heading || clip.name,
@@ -1820,7 +1815,7 @@ button, input, textarea, select { font: inherit; }
               timelineState: {
                 playheadPercent: state.playheadPercent,
                 zoom: state.zoom,
-                tracks: state.tracks.map(track => ({
+                tracks: (state.tracks || []).map(track => ({
                   id: track.id,
                   name: track.name,
                   clipCount: track.clips.length

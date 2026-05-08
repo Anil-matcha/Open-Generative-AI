@@ -421,7 +421,6 @@ export async function applyRunwayMotion(videoUrl, motionConfig = {}) {
 export async function initializeEnhancedMuAPI(config) {
     try {
         // Initialize enhanced features if available
-        console.log('[MuAPI Enhanced] Initializing with config:', config);
         // For now, return true as enhanced features are not yet implemented
         return true;
     } catch (error) {

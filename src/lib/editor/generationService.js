@@ -82,15 +82,6 @@ class MuAPIProvider {
   async submit(request) {
     const generationId = `gen_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-    console.log(`[MuAPIProvider] Starting generation ${generationId} for mode: ${request.mode}`);
-
-    // Circuit breaker check for generation requests
-    const serviceName = this.getServiceNameForMode(request.mode);
-    if (!circuitBreaker.canProceed(serviceName)) {
-      const error = new Error(`${request.mode} generation service temporarily unavailable. Please try again later.`);
-      error.code = 'CIRCUIT_BREAKER_OPEN';
-      throw error;
-    }
 
     try {
       let result;

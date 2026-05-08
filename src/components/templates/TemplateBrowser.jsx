@@ -219,7 +219,6 @@ export function TemplateBrowser() {
 
   // Event handlers
   const handleTemplateClick = (template) => {
-    console.log('[TemplateBrowser] Selected template:', template.id);
     // TODO: Navigate to template usage or project creation with template
     showToast(`Selected template: ${template.name}`, 'info');
   };

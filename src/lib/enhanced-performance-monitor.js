@@ -18,7 +18,6 @@ export class EnhancedPerformanceMonitor {
 
     // Core Web Vitals - would use web-vitals library if installed
     // For now, we'll track basic performance metrics
-    console.log('[Performance] Core Web Vitals tracking initialized');
 
     // Memory monitoring
     if ('memory' in performance) {
@@ -60,7 +59,6 @@ export class EnhancedPerformanceMonitor {
       value,
       timestamp: Date.now()
     };
-    console.log(`[CWV] ${metric}:`, value);
   }
 
   trackMemoryUsage() {

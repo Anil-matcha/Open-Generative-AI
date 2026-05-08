@@ -22,7 +22,6 @@ export class ThemeService {
     // Listen for theme changes
     this.setupThemeListeners();
 
-    console.log('[ThemeService] Initialized with theme:', this.currentTheme);
   }
 
   /**
@@ -77,7 +76,6 @@ export class ThemeService {
       detail: { theme }
     }));
 
-    console.log('[ThemeService] Applied theme:', theme);
   }
 
   /**
@@ -215,7 +213,6 @@ export class ThemeService {
     this.currentTheme = 'dark';
     root.classList.add('theme-dark');
 
-    console.log('[ThemeService] Reset to defaults');
   }
 
   /**

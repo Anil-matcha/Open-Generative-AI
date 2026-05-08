@@ -2,7 +2,7 @@ import { navigate } from '../lib/router.js';
 import { showToast, createLoadingSpinner, createLoadingOverlay } from '../lib/loading.js';
 import { createHeroSection } from '../lib/thumbnails.js';
 import { escapeHtml } from '../lib/security.js';
-import { supabase } from '../lib/supabase.js';
+import { supabase } from '../lib/hybrid-supabase.js';
 import { VideoUpload } from './common/Upload.js';
 import { Tooltip, addTooltip } from './common/Tooltip.js';
 import { createVideoUpload, addVideoErrorRecovery } from '../lib/videoPlayer.js';
@@ -2000,4 +2000,6 @@ export function RenderPage() {
   };
 
   return container;
+}
+}
 }
