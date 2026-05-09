@@ -1,6 +1,9 @@
 /**
  * Timeline State Adapter for AI Features
  * Wraps the timeline state object to provide a consistent API for AI features
+ * 
+ * Supports both legacy state format (tracks at root level) and
+ * TimelineState format (tracks in project.tracks)
  */
 
 export class TimelineStateAdapter {
@@ -8,8 +11,22 @@ export class TimelineStateAdapter {
     this.state = state;
   }
 
+  /**
+   * Get tracks from state (handles both legacy and TimelineState formats)
+   */
+  _getTracks() {
+    if (Array.isArray(this.state.tracks)) {
+      return this.state.tracks;
+    }
+    if (this.state.project && Array.isArray(this.state.project.tracks)) {
+      return this.state.project.tracks;
+    }
+    return [];
+  }
+
   addClip(clip) {
-    const videoTrack = this.state.tracks.find(t => t.type === 'video' || t.name === 'Video');
+    const tracks = this._getTracks();
+    const videoTrack = tracks.find(t => t.type === 'video' || t.name === 'Video');
     if (videoTrack) {
       const newClip = {
         id: Date.now(),
@@ -32,7 +49,8 @@ export class TimelineStateAdapter {
   }
 
   addAudioTrack(audioClip) {
-    const audioTrack = this.state.tracks.find(t => t.type === 'audio' || t.name === 'Audio');
+    const tracks = this._getTracks();
+    const audioTrack = tracks.find(t => t.type === 'audio' || t.name === 'Audio');
     if (audioTrack) {
       const newClip = {
         id: Date.now(),
@@ -50,9 +68,10 @@ export class TimelineStateAdapter {
   }
 
   getSelectedClips() {
+    const tracks = this._getTracks();
     if (!this.state.selectedClipId) return [];
     const clips = [];
-    this.state.tracks.forEach(track => {
+    tracks.forEach(track => {
       if (track.items) {
         const clip = track.items.find(c => c.id === this.state.selectedClipId);
         if (clip) clips.push(clip);
@@ -62,8 +81,9 @@ export class TimelineStateAdapter {
   }
 
   getClips() {
+    const tracks = this._getTracks();
     const clips = [];
-    this.state.tracks.forEach(track => {
+    tracks.forEach(track => {
       if (track.items) {
         clips.push(...track.items);
       }
@@ -72,11 +92,13 @@ export class TimelineStateAdapter {
   }
 
   getVideoTrack() {
-    return this.state.tracks.find(t => t.type === 'video' || t.name === 'Video');
+    const tracks = this._getTracks();
+    return tracks.find(t => t.type === 'video' || t.name === 'Video');
   }
 
   getAudioTrack() {
-    return this.state.tracks.find(t => t.type === 'audio' || t.name === 'Audio');
+    const tracks = this._getTracks();
+    return tracks.find(t => t.type === 'audio' || t.name === 'Audio');
   }
 }
 
