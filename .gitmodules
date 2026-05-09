@@ -10,6 +10,3 @@
 [submodule "modules/CineGen"]
 	path = modules/CineGen
 	url = https://github.com/deangilmoreremix/CineGen.git
-[submodule "modules/CutAI"]
-	path = modules/CutAI
-	url = https://github.com/Swapnil-bo/CutAI.git
