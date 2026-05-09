@@ -1,5 +1,6 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
+import { AIChatPanel } from '../../src/components/timeline/AIChatPanel.js';
 
 // Unit tests for Timeline Editor Core Components
 describe('Timeline Editor Core Units', () => {
@@ -145,8 +146,80 @@ describe('Timeline Editor Core Units', () => {
       const videoSize = 100 * 1024 * 1024; // 100MB
       const audioSize = 10 * 1024 * 1024;  // 10MB
       const totalSize = videoSize + audioSize;
-      
+
       expect(totalSize).toBe(110 * 1024 * 1024);
+    });
+  });
+
+  describe('AI Chat Panel Units', () => {
+    let mockContainer: HTMLElement;
+    let mockState: any;
+    let mockActions: any;
+
+    beforeEach(() => {
+      mockContainer = document.createElement('div');
+      mockState = {
+        tracks: [],
+        selectedClipId: null,
+        playheadPercent: 0
+      };
+      mockActions = {
+        detectScenes: vi.fn().mockResolvedValue(true),
+        splitClipAtPlayhead: vi.fn(),
+        trimSelectedClip: vi.fn(),
+        addTransition: vi.fn(),
+        addTextOverlay: vi.fn(),
+        generateSubtitles: vi.fn().mockResolvedValue(true),
+        removeFillerWords: vi.fn(),
+        addBRoll: vi.fn(),
+        speedRamp: vi.fn(),
+        stabilizeVideo: vi.fn(),
+        findRelatedFootage: vi.fn().mockResolvedValue([])
+      };
+    });
+
+    it('should initialize AIChatPanel correctly', () => {
+      const chatPanel = new AIChatPanel(mockContainer, mockState, mockActions);
+      expect(chatPanel).toBeInstanceOf(AIChatPanel);
+      expect(mockContainer.innerHTML).toContain('AI Assistant');
+    });
+
+    it('should handle command analysis fallback', async () => {
+      const chatPanel = new AIChatPanel(mockContainer, mockState, mockActions);
+
+      // Test fallback command detection
+      const result = (chatPanel as any).fallbackCommandDetection('detect scenes');
+      expect(result).toBe('detect_scenes');
+
+      const splitResult = (chatPanel as any).fallbackCommandDetection('split the clip');
+      expect(splitResult).toBe('split_clip');
+    });
+
+    it('should execute detect scenes command', async () => {
+      const chatPanel = new AIChatPanel(mockContainer, mockState, mockActions);
+
+      const result = await (chatPanel as any).executeCommand({
+        command: 'detect_scenes',
+        parameters: {},
+        confidence: 0.9
+      });
+
+      expect(mockActions.detectScenes).toHaveBeenCalled();
+      expect(result.success).toBe(true);
+      expect(result.response).toContain('Scene detection completed');
+    });
+
+    it('should handle unknown commands', async () => {
+      const chatPanel = new AIChatPanel(mockContainer, mockState, mockActions);
+
+      const result = await (chatPanel as any).executeCommand({
+        command: 'unknown_command',
+        parameters: {},
+        confidence: 0.5
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.response).toContain('don\'t know how to execute');
     });
   });
 });
