@@ -44,7 +44,7 @@ export function AuthModal(onSuccess) {
     const input = modal.querySelector('#muapi-key-input');
     const btn = modal.querySelector('#save-key-btn');
 
-    btn.onclick = () => {
+    btn.onclick = async () => {
         const key = input.value.trim();
         if (key) {
             if (key.length < 10) {
