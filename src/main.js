@@ -1,5 +1,5 @@
 import './style.css';
-import './components/styles/header-mega-menu.css';
+// import './components/styles/header-mega-menu.css'; // Temporarily disabled
 import { Header } from './components/Header.js';
 import { Sidebar } from './components/Sidebar.js';
 import { initRouter, navigate } from './lib/router.js';

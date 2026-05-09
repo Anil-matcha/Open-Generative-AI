@@ -1,6 +1,6 @@
 {
   "name": "open-generative-ai",
-  "description": "Open-source alternative to Higgsfield AI \u2014 AI image, video, cinema and lip sync studio",
+  "description": "Open-source alternative to Higgsfield AI — AI image, video, cinema and lip sync studio",
   "homepage": "https://github.com/Anil-matcha/Open-Generative-AI",
   "private": true,
   "version": "1.0.0",
@@ -69,7 +69,7 @@
     "jsdom": "^29.0.1",
     "postcss": "^8.5.6",
     "puppeteer": "^24.37.2",
-    "tailwindcss": "^4.1.18",
+    "tailwindcss": "^4.3.0",
     "terser": "^5.27.0",
     "typescript": "^6.0.2",
     "vite": "^7.0.0",

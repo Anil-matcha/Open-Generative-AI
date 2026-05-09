@@ -125,15 +125,7 @@ class CutAIClient {
     return { project, scenes: [] }; // Simplified for now
   }
 
-  /**
-   * Create new project
-   */
-  async createProject(name, genre = 'drama') {
-    return this.request(`${this.netlifyFunctionsBase}/storyboarder-projects`, {
-      method: 'POST',
-      body: { title: name, genre }
-    });
-  }
+
 
   /**
    * Delete project
@@ -172,14 +164,7 @@ class CutAIClient {
     }
   }
 
-  async generateStoryboard(projectId, genre, premise) {
-    // Generate storyboard using real AI - create scenes with image generation
-    const scenes = await this.generateStoryboardScenes(genre, premise);
-    return {
-      project: { id: projectId, genre, premise },
-      scenes: scenes
-    };
-  }
+
 
   async getStoryboard(projectId) {
     // Return stored storyboard data
@@ -271,26 +256,9 @@ class CutAIClient {
   // LEGACY COMPATIBILITY - Maps old API calls to new functions
   // =============================================================================
 
-  /**
-   * @deprecated Use getProject() instead
-   */
-  async getStoryboard(projectId) {
-    return this.getProject(projectId);
-  }
 
-  /**
-   * @deprecated Use updateScene() instead
-   */
-  async updateScene(sceneId, data) {
-    return this.updateScene(sceneId, data);
-  }
 
-  /**
-   * @deprecated Use updateShot() instead
-   */
-  async updateShot(shotId, data) {
-    return this.updateShot(shotId, data);
-  }
+
 
   /**
    * @deprecated Use generateStoryboard() instead

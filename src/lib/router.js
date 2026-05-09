@@ -81,7 +81,6 @@ const pageLoaders = {
   timeline: () => import('../components/TimelineEditorPage.js').then(m => m.TimelineEditorPage()),
   'timeline-test': () => import('../components/TimelineTestPage.jsx').then(m => m.TimelineTestPage),
    'remix-go': () => import('../components/RemixGoPage.js').then(m => m.RemixGoPage()),
-   'ai-vfx': () => import('../components/AiVfxPage.js').then(m => m.AiVfxPage()),
    'sendspark': () => import('../components/SendsparkPage.js').then(m => m.SendsparkPage()),
   'runway-motion': () => import('../components/RunwayMotionStudio.js').then(m => m.RunwayMotionStudio()),
   'tiktok-carousel': () => import('../components/TikTokCarouselStudio.js').then(m => m.TikTokCarouselStudio()),
