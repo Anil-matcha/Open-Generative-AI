@@ -1,0 +1,70 @@
+{
+  "meta": {
+    "name": "codex-lab-concept-hero",
+    "language": "zh-CN",
+    "created_at": "2026-05-11",
+    "reasoning_workflow": "Codex GPT-5.5 xhigh format",
+    "image_model_path": "Codex imagegen built-in",
+    "runtime_api_integration": false
+  },
+  "brief": {
+    "goal": "为 Codex 多模态实验台生成第一张可用于页面展示的概念主视觉。",
+    "audience": ["项目开发者", "内容创作者", "工作流测试者"],
+    "asset_usage": ["页面资产落点区预览图", "实验文档插图", "后续概念图风格基准"],
+    "reference_analysis": "output/analysis.md"
+  },
+  "structured_prompt": {
+    "zh": "一个本地 AI 多模态创作实验台的概念主视觉。深色产品工作台中，从左到右展示截图输入、中文分析报告、结构化 Prompt 卡片和最终概念图资产。整体克制、专业、结构清晰，有创造力但不过度科幻。黑玻璃界面、细边框、柔白文字块、酸性黄绿色状态信号，画面像高质量产品概念图而不是实际 UI 截图。",
+    "en": "A concept hero image for a local AI multimodal creative lab. On a dark product workspace, show a left-to-right workflow from screenshot input to a Chinese analysis report, structured prompt cards, and a final concept art asset preview. Restrained, professional, clearly structured, inventive but not overly sci-fi. Black glass interface surfaces, fine borders, soft white report blocks, acid-lime status signals. It should feel like polished product concept art, not an actual UI screenshot.",
+    "negative": "no external API logos, no random brand marks, no readable fake UI text, no tiny gibberish text, no watermark, no messy clutter, no robots, no neon overload"
+  },
+  "shot_list": [
+    {
+      "id": "input",
+      "purpose": "表现图片/截图分析输入",
+      "framing": "left side panel with screenshot thumbnails and local folder hints",
+      "visual_notes": "avoid readable fake filenames; use abstract document and image tiles"
+    },
+    {
+      "id": "reasoning",
+      "purpose": "表现中文分析报告和 Prompt 结构化",
+      "framing": "center panel with report blocks and prompt cards",
+      "visual_notes": "use clean blocks and lines instead of legible text"
+    },
+    {
+      "id": "asset",
+      "purpose": "表现 imagegen 概念图输出和项目资产落点",
+      "framing": "right side polished concept image preview with stable asset board",
+      "visual_notes": "make the final generated image preview the brightest focal point"
+    }
+  ],
+  "parameters": {
+    "recommended_aspect_ratio": "16:9",
+    "recommended_size": "1536x864",
+    "quality": "high",
+    "iteration_count": 1,
+    "acceptance_checks": [
+      "能看出输入、分析、输出三段闭环",
+      "没有外部服务标识或随机品牌",
+      "没有乱码文字成为视觉主体",
+      "适合放入 public/assets/codex-lab 并在页面预览"
+    ]
+  },
+  "imagegen_prompts": [
+    {
+      "id": "codex-lab-hero",
+      "target": "public/assets/codex-lab/concept-hero.png",
+      "use_case": "productivity-visual",
+      "prompt": "Use case: productivity-visual\nAsset type: web page hero concept image\nPrimary request: A concept hero image for a local AI multimodal creative lab. On a dark product workspace, show a left-to-right workflow from screenshot input to a Chinese analysis report, structured prompt cards, and a final concept art asset preview.\nScene/backdrop: restrained dark product workspace with local project folders, abstract screenshot thumbnails, clean analysis report blocks, prompt cards, and an accepted concept image board.\nSubject: a verifiable three-step workflow from image or screenshot analysis to structured prompt pack to imagegen concept asset.\nStyle/medium: polished editorial 3D illustration with realistic product surfaces, not an actual UI screenshot.\nComposition/framing: 16:9 landscape, left-to-right process path, clear focal point on the final concept image preview, usable negative space.\nLighting/mood: precise soft studio lighting, calm, capable, inventive.\nColor palette: charcoal black, warm white, acid lime accents, restrained cyan details.\nConstraints: no external API logos, no random brand marks, no readable fake UI text, no tiny gibberish text, no watermark, no messy clutter, no robots, no neon overload."
+    }
+  ],
+  "asset_plan": [
+    {
+      "filename": "concept-hero.png",
+      "candidate_path": "experiments/codex-internal-multimodal-lab/output/generated-assets/concept-hero.png",
+      "final_path": "public/assets/codex-lab/concept-hero.png",
+      "source_prompt_id": "codex-lab-hero",
+      "status": "accepted"
+    }
+  ]
+}

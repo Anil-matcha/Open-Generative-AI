@@ -92,16 +92,20 @@ const assetSlots = [
     name: "concept-hero.png",
     purpose: "Codex Lab 或工作流卡片主视觉",
     source: "imagegen-prompts.example.jsonl",
+    status: "已生成",
+    preview: "/assets/codex-lab/concept-hero.png",
   },
   {
     name: "concept-character.png",
     purpose: "角色/智能体测试头像或概念图",
     source: "prompt-pack.json",
+    status: "待生成",
   },
   {
     name: "concept-scene.png",
     purpose: "场景风格板与分镜参考",
     source: "analysis.md + prompt-pack.json",
+    status: "待生成",
   },
 ];
 
@@ -323,6 +327,24 @@ export default function CodexLabPage() {
                   key={slot.name}
                   className="rounded-lg border border-white/10 bg-black/35 p-4"
                 >
+                  {slot.preview ? (
+                    <img
+                      src={slot.preview}
+                      alt={`${slot.name} 预览`}
+                      className="mb-4 aspect-video w-full rounded-md border border-[#d9ff00]/25 object-cover"
+                    />
+                  ) : null}
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <span
+                      className={`rounded-md px-2 py-1 text-xs font-bold ${
+                        slot.status === "已生成"
+                          ? "bg-emerald-400/10 text-emerald-300"
+                          : "bg-white/[0.06] text-white/40"
+                      }`}
+                    >
+                      {slot.status}
+                    </span>
+                  </div>
                   <div className="font-mono text-sm font-bold text-[#d9ff00]">
                     {slot.name}
                   </div>
