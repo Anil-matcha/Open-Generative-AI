@@ -7,7 +7,7 @@ class OpenAIConfig {
   constructor() {
     this.defaultConfig = {
       imageModel: 'gpt-image-2',
-      baseURL: 'https://api.openai.com/v1',
+      baseURL: 'https://api.muapi.ai/api/v1/',
       timeout: 120000, // 2 minutes for image generation
       maxRetries: 3,
       supportedImageModels: [

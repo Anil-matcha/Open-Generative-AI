@@ -12,10 +12,11 @@ const supabase = createClient(
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 );
 
-const MUAPI_API_KEY = Deno.env.get('MUAPI_KEY') || Deno.env.get('OPENAI_API_KEY');
+const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+const DIRECTOR_API_BASE_URL = Deno.env.get('DIRECTOR_API_BASE_URL') || 'https://api.director.ai/v1';
 
-if (!MUAPI_API_KEY) {
-  console.error('[director-agent] Missing MUAPI_KEY environment variable');
+if (!OPENAI_API_KEY) {
+  console.error('[director-agent] Missing OPENAI_API_KEY environment variable');
 }
 
 if (!DIRECTOR_API_BASE_URL) {
@@ -206,17 +207,17 @@ Respond in JSON format.`;
 
 // Helper functions for API calls
 async function callOpenAI(prompt: string, model: string = 'gpt-4'): Promise<string> {
-  if (!MUAPI_API_KEY) {
-    throw new Error('MUAPI_KEY not configured');
+  if (!OPENAI_API_KEY) {
+    throw new Error('OpenAI API key not configured');
   }
 
-  console.log('[director-agent] Calling muapi.ai API');
+  console.log('[director-agent] Calling OpenAI API');
 
-  const response = await fetch('https://api.muapi.ai/api/v1/chat/completions', {
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': MUAPI_API_KEY
+      'Authorization': `Bearer ${OPENAI_API_KEY}`
     },
     body: JSON.stringify({
       model: model,
@@ -237,7 +238,7 @@ async function callOpenAI(prompt: string, model: string = 'gpt-4'): Promise<stri
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`muapi.ai API call failed: ${response.status} ${response.statusText} - ${errorText}`);
+    throw new Error(`OpenAI API call failed: ${response.status} ${response.statusText} - ${errorText}`);
   }
 
   const result = await response.json();

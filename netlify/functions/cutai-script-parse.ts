@@ -219,31 +219,18 @@ Requirements:
 - All fields are required, dialogue can be null
 - frame_image_path should be null`;
 
-      const response = await fetch('https://api.muapi.ai/api/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': MUAPI_API_KEY
-        },
-        body: JSON.stringify({
-          model: 'gpt-4',
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: userPrompt }
-          ],
-          temperature: 0.3,
-          max_tokens: 3000,
-          response_format: { type: 'json_object' }
-        })
-      });
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ],
+      temperature: 0.3,
+      max_tokens: 3000,
+      response_format: { type: 'json_object' }
+    });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(`muapi.ai API error: ${error.message || 'Unknown error'}`);
-      }
-
-      const data = await response.json();
-      const responseContent = data.choices[0]?.message?.content;
+    const responseContent = completion.choices[0].message.content;
 
     // Parse and validate the JSON response
     let parsedScript;

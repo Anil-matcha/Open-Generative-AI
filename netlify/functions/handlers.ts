@@ -123,12 +123,12 @@ export async function handleAIAd(prompt: string) {
 
     console.log('Creating AI ad for product:', product)
 
-    // Generate ad script using muapi.ai proxy
-    const scriptResponse = await fetch('https://api.muapi.ai/api/v1/chat/completions', {
+    // Generate ad script
+    const scriptResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': process.env.MUAPI_API_KEY || process.env.OPENAI_API_KEY
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
         model: 'gpt-4',

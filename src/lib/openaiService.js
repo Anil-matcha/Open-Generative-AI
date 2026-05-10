@@ -5,9 +5,9 @@
 
 import { openaiConfig } from './config/openaiConfig.js';
 
-const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
-const OPENAI_IMAGES_URL = 'https://api.openai.com/v1/images';
-const OPENAI_RESPONSES_URL = 'https://api.openai.com/v1/responses';
+const MUAPI_API_URL = 'https://api.muapi.ai/api/v1/chat/completions';
+const MUAPI_IMAGES_URL = 'https://api.muapi.ai/api/v1/images';
+const MUAPI_RESPONSES_URL = 'https://api.muapi.ai/api/v1/responses';
 
 class OpenAIService {
   constructor() {

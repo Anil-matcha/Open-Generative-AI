@@ -46,7 +46,7 @@ const CINEGEN_API_URL = Deno.env.get('CINEGEN_API_URL') || 'http://localhost:300
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`muapi.ai API call failed: ${response.status} ${response.statusText} - ${errorText}`);
+    throw new Error(`OpenAI API call failed: ${response.status} ${response.statusText} - ${errorText}`);
   }
 
   const result = await response.json();
