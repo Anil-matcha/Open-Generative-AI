@@ -1,0 +1,42 @@
+{
+  "name": "codex-internal-multimodal-lab",
+  "branch": "codex/internal-multimodal-lab",
+  "runtimeApiIntegration": false,
+  "capabilities": [
+    {
+      "id": "image-analysis",
+      "label": "截图/图片分析",
+      "inputs": ["image", "screenshot", "reference-frame"],
+      "outputs": ["analysis.md", "prompt-notes.md"],
+      "status": "testable"
+    },
+    {
+      "id": "multi-image-comparison",
+      "label": "多图对比",
+      "inputs": ["image-set"],
+      "outputs": ["comparison.md", "style-rules.md"],
+      "status": "testable"
+    },
+    {
+      "id": "prompt-pack",
+      "label": "创作 Prompt 生成",
+      "inputs": ["brief", "style-notes", "target-platform"],
+      "outputs": ["prompt-pack.json"],
+      "status": "testable"
+    },
+    {
+      "id": "image-generation",
+      "label": "概念图生成",
+      "inputs": ["imagegen-prompts.jsonl"],
+      "outputs": ["generated-assets"],
+      "status": "testable"
+    },
+    {
+      "id": "video-audio-spec",
+      "label": "视频/语音规格草案",
+      "inputs": ["script", "shot-list", "voice-notes"],
+      "outputs": ["integration-spec.md"],
+      "status": "deferred"
+    }
+  ]
+}
