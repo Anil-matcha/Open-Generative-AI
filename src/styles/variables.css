@@ -1,29 +1,30 @@
 :root {
-  /* Brand Colors - Open Generative AI */
-  --color-primary: #22d3ee;
-  /* Editorial Cyan */
-  --color-primary-hover: #06b6d4;
-  --color-secondary: #34d399;
-  /* Creative Emerald */
-  --color-accent: #34d399;
-  /* Creative Emerald */
-  --color-accent-hover: #22c55e;
-  --color-danger: #ef4444;
+  /* Brand Colors - OKLCH Indigo/Purple Palette */
+  --color-primary: oklch(30% 25% 270deg);
+  /* Deep Indigo */
+  --color-primary-hover: oklch(35% 25% 270deg);
+  --color-secondary: oklch(35% 18% 300deg);
+  /* Complementary Purple */
+  --color-accent: oklch(35% 18% 300deg);
+  /* Purple Accent */
+  --color-accent-hover: oklch(40% 18% 300deg);
+  --color-danger: oklch(55% 25% 20deg);
+  /* Red */
 
-  /* Backgrounds - Layered Dark Surfaces */
-  --bg-app: #020205;
-  /* Surface Void */
-  --bg-deep: #05070b;
+  /* Backgrounds - Layered Dark Surfaces with Indigo Tint */
+  --bg-app: oklch(10% 0.005 270deg);
+  /* Surface Void with slight indigo tint */
+  --bg-deep: oklch(12% 0.008 270deg);
   /* Surface Deep */
-  --bg-panel: #0a0b0f;
+  --bg-panel: oklch(15% 0.01 270deg);
   /* Surface Panel */
-  --bg-card: #111318;
+  --bg-card: oklch(18% 0.01 270deg);
   /* Surface Card */
-  --bg-elevated: #1a1d24;
+  --bg-elevated: oklch(20% 0.01 270deg);
   /* Surface Elevated */
-  --bg-header: #171b24;
+  --bg-header: oklch(22% 0.01 270deg);
   /* Surface Header */
-  --bg-glass: rgba(10, 11, 15, 0.8);
+  --bg-glass: oklch(15% 0 270deg / 0.8);
 
   /* Text */
   --text-primary: #ffffff;
@@ -42,12 +43,12 @@
   --border-radius-xl: 24px;
   --border-radius-full: 9999px;
 
-  /* Effects */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-  --shadow-glow: 0 0 20px rgba(176, 251, 93, 0.4);
-  --shadow-glow-accent: 0 0 20px rgba(168, 85, 247, 0.4);
+  /* Effects - OKLCH */
+  --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px oklch(0% 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px oklch(0% 0 0 / 0.1);
+  --shadow-glow: 0 0 20px oklch(30% 25% 270deg / 0.4);
+  --shadow-glow-accent: 0 0 20px oklch(35% 18% 300deg / 0.4);
   --backdrop-blur: blur(20px);
 
   /* Transitions */
