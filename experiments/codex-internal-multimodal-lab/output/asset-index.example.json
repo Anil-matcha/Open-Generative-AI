@@ -1,0 +1,25 @@
+{
+  "assets": [
+    {
+      "filename": "concept-hero.png",
+      "workspace_path": "public/assets/codex-lab/concept-hero.png",
+      "source_prompt_id": "codex-lab-hero",
+      "status": "planned",
+      "notes": "最终选图复制到项目资产目录后，把 status 改为 accepted。"
+    },
+    {
+      "filename": "concept-character.png",
+      "workspace_path": "public/assets/codex-lab/concept-character.png",
+      "source_prompt_id": "codex-lab-agent",
+      "status": "planned",
+      "notes": "用于智能体或能力说明头像类资产。"
+    },
+    {
+      "filename": "concept-scene.png",
+      "workspace_path": "public/assets/codex-lab/concept-scene.png",
+      "source_prompt_id": "codex-lab-scene",
+      "status": "planned",
+      "notes": "用于工作流说明、文档或测试页面补充视觉。"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # Codex Internal Multimodal Lab
 
-本目录用于测试 Codex 内部能力辅助项目创作，不接入外部 PAI、视频或语音模型。
+本目录用于测试 Codex 内部能力辅助项目创作，不接入外部 PAI、视频或语音模型。当前优先验证 3 个最有价值的本地闭环。
 
 ## 当前边界
 
@@ -8,22 +8,53 @@
 - 图像生成：由 Codex `imagegen` 技能完成，默认使用内置图像生成路径。
 - 视频/语音/音乐：暂不接入模型，只产出规格、脚本、分镜和后续接入建议。
 - 项目运行时：不直接调用 Codex 内部模型能力。
+- 项目资产：最终可引用图片统一复制到 `public/assets/codex-lab/`。
 
 ## 目录约定
 
 ```text
 experiments/codex-internal-multimodal-lab/
-  input/              # 放置参考图、截图、关键帧
-  output/             # 放置分析报告、prompt 包和生成资产
-  manifest.json       # 测试能力矩阵
+  input/
+    brief.md                    # 创作需求输入模板
+    screenshots/                # 图片、截图、页面状态图
+    references/                 # 风格参考、角色参考、竞品参考
+  output/
+    analysis-template.md         # 中文分析报告模板
+    prompt-pack.example.json     # Prompt / 分镜 / 参数建议示例
+    imagegen-prompts.example.jsonl
+    asset-index.example.json
+    generated-assets/            # imagegen 默认产物转存或候选图记录
+  manifest.json                  # 测试能力矩阵
+
+public/assets/codex-lab/          # 项目可直接引用的最终概念图
 ```
 
-## 建议测试闭环
+## 三个优先闭环
 
-1. 图片/截图分析 -> `output/analysis.md`
-2. 中文需求 -> 结构化 Prompt -> `output/prompt-pack.json`
-3. Prompt -> imagegen 生图 -> `output/generated-assets/`
-4. 视频关键帧 -> 分镜与节奏分析 -> `output/shot-list.md`
+1. 图片/截图分析 -> 输出中文分析报告
+   - 输入：`input/screenshots/*` 或 `input/references/*`
+   - 输出：`output/analysis.md`
+   - 模板：`output/analysis-template.md`
+
+2. 创作需求 -> 生成结构化 Prompt / 分镜 / 参数建议
+   - 输入：`input/brief.md`
+   - 输出：`output/prompt-pack.json`
+   - 示例：`output/prompt-pack.example.json`
+
+3. Prompt -> 用 imagegen 生成概念图 -> 存入项目资产目录
+   - 输入：`output/imagegen-prompts.jsonl`
+   - 候选输出：`output/generated-assets/`
+   - 最终资产：`public/assets/codex-lab/`
+   - 资产索引：`output/asset-index.json`
+
+## 执行方式
+
+1. 把截图、参考图或关键帧放到 `input/screenshots/`、`input/references/`。
+2. 让 Codex 基于 `analysis-template.md` 输出中文分析报告。
+3. 把创作需求填入 `input/brief.md`，生成 `prompt-pack.json`。
+4. 从 `prompt-pack.json` 提取最终生图 Prompt，整理为 `imagegen-prompts.jsonl`。
+5. 逐条调用 Codex `imagegen`，选择可用概念图。
+6. 把最终图片复制到 `public/assets/codex-lab/`，并在 `asset-index.json` 记录来源 Prompt 与用途。
 
 ## 暂不测试
 

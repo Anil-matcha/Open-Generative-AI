@@ -44,12 +44,39 @@ const capabilityRows = [
   },
 ];
 
+const priorityLoops = [
+  {
+    id: "01",
+    title: "图片/截图分析",
+    flow: "图片或截图 -> GPT-5.5 xhigh -> 中文分析报告",
+    input: "experiments/codex-internal-multimodal-lab/input/screenshots",
+    output: "experiments/codex-internal-multimodal-lab/output/analysis.md",
+    checks: ["主体与场景识别", "构图和视觉层级", "可复用风格词", "问题点与改进建议"],
+  },
+  {
+    id: "02",
+    title: "创作需求结构化",
+    flow: "中文需求 -> GPT-5.5 xhigh -> Prompt / 分镜 / 参数建议",
+    input: "experiments/codex-internal-multimodal-lab/input/brief.md",
+    output: "experiments/codex-internal-multimodal-lab/output/prompt-pack.json",
+    checks: ["中英 Prompt", "镜头表", "画幅/时长/风格参数", "负面约束"],
+  },
+  {
+    id: "03",
+    title: "概念图生成",
+    flow: "结构化 Prompt -> Codex imagegen -> 项目资产目录",
+    input: "experiments/codex-internal-multimodal-lab/output/imagegen-prompts.jsonl",
+    output: "public/assets/codex-lab/",
+    checks: ["生成图可用于页面", "资产路径稳定", "Prompt 可复现", "不接运行时 API"],
+  },
+];
+
 const runbook = [
-  "把输入图片或关键帧放到 experiments/codex-internal-multimodal-lab/input。",
-  "在本页填写任务目标、素材路径、输出格式和验收标准。",
-  "由 Codex 使用 GPT-5.5 xhigh 完成分析、推理、提示词和报告生成。",
-  "需要生图时调用 Codex imagegen 技能，生成后把最终资产放入 output 目录。",
-  "视频、语音、音乐模型暂不接入，只输出可执行规格和后续接入点。",
+  "把截图、参考图或关键帧放到 input 对应子目录。",
+  "用 analysis-template.md 生成中文分析报告，保留观察、判断和建议。",
+  "用 prompt-pack.example.json 产出结构化 Prompt、分镜和参数建议。",
+  "用 imagegen-prompts.example.jsonl 逐条调用 Codex imagegen。",
+  "把最终概念图复制到 public/assets/codex-lab，并在资产索引里记录来源 Prompt。",
 ];
 
 const outputItems = [
@@ -58,6 +85,24 @@ const outputItems = [
   "shot-list.md",
   "imagegen-prompts.jsonl",
   "generated-assets/",
+];
+
+const assetSlots = [
+  {
+    name: "concept-hero.png",
+    purpose: "Codex Lab 或工作流卡片主视觉",
+    source: "imagegen-prompts.example.jsonl",
+  },
+  {
+    name: "concept-character.png",
+    purpose: "角色/智能体测试头像或概念图",
+    source: "prompt-pack.json",
+  },
+  {
+    name: "concept-scene.png",
+    purpose: "场景风格板与分镜参考",
+    source: "analysis.md + prompt-pack.json",
+  },
 ];
 
 export default function CodexLabPage() {
@@ -149,6 +194,40 @@ export default function CodexLabPage() {
         </aside>
 
         <div className="space-y-6">
+          <section className="grid gap-4 xl:grid-cols-3">
+            {priorityLoops.map((loop) => (
+              <div
+                key={loop.id}
+                className="rounded-lg border border-white/10 bg-white/[0.03] p-5"
+              >
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <span className="rounded-md bg-[#d9ff00] px-2.5 py-1 text-xs font-black text-black">
+                    Loop {loop.id}
+                  </span>
+                  <span className="text-xs font-semibold text-white/35">本地闭环</span>
+                </div>
+                <h2 className="text-lg font-bold">{loop.title}</h2>
+                <p className="mt-2 min-h-12 text-sm leading-6 text-white/55">
+                  {loop.flow}
+                </p>
+                <div className="mt-4 space-y-2 rounded-lg border border-white/10 bg-black/35 p-3 font-mono text-xs leading-5 text-white/45">
+                  <div>input: {loop.input}</div>
+                  <div>output: {loop.output}</div>
+                </div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {loop.checks.map((check) => (
+                    <span
+                      key={check}
+                      className="rounded-md border border-white/10 bg-white/[0.04] px-2 py-1 text-xs text-white/55"
+                    >
+                      {check}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </section>
+
           <section className="rounded-lg border border-white/10 bg-white/[0.03] p-5">
             <div className="mb-5 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
               <div>
@@ -162,34 +241,36 @@ export default function CodexLabPage() {
               </span>
             </div>
 
-            <div className="overflow-hidden rounded-lg border border-white/10">
-              <div className="grid grid-cols-[1.1fr_1.2fr_1.4fr_80px] bg-white/[0.04] text-sm font-bold text-white/60">
-                <div className="p-3">能力</div>
-                <div className="p-3">输入</div>
-                <div className="p-3">输出</div>
-                <div className="p-3">状态</div>
-              </div>
-              {capabilityRows.map((row) => (
-                <div
-                  key={row.name}
-                  className="grid grid-cols-[1.1fr_1.2fr_1.4fr_80px] border-t border-white/10 text-sm"
-                >
-                  <div className="p-3 font-semibold text-white/85">{row.name}</div>
-                  <div className="p-3 text-white/50">{row.input}</div>
-                  <div className="p-3 text-white/50">{row.output}</div>
-                  <div className="p-3">
-                    <span
-                      className={`rounded-md px-2 py-1 text-xs font-bold ${
-                        row.status === "可测"
-                          ? "bg-emerald-400/10 text-emerald-300"
-                          : "bg-amber-400/10 text-amber-300"
-                      }`}
-                    >
-                      {row.status}
-                    </span>
-                  </div>
+            <div className="overflow-x-auto rounded-lg border border-white/10">
+              <div className="min-w-[760px]">
+                <div className="grid grid-cols-[1.1fr_1.2fr_1.4fr_80px] bg-white/[0.04] text-sm font-bold text-white/60">
+                  <div className="p-3">能力</div>
+                  <div className="p-3">输入</div>
+                  <div className="p-3">输出</div>
+                  <div className="p-3">状态</div>
                 </div>
-              ))}
+                {capabilityRows.map((row) => (
+                  <div
+                    key={row.name}
+                    className="grid grid-cols-[1.1fr_1.2fr_1.4fr_80px] border-t border-white/10 text-sm"
+                  >
+                    <div className="p-3 font-semibold text-white/85">{row.name}</div>
+                    <div className="p-3 text-white/50">{row.input}</div>
+                    <div className="p-3 text-white/50">{row.output}</div>
+                    <div className="p-3">
+                      <span
+                        className={`rounded-md px-2 py-1 text-xs font-bold ${
+                          row.status === "可测"
+                            ? "bg-emerald-400/10 text-emerald-300"
+                            : "bg-amber-400/10 text-amber-300"
+                        }`}
+                      >
+                        {row.status}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </section>
 
@@ -221,6 +302,34 @@ export default function CodexLabPage() {
               <p className="mt-4 text-sm leading-6 text-white/45">
                 生图结果若用于项目页面，需要从 Codex 默认生成目录复制到本仓库资产目录后再引用。
               </p>
+            </div>
+          </section>
+
+          <section className="rounded-lg border border-white/10 bg-[#0b0b0b] p-5">
+            <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+              <div>
+                <h2 className="text-lg font-bold">项目资产落点</h2>
+                <p className="mt-1 text-sm text-white/45">
+                  imagegen 生成结果统一进入 public/assets/codex-lab，页面引用时使用稳定路径。
+                </p>
+              </div>
+              <span className="font-mono text-xs text-white/35">
+                /assets/codex-lab/*
+              </span>
+            </div>
+            <div className="grid gap-3 md:grid-cols-3">
+              {assetSlots.map((slot) => (
+                <div
+                  key={slot.name}
+                  className="rounded-lg border border-white/10 bg-black/35 p-4"
+                >
+                  <div className="font-mono text-sm font-bold text-[#d9ff00]">
+                    {slot.name}
+                  </div>
+                  <p className="mt-2 text-sm leading-6 text-white/55">{slot.purpose}</p>
+                  <p className="mt-3 text-xs text-white/35">source: {slot.source}</p>
+                </div>
+              ))}
             </div>
           </section>
         </div>

@@ -1,0 +1,71 @@
+{
+  "meta": {
+    "name": "codex-lab-concept-pack",
+    "language": "zh-CN",
+    "reasoning_model": "Codex GPT-5.5 xhigh",
+    "image_model_path": "Codex imagegen built-in",
+    "runtime_api_integration": false
+  },
+  "brief": {
+    "goal": "为 Codex 多模态实验台生成一组可用于页面和文档的概念图。",
+    "audience": "项目开发者、内容创作者、工作流测试者",
+    "asset_usage": ["页面主视觉", "智能体概念头像", "场景风格板"]
+  },
+  "structured_prompt": {
+    "zh": "一个本地 AI 创作实验台，深色工作界面中展示图片分析报告、Prompt 卡片和概念图资产，整体克制、专业、有创造力，强调可验证工作流。",
+    "en": "A local AI creative lab interface on a dark workspace, showing an image analysis report, structured prompt cards, and concept art assets, restrained, professional, inventive, emphasizing a verifiable workflow.",
+    "negative": "no external API logos, no fake brand marks, no unreadable tiny text, no watermark, no noisy clutter"
+  },
+  "shot_list": [
+    {
+      "id": "hero",
+      "purpose": "页面主视觉",
+      "framing": "wide landscape composition with generous negative space",
+      "visual_notes": "dark studio desk, luminous analysis panels, one polished generated concept image preview"
+    },
+    {
+      "id": "agent",
+      "purpose": "智能体概念头像",
+      "framing": "centered portrait icon composition",
+      "visual_notes": "abstract assistant presence, calm intelligence, no literal robot cliche"
+    },
+    {
+      "id": "scene",
+      "purpose": "场景风格板",
+      "framing": "cinematic environment frame",
+      "visual_notes": "screenshots transform into structured storyboard panels and image assets"
+    }
+  ],
+  "parameters": {
+    "recommended_aspect_ratios": {
+      "hero": "16:9",
+      "agent": "1:1",
+      "scene": "3:2"
+    },
+    "quality": "high",
+    "iteration_count": 2,
+    "acceptance_checks": [
+      "主体明确",
+      "可用于项目页面",
+      "没有错误文字或水印",
+      "能从 prompt-pack 追溯来源"
+    ]
+  },
+  "asset_plan": [
+    {
+      "filename": "concept-hero.png",
+      "final_path": "public/assets/codex-lab/concept-hero.png",
+      "source_prompt_id": "codex-lab-hero"
+    },
+    {
+      "filename": "concept-character.png",
+      "final_path": "public/assets/codex-lab/concept-character.png",
+      "source_prompt_id": "codex-lab-agent"
+    },
+    {
+      "filename": "concept-scene.png",
+      "final_path": "public/assets/codex-lab/concept-scene.png",
+      "source_prompt_id": "codex-lab-scene"
+    }
+  ]
+}

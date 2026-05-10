@@ -2,6 +2,49 @@
   "name": "codex-internal-multimodal-lab",
   "branch": "codex/internal-multimodal-lab",
   "runtimeApiIntegration": false,
+  "priorityLoops": [
+    {
+      "id": "image-report",
+      "label": "图片/截图分析 -> 中文分析报告",
+      "input": "input/screenshots/*",
+      "template": "output/analysis-template.md",
+      "output": "output/analysis.md",
+      "executor": "Codex GPT-5.5 xhigh",
+      "acceptance": [
+        "识别主体、场景和关键文字",
+        "输出构图、层级、风格和风险判断",
+        "给出可直接用于下游 Prompt 的中文线索"
+      ]
+    },
+    {
+      "id": "brief-to-prompt-pack",
+      "label": "创作需求 -> Prompt / 分镜 / 参数建议",
+      "input": "input/brief.md",
+      "template": "output/prompt-pack.example.json",
+      "output": "output/prompt-pack.json",
+      "executor": "Codex GPT-5.5 xhigh",
+      "acceptance": [
+        "包含中文 Prompt、英文 Prompt 和负面约束",
+        "包含至少 3 个分镜或资产镜头",
+        "包含画幅、质量、迭代次数和验收标准"
+      ]
+    },
+    {
+      "id": "prompt-to-image-asset",
+      "label": "Prompt -> imagegen 概念图 -> 项目资产目录",
+      "input": "output/imagegen-prompts.jsonl",
+      "template": "output/imagegen-prompts.example.jsonl",
+      "candidateOutput": "output/generated-assets/",
+      "finalOutput": "public/assets/codex-lab/",
+      "executor": "Codex imagegen built-in",
+      "acceptance": [
+        "最终图像文件进入项目资产目录",
+        "资产索引记录来源 Prompt id 和用途",
+        "项目页面只引用 workspace 内稳定路径"
+      ]
+    }
+  ],
+  "assetDirectory": "public/assets/codex-lab",
   "capabilities": [
     {
       "id": "image-analysis",
@@ -28,7 +71,7 @@
       "id": "image-generation",
       "label": "概念图生成",
       "inputs": ["imagegen-prompts.jsonl"],
-      "outputs": ["generated-assets"],
+      "outputs": ["generated-assets", "public/assets/codex-lab"],
       "status": "testable"
     },
     {
