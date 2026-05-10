@@ -281,5 +281,3 @@ CREATE TRIGGER update_ai_agent_metrics_updated_at
 CREATE TRIGGER update_alert_configs_updated_at
   BEFORE UPDATE ON alert_configs
   FOR EACH ROW
-  EXECUTE FUNCTION update_updated_at_column();</content>
-<parameter name="filePath">supabase/migrations/20260425000000_create_monitoring_dashboards_schema.sql

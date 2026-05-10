@@ -80,7 +80,7 @@ COMMENT ON COLUMN projects.project_size_bytes IS 'Approximate size of project da
 
 -- Create index for efficient app-based queries
 CREATE INDEX IF NOT EXISTS idx_projects_studio_type ON projects(studio_type);
-CREATE INDEX IF NOT EXISTS idx_projects_user_app ON projects(user_id, studio_type);
+CREATE INDEX IF NOT EXISTS idx_projects_user_app ON projects(created_by, studio_type);
 CREATE INDEX IF NOT EXISTS idx_projects_last_opened ON projects(last_opened_app);
 
 -- Function to save app project data

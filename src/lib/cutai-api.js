@@ -180,11 +180,6 @@ class CutAIClient {
     return { success: true };
   }
 
-  async updateShot(shotId, data) {
-    // Simple update - in real implementation would persist to database
-    return { success: true };
-  }
-
   // =============================================================================
   // SUPABASE EDGE FUNCTIONS - Shot Operations
   // =============================================================================

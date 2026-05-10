@@ -3,3 +3,13 @@ packages:
   - 'apps/*'
   - 'apps/*/frontend'
   - 'modules/*'
+allowBuilds:
+  '@google/genai': true
+  canvas: true
+  core-js: true
+  core-js-pure: true
+  esbuild: true
+  protobufjs: true
+  puppeteer: true
+  sharp: true
+  workerd: true

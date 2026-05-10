@@ -596,5 +596,4 @@ export class LayerParenting {
       opacity: combined.opacity * transform.opacity
     }), { x: 0, y: 0, scale: 1, rotation: 0, opacity: 1 });
   }
-}</content>
-<parameter name="filePath">/workspaces/Open-Higgsfield-AI/src/lib/editor/keyframeSystem.js
+}
