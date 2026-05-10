@@ -3,6 +3,12 @@ import AgentEditClient from "./AgentEditClient";
 
 const BASE_URL = 'https://api.muapi.ai';
 
+function normalizeApiKey(value) {
+  if (!value) return null;
+  const trimmed = value.trim();
+  return trimmed && trimmed !== "null" && trimmed !== "undefined" ? trimmed : null;
+}
+
 async function fetchUserData(apiKey) {
   if (!apiKey) return null;
   try {
@@ -20,7 +26,7 @@ async function fetchUserData(apiKey) {
 export default async function EditAgentPage({ params }) {
   const { id } = await params; // although we don't use id on server here, it's used by useParams in client
   const cookieStore = await cookies();
-  const apiKey = cookieStore.get("muapi_key")?.value;
+  const apiKey = normalizeApiKey(cookieStore.get("muapi_key")?.value);
 
   const userData = await fetchUserData(apiKey);
 

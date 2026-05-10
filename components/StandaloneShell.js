@@ -7,17 +7,24 @@ import axios from 'axios';
 import ApiKeyModal from './ApiKeyModal';
 
 const TABS = [
-  { id: 'image',   label: 'Image Studio' },
-  { id: 'video',   label: 'Video Studio' },
-  { id: 'lipsync', label: 'Lip Sync' },
-  { id: 'cinema',  label: 'Cinema Studio' },
-  { id: 'marketing', label: 'Marketing Studio' },
-  { id: 'workflows', label: 'Workflows' },
-  { id: 'agents', label: 'Agents' },
-  { id: 'apps', label: 'Explore Apps' },
+  { id: 'image',   label: '图像创作' },
+  { id: 'video',   label: '视频创作' },
+  { id: 'lipsync', label: '口型同步' },
+  { id: 'cinema',  label: '电影创作' },
+  { id: 'marketing', label: '营销创作' },
+  { id: 'workflows', label: '工作流' },
+  { id: 'agents', label: '智能体' },
+  { id: 'apps', label: '应用中心' },
 ];
 
 const STORAGE_KEY = 'muapi_key';
+const REQUIRE_KEY_STORAGE_KEY = 'muapi_require_key';
+
+const normalizeApiKey = (value) => {
+  if (!value) return null;
+  const trimmed = value.trim();
+  return trimmed && trimmed !== 'null' && trimmed !== 'undefined' ? trimmed : null;
+};
 
 export default function StandaloneShell() {
   const params = useParams();
@@ -52,6 +59,7 @@ export default function StandaloneShell() {
   };
   
   const [apiKey, setApiKey] = useState(null);
+  const [requireApiKey, setRequireApiKey] = useState(false);
   const [activeTab, setActiveTab] = useState(getInitialTab());
   
   const [balance, setBalance] = useState(null);
@@ -115,26 +123,44 @@ export default function StandaloneShell() {
 
   useEffect(() => {
     setHasMounted(true);
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const stored = normalizeApiKey(localStorage.getItem(STORAGE_KEY));
+    const storedRequireKey = localStorage.getItem(REQUIRE_KEY_STORAGE_KEY) === 'true';
+    setRequireApiKey(storedRequireKey);
     if (stored) {
       setApiKey(stored);
       fetchBalance(stored);
       // Sync cookie immediately on mount to establish identity for background requests
       document.cookie = `muapi_key=${stored}; path=/; max-age=31536000; SameSite=Lax`;
+    } else {
+      localStorage.removeItem(STORAGE_KEY);
+      document.cookie = "muapi_key=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
     }
   }, [fetchBalance]);
 
   const handleKeySave = useCallback((key) => {
-    localStorage.setItem(STORAGE_KEY, key);
-    setApiKey(key);
-    fetchBalance(key);
-    document.cookie = `muapi_key=${key}; path=/; max-age=31536000; SameSite=Lax`;
+    const normalizedKey = normalizeApiKey(key);
+    if (!normalizedKey) return;
+    localStorage.setItem(STORAGE_KEY, normalizedKey);
+    setApiKey(normalizedKey);
+    fetchBalance(normalizedKey);
+    document.cookie = `muapi_key=${normalizedKey}; path=/; max-age=31536000; SameSite=Lax`;
   }, [fetchBalance]);
+
+  const handleRequireApiKeyChange = useCallback((enabled) => {
+    localStorage.setItem(REQUIRE_KEY_STORAGE_KEY, String(enabled));
+    setRequireApiKey(enabled);
+    setShowSettings(false);
+
+    if (!enabled && !apiKey) {
+      document.cookie = "muapi_key=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    }
+  }, [apiKey]);
 
   const handleKeyChange = useCallback(() => {
     localStorage.removeItem(STORAGE_KEY);
     setApiKey(null);
     setBalance(null);
+    setShowSettings(false);
     document.cookie = "muapi_key=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
   }, []);
 
@@ -213,9 +239,20 @@ export default function StandaloneShell() {
     </div>
   );
 
-  if (!apiKey) {
-    return <ApiKeyModal onSave={handleKeySave} />;
+  if (requireApiKey && !apiKey) {
+    return (
+      <ApiKeyModal
+        onSave={handleKeySave}
+        requireApiKey={requireApiKey}
+        onToggleRequireApiKey={handleRequireApiKeyChange}
+      />
+    );
   }
+
+  const hasApiKey = Boolean(apiKey);
+  const balanceLabel = hasApiKey
+    ? `余额 ${balance !== null ? `$${balance}` : '—'}`
+    : '游客模式';
 
   return (
     <div 
@@ -235,8 +272,8 @@ export default function StandaloneShell() {
               </svg>
             </div>
             <div className="flex flex-col items-center">
-              <span className="text-xl font-bold text-white">Drop your media here</span>
-              <span className="text-sm text-white/40">Images, videos, or audio files</span>
+              <span className="text-xl font-bold text-white">把素材拖到这里</span>
+              <span className="text-sm text-white/40">图片、视频或音频都可以</span>
             </div>
           </div>
         </div>
@@ -252,7 +289,7 @@ export default function StandaloneShell() {
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
               </svg>
             </div>
-            <span className="text-sm font-bold tracking-tight hidden sm:block">OpenGenerativeAI</span>
+            <span className="text-sm font-bold tracking-tight hidden sm:block">Open Generative AI</span>
           </div>
 
           {/* Center: Navigation */}
@@ -278,24 +315,24 @@ export default function StandaloneShell() {
           {/* Right: Actions */}
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3 bg-white/5 px-3 py-1.5 rounded-full border border-white/5 transition-colors">
-              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              <div className={`w-2 h-2 rounded-full ${hasApiKey ? 'bg-green-500 animate-pulse' : 'bg-white/30'}`} />
               <div className="flex flex-col">
                 <span className="text-xs font-bold text-white/90">
-                  ${balance !== null ? `${balance}` : '---'}
+                  {balanceLabel}
                 </span>
               </div>
             </div>
 
             <button
               onClick={() => setShowSettings(true)}
-              title="Settings — API key, local models, preferences"
+              title={hasApiKey ? '设置 — API 密钥、本地模型、偏好' : '设置 — 登录开关、本地模型、偏好'}
               className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-white/10 bg-white/5 text-[13px] font-bold text-white/80 hover:text-white hover:bg-white/10 hover:border-white/20 transition-colors"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="3" />
                 <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
               </svg>
-              <span>Settings</span>
+              <span>设置</span>
             </button>
           </div>
         </header>
@@ -317,34 +354,65 @@ export default function StandaloneShell() {
       {showSettings && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in-up">
           <div className="bg-[#0a0a0a] border border-white/10 rounded-xl p-8 w-full max-w-sm shadow-2xl">
-            <h2 className="text-white font-bold text-lg mb-2">Settings</h2>
+            <h2 className="text-white font-bold text-lg mb-2">设置</h2>
             <p className="text-white/40 text-[13px] mb-8">
-              Manage your AI studio preferences and authentication.
+              管理你的创作偏好、登录方式和本地设置。
             </p>
             
             <div className="space-y-4 mb-8">
               <div className="bg-white/5 border border-white/[0.03] rounded-md p-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <label className="block text-xs font-bold text-white/30 mb-2">
+                      进入时要求输入 API Key
+                    </label>
+                    <p className="text-[12px] leading-relaxed text-white/40">
+                      默认关闭。需要时再打开，系统就会在进入工作台前先检查是否已保存 Muapi API Key。
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={requireApiKey}
+                    aria-label="进入时要求输入 API Key"
+                    onClick={() => handleRequireApiKeyChange(!requireApiKey)}
+                    className={`relative inline-flex h-7 w-12 flex-shrink-0 items-center rounded-full border transition-colors ${
+                      requireApiKey ? 'border-[#d9ff00] bg-[#d9ff00]' : 'border-white/10 bg-white/10'
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-5 w-5 rounded-full bg-black transition-transform ${
+                        requireApiKey ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                </div>
+              </div>
+
+              <div className="bg-white/5 border border-white/[0.03] rounded-md p-4">
                 <label className="block text-xs font-bold text-white/30 mb-2">
-                   Active API Key
+                   {hasApiKey ? '当前 API Key' : 'API Key'}
                 </label>
                 <div className="text-[13px] font-mono text-white/80">
-                  {apiKey.slice(0, 8)}••••••••••••••••
+                  {hasApiKey ? `${apiKey.slice(0, 8)}••••••••••••••••` : '尚未保存 API Key'}
                 </div>
               </div>
             </div>
 
             <div className="flex gap-3">
-              <button
-                onClick={handleKeyChange}
-                className="flex-1 h-10 rounded-md bg-red-500/10 text-red-400 hover:bg-red-500/20 text-xs font-semibold transition-all"
-              >
-                Change Key
-              </button>
+              {hasApiKey && (
+                <button
+                  onClick={handleKeyChange}
+                  className="flex-1 h-10 rounded-md bg-red-500/10 text-red-400 hover:bg-red-500/20 text-xs font-semibold transition-all"
+                >
+                  清除 API Key
+                </button>
+              )}
               <button
                 onClick={() => setShowSettings(false)}
-                className="flex-1 h-10 rounded-md bg-white/5 text-white/80 hover:bg-white/10 text-xs font-semibold transition-all border border-white/5"
+                className={`h-10 rounded-md bg-white/5 text-white/80 hover:bg-white/10 text-xs font-semibold transition-all border border-white/5 ${hasApiKey ? 'flex-1' : 'flex-1'}`}
               >
-                Close
+                关闭
               </button>
             </div>
           </div>

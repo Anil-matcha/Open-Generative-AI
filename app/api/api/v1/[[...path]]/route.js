@@ -2,10 +2,16 @@ import { NextResponse } from 'next/server';
 
 const MUAPI_BASE = 'https://api.muapi.ai';
 
+function normalizeApiKey(value) {
+    if (!value) return null;
+    const trimmed = value.trim();
+    return trimmed && trimmed !== 'null' && trimmed !== 'undefined' ? trimmed : null;
+}
+
 function getApiKey(request) {
-    const headerKey = request.headers.get('x-api-key');
+    const headerKey = normalizeApiKey(request.headers.get('x-api-key'));
     if (headerKey) return headerKey;
-    const cookieKey = request.cookies.get('muapi_key')?.value;
+    const cookieKey = normalizeApiKey(request.cookies.get('muapi_key')?.value);
     return cookieKey;
 }
 

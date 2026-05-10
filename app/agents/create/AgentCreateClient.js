@@ -7,16 +7,22 @@ import axios from "axios";
 
 const STORAGE_KEY = "muapi_key";
 
+const normalizeApiKey = (value) => {
+  if (!value) return null;
+  const trimmed = value.trim();
+  return trimmed && trimmed !== "null" && trimmed !== "undefined" ? trimmed : null;
+};
+
 export default function AgentCreateClient({ userData }) {
   const interceptorRef = useRef(null);
 
   useEffect(() => {
     const getKey = () => {
       if (typeof window === "undefined") return null;
-      const fromStorage = localStorage.getItem(STORAGE_KEY);
+      const fromStorage = normalizeApiKey(localStorage.getItem(STORAGE_KEY));
       if (fromStorage) return fromStorage;
       const match = document.cookie.match(/muapi_key=([^;]+)/);
-      return match ? match[1] : null;
+      return match ? normalizeApiKey(match[1]) : null;
     };
 
     const apiKey = getKey();

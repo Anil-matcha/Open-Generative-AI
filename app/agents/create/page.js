@@ -3,6 +3,12 @@ import AgentCreateClient from "./AgentCreateClient";
 
 const BASE_URL = 'https://api.muapi.ai';
 
+function normalizeApiKey(value) {
+  if (!value) return null;
+  const trimmed = value.trim();
+  return trimmed && trimmed !== "null" && trimmed !== "undefined" ? trimmed : null;
+}
+
 async function fetchUserData(apiKey) {
   if (!apiKey) return null;
   try {
@@ -19,7 +25,7 @@ async function fetchUserData(apiKey) {
 
 export default async function CreateAgentPage() {
   const cookieStore = await cookies();
-  const apiKey = cookieStore.get("muapi_key")?.value;
+  const apiKey = normalizeApiKey(cookieStore.get("muapi_key")?.value);
 
   const userData = await fetchUserData(apiKey);
 

@@ -2,14 +2,14 @@
 
 import { useState } from 'react';
 
-export default function ApiKeyModal({ onSave }) {
+export default function ApiKeyModal({ onSave, requireApiKey = false, onToggleRequireApiKey }) {
   const [key, setKey] = useState('');
   const [error, setError] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const trimmed = key.trim();
-    if (!trimmed) { setError('Please enter your API key'); return; }
+    if (!trimmed) { setError('请输入 API 密钥'); return; }
     onSave(trimmed);
   };
 
@@ -25,21 +25,52 @@ export default function ApiKeyModal({ onSave }) {
           <h1 className="text-xl font-bold text-white tracking-tight mb-2">
             Open Generative AI
           </h1>
-          <p className="text-white/40 text-[13px] leading-relaxed px-4">
-            Enter your <a href="https://muapi.ai/access-keys" target="_blank" rel="noreferrer" className="text-[#d9ff00] hover:text-[#e5ff33] transition-colors">Muapi.ai</a> API key to start creating
+            <p className="text-white/40 text-[13px] leading-relaxed px-4">
+            输入你的 <a href="https://muapi.ai/access-keys" target="_blank" rel="noreferrer" className="text-[#d9ff00] hover:text-[#e5ff33] transition-colors">Muapi.ai</a> API 密钥，即可开始创作
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          {typeof onToggleRequireApiKey === 'function' && (
+            <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+              <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0 text-left">
+                    <label className="block text-xs font-bold text-white/35 mb-1">
+                    进入时要求输入 API 密钥
+                  </label>
+                  <p className="text-[12px] leading-relaxed text-white/35">
+                    默认关闭。打开后，进入工作台前会先检查是否已保存 Muapi 密钥。
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={requireApiKey}
+                  aria-label="进入时要求输入 API 密钥"
+                  onClick={() => onToggleRequireApiKey(!requireApiKey)}
+                  className={`relative inline-flex h-7 w-12 flex-shrink-0 items-center rounded-full border transition-colors ${
+                    requireApiKey ? 'border-[#d9ff00] bg-[#d9ff00]' : 'border-white/10 bg-white/10'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-5 w-5 rounded-full bg-black transition-transform ${
+                      requireApiKey ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+          )}
+
           <div className="space-y-2">
             <label className="block text-xs font-bold text-white/30 ml-1">
-              API Access Key
+              API 密钥
             </label>
             <input
               type="password"
               value={key}
               onChange={(e) => { setKey(e.target.value); setError(''); }}
-              placeholder="Paste your key here..."
+              placeholder="粘贴 API 密钥"
               className="w-full bg-white/5 border border-white/[0.03] rounded-md px-5 py-3 text-sm text-white placeholder:text-white/10 focus:outline-none focus:ring-1 focus:ring-[#d9ff00]/30 focus:bg-white/[0.07] transition-all"
               suppressHydrationWarning
             />
@@ -51,13 +82,13 @@ export default function ApiKeyModal({ onSave }) {
             className="w-full bg-[#d9ff00] text-black font-medium py-2.5 rounded-md hover:bg-[#e5ff33] hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-[#d9ff00]/5"
             suppressHydrationWarning
           >
-            Get Started
+            {requireApiKey ? '保存并继续' : '保存密钥'}
           </button>
 
           <p className="text-center text-[12px] text-white/20 pt-2">
-            Need a key?{' '}
+            还没有密钥？{' '}
             <a href="https://muapi.ai/access-keys" target="_blank" rel="noreferrer" className="text-white/40 hover:text-[#d9ff00] transition-colors font-medium">
-              Get one free →
+              免费获取 →
             </a>
           </p>
         </form>

@@ -23,12 +23,54 @@ const WorkflowUI = dynamic(() => import("./WorkflowUI"), {
       <div className="flex flex-col items-center gap-4">
         <div className="w-12 h-12 border-4 border-white/5 border-t-[#d9ff00] rounded-full animate-spin" />
         <div className="text-[10px] font-black text-white/20 uppercase tracking-widest">
-          Loading Builder...
+          正在加载编辑器...
         </div>
       </div>
     </div>
   ),
 });
+
+const WORKFLOW_LABELS = {
+  prompt: "提示词",
+  Prompt: "提示词",
+  image: "图片",
+  image_url: "图片链接",
+  video: "视频",
+  video_url: "视频链接",
+  audio: "音频",
+  audio_url: "音频链接",
+  aspect_ratio: "画幅",
+  "Aspect Ratio": "画幅",
+  width: "宽度",
+  Width: "宽度",
+  height: "高度",
+  Height: "高度",
+  resolution: "分辨率",
+  Resolution: "分辨率",
+  quality: "质量",
+  Quality: "质量",
+  duration: "时长",
+  Duration: "时长",
+  seed: "随机种子",
+  Seed: "随机种子",
+  model: "模型",
+  Model: "模型",
+  num_images: "生成数量",
+  "Number of images": "生成数量",
+  negative_prompt: "负面提示词",
+  "Negative Prompt": "负面提示词",
+  "LoRA Ids": "LoRA 模型",
+};
+
+const getWorkflowFieldLabel = (key, prop) => {
+  const title = prop?.title || key;
+  return WORKFLOW_LABELS[key] || WORKFLOW_LABELS[title] || title;
+};
+
+const getWorkflowFieldPlaceholder = (key, prop) =>
+  prop?.enum?.length
+    ? `请选择${getWorkflowFieldLabel(key, prop)}`
+    : `请输入${getWorkflowFieldLabel(key, prop)}`;
 
 function WorkflowCard({ workflow, onClick, activeTab, onRename, onDelete }) {
   const [showOptions, setShowOptions] = useState(false);
@@ -89,7 +131,7 @@ function WorkflowCard({ workflow, onClick, activeTab, onRename, onDelete }) {
                   <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
                   <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
                 </svg>
-                Rename
+                重命名
               </button>
               <button
                 onClick={() => onDelete(workflow.id)}
@@ -98,7 +140,7 @@ function WorkflowCard({ workflow, onClick, activeTab, onRename, onDelete }) {
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
                 </svg>
-                Delete
+                删除
               </button>
             </div>
           )}
@@ -115,11 +157,32 @@ function WorkflowCard({ workflow, onClick, activeTab, onRename, onDelete }) {
 
       <div className="absolute inset-x-0 bottom-0 p-4">
         <div className="text-[10px] font-bold text-[#d9ff00] uppercase tracking-wider mb-1 opacity-80">
-          {workflow.category || "General"}
+          {workflow.category || "通用"}
         </div>
         <h3 className="text-sm font-bold text-white truncate group-hover:text-[#d9ff00] transition-colors">
-          {workflow.name || "Untitled Flow"}
+          {workflow.name || "未命名流程"}
         </h3>
+      </div>
+    </div>
+  );
+}
+
+function AuthRequiredState({ title, message }) {
+  return (
+    <div className="flex-1 bg-[#050505] flex items-center justify-center p-8">
+      <div className="w-full max-w-md border border-white/10 bg-white/[0.03] rounded-2xl p-8 text-center shadow-2xl">
+        <div className="w-12 h-12 mx-auto mb-5 rounded-xl bg-[#d9ff00]/10 border border-[#d9ff00]/20 flex items-center justify-center text-[#d9ff00]">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <rect x="3" y="11" width="18" height="10" rx="2" />
+            <path d="M7 11V7a5 5 0 0110 0v4" />
+          </svg>
+        </div>
+        <h3 className="text-sm font-black text-white uppercase tracking-[0.2em] mb-3">
+          {title}
+        </h3>
+        <p className="text-sm leading-relaxed text-white/45">
+          {message}
+        </p>
       </div>
     </div>
   );
@@ -164,6 +227,10 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
   const [isExecuting, setIsExecuting] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+  const normalizedApiKey = typeof apiKey === "string" ? apiKey.trim() : apiKey;
+  const hasApiKey = typeof normalizedApiKey === "string"
+    ? Boolean(normalizedApiKey && normalizedApiKey !== "null" && normalizedApiKey !== "undefined")
+    : Boolean(normalizedApiKey);
   
 
   // Handlers defined early so they can be used in effects
@@ -186,7 +253,7 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
 
   // Dedicated data fetching effect for the active workflow
   useEffect(() => {
-    if (!selectedWorkflow?.id || !apiKey) return;
+    if (!selectedWorkflow?.id || !hasApiKey) return;
 
     async function loadWorkflowDetails() {
       try {
@@ -230,12 +297,12 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
         if (results[1].status === 'rejected' || results[2].status === 'rejected') {
           console.error("Builder components failed to load:", results[1].reason, results[2].reason);
           if (!nodes.length && !def.nodes?.length) {
-             setError("Failed to load full builder data. Some features may be disabled.");
+             setError("工作流编辑器数据加载失败，部分功能可能不可用。");
           }
         }
       } catch (err) {
         console.error("Critical error loading pulse details:", err);
-        setError("Critical error loading builder: " + err.message);
+        setError("编辑器严重错误：" + err.message);
         setNodeSchemas([]);
         setWorkflowDef({ nodes: [], edges: [] });
       } finally {
@@ -244,7 +311,7 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
     }
 
     loadWorkflowDetails();
-  }, [selectedWorkflow?.id, apiKey]);
+  }, [selectedWorkflow?.id, apiKey, hasApiKey]);
 
   const handleCreateWorkflow = useCallback(
     async (fromUrl = false) => {
@@ -253,7 +320,7 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
         if (!fromUrl) {
           const payload = {
             workflow_id: null,
-            name: "Untitled Workflow",
+            name: "未命名工作流",
             edges: [],
             data: { nodes: [] },
           };
@@ -264,12 +331,12 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
         }
 
         // Initialize state for the new flow
-        setSelectedWorkflow({ id: null, name: "Untitled Workflow" });
+        setSelectedWorkflow({ id: null, name: "未命名工作流" });
         setNodeSchemas([]);
         setWorkflowDef({ nodes: [], edges: [] });
         setActiveSubTab("builder");
       } catch (err) {
-        setError("Failed to initialize workflow: " + err.message);
+        setError("初始化工作流失败：" + err.message);
       } finally {
         setLoading(false);
       }
@@ -278,14 +345,14 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
   );
 
   const handleDeleteWorkflow = async (wfId) => {
-    if (!confirm("Are you sure you want to delete this workflow?")) return;
+    if (!confirm("确定要删除这个工作流吗？")) return;
     setIsDeletingId(wfId);
     try {
       await deleteWorkflow(apiKey, wfId);
       setWorkflows((prev) => prev.filter((w) => w.id !== wfId));
     } catch (err) {
       console.error("Delete failed:", err);
-      alert("Failed to delete workflow");
+      alert("删除工作流失败");
     } finally {
       setIsDeletingId(null);
     }
@@ -307,7 +374,7 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
       setRenamingWorkflow(null);
     } catch (err) {
       console.error("Rename failed:", err);
-      alert("Failed to rename workflow");
+      alert("重命名工作流失败");
     }
   };
 
@@ -345,7 +412,7 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
           // Fallback for deep-linking: attempt to open even if not in the current tab's list
           // handleSelectWorkflow fetches official name/data anyway
           handleSelectWorkflow(
-            { id: urlWorkflowId, name: "Loading..." },
+            { id: urlWorkflowId, name: "加载中..." },
             true,
           );
         }
@@ -375,10 +442,16 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
     async function loadWorkflows() {
       try {
         setLoading(true);
+        setError(null);
         let data = [];
         if (activeMainTab === "templates") {
           data = await getTemplateWorkflows(apiKey);
         } else if (activeMainTab === "my-workflows") {
+          if (!hasApiKey) {
+            setWorkflows([]);
+            setError("请先在设置中保存 Muapi API Key，再查看你的工作流。");
+            return;
+          }
           data = await getUserWorkflows(apiKey);
         } else if (activeMainTab === "published") {
           data = await getPublishedWorkflows(apiKey);
@@ -386,13 +459,13 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
         setWorkflows(data);
       } catch (err) {
         console.error("Failed to load workflows:", err);
-        setError("Failed to load workflows list.");
+        setError("工作流列表加载失败。");
       } finally {
         setLoading(false);
       }
     }
     loadWorkflows();
-  }, [apiKey, activeMainTab]);
+  }, [apiKey, activeMainTab, hasApiKey]);
 
   const handleRun = async (e) => {
     e.preventDefault();
@@ -416,7 +489,7 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
       setResult(data);
     } catch (err) {
       console.error("Execution failed:", err);
-      setError(err.message || "Execution failed");
+      setError(err.message || "执行失败");
     } finally {
       setIsExecuting(false);
     }
@@ -445,7 +518,7 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M19 12H5M12 19l-7-7 7-7" />
                 </svg>
-                All Workflows
+                全部工作流
               </button>
 
               <div className="h-4 w-[1px] bg-white/10" />
@@ -464,7 +537,7 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
                         : "text-white/40 hover:text-white"
                     }`}
                   >
-                    Playground
+                    试用台
                   </button>
                   <button
                     onClick={() => {
@@ -478,7 +551,7 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
                         : "text-white/40 hover:text-white"
                     }`}
                   >
-                    Full Workflow
+                    完整工作流
                   </button>
                 </div>
               </div>
@@ -491,7 +564,7 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
               <button
                 onClick={() => onToggleHeader?.(false)}
                 className="p-1.5 bg-white/5 hover:bg-white/10 rounded-md transition-colors text-white/40 hover:text-white"
-                title="Enter Zen Mode"
+                title="进入专注模式"
                 type="button"
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -506,7 +579,7 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
             <button
                onClick={() => router.push("/studio/workflows")}
                className="p-1.5 text-white/40 hover:text-white transition-colors"
-               title="Back to All Workflows"
+               title="返回全部工作流"
                type="button"
             >
                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
@@ -522,7 +595,7 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
                    activeSubTab === "playground" ? "bg-[#d9ff00] text-black" : "text-white/40"
                  }`}
                >
-                 Play
+                 试用
                </button>
                <button
                  onClick={() => setActiveSubTab("builder")}
@@ -531,7 +604,7 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
                    activeSubTab === "builder" ? "bg-[#d9ff00] text-black" : "text-white/40"
                  }`}
                >
-                 Builder
+                 编辑器
                </button>
             </div>
 
@@ -543,13 +616,18 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
               type="button"
             >
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M4 14h6v6M20 10h-6V4M10 20l-7-7M14 4l7 7"/></svg>
-              Exit Zen
+              退出专注
             </button>
           </div>
         )}
 
         <div className="flex-1 overflow-hidden flex flex-col lg:flex-row">
-          {activeSubTab === "playground" ? (
+          {!hasApiKey ? (
+            <AuthRequiredState
+              title="需要 API Key"
+              message="模板可以浏览，但打开工作流详情、试用参数和编辑器需要有效的 Muapi API Key。请在右上角设置里保存后再继续。"
+            />
+          ) : activeSubTab === "playground" ? (
             <>
               {/* Controls Panel */}
               <div className="w-full lg:w-[400px] border-r border-white/5 flex flex-col bg-black/20">
@@ -557,7 +635,7 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
                   <form onSubmit={handleRun} className="space-y-6">
                     <div>
                       <h3 className="text-xs font-black text-white/30 uppercase tracking-widest mb-4">
-                        Configuration
+                        参数配置
                       </h3>
                       <div className="space-y-4">
                         {inputSchema &&
@@ -565,7 +643,7 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
                             ([key, prop]) => (
                               <div key={key} className="space-y-2">
                                 <label className="block text-[11px] font-bold text-white/80 uppercase tracking-wider">
-                                  {prop.title || key}
+                                  {getWorkflowFieldLabel(key, prop)}
                                 </label>
                                 {prop.type === "string" && !prop.enum ? (
                                   <textarea
@@ -577,9 +655,7 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
                                       })
                                     }
                                     className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#d9ff00]/50 transition-colors min-h-[80px] resize-none"
-                                    placeholder={
-                                      prop.description || `Enter ${key}...`
-                                    }
+                                    placeholder={getWorkflowFieldPlaceholder(key, prop)}
                                   />
                                 ) : prop.enum ? (
                                   <select
@@ -613,9 +689,7 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
                                       })
                                     }
                                     className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#d9ff00]/50 transition-colors"
-                                    placeholder={
-                                      prop.description || `Enter ${key}...`
-                                    }
+                                    placeholder={getWorkflowFieldPlaceholder(key, prop)}
                                   />
                                 )}
                               </div>
@@ -632,7 +706,7 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
                       {isExecuting ? (
                         <>
                           <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
-                          <span>Generating...</span>
+                          <span>生成中...</span>
                         </>
                       ) : (
                         <>
@@ -646,13 +720,13 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
                           >
                             <path d="M5 3l14 9-14 9V3z" />
                           </svg>
-                          <span>Run Workflow</span>
+                          <span>开始运行</span>
                         </>
                       )}
                     </button>
                     {!selectedWorkflow.id && (
                       <p className="text-[10px] text-white/30 text-center mt-4">
-                        Save your workflow first to enable execution.
+                        请先保存工作流，才能执行。
                       </p>
                     )}
                   </form>
@@ -679,7 +753,7 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
                     </div>
                     <div className="text-center">
                       <span className="text-[10px] font-black text-red-500 uppercase tracking-widest block mb-1">
-                        Execution Error
+                        执行出错
                       </span>
                       <p className="text-white/60 text-sm leading-relaxed">
                         {error}
@@ -703,8 +777,8 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
                       </svg>
                     </div>
                     <p className="text-xs text-white/40 max-w-[200px] mx-auto text-center font-medium">
-                      Configure parameters and run the workflow to see results.
-                    </p>
+                        配置参数并运行工作流，即可查看结果。
+                      </p>
                   </div>
                 )}
 
@@ -728,10 +802,10 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
                     </div>
                     <div className="text-center space-y-2">
                       <div className="text-[10px] font-black text-[#d9ff00] uppercase tracking-[0.3em] animate-pulse">
-                        Running Pipeline
+                        正在运行流程
                       </div>
                       <div className="text-[13px] text-white/40 font-medium">
-                        Processing nodes and generating assets...
+                        正在处理节点并生成素材...
                       </div>
                     </div>
                   </div>
@@ -741,11 +815,11 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
                   <div className="w-full max-w-4xl space-y-8 animate-fade-in-up">
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="text-xs font-black text-white/30 uppercase tracking-widest">
-                        Workflow Results
+                        工作流结果
                       </h3>
                       <div className="flex items-center gap-2 px-3 py-1 bg-green-500/10 text-green-500 rounded-full text-[10px] font-bold border border-green-500/20">
                         <div className="w-1 h-1 bg-green-500 rounded-full animate-pulse" />{" "}
-                        COMPLETED
+                        已完成
                       </div>
                     </div>
 
@@ -821,7 +895,7 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
                   <div className="flex flex-col items-center gap-4">
                     <div className="w-12 h-12 border-4 border-white/5 border-t-[#d9ff00] rounded-full animate-spin" />
                     <div className="text-[10px] font-black text-white/20 uppercase tracking-widest">
-                      Loading Builder...
+                      正在加载编辑器...
                     </div>
                   </div>
                 </div>
@@ -841,15 +915,17 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
           <div className="flex items-end justify-between">
             <div>
               <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">
-                Workflows
+                工作流
               </h1>
               <p className="text-white/40 text-sm font-medium">
-                Create and manage your asynchronous AI processing pipelines
+                创建并管理异步 AI 处理流程
               </p>
             </div>
             <button
               onClick={() => handleCreateWorkflow()}
-              className="px-6 py-3 bg-[#d9ff00] text-black text-xs font-black uppercase tracking-widest rounded-lg hover:bg-white transition-all transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(217,255,0,0.3)] flex items-center gap-2"
+              disabled={!hasApiKey}
+              title={hasApiKey ? "新建工作流" : "请先在设置中保存 Muapi API Key"}
+              className="px-6 py-3 bg-[#d9ff00] text-black text-xs font-black uppercase tracking-widest rounded-lg hover:bg-white transition-all transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(217,255,0,0.3)] flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#d9ff00] disabled:hover:scale-100"
             >
               <svg
                 width="14"
@@ -864,7 +940,7 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
                 <line x1="12" y1="5" x2="12" y2="19"></line>
                 <line x1="5" y1="12" x2="19" y2="12"></line>
               </svg>
-              Create Workflow
+              新建工作流
             </button>
           </div>
 
@@ -877,7 +953,7 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
                   : "text-white/30 border-transparent hover:text-white"
               }`}
             >
-              Templates
+              模板
             </button>
             <button
               onClick={() => setActiveMainTab("my-workflows")}
@@ -887,7 +963,7 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
                   : "text-white/30 border-transparent hover:text-white"
               }`}
             >
-              My Workflows
+              我的工作流
             </button>
             <button
               onClick={() => setActiveMainTab("published")}
@@ -897,7 +973,7 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
                   : "text-white/30 border-transparent hover:text-white"
               }`}
             >
-              Community
+              社区
             </button>
           </div>
         </div>
@@ -905,6 +981,12 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
         {loading ? (
           <div className="py-20 flex items-center justify-center">
             <div className="w-10 h-10 border-4 border-white/5 border-t-[#d9ff00] rounded-full animate-spin" />
+          </div>
+        ) : error ? (
+          <div className="py-24 text-center border-2 border-dashed border-white/5 rounded-2xl bg-white/[0.02]">
+            <div className="text-white/30 text-sm font-medium">
+              {error}
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
@@ -923,8 +1005,8 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
             ))}
             {!loading && workflows.length === 0 && (
               <div className="col-span-full py-24 text-center border-2 border-dashed border-white/5 rounded-2xl bg-white/[0.02]">
-                <div className="text-white/20 text-sm font-medium italic">
-                  No workflows found in this section.
+                  <div className="text-white/20 text-sm font-medium italic">
+                  该分区暂无工作流。
                 </div>
               </div>
             )}
@@ -940,18 +1022,18 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
             onSubmit={handleRenameWorkflow}
             className="relative w-full max-w-sm bg-[#0a0a0a] border border-white/10 rounded-2xl p-8 shadow-2xl animate-in fade-in zoom-in duration-300"
           >
-            <h3 className="text-xl font-bold text-white mb-2">Rename Workflow</h3>
-            <p className="text-white/40 text-sm mb-6">Enter a new descriptive name for your pipeline.</p>
+            <h3 className="text-xl font-bold text-white mb-2">重命名工作流</h3>
+            <p className="text-white/40 text-sm mb-6">输入一个更清晰的名称，方便你识别这条流程。</p>
             
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-[#d9ff00] uppercase tracking-widest">Workflow Name</label>
+                <label className="text-[10px] font-black text-[#d9ff00] uppercase tracking-widest">工作流名称</label>
                 <input
                   autoFocus
                   type="text"
                   value={newWorkflowName}
                   onChange={(e) => setNewWorkflowName(e.target.value)}
-                  placeholder="e.g. Cinematic Video Flow"
+                  placeholder="例如：电影感视频流程"
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#d9ff00]/50 transition-colors"
                 />
               </div>
@@ -962,13 +1044,13 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
                   onClick={() => setRenamingWorkflow(null)}
                   className="flex-1 px-4 py-3 text-xs font-black text-white/40 uppercase tracking-widest hover:text-white transition-colors"
                 >
-                  Cancel
+                  取消
                 </button>
                 <button
                   type="submit"
                   className="flex-1 bg-[#d9ff00] text-black px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-white transition-all transform hover:scale-105 active:scale-95"
                 >
-                  Save Name
+                  保存名称
                 </button>
               </div>
             </div>

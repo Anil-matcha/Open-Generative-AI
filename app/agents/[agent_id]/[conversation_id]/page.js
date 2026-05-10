@@ -16,6 +16,12 @@ export async function generateMetadata({ params }) {
 
 const BASE_URL = 'https://api.muapi.ai';
 
+function normalizeApiKey(value) {
+  if (!value) return null;
+  const trimmed = value.trim();
+  return trimmed && trimmed !== "null" && trimmed !== "undefined" ? trimmed : null;
+}
+
 async function fetchAgentDetails(agentId, apiKey) {
   if (!apiKey) return null;
   try {
@@ -91,7 +97,7 @@ async function fetchUserData(apiKey) {
 export default async function AgentConversationPage({ params }) {
   const { agent_id, conversation_id } = await params;
   const cookieStore = await cookies();
-  const apiKey = cookieStore.get("muapi_key")?.value;
+  const apiKey = normalizeApiKey(cookieStore.get("muapi_key")?.value);
 
   console.log(`[ConvPage] Loading for agent: ${agent_id}, conv: ${conversation_id}, hasKey: ${!!apiKey}`);
 

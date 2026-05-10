@@ -1,42 +1,59 @@
 import { getModelById, getVideoModelById, getI2IModelById, getI2VModelById, getV2VModelById, getLipSyncModelById } from './models.js';
 
 const BASE_URL = 'https://api.muapi.ai';
-const PROXY_WF_BASE = '/api/workflow';
+export const MUAPI_PROXY_PATHS = Object.freeze({
+    apiV1: '/api/api/v1',
+    workflow: '/api/workflow',
+    agents: '/api/agents',
+    app: '/api/app'
+});
+const normalizeApiKey = (apiKey) => {
+    if (typeof apiKey !== 'string') return apiKey || null;
+    const trimmed = apiKey.trim();
+    return trimmed && trimmed !== 'null' && trimmed !== 'undefined' ? trimmed : null;
+};
+
+const jsonHeaders = (apiKey) => {
+    const headers = { 'Content-Type': 'application/json' };
+    const normalizedKey = normalizeApiKey(apiKey);
+    if (normalizedKey) headers['x-api-key'] = normalizedKey;
+    return headers;
+};
 
 async function pollForResult(requestId, key, maxAttempts = 900, interval = 2000) {
-    const pollUrl = `${BASE_URL}/api/v1/predictions/${requestId}/result`;
+    const pollUrl = `${MUAPI_PROXY_PATHS.apiV1}/predictions/${requestId}/result`;
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
         await new Promise(resolve => setTimeout(resolve, interval));
         try {
             const response = await fetch(pollUrl, {
-                headers: { 'Content-Type': 'application/json', 'x-api-key': key }
+                headers: jsonHeaders(key)
             });
             if (!response.ok) {
                 const errText = await response.text();
                 if (response.status >= 500) continue;
-                throw new Error(`Poll Failed: ${response.status} - ${errText.slice(0, 100)}`);
+                throw new Error(`轮询失败：${response.status} - ${errText.slice(0, 100)}`);
             }
             const data = await response.json();
             const status = data.status?.toLowerCase();
             if (status === 'completed' || status === 'succeeded' || status === 'success') return data;
-            if (status === 'failed' || status === 'error') throw new Error(`Generation failed: ${data.error || 'Unknown error'}`);
+            if (status === 'failed' || status === 'error') throw new Error(`生成失败：${data.error || '未知错误'}`);
         } catch (error) {
             if (attempt === maxAttempts) throw error;
         }
     }
-    throw new Error('Generation timed out after polling.');
+    throw new Error('轮询超时。');
 }
 
 async function submitAndPoll(endpoint, payload, key, onRequestId, maxAttempts = 60) {
-    const url = `${BASE_URL}/api/v1/${endpoint}`;
+    const url = `${MUAPI_PROXY_PATHS.apiV1}/${endpoint}`;
     const response = await fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-key': key },
+        headers: jsonHeaders(key),
         body: JSON.stringify(payload)
     });
     if (!response.ok) {
         const errText = await response.text();
-        throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+        throw new Error(`API 请求失败：${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
     }
     const submitData = await response.json();
     const requestId = submitData.request_id || submitData.id;
@@ -160,13 +177,14 @@ export async function processLipSync(apiKey, params) {
 
 export function uploadFile(apiKey, file, onProgress) {
     return new Promise((resolve, reject) => {
-        const url = `${BASE_URL}/api/v1/upload_file`;
+        const url = `${MUAPI_PROXY_PATHS.apiV1}/upload_file`;
         const formData = new FormData();
         formData.append('file', file);
 
         const xhr = new XMLHttpRequest();
         xhr.open('POST', url);
-        xhr.setRequestHeader('x-api-key', apiKey);
+        const normalizedKey = normalizeApiKey(apiKey);
+        if (normalizedKey) xhr.setRequestHeader('x-api-key', normalizedKey);
 
         if (onProgress) {
             xhr.upload.onprogress = (event) => {
@@ -183,12 +201,12 @@ export function uploadFile(apiKey, file, onProgress) {
                     const data = JSON.parse(xhr.responseText);
                     const fileUrl = data.url || data.file_url || data.data?.url;
                     if (!fileUrl) {
-                        reject(new Error('No URL returned from file upload'));
+                        reject(new Error('文件上传未返回 URL'));
                     } else {
                         resolve(fileUrl);
                     }
                 } catch (e) {
-                    reject(new Error('Failed to parse upload response'));
+                    reject(new Error('上传响应解析失败'));
                 }
             } else {
                 let detail = xhr.statusText;
@@ -198,97 +216,78 @@ export function uploadFile(apiKey, file, onProgress) {
                 } catch (e) {
                     // fallback to statusText
                 }
-                reject(new Error(`File upload failed: ${xhr.status} - ${detail}`));
+                reject(new Error(`文件上传失败：${xhr.status} - ${detail}`));
             }
         };
 
-        xhr.onerror = () => reject(new Error('Network error during file upload'));
+        xhr.onerror = () => reject(new Error('文件上传过程中出现网络错误'));
         xhr.send(formData);
     });
 }
 
 export async function getUserBalance(apiKey) {
-    const response = await fetch(`${BASE_URL}/api/v1/account/balance`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        }
+    const response = await fetch(`${MUAPI_PROXY_PATHS.apiV1}/account/balance`, {
+        headers: jsonHeaders(apiKey)
     });
     if (!response.ok) {
         const errText = await response.text();
-        throw new Error(`Failed to fetch balance: ${response.status} - ${errText.slice(0, 100)}`);
+        throw new Error(`获取余额失败：${response.status} - ${errText.slice(0, 100)}`);
     }
     return await response.json();
 }
 
 export async function getTemplateWorkflows(apiKey) {
-    const response = await fetch(`${BASE_URL}/workflow/get-template-workflows`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        }
+    const response = await fetch(`${MUAPI_PROXY_PATHS.workflow}/get-template-workflows`, {
+        headers: jsonHeaders(apiKey)
     });
     if (!response.ok) {
         const errText = await response.text();
-        throw new Error(`Failed to fetch template workflows: ${response.status} - ${errText.slice(0, 100)}`);
+        throw new Error(`获取模板工作流失败：${response.status} - ${errText.slice(0, 100)}`);
     }
     return await response.json();
 };
 
 export async function getUserWorkflows(apiKey) {
-    const response = await fetch(`${BASE_URL}/workflow/get-workflow-defs`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        }
+    const response = await fetch(`${MUAPI_PROXY_PATHS.workflow}/get-workflow-defs`, {
+        headers: jsonHeaders(apiKey)
     });
     if (!response.ok) {
         const errText = await response.text();
-        throw new Error(`Failed to fetch user workflows: ${response.status} - ${errText.slice(0, 100)}`);
+        throw new Error(`获取我的工作流失败：${response.status} - ${errText.slice(0, 100)}`);
     }
     return await response.json();
 };
 
 export async function getPublishedWorkflows(apiKey) {
-    const response = await fetch(`${BASE_URL}/workflow/get-published-workflows`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        }
+    const response = await fetch(`${MUAPI_PROXY_PATHS.workflow}/get-published-workflows`, {
+        headers: jsonHeaders(apiKey)
     });
     if (!response.ok) {
         const errText = await response.text();
-        throw new Error(`Failed to fetch published workflows: ${response.status} - ${errText.slice(0, 100)}`);
+        throw new Error(`获取已发布工作流失败：${response.status} - ${errText.slice(0, 100)}`);
     }
     return await response.json();
 };
 
-// Agents — uses direct URL → https://api.muapi.ai/agents/...
 export async function getTemplateAgents(apiKey) {
-    const response = await fetch(`${BASE_URL}/agents/templates/agents`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        }
+    const response = await fetch(`${MUAPI_PROXY_PATHS.agents}/templates/agents`, {
+        headers: jsonHeaders(apiKey)
     });
     if (!response.ok) {
         const errText = await response.text();
-        throw new Error(`Failed to fetch template agents: ${response.status} - ${errText.slice(0, 100)}`);
+        throw new Error(`获取模板智能体失败：${response.status} - ${errText.slice(0, 100)}`);
     }
     const data = await response.json();
     return Array.isArray(data) ? data : (data.agents || data.items || []);
 };
 
 export async function getUserAgents(apiKey) {
-    const response = await fetch(`${BASE_URL}/agents/user/agents`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        }
+    const response = await fetch(`${MUAPI_PROXY_PATHS.agents}/user/agents`, {
+        headers: jsonHeaders(apiKey)
     });
     if (!response.ok) {
         const errText = await response.text();
-        throw new Error(`Failed to fetch user agents: ${response.status} - ${errText.slice(0, 100)}`);
+        throw new Error(`获取我的智能体失败：${response.status} - ${errText.slice(0, 100)}`);
     }
     const data = await response.json();
     return Array.isArray(data) ? data : (data.agents || data.items || []);
@@ -296,15 +295,12 @@ export async function getUserAgents(apiKey) {
 
 export async function getPublishedAgents(apiKey) {
     // MuAPI: GET /agents/featured/agents
-    const response = await fetch(`${BASE_URL}/agents/featured/agents`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        }
+    const response = await fetch(`${MUAPI_PROXY_PATHS.agents}/featured/agents`, {
+        headers: jsonHeaders(apiKey)
     });
     if (!response.ok) {
         const errText = await response.text();
-        throw new Error(`Failed to fetch featured agents: ${response.status} - ${errText.slice(0, 100)}`);
+        throw new Error(`获取精选智能体失败：${response.status} - ${errText.slice(0, 100)}`);
     }
     const data = await response.json();
     return Array.isArray(data) ? data : (data.agents || data.items || []);
@@ -312,93 +308,75 @@ export async function getPublishedAgents(apiKey) {
 
 // GET /agents/user/conversations — returns the user's chat history across all agents
 export async function getUserConversations(apiKey) {
-    const response = await fetch(`${BASE_URL}/agents/user/conversations`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        }
+    const response = await fetch(`${MUAPI_PROXY_PATHS.agents}/user/conversations`, {
+        headers: jsonHeaders(apiKey)
     });
     if (!response.ok) {
         const errText = await response.text();
-        throw new Error(`Failed to fetch conversations: ${response.status} - ${errText.slice(0, 100)}`);
+        throw new Error(`获取对话失败：${response.status} - ${errText.slice(0, 100)}`);
     }
     const data = await response.json();
     return Array.isArray(data) ? data : [];
 };
 
 export async function createWorkflow(apiKey, payload) {
-    const response = await fetch(`${BASE_URL}/workflow/create`, {
+    const response = await fetch(`${MUAPI_PROXY_PATHS.workflow}/create`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        },
+        headers: jsonHeaders(apiKey),
         body: JSON.stringify(payload)
     });
     if (!response.ok) {
         const errText = await response.text();
-        throw new Error(`Failed to create workflow: ${response.status} - ${errText.slice(0, 100)}`);
+        throw new Error(`创建工作流失败：${response.status} - ${errText.slice(0, 100)}`);
     }
     return await response.json();
 };
 
 export async function updateWorkflowName(apiKey, workflowId, name) {
-    const response = await fetch(`${BASE_URL}/workflow/update-name/${workflowId}`, {
+    const response = await fetch(`${MUAPI_PROXY_PATHS.workflow}/update-name/${workflowId}`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        },
+        headers: jsonHeaders(apiKey),
         body: JSON.stringify({ name })
     });
     if (!response.ok) {
         const errText = await response.text();
-        throw new Error(`Failed to rename workflow: ${response.status} - ${errText.slice(0, 100)}`);
+        throw new Error(`重命名工作流失败：${response.status} - ${errText.slice(0, 100)}`);
     }
     return await response.json();
 };
 
 export async function deleteWorkflow(apiKey, workflowId) {
-    const response = await fetch(`${BASE_URL}/workflow/delete-workflow-def/${workflowId}`, {
+    const response = await fetch(`${MUAPI_PROXY_PATHS.workflow}/delete-workflow-def/${workflowId}`, {
         method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        }
+        headers: jsonHeaders(apiKey)
     });
     if (!response.ok) {
         const errText = await response.text();
-        throw new Error(`Failed to delete workflow: ${response.status} - ${errText.slice(0, 100)}`);
+        throw new Error(`删除工作流失败：${response.status} - ${errText.slice(0, 100)}`);
     }
     return await response.json();
 };
 
 export async function getWorkflowInputs(apiKey, workflowId) {
-    const response = await fetch(`${BASE_URL}/workflow/${workflowId}/api-inputs`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        }
+    const response = await fetch(`${MUAPI_PROXY_PATHS.workflow}/${workflowId}/api-inputs`, {
+        headers: jsonHeaders(apiKey)
     });
     if (!response.ok) {
         const errText = await response.text();
-        throw new Error(`Failed to fetch workflow inputs: ${response.status} - ${errText.slice(0, 100)}`);
+        throw new Error(`获取工作流输入失败：${response.status} - ${errText.slice(0, 100)}`);
     }
     return await response.json();
 };
 
 export async function executeWorkflow(apiKey, workflowId, inputs) {
-    const response = await fetch(`${BASE_URL}/workflow/${workflowId}/api-execute`, {
+    const response = await fetch(`${MUAPI_PROXY_PATHS.workflow}/${workflowId}/api-execute`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        },
+        headers: jsonHeaders(apiKey),
         body: JSON.stringify({ inputs })
     });
     if (!response.ok) {
         const errText = await response.text();
-        throw new Error(`Failed to execute workflow: ${response.status} - ${errText.slice(0, 100)}`);
+        throw new Error(`执行工作流失败：${response.status} - ${errText.slice(0, 100)}`);
     }
     const submitData = await response.json();
     const runId = submitData.run_id || submitData.id;
@@ -409,111 +387,93 @@ export async function executeWorkflow(apiKey, workflowId, inputs) {
 };
 
 async function pollWorkflowResult(runId, apiKey, maxAttempts = 900, interval = 2000) {
-    const pollUrl = `${BASE_URL}/workflow/run/${runId}/api-outputs`;
+    const pollUrl = `${MUAPI_PROXY_PATHS.workflow}/run/${runId}/api-outputs`;
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
         await new Promise(resolve => setTimeout(resolve, interval));
         try {
             const response = await fetch(pollUrl, {
-                headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey }
+                headers: jsonHeaders(apiKey)
             });
             if (!response.ok) {
                 if (response.status >= 500) continue;
-                throw new Error(`Poll Failed: ${response.status}`);
+                throw new Error(`轮询失败：${response.status}`);
             }
             const data = await response.json();
             const status = data.status?.toLowerCase();
             if (status === 'completed' || status === 'succeeded' || status === 'success') return data;
-            if (status === 'failed' || status === 'error') throw new Error(`Workflow failed: ${data.error || 'Unknown error'}`);
+            if (status === 'failed' || status === 'error') throw new Error(`工作流运行失败：${data.error || '未知错误'}`);
         } catch (error) {
             if (attempt === maxAttempts) throw error;
         }
     }
-    throw new Error('Workflow timed out after polling.');
+    throw new Error('工作流轮询超时。');
 };
 
 export async function getAllNodeSchemas(apiKey, workflowId) {
-    const response = await fetch(`${BASE_URL}/workflow/${workflowId}/node-schemas`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        }
+    const response = await fetch(`${MUAPI_PROXY_PATHS.workflow}/${workflowId}/node-schemas`, {
+        headers: jsonHeaders(apiKey)
     });
     if (!response.ok) {
         const errText = await response.text();
-        throw new Error(`Failed to fetch node schemas: ${response.status} - ${errText.slice(0, 100)}`);
+        throw new Error(`获取节点 schema 失败：${response.status} - ${errText.slice(0, 100)}`);
     }
     return await response.json();
 };
 
 export async function getWorkflowData(apiKey, workflowId) {
-    const response = await fetch(`${BASE_URL}/workflow/get-workflow-def/${workflowId}`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        }
+    const response = await fetch(`${MUAPI_PROXY_PATHS.workflow}/get-workflow-def/${workflowId}`, {
+        headers: jsonHeaders(apiKey)
     });
     if (!response.ok) {
         const errText = await response.text();
-        throw new Error(`Failed to fetch workflow data: ${response.status} - ${errText.slice(0, 100)}`);
+        throw new Error(`获取工作流数据失败：${response.status} - ${errText.slice(0, 100)}`);
     }
     return await response.json();
 };
 
 export async function getNodeSchemas(apiKey, workflowId) {
-    const response = await fetch(`${BASE_URL}/workflow/${workflowId}/api-node-schemas`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        }
+    const response = await fetch(`${MUAPI_PROXY_PATHS.workflow}/${workflowId}/api-node-schemas`, {
+        headers: jsonHeaders(apiKey)
     });
     if (!response.ok) {
         const errText = await response.text();
-        throw new Error(`Failed to fetch node schemas: ${response.status} - ${errText.slice(0, 100)}`);
+        throw new Error(`获取节点 schema 失败：${response.status} - ${errText.slice(0, 100)}`);
     }
     return await response.json();
 }
 
 export async function runSingleNode(apiKey, workflowId, nodeId, payload) {
-    const response = await fetch(`${BASE_URL}/workflow/${workflowId}/node/${nodeId}/run`, {
+    const response = await fetch(`${MUAPI_PROXY_PATHS.workflow}/${workflowId}/node/${nodeId}/run`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        },
+        headers: jsonHeaders(apiKey),
         body: JSON.stringify(payload)
     });
     if (!response.ok) {
         const errText = await response.text();
-        throw new Error(`Failed to run single node: ${response.status} - ${errText.slice(0, 100)}`);
+        throw new Error(`运行单个节点失败：${response.status} - ${errText.slice(0, 100)}`);
     }
     return await response.json();
 }
 
 export async function deleteNodeRun(apiKey, nodeRunId) {
-    const response = await fetch(`${BASE_URL}/workflow/node-run/${nodeRunId}`, {
+    const response = await fetch(`${MUAPI_PROXY_PATHS.workflow}/node-run/${nodeRunId}`, {
         method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        }
+        headers: jsonHeaders(apiKey)
     });
     if (!response.ok) {
         const errText = await response.text();
-        throw new Error(`Failed to delete node run: ${response.status} - ${errText.slice(0, 100)}`);
+        throw new Error(`删除节点运行记录失败：${response.status} - ${errText.slice(0, 100)}`);
     }
     return await response.json();
 }
 
 export async function getNodeStatus(apiKey, runId) {
-    const response = await fetch(`${BASE_URL}/workflow/run/${runId}/status`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        }
+    const response = await fetch(`${MUAPI_PROXY_PATHS.workflow}/run/${runId}/status`, {
+        headers: jsonHeaders(apiKey)
     });
     if (!response.ok) {
         const errText = await response.text();
-        throw new Error(`Failed to get node status: ${response.status} - ${errText.slice(0, 100)}`);
+        throw new Error(`获取节点状态失败：${response.status} - ${errText.slice(0, 100)}`);
     }
     return await response.json();
 }
@@ -530,8 +490,9 @@ export async function handleProxyRequest(prefix, path, method, headers, body, ap
     finalHeaders.delete('connection');
     finalHeaders.delete('content-length'); // Let fetch recalculate this for safety
 
-    if (apiKey) {
-        finalHeaders.set('x-api-key', apiKey);
+    const normalizedKey = normalizeApiKey(apiKey);
+    if (normalizedKey) {
+        finalHeaders.set('x-api-key', normalizedKey);
     }
 
     try {
@@ -589,12 +550,9 @@ export async function handleServerSideProxy(prefix, request, params, apiKey) {
 }
 
 export async function calculateDynamicCost(apiKey, taskName, payload) {
-    const response = await fetch(`${BASE_URL}/api/v1/app/calculate_dynamic_cost`, {
+    const response = await fetch(`${MUAPI_PROXY_PATHS.apiV1}/app/calculate_dynamic_cost`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        },
+        headers: jsonHeaders(apiKey),
         body: JSON.stringify({ task_name: taskName, payload })
     });
     if (!response.ok) {
@@ -605,12 +563,9 @@ export async function calculateDynamicCost(apiKey, taskName, payload) {
 }
 
 export async function registerAppInterest(apiKey, appName) {
-    const response = await fetch(`${BASE_URL}/app/interest`, {
+    const response = await fetch(`${MUAPI_PROXY_PATHS.app}/interest`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        },
+        headers: jsonHeaders(apiKey),
         body: JSON.stringify({ app_name: appName })
     });
     if (!response.ok) {
@@ -621,15 +576,12 @@ export async function registerAppInterest(apiKey, appName) {
 }
 
 export async function getAppInterests(apiKey) {
-    const response = await fetch(`${BASE_URL}/app/interests`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        }
+    const response = await fetch(`${MUAPI_PROXY_PATHS.app}/interests`, {
+        headers: jsonHeaders(apiKey)
     });
     if (!response.ok) {
         const errText = await response.text();
-        throw new Error(`Failed to fetch interests: ${response.status} - ${errText.slice(0, 100)}`);
+        throw new Error(`获取兴趣登记失败：${response.status} - ${errText.slice(0, 100)}`);
     }
     return await response.json();
 }
