@@ -1,5 +1,5 @@
-import { supabase } from '../lib/hybrid-supabase.js';
-import { showToast } from '../lib/loading.js';
+import { supabase } from '../../lib/hybrid-supabase.js';
+import { showToast } from '../../lib/loading.js';
 import { MuapiClient } from '../../lib/muapi.js';
 
 export class AIChatPanel {

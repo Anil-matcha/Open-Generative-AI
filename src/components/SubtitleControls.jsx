@@ -1,6 +1,6 @@
 // SubtitleControls.jsx - UI for timing adjustments and style customization
 
-import { createElementFromHTML } from '../../utils/jsx.js';
+import { createElementFromHTML } from '../utils/jsx.js';
 import { subtitleState } from '../lib/editor/subtitleState.js';
 import { subtitleExporter } from '../lib/editor/subtitleExporter.js';
 

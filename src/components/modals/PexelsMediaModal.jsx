@@ -1,5 +1,5 @@
 import { BaseModal } from './BaseModal';
-import { pexelsService } from '../lib/services/PexelsService.js';
+import { pexelsService } from '../../lib/services/PexelsService.js';
 
 export class PexelsMediaModal extends BaseModal {
   constructor(options = {}) {

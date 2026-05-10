@@ -182,9 +182,13 @@ export default [
   },
   {
     files: ['src/**/*.{ts,tsx}', 'tests/**/*.{ts,tsx}'],
+    plugins: {
+      '@typescript-eslint': tsPlugin
+    },
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'module',
+      parser: tsParser,
       parserOptions: {
         ecmaFeatures: {
           jsx: true
@@ -260,7 +264,13 @@ export default [
         ErrorEvent: 'readonly',
         DocumentFragment: 'readonly',
         Component: 'readonly',
-        PropTypes: 'readonly'
+        PropTypes: 'readonly',
+        CanvasRenderingContext2D: 'readonly',
+        CanvasGradient: 'readonly',
+        CanvasPattern: 'readonly',
+        Path2D: 'readonly',
+        ImageData: 'readonly',
+        TextMetrics: 'readonly'
       }
     },
     rules: {

@@ -61,16 +61,19 @@ CREATE TABLE IF NOT EXISTS generations (
 
 ALTER TABLE generations ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own generations" ON generations;
 CREATE POLICY "Users can view own generations"
   ON generations FOR SELECT
   TO anon
   USING (user_key = current_setting('request.headers', true)::json->>'x-user-key');
 
+DROP POLICY IF EXISTS "Users can insert own generations" ON generations;
 CREATE POLICY "Users can insert own generations"
   ON generations FOR INSERT
   TO anon
   WITH CHECK (user_key != '');
 
+DROP POLICY IF EXISTS "Users can delete own generations" ON generations;
 CREATE POLICY "Users can delete own generations"
   ON generations FOR DELETE
   TO anon
@@ -90,22 +93,26 @@ CREATE TABLE IF NOT EXISTS characters (
 
 ALTER TABLE characters ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own characters" ON characters;
 CREATE POLICY "Users can view own characters"
   ON characters FOR SELECT
   TO anon
   USING (user_key = current_setting('request.headers', true)::json->>'x-user-key');
 
+DROP POLICY IF EXISTS "Users can insert own characters" ON characters;
 CREATE POLICY "Users can insert own characters"
   ON characters FOR INSERT
   TO anon
   WITH CHECK (user_key != '');
 
+DROP POLICY IF EXISTS "Users can update own characters" ON characters;
 CREATE POLICY "Users can update own characters"
   ON characters FOR UPDATE
   TO anon
   USING (user_key = current_setting('request.headers', true)::json->>'x-user-key')
   WITH CHECK (user_key = current_setting('request.headers', true)::json->>'x-user-key');
 
+DROP POLICY IF EXISTS "Users can delete own characters" ON characters;
 CREATE POLICY "Users can delete own characters"
   ON characters FOR DELETE
   TO anon
@@ -123,22 +130,26 @@ CREATE TABLE IF NOT EXISTS storyboards (
 
 ALTER TABLE storyboards ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own storyboards" ON storyboards;
 CREATE POLICY "Users can view own storyboards"
   ON storyboards FOR SELECT
   TO anon
   USING (user_key = current_setting('request.headers', true)::json->>'x-user-key');
 
+DROP POLICY IF EXISTS "Users can insert own storyboards" ON storyboards;
 CREATE POLICY "Users can insert own storyboards"
   ON storyboards FOR INSERT
   TO anon
   WITH CHECK (user_key != '');
 
+DROP POLICY IF EXISTS "Users can update own storyboards" ON storyboards;
 CREATE POLICY "Users can update own storyboards"
   ON storyboards FOR UPDATE
   TO anon
   USING (user_key = current_setting('request.headers', true)::json->>'x-user-key')
   WITH CHECK (user_key = current_setting('request.headers', true)::json->>'x-user-key');
 
+DROP POLICY IF EXISTS "Users can delete own storyboards" ON storyboards;
 CREATE POLICY "Users can delete own storyboards"
   ON storyboards FOR DELETE
   TO anon
@@ -157,6 +168,7 @@ CREATE TABLE IF NOT EXISTS featured_generations (
 
 ALTER TABLE featured_generations ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Anyone can view featured generations" ON featured_generations;
 CREATE POLICY "Anyone can view featured generations"
   ON featured_generations FOR SELECT
   TO anon

@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS thumbnails (
 
 ALTER TABLE thumbnails ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Authenticated users can read thumbnails" ON thumbnails;
 CREATE POLICY "Authenticated users can read thumbnails"
   ON thumbnails
   FOR SELECT
@@ -61,6 +62,7 @@ CREATE TABLE IF NOT EXISTS instructions (
 
 ALTER TABLE instructions ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Authenticated users can read instructions" ON instructions;
 CREATE POLICY "Authenticated users can read instructions"
   ON instructions
   FOR SELECT

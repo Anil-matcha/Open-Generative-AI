@@ -1,8 +1,8 @@
 // SubtitleEditorModal.jsx - Main modal for subtitle editing with waveform display
 
 import { createElementFromHTML } from '../../utils/jsx.js';
-import { BaseModal } from './modals/BaseModal.jsx';
-import { subtitleState } from '../lib/editor/subtitleState.js';
+import { BaseModal } from './BaseModal.jsx';
+import { subtitleState } from '../../lib/editor/subtitleState.js';
 
 const DESIGN_SYSTEM = {
   colors: {

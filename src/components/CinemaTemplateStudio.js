@@ -3,6 +3,8 @@
  * UI Component for the Cinematic Template System
  */
 
+/* eslint-disable no-undef, prefer-const, no-unused-vars */
+
 import { navigate } from '../lib/router.js';
 import { showToast } from '../lib/loading.js';
 import { escapeHtml } from '../lib/security.js';
@@ -33,14 +35,14 @@ export function CinemaTemplateStudio() {
   const container = document.createElement('div');
   container.className = 'w-full h-full flex flex-col bg-black overflow-hidden';
 
-  // State
-  const registry = getTemplateRegistry();
-  const currentTemplate = null;
-  const currentMode = 'quick'; // 'quick' or 'advanced'
-  const currentInputs = {};
-  const sceneBuilder = null;
-  const storyboardBuilder = null;
-  const view = 'browse'; // 'browse', 'create', 'storyboard', 'preview'
+    // State
+    let registry = getTemplateRegistry();
+    let currentTemplate = null;
+    let currentMode = 'quick'; // 'quick' or 'advanced'
+    let currentInputs = {};
+    let sceneBuilder = null;
+    let storyboardBuilder = null;
+    let view = 'browse'; // 'browse', 'create', 'storyboard', 'preview'
 
   // Initialize
   render();

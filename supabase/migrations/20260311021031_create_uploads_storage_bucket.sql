@@ -24,14 +24,17 @@ VALUES (
 )
 ON CONFLICT (id) DO NOTHING;
 
+DROP POLICY IF EXISTS "Allow public read access on uploads" ON storage.objects;
 CREATE POLICY "Allow public read access on uploads"
   ON storage.objects FOR SELECT
   USING (bucket_id = 'uploads');
 
+DROP POLICY IF EXISTS "Allow anonymous uploads" ON storage.objects;
 CREATE POLICY "Allow anonymous uploads"
   ON storage.objects FOR INSERT
   WITH CHECK (bucket_id = 'uploads');
 
+DROP POLICY IF EXISTS "Allow anonymous delete on uploads" ON storage.objects;
 CREATE POLICY "Allow anonymous delete on uploads"
   ON storage.objects FOR DELETE
   USING (bucket_id = 'uploads');

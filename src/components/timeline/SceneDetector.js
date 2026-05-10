@@ -1,4 +1,4 @@
-import { createSurface } from '../../lib/editor/timelineRendererEnhanced.js';
+import { createElementFromHTML } from '../../utils/jsx.js';
 
 export class SceneDetector {
   constructor(container, timeline, options = {}) {
@@ -18,7 +18,7 @@ export class SceneDetector {
   }
 
   createUI() {
-    const surface = createSurface(`
+    const surface = createElementFromHTML(`
       <div class="scene-detector">
         <div class="card-title">🎬 Scene Detection</div>
 

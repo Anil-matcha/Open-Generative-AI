@@ -19,13 +19,13 @@ export function AdvancedDubbingStudio() {
     let availableVoices = [];
     const isTranslating = false;
     const isDubbing = false;
-    let previewAudioUrl = null;
+    const previewAudioUrl = null;
     const currentJobId = null;
 
     // Voice cloning options
     let voiceCloneEnabled = false;
     let referenceAudioUrl = null;
-    let clonedVoiceId = null;
+    const clonedVoiceId = null;
 
     // Quality controls
     let lipSyncQuality = 'high';
