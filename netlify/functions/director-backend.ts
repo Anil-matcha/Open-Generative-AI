@@ -12,10 +12,50 @@ const SUPABASE_URL = process.env.SUPABASE_URL
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
 const VIDEO_DB_API_KEY = process.env.VIDEO_DB_API_KEY
 const VIDEO_DB_BASE_URL = process.env.VIDEO_DB_BASE_URL || 'https://api.videodb.io'
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY
+const MUAPI_API_KEY = process.env.MUAPI_API_KEY || process.env.OPENAI_API_KEY
 
-// Initialize AI Service with production configuration
-const aiService = new AIService(getAIConfig('production'))
+// Initialize AI Service with muapi.ai proxy configuration
+const aiService = {
+  async processRequest(request, handler) {
+    const apiKey = MUAPI_API_KEY
+    if (!apiKey) {
+      throw new Error('MUAPI_API_KEY environment variable is not configured')
+    }
+    
+    // Route to appropriate handler based on agent
+    const { agentId, prompt, options = {} } = request
+    
+    if (agentId.includes('script') || agentId.includes('storyboard') || agentId.includes('analysis')) {
+      // Use muapi.ai proxy for text generation
+      const response = await fetch('https://api.muapi.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey
+        },
+        body: JSON.stringify({
+          model: 'gpt-4',
+          messages: [
+            { role: 'system', content: 'You are a professional video director and storyboard artist.' },
+            { role: 'user', content: prompt }
+          ],
+          temperature: 0.7,
+          max_tokens: 2000
+        })
+      })
+      
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(`muapi.ai API error: ${error.message || 'Unknown error'}`)
+      }
+      
+      const data = await response.json()
+      return data.choices[0]?.message?.content || ''
+    }
+    
+    return handler(request)
+  }
+}
 
 export default async function handler(req, context) {
   // Handle CORS preflight requests

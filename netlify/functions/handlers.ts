@@ -6,12 +6,12 @@ export async function handleFacelessVideo(prompt: string) {
 
     console.log('Creating faceless video for topic:', topic)
 
-    // Step 1: Generate script using OpenAI
-    const scriptResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+    // Step 1: Generate script using MuAPI proxy (which forwards to OpenAI)
+    const scriptResponse = await fetch('https://api.muapi.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+        'x-api-key': process.env.MUAPI_API_KEY || process.env.OPENAI_API_KEY
       },
       body: JSON.stringify({
         model: 'gpt-4',

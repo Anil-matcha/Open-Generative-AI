@@ -73,34 +73,34 @@ async function generateGTMPrompt({
   focus = [],
   cinematicOptions = {}
 }) {
-   const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY')
-
-   if (!OPENAI_API_KEY) {
-     console.error('[ai-video-prompt-generator] OPENAI_API_KEY environment variable is not set in Supabase edge function configuration');
-     throw new Error('AI prompt enhancement service is not configured. Please set OPENAI_API_KEY in your Supabase edge function environment variables (Settings > Edge Functions > Environment Variables).')
-   }
-
-  const systemPrompt = buildSystemPrompt(role, industry, methodology, tonality, focus, cinematicOptions)
-  const userPrompt = `Base prompt: "${basePrompt}"
-
+  const MUAPI_API_KEY = Deno.env.get('MUAPI_API_KEY') || Deno.env.get('OPENAI_API_KEY')
+  
+    if (!MUAPI_API_KEY) {
+      console.error('[ai-video-prompt-generator] MUAPI_API_KEY environment variable is not set in Supabase edge function configuration');
+      throw new Error('AI prompt enhancement service is not configured. Please set MUAPI_API_KEY in your Supabase edge function environment variables (Settings > Edge Functions).')
+    }
+  
+    const systemPrompt = buildSystemPrompt(role, industry, methodology, tonality, focus, cinematicOptions)
+    const userPrompt = `Base prompt: "${basePrompt}"
+  
 Please enhance this prompt using the specified GTM methodologies and create a comprehensive, conversion-optimized prompt for video generation.`
-
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${OPENAI_API_KEY}`
-    },
-    body: JSON.stringify({
-      model: 'gpt-4',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt }
-      ],
-      max_tokens: 2000,
-      temperature: 0.7
+  
+    const response = await fetch('https://api.muapi.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': MUAPI_API_KEY
+      },
+      body: JSON.stringify({
+        model: 'gpt-4',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ],
+        max_tokens: 2000,
+        temperature: 0.7
+      })
     })
-  })
 
   if (!response.ok) {
     const error = await response.json()

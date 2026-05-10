@@ -1,8 +1,4 @@
-import OpenAI from 'openai';
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const MUAPI_API_KEY = process.env.MUAPI_API_KEY || process.env.OPENAI_API_KEY;
 
 export async function handler(event, context) {
   // Handle CORS
@@ -15,8 +11,116 @@ export async function handler(event, context) {
         'Access-Control-Allow-Methods': 'POST, OPTIONS'
       },
       body: ''
-    };
+    }
   }
+
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({ error: 'Method not allowed' })
+    }
+  }
+
+  try {
+    const { scriptText, genre = 'drama' } = JSON.parse(event.body);
+
+    if (!scriptText) {
+      return {
+        statusCode: 400,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ error: 'Missing required field: scriptText is required' })
+      }
+    }
+
+    const systemPrompt = `You are CutAI, an expert film director and cinematographer AI. You analyze scripts and break them into detailed, filmable scenes with professional shot-by-shot breakdowns.
+
+You MUST respond ONLY in valid JSON matching the provided schema. No markdown, no explanation, no preamble. Just pure JSON.`
+
+    const userPrompt = `Analyze this ${genre} script and break it into detailed scenes with shot-by-shot breakdowns.
+
+Script:
+${scriptText}
+
+Genre: ${genre}
+
+For each scene, think like a real director:
+- Choose camera angles that serve the story's emotion
+- Vary shot types to create visual rhythm
+- Match mood scores to the narrative tension
+- Suggest soundtrack vibes that enhance the atmosphere
+
+For SD prompts: Write them as detailed visual descriptions optimized for Stable Diffusion 1.5. Include art style, lighting, color palette, composition. Example: "cinematic wide shot, dimly lit jazz bar, warm amber lighting, smoke haze, 1940s film noir aesthetic, film grain, 35mm photography"`
+
+    const response = await fetch('https://api.muapi.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': MUAPI_API_KEY
+      },
+      body: JSON.stringify({
+        model: 'gpt-4',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ],
+        temperature: 0.3,
+        max_tokens: 3000,
+        response_format: { type: 'json_object' }
+      })
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(`muapi.ai API error: ${error.message || 'Unknown error'}`)
+    }
+
+    const data = await response.json()
+    const content = data.choices[0]?.message?.content
+
+    // Parse and validate the JSON response
+    let parsedScript;
+    try {
+      parsedScript = JSON.parse(content);
+      return {
+        statusCode: 200,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(parsedScript)
+      }
+    } catch (parseError) {
+      // If JSON parsing fails, return raw text
+      return {
+        statusCode: 200,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'text/plain'
+        },
+        body: content
+      }
+    }
+  } catch (error) {
+    console.error('CutAI script parsing error:', error);
+    return {
+      statusCode: 500,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        error: 'Script parsing failed',
+        message: error.message
+      })
+    }
+  }
+}
 
   if (event.httpMethod !== 'POST') {
     return {

@@ -96,20 +96,17 @@ export async function handler(req: Request): Promise<Response> {
 }
 
 async function generateShotPrompts(input: SceneAnalysisInput): Promise<ShotPrompt[]> {
-  const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+  const MUAPI_API_KEY = Deno.env.get('MUAPI_API_KEY') || Deno.env.get("OPENAI_API_KEY");
 
-  if (!OPENAI_API_KEY) {
-    throw new Error("OPENAI_API_KEY environment variable is not configured");
+  if (!MUAPI_API_KEY) {
+    throw new Error("MUAPI_API_KEY environment variable is not configured");
   }
 
-  const systemPrompt = buildSystemPrompt();
-  const userPrompt = buildUserPrompt(input);
-
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+  const response = await fetch("https://api.muapi.ai/api/v1/chat/completions", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${OPENAI_API_KEY}`,
+      "x-api-key": MUAPI_API_KEY
     },
     body: JSON.stringify({
       model: "gpt-4",
