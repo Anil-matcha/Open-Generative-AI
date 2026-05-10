@@ -23,6 +23,8 @@ experiments/codex-internal-multimodal-lab/
     prompt-pack.example.json     # Prompt / 分镜 / 参数建议示例
     imagegen-prompts.example.jsonl
     asset-index.example.json
+    asset-index.json
+    integration-decision.md
     generated-assets/            # imagegen 默认产物转存或候选图记录
   manifest.json                  # 测试能力矩阵
 
@@ -47,6 +49,14 @@ public/assets/codex-lab/          # 项目可直接引用的最终概念图
    - 最终资产：`public/assets/codex-lab/`
    - 资产索引：`output/asset-index.json`
 
+## 当前资产
+
+- `public/assets/codex-lab/concept-hero.png`
+- `public/assets/codex-lab/concept-character.png`
+- `public/assets/codex-lab/concept-scene.png`
+
+页面资产卡片从 `output/asset-index.json` 派生，避免在 `/codex-lab` 页面里重复维护资产清单。
+
 ## 执行方式
 
 1. 把截图、参考图或关键帧放到 `input/screenshots/`、`input/references/`。
@@ -55,6 +65,10 @@ public/assets/codex-lab/          # 项目可直接引用的最终概念图
 4. 从 `prompt-pack.json` 提取最终生图 Prompt，整理为 `imagegen-prompts.jsonl`。
 5. 逐条调用 Codex `imagegen`，选择可用概念图。
 6. 把最终图片复制到 `public/assets/codex-lab/`，并在 `asset-index.json` 记录来源 Prompt 与用途。
+
+## 接入决策
+
+当前分支继续保持“不接 PAI、不接正式运行时 API”。决策记录见 `output/integration-decision.md`。
 
 ## 暂不测试
 

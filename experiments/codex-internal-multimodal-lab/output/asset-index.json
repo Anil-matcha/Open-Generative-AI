@@ -2,6 +2,7 @@
   "assets": [
     {
       "filename": "concept-hero.png",
+      "purpose": "Codex Lab 或工作流卡片主视觉",
       "workspace_path": "public/assets/codex-lab/concept-hero.png",
       "candidate_path": "experiments/codex-internal-multimodal-lab/output/generated-assets/concept-hero.png",
       "source_prompt_id": "codex-lab-hero",
@@ -12,6 +13,34 @@
       "status": "accepted",
       "created_at": "2026-05-11",
       "usage": ["Codex Lab page asset preview", "experiment documentation"]
+    },
+    {
+      "filename": "concept-character.png",
+      "purpose": "角色/智能体测试头像或概念图",
+      "workspace_path": "public/assets/codex-lab/concept-character.png",
+      "candidate_path": "experiments/codex-internal-multimodal-lab/output/generated-assets/concept-character.png",
+      "source_prompt_id": "codex-lab-agent",
+      "source_prompt_file": "experiments/codex-internal-multimodal-lab/output/imagegen-prompts.jsonl",
+      "source_brief": "experiments/codex-internal-multimodal-lab/input/brief.md",
+      "source_analysis": "experiments/codex-internal-multimodal-lab/output/analysis.md",
+      "imagegen_mode": "Codex imagegen built-in",
+      "status": "accepted",
+      "created_at": "2026-05-11",
+      "usage": ["assistant concept avatar", "experiment documentation"]
+    },
+    {
+      "filename": "concept-scene.png",
+      "purpose": "场景风格板与分镜参考",
+      "workspace_path": "public/assets/codex-lab/concept-scene.png",
+      "candidate_path": "experiments/codex-internal-multimodal-lab/output/generated-assets/concept-scene.png",
+      "source_prompt_id": "codex-lab-scene",
+      "source_prompt_file": "experiments/codex-internal-multimodal-lab/output/imagegen-prompts.jsonl",
+      "source_brief": "experiments/codex-internal-multimodal-lab/input/brief.md",
+      "source_analysis": "experiments/codex-internal-multimodal-lab/output/analysis.md",
+      "imagegen_mode": "Codex imagegen built-in",
+      "status": "accepted",
+      "created_at": "2026-05-11",
+      "usage": ["scene style board", "storyboard reference", "experiment documentation"]
     }
   ]
 }

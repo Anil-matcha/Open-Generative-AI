@@ -1,4 +1,5 @@
 import Link from "next/link";
+import assetIndex from "../../experiments/codex-internal-multimodal-lab/output/asset-index.json";
 
 export const metadata = {
   title: "Codex Lab｜Open Generative AI",
@@ -84,30 +85,18 @@ const outputItems = [
   "prompt-pack.json",
   "shot-list.md",
   "imagegen-prompts.jsonl",
+  "asset-index.json",
+  "integration-decision.md",
   "generated-assets/",
 ];
 
-const assetSlots = [
-  {
-    name: "concept-hero.png",
-    purpose: "Codex Lab 或工作流卡片主视觉",
-    source: "imagegen-prompts.example.jsonl",
-    status: "已生成",
-    preview: "/assets/codex-lab/concept-hero.png",
-  },
-  {
-    name: "concept-character.png",
-    purpose: "角色/智能体测试头像或概念图",
-    source: "prompt-pack.json",
-    status: "待生成",
-  },
-  {
-    name: "concept-scene.png",
-    purpose: "场景风格板与分镜参考",
-    source: "analysis.md + prompt-pack.json",
-    status: "待生成",
-  },
-];
+const assetSlots = assetIndex.assets.map((asset) => ({
+  name: asset.filename,
+  purpose: asset.purpose,
+  source: asset.source_prompt_id,
+  status: asset.status === "accepted" ? "已生成" : "待生成",
+  preview: `/${asset.workspace_path.replace(/^public\//, "")}`,
+}));
 
 export default function CodexLabPage() {
   return (

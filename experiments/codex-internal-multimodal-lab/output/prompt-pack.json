@@ -56,6 +56,18 @@
       "target": "public/assets/codex-lab/concept-hero.png",
       "use_case": "productivity-visual",
       "prompt": "Use case: productivity-visual\nAsset type: web page hero concept image\nPrimary request: A concept hero image for a local AI multimodal creative lab. On a dark product workspace, show a left-to-right workflow from screenshot input to a Chinese analysis report, structured prompt cards, and a final concept art asset preview.\nScene/backdrop: restrained dark product workspace with local project folders, abstract screenshot thumbnails, clean analysis report blocks, prompt cards, and an accepted concept image board.\nSubject: a verifiable three-step workflow from image or screenshot analysis to structured prompt pack to imagegen concept asset.\nStyle/medium: polished editorial 3D illustration with realistic product surfaces, not an actual UI screenshot.\nComposition/framing: 16:9 landscape, left-to-right process path, clear focal point on the final concept image preview, usable negative space.\nLighting/mood: precise soft studio lighting, calm, capable, inventive.\nColor palette: charcoal black, warm white, acid lime accents, restrained cyan details.\nConstraints: no external API logos, no random brand marks, no readable fake UI text, no tiny gibberish text, no watermark, no messy clutter, no robots, no neon overload."
+    },
+    {
+      "id": "codex-lab-agent",
+      "target": "public/assets/codex-lab/concept-character.png",
+      "use_case": "stylized-concept",
+      "prompt": "Use case: stylized-concept\nAsset type: square assistant concept portrait for a project asset library\nPrimary request: An abstract Codex-like creative assistant presence for a local multimodal lab.\nSubject: a calm intelligent presence made from layered analysis panes, image tiles, prompt cards, and subtle light geometry; avoid a literal robot cliche or human face realism.\nScene/backdrop: dark local project workspace with small hints of screenshots, reports, and concept asset boards.\nStyle/medium: refined 3D concept art, premium software identity asset, suitable for an internal AI workflow lab.\nComposition/framing: centered 1:1 portrait, strong silhouette, readable at thumbnail size, generous padding.\nLighting/mood: quiet confidence, focused, imaginative, precise soft studio lighting.\nColor palette: black glass, soft white, muted teal, small acid lime highlights.\nConstraints: no text, no logo, no watermark, no random brand marks, no external API symbols, no clutter."
+    },
+    {
+      "id": "codex-lab-scene",
+      "target": "public/assets/codex-lab/concept-scene.png",
+      "use_case": "illustration-story",
+      "prompt": "Use case: illustration-story\nAsset type: scene style frame for a local AI workflow lab\nPrimary request: A cinematic scene where raw screenshots and image references are transformed into structured storyboard panels and final concept art assets.\nScene/backdrop: local project studio with folders, analysis notes, prompt cards, and image boards arranged in a clean workflow.\nSubject: the moment of transformation from visual input to Chinese analysis report to structured prompt pack to imagegen concept output.\nStyle/medium: sophisticated digital illustration, grounded product storytelling, practical software-lab atmosphere, not decorative abstraction.\nComposition/framing: 3:2 landscape-style frame, left-to-right process path, clear separation between input, reasoning, and output.\nLighting/mood: focused creative workshop, practical, elegant, warm highlights with cool shadows.\nColor palette: neutral dark surfaces, paper white report panels, selective acid lime and amber signal accents.\nMaterials/textures: glass panels, matte black desk, printed storyboard sheets, softly glowing asset boards.\nConstraints: no external service logos, no random UI text, no watermark, no cluttered composition, no fake brand marks."
     }
   ],
   "asset_plan": [
@@ -64,6 +76,20 @@
       "candidate_path": "experiments/codex-internal-multimodal-lab/output/generated-assets/concept-hero.png",
       "final_path": "public/assets/codex-lab/concept-hero.png",
       "source_prompt_id": "codex-lab-hero",
+      "status": "accepted"
+    },
+    {
+      "filename": "concept-character.png",
+      "candidate_path": "experiments/codex-internal-multimodal-lab/output/generated-assets/concept-character.png",
+      "final_path": "public/assets/codex-lab/concept-character.png",
+      "source_prompt_id": "codex-lab-agent",
+      "status": "accepted"
+    },
+    {
+      "filename": "concept-scene.png",
+      "candidate_path": "experiments/codex-internal-multimodal-lab/output/generated-assets/concept-scene.png",
+      "final_path": "public/assets/codex-lab/concept-scene.png",
+      "source_prompt_id": "codex-lab-scene",
       "status": "accepted"
     }
   ]

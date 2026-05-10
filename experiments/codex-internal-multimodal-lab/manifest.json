@@ -2,6 +2,12 @@
   "name": "codex-internal-multimodal-lab",
   "branch": "codex/internal-multimodal-lab",
   "runtimeApiIntegration": false,
+  "paiIntegration": false,
+  "integrationDecision": {
+    "status": "deferred",
+    "record": "output/integration-decision.md",
+    "reason": "当前分支只验证 Codex 内部分析推理与 imagegen 离线资产交付，不做运行时模型/API接入。"
+  },
   "priorityLoops": [
     {
       "id": "image-report",
@@ -45,6 +51,7 @@
     }
   ],
   "assetDirectory": "public/assets/codex-lab",
+  "assetIndex": "output/asset-index.json",
   "capabilities": [
     {
       "id": "image-analysis",
@@ -71,7 +78,7 @@
       "id": "image-generation",
       "label": "概念图生成",
       "inputs": ["imagegen-prompts.jsonl"],
-      "outputs": ["generated-assets", "public/assets/codex-lab"],
+      "outputs": ["generated-assets", "asset-index.json", "public/assets/codex-lab"],
       "status": "testable"
     },
     {
