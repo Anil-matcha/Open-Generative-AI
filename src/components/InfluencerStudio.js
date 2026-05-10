@@ -30,7 +30,7 @@ export function InfluencerStudio() {
   const topBar = document.createElement('div');
   topBar.className = 'px-4 md:px-8 pt-6 pb-4 shrink-0 animate-fade-in-up';
   
-  const influBanner = createHeroSection('influencer', 'h-32 md:h-44 mb-4');
+  const influBanner = createHeroSection('influencer', 'h-64 md:h-80 lg:h-96 mb-4');
   if (influBanner) {
     const bannerText = document.createElement('div');
     bannerText.className = 'absolute bottom-0 left-0 right-0 p-4 z-10';

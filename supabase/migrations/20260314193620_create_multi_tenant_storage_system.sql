@@ -145,6 +145,7 @@ ON CONFLICT (id) DO UPDATE SET
     'video/mp4', 'video/webm', 'video/quicktime'
   ];
 
+/* COMMENTED OUT: Supabase auto-manages storage policies
 -- =====================================================
 -- STORAGE POLICIES FOR TENANT-ASSETS BUCKET
 -- =====================================================
@@ -340,6 +341,7 @@ USING (
   bucket_id = 'shared-content'
   AND owner = auth.uid()
 );
+*/
 
 -- =====================================================
 -- HELPER FUNCTIONS FOR STORAGE

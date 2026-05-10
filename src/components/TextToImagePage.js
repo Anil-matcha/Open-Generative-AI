@@ -53,7 +53,7 @@ export function TextToImagePage() {
   // Hero Section
   const hero = document.createElement('div');
   hero.className = 'flex flex-col items-center mb-8 md:mb-12 animate-fade-in-up w-full max-w-5xl';
-  const heroBanner = createHeroSection('image', 'h-32 md:h-44 mb-4');
+  const heroBanner = createHeroSection('image', 'h-64 md:h-80 lg:h-96 mb-4');
   if (heroBanner) {
     const heroContent = document.createElement('div');
     heroContent.className = 'absolute bottom-0 left-0 right-0 p-6 z-10';

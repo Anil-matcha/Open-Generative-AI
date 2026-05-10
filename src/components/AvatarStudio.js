@@ -20,7 +20,7 @@ export function AvatarStudio() {
   const topBar = document.createElement('div');
   topBar.className = 'px-4 md:px-8 pt-6 pb-4 shrink-0 animate-fade-in-up';
   
-  const avatarBanner = createHeroSection('avatar', 'h-32 md:h-44 mb-4');
+  const avatarBanner = createHeroSection('avatar', 'h-64 md:h-80 lg:h-96 mb-4');
   if (avatarBanner) {
     const bannerText = document.createElement('div');
     bannerText.className = 'absolute bottom-0 left-0 right-0 p-4 z-10';

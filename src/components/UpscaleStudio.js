@@ -21,7 +21,7 @@ export function UpscaleStudio() {
 
   const header = document.createElement('div');
   header.className = 'mb-8 animate-fade-in-up text-center w-full max-w-xl';
-  const upscaleBanner = createHeroSection('upscale', 'h-32 md:h-44 mb-4');
+  const upscaleBanner = createHeroSection('upscale', 'h-64 md:h-80 lg:h-96 mb-4');
   if (upscaleBanner) {
     const bannerText = document.createElement('div');
     bannerText.className = 'absolute bottom-0 left-0 right-0 p-5 z-10';

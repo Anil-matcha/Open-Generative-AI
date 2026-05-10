@@ -27,7 +27,7 @@ export function EffectsPage() {
   container.className = 'w-full h-full flex flex-col items-center bg-app-bg relative p-4 md:p-6 overflow-y-auto custom-scrollbar overflow-x-hidden';
 
   // Hero
-  const hero = createHeroSection('effects', 'h-32 md:h-44 mb-4');
+  const hero = createHeroSection('effects', 'h-64 md:h-80 lg:h-96 mb-4');
   if (hero) {
     const heroContent = document.createElement('div');
     heroContent.className = 'absolute bottom-0 left-0 right-0 p-6 z-10';

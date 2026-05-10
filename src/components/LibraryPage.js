@@ -14,7 +14,7 @@ export function LibraryPage() {
   const libThumb = getPageThumbnail('library');
   if (libThumb) {
     const bannerWrapper = document.createElement('div');
-    bannerWrapper.className = 'relative w-full h-32 md:h-44 rounded-2xl overflow-hidden mb-4';
+    bannerWrapper.className = 'relative w-full h-64 md:h-80 lg:h-96 rounded-2xl overflow-hidden mb-4';
     bannerWrapper.innerHTML = '<div class="thumb-skeleton absolute inset-0"></div>';
     const img = createThumbnailImg(libThumb, 'Library', 'w-full h-full object-cover');
     bannerWrapper.appendChild(img);

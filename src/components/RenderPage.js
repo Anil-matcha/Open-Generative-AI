@@ -481,7 +481,7 @@ export function RenderPage() {
   // Hero section
   const hero = document.createElement('div');
   hero.className = 'relative mb-8 overflow-hidden rounded-[28px] md:mb-10';
-  const heroBanner = createHeroSection('render', 'h-44 md:h-60');
+  const heroBanner = createHeroSection('render', 'h-64 md:h-80 lg:h-96 mb-4');
   if (heroBanner) {
     heroBanner.classList.add('rounded-[28px]');
     const heroOverlay = document.createElement('div');
@@ -503,7 +503,7 @@ export function RenderPage() {
     hero.appendChild(heroBanner);
   } else {
     // Fallback if hero image not found
-    hero.className = 'relative mb-8 h-44 overflow-hidden rounded-[28px] border border-white/10 bg-[linear-gradient(135deg,#17181b_0%,#0c0d10_45%,#1b2230_100%)] md:mb-10 md:h-60';
+    hero.className = 'relative mb-8 h-64 md:h-80 lg:h-96 overflow-hidden rounded-[28px] border border-white/10 bg-[linear-gradient(135deg,#17181b_0%,#0c0d10_45%,#1b2230_100%)] md:mb-10 md:h-80 lg:h-96';
     hero.innerHTML = `
       <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-6 md:p-8">
         <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">

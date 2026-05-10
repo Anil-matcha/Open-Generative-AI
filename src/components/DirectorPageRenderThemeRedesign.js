@@ -1172,7 +1172,7 @@ export function DirectorPageRenderThemeRedesign() {
 
     // Header section with gradient background
     const headerSection = document.createElement('div');
-    headerSection.className = 'relative mb-6 h-36 overflow-hidden rounded-[28px] border border-white/10 shadow-[0_30px_100px_rgba(0,0,0,0.55),0_0_80px_rgba(99,102,241,0.10)]';
+    headerSection.className = 'relative mb-6 h-64 md:h-80 lg:h-96 overflow-hidden rounded-[28px] border border-white/10 shadow-[0_30px_100px_rgba(0,0,0,0.55),0_0_80px_rgba(99,102,241,0.10)]';
     headerSection.style.background = 'linear-gradient(135deg, #17181b 0%, #0c0d10 45%, #1b2230 100%)';
 
     // Gradient overlays
