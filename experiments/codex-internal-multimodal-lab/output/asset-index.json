@@ -1,6 +1,36 @@
 {
+  "library": {
+    "name": "codex-lab-assets",
+    "version": 2,
+    "updated_at": "2026-05-11",
+    "asset_root": "public/assets/codex-lab",
+    "filters": {
+      "types": ["hero", "character", "scene"],
+      "statuses": ["accepted"],
+      "modes": ["Codex imagegen built-in"]
+    }
+  },
+  "types": [
+    {
+      "id": "hero",
+      "label": "主视觉",
+      "description": "页面首屏、工作流总览或文档封面使用的横向概念图。"
+    },
+    {
+      "id": "character",
+      "label": "角色/智能体",
+      "description": "用于智能体头像、能力卡片或内部角色化表达的方形概念图。"
+    },
+    {
+      "id": "scene",
+      "label": "场景风格板",
+      "description": "用于叙事分镜、创作流程说明和场景气质确认的参考图。"
+    }
+  ],
   "assets": [
     {
+      "id": "concept-hero",
+      "type": "hero",
       "filename": "concept-hero.png",
       "purpose": "Codex Lab 或工作流卡片主视觉",
       "workspace_path": "public/assets/codex-lab/concept-hero.png",
@@ -12,9 +42,12 @@
       "imagegen_mode": "Codex imagegen built-in",
       "status": "accepted",
       "created_at": "2026-05-11",
+      "tags": ["workflow", "hero", "asset-preview", "dark-ui"],
       "usage": ["Codex Lab page asset preview", "experiment documentation"]
     },
     {
+      "id": "concept-character",
+      "type": "character",
       "filename": "concept-character.png",
       "purpose": "角色/智能体测试头像或概念图",
       "workspace_path": "public/assets/codex-lab/concept-character.png",
@@ -26,9 +59,12 @@
       "imagegen_mode": "Codex imagegen built-in",
       "status": "accepted",
       "created_at": "2026-05-11",
+      "tags": ["assistant", "identity", "thumbnail", "dark-ui"],
       "usage": ["assistant concept avatar", "experiment documentation"]
     },
     {
+      "id": "concept-scene",
+      "type": "scene",
       "filename": "concept-scene.png",
       "purpose": "场景风格板与分镜参考",
       "workspace_path": "public/assets/codex-lab/concept-scene.png",
@@ -40,6 +76,7 @@
       "imagegen_mode": "Codex imagegen built-in",
       "status": "accepted",
       "created_at": "2026-05-11",
+      "tags": ["scene", "storyboard", "workflow", "style-board"],
       "usage": ["scene style board", "storyboard reference", "experiment documentation"]
     }
   ]

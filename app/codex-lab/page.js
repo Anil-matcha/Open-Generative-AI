@@ -82,7 +82,9 @@ const runbook = [
 
 const outputItems = [
   "analysis.md",
+  "analysis-draft.md",
   "prompt-pack.json",
+  "prompt-retrospective.md",
   "shot-list.md",
   "imagegen-prompts.jsonl",
   "asset-index.json",
@@ -90,12 +92,23 @@ const outputItems = [
   "generated-assets/",
 ];
 
+const assetTypes = Object.fromEntries(
+  assetIndex.types.map((type) => [type.id, type])
+);
+
+const assetTypeFilters = assetIndex.types.map((type) => ({
+  ...type,
+  count: assetIndex.assets.filter((asset) => asset.type === type.id).length,
+}));
+
 const assetSlots = assetIndex.assets.map((asset) => ({
   name: asset.filename,
+  type: assetTypes[asset.type]?.label ?? asset.type,
   purpose: asset.purpose,
   source: asset.source_prompt_id,
   status: asset.status === "accepted" ? "已生成" : "待生成",
   preview: `/${asset.workspace_path.replace(/^public\//, "")}`,
+  tags: asset.tags ?? [],
 }));
 
 export default function CodexLabPage() {
@@ -303,12 +316,22 @@ export default function CodexLabPage() {
               <div>
                 <h2 className="text-lg font-bold">项目资产落点</h2>
                 <p className="mt-1 text-sm text-white/45">
-                  imagegen 生成结果统一进入 public/assets/codex-lab，页面引用时使用稳定路径。
+                  imagegen 生成结果统一进入 public/assets/codex-lab，页面从 asset-index.json 派生展示。
                 </p>
               </div>
               <span className="font-mono text-xs text-white/35">
                 /assets/codex-lab/*
               </span>
+            </div>
+            <div className="mb-4 flex flex-wrap gap-2">
+              {assetTypeFilters.map((type) => (
+                <span
+                  key={type.id}
+                  className="rounded-md border border-white/10 bg-white/[0.04] px-2.5 py-1 text-xs text-white/55"
+                >
+                  {type.label} · {type.count}
+                </span>
+              ))}
             </div>
             <div className="grid gap-3 md:grid-cols-3">
               {assetSlots.map((slot) => (
@@ -333,12 +356,25 @@ export default function CodexLabPage() {
                     >
                       {slot.status}
                     </span>
+                    <span className="rounded-md border border-white/10 px-2 py-1 text-xs text-white/40">
+                      {slot.type}
+                    </span>
                   </div>
                   <div className="font-mono text-sm font-bold text-[#d9ff00]">
                     {slot.name}
                   </div>
                   <p className="mt-2 text-sm leading-6 text-white/55">{slot.purpose}</p>
                   <p className="mt-3 text-xs text-white/35">source: {slot.source}</p>
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {slot.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="rounded border border-white/10 px-1.5 py-0.5 text-[11px] text-white/35"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>

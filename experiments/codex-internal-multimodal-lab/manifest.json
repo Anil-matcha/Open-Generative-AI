@@ -52,6 +52,16 @@
   ],
   "assetDirectory": "public/assets/codex-lab",
   "assetIndex": "output/asset-index.json",
+  "promptRetrospective": "output/prompt-retrospective.md",
+  "localScripts": [
+    {
+      "id": "analysis-draft",
+      "command": "npm run codex-lab:analysis-draft",
+      "input": "input/screenshots",
+      "output": "output/analysis-draft.md",
+      "runtimeApiIntegration": false
+    }
+  ],
   "capabilities": [
     {
       "id": "image-analysis",
