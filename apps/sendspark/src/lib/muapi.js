@@ -77,8 +77,7 @@ class MuAPIClient {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.apiKey}`,
-          'User-Agent': 'AI-VFX-App/1.0.0'
+          'x-api-key': this.apiKey
         },
         body: JSON.stringify(requestBody)
       });
@@ -121,8 +120,7 @@ class MuAPIClient {
       const response = await fetch(`${MUAPI_VFX_ENDPOINT}/status/${requestId}`, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
-          'User-Agent': 'AI-VFX-App/1.0.0'
+          'x-api-key': this.apiKey
         }
       });
 
@@ -221,8 +219,7 @@ class MuAPIClient {
       const response = await fetch(`${MUAPI_BASE_URL}/status`, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
-          'User-Agent': 'AI-VFX-App/1.0.0'
+          'x-api-key': this.apiKey
         }
       });
 
