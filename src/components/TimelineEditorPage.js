@@ -7,8 +7,12 @@ import { extendClipContextMenu, extendGenerationPanel, extendMediaLibrary, exten
 import { integrateMediaIngest, GiphyIntegration, StickersLibrary, LowerThirds, VideoGallery, AnimationList } from '../lib/mediaIngest.js';
 import { renderMultiCameraToolbar, renderPipControls, renderSplitScreenControls } from '../lib/editor/multiCamera.js';
 import { createTimelineState } from '../lib/editor/timelineEditorState.js';
+import { KeyframeSystem } from '../lib/editor/keyframeSystem.jsx';
 import { TransitionEditor } from '../lib/editor/transitionEditor.js';
 import { TimelineTransitions } from '../lib/editor/timelineTransitions.js';
+import { SceneDetector } from './timeline/SceneDetector.js';
+import { CameraEffects } from './timeline/CameraEffects.js';
+import { AIChatPanel } from './timeline/AIChatPanel.js';
 import TIMELINE_DESIGN_SYSTEM, { enforceDesignSystem } from '../lib/designSystemEnforcer.js';
 import { createVideoPreview } from '../lib/videoPlayer.js';
 // Import rendiv animation primitives
@@ -16,6 +20,12 @@ import { interpolate, spring, blendColors, noise2D, useSequence, useSeries } fro
 // Agent system integration
 import { initTimelineAgentIntegration } from '../timelineAgentIntegration.js';
 // ColorCorrectionSystem removed - file does not exist
+
+// Subtitle system integration
+import { SubtitleTimeline } from '../lib/editor/subtitleTimeline.js';
+import { SubtitleControls } from './SubtitleControls.jsx';
+import { SubtitleEditorModal } from './modals/SubtitleEditorModal.jsx';
+import { whisperService } from '../services/whisper-client.js';
 
 // Modal imports - these are vanilla JS modal implementations
 import { EndScreenModal } from './modals/EndScreenModal.jsx';
@@ -213,10 +223,14 @@ button, input, textarea, select { font: inherit; }
 .text-input, .select-input { padding: 10px 12px; margin-bottom: 8px; }
 .select-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
 .primary-btn { background: linear-gradient(to right, var(--cyan), var(--emerald)); color: #03131a; }
-.chat-stack { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
-.chat-bubble { border-radius: 10px; padding: 10px; font-size: 10px; }
-.chat-bubble.user { background: rgba(255,255,255,0.1); }
-.chat-bubble.ai { background: rgba(34,211,238,0.2); color: #cffafe; }
+.chat-stack { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; max-height: 200px; overflow-y: auto; }
+.chat-bubble { border-radius: 10px; padding: 10px; font-size: 10px; max-width: 80%; word-wrap: break-word; }
+.chat-bubble.user { background: rgba(255,255,255,0.1); align-self: flex-end; }
+.chat-bubble.ai { background: rgba(34,211,238,0.2); color: #cffafe; align-self: flex-start; }
+.chat-input-container { display: flex; gap: 8px; align-items: center; }
+.processing-indicator { display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.6); font-size: 12px; }
+.spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.2); border-top: 2px solid #22d3ee; border-radius: 50%; animation: spin 1s linear infinite; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 .quick-commands { gap: 6px; }
 .command-btn { padding: 6px 10px; font-size: 9px; }
 .floating-rail { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 40; padding: 10px 14px; border-radius: 999px; border: 1px solid var(--border); background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03)); backdrop-filter: blur(18px); box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
@@ -486,10 +500,7 @@ button, input, textarea, select { font: inherit; }
     <div class="left-col">
       <div class="left-top">
         <aside class="side-card" style="min-height:100%; display:flex; flex-direction:column;">
-          <div class="card-title">💬 AI</div>
-          <div class="chat-stack" id="chatStack"></div>
-          <input class="text-input" id="chatInput" placeholder="Type command..." />
-          <div class="quick-commands" id="quickCommands" style="margin-top:2px;"></div>
+          <div id="aiChatContainer"></div>
         </aside>
         <section class="preview-card">
           <div class="preview-glow"></div>
@@ -548,6 +559,12 @@ button, input, textarea, select { font: inherit; }
         <button class="upload-btn" id="uploadBtn" aria-label="Upload media into the editor">Upload</button>
         <div class="media-note">Choose what you want to add to the timeline. Each tile inserts a different type of source asset.</div>
         <div class="media-grid" id="mediaGrid"></div>
+      </aside>
+      <aside class="side-card" id="sceneDetectorPanel">
+        <div id="sceneDetectorContainer"></div>
+      </aside>
+      <aside class="side-card" id="cameraEffectsPanel">
+        <div id="cameraEffectsContainer"></div>
       </aside>
       <aside class="side-card generate">
         <div class="generate-head"><div class="card-title cyan">⚡ Generate</div><div style="color: rgba(255,255,255,0.4)">✕</div></div>
@@ -656,6 +673,9 @@ button, input, textarea, select { font: inherit; }
   function createState() {
     const baseState = createTimelineState();
 
+    // Initialize keyframe system
+    baseState.keyframeSystem = new KeyframeSystem();
+
     // Override with local demo data but keep enhanced features
     const demoState = {
       projectTitle: 'Untitled Project',
@@ -691,12 +711,9 @@ button, input, textarea, select { font: inherit; }
         { icon: '🎞️', label: 'B-Roll Asset', desc: 'Drop in cutaways, overlays, or support footage.' }
       ],
       generateTypes: [['✍️', 'Text'], ['🖼️', 'Image'], ['🔄', 'Retake'], ['➡️', 'Extend'], ['🎞️', 'B-Roll']],
-      quickCommands: ['⚡Generate','Retake','Extend','B-Roll'],
+      quickCommands: ['⚡Generate','Retake','Extend','B-Roll','🎬 Detect Scenes'],
       railActions: [['⚡', 'Generate', true], ['✂️', 'Split'], ['🎬', 'Scenes'], ['💬', 'Subtitle'], ['🎞️', 'B-Roll'], ['⏱️', 'Speed'], ['🪄', 'Stabilize'], ['📝', 'Text'], ['🔄', 'Transitions'], ['🎬', 'AI Video'], ['🎥', 'Recorder'], ['🎙️', 'Enhanced Recorder'], ['📋', 'Templates'], ['👀', 'Preview Template'], ['📱', 'Social'], ['📧', 'Email Campaign'], ['🔗', 'URL Video'], ['📸', 'Page Shot'], ['👥', 'Contacts'], ['🎨', 'Canvas'], ['🏷️', 'Token Editor'], ['📦', 'Batch Generator'], ['🔄', 'Workflow'], ['👤', 'Personalization'], ['✏️', 'Personalization Editor'], ['🎬', 'Personalization Suite'], ['🏠', 'Landing Pages'], ['📋', 'Lead Generator']],
-      chat: [
-        { role: 'user', text: 'Generate a better opening shot' },
-        { role: 'ai', text: 'Opening idea ready. Use Generate or Retake.' }
-      ],
+
       // Enhanced state management
       projectId: null,
       undoStack: [],
@@ -813,6 +830,9 @@ button, input, textarea, select { font: inherit; }
     let playbackTimer = null;
     let transitionEditor = null;
     let timelineTransitions = null;
+    let sceneDetector = null;
+    let cameraEffects = null;
+    let aiChatPanel = null;
     // let colorCorrectionSystem = null; // Disabled - file not found
 
     // Keyboard shortcuts for undo/redo
@@ -851,8 +871,7 @@ button, input, textarea, select { font: inherit; }
       trackRows: root.querySelector('#trackRows'),
       mediaGrid: root.querySelector('#mediaGrid'),
       generateTypes: root.querySelector('#generateTypes'),
-      chatStack: root.querySelector('#chatStack'),
-      quickCommands: root.querySelector('#quickCommands'),
+      aiChatContainer: root.querySelector('#aiChatContainer'),
       floatingRail: root.querySelector('#floatingRail'),
       playBtn: root.querySelector('#playBtn'),
       stopBtn: root.querySelector('#stopBtn'),
@@ -882,6 +901,10 @@ button, input, textarea, select { font: inherit; }
       transitionSettingsPanel: root.querySelector('#transitionSettingsPanel'),
       clipEditorContainer: root.querySelector('#clipEditorContainer'),
       transitionEditorContainer: root.querySelector('#transitionEditorContainer'),
+      sceneDetectorPanel: root.querySelector('#sceneDetectorPanel'),
+      sceneDetectorContainer: root.querySelector('#sceneDetectorContainer'),
+      cameraEffectsPanel: root.querySelector('#cameraEffectsPanel'),
+      cameraEffectsContainer: root.querySelector('#cameraEffectsContainer'),
       multiCameraPanel: root.querySelector('#multiCameraPanel'),
       multiCameraToolbar: root.querySelector('#multiCameraToolbar'),
       pipControls: root.querySelector('#pipControls'),
@@ -1415,6 +1438,10 @@ button, input, textarea, select { font: inherit; }
             window.timelineState.selectedClipId = clip.id;
             renderTracksBasic(state, els, showToast);
             updatePreview({ id: clip.id, name: clip.name, type: clip.type, src: clip.src });
+            // Update camera effects with selected clip
+            if (cameraEffects) {
+              cameraEffects.setSelectedClip(clip.id);
+            }
           });
           lane.appendChild(clipEl);
         });
@@ -1659,15 +1686,7 @@ button, input, textarea, select { font: inherit; }
       extendGenerationPanel(els.generateTypes, state, showToast);
     }
 
-    function renderChat() {
-      els.chatStack.innerHTML = '';
-      state.chat.forEach((entry) => {
-        const bubble = document.createElement('div');
-        bubble.className = `chat-bubble ${entry.role}`;
-        bubble.textContent = entry.text;
-        els.chatStack.appendChild(bubble);
-      });
-    }
+
 
     function renderClipEditor(clipId) {
       const clip = state.tracks.flatMap(t => t.clips).find(c => c.id === clipId);
@@ -1768,6 +1787,102 @@ button, input, textarea, select { font: inherit; }
       }
     }
 
+    function initializeSceneDetector() {
+      if (!sceneDetector) {
+        sceneDetector = new SceneDetector(els.sceneDetectorContainer, {
+          tracks: state.tracks,
+          timelineSeconds: state.timelineSeconds,
+          seekTo: (time) => {
+            state.playheadPercent = (time / state.timelineSeconds) * 100;
+            renderPlayhead();
+            renderPreview();
+          }
+        }, {
+          showToast: showToast
+        });
+      }
+    }
+
+    function initializeCameraEffects() {
+      if (!cameraEffects) {
+        cameraEffects = new CameraEffects(els.cameraEffectsContainer, {
+          keyframeSystem: state.keyframeSystem,
+          timelineState: state,
+          onPreviewUpdate: (clipId, transform) => {
+            // Update preview with camera effect transform
+            renderPreview();
+          },
+          onKeyframeUpdate: () => {
+            // Refresh timeline and keyframe displays
+            renderTimeline();
+            renderKeyframes();
+          }
+        });
+      }
+    }
+
+    function initializeAIChatPanel() {
+      if (!aiChatPanel && els.aiChatContainer) {
+        aiChatPanel = new AIChatPanel(els.aiChatContainer, state, {
+          detectScenes: async () => {
+            initializeSceneDetector();
+            if (sceneDetector && sceneDetector.detectScenes) {
+              await sceneDetector.detectScenes();
+            }
+          },
+          splitClipAtPlayhead: () => {
+            // Find selected clip and split it
+            const selectedTrack = state.tracks.find(t => t.id === state.selectedTrackId);
+            if (selectedTrack) {
+              const selectedClip = selectedTrack.clips.find(c => c.id === state.selectedClipId);
+              if (selectedClip) {
+                const splitTime = (state.playheadPercent / 100) * state.timelineSeconds;
+                // Implement split logic here
+                showToast('Clip split functionality to be implemented', 'info');
+              }
+            }
+          },
+          trimSelectedClip: (start, end) => {
+            // Implement trim logic
+            showToast('Trim clip functionality to be implemented', 'info');
+          },
+          addTransition: (type, duration) => {
+            // Implement add transition logic
+            showToast(`Add ${type} transition functionality to be implemented`, 'info');
+          },
+          addTextOverlay: (text, position) => {
+            // Implement add text overlay logic
+            showToast('Add text overlay functionality to be implemented', 'info');
+          },
+          generateSubtitles: async () => {
+            // Implement subtitle generation
+            showToast('Subtitle generation functionality to be implemented', 'info');
+          },
+          removeFillerWords: () => {
+            // Implement filler word removal
+            showToast('Remove filler words functionality to be implemented', 'info');
+          },
+          addBRoll: (query) => {
+            // Implement B-roll addition
+            showToast('Add B-roll functionality to be implemented', 'info');
+          },
+          speedRamp: (speed) => {
+            // Implement speed ramp
+            showToast(`Speed ramp to ${speed}x functionality to be implemented`, 'info');
+          },
+          stabilizeVideo: () => {
+            // Implement video stabilization
+            showToast('Video stabilization functionality to be implemented', 'info');
+          },
+          findRelatedFootage: async (query) => {
+            // Implement semantic search
+            showToast('Find related footage functionality to be implemented', 'info');
+            return [];
+          }
+        });
+      }
+    }
+
     // function initializeColorCorrectionSystem() { // Disabled - ColorCorrectionSystem not available
     //   if (!colorCorrectionSystem) {
     //     // Create a keyframe system for color correction
@@ -1790,80 +1905,7 @@ button, input, textarea, select { font: inherit; }
     //   }
     // }
 
-    async function handleChatSubmit() {
-      const text = els.chatInput.value.trim();
-      if (!text) return;
 
-      state.chat.push({ role: 'user', text });
-      renderChat();
-      els.chatInput.value = '';
-  // DISABLED:       showToast('Processing AI command...', 'info');
-
-      try {
-        // Check if Supabase is configured before making requests
-        if (!supabase || typeof supabase.functions?.invoke !== 'function') {
-          throw new Error('AI features require Supabase configuration');
-        }
-
-        // Call frame-agent edge function
-        const { data, error } = await supabase.functions.invoke('frame-agent', {
-          body: {
-            command: text,
-            context: {
-              selectedClipId: state.selectedClipId,
-              currentTool: state.selectedTool,
-              timelineState: {
-                playheadPercent: state.playheadPercent,
-                zoom: state.zoom,
-                tracks: (state.tracks || []).map(track => ({
-                  id: track.id,
-                  name: track.name,
-                  clipCount: track.clips.length
-                }))
-              }
-            }
-          }
-        });
-
-        if (error) {
-          console.error('Frame agent error:', error);
-          // Handle different types of errors gracefully
-          if (error.message?.includes('401') || error.message?.includes('auth')) {
-            state.chat.push({ role: 'ai', text: 'AI features require authentication. Please sign in to use AI commands.' });
-  // DISABLED:             showToast('Please sign in to use AI features', 'warning');
-          } else {
-            state.chat.push({ role: 'ai', text: `Error: ${error.message}` });
-  // DISABLED:             showToast('AI command failed', 'error');
-          }
-        } else {
-          // Process the AI response and apply changes
-          const aiResponse = data?.response || 'Command processed successfully';
-          state.chat.push({ role: 'ai', text: aiResponse });
-
-          // Apply any timeline modifications from the AI response
-          if (data?.modifications) {
-            applyAIModifications(data.modifications);
-          }
-
-  // DISABLED:           showToast('AI command executed', 'success');
-        }
-      } catch (err) {
-        console.error('Chat submission error:', err);
-        // Provide user-friendly error messages
-        if (err.message?.includes('Supabase')) {
-          state.chat.push({ role: 'ai', text: 'AI features are not available. Supabase configuration required.' });
-  // DISABLED:           showToast('AI features require Supabase setup', 'warning');
-        } else if (err.message?.includes('fetch') || err.message?.includes('network')) {
-          state.chat.push({ role: 'ai', text: 'Network error. Please check your connection.' });
-  // DISABLED:           showToast('Network error - please check connection', 'error');
-        } else {
-          state.chat.push({ role: 'ai', text: `Error: ${err.message}` });
-  // DISABLED:           showToast('Failed to process AI command', 'error');
-        }
-      }
-
-      renderChat();
-    }
 
     function applyAIModifications(modifications) {
       if (!modifications) return;
@@ -1917,21 +1959,12 @@ button, input, textarea, select { font: inherit; }
       renderAll();
     }
 
-    function renderQuickCommands() {
-      els.quickCommands.innerHTML = '';
-      state.quickCommands.forEach((command) => {
-        const button = document.createElement('button');
-        button.className = 'command-btn';
-        button.textContent = command;
-        button.title = `Run quick command: ${command}`;
-        button.setAttribute('aria-label', `Run quick command: ${command}`);
-        button.addEventListener('click', () => {
-          els.chatInput.value = command;
-          handleChatSubmit();
-        });
-        els.quickCommands.appendChild(button);
-      });
+    function renderKeyframes() {
+      // Keyframe rendering is handled by the timeline renderer
+      // This function is called when keyframes are updated
     }
+
+
 
     // Floating rail action functionality
     function splitClipAtPlayhead() {
@@ -1978,29 +2011,11 @@ button, input, textarea, select { font: inherit; }
     }
 
     async function detectScenes() {
-  // DISABLED:       showToast('Detecting scenes...', 'info');
-
-      try {
-        const { data, error } = await supabase.functions.invoke('videoagent', {
-          body: {
-            action: 'scene-detection',
-            project_id: state.projectId,
-            timeline_data: {
-              tracks: state.tracks,
-              duration: state.timelineSeconds
-            }
-          }
-        });
-
-        if (error) throw error;
-
-        if (data.scenes) {
-          // Add scene markers or clips based on detection results
-  // DISABLED:           showToast(`Detected ${data.scenes.length} scenes`, 'success');
-        }
-      } catch (err) {
-        console.error('Scene detection error:', err);
-  // DISABLED:         showToast('Scene detection failed', 'error');
+      if (sceneDetector) {
+        await sceneDetector.detectScenes();
+      } else {
+        // Fallback to API call if scene detector not initialized
+        showToast('Scene detector not available', 'error');
       }
     }
 
@@ -3462,7 +3477,7 @@ button, input, textarea, select { font: inherit; }
       els.uploadBtn.addEventListener('click', () => els.uploadInput.click());
       els.uploadInput.addEventListener('change', (event) => handleUpload(event.target.files?.[0]));
       els.backBtn.addEventListener('click', () => showToast('Back action clicked'));
-      els.chatInput.addEventListener('keydown', (event) => { if (event.key === 'Enter') handleChatSubmit(); });
+
       root.querySelectorAll('[data-add-track]').forEach((button) => button.addEventListener('click', () => addTrack(button.dataset.addTrack)));
       root.querySelectorAll('[data-action="zoom-in"]').forEach((button) => button.addEventListener('click', () => { state.zoom = Math.min(2, state.zoom + 0.1); showToast(`Zoom ${state.zoom.toFixed(1)}x`); }));
       root.querySelectorAll('[data-action="zoom-out"]').forEach((button) => button.addEventListener('click', () => { state.zoom = Math.max(0.5, state.zoom - 0.1); showToast(`Zoom ${state.zoom.toFixed(1)}x`); }));
@@ -3475,8 +3490,7 @@ button, input, textarea, select { font: inherit; }
       renderTracks();
       renderMedia();
       renderGenerateTypes();
-      renderChat();
-      renderQuickCommands();
+
       renderRail();
       renderMultiCamera();
       updatePreview();
@@ -3511,6 +3525,11 @@ button, input, textarea, select { font: inherit; }
     // Initialize transition system
     initializeTimelineTransitions();
     initializeTransitionEditor();
+
+    // Initialize scene detector
+    initializeSceneDetector();
+    initializeCameraEffects();
+    initializeAIChatPanel();
 
     // Initialize multi-camera functionality
     window.timelineState = state; // Make state globally accessible for multi-camera functions
