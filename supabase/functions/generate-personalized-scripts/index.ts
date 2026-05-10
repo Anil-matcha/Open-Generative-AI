@@ -1,7 +1,6 @@
-import OpenAI from 'openai';
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
-const openai = new OpenAI({ apiKey: Deno.env.get('OPENAI_API_KEY')! });
+const MUAPI_KEY = Deno.env.get('MUAPI_KEY') || Deno.env.get('OPENAI_API_KEY');
 const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 
 Deno.serve(async (req) => {
@@ -14,12 +13,26 @@ Deno.serve(async (req) => {
 
   const results = [];
   for (const contact of contacts ?? []) {
-    const completion = await openai.responses.create({
-      model: 'gpt-4.1-mini',
-      input: `Return JSON only for contact: ${JSON.stringify(contact)} campaign: ${JSON.stringify(campaign)}`,
-      text: { format: { type: 'json_object' } },
+    const response = await fetch('https://api.muapi.ai/api/v1/responses', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': MUAPI_KEY
+      },
+      body: JSON.stringify({
+        model: 'gpt-4.1-mini',
+        input: `Return JSON only for contact: ${JSON.stringify(contact)} campaign: ${JSON.stringify(campaign)}`,
+        text: { format: { type: 'json_object' } },
+      })
     });
-    const output = JSON.parse(completion.output_text || '{}');
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(`muapi.ai API error: ${error.message || 'Unknown error'}`);
+    }
+
+    const result = await response.json();
+    const output = JSON.parse(result.output_text || '{}');
     const { data } = await supabase.from('personalized_scripts').upsert({
       workspace_id: campaign.workspace_id,
       campaign_id: campaign.id,

@@ -154,17 +154,30 @@ ${premise}
 
 Write the full screenplay text with proper slug lines, action, and dialogue.`;
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt }
-      ],
-      temperature: 0.7,
-      max_tokens: 2000,
+    const response = await fetch('https://api.muapi.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': MUAPI_API_KEY
+      },
+      body: JSON.stringify({
+        model: 'gpt-4',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ],
+        temperature: 0.7,
+        max_tokens: 2000
+      })
     });
 
-    const scriptText = completion.choices[0].message.content;
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(`muapi.ai API error: ${error.message || 'Unknown error'}`);
+    }
+
+    const data = await response.json();
+    const scriptText = data.choices[0]?.message?.content;
 
     return {
       statusCode: 200,

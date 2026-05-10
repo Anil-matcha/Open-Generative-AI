@@ -169,11 +169,11 @@ Please provide a JSON response with this structure:
 
 Focus on visual storytelling and cinematic elements.`
 
-    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+    const openaiResponse = await fetch('https://api.muapi.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${openaiApiKey}`
+        'x-api-key': muapiKey || openaiApiKey
       },
       body: JSON.stringify({
         model: 'gpt-4',

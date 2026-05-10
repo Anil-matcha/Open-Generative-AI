@@ -423,17 +423,30 @@ Write in standard screenplay format. Each scene should have:
 Keep scripts under 2 pages. Focus on visual storytelling over heavy dialogue.
 Write the screenplay text directly. Do NOT wrap it in JSON.`;
 
-      const completion = await openai.chat.completions.create({
-        model: 'gpt-4',
-        messages: [
-          { role: 'system', content: scriptPrompt },
-          { role: 'user', content: `Write a ${genre} script with ${Math.max(numScenes - 1, 2)} scenes based on this premise:\n\n${premise}\n\nWrite the full screenplay text with proper slug lines, action, and dialogue.` }
-        ],
-        temperature: 0.7,
-        max_tokens: 2000,
+      const scriptResponse = await fetch('https://api.muapi.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': MUAPI_API_KEY
+        },
+        body: JSON.stringify({
+          model: 'gpt-4',
+          messages: [
+            { role: 'system', content: scriptPrompt },
+            { role: 'user', content: `Write a ${genre} script with ${Math.max(numScenes - 1, 2)} scenes based on this premise:\n\n${premise}\n\nWrite the full screenplay text with proper slug lines, action, and dialogue.` }
+          ],
+          temperature: 0.7,
+          max_tokens: 2000
+        })
       });
 
-      finalScriptText = completion.choices[0].message.content;
+      if (!scriptResponse.ok) {
+        const error = await scriptResponse.json();
+        throw new Error(`muapi.ai API error: ${error.message || 'Unknown error'}`);
+      }
+
+      const scriptData = await scriptResponse.json();
+      finalScriptText = scriptData.choices[0]?.message?.content;
     }
 
     // Phase 2: Parse script into structured scenes
@@ -493,18 +506,31 @@ For SD prompts: Write them as detailed visual descriptions optimized for Stable 
   ]
 }`;
 
-    const parseCompletion = await openai.chat.completions.create({
-      model: 'gpt-4',
-      messages: [
-        { role: 'system', content: parsePrompt },
-        { role: 'user', content: `Analyze this ${genre || 'drama'} script and break it into detailed scenes with shot-by-shot breakdowns.\n\nSCRIPT:\n${finalScriptText}\n\nRespond with a single JSON object matching this EXACT schema:\n${jsonSchema}\n\nRequirements:\n- Each scene MUST have at least 2 shots\n- Each shot MUST have an sd_prompt optimized for Stable Diffusion 1.5\n- All mood scores MUST be floats between 0.0 and 1.0\n- All fields are required, dialogue can be null` }
-      ],
-      temperature: 0.3,
-      max_tokens: 3000,
-      response_format: { type: 'json_object' }
-    });
+      const parseResponse = await fetch('https://api.muapi.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': MUAPI_API_KEY
+        },
+        body: JSON.stringify({
+          model: 'gpt-4',
+          messages: [
+            { role: 'system', content: parsePrompt },
+            { role: 'user', content: `Analyze this ${genre || 'drama'} script and break it into detailed scenes with shot-by-shot breakdowns.\n\nSCRIPT:\n${finalScriptText}\n\nRespond with a single JSON object matching this EXACT schema:\n${jsonSchema}\n\nRequirements:\n- Each scene MUST have at least 2 shots\n- Each shot MUST have an sd_prompt optimized for Stable Diffusion 1.5\n- All mood scores MUST be floats between 0.0 and 1.0\n- All fields are required, dialogue can be null` }
+          ],
+          temperature: 0.3,
+          max_tokens: 3000,
+          response_format: { type: 'json_object' }
+        })
+      });
 
-    const parsedScript = JSON.parse(parseCompletion.choices[0].message.content);
+      if (!parseResponse.ok) {
+        const error = await parseResponse.json();
+        throw new Error(`muapi.ai API error: ${error.message || 'Unknown error'}`);
+      }
+
+      const parseData = await parseResponse.json();
+      const parsedScript = JSON.parse(parseData.choices[0]?.message?.content);
 
     // Fill in any missing defaults
     if (parsedScript.scenes) {
@@ -664,17 +690,30 @@ Create a vivid, cinematic description optimized for Stable Diffusion 1.5. Includ
 
 Return ONLY the enhanced prompt, nothing else.`;
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4',
-      messages: [
-        { role: 'system', content: 'You are an expert at writing Stable Diffusion prompts.' },
-        { role: 'user', content: refinementPrompt }
-      ],
-      temperature: 0.3,
-      max_tokens: 200
+    const completion = await fetch('https://api.muapi.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': MUAPI_API_KEY
+      },
+      body: JSON.stringify({
+        model: 'gpt-4',
+        messages: [
+          { role: 'system', content: 'You are an expert at writing Stable Diffusion prompts.' },
+          { role: 'user', content: refinementPrompt }
+        ],
+        temperature: 0.3,
+        max_tokens: 200
+      })
     });
 
-    return completion.choices[0].message.content.trim();
+    if (!completion.ok) {
+      const error = await completion.json();
+      throw new Error(`muapi.ai API error: ${error.message || 'Unknown error'}`);
+    }
+
+    const data = await completion.json();
+    return data.choices[0].message.content.trim();
   } catch (error) {
     console.error('SD prompt refinement error:', error);
     return prompt; // Return original prompt on error

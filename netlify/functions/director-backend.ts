@@ -158,12 +158,12 @@ export async function handleFacelessVideo(prompt) {
 
     console.log('Creating faceless video for topic:', topic)
 
-    // Step 1: Generate script using OpenAI
-    const scriptResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+    // Step 1: Generate script using muapi.ai proxy
+    const scriptResponse = await fetch('https://api.muapi.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${OPENAI_API_KEY}`
+        'x-api-key': MUAPI_API_KEY
       },
       body: JSON.stringify({
         model: 'gpt-4',
@@ -275,12 +275,12 @@ export async function handleAIAd(prompt) {
 
     console.log('Creating AI ad for product:', product)
 
-    // Generate ad script
-    const scriptResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+    // Generate ad script using muapi.ai proxy
+    const scriptResponse = await fetch('https://api.muapi.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${OPENAI_API_KEY}`
+        'x-api-key': MUAPI_API_KEY
       },
       body: JSON.stringify({
         model: 'gpt-4',

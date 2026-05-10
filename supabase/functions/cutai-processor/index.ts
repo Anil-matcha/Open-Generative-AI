@@ -184,11 +184,11 @@ export async function handler(req: Request): Promise<Response> {
 
 // Helper functions
 async function generateScript(params: any): Promise<any> {
-  // Use OpenAI for real script generation instead of mock fallbacks
-  const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+  // Use muapi.ai proxy for real script generation instead of mock fallbacks
+  const MUAPI_KEY = Deno.env.get('MUAPI_KEY') || Deno.env.get('OPENAI_API_KEY');
 
-  if (!OPENAI_API_KEY) {
-    throw new Error('OpenAI API key not configured');
+  if (!MUAPI_KEY) {
+    throw new Error('MUAPI_KEY not configured');
   }
 
   const prompt = `Create a detailed screenplay script for a ${params.genre} story with the premise: "${params.premise}"
@@ -214,11 +214,11 @@ Also include moodAnalysis with overallTone, targetAudience, and commercialPotent
 
 Format the response as valid JSON.`;
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+  const response = await fetch('https://api.muapi.ai/api/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${OPENAI_API_KEY}`
+      'x-api-key': MUAPI_KEY
     },
     body: JSON.stringify({
       model: 'gpt-4',
@@ -230,7 +230,7 @@ Format the response as valid JSON.`;
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`OpenAI API call failed: ${response.status} ${errorText}`);
+    throw new Error(`muapi.ai API call failed: ${response.status} ${errorText}`);
   }
 
   const result = await response.json();
@@ -261,11 +261,11 @@ Format the response as valid JSON.`;
 }
 
 async function analyzeMood(params: any): Promise<any> {
-  // Use OpenAI for real mood analysis
-  const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+  // Use muapi.ai proxy for real mood analysis
+  const MUAPI_KEY = Deno.env.get('MUAPI_KEY') || Deno.env.get('OPENAI_API_KEY');
 
-  if (!OPENAI_API_KEY) {
-    throw new Error('OpenAI API key not configured');
+  if (!MUAPI_KEY) {
+    throw new Error('MUAPI_KEY not configured');
   }
 
   const prompt = `Analyze the mood and atmosphere of this script: "${params.scriptText}"
@@ -284,11 +284,11 @@ For each soundtrack suggestion include:
 
 Format as valid JSON.`;
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+  const response = await fetch('https://api.muapi.ai/api/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${OPENAI_API_KEY}`
+      'x-api-key': MUAPI_KEY
     },
     body: JSON.stringify({
       model: 'gpt-4',
@@ -300,14 +300,14 @@ Format as valid JSON.`;
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`OpenAI API call failed: ${response.status} ${errorText}`);
+    throw new Error(`muapi.ai API call failed: ${response.status} ${errorText}`);
   }
 
   const result = await response.json();
   const content = result.choices[0]?.message?.content;
 
   if (!content) {
-    throw new Error('No content returned from OpenAI');
+    throw new Error('No content returned from muapi.ai');
   }
 
   try {
@@ -321,7 +321,7 @@ Format as valid JSON.`;
       },
       soundtrackSuggestions: parsed.soundtrackSuggestions || [],
       visualThemes: parsed.visualThemes || [],
-      method: 'Real OpenAI GPT-4'
+      method: 'Real muapi.ai GPT-4'
     };
   } catch (parseError) {
     console.warn('Failed to parse OpenAI response as JSON:', parseError);
@@ -330,11 +330,11 @@ Format as valid JSON.`;
 }
 
 async function createStoryboard(params: any): Promise<any> {
-  // Use OpenAI for real storyboard creation
-  const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+  // Use muapi.ai proxy for real storyboard creation
+  const MUAPI_KEY = Deno.env.get('MUAPI_KEY') || Deno.env.get('OPENAI_API_KEY');
 
-  if (!OPENAI_API_KEY) {
-    throw new Error('OpenAI API key not configured');
+  if (!MUAPI_KEY) {
+    throw new Error('MUAPI_KEY not configured');
   }
 
   const prompt = `Create a detailed storyboard from this script: "${params.scriptText}"
@@ -358,11 +358,11 @@ Also create timeline data with:
 
 Format as valid JSON.`;
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+  const response = await fetch('https://api.muapi.ai/api/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${OPENAI_API_KEY}`
+      'x-api-key': MUAPI_KEY
     },
     body: JSON.stringify({
       model: 'gpt-4',
@@ -374,14 +374,14 @@ Format as valid JSON.`;
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`OpenAI API call failed: ${response.status} ${errorText}`);
+    throw new Error(`muapi.ai API call failed: ${response.status} ${errorText}`);
   }
 
   const result = await response.json();
   const content = result.choices[0]?.message?.content;
 
   if (!content) {
-    throw new Error('No content returned from OpenAI');
+    throw new Error('No content returned from muapi.ai');
   }
 
   try {
@@ -408,7 +408,7 @@ Format as valid JSON.`;
           target: sceneCards[index + 1].id
         }))
       },
-      method: 'Real OpenAI GPT-4'
+      method: 'Real muapi.ai GPT-4'
     };
   } catch (parseError) {
     console.warn('Failed to parse OpenAI response as JSON:', parseError);
@@ -417,11 +417,11 @@ Format as valid JSON.`;
 }
 
 async function regenerateScene(params: any): Promise<any> {
-  // Use OpenAI for real scene regeneration
-  const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+  // Use muapi.ai proxy for real scene regeneration
+  const MUAPI_KEY = Deno.env.get('MUAPI_KEY') || Deno.env.get('OPENAI_API_KEY');
 
-  if (!OPENAI_API_KEY) {
-    throw new Error('OpenAI API key not configured');
+  if (!MUAPI_KEY) {
+    throw new Error('MUAPI_KEY not configured');
   }
 
   const prompt = `Regenerate and improve scene ${params.sceneId} from this script: "${params.scriptText}"
@@ -437,11 +437,11 @@ Provide the improved scene with enhanced description, better dialogue, and clear
 
 Format as JSON with scene object and improvements array.`;
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+  const response = await fetch('https://api.muapi.ai/api/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${OPENAI_API_KEY}`
+      'x-api-key': MUAPI_KEY
     },
     body: JSON.stringify({
       model: 'gpt-4',
@@ -453,14 +453,14 @@ Format as JSON with scene object and improvements array.`;
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`OpenAI API call failed: ${response.status} ${errorText}`);
+    throw new Error(`muapi.ai API call failed: ${response.status} ${errorText}`);
   }
 
   const result = await response.json();
   const content = result.choices[0]?.message?.content;
 
   if (!content) {
-    throw new Error('No content returned from OpenAI');
+    throw new Error('No content returned from muapi.ai');
   }
 
   try {
@@ -469,7 +469,7 @@ Format as JSON with scene object and improvements array.`;
       scene: parsed.scene || parsed,
       updatedScript: parsed.updatedScript || params.scriptText,
       improvements: parsed.improvements || ['Enhanced scene quality', 'Improved dialogue', 'Better visual direction'],
-      method: 'Real OpenAI GPT-4'
+      method: 'Real muapi.ai GPT-4'
     };
   } catch (parseError) {
     console.warn('Failed to parse OpenAI response as JSON:', parseError);
