@@ -1,5 +1,5 @@
 
-import { CAMERA_MAP, LENS_MAP, FOCAL_PERSPECTIVE, APERTURE_EFFECT } from '../lib/promptUtils.js';
+import { CAMERA_MAP, LENS_MAP, FOCAL_PERSPECTIVE, APERTURE_EFFECT, CAMERA_LABELS, LENS_LABELS } from '../lib/promptUtils.js';
 
 const ASSET_URLS = {
     // CAMERA
@@ -110,6 +110,13 @@ export function CameraControls(onChange) {
         });
 
         items.forEach(item => {
+            const labelText = key === 'camera'
+                ? (CAMERA_LABELS[item] || item)
+                : key === 'lens'
+                    ? (LENS_LABELS[item] || item)
+                    : key === 'focal'
+                        ? `${item}mm`
+                        : item;
             const itemEl = document.createElement('div');
             itemEl.className = `
                 h-[100px] flex flex-col items-center justify-center gap-3
@@ -140,7 +147,7 @@ export function CameraControls(onChange) {
             }
 
             const text = document.createElement('span');
-            text.textContent = item;
+            text.textContent = labelText;
             text.className = 'text-[9px] md:text-[10px] font-bold uppercase text-center leading-tight max-w-full truncate px-1 tracking-wider';
 
             itemEl.appendChild(imgContainer);
@@ -242,10 +249,10 @@ export function CameraControls(onChange) {
         return colWrapper;
     };
 
-    container.appendChild(createColumn('Camera', Object.keys(CAMERA_MAP), 'camera', state.camera));
-    container.appendChild(createColumn('Lens', Object.keys(LENS_MAP), 'lens', state.lens));
-    container.appendChild(createColumn('Focal Length', Object.keys(FOCAL_PERSPECTIVE).map(k => parseInt(k)), 'focal', state.focal));
-    container.appendChild(createColumn('Aperture', Object.keys(APERTURE_EFFECT), 'aperture', state.aperture));
+    container.appendChild(createColumn('相机', Object.keys(CAMERA_MAP), 'camera', state.camera));
+    container.appendChild(createColumn('镜头', Object.keys(LENS_MAP), 'lens', state.lens));
+    container.appendChild(createColumn('焦距', Object.keys(FOCAL_PERSPECTIVE).map(k => parseInt(k)), 'focal', state.focal));
+    container.appendChild(createColumn('光圈', Object.keys(APERTURE_EFFECT), 'aperture', state.aperture));
 
     return container;
 }

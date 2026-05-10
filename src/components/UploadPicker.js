@@ -32,7 +32,7 @@ export function createUploadPicker({ anchorContainer, onSelect, onClear, maxImag
     // ── Trigger button ────────────────────────────────────────────────────────
     const trigger = document.createElement('button');
     trigger.type = 'button';
-    trigger.title = 'Reference image';
+    trigger.title = '参考图';
     trigger.className = 'w-10 h-10 shrink-0 rounded-xl border transition-all flex items-center justify-center relative overflow-hidden mt-1.5 bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40 group';
 
     // State: icon
@@ -79,7 +79,7 @@ export function createUploadPicker({ anchorContainer, onSelect, onClear, maxImag
     const updateTrigger = () => {
         if (selectedEntries.length === 0) {
             showIcon();
-            trigger.title = maxImages > 1 ? `Add up to ${maxImages} images` : 'Reference image';
+            trigger.title = maxImages > 1 ? `最多可添加 ${maxImages} 张图片` : '参考图';
             return;
         }
 
@@ -98,17 +98,17 @@ export function createUploadPicker({ anchorContainer, onSelect, onClear, maxImag
             // Multiple selected — show count
             countBadge.className = 'absolute bottom-0.5 right-0.5 min-w-[16px] h-4 bg-primary rounded-full flex items-center justify-center px-0.5';
             countBadge.innerHTML = `<span class="text-[9px] font-black text-black leading-none">${count}</span>`;
-            trigger.title = `${count} of ${maxImages} images selected — click to manage`;
+            trigger.title = `已选择 ${count} / ${maxImages} 张图片 - 点击管理`;
         } else if (canAddMore) {
             // 1 selected, multi-mode active — show "+" to invite adding more
             countBadge.className = 'absolute bottom-0.5 right-0.5 min-w-[16px] h-4 bg-white/80 rounded-full flex items-center justify-center px-0.5 border border-primary/60';
             countBadge.innerHTML = `<span class="text-[9px] font-black text-black leading-none">+</span>`;
-            trigger.title = `1 image selected — click to add more (up to ${maxImages})`;
+            trigger.title = `已选择 1 张图片 - 点击继续添加（最多 ${maxImages} 张）`;
         } else {
             // Single mode or at max — show checkmark
             countBadge.className = 'absolute bottom-0.5 right-0.5 min-w-[16px] h-4 bg-primary rounded-full flex items-center justify-center px-0.5';
             countBadge.innerHTML = `<svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg>`;
-            trigger.title = count > 1 ? `${count} images selected` : 'Reference image';
+            trigger.title = count > 1 ? `已选择 ${count} 张图片` : '参考图';
         }
     };
 
@@ -154,11 +154,11 @@ export function createUploadPicker({ anchorContainer, onSelect, onClear, maxImag
 
         const headerLeft = document.createElement('div');
         headerLeft.className = 'flex flex-col gap-0.5';
-        headerLeft.innerHTML = `<span class="text-[10px] font-bold text-secondary uppercase tracking-widest">Reference Images</span>`;
+        headerLeft.innerHTML = `<span class="text-[10px] font-bold text-secondary uppercase tracking-widest">参考图集</span>`;
         if (isMulti) {
             const hint = document.createElement('span');
             hint.className = 'text-[9px] text-muted';
-            hint.textContent = `Select up to ${maxImages} images`;
+            hint.textContent = `最多可选择 ${maxImages} 张图片`;
             headerLeft.appendChild(hint);
         }
         header.appendChild(headerLeft);
@@ -171,7 +171,7 @@ export function createUploadPicker({ anchorContainer, onSelect, onClear, maxImag
             const doneBtn = document.createElement('button');
             doneBtn.type = 'button';
             doneBtn.className = 'flex items-center gap-1 px-3 py-1.5 bg-primary text-black rounded-xl text-xs font-black transition-all hover:scale-105';
-            doneBtn.innerHTML = `✓ Done (${selectedEntries.length})`;
+            doneBtn.innerHTML = `✓ 完成 (${selectedEntries.length})`;
             doneBtn.onclick = (e) => {
                 e.stopPropagation();
                 closePanel();
@@ -183,7 +183,7 @@ export function createUploadPicker({ anchorContainer, onSelect, onClear, maxImag
         const uploadNewBtn = document.createElement('button');
         uploadNewBtn.type = 'button';
         uploadNewBtn.className = 'flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 hover:bg-primary/20 text-primary rounded-xl text-xs font-bold transition-all border border-primary/20';
-        const uploadLabel = isMulti ? 'Upload files' : 'Upload new';
+        const uploadLabel = isMulti ? '上传文件' : '上传新图';
         uploadNewBtn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> ${uploadLabel}`;
         uploadNewBtn.onclick = (e) => { e.stopPropagation(); closePanel(); fileInput.click(); };
         headerRight.appendChild(uploadNewBtn);
@@ -195,7 +195,7 @@ export function createUploadPicker({ anchorContainer, onSelect, onClear, maxImag
             empty.className = 'py-6 flex flex-col items-center gap-2 opacity-40';
             empty.innerHTML = `
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-secondary"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                <span class="text-xs text-secondary">No uploads yet</span>
+            <span class="text-xs text-secondary">暂无上传</span>
             `;
             panel.appendChild(empty);
             return;
@@ -224,7 +224,7 @@ export function createUploadPicker({ anchorContainer, onSelect, onClear, maxImag
             const delBtn = document.createElement('button');
             delBtn.type = 'button';
             delBtn.className = 'w-5 h-5 bg-red-500/80 hover:bg-red-500 rounded-md flex items-center justify-center transition-colors';
-            delBtn.title = 'Remove from history';
+            delBtn.title = '从历史记录移除';
             delBtn.innerHTML = `<svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
             delBtn.onclick = (e) => {
                 e.stopPropagation();
@@ -297,7 +297,7 @@ export function createUploadPicker({ anchorContainer, onSelect, onClear, maxImag
             const doneBtn2 = document.createElement('button');
             doneBtn2.type = 'button';
             doneBtn2.className = 'px-4 py-1.5 bg-primary text-black rounded-xl text-xs font-black transition-all hover:scale-105';
-            doneBtn2.textContent = 'Use Selected';
+            doneBtn2.textContent = '使用已选';
             doneBtn2.onclick = (e) => {
                 e.stopPropagation();
                 closePanel();
@@ -376,7 +376,7 @@ export function createUploadPicker({ anchorContainer, onSelect, onClear, maxImag
         } catch (err) {
             console.error('[UploadPicker] Upload failed:', err);
             updateTrigger();
-            alert(`Image upload failed: ${err.message}`);
+            alert(`图片上传失败：${err.message}`);
         }
 
         fileInput.value = '';

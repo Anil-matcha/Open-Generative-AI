@@ -1,30 +1,30 @@
-# Open Generative AI — Uncensored Open-Source Alternative to AI Video Platforms
+# Open Generative AI — 面向 AI 影像平台的开源替代方案
 
-> **The free, open-source, unrestricted alternative to AI Video Platforms.** Generate AI images and videos using 200+ state-of-the-art models — no content filters, no closed ecosystem, no subscription fees.
+> **免费、开源、无约束的 AI 影像平台替代品。** 使用 200+ 个前沿模型生成 AI 图像和视频，没有内容过滤，没有封闭生态，没有订阅费用。
 
-**Community:** Join [Reddit](reddit.com/r/muapi) & [Discord](https://discord.gg/s7KW4fsqXK) for discussions and support
+**社区：** 加入 [Reddit](reddit.com/r/muapi) 或 [Discord](https://discord.gg/s7KW4fsqXK) 获取讨论和支持
 
-> 🤖 **Automate media generations with AI coding agents:** [Generative-Media-Skills](https://github.com/SamurAIGPT/Generative-Media-Skills) — a library of skills that let agents like **Claude Code**, **Codex**, and other coding assistants drive 200+ image/video models end-to-end (prompt → generate → edit → stitch) directly from your terminal. Perfect for building automated media pipelines without touching a UI.
+> 🤖 **用 AI 编码智能体自动化媒体生成：** [Generative-Media-Skills](https://github.com/SamurAIGPT/Generative-Media-Skills) 是一套技能库，能让 **Claude Code**、**Codex** 等编码助手直接驱动 200+ 个图像/视频模型完成端到端流程（提示词 → 生成 → 编辑 → 拼接），适合搭建自动化媒体流水线。
 
-### Related projects
+### 相关项目
 
-> **Open-source Node based workflow builder** -> https://github.com/SamurAIGPT/Vibe-Workflow
+> **开源 Node 工作流构建器** -> https://github.com/SamurAIGPT/Vibe-Workflow
 
-> **Open-source AI Clipping — turn any long-form YouTube video into viral-ready vertical shorts** -> https://github.com/SamurAIGPT/AI-Youtube-Shorts-Generator
+> **开源 AI 剪辑工具** -> https://github.com/SamurAIGPT/AI-Youtube-Shorts-Generator
 
-## 🌐 Try it Online — No Install Required
+## 🌐 在线体验 - 无需安装
 
-**Hosted version:** [https://dev.muapi.ai/open-generative-ai](https://dev.muapi.ai/open-generative-ai)
+**托管版本：** [https://dev.muapi.ai/open-generative-ai](https://dev.muapi.ai/open-generative-ai)
 
-Use all four studios (Image, Video, Lip Sync, Cinema) directly in your browser — no Node.js, no setup. Sign up for a free account to start generating. The hosted version is always up to date with the latest models.
+可直接在浏览器里使用四个工作台（图像、视频、口型同步、电影），无需 Node.js，也无需额外配置。注册免费账号即可开始生成。托管版会持续同步最新模型。
 
-**Follow** the [creator](https://x.com/matchaman11) for updates
+**关注** [作者](https://x.com/matchaman11) 获取更新
 
 ---
 
-## ⬇️ Download Desktop App
+## ⬇️ 下载桌面应用
 
-One-click installers — no Node.js or terminal required.
+一键安装包，无需 Node.js，也不用开终端。
 
 | Platform | Download |
 |---|---|
@@ -35,133 +35,133 @@ One-click installers — no Node.js or terminal required.
 
 All releases: [github.com/Anil-matcha/Open-Generative-AI/releases](https://github.com/Anil-matcha/Open-Generative-AI/releases)
 
-### macOS Installation Guide
+### macOS 安装指南
 
-Because the app is not notarized by Apple, macOS Gatekeeper will block it on first launch. Follow these steps:
+由于应用未经过 Apple 公证，macOS Gatekeeper 会在首次启动时拦截。按下面步骤处理：
 
-**Step 1** — Mount the DMG and drag the app to `/Applications`
+**步骤 1** - 挂载 DMG，并把应用拖到 `/Applications`
 
-**Step 2** — Open Terminal and run:
+**步骤 2** - 打开终端并执行：
 ```bash
 xattr -cr "/Applications/Open Generative AI.app"
 ```
 
-**Step 3** — Right-click the app in `/Applications` → click **Open** → click **Open** again on the dialog
+**步骤 3** - 在 `/Applications` 里右键应用 → 点 **打开** → 弹窗里再点一次 **打开**
 
-> You only need to do this once. After that, the app opens normally.
+> 这一步只需要做一次，之后就能正常打开。
 
-**Alternative (no Terminal):**
-1. Try to open the app — macOS will block it
-2. Go to **System Settings → Privacy & Security**
-3. Scroll down to find _"Open Generative AI was blocked"_
-4. Click **Open Anyway** → **Open**
+**替代方式（不使用终端）：**
+1. 先尝试打开应用，macOS 会拦截
+2. 进入 **系统设置 → 隐私与安全性**
+3. 向下找到 _"Open Generative AI was blocked"_
+4. 点击 **仍要打开** → **打开**
 
-### Windows Installation — SmartScreen warning fix
+### Windows 安装 - SmartScreen 提示处理
 
-Windows SmartScreen may show a warning because the installer is not code-signed:
+由于安装包未做代码签名，Windows SmartScreen 可能会弹出警告：
 
-1. Click **More info** on the SmartScreen dialog
-2. Click **Run anyway**
+1. 在 SmartScreen 弹窗里点击 **更多信息**
+2. 点击 **仍要运行**
 
-The app will install silently to `%LocalAppData%` with a Start Menu shortcut.
+应用会静默安装到 `%LocalAppData%`，并创建开始菜单快捷方式。
 
-### Ubuntu / Linux Installation
+### Ubuntu / Linux 安装
 
-Linux artifacts are available when building with Electron Builder:
+使用 Electron Builder 构建时会生成 Linux 安装包：
 
 ```bash
 # Build Linux installers (AppImage + .deb)
 npm run electron:build:linux
 ```
 
-Generated files are written to the `release/` folder:
-- **AppImage** — portable, run directly after making executable:
+生成文件会输出到 `release/` 目录：
+- **AppImage** - 便携版，赋予可执行权限后即可运行：
   ```bash
   chmod +x "release/Open Generative AI-*.AppImage"
   ./release/Open\ Generative\ AI-*.AppImage
   ```
-- **.deb** — install on Debian/Ubuntu:
+- **.deb** - Debian / Ubuntu 可直接安装：
   ```bash
   sudo apt install ./release/open-generative-ai_*_amd64.deb
   ```
 
-If AppImage fails to start on older systems, install `libfuse2`:
+如果较旧系统上的 AppImage 无法启动，请安装 `libfuse2`：
 
 ```bash
 sudo apt install libfuse2
 ```
 
-#### Ubuntu 24.04+ / AppArmor sandbox restriction
+#### Ubuntu 24.04+ / AppArmor 沙箱限制
 
-Ubuntu 24.04 and later enable a kernel security policy (`apparmor_restrict_unprivileged_userns`) that blocks Chromium's user-namespace sandbox. If the app fails to start silently or crashes immediately, you have two options:
+Ubuntu 24.04 及以上默认启用内核安全策略（`apparmor_restrict_unprivileged_userns`），会阻止 Chromium 的用户命名空间沙箱。如果应用无法静默启动或一打开就崩溃，可以选择下面两种方式：
 
-**Option A — Recommended: install the `.deb` instead.**
-The `.deb` package ships an AppArmor profile that grants the required permission automatically on install with no system-wide changes.
+**方案 A - 推荐：改装 `.deb`。**
+`.deb` 包里已经包含 AppArmor 配置，安装后会自动获得所需权限，不需要改系统全局设置。
 
-**Option B — Temporary system fix (AppImage users):**
+**方案 B - 临时系统修复（AppImage 用户）：**
 ```bash
 sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 ```
-This lasts until next reboot. To make it permanent:
+这只会持续到下次重启。若要永久生效：
 ```bash
 echo 'kernel.apparmor_restrict_unprivileged_userns=0' | sudo tee /etc/sysctl.d/99-userns.conf
 ```
 
 ---
 
-Open Generative AI is a free, uncensored, open-source AI image, video, cinema, and lip sync studio that brings unrestricted creative workflows to everyone. No content filters, no prompt rejections, no guardrails — just full creative freedom. Powered by [Muapi.ai](https://muapi.ai), it supports text-to-image, image-to-image, text-to-video, image-to-video, and audio-driven lip sync generation across models like Flux, Nano Banana, Midjourney, Kling, Sora, Veo, Seedream, Infinite Talk, LTX Lipsync, Wan 2.2, and more — all from a sleek, modern interface you can self-host and customize.
+Open Generative AI 是一套免费、开源、无内容限制的 AI 图像、视频、电影和口型同步工作台，面向所有想要自由创作的人。没有内容过滤，没有提示词拒绝，没有守门规则，只保留完整的创作自由。项目基于 [Muapi.ai](https://muapi.ai) 提供能力，支持文生图、图生图、文生视频、图生视频，以及音频驱动的口型同步生成，覆盖 Flux、Nano Banana、Midjourney、Kling、Sora、Veo、Seedream、Infinite Talk、LTX Lipsync、Wan 2.2 等模型，并提供可自托管、可定制的现代界面。
 
-**Why Open Generative AI instead of other AI Video Platforms?**
-- **Uncensored & unrestricted** — no content filters, no nanny guardrails, no prompt rejections
-- **Free & open-source** — no subscription, no vendor lock-in
-- **Self-hosted** — your data stays on your machine, full creative control
-- **200+ models** — text-to-image, image-to-image, text-to-video, image-to-video, lip sync
-- **Multi-image input** — feed up to 14 reference images into compatible models
-- **Lip Sync Studio** — animate portraits or sync lips to any audio with 9 dedicated models
-- **Extensible** — add your own models, modify the UI, build on top of it
+**为什么选 Open Generative AI？**
+- **无内容限制** - 没有过滤器、没有提示词拒绝、没有额外守门规则
+- **免费开源** - 无需订阅，没有厂商锁定
+- **可自托管** - 数据留在本机，创作完全可控
+- **200+ 模型** - 覆盖文生图、图生图、文生视频、图生视频和口型同步
+- **多图输入** - 兼容模型最多可接收 14 张参考图
+- **口型同步工作台** - 可用 9 个专用模型驱动人像口型或音频同步
+- **可扩展** - 能接入自己的模型，也能继续改 UI 做二次开发
 
-For a deep dive into the technical architecture and the philosophy behind the "Infinite Budget" cinema workflow, see our [comprehensive guide and roadmap](https://medium.com/@anilmatcha/).
+若想深入了解技术架构，以及 “Infinite Budget” 电影工作流背后的理念，可查看我们的 [完整指南和路线图](https://medium.com/@anilmatcha/)。
 
 ![Studio Demo](docs/assets/studio_demo.webp)
 
-## ⚡ Local Model Inference (Desktop App Only)
+## ⚡ 本地模型推理（仅桌面应用）
 
-The desktop app supports **two independent local engines**. Pick whichever fits the machine you actually run on:
+桌面应用支持 **两套独立的本地引擎**。根据实际运行机器选择即可：
 
-| Engine | What it is | Best for |
+| 引擎 | 说明 | 适合场景 |
 |---|---|---|
-| **sd.cpp** (bundled) | C++ engine from [stable-diffusion.cpp](https://github.com/leejet/stable-diffusion.cpp), runs on the same machine as the app. Metal GPU on Apple Silicon, CUDA/Vulkan/ROCm on Linux/Windows. | Image-only models. Works on Mac M-series. |
-| **Wan2GP** (BYO server) | HTTP client to a user-run [Wan2GP](https://github.com/deepbeepmeep/Wan2GP) server. The server runs Python + PyTorch on a CUDA/ROCm GPU; the desktop app only sends prompts and receives results. | Video models (Wan 2.2, Hunyuan, LTX) and large image models (Flux, Qwen-Image). NVIDIA/AMD GPU required on the *server*; the desktop app itself can run on a Mac. |
+| **sd.cpp**（内置） | 基于 [stable-diffusion.cpp](https://github.com/leejet/stable-diffusion.cpp) 的 C++ 引擎，和应用运行在同一台机器上。Apple Silicon 使用 Metal GPU，Linux/Windows 可用 CUDA/Vulkan/ROCm。 | 纯图像模型。适合 Mac M 系列。 |
+| **Wan2GP**（自带服务器） | 连接用户自行运行的 [Wan2GP](https://github.com/deepbeepmeep/Wan2GP) 服务。服务器负责 Python + PyTorch + CUDA/ROCm，桌面应用只发送提示词并接收结果。 | 视频模型（Wan 2.2、Hunyuan、LTX）以及大型图像模型（Flux、Qwen-Image）。NVIDIA/AMD GPU 需要在服务器端，桌面应用本身可以跑在 Mac 上。 |
 
-Both engines share the same UI: open **Settings → Local Models** to configure each.
+两套引擎共用同一个界面：打开 **设置 → Local Models** 分别配置即可。
 
-### Engine 1 — sd.cpp (bundled)
+### 引擎 1 - sd.cpp（内置）
 
-| Model | Type | Size | Notes |
+| 模型 | 类型 | 大小 | 备注 |
 |---|---|---|---|
-| **Z-Image Turbo** ⚡ | Diffusion Transformer | 2.5 GB + 2.7 GB aux | 8-step turbo. Heavy on memory. |
-| **Z-Image Base** ⚡ | Diffusion Transformer | 3.5 GB + 2.7 GB aux | 50-step high-quality. Heavy on memory. |
-| **Dreamshaper 8** | SD 1.5 | 2.1 GB | 20-step versatile. Lightest tested option on Mac. |
-| **Realistic Vision v5.1** | SD 1.5 | 2.1 GB | 25-step photorealistic |
-| **Anything v5** | SD 1.5 | 2.1 GB | 20-step anime/illustration |
-| **SDXL Base 1.0** | SDXL | 6.9 GB | 30-step high-res |
+| **Z-Image Turbo** ⚡ | Diffusion Transformer | 2.5 GB + 2.7 GB 辅助文件 | 8 步极速生成，内存占用较高。 |
+| **Z-Image Base** ⚡ | Diffusion Transformer | 3.5 GB + 2.7 GB 辅助文件 | 50 步高质量生成，内存占用较高。 |
+| **Dreamshaper 8** | SD 1.5 | 2.1 GB | 20 步通用模型，是 Mac 上测试过的最轻量选项。 |
+| **Realistic Vision v5.1** | SD 1.5 | 2.1 GB | 25 步写实模型 |
+| **Anything v5** | SD 1.5 | 2.1 GB | 20 步动漫/插画模型 |
+| **SDXL Base 1.0** | SDXL | 6.9 GB | 30 步高分辨率 |
 
-> **Z-Image models** require two shared auxiliary files (downloaded once, shared across both models):
-> - **Qwen3-4B Text Encoder** — 2.4 GB
-> - **FLUX VAE** — 335 MB
+> **Z-Image 模型**需要两个共享辅助文件（只需下载一次，两款模型共用）：
+> - **Qwen3-4B Text Encoder** - 2.4 GB
+> - **FLUX VAE** - 335 MB
 
-**How to use:**
-1. Open **Settings → Local Models** in the desktop app
-2. Install the **sd.cpp inference engine** (one click — auto-downloaded)
-3. Download your chosen model (and auxiliary files for Z-Image)
-4. In **Image Studio**, click the **⚡ Local** toggle next to the model selector
-5. Select your local model and generate — no API key needed
+**使用方式：**
+1. 在桌面应用中打开 **设置 → Local Models**
+2. 安装 **sd.cpp 推理引擎**（一键自动下载）
+3. 下载你选择的模型（Z-Image 还需要辅助文件）
+4. 在 **图像创作** 中点击模型选择器旁边的 **⚡ Local** 开关
+5. 选择本地模型并生成，无需 API Key
 
-All downloads happen inside the app. Nothing is installed system-wide.
+所有下载都在应用内完成，不会把内容安装到系统全局。
 
-### Engine 2 — Wan2GP (remote Gradio server)
+### 引擎 2 - Wan2GP（远程 Gradio 服务）
 
-The app does **not** bundle Python or model weights for Wan2GP. You run Wan2GP yourself on a machine with a CUDA or ROCm GPU and point the desktop app at its URL.
+应用本身 **不内置** Wan2GP 的 Python 环境或模型权重。你需要在带 CUDA 或 ROCm GPU 的机器上自行运行 Wan2GP，然后把桌面应用指向它的 URL。
 
 ```bash
 # On your GPU machine
@@ -171,13 +171,13 @@ cd Wan2GP
 python wgp.py --listen --server-name 0.0.0.0   # binds to all interfaces
 ```
 
-Then in the desktop app: **Settings → Local Models → Wan2GP server**, paste the URL (e.g. `http://192.168.1.42:7860`), click **Test**, then **Save**. The Wan2GP models become available — image models in **Image Studio**, video models reachable via the same generation API (Image Studio rejects video output explicitly; full Video Studio wiring is on the roadmap).
+然后在桌面应用中打开：**设置 → Local Models → Wan2GP server**，粘贴 URL（例如 `http://192.168.1.42:7860`），点击 **测试**，再点击 **保存**。之后 Wan2GP 模型即可使用：图像模型会出现在 **图像创作** 中，视频模型也可通过同一生成 API 访问（图像创作会显式拒绝视频输出，完整视频创作接入仍在路线图中）。
 
-| Model | Type | Notes |
+| 模型 | 类型 | 备注 |
 |---|---|---|
 | **Flux.1 Dev** | Image | 1024px, 28 steps |
 | **Qwen Image** | Image | 1024px, 30 steps |
-| **Wan 2.2 (T2V / I2V)** | Video | Slow on consumer GPUs |
+| **Wan 2.2 (T2V / I2V)** | Video | 消费级 GPU 上较慢 |
 | **Hunyuan Video** | Video | High-quality T2V |
 | **LTX Video** | Video | Fastest video option |
 
@@ -220,46 +220,46 @@ A healthy run on Apple Silicon prints `total params memory size = 1969.78MB (VRA
 
 ---
 
-## ✨ Features
+## ✨ 功能一览
 
-- **Image Studio** — Generate images from text prompts (50+ text-to-image models) or transform existing images (55+ image-to-image models). Switches model set automatically based on whether a reference image is provided. Quality and resolution controls visible for models that support them.
-- **Local Inference** — Two engines: **sd.cpp** (bundled, runs on Mac/Win/Linux with Metal/CUDA/Vulkan/ROCm) for SD 1.5, SDXL, and Z-Image; and **Wan2GP** (BYO Gradio server) for Flux, Qwen-Image, and video models (Wan 2.2, Hunyuan, LTX). Configure both in Settings → Local Models.
-- **Multi-Image Input** — Upload up to 14 reference images for compatible edit models (Nano Banana 2 Edit, Flux Kontext Dev, GPT-4o Edit, and more). Multi-select picker with order badges, batch upload, and a "Use Selected" confirmation flow.
-- **Video Studio** — Generate videos from text prompts (40+ text-to-video models) or animate a start-frame image (60+ image-to-video models). Same intelligent mode switching as Image Studio.
-- **Lip Sync Studio** — Animate portrait images or sync lips on existing videos using audio. 9 dedicated models across two modes: portrait image + audio → talking video, and video + audio → lipsync video.
-- **Cinema Studio** — Interface for photorealistic cinematic shots with pro camera controls (Lens, Focal Length, Aperture)
-- **Workflow Studio** — Build and run multi-step AI pipelines visually. Chain image, video, and audio models into automated flows. Browse community templates, create your own with a node-based editor, and run them via an interactive playground.
-- **Upload History** — Reference images are uploaded once and stored locally. A picker panel lets you reuse any previously uploaded image across sessions — no re-uploading.
-- **Smart Controls** — Dynamic aspect ratio, resolution/quality, and duration pickers that adapt to each model's capabilities (including t2i models with resolution or quality options)
-- **Generation History** — Browse, revisit, and download all past generations (persisted in browser storage)
-- **Image & Video Download** — One-click download of generated outputs in full resolution
-- **API Key Management** — Secure API key storage in browser localStorage (never sent to any server except Muapi)
-- **Responsive Design** — Works seamlessly on desktop and mobile with dark glassmorphism UI
+- **图像创作** — 可直接输入提示词生成图像（50+ 文生图模型），也可以上传参考图把现有图片改成新画面（55+ 图生图模型）。只要上传了参考图，系统就会自动切换模型集合；支持分辨率和质量控制的模型也会同步显示对应选项。
+- **本地推理** — 提供两套引擎：**sd.cpp**（内置，支持 Mac / Windows / Linux，覆盖 Metal / CUDA / Vulkan / ROCm）用于 SD 1.5、SDXL 和 Z-Image；**Wan2GP**（自带 Gradio 服务器）用于 Flux、Qwen-Image 以及视频模型（Wan 2.2、Hunyuan、LTX）。两者都可以在“设置 → 本地模型”里配置。
+- **多图参考** — 兼容的编辑模型可一次上传最多 14 张参考图（如 Nano Banana 2 Edit、Flux Kontext Dev、GPT-4o Edit 等）。支持按顺序选择、批量上传和“使用已选”确认流程。
+- **视频创作** — 可输入提示词直接生成视频（40+ 文生视频模型），也可以上传起始帧把静帧动起来（60+ 图生视频模型）。模式切换逻辑与图像创作保持一致。
+- **口型同步工作台** — 用音频驱动人像图或现有视频生成对口型视频。内置 9 个专用模型，覆盖“人像图 + 音频 → 说话视频”和“视频 + 音频 → 口型同步视频”两种模式。
+- **电影创作** — 为写实电影镜头准备的界面，提供专业级镜头控制（镜头、焦距、光圈）。
+- **工作流工作台** — 可视化搭建并运行多步 AI 流水线，把图像、视频和音频模型串起来自动执行。可以浏览社区模板、自己用节点编辑器搭建流程，也能在交互式 playground 里直接跑。
+- **上传历史** — 参考图只需上传一次，就会保存在本地。之后可以在选择器里复用之前上传过的图片，不必重复上传。
+- **智能控制** — 画幅、分辨率/质量、时长等选项会根据模型能力动态变化。
+- **生成历史** — 可浏览、回看并下载所有历史生成结果，数据保存在浏览器存储中。
+- **图像与视频下载** — 一键下载生成结果的原始分辨率文件。
+- **API Key 管理** — `API Key` 安全保存在浏览器 `localStorage` 中，不会发送到任何服务器，除 Muapi 外。
+- **响应式设计** — 桌面和移动端都能顺畅使用，整体采用深色玻璃拟态 UI。
 
-### 🖼️ Image Studio — Dual Mode
+### 🖼️ 图像创作 - 双模式
 
-The Image Studio automatically switches between two model sets:
+图像创作会在两套模型集合之间自动切换：
 
-| Mode | Trigger | Models | Prompt |
+| 模式 | 触发条件 | 模型 | 提示词 |
 | :--- | :--- | :--- | :--- |
-| **Text-to-Image** | Default (no image) | 50+ t2i models (Flux, Nano Banana 2, Seedream 5.0, Ideogram, GPT-4o, Midjourney…) | Required |
-| **Image-to-Image** | Reference image uploaded | 55+ i2i models (Kontext, Nano Banana 2 Edit, Seedream 5.0 Edit, Seededit, Upscaler…) | Optional |
+| **文生图** | 默认状态（未上传图片） | 50+ 文生图模型（Flux、Nano Banana 2、Seedream 5.0、Ideogram、GPT-4o、Midjourney 等） | 必填 |
+| **图生图** | 已上传参考图 | 55+ 图生图模型（Kontext、Nano Banana 2 Edit、Seedream 5.0 Edit、Seededit、Upscaler 等） | 可选 |
 
-#### Newly Added Models
+#### 新增模型
 
-| Model | Type | Key Features |
+| 模型 | 类型 | 关键能力 |
 | :--- | :--- | :--- |
-| **Nano Banana 2** | Text-to-Image | Google Gemini 3.1 Flash Image · Resolution 1K/2K/4K · Google Search enhancement · aspect ratio `auto` |
-| **Nano Banana 2 Edit** | Image-to-Image | Up to **14 reference images** · Resolution 1K/2K/4K · Google Search enhancement |
-| **Seedream 5.0** | Text-to-Image | ByteDance · Quality basic/high · 8 aspect ratios · up to 4K |
-| **Seedream 5.0 Edit** | Image-to-Image | ByteDance · Natural language style transfer · Quality basic/high |
-| **MiniMax Image 01** | Text-to-Image | MiniMax · 8 aspect ratios · up to 4 images per request · 1500 char prompt |
+| **Nano Banana 2** | 文生图 | Google Gemini 3.1 Flash Image · 分辨率 1K / 2K / 4K · 支持 Google Search 增强 · 画幅 `auto` |
+| **Nano Banana 2 Edit** | 图生图 | 最多 **14 张参考图** · 分辨率 1K / 2K / 4K · 支持 Google Search 增强 |
+| **Seedream 5.0** | 文生图 | ByteDance · 质量 basic / high · 8 种画幅 · 最多 4K |
+| **Seedream 5.0 Edit** | 图生图 | ByteDance · 自然语言风格迁移 · 质量 basic / high |
+| **MiniMax Image 01** | 文生图 | MiniMax · 8 种画幅 · 每次最多 4 张图 · 1500 字提示词 |
 
-#### Multi-Image Input
+#### 多图参考
 
-Models that accept multiple reference images expose a multi-select picker when active:
+支持多图输入的模型在激活时会自动显示多选选择器：
 
-| Model | Max Images |
+| 模型 | 最多张数 |
 | :--- | :--- |
 | Nano Banana 2 Edit | 14 |
 | Nano Banana Edit | 10 |
@@ -276,263 +276,262 @@ Models that accept multiple reference images expose a multi-select picker when a
 | GPT-4o Image to Image | 5 |
 | Flux 2 Klein 4b/9b Edit | 4 |
 
-When a multi-image model is selected the upload trigger switches to multi-select mode:
-- **Checkboxes with order numbers** — images are sent to the model in the order you select them
-- **Batch upload** — pick multiple files at once from your file dialog
-- **Count badge** on the trigger shows how many images are active; a `+` badge appears when more slots are available
-- **"Use Selected" button** confirms and closes the picker
+当选中多图模型后，上传按钮会切换为多选模式：
+- **带顺序编号的复选框** — 图片会按你选择的顺序发送给模型
+- **批量上传** — 可以在文件选择器里一次选多个文件
+- **数量徽标** 会显示当前已选图片数量；还有剩余位置时会出现 `+` 标记
+- **“使用已选”按钮** 用于确认并关闭选择器
 
-### 🎬 Video Studio — Dual Mode
+### 🎬 视频创作 - 双模式
 
-The Video Studio follows the same pattern:
+视频创作遵循同样的切换逻辑：
 
-| Mode | Trigger | Models | Prompt |
+| 模式 | 触发条件 | 模型 | 提示词 |
 | :--- | :--- | :--- | :--- |
-| **Text-to-Video** | Default (no image) | 40+ t2v models (Kling, Sora, Veo, Wan, Seedance 2.0, Hailuo, Runway…) | Required |
-| **Image-to-Video** | Start frame uploaded | 60+ i2v models (Kling I2V, Veo3 I2V, Runway I2V, Wan I2V, Seedance 2.0 I2V, Midjourney I2V…) | Optional |
+| **文生视频** | 默认状态（未上传图片） | 40+ 文生视频模型（Kling、Sora、Veo、Wan、Seedance 2.0、Hailuo、Runway 等） | 必填 |
+| **图生视频** | 已上传起始帧 | 60+ 图生视频模型（Kling I2V、Veo3 I2V、Runway I2V、Wan I2V、Seedance 2.0 I2V、Midjourney I2V 等） | 可选 |
 
-#### Newly Added Models
+#### 新增模型
 
-| Model | Type | Key Features |
+| 模型 | 类型 | 关键能力 |
 | :--- | :--- | :--- |
-| **Seedance 2.0** | Text-to-Video | ByteDance · Aspect ratios 16:9 / 9:16 / 4:3 / 3:4 · Duration 5 / 10 / 15s · Quality basic/high |
-| **Seedance 2.0 I2V** | Image-to-Video | ByteDance · Animate images into video · Up to 9 reference images · Aspect ratios 16:9 / 9:16 / 4:3 / 3:4 · Duration 5 / 10 / 15s · Quality basic/high |
-| **Seedance 2.0 Extend** | Video Extension | ByteDance · Seamlessly continue any Seedance 2.0 generation · Preserves style, motion & audio · Optional continuation prompt · Duration 5 / 10 / 15s · Quality basic/high |
-| **Grok Imagine T2V** | Text-to-Video | xAI · Duration 6 / 10 / **15s** · Modes: fun / normal / spicy · Aspect ratios 9:16 / 16:9 / 2:3 / 3:2 / 1:1 |
-| **Grok Imagine I2V** | Image-to-Video | xAI · Duration 6 / 10 / **15s** · Modes: fun / normal / spicy · Cinematic motion from still images |
-| **MiniMax Hailuo 02 / 2.3 Standard & Pro** | Text-to-Video / Image-to-Video | MiniMax · Full HD video · Multiple aspect ratios · Fast variant included |
+| **Seedance 2.0** | 文生视频 | ByteDance · 画幅 16:9 / 9:16 / 4:3 / 3:4 · 时长 5 / 10 / 15 秒 · 质量 basic / high |
+| **Seedance 2.0 I2V** | 图生视频 | ByteDance · 将图片动起来 · 最多 9 张参考图 · 画幅 16:9 / 9:16 / 4:3 / 3:4 · 时长 5 / 10 / 15 秒 · 质量 basic / high |
+| **Seedance 2.0 Extend** | 视频续写 | ByteDance · 无缝延续任何 Seedance 2.0 结果 · 保留风格、运动和音频 · 支持续写提示词 · 时长 5 / 10 / 15 秒 · 质量 basic / high |
+| **Grok Imagine T2V** | 文生视频 | xAI · 时长 6 / 10 / **15 秒** · 模式：fun / normal / spicy · 画幅 9:16 / 16:9 / 2:3 / 3:2 / 1:1 |
+| **Grok Imagine I2V** | 图生视频 | xAI · 时长 6 / 10 / **15 秒** · 模式：fun / normal / spicy · 从静帧生成电影感运动 |
+| **MiniMax Hailuo 02 / 2.3 Standard & Pro** | 文生视频 / 图生视频 | MiniMax · Full HD 视频 · 多种画幅 · 包含快速版本 |
 
-### 🎙️ Lip Sync Studio
+### 🎙️ 口型同步工作台
 
-The **Lip Sync Studio** generates audio-driven talking videos using 9 models across two input modes:
+**口型同步工作台**使用 9 个模型和两种输入模式，生成音频驱动的对口型视频：
 
-| Mode | Trigger | Description |
+| 模式 | 触发条件 | 说明 |
 | :--- | :--- | :--- |
-| **Portrait Image** | Default | Upload a portrait image + audio file → animated talking video |
-| **Video** | Switch to Video mode | Upload an existing video + audio file → lipsync video |
+| **人像图** | 默认 | 上传人像图 + 音频文件 → 生成对口型说话视频 |
+| **视频** | 切换到视频模式 | 上传已有视频 + 音频文件 → 生成口型同步视频 |
 
-#### Image-based Models (Portrait Image + Audio → Video)
+#### 基于图片的模型（人像图 + 音频 → 视频）
 
-| Model | Endpoint | Resolutions | Prompt |
+| 模型 | Endpoint | 分辨率 | 提示词 |
 | :--- | :--- | :--- | :--- |
-| **Infinite Talk** | `infinitetalk-image-to-video` | 480p, 720p | Optional |
-| **Wan 2.2 Speech to Video** | `wan2.2-speech-to-video` | 480p, 720p | Optional |
-| **LTX 2.3 Lipsync** | `ltx-2.3-lipsync` | 480p, 720p, 1080p | Optional |
-| **LTX 2 19B Lipsync** | `ltx-2-19b-lipsync` | 480p, 720p, 1080p | Optional |
+| **Infinite Talk** | `infinitetalk-image-to-video` | 480p, 720p | 可选 |
+| **Wan 2.2 Speech to Video** | `wan2.2-speech-to-video` | 480p, 720p | 可选 |
+| **LTX 2.3 Lipsync** | `ltx-2.3-lipsync` | 480p, 720p, 1080p | 可选 |
+| **LTX 2 19B Lipsync** | `ltx-2-19b-lipsync` | 480p, 720p, 1080p | 可选 |
 
-#### Video-based Models (Video + Audio → Lipsync Video)
+#### 基于视频的模型（视频 + 音频 → 口型同步视频）
 
-| Model | Endpoint | Resolutions | Prompt |
+| 模型 | Endpoint | 分辨率 | 提示词 |
 | :--- | :--- | :--- | :--- |
 | **Sync Lipsync** | `sync-lipsync` | — | — |
 | **LatentSync** | `latentsync-video` | — | — |
 | **Creatify Lipsync** | `creatify-lipsync` | — | — |
 | **Veed Lipsync** | `veed-lipsync` | — | — |
-| **Infinite Talk V2V** | `infinitetalk-video-to-video` | 480p, 720p | Optional |
+| **Infinite Talk V2V** | `infinitetalk-video-to-video` | 480p, 720p | 可选 |
 
-**How it works:**
-1. Select **Portrait Image** or **Video** mode using the toggle
-2. Upload your portrait image (or video) using the image/video upload button
-3. Upload your audio file using the audio upload button
-4. Optionally enter a prompt to guide the motion style
-5. Select a model and resolution (where supported), then click **Generate**
+**使用方式：**
+1. 用切换按钮选择 **人像图** 或 **视频** 模式
+2. 通过图片/视频上传按钮上传人像图（或视频）
+3. 通过音频上传按钮上传音频文件
+4. 可选输入提示词，用来引导动作风格
+5. 选择模型和分辨率（如支持），然后点击 **开始生成**
 
-Generation history is saved separately in `lipsync_history` and pending jobs resume automatically on page reload.
+生成历史会单独保存到 `lipsync_history`，页面刷新后待处理任务会自动恢复。
 
-### 🔀 Workflow Studio
+### 🔀 工作流工作台
 
-The **Workflow Studio** lets you build and run multi-step AI pipelines without writing code.
+**工作流工作台**可以让你不用写代码，就能搭建并运行多步 AI 流水线。
 
-**Key capabilities:**
-- **Templates** — Start from pre-built workflows (image chains, video pipelines, and more)
-- **My Workflows** — Save and manage your own custom pipelines
-- **Community** — Browse and run workflows published by other users
-- **Node-based Builder** — Drag-and-drop visual editor to connect models and route outputs between steps
-- **Playground** — Run any workflow interactively with a form UI; results render inline
-- **API execution** — Every workflow is also callable via the Muapi API
+**核心能力：**
+- **模板** — 从预置工作流开始（图像链路、视频管线等）
+- **我的工作流** — 保存并管理你自己的自定义流程
+- **社区** — 浏览并运行其他用户发布的工作流
+- **节点式编辑器** — 拖拽式可视化编辑器，用来连接模型和路由步骤输出
+- **Playground** — 用表单界面交互运行任意工作流，结果直接内联显示
+- **API 执行** — 每个工作流都可以通过 Muapi API 调用
 
-> 💡 **Want to add workflows to your own app?** Check out **[Vibe Workflow](https://github.com/SamurAIGPT/Vibe-Workflow)** — the open-source workflow engine powering this feature. Drop it into any project.
+> 💡 想把工作流加进自己的应用里？可以看看 **[Vibe Workflow](https://github.com/SamurAIGPT/Vibe-Workflow)**，这是驱动这个功能的开源工作流引擎，几乎可以直接嵌进任何项目。
 
-### 🎥 Cinema Studio Controls
+### 🎥 电影创作控制
 
-The **Cinema Studio** offers precise control over the virtual camera, translating your choices into optimized prompt modifiers:
+**电影创作**提供对虚拟相机的精细控制，并把你的选择转换成优化后的提示词修饰：
 
-| Category | Available Options |
+| 类别 | 可选项 |
 | :--- | :--- |
-| **Cameras** | Modular 8K Digital, Full-Frame Cine Digital, Grand Format 70mm Film, Studio Digital S35, Classic 16mm Film, Premium Large Format Digital |
-| **Lenses** | Creative Tilt, Compact Anamorphic, Extreme Macro, 70s Cinema Prime, Classic Anamorphic, Premium Modern Prime, Warm Cinema Prime, Swirl Bokeh Portrait, Vintage Prime, Halation Diffusion, Clinical Sharp Prime |
-| **Focal Lengths** | 8mm (Ultra-Wide), 14mm, 24mm, 35mm (Human Eye), 50mm (Portrait), 85mm (Tight Portrait) |
-| **Apertures** | f/1.4 (Shallow DoF), f/4 (Balanced), f/11 (Deep Focus) |
+| **相机** | Modular 8K Digital、Full-Frame Cine Digital、Grand Format 70mm Film、Studio Digital S35、Classic 16mm Film、Premium Large Format Digital |
+| **镜头** | Creative Tilt、Compact Anamorphic、Extreme Macro、70s Cinema Prime、Classic Anamorphic、Premium Modern Prime、Warm Cinema Prime、Swirl Bokeh Portrait、Vintage Prime、Halation Diffusion、Clinical Sharp Prime |
+| **焦距** | 8mm（超广角）、14mm、24mm、35mm（人眼视角）、50mm（人像）、85mm（紧人像） |
+| **光圈** | f/1.4（浅景深）、f/4（均衡）、f/11（深焦点） |
 
-### 📁 Upload History & Picker
+### 📁 上传历史与选择器
 
-Every image you upload is saved locally (URL + thumbnail) so you never upload the same file twice:
+你上传的每张图片都会保存在本地（URL + 缩略图），所以同一文件不用重复上传：
 
-- Click the upload button to open the **reference image picker**
-- Previously uploaded images appear in a 3-column grid with thumbnails
-- **Single-image models** — click a thumbnail to instantly select and close
-- **Multi-image models** — toggle multiple thumbnails (shown with order numbers), then click **Use Selected**
-- Upload new images with the **Upload files** button (supports multi-file selection in multi-image mode)
-- Remove individual images from history with the ✕ button
-- History persists across browser sessions (stored in `localStorage`)
+- 点击上传按钮即可打开 **参考图选择器**
+- 以前上传过的图片会以三列网格和缩略图显示
+- **单图模型** — 点击缩略图即可直接选中并关闭
+- **多图模型** — 可切换多张缩略图（带顺序编号），然后点击 **使用已选**
+- 用 **上传文件** 按钮继续上传新图片（多图模式下支持一次选多个文件）
+- 可以用 ✕ 按钮移除历史中的单张图片
+- 历史记录会跨浏览器会话保留（存储在 `localStorage`）
 
-## 🚀 Quick Start
+## 🚀 快速开始
 
-### Prerequisites
+### 前置条件
 
-- [Node.js](https://nodejs.org/) (v18+)
-- A [Muapi.ai](https://muapi.ai) API key
+- [Node.js](https://nodejs.org/)（v18+）
+- 一个 [Muapi.ai](https://muapi.ai) 的 `API Key`
 
-### Setup
+### 环境准备
 
-> **Most users want the desktop app, not this dev path.** If you just want to run Open Generative AI on your machine, [download a prebuilt installer](#-download-desktop-app) instead — no Node.js required. The instructions below are for contributors building from source.
+> **大多数用户其实更适合直接用桌面应用，不必走开发路径。** 如果你只是想在本机使用 Open Generative AI，直接去 [下载预编译安装包](#-download-desktop-app) 就好，不需要安装 Node.js。下面这些步骤主要给从源码开发的贡献者。
 
-Pick the entry point that matches your goal:
+先选择与你目标一致的入口：
 
-- **Desktop app (Electron)** → `npm run electron:dev`
-- **Hosted web version (Next.js)** → `npm run dev`
+- **桌面应用（Electron）** → `npm run electron:dev`
+- **托管网页版本（Next.js）** → `npm run dev`
 
 ```bash
-# Clone the repository (with submodules — required for the workflow + agent packages)
+# 克隆仓库（带子模块 — 工作流和智能体包都依赖它）
 git clone --recurse-submodules https://github.com/Anil-matcha/Open-Generative-AI.git
 cd Open-Generative-AI
 
-# If you already cloned without --recurse-submodules, run this once:
+# 如果你之前没带 --recurse-submodules 克隆过，补执行一次：
 # git submodule update --init --recursive
 
-# Install dependencies + build workspace packages (studio, workflow, agents).
-# This step is REQUIRED — `npm install` alone is not enough; the workspaces
-# need to be built before either dev script will work.
+# 安装依赖并构建工作区包（studio、workflow、agents）。
+# 这一步是必须的 — 只跑 `npm install` 还不够，工作区包在启动任一开发脚本前都要先构建好。
 npm run setup
 
-# Then start ONE of:
-npm run electron:dev   # Desktop app (Electron + Vite) — recommended
-npm run dev            # Hosted web version (Next.js) → http://localhost:3000
+# 然后从下面任选一个启动：
+npm run electron:dev   # 桌面应用（Electron + Vite）— 推荐
+npm run dev            # 托管网页版本（Next.js）→ http://localhost:3000
 ```
 
-You'll be prompted to enter your Muapi API key on first use (skip the key if you only plan to use local models).
+首次使用时会提示你输入 Muapi `API Key`（如果你只打算使用本地模型，可以先不填）。
 
-> **Troubleshooting — `Couldn't find a 'pages' directory`**: this means Next.js can't see the `app/` folder. Confirm you're running `npm run dev` from the repo root (the directory that contains `app/`, `package.json`, and `next.config.mjs`), and that you cloned with submodules. Re-run `npm run setup` if `packages/Vibe-Workflow` or `packages/Open-Poe-AI` are empty.
+> **排错提示 — `Couldn't find a 'pages' directory`**：这说明 Next.js 没有看到 `app/` 目录。请确认你是在仓库根目录运行 `npm run dev`（也就是包含 `app/`、`package.json` 和 `next.config.mjs` 的那个目录），并且克隆时带了子模块。如果 `packages/Vibe-Workflow` 或 `packages/Open-Poe-AI` 还是空的，请重新执行 `npm run setup`。
 
-### Production Build
+### 生产构建
 
 ```bash
 npm run build
 npm run start
 ```
 
-### Desktop App Build
+### 桌面端打包
 
-Build native desktop apps with Electron:
+使用 Electron 构建原生桌面应用：
 
 ```bash
-# macOS (DMG — Intel + Apple Silicon)
+# macOS（DMG — Intel + Apple Silicon）
 npm run electron:build
 
-# Windows (NSIS installer — x64 + ARM64)
+# Windows（NSIS 安装包 — x64 + ARM64）
 npm run electron:build:win
 
-# Linux (AppImage + DEB — x64)
+# Linux（AppImage + DEB — x64）
 npm run electron:build:linux
 
-# Both platforms in one pass
+# 一次性打包两个平台
 npm run electron:build:all
 ```
 
-Installers are output to the `release/` folder. Pre-built binaries are also available on the [Releases page](https://github.com/Anil-matcha/Open-Generative-AI/releases).
+安装包会输出到 `release/` 目录。预构建二进制也可以在 [Releases 页面](https://github.com/Anil-matcha/Open-Generative-AI/releases) 找到。
 
-## 🏗️ Architecture
+## 🏗️ 架构
 
-The app is a **Next.js monorepo** with a shared `packages/studio` component library.
+这个应用是一个 **Next.js 单体仓库**，共享 `packages/studio` 组件库。
 
 ```
 Open-Generative-AI/
 ├── app/                        # Next.js App Router
-│   ├── layout.js               # Root layout (Tailwind, fonts)
-│   ├── page.js                 # Redirects → /studio
+│   ├── layout.js               # 根布局（Tailwind、字体）
+│   ├── page.js                 # 重定向 → /studio
 │   └── studio/
-│       └── page.js             # Studio page — renders StandaloneShell
+│       └── page.js             # 工作台页面 — 渲染 StandaloneShell
 ├── components/
-│   ├── StandaloneShell.js      # Tab nav + BYOK (API key from localStorage)
-│   └── ApiKeyModal.js          # API key entry modal
+│   ├── StandaloneShell.js      # 标签导航 + BYOK（从 localStorage 读取 API key）
+│   └── ApiKeyModal.js          # API key 输入弹窗
 ├── packages/
-│   └── studio/                 # Shared React component library
+│   └── studio/                 # 共享 React 组件库
 │       └── src/
-│           ├── index.js        # Exports: ImageStudio, VideoStudio, LipSyncStudio, CinemaStudio, WorkflowStudio
-│           ├── models.js       # 200+ model definitions (single source of truth)
-│           ├── muapi.js        # API client (named exports, apiKey as first param)
+│           ├── index.js        # 导出：ImageStudio、VideoStudio、LipSyncStudio、CinemaStudio、WorkflowStudio
+│           ├── models.js       # 200+ 个模型定义（单一事实来源）
+│           ├── muapi.js        # API 客户端（命名导出，apiKey 作为第一个参数）
 │           └── components/
-│               ├── ImageStudio.jsx    # Dual-mode t2i/i2i studio
-│               ├── VideoStudio.jsx    # Dual-mode t2v/i2v studio
-│               ├── LipSyncStudio.jsx  # Portrait/video + audio → talking video
-│               ├── CinemaStudio.jsx   # Pro studio with camera controls
-│               └── WorkflowStudio.jsx # Multi-step pipeline builder & playground
+│               ├── ImageStudio.jsx    # 文生图 / 图生图双模式工作台
+│               ├── VideoStudio.jsx    # 文生视频 / 图生视频双模式工作台
+│               ├── LipSyncStudio.jsx  # 人像/视频 + 音频 → 对口型视频
+│               ├── CinemaStudio.jsx   # 带镜头控制的专业工作台
+│               └── WorkflowStudio.jsx # 多步流水线搭建器与 playground
 ├── next.config.mjs             # transpilePackages: ['studio']
 ├── tailwind.config.js
 └── package.json                # workspaces: ["packages/studio"]
 ```
 
-The `packages/studio` library is also consumed by the hosted version on [muapi.ai](https://muapi.ai) — model updates made in `packages/studio/src/models.js` apply to both the self-hosted app and the hosted version automatically.
+`packages/studio` 这套库同样被 [muapi.ai](https://muapi.ai) 上的托管版本使用，因此你在 `packages/studio/src/models.js` 里做的模型更新，会自动同步到自托管版本和托管版本。
 
-## 🔌 API Integration
+## 🔌 API 接入
 
-The app communicates with [Muapi.ai](https://muapi.ai) using a two-step pattern:
+应用与 [Muapi.ai](https://muapi.ai) 的通信采用两步流程：
 
-1. **Submit** — `POST /api/v1/{model-endpoint}` with prompt and parameters
-2. **Poll** — `GET /api/v1/predictions/{request_id}/result` until status is `completed`
+1. **提交** — 使用 `POST /api/v1/{model-endpoint}` 提交提示词和参数
+2. **轮询** — 反复请求 `GET /api/v1/predictions/{request_id}/result`，直到状态变成 `completed`
 
-Authentication uses the `x-api-key` header. During development, a Vite proxy handles CORS by routing `/api` requests to `https://api.muapi.ai`.
+认证使用 `x-api-key` 请求头。开发环境下，Vite 代理会把 `/api` 请求转发到 `https://api.muapi.ai`，从而处理 CORS。
 
-File uploads use `POST /api/v1/upload_file` (multipart/form-data) and return a hosted URL that is passed to image-conditioned models. For multi-image models the full `images_list` array is forwarded to the API in one request.
+文件上传使用 `POST /api/v1/upload_file`（`multipart/form-data`），返回可访问的托管 URL，随后会传给需要图片条件的模型。对于多图模型，整个 `images_list` 数组会一次性转给 API。
 
-Lip sync jobs use the same two-step pattern: a dedicated `processLipSync()` method accepts `image_url` or `video_url` alongside `audio_url`, dispatches to the model's endpoint, and polls until the output video URL is available.
+口型同步任务也使用同样的两步流程：专门的 `processLipSync()` 方法会接收 `image_url` 或 `video_url` 以及 `audio_url`，发到对应模型的 endpoint，然后轮询直到拿到输出视频 URL。
 
-## 🎨 Supported Model Categories
+## 🎨 支持的模型类别
 
-| Category | Count | Examples |
+| 类别 | 数量 | 示例 |
 |---|---|---|
-| **Text-to-Image** | 50+ | Flux Dev, Nano Banana 2, Seedream 5.0, Ideogram v3, Midjourney v7, GPT-4o, SDXL |
-| **Image-to-Image** | 55+ | Nano Banana 2 Edit (×14), Flux Kontext Pro, GPT-4o Edit, Seededit v3, Upscaler, Background Remover |
-| **Text-to-Video** | 40+ | Kling v3, Sora 2, Veo 3, Wan 2.6, Seedance 2.0, Seedance 2.0 Extend, Seedance Pro, Hailuo 2.3, Runway Gen-3 |
-| **Image-to-Video** | 60+ | Kling v2.1 I2V, Veo3 I2V, Runway I2V, Seedance 2.0 I2V, Midjourney v7 I2V, Hunyuan I2V, Wan2.2 I2V |
-| **Lip Sync** | 9 | Infinite Talk I2V, Wan 2.2 Speech to Video, LTX 2.3 Lipsync, LTX 2 19B Lipsync, Sync, LatentSync, Creatify, Veed, Infinite Talk V2V |
+| **文生图** | 50+ | Flux Dev、Nano Banana 2、Seedream 5.0、Ideogram v3、Midjourney v7、GPT-4o、SDXL |
+| **图生图** | 55+ | Nano Banana 2 Edit（×14）、Flux Kontext Pro、GPT-4o Edit、Seededit v3、Upscaler、Background Remover |
+| **文生视频** | 40+ | Kling v3、Sora 2、Veo 3、Wan 2.6、Seedance 2.0、Seedance 2.0 Extend、Seedance Pro、Hailuo 2.3、Runway Gen-3 |
+| **图生视频** | 60+ | Kling v2.1 I2V、Veo3 I2V、Runway I2V、Seedance 2.0 I2V、Midjourney v7 I2V、Hunyuan I2V、Wan2.2 I2V |
+| **口型同步** | 9 | Infinite Talk I2V、Wan 2.2 Speech to Video、LTX 2.3 Lipsync、LTX 2 19B Lipsync、Sync、LatentSync、Creatify、Veed、Infinite Talk V2V |
 
-## 🛠️ Tech Stack
+## 🛠️ 技术栈
 
-- **Next.js 14** — App Router, server components, fast dev server
-- **React 18** — Studio UI components
-- **Tailwind CSS v3** — Utility-first styling
-- **npm workspaces** — Monorepo with shared `packages/studio` library
-- **Muapi.ai** — AI model API gateway
+- **Next.js 14** — App Router、Server Components、快速开发服务器
+- **React 18** — 工作台 UI 组件
+- **Tailwind CSS v3** — 原子化样式
+- **npm workspaces** — 带共享 `packages/studio` 库的单体仓库
+- **Muapi.ai** — AI 模型 API 网关
 
-## 🤔 How is this different from other AI Video Plaforms?
+## 🤔 和其他 AI 视频平台有什么不同？
 
-**Open Generative AI** is a community-driven, open-source alternative that provides similar creative capabilities without the closed ecosystem:
+**Open Generative AI** 是一个社区驱动的开源替代方案，保留相近的创作能力，但不把你锁在封闭生态里：
 
-| | Other providers | Open Generative AI |
+| | 其他平台 | Open Generative AI |
 | :--- | :--- | :--- |
-| **Cost** | Subscription-based | Free (open-source) |
-| **Content filters** | Yes — prompts blocked or altered | None — fully uncensored |
-| **Restrictions** | Platform guardrails enforced | Unrestricted creative freedom |
-| **Models** | Proprietary | 200+ open & commercial models |
-| **Multi-image input** | Limited | Up to 14 images per request |
-| **Lip sync** | No | 9 models, image & video modes |
-| **Hosted version** | Subscription | Free at [muapi.ai/open-generative-ai](https://muapi.ai/open-generative-ai) |
-| **Self-hosting** | No | Yes |
-| **Customizable** | No | Fully hackable |
-| **Data privacy** | Cloud-based | Your data stays local |
-| **Source code** | Closed | MIT licensed |
+| **费用** | 订阅制 | 免费（开源） |
+| **内容过滤** | 有，会拦截或改写提示词 | 无，完全不设过滤 |
+| **限制** | 平台规则强约束 | 创作自由度更高 |
+| **模型** | 专有 | 200+ 开源与商业模型 |
+| **多图输入** | 有限制 | 单次最多 14 张图 |
+| **口型同步** | 没有 | 9 个模型，支持图像和视频两种模式 |
+| **托管版本** | 订阅制 | 可在 [muapi.ai/open-generative-ai](https://muapi.ai/open-generative-ai) 免费使用 |
+| **自托管** | 不支持 | 支持 |
+| **可定制性** | 不支持 | 完全可改、可扩展 |
+| **数据隐私** | 云端托管 | 数据留在本地 |
+| **源代码** | 闭源 | MIT 许可 |
 
-## 📄 License
+## 📄 许可证
 
 MIT
 
-## 🙏 Credits
+## 🙏 致谢
 
-Built with [Muapi.ai](https://muapi.ai) — the unified API for AI image and video generation models.
-
----
-**Deep Dive**: For more details on the "AI Influencer" engine, upcoming "Popcorn" storyboarding features, and the future of this project, read the [full technical overview](https://medium.com/@anilmatcha/).
+由 [Muapi.ai](https://muapi.ai) 提供支持，这是一个统一的 AI 图像和视频生成 API。
 
 ---
-*Looking for a free, uncensored AI Video Plaform? Open Generative AI is an open-source, unrestricted AI image and video generation studio — with no content filters that you can self-host, customize, and extend.*
+**深入阅读**：如果你想了解更多关于 “AI Influencer” 引擎、即将推出的 “Popcorn” 分镜功能，以及这个项目的未来方向，可以阅读 [完整技术概览](https://medium.com/@anilmatcha/)。
+
+---
+*想找一个免费、无过滤的 AI 视频平台？Open Generative AI 是一个开源、无限制的 AI 图像和视频生成工作台，支持自托管、可定制、可扩展。*

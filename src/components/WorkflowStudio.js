@@ -10,11 +10,11 @@ export function WorkflowStudio() {
     </svg>`;
 
     const title = document.createElement('p');
-    title.textContent = 'Workflow Studio';
+    title.textContent = '工作流工作台';
     title.className = 'text-lg font-bold opacity-60';
 
     const sub = document.createElement('p');
-    sub.textContent = 'Available in the web app at open-generative-ai.com';
+    sub.textContent = '可在 open-generative-ai.com 的网页版中使用';
     sub.className = 'text-sm opacity-40';
 
     container.appendChild(icon);

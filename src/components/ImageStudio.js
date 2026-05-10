@@ -16,8 +16,8 @@ function createInlineInstructions(type) {
     el.className = 'w-full text-center text-white/30 text-sm flex flex-col items-center gap-2 py-2';
     const icon = type === 'image' ? '🖼️' : '🎬';
     el.innerHTML = `
-        <p>${icon} Enter a prompt above and click <span class="text-primary font-semibold">Generate</span> to create your ${type}.</p>
-        <p class="text-xs text-white/20">Tip: Be descriptive — include style, lighting, mood, and subject for best results.</p>
+        <p>${icon} 在上方输入提示词，再点击 <span class="text-primary font-semibold">开始生成</span>，即可创建你的${type === 'image' ? '图像' : '视频'}。</p>
+        <p class="text-xs text-white/20">提示：尽量写具体些，加入风格、光线、氛围和主体，效果会更好。</p>
     `;
     return el;
 }
@@ -43,13 +43,13 @@ export function ImageStudio() {
     let selectedLocalModel = LOCAL_IMAGE_MODELS[0]?.id || null;
     let localGenProgress = 0; // 0–1
 
-    // Advanced parameters state
+    // 高级 parameters state
     let negativePrompt = '';
     let guidanceScale = 7.5;
     let steps = 25;
     let seed = -1;
     let showAdvanced = false;
-    let selectedStyle = 'None';
+    let selectedStyle = '无';
     let batchCount = 1;
 
     // New advanced controls
@@ -90,8 +90,8 @@ export function ImageStudio() {
                 <div class="absolute top-4 right-4 text-primary animate-pulse">✨</div>
              </div>
         </div>
-        <h1 class="text-2xl sm:text-4xl md:text-7xl font-black text-white tracking-widest uppercase mb-4 selection:bg-primary selection:text-black text-center px-4">Image Studio</h1>
-        <p class="text-secondary text-sm font-medium tracking-wide opacity-60">Transform images with AI — upscale, stylize, animate and more</p>
+        <h1 class="text-2xl sm:text-4xl md:text-7xl font-black text-white tracking-widest uppercase mb-4 selection:bg-primary selection:text-black text-center px-4">图像创作</h1>
+        <p class="text-secondary text-sm font-medium tracking-wide opacity-60">用 AI 改造图像：放大、风格化、动图化等</p>
     `;
     container.appendChild(hero);
 
@@ -129,8 +129,8 @@ export function ImageStudio() {
                 picker.setMaxImages(getMaxImagesForI2IModel(selectedModel));
             }
             textarea.placeholder = uploadedImageUrls.length > 1
-                ? `${uploadedImageUrls.length} images selected — describe the transformation (optional)`
-                : 'Describe how to transform this image (optional)';
+                ? `${uploadedImageUrls.length} 张图片已选 — 描述改造方式（可选）`
+                : '描述你想如何改造这张图（可选）';
         },
         onClear: () => {
             uploadedImageUrls = [];
@@ -144,14 +144,14 @@ export function ImageStudio() {
             qualityBtn.style.display = t2iResolutions.length > 0 ? 'flex' : 'none';
             if (t2iResolutions.length > 0) document.getElementById('quality-btn-label').textContent = t2iResolutions[0];
             picker.setMaxImages(1);
-            textarea.placeholder = 'Describe the image you want to create';
+            textarea.placeholder = '描述你想要生成的画面';
         }
     });
     topRow.appendChild(picker.trigger);
     container.appendChild(picker.panel);
 
     const textarea = document.createElement('textarea');
-    textarea.placeholder = 'Describe the image you want to create';
+    textarea.placeholder = '描述你想要生成的画面';
     textarea.className = 'flex-1 bg-transparent border-none text-white text-base md:text-xl placeholder:text-muted focus:outline-none resize-none pt-2.5 leading-relaxed min-h-[40px] max-h-[150px] md:max-h-[250px] overflow-y-auto custom-scrollbar';
     textarea.rows = 1;
     textarea.oninput = () => {
@@ -187,15 +187,15 @@ export function ImageStudio() {
         <div class="w-5 h-5 bg-primary rounded-md flex items-center justify-center shadow-lg shadow-primary/20">
             <span class="text-[10px] font-black text-black">G</span>
         </div>
-    `, selectedModelName, 'model-btn', 'Select AI generation model');
+    `, selectedModelName, 'model-btn', '选择 AI 生成模型');
 
     const arBtn = createControlBtn(`
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="opacity-60 text-secondary"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg>
-    `, selectedAr, 'ar-btn', 'Change aspect ratio');
+    `, selectedAr, 'ar-btn', '切换画幅');
 
     const qualityBtn = createControlBtn(`
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="opacity-60 text-secondary"><path d="M6 2L3 6v15a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z"/></svg>
-    `, '720p', 'quality-btn', 'Set output quality');
+    `, '720p', 'quality-btn', '设置输出质量');
 
     // Local / API source toggle (only shown in Electron)
     let localToggleBtn = null;
@@ -206,7 +206,7 @@ export function ImageStudio() {
         const updateLocalToggleStyle = () => {
             if (useLocalModel) {
                 localToggleBtn.className = 'flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all border text-xs font-bold whitespace-nowrap bg-primary/20 border-primary/40 text-primary';
-                localToggleBtn.textContent = '⚡ Local';
+                localToggleBtn.textContent = '⚡ 本地';
             } else {
                 localToggleBtn.className = 'flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all border text-xs font-bold whitespace-nowrap bg-white/5 border-white/5 text-white/60 hover:bg-white/10';
                 localToggleBtn.textContent = '☁ API';
@@ -232,16 +232,16 @@ export function ImageStudio() {
     controlsLeft.appendChild(arBtn);
     controlsLeft.appendChild(qualityBtn);
     
-    // Advanced options toggle button
+    // 高级 options toggle button
     const advancedBtn = createControlBtn(`
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="opacity-60 text-secondary"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 001.82-.33 1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-1.82.33A1.65 1.65 0 0019.4 9a1.65 1.65 0 00-1.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-    `, 'Advanced', 'advanced-btn', 'Show advanced options');
+    `, '高级', 'advanced-btn', '显示高级选项');
     controlsLeft.appendChild(advancedBtn);
     
-    // Quick Tools toggle button
+    // 快捷工具 toggle button
     const toolsBtn = createControlBtn(`
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="opacity-60 text-secondary"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
-    `, 'Tools', 'tools-btn', 'Quick starters & prompt enhancer');
+    `, '工具', 'tools-btn', '快速起始与提示词增强');
     controlsLeft.appendChild(toolsBtn);
     // Show quality button if the default model has quality/resolution options
     const _initResolutions = getResolutionsForModel(defaultModel.id);
@@ -253,8 +253,8 @@ export function ImageStudio() {
 
     const generateBtn = document.createElement('button');
     generateBtn.className = 'bg-primary text-black px-6 md:px-8 py-3 md:py-3.5 rounded-xl md:rounded-[1.5rem] font-black text-sm md:text-base hover:shadow-glow hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2.5 w-full sm:w-auto shadow-lg';
-    generateBtn.setAttribute('data-tooltip', 'Generate AI image from prompt');
-    generateBtn.innerHTML = `Generate ✨`;
+    generateBtn.setAttribute('data-tooltip', '根据提示词生成图像');
+    generateBtn.innerHTML = `开始生成 ✨`;
 
     bottomRow.appendChild(controlsLeft);
     bottomRow.appendChild(generateBtn);
@@ -272,14 +272,14 @@ export function ImageStudio() {
     localProgressWrap.id = 'local-progress-wrap';
     localProgressWrap.innerHTML = `
         <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-white/60">Generating locally...</span>
+            <span class="text-xs font-bold text-white/60">正在本地生成...</span>
             <span id="local-progress-pct" class="text-xs font-bold text-primary">0%</span>
         </div>
         <div class="h-1.5 rounded-full bg-white/10 overflow-hidden">
             <div id="local-progress-fill" class="h-full bg-primary transition-all duration-200" style="width:0%"></div>
         </div>
         <div class="flex justify-end">
-            <button id="local-cancel-btn" class="text-xs text-red-400 hover:text-red-300 transition-colors">Cancel</button>
+            <button id="local-cancel-btn" class="text-xs text-red-400 hover:text-red-300 transition-colors">取消</button>
         </div>
     `;
     container.appendChild(localProgressWrap);
@@ -289,11 +289,11 @@ export function ImageStudio() {
         localProgressWrap.classList.remove('flex');
         localProgressWrap.classList.add('hidden');
         generateBtn.disabled = false;
-        generateBtn.innerHTML = `Generate ✨`;
+        generateBtn.innerHTML = `开始生成 ✨`;
     });
 
     // ==========================================
-    // 3. QUICK TOOLS PANEL (Prompt Enhancer + Quick Starters)
+    // 3. QUICK TOOLS PANEL (提示词增强 + 快速起始)
     // ==========================================
     const toolsPanel = document.createElement('div');
     toolsPanel.className = 'w-full max-w-4xl mt-6 animate-fade-in-up hidden';
@@ -303,16 +303,16 @@ export function ImageStudio() {
     toolsPanel.innerHTML = `
         <div class="bg-[#111]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-5 flex flex-col gap-4">
             <div class="flex items-center justify-between pb-3 border-b border-white/5">
-                <h3 class="text-sm font-bold text-white">Quick Tools</h3>
+                <h3 class="text-sm font-bold text-white">快捷工具</h3>
                 <button id="close-tools-btn" class="text-white/40 hover:text-white transition-colors">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
                 </button>
             </div>
             
             <div class="flex flex-col lg:flex-row gap-6">
-                <!-- Quick Starters Section -->
+                <!-- 快速起始 Section -->
                 <div class="flex-1">
-                    <h4 class="text-xs font-bold text-secondary uppercase tracking-wider mb-3">Quick Starters</h4>
+                    <h4 class="text-xs font-bold text-secondary uppercase tracking-wider mb-3">快速起始</h4>
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
                         ${QUICK_PROMPTS.map(q => `
                             <button class="quick-starter-btn px-3 py-2 rounded-lg text-xs font-bold bg-white/5 text-secondary hover:bg-white/10 hover:text-primary transition-all text-left border border-white/5 hover:border-primary/30" data-prompt="${q.prompt}">
@@ -322,16 +322,16 @@ export function ImageStudio() {
                     </div>
                 </div>
                 
-                <!-- Prompt Enhancer Section -->
+                <!-- 提示词增强 Section -->
                 <div class="flex-1">
-                    <h4 class="text-xs font-bold text-secondary uppercase tracking-wider mb-3">Prompt Enhancer</h4>
+                    <h4 class="text-xs font-bold text-secondary uppercase tracking-wider mb-3">提示词增强</h4>
                     <div class="flex flex-col gap-3">
                         <input type="text" id="base-prompt-input" 
-                            placeholder="Enter base prompt..."
+                            placeholder="输入基础提示词..."
                             class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder:text-muted focus:outline-none focus:border-primary/50 transition-colors">
                         
                         <div>
-                            <label class="text-[10px] font-bold text-muted uppercase tracking-wider mb-2 block">Enhancement Tags</label>
+                            <label class="text-[10px] font-bold text-muted uppercase tracking-wider mb-2 block">增强标签</label>
                             <div id="enhance-tags-area" class="flex flex-wrap gap-1.5">
                                 ${Object.entries(ENHANCE_TAGS).map(([category, tags]) => 
                                     tags.map(tag => `<button class="enhance-tag-btn px-2 py-1 rounded-full text-[10px] font-bold bg-white/5 text-secondary hover:bg-white/10 transition-all" data-tag="${tag}">${tag}</button>`).join('')
@@ -340,14 +340,14 @@ export function ImageStudio() {
                         </div>
                         
                         <div class="flex flex-col gap-2">
-                            <label class="text-[10px] font-bold text-muted uppercase tracking-wider">Enhanced Prompt</label>
+                            <label class="text-[10px] font-bold text-muted uppercase tracking-wider">增强后的提示词</label>
                             <div id="enhanced-prompt-display" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-xs min-h-[40px]"></div>
                             <div class="flex gap-2">
                                 <button id="copy-enhanced-btn" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white/5 text-secondary hover:bg-white/10 transition-all">
-                                    Copy
+                                    复制
                                 </button>
                                 <button id="use-enhanced-btn" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-primary text-black hover:shadow-glow transition-all">
-                                    Use in Generator
+                                    应用到生成器
                                 </button>
                             </div>
                         </div>
@@ -362,7 +362,7 @@ export function ImageStudio() {
     // ==========================================
     // 4. ADVANCED OPTIONS PANEL
     // ==========================================
-    const STYLE_PRESETS = ['None', 'Photorealistic', 'Anime', 'Cinematic', 'Oil Painting', 'Watercolor', 'Digital Art', 'Concept Art', 'Cyberpunk'];
+    const STYLE_PRESETS = ['无', '写实照片', '动漫', '电影感', '油画', '水彩', '数字艺术', '概念设计', '赛博朋克'];
     
     const advancedPanel = document.createElement('div');
     advancedPanel.className = 'w-full max-w-4xl mt-6 animate-fade-in-up hidden';
@@ -370,33 +370,33 @@ export function ImageStudio() {
     advancedPanel.innerHTML = `
         <div class="bg-[#111]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-5 flex flex-col gap-4">
             <div class="flex items-center justify-between pb-3 border-b border-white/5">
-                <h3 class="text-sm font-bold text-white">Advanced Options</h3>
+                <h3 class="text-sm font-bold text-white">高级选项</h3>
                 <button id="close-adv-btn" class="text-white/40 hover:text-white transition-colors">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
                 </button>
             </div>
             
-            <!-- Style Presets -->
+            <!-- 风格预设s -->
             <div class="flex flex-col gap-2">
-                <label class="text-xs font-bold text-secondary uppercase tracking-wider">Style Preset</label>
+                <label class="text-xs font-bold text-secondary uppercase tracking-wider">风格预设</label>
                 <div class="flex gap-2 flex-wrap">
                     ${STYLE_PRESETS.map(s => `<button class="style-preset-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-white/5 text-secondary hover:bg-white/10 transition-all" data-style="${s}">${s}</button>`).join('')}
                 </div>
             </div>
             
-            <!-- Negative Prompt -->
+            <!-- 反向提示词 -->
             <div class="flex flex-col gap-2">
-                <label class="text-xs font-bold text-secondary uppercase tracking-wider">Negative Prompt</label>
+                <label class="text-xs font-bold text-secondary uppercase tracking-wider">反向提示词</label>
                 <input type="text" id="negative-prompt-input" 
-                    placeholder="What to exclude from the image (e.g., blurry, distorted, watermark)"
+                    placeholder="需要排除的内容（例如：模糊、变形、水印）"
                     class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder:text-muted focus:outline-none focus:border-primary/50 transition-colors">
             </div>
             
-            <!-- Guidance Scale & Steps Row -->
+            <!-- 引导强度 & 步数 Row -->
             <div class="flex gap-4 flex-wrap">
                 <div class="flex-1 min-w-[200px] flex flex-col gap-2">
                     <div class="flex items-center justify-between">
-                        <label class="text-xs font-bold text-secondary uppercase tracking-wider">Guidance Scale</label>
+                        <label class="text-xs font-bold text-secondary uppercase tracking-wider">引导强度</label>
                         <span id="guidance-value" class="text-xs font-bold text-primary">7.5</span>
                     </div>
                     <input type="range" id="guidance-slider" min="1" max="20" step="0.5" value="7.5" 
@@ -405,7 +405,7 @@ export function ImageStudio() {
                 
                 <div class="flex-1 min-w-[200px] flex flex-col gap-2">
                     <div class="flex items-center justify-between">
-                        <label class="text-xs font-bold text-secondary uppercase tracking-wider">Steps</label>
+                        <label class="text-xs font-bold text-secondary uppercase tracking-wider">步数</label>
                         <span id="steps-value" class="text-xs font-bold text-primary">25</span>
                     </div>
                     <input type="range" id="steps-slider" min="1" max="50" step="1" value="25" 
@@ -413,80 +413,80 @@ export function ImageStudio() {
                 </div>
             </div>
             
-            <!-- Seed -->
+            <!-- 随机种子 -->
             <div class="flex flex-col gap-2">
                 <div class="flex items-center justify-between">
-                    <label class="text-xs font-bold text-secondary uppercase tracking-wider">Seed</label>
-                    <button id="randomize-seed-btn" class="text-xs font-bold text-primary hover:text-primary/80 transition-colors">Randomize</button>
+                    <label class="text-xs font-bold text-secondary uppercase tracking-wider">随机种子</label>
+                    <button id="randomize-seed-btn" class="text-xs font-bold text-primary hover:text-primary/80 transition-colors">随机</button>
                 </div>
                 <input type="number" id="seed-input" 
-                    placeholder="-1 for random"
+                    placeholder="-1 表示随机"
                     value="-1"
                     class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder:text-muted focus:outline-none focus:border-primary/50 transition-colors">
             </div>
             
-            <!-- Batch Count -->
+            <!-- 批量数量 -->
             <div class="flex flex-col gap-2">
                 <div class="flex items-center justify-between">
-                    <label class="text-xs font-bold text-secondary uppercase tracking-wider">Batch Count</label>
+                    <label class="text-xs font-bold text-secondary uppercase tracking-wider">批量数量</label>
                     <span id="batch-value" class="text-xs font-bold text-primary">1</span>
                 </div>
                 <input type="range" id="batch-slider" min="1" max="4" step="1" value="1" 
                     class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-primary">
             </div>
             
-            <!-- Width & Height -->
+            <!-- 宽度 & 高度 -->
             <div class="flex gap-4 flex-wrap">
                 <div class="flex-1 min-w-[120px] flex flex-col gap-2">
-                    <label class="text-xs font-bold text-secondary uppercase tracking-wider">Width</label>
+                    <label class="text-xs font-bold text-secondary uppercase tracking-wider">宽度</label>
                     <input type="number" id="width-input" 
-                        placeholder="Auto"
+                        placeholder="自动"
                         value=""
                         class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder:text-muted focus:outline-none focus:border-primary/50 transition-colors">
                 </div>
                 <div class="flex-1 min-w-[120px] flex flex-col gap-2">
-                    <label class="text-xs font-bold text-secondary uppercase tracking-wider">Height</label>
+                    <label class="text-xs font-bold text-secondary uppercase tracking-wider">高度</label>
                     <input type="number" id="height-input" 
-                        placeholder="Auto"
+                        placeholder="自动"
                         value=""
                         class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder:text-muted focus:outline-none focus:border-primary/50 transition-colors">
                 </div>
             </div>
             
-            <!-- Reference Strength (for I2I models) -->
+            <!-- 参考强度 (for I2I models) -->
             <div class="flex flex-col gap-2">
                 <div class="flex items-center justify-between">
-                    <label class="text-xs font-bold text-secondary uppercase tracking-wider">Reference Strength</label>
+                    <label class="text-xs font-bold text-secondary uppercase tracking-wider">参考强度</label>
                     <span id="reference-strength-value" class="text-xs font-bold text-primary">50%</span>
                 </div>
                 <input type="range" id="reference-strength-slider" min="0" max="100" step="5" value="50" 
                     class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-primary">
-                <p class="text-xs text-muted">How much to preserve the reference image characteristics</p>
+                <p class="text-xs text-muted">保留参考图特征的程度</p>
             </div>
             
             <!-- LoRA Model Selection -->
             <div class="flex flex-col gap-2">
-                <label class="text-xs font-bold text-secondary uppercase tracking-wider">LoRA Model (Optional)</label>
+                <label class="text-xs font-bold text-secondary uppercase tracking-wider">LoRA 模型（可选）</label>
                 <input type="text" id="lora-input" 
-                    placeholder="e.g., civitai:1642876@1864626"
+                    placeholder="例如：civitai:1642876@1864626"
                     class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder:text-muted focus:outline-none focus:border-primary/50 transition-colors">
                 <div class="flex items-center gap-2 mt-1">
-                    <label class="text-xs font-bold text-secondary">LoRA Weight:</label>
+                    <label class="text-xs font-bold text-secondary">LoRA 权重：</label>
                     <input type="number" id="lora-weight-input" 
                         value="1.0" min="0" max="4" step="0.1"
                         class="w-20 bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-white text-sm focus:outline-none focus:border-primary/50 transition-colors">
                 </div>
-                <p class="text-xs text-muted">Enter a LoRA model ID from Civitai (format: civitai:id@version)</p>
+                <p class="text-xs text-muted">输入来自 Civitai 的 LoRA 模型 ID（格式：civitai:id@version）</p>
             </div>
         </div>
     `;
     container.appendChild(advancedPanel);
 
-    // Advanced panel toggle logic
+    // 高级 panel toggle logic
     const toggleAdvanced = () => {
         showAdvanced = !showAdvanced;
         advancedPanel.classList.toggle('hidden', !showAdvanced);
-        document.getElementById('advanced-btn-label').textContent = showAdvanced ? 'Less' : 'Advanced';
+        document.getElementById('advanced-btn-label').textContent = showAdvanced ? '收起' : '高级';
     };
     
     // Add tools panel and advanced panel to container first before accessing their elements
@@ -498,7 +498,7 @@ export function ImageStudio() {
     const closeAdvBtn = advancedPanel.querySelector('#close-adv-btn');
     if (closeAdvBtn) closeAdvBtn.onclick = toggleAdvanced;
     
-    // Quick Tools Panel toggle
+    // 快捷工具 Panel toggle
     const toggleTools = () => {
         showToolsPanel = !showToolsPanel;
         toolsPanel.classList.toggle('hidden', !showToolsPanel);
@@ -509,7 +509,7 @@ export function ImageStudio() {
                 advancedPanel.classList.remove('hidden');
             }
         }
-        document.getElementById('tools-btn-label').textContent = showToolsPanel ? 'Tools' : 'Tools';
+        document.getElementById('tools-btn-label').textContent = showToolsPanel ? '工具' : '工具';
     };
     
     toolsBtn.onclick = toggleTools;
@@ -531,7 +531,7 @@ export function ImageStudio() {
         };
     });
     
-    // Prompt Enhancer - selected tags state
+    // 提示词增强 - selected tags state
     const enhanceSelectedTags = new Set();
     const basePromptInput = toolsPanel.querySelector('#base-prompt-input');
     const enhancedPromptDisplay = toolsPanel.querySelector('#enhanced-prompt-display');
@@ -542,7 +542,7 @@ export function ImageStudio() {
         const tags = Array.from(enhanceSelectedTags).join(', ');
         const enhanced = [base, tags].filter(p => p).join(', ');
         if (enhancedPromptDisplay) {
-            enhancedPromptDisplay.textContent = enhanced || 'Your enhanced prompt will appear here...';
+            enhancedPromptDisplay.textContent = enhanced || '增强后的提示词会显示在这里...';
             enhancedPromptDisplay.classList.toggle('text-muted', !enhanced);
         }
     };
@@ -570,15 +570,15 @@ export function ImageStudio() {
         };
     });
     
-    // Copy enhanced button
+    // 复制 enhanced button
     const copyEnhancedBtn = toolsPanel.querySelector('#copy-enhanced-btn');
     if (copyEnhancedBtn) {
         copyEnhancedBtn.onclick = () => {
             const text = enhancedPromptDisplay?.textContent || '';
-            if (text && text !== 'Your enhanced prompt will appear here...') {
+            if (text && text !== '增强后的提示词会显示在这里...') {
                 navigator.clipboard.writeText(text);
-                copyEnhancedBtn.textContent = 'Copied!';
-                setTimeout(() => { copyEnhancedBtn.textContent = 'Copy'; }, 1500);
+                copyEnhancedBtn.textContent = '已复制';
+                setTimeout(() => { copyEnhancedBtn.textContent = '复制'; }, 1500);
             }
         };
     }
@@ -588,7 +588,7 @@ export function ImageStudio() {
     if (useEnhancedBtn) {
         useEnhancedBtn.onclick = () => {
             const text = enhancedPromptDisplay?.textContent || '';
-            if (text && text !== 'Your enhanced prompt will appear here...') {
+            if (text && text !== '增强后的提示词会显示在这里...') {
                 textarea.value = text;
                 textarea.style.height = 'auto';
                 const maxHeight = window.innerWidth < 768 ? 150 : 250;
@@ -614,7 +614,7 @@ export function ImageStudio() {
         };
     }
     
-    // Steps slider
+    // 步数 slider
     const stepsSlider = advancedPanel.querySelector('#steps-slider');
     const stepsValue = advancedPanel.querySelector('#steps-value');
     if (stepsSlider && stepsValue) {
@@ -624,11 +624,11 @@ export function ImageStudio() {
         };
     }
     
-    // Seed input
+    // 随机种子 input
     const seedInput = advancedPanel.querySelector('#seed-input');
     if (seedInput) seedInput.oninput = (e) => { seed = parseInt(e.target.value) || -1; };
     
-    // Randomize seed button
+    // 随机 seed button
     const randSeedBtn = advancedPanel.querySelector('#randomize-seed-btn');
     if (randSeedBtn) {
         randSeedBtn.onclick = () => {
@@ -647,7 +647,7 @@ export function ImageStudio() {
         };
     }
     
-    // Width input
+    // 宽度 input
     const widthInput = advancedPanel.querySelector('#width-input');
     if (widthInput) {
         widthInput.oninput = (e) => {
@@ -655,7 +655,7 @@ export function ImageStudio() {
         };
     }
     
-    // Height input
+    // 高度 input
     const heightInput = advancedPanel.querySelector('#height-input');
     if (heightInput) {
         heightInput.oninput = (e) => {
@@ -720,10 +720,10 @@ export function ImageStudio() {
                     <div class="px-2 pb-3 mb-2 border-b border-white/5 shrink-0">
                         <div class="flex items-center gap-3 bg-white/5 rounded-xl px-4 py-2.5 border border-white/5 focus-within:border-primary/50 transition-colors">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="text-muted"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-                            <input type="text" id="model-search" placeholder="Search models..." class="bg-transparent border-none text-xs text-white focus:ring-0 w-full p-0">
+                            <input type="text" id="model-search" placeholder="搜索模型..." class="bg-transparent border-none text-xs text-white focus:ring-0 w-full p-0">
                         </div>
                     </div>
-                    <div class="text-[10px] font-bold text-secondary uppercase tracking-widest px-3 py-2 shrink-0">Available models</div>
+                    <div class="text-[10px] font-bold text-secondary uppercase tracking-widest px-3 py-2 shrink-0">可用模型</div>
                     <div id="model-list-container" class="flex flex-col gap-1.5 overflow-y-auto custom-scrollbar pr-1 pb-2"></div>
                 </div>
             `;
@@ -739,7 +739,7 @@ export function ImageStudio() {
                         m.id.toLowerCase().includes(filter.toLowerCase())
                     );
                     if (filtered.length === 0) {
-                        list.innerHTML = `<div class="text-xs text-muted text-center py-4">No local models match</div>`;
+                        list.innerHTML = `<div class="text-xs text-muted text-center py-4">没有匹配的本地模型</div>`;
                         return;
                     }
                     filtered.forEach(m => {
@@ -751,7 +751,7 @@ export function ImageStudio() {
                                 <div class="flex flex-col gap-0.5">
                                     <div class="flex items-center gap-1.5">
                                         <span class="text-xs font-bold text-white tracking-tight">${m.name}</span>
-                                        ${m.featured ? '<span class="text-[9px] font-black px-1 py-0.5 rounded bg-primary/20 text-primary">FEATURED</span>' : ''}
+                                        ${m.featured ? '<span class="text-[9px] font-black px-1 py-0.5 rounded bg-primary/20 text-primary">推荐</span>' : ''}
                                     </div>
                                     <span class="text-[10px] text-muted">${m.type.toUpperCase()} · ${m.family}</span>
                                 </div>
@@ -821,7 +821,7 @@ export function ImageStudio() {
 
         } else if (type === 'ar') {
             dropdown.classList.add('max-w-[240px]');
-            dropdown.innerHTML = `<div class="text-[10px] font-bold text-muted uppercase tracking-widest px-3 py-2 border-b border-white/5 mb-2">Aspect Ratio</div>`;
+            dropdown.innerHTML = `<div class="text-[10px] font-bold text-muted uppercase tracking-widest px-3 py-2 border-b border-white/5 mb-2">画幅</div>`;
             const list = document.createElement('div');
             list.className = 'flex flex-col gap-1';
 
@@ -849,7 +849,7 @@ export function ImageStudio() {
             dropdown.appendChild(list);
         } else if (type === 'quality') {
             dropdown.classList.add('max-w-[200px]');
-            dropdown.innerHTML = `<div class="text-[10px] font-bold text-secondary uppercase tracking-widest px-3 py-2 border-b border-white/5 mb-2">Resolution</div>`;
+            dropdown.innerHTML = `<div class="text-[10px] font-bold text-secondary uppercase tracking-widest px-3 py-2 border-b border-white/5 mb-2">分辨率</div>`;
             const list = document.createElement('div');
             list.className = 'flex flex-col gap-1';
 
@@ -932,14 +932,14 @@ export function ImageStudio() {
     // ==========================================
     const generationHistory = [];
 
-    // History sidebar
+    // 历史记录 sidebar
     const historySidebar = document.createElement('div');
     historySidebar.className = 'fixed right-0 top-0 h-full w-20 md:w-24 bg-black/60 backdrop-blur-xl border-l border-white/5 z-50 flex flex-col items-center py-4 gap-3 overflow-y-auto transition-all duration-500 translate-x-full opacity-0';
     historySidebar.id = 'history-sidebar';
 
     const historyLabel = document.createElement('div');
     historyLabel.className = 'text-[9px] font-bold text-muted uppercase tracking-widest mb-2 rotate-0';
-    historyLabel.textContent = 'History';
+    historyLabel.textContent = '历史记录';
     historySidebar.appendChild(historyLabel);
 
     const historyList = document.createElement('div');
@@ -965,15 +965,15 @@ export function ImageStudio() {
 
     const regenerateBtn = document.createElement('button');
     regenerateBtn.className = 'bg-white/10 hover:bg-white/20 px-6 py-2.5 rounded-2xl text-xs font-bold transition-all border border-white/5 backdrop-blur-lg text-white';
-    regenerateBtn.textContent = '↻ Regenerate';
+    regenerateBtn.textContent = '↻ 重新生成';
 
     const downloadBtn = document.createElement('button');
     downloadBtn.className = 'bg-primary text-black px-6 py-2.5 rounded-2xl text-xs font-bold transition-all shadow-glow active:scale-95';
-    downloadBtn.textContent = '↓ Download';
+    downloadBtn.textContent = '↓ 下载';
 
     const newPromptBtn = document.createElement('button');
     newPromptBtn.className = 'bg-white/10 hover:bg-white/20 px-6 py-2.5 rounded-2xl text-xs font-bold transition-all border border-white/5 backdrop-blur-lg text-white';
-    newPromptBtn.textContent = '+ New';
+    newPromptBtn.textContent = '+ 新建';
 
     canvasControls.appendChild(regenerateBtn);
     canvasControls.appendChild(downloadBtn);
@@ -1019,9 +1019,9 @@ export function ImageStudio() {
             thumb.className = `relative group/thumb cursor-pointer rounded-xl overflow-hidden border-2 transition-all duration-300 ${idx === 0 ? 'border-primary shadow-glow' : 'border-white/10 hover:border-white/30'}`;
 
             thumb.innerHTML = `
-                <img src="${entry.url}" alt="${entry.prompt?.substring(0, 30) || 'Generated'}" class="w-full aspect-square object-cover">
+                <img src="${entry.url}" alt="${entry.prompt?.substring(0, 30) || '生成结果'}" class="w-full aspect-square object-cover">
                 <div class="absolute inset-0 bg-black/60 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center gap-1">
-                    <button class="hist-download p-1.5 bg-primary rounded-lg text-black hover:scale-110 transition-transform" title="Download">
+                    <button class="hist-download p-1.5 bg-primary rounded-lg text-black hover:scale-110 transition-transform" title="下载">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
                     </button>
                 </div>
@@ -1046,7 +1046,7 @@ export function ImageStudio() {
         });
     };
 
-    // --- Helper: Download image ---
+    // --- Helper: 下载 image ---
     const downloadImage = async (url, filename) => {
         try {
             const response = await fetch(url);
@@ -1086,7 +1086,7 @@ export function ImageStudio() {
 
         const banner = document.createElement('div');
         banner.className = 'fixed top-4 left-1/2 -translate-x-1/2 z-[200] bg-[#111] border border-white/10 text-white text-sm px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3';
-        banner.innerHTML = `<span class="animate-spin text-primary">◌</span> <span class="banner-text">Resuming ${pending.length} pending generation${pending.length > 1 ? 's' : ''}…</span>`;
+        banner.innerHTML = `<span class="animate-spin text-primary">◌</span> <span class="banner-text">正在恢复 ${pending.length} 个待完成任务…</span>`;
         document.body.appendChild(banner);
 
         let remaining = pending.length;
@@ -1105,7 +1105,7 @@ export function ImageStudio() {
                 removePendingJob(job.requestId);
                 remaining--;
                 if (remaining === 0) banner.remove();
-                else banner.querySelector('.banner-text').textContent = `Resuming ${remaining} pending generation${remaining > 1 ? 's' : ''}…`;
+                else banner.querySelector('.banner-text').textContent = `正在恢复 ${remaining} 个待完成任务…`;
             }
         });
     })();
@@ -1146,7 +1146,7 @@ export function ImageStudio() {
         const resetResolutions = getResolutionsForModel(selectedModel);
         qualityBtn.style.display = resetResolutions.length > 0 ? 'flex' : 'none';
         if (resetResolutions.length > 0) document.getElementById('quality-btn-label').textContent = resetResolutions[0];
-        textarea.placeholder = 'Describe the image you want to create';
+        textarea.placeholder = '描述你想要生成的画面';
         textarea.focus();
     };
 
@@ -1157,12 +1157,12 @@ export function ImageStudio() {
         const prompt = textarea.value.trim();
         if (imageMode) {
             if (uploadedImageUrls.length === 0) {
-                alert('Please upload a reference image first.');
+                alert('请先上传参考图。');
                 return;
             }
         } else {
             if (!prompt) {
-                alert('Please enter a prompt to generate an image.');
+                alert('请先输入提示词。');
                 return;
             }
         }
@@ -1170,11 +1170,11 @@ export function ImageStudio() {
         // ── Local inference path ──────────────────────────────────────────────
         if (useLocalModel) {
             const lm = getLocalModelById(selectedLocalModel);
-            if (!lm) { alert('No local model selected.'); return; }
+            if (!lm) { alert('未选择本地模型。'); return; }
 
             hero.classList.add('opacity-0', 'scale-95', '-translate-y-10', 'pointer-events-none');
             generateBtn.disabled = true;
-            generateBtn.innerHTML = `<span class="animate-spin inline-block mr-2 text-black">◌</span> Generating...`;
+            generateBtn.innerHTML = `<span class="animate-spin inline-block mr-2 text-black">◌</span> 生成中...`;
 
             const progressWrap = document.getElementById('local-progress-wrap');
             const progressFill = document.getElementById('local-progress-fill');
@@ -1185,7 +1185,7 @@ export function ImageStudio() {
             const unsub = localAI.onProgress(({ progress, status }) => {
                 const pct = Math.round((progress ?? 0) * 100);
                 if (progressFill) progressFill.style.width = `${pct}%`;
-                if (progressPct) progressPct.textContent = status === 'starting' ? 'Starting...' : `${pct}%`;
+                if (progressPct) progressPct.textContent = status === 'starting' ? '开始中...' : `${pct}%`;
                 generateBtn.innerHTML = `<span class="animate-spin inline-block mr-2 text-black">◌</span> ${status === 'starting' ? '...' : pct + '%'}`;
             });
 
@@ -1204,9 +1204,9 @@ export function ImageStudio() {
                 progressWrap.classList.replace('flex', 'hidden');
                 progressWrap.classList.add('hidden');
 
-                if (!res?.url) throw new Error('No output returned from local generation');
+                if (!res?.url) throw new Error('本地生成未返回结果');
                 if (res.mediaType === 'video') {
-                    throw new Error('This model produces video — use the Video studio instead.');
+                    throw new Error('该模型生成的是视频，请使用视频创作。');
                 }
                 addToHistory({
                     id: Date.now().toString(),
@@ -1225,11 +1225,11 @@ export function ImageStudio() {
                 console.error('[Local] generation error:', e);
                 hero.classList.remove('opacity-0', 'scale-95', '-translate-y-10', 'pointer-events-none');
                 console.error('[Local] full error:', e.message);
-                generateBtn.innerHTML = `Error: ${e.message.slice(0, 120)}`;
-                setTimeout(() => { generateBtn.innerHTML = `Generate ✨`; }, 6000);
+                generateBtn.innerHTML = `错误：${e.message.slice(0, 120)}`;
+                setTimeout(() => { generateBtn.innerHTML = `开始生成 ✨`; }, 6000);
             } finally {
                 generateBtn.disabled = false;
-                if (!hadError) generateBtn.innerHTML = `Generate ✨`;
+                if (!hadError) generateBtn.innerHTML = `开始生成 ✨`;
             }
             return;
         }
@@ -1243,7 +1243,7 @@ export function ImageStudio() {
 
         hero.classList.add('opacity-0', 'scale-95', '-translate-y-10', 'pointer-events-none');
         generateBtn.disabled = true;
-        generateBtn.innerHTML = `<span class="animate-spin inline-block mr-2 text-black">◌</span> Generating...`;
+        generateBtn.innerHTML = `<span class="animate-spin inline-block mr-2 text-black">◌</span> 生成中...`;
 
         let hadError = false;
         let capturedRequestId = null;
@@ -1297,7 +1297,7 @@ export function ImageStudio() {
                 showImageInCanvas(res.url);
             } else {
                 console.error('[ImageStudio] No image URL in response:', res);
-                throw new Error('No image URL returned by API');
+                throw new Error('API 未返回图像 URL');
             }
         } catch (e) {
             hadError = true;
@@ -1305,14 +1305,14 @@ export function ImageStudio() {
             console.error(e);
             // Restore hero so the page doesn't look broken after a failed generation
             hero.classList.remove('opacity-0', 'scale-95', '-translate-y-10', 'pointer-events-none');
-            generateBtn.innerHTML = `Error: ${e.message.slice(0, 60)}`;
+            generateBtn.innerHTML = `错误：${e.message.slice(0, 60)}`;
             setTimeout(() => {
-                generateBtn.innerHTML = `Generate ✨`;
+                generateBtn.innerHTML = `开始生成 ✨`;
             }, 4000);
         } finally {
             generateBtn.disabled = false;
             // Only reset the label on success; the catch timeout handles the error case
-            if (!hadError) generateBtn.innerHTML = `Generate ✨`;
+            if (!hadError) generateBtn.innerHTML = `开始生成 ✨`;
         }
     };
 

@@ -60,8 +60,8 @@ function MediaPickerButton({
       type="button"
       title={
         uploadState === UPLOAD_STATE.READY
-          ? `${fileName} — click to clear`
-          : `Upload ${label.toLowerCase()} file`
+          ? `${fileName} - 点击清除`
+          : `上传${label}`
       }
       onClick={handleClick}
       className={`flex-shrink-0 w-10 h-10 rounded-full border transition-all flex items-center justify-center relative overflow-hidden group ${borderClass}`}
@@ -256,7 +256,7 @@ function HistoryThumb({ entry, isActive, onSelect, onDownload }) {
             onDownload(entry);
           }}
           className="p-1.5 bg-primary rounded-lg text-black hover:scale-110 transition-transform"
-          title="Download"
+          title="下载"
         >
           <svg
             width="12"
@@ -471,7 +471,7 @@ export default function LipSyncStudio({
   const handleImageUpload = useCallback(
     async (file) => {
       if (file.size > 10 * 1024 * 1024) {
-        alert("Image exceeds 10MB limit.");
+        alert("图片超过 10MB 限制。");
         return;
       }
       setImageState(UPLOAD_STATE.UPLOADING);
@@ -485,7 +485,7 @@ export default function LipSyncStudio({
         setImageState(UPLOAD_STATE.READY);
       } catch (err) {
         setImageState(UPLOAD_STATE.IDLE);
-        alert(`Image upload failed: ${err.message}`);
+        alert(`图片上传失败：${err.message}`);
       } finally {
         setImageProgress(0);
       }
@@ -496,7 +496,7 @@ export default function LipSyncStudio({
   const handleVideoPick = useCallback(
     async (file) => {
       if (file.size > 50 * 1024 * 1024) {
-        alert("Video exceeds 50MB limit.");
+        alert("视频超过 50MB 限制。");
         return;
       }
       setVideoState(UPLOAD_STATE.UPLOADING);
@@ -510,7 +510,7 @@ export default function LipSyncStudio({
         setVideoState(UPLOAD_STATE.READY);
       } catch (err) {
         setVideoState(UPLOAD_STATE.IDLE);
-        alert(`Video upload failed: ${err.message}`);
+        alert(`视频上传失败：${err.message}`);
       } finally {
         setVideoProgress(0);
       }
@@ -521,7 +521,7 @@ export default function LipSyncStudio({
   const handleAudioPick = useCallback(
     async (file) => {
       if (file.size > 10 * 1024 * 1024) {
-        alert("Audio file exceeds 10MB limit.");
+        alert("音频超过 10MB 限制。");
         return;
       }
       setAudioState(UPLOAD_STATE.UPLOADING);
@@ -535,7 +535,7 @@ export default function LipSyncStudio({
         setAudioState(UPLOAD_STATE.READY);
       } catch (err) {
         setAudioState(UPLOAD_STATE.IDLE);
-        alert(`Audio upload failed: ${err.message}`);
+        alert(`音频上传失败：${err.message}`);
       } finally {
         setAudioProgress(0);
       }
@@ -616,15 +616,15 @@ export default function LipSyncStudio({
   // ── Generation ──────────────────────────────────────────────────────────
   const handleGenerate = async () => {
     if (!audioUrl) {
-      alert("Please upload an audio file first.");
+      alert("请先上传音频。");
       return;
     }
     if (inputMode === "image" && !imageUrl) {
-      alert("Please upload a portrait image first.");
+      alert("请先上传人像图片。");
       return;
     }
     if (inputMode === "video" && !videoUrl) {
-      alert("Please upload a source video first.");
+      alert("请先上传源视频。");
       return;
     }
 
@@ -644,7 +644,7 @@ export default function LipSyncStudio({
 
       const res = await processLipSync(apiKey, lipsyncParams);
 
-      if (!res?.url) throw new Error("No video URL returned by API");
+      if (!res?.url) throw new Error("接口未返回视频地址");
 
       const genId = res.id || Date.now().toString();
       const entry = {
@@ -671,7 +671,7 @@ export default function LipSyncStudio({
       }
     } catch (e) {
       console.error("[LipSyncStudio]", e);
-      setGenerateError(e.message?.slice(0, 80) ?? "Unknown error");
+      setGenerateError(e.message?.slice(0, 80) ?? "未知错误");
       setTimeout(() => setGenerateError(null), 4000);
     } finally {
       setIsGenerating(false);
@@ -699,17 +699,17 @@ export default function LipSyncStudio({
     inputMode === "image"
       ? imageState === UPLOAD_STATE.READY
         ? `✓ ${imageName}`
-        : "No image"
+        : "暂无图片"
       : videoState === UPLOAD_STATE.READY
         ? `✓ ${videoName}`
-        : "No video";
+        : "暂无视频";
   const mediaStatusClass =
     (inputMode === "image" ? imageState : videoState) === UPLOAD_STATE.READY
       ? "text-primary"
       : "text-muted";
 
   const audioStatusText =
-    audioState === UPLOAD_STATE.READY ? `✓ ${audioName}` : "No audio";
+    audioState === UPLOAD_STATE.READY ? `✓ ${audioName}` : "暂无音频";
   const audioStatusClass =
     audioState === UPLOAD_STATE.READY ? "text-primary" : "text-muted";
 
@@ -754,7 +754,7 @@ export default function LipSyncStudio({
                 <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     type="button"
-                    title="Fullscreen"
+            title="全屏"
                     onClick={(e) => {
                       e.stopPropagation();
                       setFullscreenUrl(entry.url);
@@ -770,7 +770,7 @@ export default function LipSyncStudio({
                   </button>
                   <button
                     type="button"
-                    title="Download"
+                    title="下载"
                     onClick={(e) => {
                       e.stopPropagation();
                       downloadFile(entry.url, `lipsync-${entry.id || idx}.mp4`);
@@ -814,11 +814,11 @@ export default function LipSyncStudio({
               </div>
             </div>
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight mb-4 text-center px-4">
-              <span className="text-white/40 font-medium">START CREATING WITH</span><br />
-              <span className="text-white">LIP SYNC</span>
+              <span className="text-white/40 font-medium">开始使用</span><br />
+              <span className="text-white">口型同步</span>
             </h1>
             <p className="text-white/40 text-sm md:text-base font-medium tracking-wide text-center max-w-lg leading-relaxed">
-              Animate portraits or sync lips to audio with AI
+              上传人像或视频，自动对齐音频与口型
             </p>
           </div>
         )}
@@ -838,7 +838,7 @@ export default function LipSyncStudio({
                   : "border-white/[0.03] bg-white/[0.03] text-white/40 hover:border-white/20 hover:text-white"
               }`}
             >
-              🖼 Portrait Image
+              🖼 人像图片
             </button>
             <button
               type="button"
@@ -849,7 +849,7 @@ export default function LipSyncStudio({
                   : "border-white/[0.03] bg-white/[0.03] text-white/40 hover:border-white/20 hover:text-white"
               }`}
             >
-              🎬 Video
+              🎬 视频
             </button>
           </div>
 
@@ -860,7 +860,7 @@ export default function LipSyncStudio({
               {inputMode === "image" && (
                 <MediaPickerButton
                   accept="image/*"
-                  label="Image"
+                  label="图片"
                   icon={
                     <svg
                       width="16"
@@ -895,7 +895,7 @@ export default function LipSyncStudio({
               {inputMode === "video" && (
                 <MediaPickerButton
                   accept="video/*"
-                  label="Video"
+                  label="视频"
                   icon={
                     <VideoIcon className="text-white/40 group-hover:text-primary transition-colors" />
                   }
@@ -917,7 +917,7 @@ export default function LipSyncStudio({
               {/* Audio picker — always visible */}
               <MediaPickerButton
                 accept="audio/*"
-                label="Audio"
+                label="音频"
                 icon={
                   <MicIcon className="text-white/40 group-hover:text-primary transition-colors" />
                 }
@@ -942,7 +942,7 @@ export default function LipSyncStudio({
                 <textarea
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="Describe speech style..."
+                  placeholder="描述说话方式、语气或口型风格..."
                   className="w-full bg-transparent border-none text-white text-sm placeholder:text-white/10 focus:outline-none resize-none pt-1 leading-relaxed min-h-[40px] max-h-[150px] md:max-h-[250px] overflow-y-auto custom-scrollbar disabled:opacity-40"
                   rows={1}
                 />
@@ -972,7 +972,7 @@ export default function LipSyncStudio({
                     </span>
                   </div>
                   <span className="text-xs font-semibold text-white/70 group-hover:text-[#d9ff00] transition-colors">
-                    {selectedModel?.name ?? "Select model"}
+                    {selectedModel?.name ?? "选择模型"}
                   </span>
                   <svg
                     width="10"
@@ -1038,13 +1038,13 @@ export default function LipSyncStudio({
                   <span className="animate-spin inline-block text-black">
                     ◌
                   </span>{" "}
-                  Generating...
+                  生成中...
                 </>
               ) : generateError ? (
-                `Error: ${generateError}`
+                `错误：${generateError}`
               ) : (
                 <>
-                  <span>Sync Lip</span>
+                  <span>开始同步</span>
                 </>
               )}
             </button>

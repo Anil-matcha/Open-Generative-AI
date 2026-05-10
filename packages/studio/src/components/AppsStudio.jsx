@@ -10,10 +10,46 @@ import {
 import { registerAppInterest, getAppInterests } from '../muapi.js';
 import toast, { Toaster } from 'react-hot-toast';
 
+const CATEGORY_LABELS = {
+  Lifestyle: "生活方式",
+  Business: "商业",
+  Productivity: "效率",
+  Creative: "创作",
+  "Real Estate": "房产",
+  Education: "教育",
+  Development: "开发",
+  Marketing: "营销",
+  Services: "服务",
+  Health: "健康",
+  Legal: "法律",
+  Template: "模板",
+};
+
+const CATEGORY_SUMMARIES = {
+  Lifestyle: "适合生活方式内容与个人展示。",
+  Business: "适合商业推广、增长和运营场景。",
+  Productivity: "适合文档、会议与流程效率。",
+  Creative: "适合创意表达与视觉内容创作。",
+  "Real Estate": "适合房产展示、上架和成交。",
+  Education: "适合教学、学习和知识整理。",
+  Development: "适合开发流程和表单构建。",
+  Marketing: "适合营销投放与内容发布。",
+  Services: "适合服务型业务的线上化。",
+  Health: "适合健康、医疗和养护场景。",
+  Legal: "适合法律、合规和文书工作。",
+};
+
+const getAppDescription = (app) => {
+  if (app.description && /[\u4e00-\u9fff]/.test(app.description)) {
+    return app.description;
+  }
+  return CATEGORY_SUMMARIES[app.category] || "适合快速部署的模板。";
+};
+
 const templateApps = [
   {
-    name: "AI Headshot Studio",
-    description: "Launch a headshot SaaS in minutes. Charge $5–$20 per set, keep all profits. Stripe payments & user accounts included.",
+    name: "AI 头像工作室",
+    description: "几分钟内上线头像生成 SaaS。每套定价 5–20 美元，收益归你，已包含 Stripe 支付和用户账户。",
     icon: FaUserTie,
     color: "blue",
     repo: "https://github.com/SamurAIGPT/ai-headshot-generator",
@@ -22,8 +58,8 @@ const templateApps = [
     isTemplate: true
   },
   {
-    name: "Nano Banana Studio",
-    description: "Your own AI image generation platform, ready to monetize. Add credit packs or subscriptions and start earning from day one.",
+    name: "Nano Banana 图像工作室",
+    description: "你的专属 AI 图像生成平台，拿来就能变现。可直接接入积分包或订阅，从第一天开始赚钱。",
     icon: FaHandSparkles,
     color: "amber",
     repo: "https://github.com/SamurAIGPT/nano-banana-generator",
@@ -32,8 +68,8 @@ const templateApps = [
     isTemplate: true
   },
   {
-    name: "Seedance V2 Studio",
-    description: "Deploy a premium AI art studio and sell access to users. Full Stripe integration lets you collect revenue immediately after launch.",
+    name: "Seedance V2 创作工作室",
+    description: "部署高品质 AI 创作工作室并向用户售卖访问权限。Stripe 已完整集成，上线后即可收款。",
     icon: FaMagic,
     color: "purple",
     repo: "https://github.com/SamurAIGPT/seedance-2-generator",
@@ -42,8 +78,8 @@ const templateApps = [
     isTemplate: true
   },
   {
-    name: "AI Clipping Studio",
-    description: "Launch your own AI-powered video clipping SaaS. Download YouTube videos and extract viral highlights with ease.",
+    name: "AI 剪辑工作室",
+    description: "上线你自己的 AI 视频剪辑 SaaS。可下载 YouTube 视频并轻松提取适合传播的高光片段。",
     icon: FaVideo,
     color: "emerald",
     repo: "https://github.com/SamurAIGPT/ai-clipping-generator",
@@ -52,8 +88,8 @@ const templateApps = [
     isTemplate: true
   },
   {
-    name: "EasyVeo Studio",
-    description: "The complete Veo 3.1 video generation suite. Monetize text-to-video, image-to-video, and reference-to-video workflows with ease.",
+    name: "EasyVeo 视频工作室",
+    description: "完整的 Veo 3.1 视频生成套件，轻松把文生视频、图生视频和参考转视频流程变现。",
     icon: FaVideo,
     color: "indigo",
     repo: "https://github.com/SamurAIGPT/veo4-video-generator",
@@ -149,11 +185,11 @@ export default function AppsStudio({ apiKey }) {
     try {
       await registerAppInterest(apiKey, selectedApp.name);
       setRequestedApps(prev => [...prev, selectedApp.name]);
-      toast.success("Got it! We'll send you the template details shortly.");
+      toast.success("收到，我们会很快把模板详情发给你。");
       setTimeout(() => setSelectedApp(null), 1500);
     } catch (error) {
       console.error(error);
-      toast.error("Failed to register interest. Please try again later.");
+      toast.error("登记兴趣失败，请稍后再试。");
     } finally {
       setIsRequesting(false);
     }
@@ -200,11 +236,11 @@ export default function AppsStudio({ apiKey }) {
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="text-sm font-bold text-white uppercase tracking-tight truncate">{app.name}</h3>
-              <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest">{app.category || 'Template'}</p>
+              <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest">{CATEGORY_LABELS[app.category] || app.category || '模板'}</p>
             </div>
           </div>
           
-          <p className="text-xs text-white/50 leading-relaxed font-medium line-clamp-2 min-h-[2.5rem]">{app.description}</p>
+          <p className="text-xs text-white/50 leading-relaxed font-medium line-clamp-2 min-h-[2.5rem]">{getAppDescription(app)}</p>
           
           {/* Action Buttons */}
           <div className="flex items-center gap-2 pt-2">
@@ -215,14 +251,14 @@ export default function AppsStudio({ apiKey }) {
                   className="flex-1 py-2 bg-white/5 text-white rounded-md text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-white/10 transition-all border border-white/5 active:scale-95"
                 >
                   <FaGithub className="text-xs" />
-                  Github
+                  GitHub
                 </button>
                 <button
                   onClick={() => setSelectedApp(app)}
                   className="flex-1 py-2 bg-[#d9ff00]/10 text-[#d9ff00] rounded-md text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-[#d9ff00]/20 transition-all border border-[#d9ff00]/20 active:scale-95"
                 >
                   <FaExternalLinkAlt className="text-[9px]" />
-                  Demo
+                  演示
                 </button>
               </>
             ) : (
@@ -234,7 +270,7 @@ export default function AppsStudio({ apiKey }) {
                   className="flex-1 py-2 bg-white/5 text-white rounded-md text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-white/10 transition-all border border-white/5 active:scale-95"
                 >
                   <FaGithub className="text-xs" />
-                  Github
+                  GitHub
                 </a>
                 <a
                   href={app.hosted || '#'}
@@ -243,7 +279,7 @@ export default function AppsStudio({ apiKey }) {
                   className="flex-1 py-2 bg-[#d9ff00]/10 text-[#d9ff00] rounded-md text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-[#d9ff00]/20 transition-all border border-[#d9ff00]/20 active:scale-95"
                 >
                   <FaExternalLinkAlt className="text-[9px]" />
-                  Demo
+                  演示
                 </a>
               </>
             )}
@@ -263,14 +299,14 @@ export default function AppsStudio({ apiKey }) {
         <div className="text-center space-y-6 max-w-3xl">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#d9ff00]/10 border border-[#d9ff00]/20 rounded-full">
             <FaDollarSign className="text-[#d9ff00] text-xs" />
-            <span className="text-[10px] font-black text-[#d9ff00] uppercase tracking-widest">Revenue-Ready Templates</span>
+            <span className="text-[10px] font-black text-[#d9ff00] uppercase tracking-widest">可变现模板</span>
           </div>
           <h1 className="text-5xl font-black text-white tracking-tighter leading-[0.9]">
-            LAUNCH AN AI APP.<br />START EARNING TODAY.
+            上线你的 AI 应用。<br />今天就开始收益。
           </h1>
           <p className="text-white/40 text-sm font-medium leading-relaxed max-w-xl mx-auto">
-            Each template is a fully-functional, Stripe-integrated AI SaaS you can deploy in minutes.
-            Charge your users, keep the revenue — muapi handles the AI infrastructure.
+            每个模板都是可直接部署的完整 AI SaaS，已集成 Stripe。
+            你负责收款，muapi 负责 AI 基础设施。
           </p>
         </div>
 
@@ -280,20 +316,20 @@ export default function AppsStudio({ apiKey }) {
             {
               icon: FaRocket,
               step: "01",
-              title: "Deploy in Minutes",
-              body: "Fork the open-source template, add your muapi key, and push to Vercel. No backend setup needed."
+              title: "几分钟完成部署",
+              body: "Fork 开源模板，填入你的 muapi key，直接推送到 Vercel，无需额外后端配置。"
             },
             {
               icon: FaCreditCard,
               step: "02",
-              title: "Collect Payments",
-              body: "Stripe is pre-wired. Set your own pricing — one-time credits, subscriptions, or pay-per-use."
+              title: "直接收款",
+              body: "Stripe 已预接好。你可以按自己的业务设置一次性积分、订阅或按次付费。"
             },
             {
               icon: FaDollarSign,
               step: "03",
-              title: "Keep the Revenue",
-              body: "Payments go straight to your Stripe account. You own the product, the brand, and the profits."
+              title: "收益归你",
+              body: "款项直接进入你的 Stripe 账户。产品、品牌和利润都归你所有。"
             }
           ].map(({ icon: Icon, step, title, body }) => (
             <div key={step} className="flex items-start gap-4 bg-[#0a0a0a] border border-white/5 rounded-2xl p-6 hover:border-white/10 transition-colors">
@@ -301,7 +337,7 @@ export default function AppsStudio({ apiKey }) {
                 <Icon className="text-lg" />
               </div>
               <div>
-                <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-1">Step {step}</p>
+                <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-1">步骤 {step}</p>
                 <h3 className="text-sm font-bold text-white mb-1.5">{title}</h3>
                 <p className="text-xs text-white/40 leading-relaxed font-medium">{body}</p>
               </div>
@@ -319,7 +355,7 @@ export default function AppsStudio({ apiKey }) {
         <div className="pt-24 pb-12 flex flex-col items-center gap-4">
           <div className="inline-flex items-center gap-3 px-4 py-2 bg-white/5 rounded-full border border-white/5">
             <span className="block w-1.5 h-1.5 rounded-full bg-[#d9ff00] animate-pulse" />
-            <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">Muapi Ecosystem — More templates coming soon</span>
+            <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">Muapi 生态系统 - 更多模板即将上线</span>
           </div>
         </div>
       </div>
@@ -334,10 +370,10 @@ export default function AppsStudio({ apiKey }) {
                 <selectedApp.icon />
               </div>
               <h2 className="text-2xl font-black text-white uppercase tracking-tight">
-                Deploy {selectedApp.name}
+                部署 {selectedApp.name}
               </h2>
               <p className="text-sm font-medium text-white/40 leading-relaxed px-4">
-                Enter your details and we&apos;ll send you the <b>{selectedApp.name}</b> template along with setup instructions so you can deploy and start earning immediately.
+                填写信息后，我们会把 <b>{selectedApp.name}</b> 模板和部署说明发给你，方便你快速上线并开始变现。
               </p>
             </div>
 
@@ -347,13 +383,13 @@ export default function AppsStudio({ apiKey }) {
                 disabled={isRequesting}
                 className="w-full py-4 bg-[#d9ff00] text-black rounded-md text-sm font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-[#d9ff00]/90 transition-all shadow-lg active:scale-95 disabled:opacity-50"
               >
-                {isRequesting ? 'Sending Details...' : 'Get Template'}
+                {isRequesting ? '正在发送详情...' : '获取模板'}
               </button>
               <button 
                 onClick={() => setSelectedApp(null)}
                 className="w-full py-4 bg-white/5 border border-white/10 text-white/60 rounded-md text-sm font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-white/10 transition-all"
               >
-                Maybe Later
+                稍后再说
               </button>
             </div>
           </div>

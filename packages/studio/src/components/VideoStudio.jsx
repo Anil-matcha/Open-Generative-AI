@@ -144,7 +144,7 @@ function ModelDropdown({ imageMode, selectedModel, onSelect, onClose }) {
           </span>
           {isV2V && (
             <span className="text-[9px] text-orange-400/70">
-              {m.imageField ? "Upload a video and image" : "Upload a video to use"}
+              {m.imageField ? "上传视频和参考图" : "上传视频即可使用"}
             </span>
           )}
         </div>
@@ -171,7 +171,7 @@ function ModelDropdown({ imageMode, selectedModel, onSelect, onClose }) {
           </svg>
           <input
             type="text"
-            placeholder="Search models..."
+            placeholder="搜索模型..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onClick={(e) => e.stopPropagation()}
@@ -180,14 +180,14 @@ function ModelDropdown({ imageMode, selectedModel, onSelect, onClose }) {
         </div>
       </div>
       <div className="text-xs font-bold text-secondary px-3 py-2 shrink-0">
-        Video models
+        视频模型
       </div>
       <div className="flex flex-col gap-1.5 overflow-y-auto custom-scrollbar pr-1 pb-2">
         {filteredMain.map((m) => renderItem(m, false))}
         {filteredV2V.length > 0 && (
           <>
             <div className="text-xs font-bold text-orange-400/70 px-3 py-2 mt-1 border-t border-white/5">
-              Video Tools
+              视频工具
             </div>
             {filteredV2V.map((m) => renderItem(m, true))}
           </>
@@ -519,7 +519,7 @@ export default function VideoStudio({
 
   const processDroppedImage = async (file) => {
     if (file.size > 10 * 1024 * 1024) {
-      alert("Image exceeds 10MB limit.");
+      alert("图片超过 10MB 限制。");
       return;
     }
     setImageUploading(true);
@@ -545,7 +545,7 @@ export default function VideoStudio({
       }
       setPromptDisabled(false);
     } catch (err) {
-      alert(`Image upload failed: ${err.message}`);
+      alert(`图片上传失败：${err.message}`);
     } finally {
       setImageUploading(false);
       setImageProgress(0);
@@ -554,7 +554,7 @@ export default function VideoStudio({
 
   const processDroppedVideo = async (file) => {
     if (file.size > 50 * 1024 * 1024) {
-      alert("Video exceeds 50MB limit.");
+      alert("视频超过 50MB 限制。");
       return;
     }
     setVideoUploading(true);
@@ -577,7 +577,7 @@ export default function VideoStudio({
       setPrompt("");
       setPromptDisabled(true);
     } catch (err) {
-      alert(`Video upload failed: ${err.message}`);
+      alert(`视频上传失败：${err.message}`);
     } finally {
       setVideoUploading(false);
       setVideoProgress(0);
@@ -632,7 +632,7 @@ export default function VideoStudio({
     const file = e.target.files[0];
     if (!file) return;
     if (file.size > 10 * 1024 * 1024) {
-      alert("Image exceeds 10MB limit.");
+      alert("图片超过 10MB 限制。");
       return;
     }
     setImageUploading(true);
@@ -668,7 +668,7 @@ export default function VideoStudio({
       }
     } catch (err) {
       console.error("[VideoStudio] Image upload failed:", err);
-      alert(`Image upload failed: ${err.message}`);
+      alert(`图片上传失败：${err.message}`);
     } finally {
       setImageUploading(false);
       setImageProgress(0);
@@ -694,7 +694,7 @@ export default function VideoStudio({
     const file = e.target.files[0];
     if (!file) return;
     if (file.size > 10 * 1024 * 1024) {
-      alert("Image exceeds 10MB limit.");
+      alert("图片超过 10MB 限制。");
       return;
     }
     setEndImageUploading(true);
@@ -705,7 +705,7 @@ export default function VideoStudio({
       });
       setUploadedEndImageUrl(url);
     } catch (err) {
-      alert(`End frame upload failed: ${err.message}`);
+      alert(`结束帧上传失败：${err.message}`);
     } finally {
       setEndImageUploading(false);
       setEndImageProgress(0);
@@ -720,7 +720,7 @@ export default function VideoStudio({
     const file = e.target.files[0];
     if (!file) return;
     if (file.size > 50 * 1024 * 1024) {
-      alert("Video exceeds 50MB limit.");
+      alert("视频超过 50MB 限制。");
       return;
     }
     setVideoUploading(true);
@@ -751,7 +751,7 @@ export default function VideoStudio({
       }
     } catch (err) {
       console.error("[VideoStudio] Video upload failed:", err);
-      alert(`Video upload failed: ${err.message}`);
+      alert(`视频上传失败：${err.message}`);
     } finally {
       setVideoUploading(false);
       setVideoProgress(0);
@@ -828,32 +828,32 @@ export default function VideoStudio({
 
     if (v2vMode) {
       if (!uploadedVideoUrl) {
-        alert("Please upload a video first.");
+        alert("请先上传视频。");
         return;
       }
       if (currentModel?.imageField && !uploadedImageUrl) {
-        alert("Please upload a reference image for motion control.");
+        alert("请先上传用于运镜控制的参考图。");
         return;
       }
       if (currentModel?.promptRequired && !trimmedPrompt) {
-        alert("Please describe the motion you want.");
+        alert("请描述你想要的运镜方式。");
         return;
       }
     } else if (isExtendMode) {
       if (!lastGenerationId) {
         alert(
-          "No Seedance 2.0 generation found to extend. Generate a video first.",
+          "没有可续接的 Seedance 2.0 结果，请先生成一段视频。",
         );
         return;
       }
     } else if (imageMode) {
       if (!uploadedImageUrl) {
-        alert("Please upload a start frame image first.");
+        alert("请先上传起始帧图片。");
         return;
       }
     } else {
       if (!trimmedPrompt) {
-        alert("Please enter a prompt to generate a video.");
+        alert("请输入提示词再开始生成视频。");
         return;
       }
     }
@@ -880,7 +880,7 @@ export default function VideoStudio({
           v2vParams.prompt = trimmedPrompt;
         }
         res = await processV2V(apiKey, v2vParams);
-        if (!res?.url) throw new Error("No video URL returned by API");
+        if (!res?.url) throw new Error("接口未返回视频地址");
 
         const genId = res.id || Date.now().toString();
         setLastGenerationId(null);
@@ -917,7 +917,7 @@ export default function VideoStudio({
         if (selectedMode) i2vParams.mode = selectedMode;
 
         res = await generateI2V(apiKey, i2vParams);
-        if (!res?.url) throw new Error("No video URL returned by API");
+        if (!res?.url) throw new Error("接口未返回视频地址");
 
         const genId = res.id || Date.now().toString();
         if (selectedModel === "seedance-v2.0-i2v") {
@@ -964,7 +964,7 @@ export default function VideoStudio({
         if (selectedMode) params.mode = selectedMode;
 
         res = await generateVideo(apiKey, params);
-        if (!res?.url) throw new Error("No video URL returned by API");
+        if (!res?.url) throw new Error("接口未返回视频地址");
 
         const genId = res.id || Date.now().toString();
         if (
@@ -999,7 +999,7 @@ export default function VideoStudio({
     } catch (e) {
       hadError = true;
       console.error("[VideoStudio]", e);
-      setGenerateError(e.message?.slice(0, 80) || "Generation failed");
+      setGenerateError(e.message?.slice(0, 80) || "生成失败");
       setTimeout(() => setGenerateError(null), 4000);
     } finally {
       setGenerating(false);
@@ -1069,14 +1069,14 @@ export default function VideoStudio({
   const promptPlaceholder = v2vMode
     ? currentModelObj?.imageField
       ? currentModelObj?.promptRequired
-        ? "Describe the motion"
-        : "Describe the motion (optional)"
-      : "Video ready — click Generate to remove watermark"
+        ? "描述你希望的运动"
+        : "描述运动方式（可选）"
+      : "视频已就绪 - 点击开始生成可去除水印"
     : imageMode
-      ? "Describe the motion or effect (optional)"
+      ? "描述运动或效果（可选）"
       : isExtendMode
-        ? "Optional: describe how to continue the video..."
-        : "Describe the video you want to create";
+        ? "可选：描述你希望如何续接视频..."
+        : "描述你想要生成的视频";
 
   const toggleDropdown = (type) => (e) => {
     e.stopPropagation();
@@ -1119,7 +1119,7 @@ export default function VideoStudio({
                   <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                       type="button"
-                      title="Fullscreen"
+                      title="全屏"
                       onClick={(e) => {
                         e.stopPropagation();
                         setFullscreenUrl(entry.url);
@@ -1135,7 +1135,7 @@ export default function VideoStudio({
                     </button>
                     <button
                       type="button"
-                      title="Download"
+                      title="下载"
                       onClick={(e) => {
                         e.stopPropagation();
                         downloadFile(entry.url, `video-${entry.id || idx}.mp4`);
@@ -1149,7 +1149,7 @@ export default function VideoStudio({
                     {isSeedance2 && (
                       <button
                         type="button"
-                        title="Extend this video using Seedance 2.0 Extend"
+                        title="使用 Seedance 2.0 Extend 续接此视频"
                         onClick={(e) => {
                           e.stopPropagation();
                           setLastGenerationId(entry.id);
@@ -1167,7 +1167,7 @@ export default function VideoStudio({
                   {/* Prompt & Details */}
                   <div className="p-3 bg-black/80 backdrop-blur-sm border-t border-white/5 flex-1 flex flex-col justify-between gap-2">
                     <p className="text-white/70 text-xs line-clamp-3 leading-relaxed" title={entry.prompt}>
-                      {entry.prompt || "No prompt provided"}
+                      {entry.prompt || "未填写提示词"}
                     </p>
                     <div className="flex items-center justify-between mt-1 flex-wrap gap-1">
                       <span className="text-[10px] font-bold text-primary px-2 py-0.5 bg-primary/10 rounded border border-primary/20 whitespace-nowrap">
@@ -1202,11 +1202,11 @@ export default function VideoStudio({
               </div>
             </div>
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight mb-4 text-center px-4">
-              <span className="text-white/40 font-medium">START CREATING WITH</span><br />
-              <span className="text-white">VIDEO STUDIO</span>
+              <span className="text-white/40 font-medium">开始使用</span><br />
+              <span className="text-white">视频创作</span>
             </h1>
             <p className="text-white/40 text-sm md:text-base font-medium tracking-wide text-center max-w-lg leading-relaxed">
-              Animate images into stunning AI videos with motion effects
+              把静帧变成有运动感的 AI 视频
             </p>
           </div>
         )}
@@ -1229,8 +1229,8 @@ export default function VideoStudio({
                 type="button"
                 title={
                   uploadedImageUrl
-                    ? "Clear image"
-                    : "Upload image for Image-to-Video"
+                    ? "清除参考图"
+                    : "上传参考图用于图生视频"
                 }
                 onClick={() =>
                   uploadedImageUrl
@@ -1314,7 +1314,7 @@ export default function VideoStudio({
                 />
                 <button
                   type="button"
-                  title={uploadedEndImageUrl ? "Clear end frame" : "Upload end frame (optional)"}
+                  title={uploadedEndImageUrl ? "清除结束帧" : "上传结束帧（可选）"}
                   onClick={() =>
                     uploadedEndImageUrl
                       ? clearEndImage()
@@ -1380,7 +1380,7 @@ export default function VideoStudio({
                 title={
                   uploadedVideoUrl
                     ? `${uploadedVideoName} — click to clear`
-                    : "Upload video to remove watermark"
+                    : "上传视频用于去除水印"
                 }
                 onClick={() =>
                   uploadedVideoUrl
@@ -1456,7 +1456,7 @@ export default function VideoStudio({
               >
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
-              <span>Extending previous Seedance 2.0 generation</span>
+              <span>正在续接上一段 Seedance 2.0 结果</span>
             </div>
           )}
 
@@ -1543,7 +1543,7 @@ export default function VideoStudio({
                       className="absolute bottom-[calc(100%+12px)] left-0 z-50 bg-[#0a0a0a] rounded-lg p-3 shadow-2xl border border-white/[0.05] max-h-80 overflow-y-auto custom-scrollbar min-w-[160px]"
                     >
                       <div className="text-xs font-bold text-white/20 border-b border-white/[0.03] mb-2">
-                        Aspect Ratio
+                        画幅
                       </div>
                       <div className="flex flex-col gap-1">
                         {getCurrentAspectRatios(selectedModel).map((r) => (
@@ -1654,7 +1654,7 @@ export default function VideoStudio({
                       className="absolute bottom-[calc(100%+12px)] left-0 z-50 bg-[#0a0a0a] rounded-md p-3 shadow-2xl border border-white/[0.05] min-w-[140px]"
                     >
                       <div className="text-xs font-bold text-white/20 border-b border-white/[0.03] mb-2">
-                        Resolution
+                        分辨率
                       </div>
                       <div className="flex flex-col gap-1">
                         {getCurrentResolutions(selectedModel).map((r) => (
@@ -1692,13 +1692,13 @@ export default function VideoStudio({
                   <span className="animate-spin inline-block text-black">
                     ◌
                   </span>{" "}
-                  Generating...
+                  生成中...
                 </>
               ) : generateError ? (
-                `Error: ${generateError}`
+                `错误：${generateError}`
               ) : (
                 <>
-                  <span>Generate</span>
+                  <span>开始生成</span>
                 </>
               )}
             </button>

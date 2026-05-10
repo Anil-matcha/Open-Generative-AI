@@ -27,7 +27,7 @@ export function Header(navigate) {
 
     const menu = document.createElement('nav');
     menu.className = 'hidden lg:flex items-center gap-6 text-[13px] font-bold text-secondary';
-    const items = ['Image', 'Video', 'Lip Sync', 'Cinema Studio', 'Workflows', 'Agents', 'MCP & CLI'];
+    const items = ['图像创作', '视频创作', '口型同步', '电影创作', '工作流', '智能体', 'MCP 与 CLI'];
 
     items.forEach(item => {
         const link = document.createElement('a');
@@ -35,7 +35,7 @@ export function Header(navigate) {
         link.className = `hover:text-white transition-all cursor-pointer relative group ${item === 'Image' ? 'text-white' : ''}`;
 
         // Active Indicator or Dot
-        if (item === 'Image') {
+        if (item === '图像创作') {
             const dot = document.createElement('div');
             dot.className = 'absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-primary rounded-full';
             link.appendChild(dot);
@@ -47,13 +47,13 @@ export function Header(navigate) {
             // Add to current
             link.classList.add('text-white');
 
-            if (item === 'Image') navigate('image');
-            else if (item === 'Video') navigate('video');
-            else if (item === 'Lip Sync') navigate('lipsync');
-            else if (item === 'Cinema Studio') navigate('cinema');
-            else if (item === 'Workflows') navigate('workflows');
-            else if (item === 'Agents') navigate('agents');
-            else if (item === 'MCP & CLI') navigate('mcp-cli');
+            if (item === '图像创作') navigate('image');
+            else if (item === '视频创作') navigate('video');
+            else if (item === '口型同步') navigate('lipsync');
+            else if (item === '电影创作') navigate('cinema');
+            else if (item === '工作流') navigate('workflows');
+            else if (item === '智能体') navigate('agents');
+            else if (item === 'MCP 与 CLI') navigate('mcp-cli');
         };
 
         menu.appendChild(link);
@@ -67,13 +67,13 @@ export function Header(navigate) {
 
     const settingsBtn = document.createElement('button');
     settingsBtn.className = 'flex items-center gap-2 px-3 py-1.5 rounded-md border border-white/10 bg-white/5 text-[13px] font-bold text-white/80 hover:text-white hover:bg-white/10 hover:border-white/20 transition-colors';
-    settingsBtn.title = 'Settings — API key, local models, preferences';
+    settingsBtn.title = '设置 - API Key、本地模型、偏好';
     settingsBtn.innerHTML = `
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="3"/>
             <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
         </svg>
-        <span>Settings</span>
+        <span>设置</span>
     `;
     settingsBtn.onclick = () => {
         document.body.appendChild(SettingsModal());

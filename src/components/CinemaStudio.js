@@ -1,7 +1,7 @@
 
 import { muapi } from '../lib/muapi.js';
 import { CameraControls } from './CameraControls.js';
-import { buildNanoBananaPrompt, CAMERA_MAP, LENS_MAP, FOCAL_PERSPECTIVE, APERTURE_EFFECT } from '../lib/promptUtils.js';
+import { buildNanoBananaPrompt, CAMERA_MAP, LENS_MAP, FOCAL_PERSPECTIVE, APERTURE_EFFECT, CAMERA_LABELS, LENS_LABELS } from '../lib/promptUtils.js';
 import { AuthModal } from './AuthModal.js';
 
 export function CinemaStudio() {
@@ -17,6 +17,8 @@ export function CinemaStudio() {
         focal: 35,
         aperture: "f/1.4"
     };
+    const getCameraLabel = (key) => CAMERA_LABELS[key] || CAMERA_MAP[key] || key;
+    const getLensLabel = (key) => LENS_LABELS[key] || LENS_MAP[key] || key;
     
     // Camera builder panel state
     let showCameraBuilder = false;
@@ -27,9 +29,9 @@ export function CinemaStudio() {
     const heroSection = document.createElement('div');
     heroSection.className = 'flex flex-col items-center justify-center text-center px-4 animate-fade-in-up';
     heroSection.innerHTML = `
-        <div class="mb-4 text-xs font-bold text-white/40 tracking-[0.2em] uppercase">Cinema Studio 2.0</div>
+        <div class="mb-4 text-xs font-bold text-white/40 tracking-[0.2em] uppercase">电影创作 2.0</div>
         <h1 class="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-white/50 tracking-tight leading-tight mb-2">
-            What would you shoot<br>with infinite budget?
+            如果预算无限，<br>你会怎么拍？
         </h1>
     `;
     container.appendChild(heroSection);
@@ -50,7 +52,7 @@ export function CinemaStudio() {
     overlayHeader.className = 'flex items-center justify-between mb-8';
     overlayHeader.innerHTML = `
         <div class="flex gap-4">
-            <button class="px-4 py-2 bg-white text-black text-xs font-bold rounded-full">All</button>
+            <button class="px-4 py-2 bg-white text-black text-xs font-bold rounded-full">全部</button>
         </div>
         <button id="close-overlay-btn" class="text-white/50 hover:text-white transition-colors">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
@@ -106,7 +108,7 @@ export function CinemaStudio() {
 
     // Textarea
     const textarea = document.createElement('textarea');
-    textarea.placeholder = 'Describe your scene - use @ to add characters & props';
+    textarea.placeholder = '描述你的场景，可用 @ 添加角色和道具';
     textarea.className = 'flex-1 bg-transparent border-none text-white text-lg font-medium placeholder:text-white/20 focus:outline-none resize-none h-[28px] leading-relaxed overflow-hidden';
     textarea.style.height = 'auto'; // Auto-grow check
     textarea.rows = 1;
@@ -187,8 +189,8 @@ export function CinemaStudio() {
     // Camera Builder Toggle Button
     const cameraBuilderBtn = document.createElement('button');
     cameraBuilderBtn.className = 'flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold text-white/50 hover:text-white transition-colors bg-white/5 hover:bg-white/10 rounded-lg border border-white/5';
-    cameraBuilderBtn.setAttribute('data-tooltip', 'Quick camera builder');
-    cameraBuilderBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg> Builder`;
+    cameraBuilderBtn.setAttribute('data-tooltip', '快速镜头设置');
+    cameraBuilderBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg> 设置`;
     settingsToolbar.appendChild(cameraBuilderBtn);
 
     leftColumn.appendChild(settingsToolbar);
@@ -203,7 +205,7 @@ export function CinemaStudio() {
     const summaryCard = document.createElement('button');
     // Removed 'hidden' class, added 'flex' and refined width constraints for mobile
     summaryCard.className = 'flex flex-col items-start justify-center px-4 py-2 bg-[#2a2a2a] rounded-xl border border-white/5 hover:border-white/20 transition-colors text-left flex-1 min-w-[100px] md:min-w-[140px] max-w-[240px] h-[56px] relative group overflow-hidden';
-    summaryCard.setAttribute('data-tooltip', 'Open camera settings');
+    summaryCard.setAttribute('data-tooltip', '打开镜头设置');
 
     // Dot indicator
     const dot = document.createElement('div');
@@ -212,7 +214,7 @@ export function CinemaStudio() {
 
     const summaryTitle = document.createElement('span');
     summaryTitle.className = 'text-[10px] font-bold text-white uppercase truncate w-full tracking-wide';
-    summaryTitle.textContent = currentSettings.camera;
+    summaryTitle.textContent = getCameraLabel(currentSettings.camera);
 
     const summaryValue = document.createElement('span');
     summaryValue.className = 'text-[10px] font-medium text-white/60 truncate w-full';
@@ -224,19 +226,19 @@ export function CinemaStudio() {
     summaryCard.onclick = openOverlay;
 
     function formatSummaryValue() {
-        return `${currentSettings.lens}, ${currentSettings.focal}mm, ${currentSettings.aperture}`;
+        return `${getLensLabel(currentSettings.lens)}, ${currentSettings.focal}mm, ${currentSettings.aperture}`;
     }
 
     function updateSummaryCard() {
-        summaryTitle.textContent = currentSettings.camera;
+        summaryTitle.textContent = getCameraLabel(currentSettings.camera);
         summaryValue.textContent = formatSummaryValue();
     }
 
     // Generate Button
     const generateBtn = document.createElement('button');
     generateBtn.className = 'h-[56px] px-8 bg-[#d9ff00] text-black rounded-xl font-black text-xs uppercase hover:bg-white transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed';
-    generateBtn.setAttribute('data-tooltip', 'Generate cinema shot');
-    generateBtn.innerHTML = `GENERATE ✨`;
+    generateBtn.setAttribute('data-tooltip', '生成电影镜头');
+    generateBtn.innerHTML = `开始拍摄 ✨`;
 
     rightGroup.appendChild(summaryCard);
     rightGroup.appendChild(generateBtn);
@@ -257,7 +259,7 @@ export function CinemaStudio() {
     
     builderCard.innerHTML = `
         <div class="flex items-center justify-between mb-4">
-            <h4 class="text-xs font-bold text-white">Camera Builder</h4>
+            <h4 class="text-xs font-bold text-white">镜头设置</h4>
             <button id="close-builder-btn" class="text-white/40 hover:text-white transition-colors">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
             </button>
@@ -265,25 +267,25 @@ export function CinemaStudio() {
         
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
             <div class="flex flex-col gap-1.5">
-                <label class="text-[10px] font-bold text-muted uppercase">Camera</label>
+                <label class="text-[10px] font-bold text-muted uppercase">相机</label>
                 <select id="builder-camera" class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary/50">
-                    ${Object.keys(CAMERA_MAP).map(c => `<option value="${c}" ${c === currentSettings.camera ? 'selected' : ''}>${c}</option>`).join('')}
+                    ${Object.keys(CAMERA_MAP).map(c => `<option value="${c}" ${c === currentSettings.camera ? 'selected' : ''}>${getCameraLabel(c)}</option>`).join('')}
                 </select>
             </div>
             <div class="flex flex-col gap-1.5">
-                <label class="text-[10px] font-bold text-muted uppercase">Lens</label>
+                <label class="text-[10px] font-bold text-muted uppercase">镜头</label>
                 <select id="builder-lens" class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary/50">
-                    ${Object.keys(LENS_MAP).map(l => `<option value="${l}" ${l === currentSettings.lens ? 'selected' : ''}>${l}</option>`).join('')}
+                    ${Object.keys(LENS_MAP).map(l => `<option value="${l}" ${l === currentSettings.lens ? 'selected' : ''}>${getLensLabel(l)}</option>`).join('')}
                 </select>
             </div>
             <div class="flex flex-col gap-1.5">
-                <label class="text-[10px] font-bold text-muted uppercase">Focal</label>
+                <label class="text-[10px] font-bold text-muted uppercase">焦距</label>
                 <select id="builder-focal" class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary/50">
                     ${Object.keys(FOCAL_PERSPECTIVE).map(f => `<option value="${f}" ${f === currentSettings.focal ? 'selected' : ''}>${f}mm</option>`).join('')}
                 </select>
             </div>
             <div class="flex flex-col gap-1.5">
-                <label class="text-[10px] font-bold text-muted uppercase">Aperture</label>
+                <label class="text-[10px] font-bold text-muted uppercase">光圈</label>
                 <select id="builder-aperture" class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary/50">
                     ${Object.keys(APERTURE_EFFECT).map(a => `<option value="${a}" ${a === currentSettings.aperture ? 'selected' : ''}>${a}</option>`).join('')}
                 </select>
@@ -291,10 +293,10 @@ export function CinemaStudio() {
         </div>
         
         <div class="flex flex-col gap-2">
-            <label class="text-[10px] font-bold text-muted uppercase">Preview</label>
+            <label class="text-[10px] font-bold text-muted uppercase">预览</label>
             <div id="builder-preview" class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white text-xs min-h-[40px]"></div>
             <button id="apply-builder-btn" class="px-4 py-2 bg-primary text-black rounded-lg text-xs font-bold hover:shadow-glow transition-all">
-                Use This Setup
+                应用此设置
             </button>
         </div>
     `;
@@ -325,7 +327,7 @@ export function CinemaStudio() {
         const preview = buildNanoBananaPrompt('', camera, lens, focal, aperture);
         const previewEl = builderCard.querySelector('#builder-preview');
         if (previewEl) {
-            previewEl.textContent = preview || 'Select camera settings to see preview...';
+            previewEl.textContent = preview || '选择镜头设置即可预览...';
         }
     };
     
@@ -365,7 +367,7 @@ export function CinemaStudio() {
 
     const historyLabel = document.createElement('div');
     historyLabel.className = 'text-[9px] font-bold text-white/40 uppercase tracking-widest mb-2';
-    historyLabel.textContent = 'History';
+    historyLabel.textContent = '历史记录';
     historySidebar.appendChild(historyLabel);
 
     const historyList = document.createElement('div');
@@ -401,9 +403,9 @@ export function CinemaStudio() {
         return btn;
     };
 
-    const regenerateBtn = createActionBtn('↻ Regenerate');
-    const downloadBtn = createActionBtn('↓ Download', true);
-    const newPromptBtn = createActionBtn('+ New Shot');
+    const regenerateBtn = createActionBtn('↻ 重新生成');
+    const downloadBtn = createActionBtn('↓ 下载', true);
+    const newPromptBtn = createActionBtn('+ 新镜头');
 
     canvasControls.appendChild(regenerateBtn);
     canvasControls.appendChild(downloadBtn);
@@ -422,7 +424,7 @@ export function CinemaStudio() {
             thumb.innerHTML = `
                 <img src="${entry.url}" class="w-full h-full object-cover opacity-80 group-hover/thumb:opacity-100 transition-opacity">
                 <div class="absolute inset-0 bg-black/50 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center">
-                    <span class="text-[8px] font-bold text-white uppercase">Load</span>
+                    <span class="text-[8px] font-bold text-white uppercase">载入</span>
                 </div>
             `;
 
@@ -544,7 +546,7 @@ export function CinemaStudio() {
         }
 
         generateBtn.disabled = true;
-        generateBtn.innerHTML = "SHOOTING...";
+        generateBtn.innerHTML = "拍摄中...";
 
         // Compile Prompt
         const finalPrompt = buildNanoBananaPrompt(
@@ -578,15 +580,15 @@ export function CinemaStudio() {
 
                 showCanvas(res.url);
             } else {
-                throw new Error('No Data');
+                throw new Error('接口未返回数据');
             }
 
         } catch (e) {
             console.error(e);
-            alert('Generation Failed: ' + e.message);
+            alert('生成失败：' + e.message);
         } finally {
             generateBtn.disabled = false;
-            generateBtn.innerHTML = `GENERATE ✨`;
+            generateBtn.innerHTML = `开始拍摄 ✨`;
         }
     };
 

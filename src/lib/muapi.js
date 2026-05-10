@@ -8,7 +8,7 @@ export class MuapiClient {
 
     getKey() {
         const key = window.__MUAPI_KEY__ || localStorage.getItem('muapi_key');
-        if (!key) throw new Error('API Key missing. Please set it in Settings.');
+        if (!key) throw new Error('缺少 API 密钥，请先在设置中配置。');
         return key;
     }
 
@@ -82,7 +82,7 @@ export class MuapiClient {
             if (!response.ok) {
                 const errText = await response.text();
                 console.error('[Muapi] API Error Body:', errText);
-                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+                throw new Error(`API 请求失败：${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
             }
 
             const submitData = await response.json();
@@ -142,7 +142,7 @@ export class MuapiClient {
                     console.warn(`[Muapi] Poll error (${response.status}):`, errText);
                     // Continue polling on non-fatal errors
                     if (response.status >= 500) continue;
-                    throw new Error(`Poll Failed: ${response.status} - ${errText.slice(0, 100)}`);
+                    throw new Error(`轮询失败：${response.status} - ${errText.slice(0, 100)}`);
                 }
 
                 const data = await response.json();
@@ -155,7 +155,7 @@ export class MuapiClient {
                 }
 
                 if (status === 'failed' || status === 'error') {
-                    throw new Error(`Generation failed: ${data.error || 'Unknown error'}`);
+                    throw new Error(`生成失败：${data.error || '未知错误'}`);
                 }
 
                 // Otherwise (processing, pending, etc.) keep polling
@@ -165,7 +165,7 @@ export class MuapiClient {
             }
         }
 
-        throw new Error('Generation timed out after polling.');
+        throw new Error('轮询超时。');
     }
 
     async generateVideo(params) {
@@ -202,7 +202,7 @@ export class MuapiClient {
             if (!response.ok) {
                 const errText = await response.text();
                 console.error('[Muapi] API Error Body:', errText);
-                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+                throw new Error(`API 请求失败：${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
             }
 
             const submitData = await response.json();
@@ -274,7 +274,7 @@ export class MuapiClient {
 
             if (!response.ok) {
                 const errText = await response.text();
-                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+                throw new Error(`API 请求失败：${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
             }
 
             const submitData = await response.json();
@@ -352,7 +352,7 @@ export class MuapiClient {
 
             if (!response.ok) {
                 const errText = await response.text();
-                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+                throw new Error(`API 请求失败：${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
             }
 
             const submitData = await response.json();
@@ -395,14 +395,14 @@ export class MuapiClient {
 
         if (!response.ok) {
             const errText = await response.text();
-            throw new Error(`File upload failed: ${response.status} - ${errText.slice(0, 100)}`);
+            throw new Error(`文件上传失败：${response.status} - ${errText.slice(0, 100)}`);
         }
 
         const data = await response.json();
         console.log('[Muapi] Upload response:', data);
 
         const fileUrl = data.url || data.file_url || data.data?.url;
-        if (!fileUrl) throw new Error('No URL returned from file upload');
+        if (!fileUrl) throw new Error('文件上传未返回 URL');
         return fileUrl;
     }
 
@@ -444,7 +444,7 @@ export class MuapiClient {
 
             if (!response.ok) {
                 const errText = await response.text();
-                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+                throw new Error(`API 请求失败：${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
             }
 
             const submitData = await response.json();
@@ -506,7 +506,7 @@ export class MuapiClient {
             if (!response.ok) {
                 const errText = await response.text();
                 console.error('[Muapi] LipSync API Error:', errText);
-                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+                throw new Error(`API 请求失败：${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
             }
 
             const submitData = await response.json();

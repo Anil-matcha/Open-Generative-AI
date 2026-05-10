@@ -48,8 +48,8 @@ export function LipSyncStudio() {
                 <div class="absolute top-4 right-4 text-primary animate-pulse">🎙</div>
             </div>
         </div>
-        <h1 class="text-2xl sm:text-4xl md:text-7xl font-black text-white tracking-widest uppercase mb-4 selection:bg-primary selection:text-black text-center px-4">Lip Sync</h1>
-        <p class="text-secondary text-sm font-medium tracking-wide opacity-60">Animate portraits or sync lips to audio with AI</p>
+        <h1 class="text-2xl sm:text-4xl md:text-7xl font-black text-white tracking-widest uppercase mb-4 selection:bg-primary selection:text-black text-center px-4">口型同步</h1>
+        <p class="text-secondary text-sm font-medium tracking-wide opacity-60">让人像开口说话，或让视频和音频精准对齐</p>
     `;
     container.appendChild(hero);
 
@@ -69,17 +69,17 @@ export function LipSyncStudio() {
 
     const modeLabel = document.createElement('span');
     modeLabel.className = 'text-xs text-muted font-bold uppercase tracking-widest mr-2';
-    modeLabel.textContent = 'Input:';
+    modeLabel.textContent = '输入：';
 
     const imageModeBtn = document.createElement('button');
     imageModeBtn.type = 'button';
     imageModeBtn.className = 'px-4 py-1.5 rounded-xl text-xs font-bold transition-all border border-primary bg-primary/10 text-primary';
-    imageModeBtn.textContent = '🖼 Portrait Image';
+    imageModeBtn.textContent = '🖼 人像图';
 
     const videoModeBtn = document.createElement('button');
     videoModeBtn.type = 'button';
     videoModeBtn.className = 'px-4 py-1.5 rounded-xl text-xs font-bold transition-all border border-white/10 text-muted hover:border-white/30 hover:text-white';
-    videoModeBtn.textContent = '🎬 Video';
+    videoModeBtn.textContent = '🎬 视频';
 
     modeToggleRow.appendChild(modeLabel);
     modeToggleRow.appendChild(imageModeBtn);
@@ -95,12 +95,12 @@ export function LipSyncStudio() {
         anchorContainer: container,
         onSelect: ({ url }) => {
             uploadedImageUrl = url;
-            imageStatusLabel.textContent = '✓ Image ready';
+            imageStatusLabel.textContent = '✓ 图片已就绪';
             imageStatusLabel.className = 'text-primary';
         },
         onClear: () => {
             uploadedImageUrl = null;
-            imageStatusLabel.textContent = 'No image';
+            imageStatusLabel.textContent = '暂无图片';
             imageStatusLabel.className = 'text-muted';
         }
     });
@@ -118,12 +118,12 @@ export function LipSyncStudio() {
 
     const videoPickerBtn = document.createElement('button');
     videoPickerBtn.type = 'button';
-    videoPickerBtn.title = 'Upload source video';
+    videoPickerBtn.title = '上传源视频';
     videoPickerBtn.className = 'flex-shrink-0 w-14 h-14 rounded-xl border transition-all flex items-center justify-center relative overflow-hidden hidden bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40 group';
 
     const videoIconEl = document.createElement('div');
     videoIconEl.className = 'flex flex-col items-center justify-center gap-1 w-full h-full';
-    videoIconEl.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted group-hover:text-primary transition-colors"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg><span class="text-[9px] text-muted group-hover:text-primary font-bold">VIDEO</span>`;
+    videoIconEl.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted group-hover:text-primary transition-colors"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg><span class="text-[9px] text-muted group-hover:text-primary font-bold">视频</span>`;
 
     const videoSpinnerEl = document.createElement('div');
     videoSpinnerEl.className = 'hidden items-center justify-center w-full h-full';
@@ -131,7 +131,7 @@ export function LipSyncStudio() {
 
     const videoReadyEl = document.createElement('div');
     videoReadyEl.className = 'hidden flex-col items-center justify-center gap-1 w-full h-full absolute inset-0 bg-primary/10';
-    videoReadyEl.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg><span class="text-[9px] text-primary font-bold">READY</span>`;
+    videoReadyEl.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg><span class="text-[9px] text-primary font-bold">就绪</span>`;
 
     videoPickerBtn.appendChild(videoFileInput);
     videoPickerBtn.appendChild(videoIconEl);
@@ -143,8 +143,8 @@ export function LipSyncStudio() {
         videoSpinnerEl.classList.add('hidden'); videoSpinnerEl.classList.remove('flex');
         videoReadyEl.classList.add('hidden'); videoReadyEl.classList.remove('flex');
         videoPickerBtn.classList.remove('border-primary/60'); videoPickerBtn.classList.add('border-white/10');
-        videoPickerBtn.title = 'Upload source video';
-        mediaStatusLabel.textContent = 'No video'; mediaStatusLabel.className = 'text-muted';
+        videoPickerBtn.title = '上传源视频';
+        mediaStatusLabel.textContent = '暂无视频'; mediaStatusLabel.className = 'text-muted';
     };
     const showVideoSpinner = () => {
         videoIconEl.classList.add('hidden'); videoIconEl.classList.remove('flex');
@@ -156,7 +156,7 @@ export function LipSyncStudio() {
         videoSpinnerEl.classList.add('hidden'); videoSpinnerEl.classList.remove('flex');
         videoReadyEl.classList.replace('hidden', 'flex');
         videoPickerBtn.classList.remove('border-white/10'); videoPickerBtn.classList.add('border-primary/60');
-        videoPickerBtn.title = `${name} — click to clear`;
+        videoPickerBtn.title = `${name} — 点击清除`;
         mediaStatusLabel.textContent = `✓ ${name}`; mediaStatusLabel.className = 'text-primary';
     };
 
@@ -174,7 +174,7 @@ export function LipSyncStudio() {
         try {
             uploadedVideoUrl = await muapi.uploadFile(file);
             showVideoReady(file.name);
-        } catch (err) { showVideoIcon(); alert(`Video upload failed: ${err.message}`); }
+        } catch (err) { showVideoIcon(); alert(`视频上传失败：${err.message}`); }
         videoFileInput.value = '';
     };
 
@@ -186,12 +186,12 @@ export function LipSyncStudio() {
 
     const audioPickerBtn = document.createElement('button');
     audioPickerBtn.type = 'button';
-    audioPickerBtn.title = 'Upload audio file';
+    audioPickerBtn.title = '上传音频文件';
     audioPickerBtn.className = 'flex-shrink-0 w-14 h-14 rounded-xl border transition-all flex items-center justify-center relative overflow-hidden bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40 group';
 
     const audioIconEl = document.createElement('div');
     audioIconEl.className = 'flex flex-col items-center justify-center gap-1 w-full h-full';
-    audioIconEl.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted group-hover:text-primary transition-colors"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg><span class="text-[9px] text-muted group-hover:text-primary font-bold">AUDIO</span>`;
+    audioIconEl.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted group-hover:text-primary transition-colors"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg><span class="text-[9px] text-muted group-hover:text-primary font-bold">音频</span>`;
 
     const audioSpinnerEl = document.createElement('div');
     audioSpinnerEl.className = 'hidden items-center justify-center w-full h-full';
@@ -199,7 +199,7 @@ export function LipSyncStudio() {
 
     const audioReadyEl = document.createElement('div');
     audioReadyEl.className = 'hidden flex-col items-center justify-center gap-1 w-full h-full absolute inset-0 bg-primary/10';
-    audioReadyEl.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg><span class="text-[9px] text-primary font-bold">READY</span>`;
+    audioReadyEl.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg><span class="text-[9px] text-primary font-bold">就绪</span>`;
 
     audioPickerBtn.appendChild(audioFileInput);
     audioPickerBtn.appendChild(audioIconEl);
@@ -211,8 +211,8 @@ export function LipSyncStudio() {
         audioSpinnerEl.classList.add('hidden'); audioSpinnerEl.classList.remove('flex');
         audioReadyEl.classList.add('hidden'); audioReadyEl.classList.remove('flex');
         audioPickerBtn.classList.remove('border-primary/60'); audioPickerBtn.classList.add('border-white/10');
-        audioPickerBtn.title = 'Upload audio file';
-        audioStatusLabel.textContent = 'No audio'; audioStatusLabel.className = 'text-muted';
+        audioPickerBtn.title = '上传音频文件';
+        audioStatusLabel.textContent = '暂无音频'; audioStatusLabel.className = 'text-muted';
     };
     const showAudioSpinner = () => {
         audioIconEl.classList.add('hidden'); audioIconEl.classList.remove('flex');
@@ -224,7 +224,7 @@ export function LipSyncStudio() {
         audioSpinnerEl.classList.add('hidden'); audioSpinnerEl.classList.remove('flex');
         audioReadyEl.classList.replace('hidden', 'flex');
         audioPickerBtn.classList.remove('border-white/10'); audioPickerBtn.classList.add('border-primary/60');
-        audioPickerBtn.title = `${name} — click to clear`;
+        audioPickerBtn.title = `${name} — 点击清除`;
         audioStatusLabel.textContent = `✓ ${name}`; audioStatusLabel.className = 'text-primary';
     };
 
@@ -242,13 +242,13 @@ export function LipSyncStudio() {
         try {
             uploadedAudioUrl = await muapi.uploadFile(file);
             showAudioReady(file.name);
-        } catch (err) { showAudioIcon(); alert(`Audio upload failed: ${err.message}`); }
+        } catch (err) { showAudioIcon(); alert(`音频上传失败：${err.message}`); }
         audioFileInput.value = '';
     };
 
     // ── Prompt Textarea ──
     const textarea = document.createElement('textarea');
-    textarea.placeholder = 'Optional: describe the talking style or motion...';
+    textarea.placeholder = '可选：描述说话风格或动作...';
     textarea.className = 'flex-1 bg-transparent text-white placeholder-muted/50 text-sm resize-none outline-none min-h-[56px] leading-relaxed pt-1';
     textarea.rows = 2;
 
@@ -265,13 +265,13 @@ export function LipSyncStudio() {
     // mediaStatusLabel: shows image or video status depending on mode
     const mediaStatusLabel = document.createElement('span');
     mediaStatusLabel.className = 'text-muted';
-    mediaStatusLabel.textContent = 'No image';
+    mediaStatusLabel.textContent = '暂无图片';
 
     const imageStatusLabel = mediaStatusLabel; // alias used in imagePicker callbacks
 
     const audioStatusLabel = document.createElement('span');
     audioStatusLabel.className = 'text-muted';
-    audioStatusLabel.textContent = 'No audio';
+    audioStatusLabel.textContent = '暂无音频';
 
     statusRow.appendChild(mediaStatusLabel);
     statusRow.appendChild(document.createTextNode(' · '));
@@ -301,7 +301,7 @@ export function LipSyncStudio() {
     generateBtn.id = 'ls-generate-btn';
     generateBtn.type = 'button';
     generateBtn.className = 'ml-auto px-6 py-2.5 bg-primary text-black font-black text-sm rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-glow disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100';
-    generateBtn.textContent = 'Generate ✨';
+    generateBtn.textContent = '开始生成 ✨';
 
     bottomRow.appendChild(modelBtn);
     bottomRow.appendChild(resolutionBtn);
@@ -407,14 +407,14 @@ export function LipSyncStudio() {
             videoModeBtn.className = 'px-4 py-1.5 rounded-xl text-xs font-bold transition-all border border-white/10 text-muted hover:border-white/30 hover:text-white';
             imagePicker.trigger.classList.remove('hidden');
             videoPickerBtn.classList.add('hidden');
-            mediaStatusLabel.textContent = uploadedImageUrl ? '✓ Image ready' : 'No image';
+            mediaStatusLabel.textContent = uploadedImageUrl ? '✓ 图片已就绪' : '暂无图片';
             mediaStatusLabel.className = uploadedImageUrl ? 'text-primary' : 'text-muted';
         } else {
             videoModeBtn.className = 'px-4 py-1.5 rounded-xl text-xs font-bold transition-all border border-primary bg-primary/10 text-primary';
             imageModeBtn.className = 'px-4 py-1.5 rounded-xl text-xs font-bold transition-all border border-white/10 text-muted hover:border-white/30 hover:text-white';
             videoPickerBtn.classList.remove('hidden');
             imagePicker.trigger.classList.add('hidden');
-            mediaStatusLabel.textContent = uploadedVideoUrl ? '✓ Video ready' : 'No video';
+            mediaStatusLabel.textContent = uploadedVideoUrl ? '✓ 视频已就绪' : '暂无视频';
             mediaStatusLabel.className = uploadedVideoUrl ? 'text-primary' : 'text-muted';
         }
 
@@ -469,7 +469,7 @@ export function LipSyncStudio() {
 
     const historyLabel = document.createElement('div');
     historyLabel.className = 'text-[9px] font-bold text-muted uppercase tracking-widest mb-2';
-    historyLabel.textContent = 'History';
+    historyLabel.textContent = '历史记录';
     historySidebar.appendChild(historyLabel);
 
     const historyList = document.createElement('div');
@@ -498,15 +498,15 @@ export function LipSyncStudio() {
 
     const regenerateBtn = document.createElement('button');
     regenerateBtn.className = 'bg-white/10 hover:bg-white/20 px-6 py-2.5 rounded-2xl text-xs font-bold transition-all border border-white/5 backdrop-blur-lg text-white';
-    regenerateBtn.textContent = '↻ Regenerate';
+    regenerateBtn.textContent = '↻ 重新生成';
 
     const downloadBtn = document.createElement('button');
     downloadBtn.className = 'bg-primary text-black px-6 py-2.5 rounded-2xl text-xs font-bold transition-all shadow-glow active:scale-95';
-    downloadBtn.textContent = '↓ Download';
+    downloadBtn.textContent = '↓ 下载';
 
     const newBtn = document.createElement('button');
     newBtn.className = 'bg-white/10 hover:bg-white/20 px-6 py-2.5 rounded-2xl text-xs font-bold transition-all border border-white/5 backdrop-blur-lg text-white';
-    newBtn.textContent = '+ New';
+    newBtn.textContent = '+ 新建';
 
     canvasControls.appendChild(regenerateBtn);
     canvasControls.appendChild(downloadBtn);
@@ -543,7 +543,7 @@ export function LipSyncStudio() {
             thumb.innerHTML = `
                 <video src="${entry.url}" preload="metadata" muted class="w-full aspect-square object-cover"></video>
                 <div class="absolute inset-0 bg-black/60 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center">
-                    <button class="hist-download p-1.5 bg-primary rounded-lg text-black hover:scale-110 transition-transform" title="Download">
+                    <button class="hist-download p-1.5 bg-primary rounded-lg text-black hover:scale-110 transition-transform" title="下载">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
                     </button>
                 </div>
@@ -591,7 +591,7 @@ export function LipSyncStudio() {
         if (!apiKey) return;
         const banner = document.createElement('div');
         banner.className = 'fixed top-4 left-1/2 -translate-x-1/2 z-[200] bg-[#111] border border-white/10 text-white text-sm px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3';
-        banner.innerHTML = `<span class="animate-spin text-primary">◌</span> <span class="banner-text">Resuming ${pending.length} pending generation${pending.length > 1 ? 's' : ''}…</span>`;
+        banner.innerHTML = `<span class="animate-spin text-primary">◌</span> <span class="banner-text">正在恢复 ${pending.length} 个待完成任务…</span>`;
         document.body.appendChild(banner);
         let remaining = pending.length;
         pending.forEach(async (job) => {
@@ -606,7 +606,7 @@ export function LipSyncStudio() {
                 removePendingJob(job.requestId);
                 remaining--;
                 if (remaining === 0) banner.remove();
-                else banner.querySelector('.banner-text').textContent = `Resuming ${remaining} pending generation${remaining > 1 ? 's' : ''}…`;
+                else banner.querySelector('.banner-text').textContent = `正在恢复 ${remaining} 个待完成任务…`;
             }
         });
     })();
@@ -639,9 +639,9 @@ export function LipSyncStudio() {
         uploadedAudioUrl = null;
         showVideoIcon();
         showAudioIcon();
-        mediaStatusLabel.textContent = inputMode === 'image' ? 'No image' : 'No video';
+        mediaStatusLabel.textContent = inputMode === 'image' ? '暂无图片' : '暂无视频';
         mediaStatusLabel.className = 'text-muted';
-        audioStatusLabel.textContent = 'No audio';
+        audioStatusLabel.textContent = '暂无音频';
         audioStatusLabel.className = 'text-muted';
         textarea.focus();
     };
@@ -655,15 +655,15 @@ export function LipSyncStudio() {
 
         // Validation
         if (!uploadedAudioUrl) {
-            alert('Please upload an audio file first.');
+            alert('请先上传音频文件。');
             return;
         }
         if (inputMode === 'image' && !uploadedImageUrl) {
-            alert('Please upload a portrait image first.');
+            alert('请先上传人像图。');
             return;
         }
         if (inputMode === 'video' && !uploadedVideoUrl) {
-            alert('Please upload a source video first.');
+            alert('请先上传源视频。');
             return;
         }
 
@@ -672,7 +672,7 @@ export function LipSyncStudio() {
 
         hero.classList.add('opacity-0', 'scale-95', '-translate-y-10', 'pointer-events-none');
         generateBtn.disabled = true;
-        generateBtn.innerHTML = `<span class="animate-spin inline-block mr-2 text-black">◌</span> Generating...`;
+        generateBtn.innerHTML = `<span class="animate-spin inline-block mr-2 text-black">◌</span> 生成中...`;
 
         let hadError = false;
         let capturedRequestId = null;
@@ -712,18 +712,18 @@ export function LipSyncStudio() {
                 addToHistory({ id: genId, url: res.url, prompt, model: selectedModel, timestamp: new Date().toISOString() });
                 showVideoInCanvas(res.url);
             } else {
-                throw new Error('No video URL returned by API');
+                throw new Error('API 未返回视频 URL');
             }
         } catch (e) {
             hadError = true;
             if (capturedRequestId) removePendingJob(capturedRequestId);
             console.error(e);
             hero.classList.remove('opacity-0', 'scale-95', '-translate-y-10', 'pointer-events-none');
-            generateBtn.innerHTML = `Error: ${e.message.slice(0, 60)}`;
-            setTimeout(() => { generateBtn.innerHTML = `Generate ✨`; }, 4000);
+            generateBtn.innerHTML = `错误：${e.message.slice(0, 60)}`;
+            setTimeout(() => { generateBtn.innerHTML = `开始生成 ✨`; }, 4000);
         } finally {
             generateBtn.disabled = false;
-            if (!hadError) generateBtn.innerHTML = `Generate ✨`;
+            if (!hadError) generateBtn.innerHTML = `开始生成 ✨`;
         }
     };
 

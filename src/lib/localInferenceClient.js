@@ -15,19 +15,19 @@ class LocalInferenceClient {
         return window.localAI.getBinaryStatus();
     }
     async downloadBinary() {
-        if (!isLocalAIAvailable()) throw new Error('Local AI only available in the desktop app.');
+        if (!isLocalAIAvailable()) throw new Error('本地 AI 仅在桌面端可用。');
         return window.localAI.downloadBinary();
     }
     async downloadModel(modelId) {
-        if (!isLocalAIAvailable()) throw new Error('Local AI only available in the desktop app.');
+        if (!isLocalAIAvailable()) throw new Error('本地 AI 仅在桌面端可用。');
         return window.localAI.downloadModel(modelId);
     }
     async downloadAuxiliary(auxKey) {
-        if (!isLocalAIAvailable()) throw new Error('Local AI only available in the desktop app.');
+        if (!isLocalAIAvailable()) throw new Error('本地 AI 仅在桌面端可用。');
         return window.localAI.downloadAuxiliary(auxKey);
     }
     async deleteModel(modelId) {
-        if (!isLocalAIAvailable()) throw new Error('Local AI only available in the desktop app.');
+        if (!isLocalAIAvailable()) throw new Error('本地 AI 仅在桌面端可用。');
         return window.localAI.deleteModel(modelId);
     }
 
@@ -37,11 +37,11 @@ class LocalInferenceClient {
         return window.localAI.wan2gp.getConfig();
     }
     async setWan2gpUrl(url) {
-        if (!isLocalAIAvailable()) throw new Error('Local AI only available in the desktop app.');
+        if (!isLocalAIAvailable()) throw new Error('本地 AI 仅在桌面端可用。');
         return window.localAI.wan2gp.setUrl(url);
     }
     async probeWan2gp(url) {
-        if (!isLocalAIAvailable()) return { ok: false, error: 'Not in desktop app' };
+        if (!isLocalAIAvailable()) return { ok: false, error: '当前不在桌面端环境' };
         return window.localAI.wan2gp.probe(url);
     }
     // Pushes a File/Blob to the configured Wan2GP server's /upload endpoint
@@ -49,7 +49,7 @@ class LocalInferenceClient {
     // also remembers the path so a subsequent generate(params.image=url) call
     // can rehydrate it as a Gradio file descriptor.
     async uploadFileToWan2gp(file) {
-        if (!isLocalAIAvailable()) throw new Error('Local AI only available in the desktop app.');
+        if (!isLocalAIAvailable()) throw new Error('本地 AI 仅在桌面端可用。');
         const buf = await file.arrayBuffer();
         return window.localAI.wan2gp.uploadFile({
             name: file.name,
@@ -73,7 +73,7 @@ class LocalInferenceClient {
 
     // ── Provider-aware generate ───────────────────────────────────────────
     async generate(params) {
-        if (!isLocalAIAvailable()) throw new Error('Local AI only available in the desktop app.');
+        if (!isLocalAIAvailable()) throw new Error('本地 AI 仅在桌面端可用。');
         const model = getLocalModelById(params.model);
         if (model?.provider === 'wan2gp') {
             return window.localAI.wan2gp.generate(params);

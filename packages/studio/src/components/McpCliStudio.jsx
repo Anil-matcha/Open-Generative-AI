@@ -9,7 +9,7 @@ const FEATURES = [
     title: 'muapi-cli',
     icon: FaTerminal,
     description:
-      'Generate images, videos, and audio from the terminal across 14+ AI models. Dual interface — colored human output plus JSON for agents (--output-json, --jq filtering). Async workflows, file uploads, credit tracking.',
+      '在终端中调用 14+ 个 AI 模型生成图像、视频和音频。双重输出模式，兼顾人类可读内容与智能体可用的 JSON（支持 --output-json、--jq 过滤），并提供异步工作流、文件上传和额度跟踪。',
     code: `npm install -g muapi-cli
 muapi auth login
 muapi image generate "a cyberpunk city" \\
@@ -21,34 +21,34 @@ muapi image generate "a cyberpunk city" \\
     title: 'muapi-mcp-server',
     icon: FaPlug,
     description:
-      'Connect Claude, Cursor, Windsurf, and any MCP-compatible assistant to 100+ generative models. Hosted endpoint — no install. 19 structured tools with input/output schemas, async polling, and account management.',
+      '把 Claude、Cursor、Windsurf 以及任何兼容 MCP 的助手连接到 100+ 个生成模型。提供托管端点，无需安装；内置 19 个结构化工具，包含输入输出 schema、异步轮询和账户管理。',
     code: `claude mcp add --transport http muapi \\
   https://api.muapi.ai/mcp \\
   --header "Authorization: Bearer YOUR_KEY"`,
     href: 'https://github.com/SamurAIGPT/muapi-mcp-server',
   },
   {
-    tag: 'Skills',
-    title: 'Generative Media Skills',
+    tag: '技能',
+    title: '生成媒体技能',
     icon: FaStar,
     description:
-      'Multimodal toolkit for Claude Code, Cursor, and Gemini CLI. Cinema Director, Nano-Banana, UI Designer, Logo Creator, Seedance 2, AI Clipping, and YouTube Shorts presets. Agent-native with JSON outputs and semantic exit codes.',
+      '面向 Claude Code、Cursor 和 Gemini CLI 的多模态工具包。内含 Cinema Director、Nano-Banana、UI Designer、Logo Creator、Seedance 2、AI Clipping 和 YouTube Shorts 等预设，适合智能体直接驱动，支持 JSON 输出与语义化退出码。',
     code: `npx skills add SamurAIGPT/Generative-Media-Skills --all`,
     href: 'https://github.com/SamurAIGPT/Generative-Media-Skills',
   },
 ];
 
 const QUICK_STEPS = [
-  { num: '1', title: 'Install the CLI', code: 'npm install -g muapi-cli' },
-  { num: '2', title: 'Sign in', code: 'muapi auth login' },
-  { num: '3', title: 'Add the skills', code: 'npx skills add SamurAIGPT/Generative-Media-Skills' },
+  { num: '1', title: '安装 CLI', code: 'npm install -g muapi-cli' },
+  { num: '2', title: '登录', code: 'muapi auth login' },
+  { num: '3', title: '添加技能', code: 'npx skills add SamurAIGPT/Generative-Media-Skills' },
 ];
 
 const EXAMPLES = [
-  { title: 'Image generation', code: 'muapi image generate "a serene mountain lake at sunrise" \\\n  --model flux-dev --download ./outputs' },
-  { title: 'Text-to-video', code: 'muapi video generate "a dog running on a beach" \\\n  --model kling-master' },
-  { title: 'Audio creation', code: 'muapi audio create "upbeat lo-fi hip hop for studying"' },
-  { title: 'Run a skill', code: 'bash library/visual/nano-banana/scripts/\\\n  generate-nano-art.sh --file image.jpg --view' },
+  { title: '图像生成', code: 'muapi image generate "清晨宁静的山间湖泊" \\\n  --model flux-dev --download ./outputs' },
+  { title: '文生视频', code: 'muapi video generate "一只狗在海滩上奔跑" \\\n  --model kling-master' },
+  { title: '音频生成', code: 'muapi audio create "适合学习的轻快 lo-fi hip hop"' },
+  { title: '运行技能', code: 'bash library/visual/nano-banana/scripts/\\\n  generate-nano-art.sh --file image.jpg --view' },
 ];
 
 function CodeBlock({ children, className = '' }) {
@@ -69,20 +69,19 @@ export default function McpCliStudio() {
         {/* Hero */}
         <section className="flex flex-col items-center text-center gap-4">
           <div className="px-3 py-1 rounded-full border border-white/10 bg-white/5 text-[11px] font-bold uppercase tracking-widest text-white/60">
-            For developers &amp; AI agents
+            面向开发者和 AI 智能体
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight">MCP &amp; CLI</h1>
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight">MCP 与 CLI</h1>
           <p className="text-white/60 text-base md:text-lg max-w-2xl">
-            Use Open Higgsfield AI from your terminal, your IDE, or any MCP-compatible
-            assistant. Generate cinematic images, videos, and audio across 100+ models —
-            without leaving your workflow.
+            你可以在终端、IDE 或任何兼容 MCP 的助手中使用 Open Generative AI。
+            无需离开现有工作流，就能生成电影感图像、视频和音频。
           </p>
         </section>
 
         {/* Quick start */}
         <section className="rounded-2xl border border-white/5 bg-white/[0.02] p-6 md:p-8 flex flex-col gap-4">
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-bold uppercase tracking-widest text-white/50">Quick start</span>
+            <span className="text-[11px] font-bold uppercase tracking-widest text-white/50">快速上手</span>
             <div className="flex-1 h-px bg-white/5" />
           </div>
           <div className="grid md:grid-cols-3 gap-4">
@@ -126,7 +125,7 @@ export default function McpCliStudio() {
                 <CodeBlock>{f.code}</CodeBlock>
                 <div className="mt-auto flex items-center gap-1.5 text-[12px] font-bold text-white/50 group-hover:text-white transition-colors">
                   <FaGithub className="text-sm" />
-                  <span>View on GitHub</span>
+                  <span>在 GitHub 查看</span>
                   <FaExternalLinkAlt className="text-[10px]" />
                 </div>
               </a>
@@ -137,7 +136,7 @@ export default function McpCliStudio() {
         {/* Examples */}
         <section className="flex flex-col gap-4">
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-bold uppercase tracking-widest text-white/50">Examples</span>
+            <span className="text-[11px] font-bold uppercase tracking-widest text-white/50">示例</span>
             <div className="flex-1 h-px bg-white/5" />
           </div>
           <div className="grid md:grid-cols-2 gap-4">
@@ -154,7 +153,7 @@ export default function McpCliStudio() {
         </section>
 
         <p className="text-center text-xs text-white/40 pb-4">
-          Open-source · MIT licensed · Works with Claude, Cursor, Windsurf, and Gemini CLI
+          开源 · MIT 许可 · 兼容 Claude、Cursor、Windsurf 和 Gemini CLI
         </p>
       </div>
     </div>

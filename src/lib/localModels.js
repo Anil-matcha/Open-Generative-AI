@@ -8,7 +8,7 @@ export const LOCAL_MODEL_CATALOG = [
     {
         id: 'z-image-turbo',
         name: 'Z-Image Turbo',
-        description: 'WaveSpeed\'s featured local model — 6B params, ultra-fast 8-step generation. No API key needed.',
+        description: 'WaveSpeed 主推的本地模型，6B 参数，8 步极速生成，无需 API Key。',
         type: 'z-image',
         provider: 'sdcpp',
         filename: 'z_image_turbo-Q4_K.gguf',
@@ -22,7 +22,7 @@ export const LOCAL_MODEL_CATALOG = [
     {
         id: 'z-image-base',
         name: 'Z-Image Base',
-        description: 'Full-quality 6B parameter model from Tongyi-MAI — higher detail, 50-step generation.',
+        description: '来自通义-MAI 的完整质量 6B 参数模型，细节更丰富，支持 50 步生成。',
         type: 'z-image',
         provider: 'sdcpp',
         filename: 'Z-Image-Q4_K_M.gguf',
@@ -37,7 +37,7 @@ export const LOCAL_MODEL_CATALOG = [
     {
         id: 'dreamshaper-8',
         name: 'Dreamshaper 8',
-        description: 'Versatile SD 1.5 model — great for portraits, landscapes, and artistic styles.',
+        description: '通用型 SD 1.5 模型，适合人像、风景和艺术风格。',
         type: 'sd1',
         provider: 'sdcpp',
         filename: 'DreamShaper_8_pruned.safetensors',
@@ -50,7 +50,7 @@ export const LOCAL_MODEL_CATALOG = [
     {
         id: 'realistic-vision-v51',
         name: 'Realistic Vision v5.1',
-        description: 'Highly photorealistic people and scenes, based on SD 1.5.',
+        description: '基于 SD 1.5 的高写实人物与场景模型。',
         type: 'sd1',
         provider: 'sdcpp',
         filename: 'realisticVisionV51_v51VAE.safetensors',
@@ -63,7 +63,7 @@ export const LOCAL_MODEL_CATALOG = [
     {
         id: 'anything-v5',
         name: 'Anything v5',
-        description: 'High quality anime and illustration style image generation.',
+        description: '高质量的动漫与插画风图像生成模型。',
         type: 'sd1',
         provider: 'sdcpp',
         filename: 'Anything-v5.0-PRT.safetensors',
@@ -77,7 +77,7 @@ export const LOCAL_MODEL_CATALOG = [
     {
         id: 'stable-diffusion-xl-base',
         name: 'SDXL Base 1.0',
-        description: 'Official Stable Diffusion XL base model — higher resolution, excellent quality.',
+        description: '官方 Stable Diffusion XL 基础模型，分辨率更高，画质优秀。',
         type: 'sdxl',
         provider: 'sdcpp',
         filename: 'sd_xl_base_1.0.safetensors',
@@ -92,7 +92,7 @@ export const LOCAL_MODEL_CATALOG = [
     {
         id: 'wan2gp:flux-dev',
         name: 'Flux.1 Dev (Wan2GP)',
-        description: 'Image — FLUX.1 dev served by Wan2GP. Requires running Wan2GP server.',
+        description: '图像模型 - 由 Wan2GP 提供的 FLUX.1 dev，需要运行 Wan2GP 服务。',
         type: 'image',
         family: 'flux',
         provider: 'wan2gp',
@@ -104,7 +104,7 @@ export const LOCAL_MODEL_CATALOG = [
     {
         id: 'wan2gp:qwen-image',
         name: 'Qwen Image (Wan2GP)',
-        description: 'Image — Qwen-Image text-to-image served by Wan2GP.',
+        description: '图像模型 - 由 Wan2GP 提供的 Qwen-Image 文生图。',
         type: 'image',
         family: 'qwen',
         provider: 'wan2gp',
@@ -117,7 +117,7 @@ export const LOCAL_MODEL_CATALOG = [
     {
         id: 'wan2gp:wan22-t2v',
         name: 'Wan 2.2 (Text-to-Video)',
-        description: 'Video — Wan 2.2 text-to-video. Slow on consumer GPUs.',
+        description: '视频模型 - Wan 2.2 文生视频，在消费级 GPU 上速度较慢。',
         type: 'video',
         family: 'wan',
         provider: 'wan2gp',
@@ -129,7 +129,7 @@ export const LOCAL_MODEL_CATALOG = [
     {
         id: 'wan2gp:wan22-i2v',
         name: 'Wan 2.2 (Image-to-Video)',
-        description: 'Video — Wan 2.2 image-to-video. Provide a start frame.',
+        description: '视频模型 - Wan 2.2 图生视频，需要提供起始帧。',
         type: 'video',
         family: 'wan',
         provider: 'wan2gp',
@@ -142,7 +142,7 @@ export const LOCAL_MODEL_CATALOG = [
     {
         id: 'wan2gp:hunyuan-video',
         name: 'Hunyuan Video (Wan2GP)',
-        description: 'Video — Hunyuan text-to-video via Wan2GP.',
+        description: '视频模型 - 通过 Wan2GP 提供的 Hunyuan 文生视频。',
         type: 'video',
         family: 'hunyuan',
         provider: 'wan2gp',
@@ -154,7 +154,7 @@ export const LOCAL_MODEL_CATALOG = [
     {
         id: 'wan2gp:ltx-video',
         name: 'LTX Video (Wan2GP)',
-        description: 'Video — LTX text-to-video. Fastest video option in Wan2GP.',
+        description: '视频模型 - LTX 文生视频，是 Wan2GP 中最快的视频选项。',
         type: 'video',
         family: 'ltx',
         provider: 'wan2gp',

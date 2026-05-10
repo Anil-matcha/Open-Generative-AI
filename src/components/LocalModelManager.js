@@ -25,14 +25,14 @@ function BinaryStatusBar(onStatusChange) {
     const label = document.createElement('div');
     label.className = 'flex flex-col gap-0.5';
     label.innerHTML = `
-        <span class="text-xs font-bold text-white">sd.cpp inference engine</span>
-        <span id="binary-status-text" class="text-[11px] text-muted">Checking...</span>
+        <span class="text-xs font-bold text-white">sd.cpp 推理引擎</span>
+        <span id="binary-status-text" class="text-[11px] text-muted">检查中...</span>
     `;
 
     const btn = document.createElement('button');
     btn.id = 'binary-action-btn';
     btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition-all hidden';
-    btn.textContent = 'Install';
+    btn.textContent = '安装';
 
     bar.appendChild(label);
     bar.appendChild(btn);
@@ -47,13 +47,13 @@ function BinaryStatusBar(onStatusChange) {
         const status = await localAI.getBinaryStatus();
         const text = bar.querySelector('#binary-status-text');
         if (status.exists) {
-            text.textContent = 'Installed and ready';
+            text.textContent = '已安装，可用';
             text.className = 'text-[11px] text-green-400';
             btn.classList.add('hidden');
         } else {
-            text.textContent = 'Not installed — required for local generation';
+            text.textContent = '未安装 - 本地生成必需';
             text.className = 'text-[11px] text-yellow-400';
-            btn.textContent = 'Install Engine';
+            btn.textContent = '安装引擎';
             btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-primary text-black transition-all';
             btn.classList.remove('hidden');
         }
@@ -62,7 +62,7 @@ function BinaryStatusBar(onStatusChange) {
 
     btn.onclick = async () => {
         btn.disabled = true;
-        btn.textContent = 'Downloading...';
+        btn.textContent = '下载中...';
         progressBar.classList.remove('hidden');
 
         const unsub = localAI.onDownloadProgress(({ id, phase, progress }) => {
@@ -70,7 +70,7 @@ function BinaryStatusBar(onStatusChange) {
             const fill = document.getElementById('binary-progress-fill');
             const text = bar.querySelector('#binary-status-text');
             if (fill) fill.style.width = `${Math.round(progress * 100)}%`;
-            if (text) text.textContent = phase === 'extracting' ? 'Extracting...' : `Downloading... ${Math.round(progress * 100)}%`;
+            if (text) text.textContent = phase === 'extracting' ? '解压中...' : `下载中... ${Math.round(progress * 100)}%`;
         });
 
         try {
@@ -81,9 +81,9 @@ function BinaryStatusBar(onStatusChange) {
         } catch (err) {
             unsub();
             const text = bar.querySelector('#binary-status-text');
-            if (text) text.textContent = `Error: ${err.message}`;
+            if (text) text.textContent = `错误：${err.message}`;
             btn.disabled = false;
-            btn.textContent = 'Retry';
+            btn.textContent = '重试';
         }
     };
 
@@ -108,14 +108,14 @@ function AuxRow(label, auxKey, initStatus, onStateChange) {
         </div>
         <div class="flex items-center gap-2 shrink-0">
             ${isReady
-                ? `<span class="text-[10px] text-green-400">Ready</span>`
-                : `<button class="aux-dl-btn flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-primary/20 text-primary border border-primary/30 hover:bg-primary/30 transition-all">${DownloadIcon} Get</button>`}
+                ? `<span class="text-[10px] text-green-400">就绪</span>`
+                : `<button class="aux-dl-btn flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-primary/20 text-primary border border-primary/30 hover:bg-primary/30 transition-all">${DownloadIcon} 获取</button>`}
         </div>
         <div class="aux-progress hidden w-full col-span-2 mt-1">
             <div class="h-1 rounded-full bg-white/10 overflow-hidden">
                 <div class="aux-fill h-full bg-primary transition-all" style="width:0%"></div>
             </div>
-            <span class="aux-text text-[10px] text-muted block mt-0.5">Downloading...</span>
+            <span class="aux-text text-[10px] text-muted block mt-0.5">下载中...</span>
         </div>
     `;
 
@@ -133,7 +133,7 @@ function AuxRow(label, auxKey, initStatus, onStateChange) {
             const unsub = localAI.onDownloadProgress(({ id, phase, progress }) => {
                 if (id !== auxId) return;
                 progFill.style.width = `${Math.round(progress * 100)}%`;
-                progText.textContent = phase === 'done' ? 'Complete!' : `Downloading... ${Math.round(progress * 100)}%`;
+                progText.textContent = phase === 'done' ? '完成！' : `下载中... ${Math.round(progress * 100)}%`;
             });
 
             try {
@@ -142,9 +142,9 @@ function AuxRow(label, auxKey, initStatus, onStateChange) {
                 if (onStateChange) onStateChange();
             } catch (err) {
                 unsub();
-                progText.textContent = `Error: ${err.message}`;
+                progText.textContent = `错误：${err.message}`;
                 btn.disabled = false;
-                btn.innerHTML = `${DownloadIcon} Retry`;
+                btn.innerHTML = `${DownloadIcon} 重试`;
             }
         };
     }
@@ -158,19 +158,19 @@ function Wan2gpConfigBar(onChange) {
     wrap.className = 'flex flex-col gap-3 p-3 rounded-xl bg-white/3 border border-white/5';
     wrap.innerHTML = `
         <div class="flex flex-col gap-0.5">
-            <span class="text-xs font-bold text-white">Wan2GP server (optional)</span>
+            <span class="text-xs font-bold text-white">Wan2GP 服务器（可选）</span>
             <span class="text-[11px] text-muted leading-relaxed">
-                Run <a href="https://github.com/deepbeepmeep/Wan2GP" target="_blank" class="text-primary hover:underline">Wan2GP</a>
-                on a CUDA box (<code class="text-primary/80">python wgp.py --listen --server-name 0.0.0.0</code>) to unlock video models from this UI.
+                在 CUDA 机器上运行 <a href="https://github.com/deepbeepmeep/Wan2GP" target="_blank" class="text-primary hover:underline">Wan2GP</a>
+                （<code class="text-primary/80">python wgp.py --listen --server-name 0.0.0.0</code>），即可在此界面解锁视频模型。
             </span>
         </div>
         <div class="flex items-center gap-2">
             <input id="wan2gp-url" type="text" placeholder="http://127.0.0.1:7860"
                    class="flex-1 bg-white/5 border border-white/5 focus:border-primary/40 rounded-lg px-3 py-1.5 text-xs text-white placeholder-white/30 focus:outline-none"/>
-            <button id="wan2gp-test" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-primary/20 text-primary border border-primary/30 hover:bg-primary/30 transition-all">Test</button>
-            <button id="wan2gp-save" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-primary text-black hover:shadow-glow transition-all">Save</button>
+            <button id="wan2gp-test" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-primary/20 text-primary border border-primary/30 hover:bg-primary/30 transition-all">测试</button>
+            <button id="wan2gp-save" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-primary text-black hover:shadow-glow transition-all">保存</button>
         </div>
-        <div id="wan2gp-status" class="text-[11px] text-muted">Not configured</div>
+        <div id="wan2gp-status" class="text-[11px] text-muted">未配置</div>
     `;
 
     const input = wrap.querySelector('#wan2gp-url');
@@ -188,20 +188,20 @@ function Wan2gpConfigBar(onChange) {
         if (cfg.url) {
             input.value = cfg.url;
             const r = await localAI.probeWan2gp(cfg.url);
-            setStatus(r.ok ? `Connected · Gradio ${r.version}` : `Saved URL not reachable: ${r.error}`, r.ok ? 'ok' : 'warn');
+            setStatus(r.ok ? `已连接 · Gradio ${r.version}` : `已保存的 URL 无法访问：${r.error}`, r.ok ? 'ok' : 'warn');
         } else {
-            setStatus('Not configured (Wan2GP models will appear offline)', 'muted');
+            setStatus('未配置（Wan2GP 模型会显示为离线）', 'muted');
         }
     })();
 
     testBtn.onclick = async () => {
         const url = input.value.trim();
-        if (!url) { setStatus('Enter a URL first', 'warn'); return; }
-        setStatus('Probing...', 'muted');
+        if (!url) { setStatus('请先输入 URL', 'warn'); return; }
+        setStatus('检测中...', 'muted');
         testBtn.disabled = true;
         try {
             const r = await localAI.probeWan2gp(url);
-            setStatus(r.ok ? `Reachable · Gradio ${r.version}` : `Unreachable: ${r.error}`, r.ok ? 'ok' : 'err');
+            setStatus(r.ok ? `可访问 · Gradio ${r.version}` : `无法访问：${r.error}`, r.ok ? 'ok' : 'err');
         } finally { testBtn.disabled = false; }
     };
 
@@ -211,7 +211,7 @@ function Wan2gpConfigBar(onChange) {
         try {
             await localAI.setWan2gpUrl(url);
             const r = url ? await localAI.probeWan2gp(url) : { ok: false, error: 'cleared' };
-            setStatus(r.ok ? `Saved · Connected to Gradio ${r.version}` : (url ? `Saved, not reachable: ${r.error}` : 'Cleared'), r.ok ? 'ok' : 'warn');
+            setStatus(r.ok ? `已保存 · 已连接到 Gradio ${r.version}` : (url ? `已保存，但无法访问：${r.error}` : '已清空'), r.ok ? 'ok' : 'warn');
             onChange?.();
         } finally { saveBtn.disabled = false; }
     };
@@ -233,12 +233,12 @@ function Wan2gpModelCard(model) {
             <p class="text-[11px] text-muted leading-relaxed">${model.description}</p>
             <div class="flex items-center gap-1.5 flex-wrap mt-1">
                 <span class="px-1.5 py-0.5 rounded-md text-[10px] font-bold ${model.type === 'video' ? 'bg-purple-500/15 text-purple-300' : 'bg-primary/10 text-primary'}">${model.type.toUpperCase()}</span>
-                <span class="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-white/5 text-muted">via Wan2GP</span>
+                <span class="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-white/5 text-muted">通过 Wan2GP</span>
                 ${(model.tags || []).filter(t => !['featured', 'remote'].includes(t)).map(t => `<span class="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-white/5 text-muted">${t}</span>`).join('')}
             </div>
         </div>
         <div class="shrink-0">
-            <span class="text-[10px] font-bold ${ready ? 'text-green-400' : 'text-yellow-400'}">${ready ? 'Available' : 'Server offline'}</span>
+            <span class="text-[10px] font-bold ${ready ? 'text-green-400' : 'text-yellow-400'}">${ready ? '可用' : '服务器离线'}</span>
         </div>
     `;
     return card;
@@ -259,7 +259,7 @@ function ModelCard(model, onStateChange) {
             <div class="flex flex-col gap-1 min-w-0">
                 <div class="flex items-center gap-2 flex-wrap">
                     <span class="text-sm font-bold text-white truncate">${model.name}</span>
-                    ${model.featured ? `<span class="px-1.5 py-0.5 rounded-md text-[10px] font-black bg-primary/20 text-primary border border-primary/30">⚡ Featured</span>` : ''}
+                    ${model.featured ? `<span class="px-1.5 py-0.5 rounded-md text-[10px] font-black bg-primary/20 text-primary border border-primary/30">⚡ 主推</span>` : ''}
                     ${fullyReady ? `<span class="text-green-400">${CheckIcon}</span>` : ''}
                 </div>
                 <p class="text-[11px] text-muted leading-relaxed">${model.description}</p>
@@ -272,7 +272,7 @@ function ModelCard(model, onStateChange) {
             <div class="flex items-center gap-2 shrink-0">
                 ${isDownloaded
                     ? `<button class="delete-btn p-2 rounded-lg text-red-400 hover:bg-red-500/10 transition-all">${TrashIcon}</button>`
-                    : `<button class="download-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-primary text-black hover:shadow-glow transition-all">${DownloadIcon} Download</button>`
+                    : `<button class="download-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-primary text-black hover:shadow-glow transition-all">${DownloadIcon} 下载</button>`
                 }
             </div>
         </div>
@@ -280,7 +280,7 @@ function ModelCard(model, onStateChange) {
             <div class="h-1 rounded-full bg-white/10 overflow-hidden">
                 <div class="progress-fill h-full bg-primary transition-all" style="width:0%"></div>
             </div>
-            <span class="progress-text text-[10px] text-muted mt-1 block">Preparing...</span>
+            <span class="progress-text text-[10px] text-muted mt-1 block">准备中...</span>
         </div>
         ${model.requiresAuxiliary ? `<div class="aux-section flex flex-col gap-1.5 pt-1 border-t border-white/5"></div>` : ''}
     `;
@@ -289,7 +289,7 @@ function ModelCard(model, onStateChange) {
     if (model.requiresAuxiliary) {
         const auxSection = card.querySelector('.aux-section');
         auxSection.appendChild(document.createElement('span')).className = 'text-[10px] text-muted uppercase tracking-wider font-bold';
-        auxSection.querySelector('span').textContent = 'Required components';
+        auxSection.querySelector('span').textContent = '必需组件';
         auxSection.appendChild(AuxRow('Qwen3-4B Text Encoder (2.4 GB)', 'llm', auxStatus.llm, onStateChange));
         auxSection.appendChild(AuxRow('FLUX VAE (335 MB)', 'vae', auxStatus.vae, onStateChange));
     }
@@ -302,13 +302,13 @@ function ModelCard(model, onStateChange) {
     if (downloadBtn) {
         downloadBtn.onclick = async () => {
             downloadBtn.disabled = true;
-            downloadBtn.innerHTML = `<span class="animate-spin">◌</span> Starting...`;
+            downloadBtn.innerHTML = `<span class="animate-spin">◌</span> 正在开始...`;
             progressWrap.classList.remove('hidden');
 
             const unsub = localAI.onDownloadProgress(({ id, phase, progress }) => {
                 if (id !== model.id) return;
                 progressFill.style.width = `${Math.round(progress * 100)}%`;
-                progressText.textContent = phase === 'done' ? 'Complete!' : `Downloading... ${Math.round(progress * 100)}%`;
+                progressText.textContent = phase === 'done' ? '完成！' : `下载中... ${Math.round(progress * 100)}%`;
             });
 
             try {
@@ -317,9 +317,9 @@ function ModelCard(model, onStateChange) {
                 if (onStateChange) onStateChange();
             } catch (err) {
                 unsub();
-                progressText.textContent = `Error: ${err.message}`;
+                progressText.textContent = `错误：${err.message}`;
                 downloadBtn.disabled = false;
-                downloadBtn.innerHTML = `${DownloadIcon} Retry`;
+                downloadBtn.innerHTML = `${DownloadIcon} 重试`;
             }
         };
     }
@@ -327,7 +327,7 @@ function ModelCard(model, onStateChange) {
     const deleteBtn = card.querySelector('.delete-btn');
     if (deleteBtn) {
         deleteBtn.onclick = async () => {
-            if (!confirm(`Delete "${model.name}"? You'll need to re-download it to use it again.`)) return;
+            if (!confirm(`确定删除“${model.name}”吗？之后需要重新下载才能使用。`)) return;
             await localAI.deleteModel(model.id);
             if (onStateChange) onStateChange();
         };
@@ -344,8 +344,8 @@ export function LocalModelManager() {
     if (!isLocalAIAvailable()) {
         root.innerHTML = `
             <div class="flex flex-col items-center gap-3 py-8 text-center">
-                <p class="text-sm font-bold text-white">Local Models</p>
-                <p class="text-xs text-muted max-w-xs">Local model inference is only available in the desktop app (Electron build). Use <span class="text-primary font-bold">npm run electron:build</span> to build.</p>
+                <p class="text-sm font-bold text-white">本地模型</p>
+                <p class="text-xs text-muted max-w-xs">本地模型推理仅在桌面应用（Electron 构建）中可用。请使用 <span class="text-primary font-bold">npm run electron:build</span> 构建。</p>
             </div>
         `;
         return root;
@@ -354,7 +354,7 @@ export function LocalModelManager() {
     // ── Section: engine status
     const engineSection = document.createElement('div');
     engineSection.className = 'flex flex-col gap-2';
-    engineSection.innerHTML = `<h3 class="text-xs font-bold text-secondary uppercase tracking-wider">Inference Engine</h3>`;
+    engineSection.innerHTML = `<h3 class="text-xs font-bold text-secondary uppercase tracking-wider">推理引擎</h3>`;
 
     let binaryReady = false;
     const binaryBar = BinaryStatusBar((ready) => { binaryReady = ready; });
@@ -369,8 +369,8 @@ export function LocalModelManager() {
     modelsSection.className = 'flex flex-col gap-3';
     modelsSection.innerHTML = `
         <div class="flex items-center justify-between">
-            <h3 class="text-xs font-bold text-secondary uppercase tracking-wider">Local Models</h3>
-            <span class="text-[10px] text-muted">Stored in your app data folder</span>
+            <h3 class="text-xs font-bold text-secondary uppercase tracking-wider">本地模型</h3>
+            <span class="text-[10px] text-muted">存储在应用数据目录中</span>
         </div>
         <div id="local-model-list" class="flex flex-col gap-3"></div>
     `;
@@ -379,7 +379,7 @@ export function LocalModelManager() {
     const listEl = modelsSection.querySelector('#local-model-list');
 
     const renderModels = async () => {
-        listEl.innerHTML = `<div class="text-xs text-muted text-center py-4">Loading...</div>`;
+        listEl.innerHTML = `<div class="text-xs text-muted text-center py-4">加载中...</div>`;
         try {
             const models = await localAI.listModels();
             listEl.innerHTML = '';
@@ -387,7 +387,7 @@ export function LocalModelManager() {
                 listEl.appendChild(ModelCard(m, renderModels));
             });
         } catch (err) {
-            listEl.innerHTML = `<div class="text-xs text-red-400 text-center py-4">Error loading models: ${err.message}</div>`;
+            listEl.innerHTML = `<div class="text-xs text-red-400 text-center py-4">模型加载失败：${err.message}</div>`;
         }
     };
 

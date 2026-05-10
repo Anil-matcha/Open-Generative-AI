@@ -7,13 +7,13 @@ import { localAI, isLocalAIAvailable } from '../lib/localInferenceClient.js';
 import { isWan2gpModelId, getLocalModelById, localT2VModels, localI2VModels } from '../lib/localModels.js';
 
 // Promotes a wan2gp catalog entry (lib/localModels.js shape) into the
-// `inputs`-shaped descriptor the Video Studio dropdowns/controls expect.
+// `inputs`-shaped descriptor the 视频创作 dropdowns/controls expect.
 const adaptLocalToVideoEntry = (m) => ({
     id: m.id,
     name: m.name,
     provider: 'wan2gp',
     inputs: {
-        prompt: { type: 'string', name: 'prompt', title: 'Prompt' },
+        prompt: { type: 'string', name: 'prompt', title: '提示词' },
         aspect_ratio: { type: 'string', name: 'aspect_ratio', enum: m.aspectRatios || ['16:9', '1:1', '9:16'], default: (m.aspectRatios || ['16:9'])[0] },
     },
 });
@@ -77,6 +77,18 @@ export function VideoStudio() {
         const model = getCurrentModels().find(m => m.id === id);
         return model?.inputs?.name?.enum || [];
     };
+    const getProgressStatusLabel = (status) => {
+        const key = String(status || '').toLowerCase();
+        return {
+            starting: '开始中',
+            processing: '生成中',
+            running: '生成中',
+            queued: '排队中',
+            waiting: '等待中',
+            completed: '已完成',
+            succeeded: '已完成',
+        }[key] || '生成中';
+    };
 
     // ==========================================
     // 1. HERO SECTION
@@ -100,8 +112,8 @@ export function VideoStudio() {
                 <div class="absolute top-4 right-4 text-primary animate-pulse">✨</div>
              </div>
         </div>
-        <h1 class="text-2xl sm:text-4xl md:text-7xl font-black text-white tracking-widest uppercase mb-4 selection:bg-primary selection:text-black text-center px-4">Video Studio</h1>
-        <p class="text-secondary text-sm font-medium tracking-wide opacity-60">Animate images into stunning AI videos with motion effects</p>
+        <h1 class="text-2xl sm:text-4xl md:text-7xl font-black text-white tracking-widest uppercase mb-4 selection:bg-primary selection:text-black text-center px-4">视频创作</h1>
+        <p class="text-secondary text-sm font-medium tracking-wide opacity-60">把静帧变成有运动感的 AI 视频</p>
     `;
     container.appendChild(hero);
 
@@ -127,8 +139,8 @@ export function VideoStudio() {
             if (isMotionControlV2V()) {
                 textarea.disabled = false;
                 textarea.placeholder = uploadedVideoUrl
-                    ? (getCurrentModel()?.promptRequired ? 'Describe the motion' : 'Describe the motion (optional)')
-                    : 'Now upload a reference video using the 🎥 button';
+                    ? (getCurrentModel()?.promptRequired ? '描述你希望的运动' : '描述运动方式（可选）')
+                    : '请先用 🎥 按钮上传参考视频';
                 return;
             }
             // Clear video mode if active
@@ -149,7 +161,7 @@ export function VideoStudio() {
                 document.getElementById('v-model-btn-label').textContent = selectedModelName;
                 updateControlsForModel(selectedModel);
             }
-            textarea.placeholder = 'Describe the motion or effect (optional)';
+            textarea.placeholder = '描述运动或效果（可选）';
             textarea.disabled = false;
         },
         onClear: () => {
@@ -164,7 +176,7 @@ export function VideoStudio() {
             selectedModelName = allT2V[0].name;
             document.getElementById('v-model-btn-label').textContent = selectedModelName;
             updateControlsForModel(selectedModel);
-            textarea.placeholder = 'Describe the video you want to create';
+            textarea.placeholder = '描述你想要生成的视频';
             textarea.disabled = false;
         },
         // Route the upload through the configured Wan2GP server when the active
@@ -186,13 +198,13 @@ export function VideoStudio() {
         uploadFn: (file) => muapi.uploadFile(file),
         requireApiKey: () => true,
     });
-    endPicker.trigger.title = 'End frame (optional)';
+    endPicker.trigger.title = '结束帧（可选）';
     // Visual marker: small "L" badge in the corner so users can tell the two
     // pickers apart at a glance. The wrapper keeps it from interfering with
     // UploadPicker's own thumbnail/spinner state swapping.
     const endBadge = document.createElement('div');
     endBadge.className = 'absolute top-0.5 left-0.5 px-1 h-4 bg-white/20 rounded-md flex items-center justify-center pointer-events-none';
-    endBadge.innerHTML = '<span class="text-[8px] font-black text-white leading-none">END</span>';
+    endBadge.innerHTML = '<span class="text-[8px] font-black text-white leading-none">结束</span>';
     endPicker.trigger.appendChild(endBadge);
     endPicker.trigger.classList.add('hidden'); // start hidden until updateEndFrameVisibility flips it on
     topRow.appendChild(endPicker.trigger);
@@ -223,7 +235,7 @@ export function VideoStudio() {
 
     const videoPickerBtn = document.createElement('button');
     videoPickerBtn.type = 'button';
-    videoPickerBtn.title = 'Upload video to remove watermark';
+    videoPickerBtn.title = '上传视频以去除水印';
     videoPickerBtn.className = 'w-10 h-10 shrink-0 rounded-xl border transition-all flex items-center justify-center relative overflow-hidden mt-1.5 bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40 group';
 
     const videoIconEl = document.createElement('div');
@@ -249,7 +261,7 @@ export function VideoStudio() {
         videoReadyEl.classList.add('hidden'); videoReadyEl.classList.remove('flex');
         videoPickerBtn.classList.remove('border-primary/60');
         videoPickerBtn.classList.add('border-white/10');
-        videoPickerBtn.title = 'Upload video to remove watermark';
+        videoPickerBtn.title = '上传视频以去除水印';
     };
 
     const showVideoSpinner = () => {
@@ -264,7 +276,7 @@ export function VideoStudio() {
         videoReadyEl.classList.replace('hidden', 'flex');
         videoPickerBtn.classList.remove('border-white/10');
         videoPickerBtn.classList.add('border-primary/60');
-        videoPickerBtn.title = `${filename} — click to clear`;
+        videoPickerBtn.title = `${filename} — 点击清除`;
     };
 
     const clearVideoUpload = () => {
@@ -272,7 +284,7 @@ export function VideoStudio() {
         showVideoIcon();
         // Motion-control v2v: keep the model and image; user can re-upload a video
         if (isMotionControlV2V()) {
-            textarea.placeholder = 'Upload a reference video using the 🎥 button';
+            textarea.placeholder = '用 🎥 按钮上传参考视频';
             return;
         }
         v2vMode = false;
@@ -280,7 +292,7 @@ export function VideoStudio() {
         selectedModelName = allT2V[0].name;
         document.getElementById('v-model-btn-label').textContent = selectedModelName;
         updateControlsForModel(selectedModel);
-        textarea.placeholder = 'Describe the video you want to create';
+        textarea.placeholder = '描述你想要生成的视频';
         textarea.disabled = false;
     };
 
@@ -313,8 +325,8 @@ export function VideoStudio() {
             if (isMotionControlV2V()) {
                 textarea.disabled = false;
                 textarea.placeholder = uploadedImageUrl
-                    ? (getCurrentModel()?.promptRequired ? 'Describe the motion' : 'Describe the motion (optional)')
-                    : 'Now upload a reference image using the 🖼 button';
+                    ? (getCurrentModel()?.promptRequired ? '描述你希望的运动' : '描述运动方式（可选）')
+                    : '现在用 🖼 按钮上传参考图';
             } else {
                 // Default v2v flow (e.g. watermark remover) — auto-pick the first v2v model
                 if (imageMode) {
@@ -327,13 +339,13 @@ export function VideoStudio() {
                 selectedModelName = v2vModels[0].name;
                 document.getElementById('v-model-btn-label').textContent = selectedModelName;
                 updateControlsForModel(selectedModel);
-                textarea.placeholder = 'Video ready — click Generate to remove watermark';
+                textarea.placeholder = '视频已就绪，点击开始生成以去除水印';
                 textarea.disabled = true;
             }
         } catch (err) {
             console.error('[VideoStudio] Video upload failed:', err);
             showVideoIcon();
-            alert(`Video upload failed: ${err.message}`);
+            alert(`视频上传失败：${err.message}`);
         }
         videoFileInput.value = '';
     };
@@ -341,7 +353,7 @@ export function VideoStudio() {
     topRow.appendChild(videoPickerBtn);
 
     const textarea = document.createElement('textarea');
-    textarea.placeholder = 'Describe the video you want to create';
+    textarea.placeholder = '描述你想要生成的视频';
     textarea.className = 'flex-1 bg-transparent border-none text-white text-base md:text-xl placeholder:text-muted focus:outline-none resize-none pt-2.5 leading-relaxed min-h-[40px] max-h-[150px] md:max-h-[250px] overflow-y-auto custom-scrollbar';
     textarea.rows = 1;
     textarea.oninput = () => {
@@ -358,7 +370,7 @@ export function VideoStudio() {
     extendBanner.className = 'hidden items-center gap-2 px-4 py-2 mx-2 mt-2 bg-primary/10 border border-primary/20 rounded-xl text-xs text-primary';
     extendBanner.innerHTML = `
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        <span>Extending previous Seedance 2.0 generation — add an optional prompt to guide the continuation</span>
+        <span>正在续写上一条 Seedance 2.0 生成结果，可补充提示词引导后续内容</span>
     `;
     bar.appendChild(extendBanner);
 
@@ -386,23 +398,23 @@ export function VideoStudio() {
         <div class="w-5 h-5 bg-primary rounded-md flex items-center justify-center shadow-lg shadow-primary/20">
             <span class="text-[10px] font-black text-black">V</span>
         </div>
-    `, selectedModelName, 'v-model-btn', 'Select AI video model');
+    `, selectedModelName, 'v-model-btn', '选择 AI 视频模型');
 
     const arBtn = createControlBtn(`
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="opacity-60 text-secondary"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg>
-    `, selectedAr, 'v-ar-btn', 'Change aspect ratio');
+    `, selectedAr, 'v-ar-btn', '切换画幅');
 
     const durationBtn = createControlBtn(`
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="opacity-60 text-secondary"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-    `, `${selectedDuration}s`, 'v-duration-btn', 'Set video duration');
+    `, `${selectedDuration}s`, 'v-duration-btn', '设置视频时长');
 
     const resolutionBtn = createControlBtn(`
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="opacity-60 text-secondary"><path d="M6 2L3 6v15a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z"/></svg>
-    `, selectedResolution || '720p', 'v-resolution-btn', 'Set output resolution');
+    `, selectedResolution || '720p', 'v-resolution-btn', '设置输出分辨率');
 
     const qualityBtn = createControlBtn(`
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="opacity-60 text-secondary"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-    `, selectedQuality || 'basic', 'v-quality-btn', 'Set output quality');
+    `, selectedQuality || 'basic', 'v-quality-btn', '设置输出质量');
 
     const modeBtn = createControlBtn(`
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="opacity-60 text-secondary"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -410,7 +422,7 @@ export function VideoStudio() {
 
     const effectNameBtn = createControlBtn(`
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="opacity-60 text-secondary"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z"/></svg>
-    `, 'Effect', 'v-effect-btn', 'Select effect type');
+    `, '效果', 'v-effect-btn', '选择效果类型');
 
     controlsLeft.appendChild(modelBtn);
     controlsLeft.appendChild(arBtn);
@@ -422,7 +434,7 @@ export function VideoStudio() {
     // Advanced options toggle button
     const advancedBtn = createControlBtn(`
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="opacity-60 text-secondary"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 001.82-.33 1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-1.82.33A1.65 1.65 0 0019.4 9a1.65 1.65 0 00-1.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-    `, 'Advanced', 'v-advanced-btn', 'Show advanced options');
+    `, '高级', 'v-advanced-btn', '显示高级选项');
     controlsLeft.appendChild(advancedBtn);
 
     // Initial visibility (t2v mode)
@@ -436,8 +448,8 @@ export function VideoStudio() {
 
     const generateBtn = document.createElement('button');
     generateBtn.className = 'bg-primary text-black px-6 md:px-8 py-3 md:py-3.5 rounded-xl md:rounded-[1.5rem] font-black text-sm md:text-base hover:shadow-glow hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2.5 w-full sm:w-auto shadow-lg';
-    generateBtn.setAttribute('data-tooltip', 'Generate AI video from prompt');
-    generateBtn.innerHTML = `Generate ✨`;
+    generateBtn.setAttribute('data-tooltip', '根据提示词生成视频');
+    generateBtn.innerHTML = `开始生成 ✨`;
 
     bottomRow.appendChild(controlsLeft);
     bottomRow.appendChild(generateBtn);
@@ -556,10 +568,10 @@ export function VideoStudio() {
                     <div class="px-2 pb-3 mb-2 border-b border-white/5 shrink-0">
                         <div class="flex items-center gap-3 bg-white/5 rounded-xl px-4 py-2.5 border border-white/5 focus-within:border-primary/50 transition-colors">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="text-muted"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-                            <input type="text" id="v-model-search" placeholder="Search models..." class="bg-transparent border-none text-xs text-white focus:ring-0 w-full p-0">
+                            <input type="text" id="v-model-search" placeholder="搜索模型..." class="bg-transparent border-none text-xs text-white focus:ring-0 w-full p-0">
                         </div>
                     </div>
-                    <div class="text-[10px] font-bold text-secondary uppercase tracking-widest px-3 py-2 shrink-0">Video models</div>
+                    <div class="text-[10px] font-bold text-secondary uppercase tracking-widest px-3 py-2 shrink-0">视频模型</div>
                     <div id="v-model-list-container" class="flex flex-col gap-1.5 overflow-y-auto custom-scrollbar pr-1 pb-2"></div>
                 </div>
             `;
@@ -574,7 +586,7 @@ export function VideoStudio() {
                          <div class="w-10 h-10 ${iconColor} border border-white/5 rounded-xl flex items-center justify-center font-black text-sm shadow-inner uppercase">${m.name.charAt(0)}</div>
                          <div class="flex flex-col gap-0.5">
                             <span class="text-xs font-bold text-white tracking-tight">${m.name}</span>
-                            ${isV2V ? `<span class="text-[9px] text-orange-400/70">${m.imageField ? 'Upload a video and image' : 'Upload a video to use'}</span>` : ''}
+                            ${isV2V ? `<span class="text-[9px] text-orange-400/70">${m.imageField ? '上传视频和图片' : '上传视频即可使用'}</span>` : ''}
                          </div>
                     </div>
                     ${selectedModel === m.id ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d9ff00" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
@@ -597,11 +609,11 @@ export function VideoStudio() {
                         updateControlsForModel(selectedModel);
                         if (isMC) {
                             textarea.placeholder = m.promptRequired
-                                ? 'Upload a reference video and image, then describe the motion'
-                                : 'Upload a reference video and image, then describe the motion (optional)';
+                                ? '上传参考视频和参考图，然后描述运动'
+                                : '上传参考视频和参考图，然后描述运动（可选）';
                             textarea.disabled = false;
                         } else {
-                            textarea.placeholder = 'Upload a video using the 🎥 button, then click Generate';
+                            textarea.placeholder = '用 🎥 按钮上传视频，然后点击开始生成';
                             textarea.disabled = true;
                         }
                     } else {
@@ -616,7 +628,7 @@ export function VideoStudio() {
                         selectedModelName = m.name;
                         document.getElementById('v-model-btn-label').textContent = selectedModelName;
                         updateControlsForModel(selectedModel);
-                        textarea.placeholder = imageMode ? 'Describe the motion or effect (optional)' : 'Describe the video you want to create';
+                        textarea.placeholder = imageMode ? '描述运动或效果（可选）' : '描述你想要生成的视频';
                     }
                     closeDropdown();
                 };
@@ -633,12 +645,12 @@ export function VideoStudio() {
                     .filter(m => m.name.toLowerCase().includes(lf) || m.id.toLowerCase().includes(lf));
                 filteredMain.forEach(m => list.appendChild(makeModelItem(m, false)));
 
-                // Video Tools section
+                // 视频工具 section
                 const filteredV2V = v2vModels.filter(m => m.name.toLowerCase().includes(lf) || m.id.toLowerCase().includes(lf));
                 if (filteredV2V.length > 0) {
                     const sectionLabel = document.createElement('div');
                     sectionLabel.className = 'text-[10px] font-bold text-orange-400/70 uppercase tracking-widest px-3 py-2 mt-1 border-t border-white/5';
-                    sectionLabel.textContent = 'Video Tools';
+                    sectionLabel.textContent = '视频工具';
                     list.appendChild(sectionLabel);
                     filteredV2V.forEach(m => list.appendChild(makeModelItem(m, true)));
                 }
@@ -651,7 +663,7 @@ export function VideoStudio() {
 
         } else if (type === 'ar') {
             dropdown.classList.add('max-w-[240px]');
-            dropdown.innerHTML = `<div class="text-[10px] font-bold text-muted uppercase tracking-widest px-3 py-2 border-b border-white/5 mb-2">Aspect Ratio</div>`;
+            dropdown.innerHTML = `<div class="text-[10px] font-bold text-muted uppercase tracking-widest px-3 py-2 border-b border-white/5 mb-2">画幅</div>`;
             const list = document.createElement('div');
             list.className = 'flex flex-col gap-1';
             const availableArs = getCurrentAspectRatios(selectedModel);
@@ -679,7 +691,7 @@ export function VideoStudio() {
 
         } else if (type === 'duration') {
             dropdown.classList.add('max-w-[200px]');
-            dropdown.innerHTML = `<div class="text-[10px] font-bold text-secondary uppercase tracking-widest px-3 py-2 border-b border-white/5 mb-2">Duration</div>`;
+            dropdown.innerHTML = `<div class="text-[10px] font-bold text-secondary uppercase tracking-widest px-3 py-2 border-b border-white/5 mb-2">时长</div>`;
             const list = document.createElement('div');
             list.className = 'flex flex-col gap-1';
             const durations = getCurrentDurations(selectedModel);
@@ -702,7 +714,7 @@ export function VideoStudio() {
 
         } else if (type === 'quality') {
             dropdown.classList.add('max-w-[200px]');
-            dropdown.innerHTML = `<div class="text-[10px] font-bold text-secondary uppercase tracking-widest px-3 py-2 border-b border-white/5 mb-2">Quality</div>`;
+            dropdown.innerHTML = `<div class="text-[10px] font-bold text-secondary uppercase tracking-widest px-3 py-2 border-b border-white/5 mb-2">质量</div>`;
             const list = document.createElement('div');
             list.className = 'flex flex-col gap-1';
             getQualitiesForModel(selectedModel).forEach(q => {
@@ -724,7 +736,7 @@ export function VideoStudio() {
 
         } else if (type === 'resolution') {
             dropdown.classList.add('max-w-[200px]');
-            dropdown.innerHTML = `<div class="text-[10px] font-bold text-secondary uppercase tracking-widest px-3 py-2 border-b border-white/5 mb-2">Resolution</div>`;
+            dropdown.innerHTML = `<div class="text-[10px] font-bold text-secondary uppercase tracking-widest px-3 py-2 border-b border-white/5 mb-2">分辨率</div>`;
             const list = document.createElement('div');
             list.className = 'flex flex-col gap-1';
             const resolutions = getCurrentResolutions(selectedModel);
@@ -747,7 +759,7 @@ export function VideoStudio() {
 
         } else if (type === 'mode') {
             dropdown.classList.add('max-w-[200px]');
-            dropdown.innerHTML = `<div class="text-[10px] font-bold text-secondary uppercase tracking-widest px-3 py-2 border-b border-white/5 mb-2">Mode</div>`;
+            dropdown.innerHTML = `<div class="text-[10px] font-bold text-secondary uppercase tracking-widest px-3 py-2 border-b border-white/5 mb-2">模式</div>`;
             const list = document.createElement('div');
             list.className = 'flex flex-col gap-1';
             getCurrentModes(selectedModel).forEach(m => {
@@ -770,7 +782,7 @@ export function VideoStudio() {
         } else if (type === 'effect') {
             dropdown.classList.add('max-w-[240px]');
             dropdown.classList.remove('max-w-[200px]');
-            dropdown.innerHTML = `<div class="text-[10px] font-bold text-secondary uppercase tracking-widest px-3 py-2 border-b border-white/5 mb-2">Effect Type</div>`;
+            dropdown.innerHTML = `<div class="text-[10px] font-bold text-secondary uppercase tracking-widest px-3 py-2 border-b border-white/5 mb-2">效果类型</div>`;
             const list = document.createElement('div');
             list.className = 'flex flex-col gap-1 max-h-[50vh] overflow-y-auto custom-scrollbar';
             getEffectNamesForModel(selectedModel).forEach(e => {
@@ -838,7 +850,7 @@ export function VideoStudio() {
 
     const historyLabel = document.createElement('div');
     historyLabel.className = 'text-[9px] font-bold text-muted uppercase tracking-widest mb-2';
-    historyLabel.textContent = 'History';
+    historyLabel.textContent = '历史记录';
     historySidebar.appendChild(historyLabel);
 
     const historyList = document.createElement('div');
@@ -868,20 +880,20 @@ export function VideoStudio() {
 
     const regenerateBtn = document.createElement('button');
     regenerateBtn.className = 'bg-white/10 hover:bg-white/20 px-6 py-2.5 rounded-2xl text-xs font-bold transition-all border border-white/5 backdrop-blur-lg text-white';
-    regenerateBtn.textContent = '↻ Regenerate';
+    regenerateBtn.textContent = '↻ 重新生成';
 
     const downloadBtn = document.createElement('button');
     downloadBtn.className = 'bg-primary text-black px-6 py-2.5 rounded-2xl text-xs font-bold transition-all shadow-glow active:scale-95';
-    downloadBtn.textContent = '↓ Download';
+    downloadBtn.textContent = '↓ 下载';
 
     const extendBtn = document.createElement('button');
     extendBtn.className = 'hidden bg-white/10 hover:bg-white/20 px-6 py-2.5 rounded-2xl text-xs font-bold transition-all border border-primary/30 text-primary backdrop-blur-lg';
-    extendBtn.textContent = '↗ Extend';
-    extendBtn.title = 'Extend this video using Seedance 2.0 Extend';
+    extendBtn.textContent = '↗ 续写';
+    extendBtn.title = '使用 Seedance 2.0 Extend 续写此视频';
 
     const newPromptBtn = document.createElement('button');
     newPromptBtn.className = 'bg-white/10 hover:bg-white/20 px-6 py-2.5 rounded-2xl text-xs font-bold transition-all border border-white/5 backdrop-blur-lg text-white';
-    newPromptBtn.textContent = '+ New';
+    newPromptBtn.textContent = '+ 新建';
 
     canvasControls.appendChild(regenerateBtn);
     canvasControls.appendChild(extendBtn);
@@ -928,7 +940,7 @@ export function VideoStudio() {
             thumb.innerHTML = `
                 <video src="${entry.url}" preload="metadata" muted class="w-full aspect-square object-cover"></video>
                 <div class="absolute inset-0 bg-black/60 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center gap-1">
-                    <button class="hist-download p-1.5 bg-primary rounded-lg text-black hover:scale-110 transition-transform" title="Download">
+                    <button class="hist-download p-1.5 bg-primary rounded-lg text-black hover:scale-110 transition-transform" title="下载">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
                     </button>
                 </div>
@@ -999,7 +1011,7 @@ export function VideoStudio() {
 
         const banner = document.createElement('div');
         banner.className = 'fixed top-4 left-1/2 -translate-x-1/2 z-[200] bg-[#111] border border-white/10 text-white text-sm px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3';
-        banner.innerHTML = `<span class="animate-spin text-primary">◌</span> <span class="banner-text">Resuming ${pending.length} pending generation${pending.length > 1 ? 's' : ''}…</span>`;
+        banner.innerHTML = `<span class="animate-spin text-primary">◌</span> <span class="banner-text">正在恢复 ${pending.length} 个待完成任务…</span>`;
         document.body.appendChild(banner);
 
         let remaining = pending.length;
@@ -1018,7 +1030,7 @@ export function VideoStudio() {
                 removePendingJob(job.requestId);
                 remaining--;
                 if (remaining === 0) banner.remove();
-                else banner.querySelector('.banner-text').textContent = `Resuming ${remaining} pending generation${remaining > 1 ? 's' : ''}…`;
+                else banner.querySelector('.banner-text').textContent = `正在恢复 ${remaining} 个待完成任务…`;
             }
         });
     })();
@@ -1056,7 +1068,7 @@ export function VideoStudio() {
         selectedModelName = allT2V[0].name;
         document.getElementById('v-model-btn-label').textContent = selectedModelName;
         updateControlsForModel(selectedModel);
-        textarea.placeholder = 'Describe the video you want to create';
+        textarea.placeholder = '描述你想要生成的视频';
         textarea.disabled = false;
         textarea.focus();
     };
@@ -1072,7 +1084,7 @@ export function VideoStudio() {
         selectedModelName = 'Seedance 2.0 Extend';
         document.getElementById('v-model-btn-label').textContent = selectedModelName;
         updateControlsForModel(selectedModel);
-        textarea.placeholder = 'Optional: describe how to continue the video...';
+        textarea.placeholder = '可选：描述视频要如何继续...';
         textarea.focus();
     };
 
@@ -1086,30 +1098,30 @@ export function VideoStudio() {
 
         if (v2vMode) {
             if (!uploadedVideoUrl) {
-                alert('Please upload a video first.');
+                alert('请先上传视频。');
                 return;
             }
             if (model?.imageField && !uploadedImageUrl) {
-                alert('Please upload a reference image for motion control.');
+                alert('请先上传用于运动控制的参考图。');
                 return;
             }
             if (model?.promptRequired && !prompt) {
-                alert('Please describe the motion you want.');
+                alert('请先描述你希望的运动。');
                 return;
             }
         } else if (isExtendMode) {
             if (!lastGenerationId) {
-                alert('No Seedance 2.0 generation found to extend. Generate a video first.');
+                alert('未找到可续写的 Seedance 2.0 结果，请先生成一个视频。');
                 return;
             }
         } else if (imageMode) {
             if (!uploadedImageUrl) {
-                alert('Please upload a start frame image first.');
+                alert('请先上传起始帧图片。');
                 return;
             }
         } else {
             if (!prompt) {
-                alert('Please enter a prompt to generate a video.');
+                alert('请先输入提示词。');
                 return;
             }
         }
@@ -1127,14 +1139,14 @@ export function VideoStudio() {
 
         hero.classList.add('opacity-0', 'scale-95', '-translate-y-10', 'pointer-events-none');
         generateBtn.disabled = true;
-        generateBtn.innerHTML = `<span class="animate-spin inline-block mr-2 text-black">◌</span> Generating...`;
+        generateBtn.innerHTML = `<span class="animate-spin inline-block mr-2 text-black">◌</span> 生成中...`;
 
         // For local generations, surface step progress in the button label.
         let unsubscribeProgress = null;
         if (isLocal) {
             unsubscribeProgress = localAI.onProgress(({ status, progress }) => {
                 const pct = typeof progress === 'number' ? Math.round(progress * 100) : null;
-                generateBtn.innerHTML = `<span class="animate-spin inline-block mr-2 text-black">◌</span> ${status || 'Generating'}${pct != null ? ` ${pct}%` : '…'}`;
+                generateBtn.innerHTML = `<span class="animate-spin inline-block mr-2 text-black">◌</span> ${getProgressStatusLabel(status)}${pct != null ? ` ${pct}%` : '…'}`;
             });
         }
 
@@ -1167,10 +1179,10 @@ export function VideoStudio() {
                     addToHistory({ id: genId, url: res.url, prompt, model: selectedModel, aspect_ratio: selectedAr, timestamp: new Date().toISOString() });
                     showVideoInCanvas(res.url, selectedModel);
                 } else {
-                    throw new Error('No video URL returned by Wan2GP');
+                    throw new Error('Wan2GP 未返回视频 URL');
                 }
                 generateBtn.disabled = false;
-                generateBtn.innerHTML = `Generate ✨`;
+                generateBtn.innerHTML = `开始生成 ✨`;
                 return;
             }
 
@@ -1188,10 +1200,10 @@ export function VideoStudio() {
                     addToHistory({ id: genId, url: res.url, prompt: model?.hasPrompt ? prompt : '', model: selectedModel, timestamp: new Date().toISOString() });
                     showVideoInCanvas(res.url, selectedModel);
                 } else {
-                    throw new Error('No video URL returned by API');
+                    throw new Error('API 未返回视频 URL');
                 }
                 generateBtn.disabled = false;
-                generateBtn.innerHTML = `Generate ✨`;
+                generateBtn.innerHTML = `开始生成 ✨`;
                 return;
             }
 
@@ -1230,10 +1242,10 @@ export function VideoStudio() {
                     addToHistory({ id: genId, url: res.url, prompt, model: selectedModel, aspect_ratio: selectedAr, duration: selectedDuration, timestamp: new Date().toISOString() });
                     showVideoInCanvas(res.url, selectedModel);
                 } else {
-                    throw new Error('No video URL returned by API');
+                    throw new Error('API 未返回视频 URL');
                 }
                 generateBtn.disabled = false;
-                generateBtn.innerHTML = `Generate ✨`;
+                generateBtn.innerHTML = `开始生成 ✨`;
                 return;
             }
 
@@ -1285,7 +1297,7 @@ export function VideoStudio() {
                 showVideoInCanvas(res.url, selectedModel);
             } else {
                 console.error('[VideoStudio] No video URL in response:', res);
-                throw new Error('No video URL returned by API');
+                throw new Error('API 未返回视频 URL');
             }
         } catch (e) {
             hadError = true;
@@ -1293,15 +1305,15 @@ export function VideoStudio() {
             console.error(e);
             // Restore hero so the page doesn't look broken after a failed generation
             hero.classList.remove('opacity-0', 'scale-95', '-translate-y-10', 'pointer-events-none');
-            generateBtn.innerHTML = `Error: ${e.message.slice(0, 60)}`;
+            generateBtn.innerHTML = `错误：${e.message.slice(0, 60)}`;
             setTimeout(() => {
-                generateBtn.innerHTML = `Generate ✨`;
+                generateBtn.innerHTML = `开始生成 ✨`;
             }, 4000);
         } finally {
             generateBtn.disabled = false;
             if (typeof unsubscribeProgress === 'function') unsubscribeProgress();
             // Only reset the label on success; the catch timeout handles the error case
-            if (!hadError) generateBtn.innerHTML = `Generate ✨`;
+            if (!hadError) generateBtn.innerHTML = `开始生成 ✨`;
         }
     };
 

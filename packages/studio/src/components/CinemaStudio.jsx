@@ -6,41 +6,41 @@ import { generateImage, uploadFile } from "../muapi.js";
 // ─── Constants (inlined from promptUtils) ───────────────────────────────────
 
 const CAMERA_MAP = {
-  "Modular 8K Digital": "modular 8K digital cinema camera",
-  "Full-Frame Cine Digital": "full-frame digital cinema camera",
-  "Grand Format 70mm Film": "grand format 70mm film camera",
-  "Studio Digital S35": "Super 35 studio digital camera",
-  "Classic 16mm Film": "classic 16mm film camera",
-  "Premium Large Format Digital": "premium large-format digital cinema camera",
+  "Modular 8K Digital": "模块化 8K 数字电影机",
+  "Full-Frame Cine Digital": "全画幅数字电影机",
+  "Grand Format 70mm Film": "70mm 大画幅胶片机",
+  "Studio Digital S35": "Super 35 电影机",
+  "Classic 16mm Film": "经典 16mm 胶片机",
+  "Premium Large Format Digital": "高端大画幅数字电影机",
 };
 
 const LENS_MAP = {
-  "Creative Tilt Lens": "creative tilt lens effect",
-  "Compact Anamorphic": "compact anamorphic lens",
-  "Extreme Macro": "extreme macro lens",
-  "70s Cinema Prime": "1970s cinema prime lens",
-  "Classic Anamorphic": "classic anamorphic lens",
-  "Premium Modern Prime": "premium modern prime lens",
-  "Warm Cinema Prime": "warm-toned cinema prime lens",
-  "Swirl Bokeh Portrait": "swirl bokeh portrait lens",
-  "Vintage Prime": "vintage prime lens",
-  "Halation Diffusion": "halation diffusion filter",
-  "Clinical Sharp Prime": "ultra-sharp clinical prime lens",
+  "Creative Tilt Lens": "创意移轴镜头",
+  "Compact Anamorphic": "紧凑型变形宽银幕镜头",
+  "Extreme Macro": "极致微距镜头",
+  "70s Cinema Prime": "70 年代电影定焦镜头",
+  "Classic Anamorphic": "经典变形宽银幕镜头",
+  "Premium Modern Prime": "高端现代定焦镜头",
+  "Warm Cinema Prime": "暖调电影定焦镜头",
+  "Swirl Bokeh Portrait": "旋涡散景人像镜头",
+  "Vintage Prime": "复古定焦镜头",
+  "Halation Diffusion": "柔光晕染滤镜",
+  "Clinical Sharp Prime": "超锐利临床感定焦镜头",
 };
 
 const FOCAL_PERSPECTIVE = {
-  8: "ultra-wide perspective",
-  14: "wide-angle perspective",
-  24: "wide-angle dynamic perspective",
-  35: "natural cinematic perspective",
-  50: "standard portrait perspective",
-  85: "classic portrait perspective",
+  8: "超广角视角",
+  14: "广角视角",
+  24: "广角动感视角",
+  35: "自然电影视角",
+  50: "标准人像视角",
+  85: "经典人像视角",
 };
 
 const APERTURE_EFFECT = {
-  "f/1.4": "shallow depth of field, creamy bokeh",
-  "f/4": "balanced depth of field",
-  "f/11": "deep focus clarity, sharp foreground to background",
+  "f/1.4": "浅景深，奶油般虚化",
+  "f/4": "景深平衡",
+  "f/11": "深焦清晰，前后景都锐利",
 };
 
 const ASSET_URLS = {
@@ -86,19 +86,19 @@ function buildNanoBananaPrompt(
   const perspective = FOCAL_PERSPECTIVE[focalLength] || "";
   const depthEffect = APERTURE_EFFECT[aperture] || "";
   const qualityTags = [
-    "professional photography",
-    "ultra-detailed",
-    "8K resolution",
+    "专业摄影",
+    "超高细节",
+    "8K 分辨率",
   ];
   const parts = [
     basePrompt,
-    `shot on a ${cameraDesc}`,
-    `using a ${lensDesc} at ${focalLength}mm ${perspective ? `(${perspective})` : ""}`,
-    `aperture ${aperture}`,
+    `使用${cameraDesc}拍摄`,
+    `搭配${lensDesc}，焦距 ${focalLength}mm${perspective ? `（${perspective}）` : ""}`,
+    `光圈 ${aperture}`,
     depthEffect,
-    "cinematic lighting",
-    "natural color science",
-    "high dynamic range",
+    "电影感布光",
+    "自然色彩科学",
+    "高动态范围",
     qualityTags.join(", "),
   ];
   return parts.filter((p) => p && p.trim() !== "").join(", ");
@@ -281,6 +281,13 @@ function ScrollColumn({ title, items, columnKey, value, onChange }) {
     return '';
   };
 
+  const getItemLabel = (item) => {
+    if (columnKey === 'camera') return CAMERA_MAP[item] || item;
+    if (columnKey === 'lens') return LENS_MAP[item] || item;
+    if (columnKey === 'focal') return `${item}mm`;
+    return item;
+  };
+
   return (
     <div className="flex flex-col items-center relative w-[130px] md:w-[150px] shrink-0 snap-center">
       <div className="mb-4 text-[10px] font-black text-white/20 uppercase tracking-[0.25em] text-center">
@@ -306,6 +313,7 @@ function ScrollColumn({ title, items, columnKey, value, onChange }) {
 
           {items.map((item) => {
             const imageUrl = ASSET_URLS[item];
+            const itemLabel = getItemLabel(item);
             return (
               <div
                 key={item}
@@ -320,12 +328,12 @@ function ScrollColumn({ title, items, columnKey, value, onChange }) {
                   {imageUrl ? (
                     <img
                       src={imageUrl}
-                      alt={String(item)}
+                      alt={String(itemLabel)}
                       className="w-full h-full object-cover opacity-70"
                     />
                   ) : (
                     <span className="text-sm font-bold text-white/40">
-                      {item}
+                      {itemLabel}
                     </span>
                   )}
                 </div>
@@ -333,7 +341,7 @@ function ScrollColumn({ title, items, columnKey, value, onChange }) {
                   data-label="true"
                   className="text-[8px] md:text-[9px] font-black uppercase text-center leading-tight max-w-full truncate px-1 tracking-widest text-white/60"
                 >
-                  {item}
+                  {itemLabel}
                 </span>
               </div>
             );
@@ -382,7 +390,7 @@ function CameraControlsOverlay({
         <div className="flex items-center justify-between mb-8">
           <div className="flex flex-col gap-1">
             <h2 className="text-2xl font-black text-white tracking-tighter uppercase italic">
-              Camera Config
+              镜头配置
             </h2>
             <div className="h-[1px] w-12 bg-primary/40" />
           </div>
@@ -406,28 +414,28 @@ function CameraControlsOverlay({
         {/* Scroll columns */}
         <div className="w-full flex justify-start md:justify-center gap-3 md:gap-6 py-4 md:py-8 overflow-x-auto no-scrollbar snap-x px-4 md:px-0">
           <ScrollColumn
-            title="Camera"
+            title="摄影机"
             items={CAMERAS}
             columnKey="camera"
             value={settings.camera}
             onChange={updateSetting("camera")}
           />
           <ScrollColumn
-            title="Lens"
+            title="镜头"
             items={LENSES}
             columnKey="lens"
             value={settings.lens}
             onChange={updateSetting("lens")}
           />
           <ScrollColumn
-            title="Focal Length"
+            title="焦距"
             items={FOCAL_LENGTHS}
             columnKey="focal"
             value={settings.focal}
             onChange={updateSetting("focal")}
           />
           <ScrollColumn
-            title="Aperture"
+            title="光圈"
             items={APERTURES}
             columnKey="aperture"
             value={settings.aperture}
@@ -562,7 +570,7 @@ export default function CinemaStudio({
   }, [historyItems]);
 
   const formatSummaryValue = () =>
-    `${settings.lens}, ${settings.focal}mm, ${settings.aperture}`;
+    `${LENS_MAP[settings.lens] || settings.lens}, ${settings.focal}mm, ${settings.aperture}`;
 
   // ── Textarea auto-height ──
   const handleTextareaInput = (e) => {
@@ -628,11 +636,11 @@ export default function CinemaStudio({
           });
         }
       } else {
-        throw new Error("No data returned");
+        throw new Error("接口未返回数据");
       }
     } catch (e) {
       console.error(e);
-      alert("Generation Failed: " + e.message);
+      alert("生成失败：" + e.message);
     } finally {
       setIsGenerating(false);
     }
@@ -722,7 +730,7 @@ export default function CinemaStudio({
               >
                 <img
                   src={entry.url}
-                  alt={`History item ${idx + 1}`}
+                  alt={`历史记录 ${idx + 1}`}
                   className="w-full aspect-[4/3] object-cover bg-black/40"
                 />
                 
@@ -730,7 +738,7 @@ export default function CinemaStudio({
                 <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     type="button"
-                    title="Fullscreen"
+                    title="全屏"
                     onClick={(e) => {
                       e.stopPropagation();
                       setFullscreenUrl(entry.url);
@@ -746,7 +754,7 @@ export default function CinemaStudio({
                   </button>
                   <button
                     type="button"
-                    title="Download"
+                    title="下载"
                     onClick={async (e) => {
                       e.stopPropagation();
                       try {
@@ -775,14 +783,14 @@ export default function CinemaStudio({
                 {/* Details */}
                 <div className="p-3 bg-black/80 backdrop-blur-sm border-t border-white/5 flex-1 flex flex-col justify-between gap-2">
                   <p className="text-white/70 text-xs line-clamp-3 leading-relaxed">
-                    {entry.settings?.prompt || "No prompt"}
+                    {entry.settings?.prompt || "未填写提示词"}
                   </p>
                   <div className="flex items-center justify-between mt-1 flex-wrap gap-1">
                     <span className="text-[10px] font-bold text-[#d9ff00] px-2 py-0.5 bg-[#d9ff00]/10 rounded border border-[#d9ff00]/20">
-                      {entry.settings?.camera || "Standard"}
+                      {CAMERA_MAP[entry.settings?.camera] || entry.settings?.camera || "默认摄影机"}
                     </span>
                     <div className="flex gap-2">
-                      <span className="text-[10px] text-white/40">{entry.settings?.lens || "35mm"}</span>
+                      <span className="text-[10px] text-white/40">{LENS_MAP[entry.settings?.lens] || entry.settings?.lens || "35mm"}</span>
                       {entry.settings?.aspect_ratio && (
                         <span className="text-[10px] text-white/40">{entry.settings.aspect_ratio}</span>
                       )}
@@ -807,11 +815,11 @@ export default function CinemaStudio({
               </div>
             </div>
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight mb-4 text-center px-4">
-              <span className="text-white/40 font-medium">START CREATING WITH</span><br />
-              <span className="text-white uppercase tracking-wider">Cinema Studio</span>
+              <span className="text-white/40 font-medium">开始使用</span><br />
+              <span className="text-white uppercase tracking-wider">电影创作</span>
             </h1>
             <p className="text-white/40 text-sm md:text-base font-medium tracking-wide text-center max-w-lg leading-relaxed">
-              What would you shoot with infinite budget?
+              如果预算无限，你想拍什么镜头？
             </p>
           </div>
         )}
@@ -875,7 +883,7 @@ export default function CinemaStudio({
                     <div className="relative w-full h-full group">
                       <img
                         src={uploadedImage}
-                        alt="Reference"
+                        alt="参考图"
                         className="w-full h-full object-cover opacity-80 group-hover:opacity-40 transition-opacity"
                       />
                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -896,7 +904,7 @@ export default function CinemaStudio({
 
               <textarea
                 ref={textareaRef}
-                placeholder="Describe your cinema scene..."
+                placeholder="描述你想拍的画面..."
                 className="w-full bg-transparent border-none text-white text-sm placeholder:text-white/10 focus:outline-none resize-none pt-1 leading-relaxed min-h-[40px] max-h-[150px] md:max-h-[250px] overflow-y-auto custom-scrollbar disabled:opacity-40"
                 rows={1}
                 onInput={handleTextareaInput}
@@ -964,7 +972,7 @@ export default function CinemaStudio({
                 >
                   <div className="absolute top-3 right-3 w-1.5 h-1.5 bg-[#d9ff00] rounded-full shadow-lg shadow-[#d9ff00]/20" />
                   <span className="text-[9px] font-bold text-white/30 uppercase truncate w-full tracking-wider group-hover:text-white transition-colors">
-                    {settings.camera}
+                    {CAMERA_MAP[settings.camera] || settings.camera}
                   </span>
                   <span className="text-xs font-semibold text-white/70 truncate w-full group-hover:text-[#d9ff00] transition-colors">
                     {formatSummaryValue()}
@@ -979,11 +987,11 @@ export default function CinemaStudio({
                 >
                   {isGenerating ? (
                     <>
-                      <span className="animate-spin inline-block text-black">◌</span> SHOOTING...
+                      <span className="animate-spin inline-block text-black">◌</span> 拍摄中...
                     </>
                   ) : (
                     <>
-                      <span>SHOOT</span>
+                      <span>开始拍摄</span>
                     </>
                   )}
                 </button>
@@ -1012,7 +1020,7 @@ export default function CinemaStudio({
           </button>
           <img 
             src={fullscreenUrl} 
-            alt="Fullscreen Preview" 
+            alt="全屏预览"
             className="max-w-[95vw] max-h-[95vh] rounded-2xl shadow-2xl object-contain animate-scale-up" 
             onClick={(e) => e.stopPropagation()}
           />

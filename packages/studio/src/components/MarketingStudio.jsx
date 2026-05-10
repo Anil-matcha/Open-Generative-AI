@@ -78,12 +78,12 @@ const ASSETS = {
     { id: "b6971dd4-55fa-4e64-b318-392b16504284", name: "Jin", url: "https://d3adwkbyhxyrtq.cloudfront.net/web-app/Jin.webp" }
   ],
   ugc: [
-    { id: 1, name: "UGC", url: "https://d3adwkbyhxyrtq.cloudfront.net/web-app/ugc.mp4" },
-    { id: 2, name: "Tutorial", url: "https://d3adwkbyhxyrtq.cloudfront.net/web-app/ugc_how_to.mp4" },
-    { id: 3, name: "Unboxing", url: "https://d3adwkbyhxyrtq.cloudfront.net/web-app/ugc_unboxing.mp4" },
-    { id: 4, name: "Hyper Motion", url: "https://d3adwkbyhxyrtq.cloudfront.net/web-app/hyper-motion-mini.mp4" },
-    { id: 5, name: "Product Review", url: "https://d3adwkbyhxyrtq.cloudfront.net/web-app/product_review.mp4" },
-    { id: 6, name: "TV Spot", url: "https://d3adwkbyhxyrtq.cloudfront.net/web-app/tv-spot-mini.mp4" }
+    { id: 1, name: "UGC 短片", url: "https://d3adwkbyhxyrtq.cloudfront.net/web-app/ugc.mp4" },
+    { id: 2, name: "教程讲解", url: "https://d3adwkbyhxyrtq.cloudfront.net/web-app/ugc_how_to.mp4" },
+    { id: 3, name: "开箱展示", url: "https://d3adwkbyhxyrtq.cloudfront.net/web-app/ugc_unboxing.mp4" },
+    { id: 4, name: "高动感镜头", url: "https://d3adwkbyhxyrtq.cloudfront.net/web-app/hyper-motion-mini.mp4" },
+    { id: 5, name: "产品测评", url: "https://d3adwkbyhxyrtq.cloudfront.net/web-app/product_review.mp4" },
+    { id: 6, name: "电视广告", url: "https://d3adwkbyhxyrtq.cloudfront.net/web-app/tv-spot-mini.mp4" }
   ]
 };
 
@@ -102,7 +102,7 @@ function UploadSlot({ icon, url, progress, label, onUpload, onClear, multiple = 
     <div className="relative group/slot flex items-center">
       <div 
         onClick={() => inputRef.current?.click()}
-        title={`Upload ${label}`}
+        title={`上传${label}`}
         className={`relative w-10 h-10 rounded-full border transition-all flex items-center justify-center cursor-pointer ${
           url ? 'border-primary/40 bg-primary/5' : 'border-white/5 bg-white/5 hover:bg-white/10 hover:border-white/20'
         }`}
@@ -324,8 +324,8 @@ export default function MarketingStudio({ apiKey, droppedFiles, onFilesHandled }
   };
 
   const handleGenerate = async () => {
-    if (!prompt.trim()) return alert("Please enter an ad script.");
-    if (!productImage) return alert("Please upload a product image.");
+    if (!prompt.trim()) return alert("请先输入广告脚本。");
+    if (!productImage) return alert("请上传产品图。");
 
     setIsGenerating(true);
     try {
@@ -350,7 +350,7 @@ export default function MarketingStudio({ apiKey, droppedFiles, onFilesHandled }
         setFullscreenUrl(result.url);
       }
     } catch (err) {
-      alert("Generation failed: " + err.message);
+      alert("生成失败：" + err.message);
     } finally {
       setIsGenerating(false);
     }
@@ -386,7 +386,7 @@ export default function MarketingStudio({ apiKey, droppedFiles, onFilesHandled }
                    <button
                     onClick={(e) => { e.stopPropagation(); downloadFile(entry.url, `marketing-ad-${entry.id}.mp4`); }}
                     className="p-2 bg-black/60 backdrop-blur-md rounded-full text-white hover:bg-primary hover:text-black transition-all border border-white/10"
-                    title="Download"
+                    title="下载"
                    >
                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" />
@@ -421,12 +421,12 @@ export default function MarketingStudio({ apiKey, droppedFiles, onFilesHandled }
                 </div>
               </div>
               <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight mb-4 text-center px-4">
-                <span className="text-white/40 font-medium uppercase tracking-widest">START CREATING WITH</span>
+                <span className="text-white/40 font-medium uppercase tracking-widest">开始制作</span>
                 <br />
-                <span className="text-white uppercase tracking-tight">MARKETING STUDIO</span>
+                <span className="text-white uppercase tracking-tight">营销视频工作台</span>
               </h1>
               <p className="text-white/40 text-sm md:text-base font-medium tracking-wide text-center max-w-lg leading-relaxed px-6">
-                Describe your scene, upload your product, and watch high-converting AI video ads come to life.
+                描述广告脚本，上传产品图，即可生成适合投放的 AI 视频广告。
               </p>
           </div>
         )}
@@ -457,7 +457,7 @@ export default function MarketingStudio({ apiKey, droppedFiles, onFilesHandled }
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               onInput={handleTextareaInput}
-              placeholder="Describe your ad script... Use @image1 for product, @image2 for avatar."
+              placeholder="输入广告脚本... 可用 @image1 指代产品图，@image2 指代人物图。"
               rows={1}
               className="w-full bg-transparent border-none text-white text-sm placeholder:text-white/20 focus:outline-none resize-none pt-1 leading-relaxed min-h-[44px] max-h-[300px] custom-scrollbar font-medium"
             />
@@ -470,7 +470,7 @@ export default function MarketingStudio({ apiKey, droppedFiles, onFilesHandled }
               {/* Asset Uploads Group */}
               <div className="flex items-center gap-1.5 pr-3 border-r border-white/10">
                 <UploadSlot 
-                  label="Product" 
+                  label="产品图"
                   icon={<ProductIcon />} 
                   url={productImage} 
                   progress={uploadProgress.product} 
@@ -478,7 +478,7 @@ export default function MarketingStudio({ apiKey, droppedFiles, onFilesHandled }
                   onClear={() => setProductImage(null)} 
                 />
                 <UploadSlot 
-                  label="Avatar" 
+                  label="人物图"
                   icon={<AvatarIcon />} 
                   url={avatarImage} 
                   progress={uploadProgress.avatar} 
@@ -486,7 +486,7 @@ export default function MarketingStudio({ apiKey, droppedFiles, onFilesHandled }
                   onClear={() => setAvatarImage(null)} 
                 />
                 <UploadSlot 
-                  label="References" 
+                  label="参考图"
                   icon={<RefIcon />} 
                   url={additionalImages[0]} 
                   progress={uploadProgress.additional} 
@@ -517,7 +517,7 @@ export default function MarketingStudio({ apiKey, droppedFiles, onFilesHandled }
                 </button>
                 <Dropdown 
                   isOpen={dropdown === 'format'} 
-                  title="Video Format Presets"
+                  title="视频模板"
                   items={ASSETS.ugc} 
                   selectedId={params.format}
                   onSelect={(item) => setParams({ ...params, format: item.name, videoUrl: item.url })}
@@ -536,13 +536,13 @@ export default function MarketingStudio({ apiKey, droppedFiles, onFilesHandled }
                     <img src={avatarImage || ASSETS.avatar[0].url} className="w-full h-full object-cover" />
                   </div>
                   <span className="text-sm font-bold text-white/70 group-hover:text-primary transition-colors">
-                    {ASSETS.avatar.find(a => a.url === avatarImage)?.name || "Select Avatar"}
+                    {ASSETS.avatar.find(a => a.url === avatarImage)?.name || "选择人物"}
                   </span>
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" className="opacity-20 group-hover:opacity-100 transition-opacity"><path d="M6 9l6 6 6-6" /></svg>
                 </button>
                 <Dropdown 
                   isOpen={dropdown === 'avatar'} 
-                  title="Avatar Presets"
+                  title="人物预设"
                   items={ASSETS.avatar} 
                   selectedId={avatarImage}
                   onSelect={(item) => setAvatarImage(item.url)}
@@ -561,7 +561,7 @@ export default function MarketingStudio({ apiKey, droppedFiles, onFilesHandled }
                   </button>
                   <SimpleDropdown 
                     isOpen={dropdown === key} 
-                    title={key === 'res' ? 'Resolution' : key.toUpperCase()} 
+                    title={key === 'res' ? '分辨率' : key === 'ratio' ? '画幅' : '时长'}
                     options={OPTIONS[key]} 
                     selected={params[key]} 
                     onSelect={(val) => setParams({ ...params, [key]: val })} 
@@ -579,11 +579,11 @@ export default function MarketingStudio({ apiKey, droppedFiles, onFilesHandled }
               {isGenerating ? (
                 <>
                   <div className="w-3 h-3 border-2 border-black/20 border-t-black rounded-full animate-spin" />
-                  Generating...
+                  生成中...
                 </>
               ) : (
                 <>
-                  <span>Launch</span>
+                  <span>开始生成</span>
                   <div className="flex items-center gap-1 border-l border-black/10 pl-3">
                     <span className="text-[10px] opacity-70">{params.res === '1080p' ? params.duration * 0.675 : params.duration * 0.3}</span>
                     <span className="text-[8px] font-black opacity-40">$</span>

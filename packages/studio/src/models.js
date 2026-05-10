@@ -8397,6 +8397,179 @@ export const lipsyncModels = [
   }
 ];
 
+const MODEL_TITLE_MAP = {
+  "API Key": "API 密钥",
+  Prompt: "提示词",
+  "Aspect Ratio": "画幅",
+  Audio: "音频",
+  Bgm: "背景音乐",
+  "Camera Fixed": "固定机位",
+  Width: "宽度",
+  Height: "高度",
+  Resolution: "分辨率",
+  Duration: "时长",
+  Quality: "质量",
+  "Number of images": "生成数量",
+  "Number of videos": "视频数量",
+  "Effect Name": "效果名称",
+  "Effect Type": "效果类型",
+  "Generate Audio": "生成音频",
+  "Go Fast": "极速模式",
+  "Google Search": "谷歌搜索",
+  "Image URL": "图片链接",
+  "Keep Original Sound": "保留原声",
+  "LoRA Ids": "LoRA 模型",
+  "Make Input": "设为输入",
+  Mode: "模式",
+  "Model ID": "模型 ID",
+  "Model URL": "模型链接",
+  Motion: "运动",
+  "Move Forward → Close-Up": "推进到特写",
+  "Movement Amplitude": "运动幅度",
+  "Multi Clip": "多段剪辑",
+  Opacity: "不透明度",
+  Options: "选项",
+  "Output Format": "输出格式",
+  Position: "位置",
+  "Rotate Right-Left (degrees°)": "左右旋转（度）",
+  "Remove Watermark": "去除水印",
+  "Render Speed": "渲染速度",
+  "Request ID": "请求 ID",
+  Scale: "缩放",
+  "Scene Description": "场景描述",
+  "Shot Type": "镜头类型",
+  Sound: "声音",
+  Speed: "速度",
+  Strength: "强度",
+  Style: "风格",
+  Stylization: "风格化",
+  "Target Index": "目标索引",
+  Thinking: "思考模式",
+  "Upscale Factor": "放大倍数",
+  Variety: "多样性",
+  "Vertical Angle (Bird ⬄ Worm)": "垂直角度（鸟瞰/虫视）",
+  Weirdness: "奇异度",
+  "Wide-Angle Lens": "广角镜头",
+  Weight: "权重",
+};
+
+const MODEL_DESCRIPTION_REPLACEMENTS = [
+  [/Text prompt describing the image, what you want the final edited image to look like\./g, "用于描述图像内容，以及你希望最终成图呈现的效果。"],
+  [/Text prompt describing the image\. The length of the prompt must be between 2 and 3000 characters\./g, "用于描述图像的提示词，长度需在 2 到 3000 个字符之间。"],
+  [/Text prompt describing the image\./g, "用于描述图像的提示词。"],
+  [/Aspect ratio of the output image\./g, "输出图像的画幅比例。"],
+  [/Width of the output image\. The value must be divisible by 64, eg: 128\.\.\.512, 576, 640\.\.\.2048\./g, "输出图像的宽度，必须能被 64 整除，例如 128...512、576、640...2048。"],
+  [/Height of the output image\. The value must be divisible by 64, eg: 128\.\.\.512, 576, 640\.\.\.2048\./g, "输出图像的高度，必须能被 64 整除，例如 128...512、576、640...2048。"],
+  [/Number of images generated in single request\. Each number will charge separately/g, "单次请求生成的图片数量，每张都会单独计费。"],
+  [/The unique identifier of a LoRA model hosted on Civitai, used by the Flux Dev image generation system\. This ID tells Flux Dev which specific LoRA model to apply during generation\. You can find the model ID in the Civitai model URL \(e\.g\., model_id: civitai:1642876@1864626\)\./g, "Civitai 上 LoRA 模型的唯一标识，用于 Flux Dev 图像生成系统。它会告诉 Flux Dev 在生成时应用哪个 LoRA 模型。可在 Civitai 模型链接中找到，例如 model_id: civitai:1642876@1864626。"],
+  [/A list of LoRA models to use for generation\. Each item must include an `id` \(e\.g\., "civitai:1642876@1864626"\) and a `weight` between 0 and 4\. You can include up to 4 models\. The `id` can be found in the Civitai model URL\. These models will be applied with the specified weights by the Flux Dev system during image generation\./g, "用于生成的 LoRA 模型列表。每项必须包含 `id`（例如 \"civitai:1642876@1864626\"）和 0 到 4 之间的 `weight`，最多可添加 4 个模型。`id` 可在 Civitai 模型链接中找到。Flux Dev 会在图像生成时按指定权重应用这些模型。"],
+  [/The duration of the generated video in seconds/g, "生成视频的时长（秒）。"],
+  [/Quality of the generated video\./g, "生成视频的质量。"],
+  [/Video generation from the image\./g, "从图像生成视频。"],
+  [/Provide a start frame\./g, "请提供起始帧。"],
+  [/Animate a portrait image into a talking video driven by audio\./g, "将人像照片在音频驱动下生成说话视频。"],
+  [/Generate a talking portrait video from an image and audio using Wan 2\.2\./g, "使用 Wan 2.2 将图像和音频生成说话人像视频。"],
+  [/High-quality lipsync from portrait image and audio using LTX 2\.3\./g, "使用 LTX 2.3 生成高质量口型同步视频。"],
+  [/Lipsync from portrait image and audio using LTX 2 19B model\./g, "使用 LTX 2 19B 模型从人像照片和音频生成口型同步视频。"],
+  [/Generate realistic lipsync animations from audio using Sync's advanced algorithms\./g, "使用 Sync 的高级算法，从音频生成逼真的口型同步动画。"],
+  [/Video-to-video lipsync using LatentSync for high-quality audio-driven lip animations\./g, "使用 LatentSync 对现有视频进行口型同步，适合高质量音频驱动的唇部动画。"],
+  [/Realistic lipsync video optimized for speed, quality, and consistency by Creatify\./g, "由 Creatify 优化的高真实性口型同步视频，兼顾速度、质量和一致性。"],
+  [/Generate realistic lipsync from any audio using VEED's latest model\./g, "使用 VEED 最新模型，从任意音频生成逼真的口型同步视频。"],
+  [/Apply audio-driven lipsync to an existing video using Infinite Talk\./g, "使用 Infinite Talk 将音频驱动的口型同步应用到现有视频。"],
+  [/Image — FLUX\.1 dev served by Wan2GP\. Requires running Wan2GP server\./g, "图像模型 - 由 Wan2GP 提供的 FLUX.1 dev，需要运行 Wan2GP 服务。"],
+  [/Image — Qwen-Image text-to-image served by Wan2GP\./g, "图像模型 - 由 Wan2GP 提供的 Qwen-Image 文生图。"],
+  [/Video — Wan 2\.2 text-to-video\. Slow on consumer GPUs\./g, "视频模型 - Wan 2.2 文生视频，在消费级 GPU 上速度较慢。"],
+  [/Video — Wan 2\.2 image-to-video\. Provide a start frame\./g, "视频模型 - Wan 2.2 图生视频，需要提供起始帧。"],
+  [/Video — Hunyuan text-to-video via Wan2GP\./g, "视频模型 - 通过 Wan2GP 提供的 Hunyuan 文生视频。"],
+  [/Video — LTX text-to-video\. Fastest video option in Wan2GP\./g, "视频模型 - LTX 文生视频，是 Wan2GP 中最快的视频选项。"],
+  [/WaveSpeed's featured local model — 6B params, ultra-fast 8-step generation\. No API key needed\./g, "WaveSpeed 主推的本地模型，6B 参数，8 步极速生成，无需 API Key。"],
+  [/Full-quality 6B parameter model from Tongyi-MAI — higher detail, 50-step generation\./g, "来自通义-MAI 的完整质量 6B 参数模型，细节更丰富，支持 50 步生成。"],
+  [/Versatile SD 1\.5 model — great for portraits, landscapes, and artistic styles\./g, "通用型 SD 1.5 模型，适合人像、风景和艺术风格。"],
+  [/Highly photorealistic people and scenes, based on SD 1\.5\./g, "基于 SD 1.5 的高写实人物与场景模型。"],
+  [/High quality anime and illustration style image generation\./g, "高质量的动漫与插画风图像生成模型。"],
+  [/Official Stable Diffusion XL base model — higher resolution, excellent quality\./g, "官方 Stable Diffusion XL 基础模型，分辨率更高，画质优秀。"],
+  [/API key for authentication/g, "用于身份验证的 API 密钥。"],
+  [/Aspect ratio of the output video\./g, "输出视频的画幅比例。"],
+  [/Aspect ratio of the output video\. 16:9 for 360p\/720p, 1:1 for 1080p are supported\./g, "输出视频的画幅比例。360p/720p 支持 16:9，1080p 支持 1:1。"],
+  [/Generate a talking portrait video from an image and audio using Wan 2\.2\./g, "使用 Wan 2.2 根据图像和音频生成说话人像视频。"],
+  [/Generate realistic lipsync animations from audio using Sync's advanced algorithms\./g, "使用 Sync 的高级算法，从音频生成逼真的口型同步动画。"],
+  [/Generate realistic lipsync from any audio using VEED's latest model\./g, "使用 VEED 最新模型，从任意音频生成逼真的口型同步。"],
+  [/Enable audio generation \(BGM, SFX, dialogue\)\./g, "启用音频生成（背景音乐、音效、对白）。"],
+  [/Enable multi-clip generation with dynamic camera changes\./g, "启用多段剪辑与动态镜头变化生成。"],
+  [/Enable wide-angle lens effect/g, "启用广角镜头效果。"],
+  [/Factor to upscale the image by \(e\.g\. 2\.0 doubles width and height\)\./g, "图像放大倍数（例如 2.0 会将宽高翻倍）。"],
+  [/Generation style: normal = standard output; fun = more creative\/expressive; spicy = edgier content \(text-to-video only\)\./g, "生成风格：normal = 标准输出；fun = 更具创意/表现力；spicy = 更大胆的内容（仅文生视频）。"],
+  [/Height of the image in pixels/g, "图像高度（像素）。"],
+  [/The prompt to be used to generate a video/g, "用于生成视频的提示词。"],
+  [/The prompt to generate the video/g, "用于生成视频的提示词。"],
+  [/The prompt to guide video generation from the image\./g, "用于引导图生视频的提示词。"],
+  [/The quality of the generated image\./g, "生成图像的质量。"],
+  [/The resolution of the generated image\./g, "生成图像的分辨率。"],
+  [/The resolution of the generated video\./g, "生成视频的分辨率。"],
+  [/The resolution of the output image\./g, "输出图像的分辨率。"],
+  [/The format of the output image\./g, "输出图像的格式。"],
+  [/The background music for generating the output\./g, "用于生成输出内容的背景音乐。"],
+  [/Watermark size relative to image \(0\.1 = 10%, 1\.0 = 100%\)/g, "水印相对于图像的大小（0.1 = 10%，1.0 = 100%）。"],
+  [/Watermark transparency \(0 = invisible, 1 = fully opaque\)/g, "水印透明度（0 = 不可见，1 = 完全不透明）。"],
+  [/Whether to generate audio\./g, "是否生成音频。"],
+  [/Whether to generate audio for the video/g, "是否为视频生成音频。"],
+  [/Whether sound is generated simultaneously when generating a video\./g, "生成视频时是否同步生成声音。"],
+  [/Whether to fix the camera position/g, "是否固定机位。"],
+  [/Whether to use Google Search for prompt enhancement\./g, "是否使用 Google 搜索增强提示词。"],
+  [/Move camera forward \(0=no movement, 10=close-up\)/g, "镜头前移（0=不移动，10=特写）。"],
+  [/Rotate camera left \(positive\) or right \(negative\) in degrees\. Positive values rotate left, negative values rotate right\./g, "镜头左右旋转（正数向左，负数向右），单位为度。"],
+  [/Request ID of the original Seedance 2\.0 video generation\./g, "原始 Seedance 2.0 视频生成的请求 ID。"],
+  [/The Civitai LoRA model ID\./g, "Civitai LoRA 模型 ID。"],
+  [/Text prompt describing the desired video content\./g, "描述期望视频内容的提示词。"],
+  [/Text prompt describing the desired modification\./g, "描述期望修改内容的提示词。"],
+  [/Text prompt describing the image to generate\./g, "描述要生成图像的提示词。"],
+  [/Text prompt describing the image, what you want the final edited image to look like\./g, "描述图像，以及你希望最终编辑后的图像呈现的效果。"],
+  [/Text prompt describing the image\. Up to 20,000 characters supported\./g, "描述图像的提示词，最多支持 20,000 个字符。"],
+  [/Text prompt describing the transformation\. Up to 20,000 characters supported\./g, "描述变换内容的提示词，最多支持 20,000 个字符。"],
+];
+
+const localizeText = (value, isTitle = false) => {
+  if (typeof value !== "string") return value;
+  if (isTitle && MODEL_TITLE_MAP[value]) return MODEL_TITLE_MAP[value];
+  let next = value;
+  for (const [pattern, replacement] of MODEL_DESCRIPTION_REPLACEMENTS) {
+    next = next.replace(pattern, replacement);
+  }
+  return next;
+};
+
+const localizeSchemaNode = (node) => {
+  if (!node || typeof node !== "object") return node;
+  if (Array.isArray(node)) {
+    node.forEach(localizeSchemaNode);
+    return node;
+  }
+
+  if (typeof node.title === "string") {
+    node.title = localizeText(node.title, true);
+  }
+  if (typeof node.description === "string") {
+    node.description = localizeText(node.description);
+  }
+
+  Object.values(node).forEach((value) => {
+    if (value && typeof value === "object") {
+      localizeSchemaNode(value);
+    }
+  });
+
+  return node;
+};
+
+[
+  ...t2iModels,
+  ...t2vModels,
+  ...i2iModels,
+  ...i2vModels,
+  ...v2vModels,
+  ...lipsyncModels,
+].forEach(localizeSchemaNode);
+
 export const getLipSyncModelById = (id) => lipsyncModels.find(m => m.id === id);
 
 export const getResolutionsForLipSyncModel = (id) => {
