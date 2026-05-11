@@ -38,7 +38,7 @@
     {
       "id": "prompt-to-image-asset",
       "label": "Prompt -> imagegen 概念图 -> 项目资产目录",
-      "input": "output/imagegen-prompts.jsonl",
+      "input": "output/imagegen-prompts.jsonl / output/imagegen-prompts-batch.jsonl",
       "template": "output/imagegen-prompts.example.jsonl",
       "candidateOutput": "output/generated-assets/",
       "finalOutput": "public/assets/codex-lab/",
@@ -73,10 +73,34 @@
     {
       "id": "prompt-pack-draft",
       "command": "npm run codex-lab:prompt-pack-draft",
-      "options": ["--brief", "--analysis", "--out", "--imagegen-out", "--no-imagegen-out"],
+      "options": ["--brief", "--analysis", "--out", "--imagegen-out", "--asset-type", "--no-imagegen-out"],
       "input": "input/brief.md",
       "output": "output/prompt-pack-draft.json",
       "secondaryOutput": "output/imagegen-prompts-draft.jsonl",
+      "runtimeApiIntegration": false
+    },
+    {
+      "id": "asset-index-validate",
+      "command": "npm run codex-lab:asset-index-validate",
+      "options": ["--index", "--report", "--no-report"],
+      "input": "output/asset-index.json",
+      "output": "output/asset-index-validation.md",
+      "runtimeApiIntegration": false
+    },
+    {
+      "id": "asset-check",
+      "command": "npm run codex-lab:asset-check",
+      "options": ["--index", "--report", "--no-report"],
+      "input": "output/asset-index.json",
+      "output": "output/asset-check-report.md",
+      "runtimeApiIntegration": false
+    },
+    {
+      "id": "imagegen-export",
+      "command": "npm run codex-lab:imagegen-export",
+      "options": ["--prompt-pack", "--out", "--asset-type"],
+      "input": "output/prompt-pack-draft.json",
+      "output": "output/imagegen-prompts-batch.jsonl",
       "runtimeApiIntegration": false
     }
   ],
@@ -99,14 +123,21 @@
       "id": "prompt-pack",
       "label": "创作 Prompt 生成",
       "inputs": ["brief", "style-notes", "target-platform"],
-      "outputs": ["prompt-pack-draft.json", "imagegen-prompts-draft.jsonl"],
+      "outputs": ["prompt-pack-draft.json", "imagegen-prompts-draft.jsonl", "imagegen-prompts-batch.jsonl"],
       "status": "testable"
     },
     {
       "id": "image-generation",
       "label": "概念图生成",
-      "inputs": ["imagegen-prompts.jsonl"],
+      "inputs": ["imagegen-prompts.jsonl", "imagegen-prompts-batch.jsonl"],
       "outputs": ["generated-assets", "asset-index.json", "public/assets/codex-lab"],
+      "status": "testable"
+    },
+    {
+      "id": "asset-quality-gate",
+      "label": "资产质量门禁",
+      "inputs": ["asset-index.json", "public/assets/codex-lab"],
+      "outputs": ["asset-index-validation.md", "asset-check-report.md"],
       "status": "testable"
     },
     {

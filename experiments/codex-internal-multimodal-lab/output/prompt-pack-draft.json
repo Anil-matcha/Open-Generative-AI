@@ -1,12 +1,13 @@
 {
   "meta": {
-    "name": "codex-lab-concept-hero",
+    "name": "codex-lab-all-concept-pack",
     "language": "zh-CN",
     "created_at": "2026-05-11",
     "generator": "scripts/codex-lab-prompt-pack-draft.cjs",
     "reasoning_workflow": "Codex GPT-5.5 xhigh handoff draft",
     "image_model_path": "Codex imagegen built-in",
     "runtime_api_integration": false,
+    "asset_type": "all",
     "source_brief": "experiments/codex-internal-multimodal-lab/input/brief.md",
     "source_analysis": "experiments/codex-internal-multimodal-lab/output/analysis.md"
   },
@@ -28,11 +29,37 @@
   },
   "structured_prompt": {
     "zh": "为 Codex 多模态实验台生成第一张可用于页面展示的概念主视觉，验证 `Prompt -> imagegen -> public/assets/codex-lab` 的完整闭环。 主体：本地 AI 多模态实验工作台，展示图片分析报告、Prompt 卡片和概念图资产。 场景：深色产品工作台，包含项目文件夹、截图输入、结构化报告、Prompt 包、生成图预览。 情绪：克制、专业、可靠，同时保留创造力。 必须出现：三步闭环的视觉暗示，从截图输入到中文分析，再到概念图输出。 风格关键词：dark local AI lab interface, structured workflow cards, prompt pack, concept art asset board, restrained product visual 色彩：黑色、炭灰、柔白、酸性黄绿色强调，少量青色细节。 构图：16:9 横向，左到右形成输入、推理、输出路径，保留可用于页面排版的负空间。 生图结果不是实际 UI 截图，不需要复刻页面文字。画面应像高质量产品概念图，便于后续在 `/codex-lab` 页面中作为资产预览使用。",
-    "en_scaffold": "Use case: productivity-visual\nAsset type: 16:9 project concept image\nPrimary request: 为 Codex 多模态实验台生成第一张可用于页面展示的概念主视觉，验证 `Prompt -> imagegen -> public/assets/codex-lab` 的完整闭环。\nSubject: 本地 AI 多模态实验工作台，展示图片分析报告、Prompt 卡片和概念图资产。\nScene/backdrop: 深色产品工作台，包含项目文件夹、截图输入、结构化报告、Prompt 包、生成图预览。\nStyle/medium: polished product concept art for an internal AI workflow lab, not an actual UI screenshot.\nComposition/framing: 16:9 横向，左到右形成输入、推理、输出路径，保留可用于页面排版的负空间。\nLighting/mood: 克制、专业、可靠，同时保留创造力。\nColor palette: 黑色、炭灰、柔白、酸性黄绿色强调，少量青色细节。\nReference input: experiments/codex-internal-multimodal-lab/input/screenshots/codex-lab-home-1366x900.png\nConstraints: no external API logos, no random brand marks, no readable fake UI text, no watermark, no sci-fi overload",
+    "en_scaffold": "Use case: productivity-visual\nAsset type: web page hero concept image\nPrimary request: 为 Codex 多模态实验台生成第一张可用于页面展示的概念主视觉，验证 `Prompt -> imagegen -> public/assets/codex-lab` 的完整闭环。\nSubject: 本地 AI 多模态实验工作台，展示图片分析报告、Prompt 卡片和概念图资产。\nScene/backdrop: 深色产品工作台，包含项目文件夹、截图输入、结构化报告、Prompt 包、生成图预览。\nStyle/medium: polished product concept art for an internal AI workflow lab, not an actual UI screenshot.\nComposition/framing: wide landscape frame, left-to-right workflow path, strong focal point on the final asset preview\nLighting/mood: 克制、专业、可靠，同时保留创造力。\nColor palette: 黑色、炭灰、柔白、酸性黄绿色强调，少量青色细节。\nReference input: experiments/codex-internal-multimodal-lab/input/screenshots/codex-lab-home-1366x900.png\nConstraints: no external API logos, no random brand marks, no readable fake UI text, no watermark, no sci-fi overload\n\n---\n\nUse case: stylized-concept\nAsset type: square assistant concept portrait\nPrimary request: 基于 brief 派生一个 Codex Lab 智能体概念头像，用于表达本地多模态分析与 Prompt 创作能力。原始目标：为 Codex 多模态实验台生成第一张可用于页面展示的概念主视觉，验证 `Prompt -> imagegen -> public/assets/codex-lab` 的完整闭环。\nSubject: an abstract calm assistant presence made from analysis panes, image tiles, prompt cards, and subtle light geometry; avoid a literal robot or human face\nScene/backdrop: 深色产品工作台，包含项目文件夹、截图输入、结构化报告、Prompt 包、生成图预览。\nStyle/medium: polished product concept art for an internal AI workflow lab, not an actual UI screenshot.\nComposition/framing: centered square portrait, strong silhouette, readable at thumbnail size, generous padding\nLighting/mood: 克制、专业、可靠，同时保留创造力。\nColor palette: 黑色、炭灰、柔白、酸性黄绿色强调，少量青色细节。\nReference input: experiments/codex-internal-multimodal-lab/input/screenshots/codex-lab-home-1366x900.png\nConstraints: no external API logos, no random brand marks, no readable fake UI text, no watermark, no sci-fi overload\n\n---\n\nUse case: illustration-story\nAsset type: scene style frame\nPrimary request: 基于 brief 派生一个本地多模态创作工作流的场景风格板，用于表达从素材输入到概念图资产输出的创作现场。原始目标：为 Codex 多模态实验台生成第一张可用于页面展示的概念主视觉，验证 `Prompt -> imagegen -> public/assets/codex-lab` 的完整闭环。\nSubject: the transformation moment from screenshots and references into Chinese analysis notes, prompt cards, storyboard panels, and final concept assets\nScene/backdrop: 深色产品工作台，包含项目文件夹、截图输入、结构化报告、Prompt 包、生成图预览。\nStyle/medium: polished product concept art for an internal AI workflow lab, not an actual UI screenshot.\nComposition/framing: cinematic landscape-style frame, clear separation between input, reasoning, and output zones\nLighting/mood: 克制、专业、可靠，同时保留创造力。\nColor palette: 黑色、炭灰、柔白、酸性黄绿色强调，少量青色细节。\nReference input: experiments/codex-internal-multimodal-lab/input/screenshots/codex-lab-home-1366x900.png\nConstraints: no external API logos, no random brand marks, no readable fake UI text, no watermark, no sci-fi overload",
     "negative": "外部 API Logo、随机品牌、乱码 UI 文本、水印、过度科幻装饰。",
     "negative_en": "no external API logos, no random brand marks, no readable fake UI text, no watermark, no sci-fi overload",
     "analysis_prompt_clues": "```text\n主体：本地 AI 多模态实验台，三条闭环从截图分析到 Prompt 包再到概念图资产\n场景：深色产品工作台，项目文件夹、分析报告、Prompt 卡片、概念图预览并列出现\n风格：克制、专业、结构化、有创造力，黑玻璃界面与酸性黄绿色状态信号\n构图：16:9 横向主视觉，左到右表达输入、推理、输出，预留页面可用空间\n避免：外部 API Logo、随机品牌、乱码小字、水印、过度科幻、杂乱装饰\n```"
   },
+  "asset_variants": [
+    {
+      "asset_type": "hero",
+      "prompt_id": "codex-lab-hero",
+      "filename": "concept-hero.png",
+      "purpose": "页面主视觉、工作流总览、实验文档封面",
+      "aspect_ratio": "16:9",
+      "recommended_size": "1536x864"
+    },
+    {
+      "asset_type": "character",
+      "prompt_id": "codex-lab-agent",
+      "filename": "concept-character.png",
+      "purpose": "智能体头像、能力卡片、内部角色化表达",
+      "aspect_ratio": "1:1",
+      "recommended_size": "1024x1024"
+    },
+    {
+      "asset_type": "scene",
+      "prompt_id": "codex-lab-scene",
+      "filename": "concept-scene.png",
+      "purpose": "场景风格板、分镜参考、创作流程说明",
+      "aspect_ratio": "3:2",
+      "recommended_size": "1536x1024"
+    }
+  ],
   "shot_list": [
     {
       "id": "input",
@@ -54,8 +81,18 @@
     }
   ],
   "parameters": {
-    "recommended_aspect_ratio": "16:9",
-    "recommended_size": "1536x864",
+    "recommended_aspect_ratio": "mixed",
+    "recommended_aspect_ratios": {
+      "hero": "16:9",
+      "character": "1:1",
+      "scene": "3:2"
+    },
+    "recommended_size": "mixed",
+    "recommended_sizes": {
+      "hero": "1536x864",
+      "character": "1024x1024",
+      "scene": "1536x1024"
+    },
     "recommended_size_note": "1536x864 或更高比例等价尺寸",
     "transparent_background": false,
     "quality": "high",
@@ -71,9 +108,24 @@
   "imagegen_prompts": [
     {
       "id": "codex-lab-hero",
+      "asset_type": "hero",
       "target": "public/assets/codex-lab/concept-hero.png",
       "use_case": "productivity-visual",
-      "prompt": "Use case: productivity-visual\nAsset type: 16:9 project concept image\nPrimary request: 为 Codex 多模态实验台生成第一张可用于页面展示的概念主视觉，验证 `Prompt -> imagegen -> public/assets/codex-lab` 的完整闭环。\nSubject: 本地 AI 多模态实验工作台，展示图片分析报告、Prompt 卡片和概念图资产。\nScene/backdrop: 深色产品工作台，包含项目文件夹、截图输入、结构化报告、Prompt 包、生成图预览。\nStyle/medium: polished product concept art for an internal AI workflow lab, not an actual UI screenshot.\nComposition/framing: 16:9 横向，左到右形成输入、推理、输出路径，保留可用于页面排版的负空间。\nLighting/mood: 克制、专业、可靠，同时保留创造力。\nColor palette: 黑色、炭灰、柔白、酸性黄绿色强调，少量青色细节。\nReference input: experiments/codex-internal-multimodal-lab/input/screenshots/codex-lab-home-1366x900.png\nConstraints: no external API logos, no random brand marks, no readable fake UI text, no watermark, no sci-fi overload"
+      "prompt": "Use case: productivity-visual\nAsset type: web page hero concept image\nPrimary request: 为 Codex 多模态实验台生成第一张可用于页面展示的概念主视觉，验证 `Prompt -> imagegen -> public/assets/codex-lab` 的完整闭环。\nSubject: 本地 AI 多模态实验工作台，展示图片分析报告、Prompt 卡片和概念图资产。\nScene/backdrop: 深色产品工作台，包含项目文件夹、截图输入、结构化报告、Prompt 包、生成图预览。\nStyle/medium: polished product concept art for an internal AI workflow lab, not an actual UI screenshot.\nComposition/framing: wide landscape frame, left-to-right workflow path, strong focal point on the final asset preview\nLighting/mood: 克制、专业、可靠，同时保留创造力。\nColor palette: 黑色、炭灰、柔白、酸性黄绿色强调，少量青色细节。\nReference input: experiments/codex-internal-multimodal-lab/input/screenshots/codex-lab-home-1366x900.png\nConstraints: no external API logos, no random brand marks, no readable fake UI text, no watermark, no sci-fi overload"
+    },
+    {
+      "id": "codex-lab-agent",
+      "asset_type": "character",
+      "target": "public/assets/codex-lab/concept-character.png",
+      "use_case": "stylized-concept",
+      "prompt": "Use case: stylized-concept\nAsset type: square assistant concept portrait\nPrimary request: 基于 brief 派生一个 Codex Lab 智能体概念头像，用于表达本地多模态分析与 Prompt 创作能力。原始目标：为 Codex 多模态实验台生成第一张可用于页面展示的概念主视觉，验证 `Prompt -> imagegen -> public/assets/codex-lab` 的完整闭环。\nSubject: an abstract calm assistant presence made from analysis panes, image tiles, prompt cards, and subtle light geometry; avoid a literal robot or human face\nScene/backdrop: 深色产品工作台，包含项目文件夹、截图输入、结构化报告、Prompt 包、生成图预览。\nStyle/medium: polished product concept art for an internal AI workflow lab, not an actual UI screenshot.\nComposition/framing: centered square portrait, strong silhouette, readable at thumbnail size, generous padding\nLighting/mood: 克制、专业、可靠，同时保留创造力。\nColor palette: 黑色、炭灰、柔白、酸性黄绿色强调，少量青色细节。\nReference input: experiments/codex-internal-multimodal-lab/input/screenshots/codex-lab-home-1366x900.png\nConstraints: no external API logos, no random brand marks, no readable fake UI text, no watermark, no sci-fi overload"
+    },
+    {
+      "id": "codex-lab-scene",
+      "asset_type": "scene",
+      "target": "public/assets/codex-lab/concept-scene.png",
+      "use_case": "illustration-story",
+      "prompt": "Use case: illustration-story\nAsset type: scene style frame\nPrimary request: 基于 brief 派生一个本地多模态创作工作流的场景风格板，用于表达从素材输入到概念图资产输出的创作现场。原始目标：为 Codex 多模态实验台生成第一张可用于页面展示的概念主视觉，验证 `Prompt -> imagegen -> public/assets/codex-lab` 的完整闭环。\nSubject: the transformation moment from screenshots and references into Chinese analysis notes, prompt cards, storyboard panels, and final concept assets\nScene/backdrop: 深色产品工作台，包含项目文件夹、截图输入、结构化报告、Prompt 包、生成图预览。\nStyle/medium: polished product concept art for an internal AI workflow lab, not an actual UI screenshot.\nComposition/framing: cinematic landscape-style frame, clear separation between input, reasoning, and output zones\nLighting/mood: 克制、专业、可靠，同时保留创造力。\nColor palette: 黑色、炭灰、柔白、酸性黄绿色强调，少量青色细节。\nReference input: experiments/codex-internal-multimodal-lab/input/screenshots/codex-lab-home-1366x900.png\nConstraints: no external API logos, no random brand marks, no readable fake UI text, no watermark, no sci-fi overload"
     }
   ],
   "asset_plan": [
@@ -82,6 +134,23 @@
       "candidate_path": "experiments/codex-internal-multimodal-lab/output/generated-assets/concept-hero.png",
       "final_path": "public/assets/codex-lab/concept-hero.png",
       "source_prompt_id": "codex-lab-hero",
+      "asset_type": "hero",
+      "status": "draft"
+    },
+    {
+      "filename": "concept-character.png",
+      "candidate_path": "experiments/codex-internal-multimodal-lab/output/generated-assets/concept-character.png",
+      "final_path": "public/assets/codex-lab/concept-character.png",
+      "source_prompt_id": "codex-lab-agent",
+      "asset_type": "character",
+      "status": "draft"
+    },
+    {
+      "filename": "concept-scene.png",
+      "candidate_path": "experiments/codex-internal-multimodal-lab/output/generated-assets/concept-scene.png",
+      "final_path": "public/assets/codex-lab/concept-scene.png",
+      "source_prompt_id": "codex-lab-scene",
+      "asset_type": "scene",
       "status": "draft"
     }
   ]

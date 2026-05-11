@@ -28,8 +28,11 @@ experiments/codex-internal-multimodal-lab/
     prompt-retrospective.md      # 三张概念图的 Prompt 复盘
     imagegen-prompts.example.jsonl
     imagegen-prompts-draft.jsonl
+    imagegen-prompts-batch.jsonl # 从 Prompt Pack 导出的批量生图队列
     asset-index.example.json
     asset-index.json
+    asset-index-validation.md    # 资产索引 schema 校验报告
+    asset-check-report.md        # 资产文件、来源和尺寸检查报告
     integration-decision.md
     generated-assets/            # imagegen 默认产物转存或候选图记录
   manifest.json                  # 测试能力矩阵
@@ -50,7 +53,7 @@ public/assets/codex-lab/          # 项目可直接引用的最终概念图
    - 示例：`output/prompt-pack.example.json`
 
 3. Prompt -> 用 imagegen 生成概念图 -> 存入项目资产目录
-   - 输入：`output/imagegen-prompts.jsonl`
+   - 输入：`output/imagegen-prompts.jsonl` 或 `output/imagegen-prompts-batch.jsonl`
    - 候选输出：`output/generated-assets/`
    - 最终资产：`public/assets/codex-lab/`
    - 资产索引：`output/asset-index.json`
@@ -104,6 +107,9 @@ npm run codex-lab:analysis-draft -- --latest-only
 npm run codex-lab:analysis-draft -- --changed-only
 npm run codex-lab:compare-draft
 npm run codex-lab:prompt-pack-draft
+npm run codex-lab:asset-index-validate
+npm run codex-lab:asset-check
+npm run codex-lab:imagegen-export
 ```
 
 - `--latest-only`：只保留最新一张截图。
@@ -116,8 +122,23 @@ npm run codex-lab:prompt-pack-draft
 ```bash
 npm run codex-lab:prompt-pack-draft -- --brief experiments/codex-internal-multimodal-lab/input/brief.md
 npm run codex-lab:prompt-pack-draft -- --out experiments/codex-internal-multimodal-lab/output/prompt-pack-draft.json
+npm run codex-lab:prompt-pack-draft -- --asset-type hero
+npm run codex-lab:prompt-pack-draft -- --asset-type character
+npm run codex-lab:prompt-pack-draft -- --asset-type scene
 npm run codex-lab:prompt-pack-draft -- --no-imagegen-out
 ```
+
+`--asset-type` 默认值为 `all`，会同时生成 hero、character、scene 三类概念资产的 Prompt、参数建议和资产计划。指定单一类型时，只输出对应资产的最小测试包。
+
+`codex-lab:imagegen-export` 默认读取 `output/prompt-pack-draft.json`，把其中的 `imagegen_prompts` 导出为 `output/imagegen-prompts-batch.jsonl`，用于后续逐条调用 Codex `imagegen`：
+
+```bash
+npm run codex-lab:imagegen-export
+npm run codex-lab:imagegen-export -- --asset-type hero
+npm run codex-lab:imagegen-export -- --prompt-pack experiments/codex-internal-multimodal-lab/output/prompt-pack-draft.json
+```
+
+`codex-lab:asset-index-validate` 会校验 `asset-index.json` 的类型、路径、状态、评分和来源字段，并生成 `output/asset-index-validation.md`。`codex-lab:asset-check` 会继续检查最终资产文件、候选图、来源 Prompt、PNG 尺寸和字节大小，并生成 `output/asset-check-report.md`。
 
 ## 接入决策
 

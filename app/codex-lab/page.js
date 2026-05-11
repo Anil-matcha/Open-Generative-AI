@@ -29,13 +29,19 @@ const capabilityRows = [
   {
     name: "创作 Prompt 生成",
     input: "中文需求、角色设定、目标平台",
-    output: "Prompt Pack 草稿、分镜、参数建议",
+    output: "多资产 Prompt Pack、分镜、参数建议",
     status: "可测",
   },
   {
     name: "概念图生成",
-    input: "结构化 Prompt",
+    input: "结构化 Prompt 或批量 JSONL",
     output: "由 Codex imagegen 生成的位图资产",
+    status: "可测",
+  },
+  {
+    name: "资产质量门禁",
+    input: "asset-index.json、最终资产目录",
+    output: "schema 校验、路径检查、图片尺寸报告",
     status: "可测",
   },
   {
@@ -92,7 +98,10 @@ const outputItems = [
   "shot-list.md",
   "imagegen-prompts.jsonl",
   "imagegen-prompts-draft.jsonl",
+  "imagegen-prompts-batch.jsonl",
   "asset-index.json",
+  "asset-index-validation.md",
+  "asset-check-report.md",
   "integration-decision.md",
   "generated-assets/",
 ];
