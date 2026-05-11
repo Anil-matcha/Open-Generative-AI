@@ -18,9 +18,14 @@ export class MonitoringService {
    * Start the monitoring service
    */
   async start() {
-    // Skip WebSocket connection in development
-    if (typeof import.meta !== 'undefined' && import.meta.env?.DEV) {
-      console.log('[MonitoringService] Skipping WebSocket connection in development mode');
+    // Skip WebSocket connection in development or on platforms that don't support it
+    const isDevelopment = typeof import.meta !== 'undefined' && import.meta.env?.DEV;
+    const isNetlify = typeof window !== 'undefined' &&
+                     (window.location.hostname.includes('netlify.app') ||
+                      window.location.hostname.includes('netlify.com'));
+
+    if (isDevelopment || isNetlify) {
+      console.log(`[MonitoringService] Skipping WebSocket connection (${isDevelopment ? 'development' : 'Netlify'} mode)`);
       return;
     }
 

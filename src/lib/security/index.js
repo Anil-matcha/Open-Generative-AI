@@ -26,7 +26,11 @@ export const CSP_POLICY = {
 };
 
 export function generateCSPHeader() {
+  // Meta tag CSP excludes directives that only work with HTTP headers
+  const metaTagExclusions = ['frame-ancestors'];
+
   return Object.entries(CSP_POLICY)
+    .filter(([directive]) => !metaTagExclusions.includes(directive))
     .map(([directive, value]) => `${directive} ${value}`)
     .join('; ');
 }
