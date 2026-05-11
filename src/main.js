@@ -1,5 +1,5 @@
 import './style.css';
-import './onboarding.js';
+import { initOnboarding } from './onboarding.js';
 // import './components/styles/header-mega-menu.css'; // Temporarily disabled
 import { Header } from './components/Header.js';
 import { Sidebar } from './components/Sidebar.js';
@@ -261,6 +261,9 @@ try {
     
     console.log('[App] App shell rendered, navigating to:', initialPage);
     navigate(initialPage);
+
+    // Initialize onboarding for main app (not landing page)
+    initOnboarding();
   }
   
   // Track initialization time

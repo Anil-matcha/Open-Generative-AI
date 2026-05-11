@@ -27,7 +27,7 @@ export function initOnboarding() {
 
   // Step 1: Welcome
   const step1 = createStep(1, {
-    title: 'Welcome to Higgsfield AI',
+    title: 'Welcome to AI Video Agency',
     description: 'Your professional video editing studio with AI-powered tools.',
     icon: '🎬',
     tips: [
@@ -129,9 +129,5 @@ function completeOnboarding(overlay) {
   setTimeout(() => overlay.remove(), 300);
 }
 
-// Initialize on DOM ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initOnboarding);
-} else {
-  initOnboarding();
-}
+// Export initOnboarding function to be called manually from main app
+export { initOnboarding };

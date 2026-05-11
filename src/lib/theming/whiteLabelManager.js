@@ -165,7 +165,7 @@ export class WhiteLabelManager {
    * @returns {string} Brand name or default
    */
   getBrandName() {
-    return this.currentWhiteLabel?.branding?.name || 'Open Higgsfield AI';
+    return this.currentWhiteLabel?.branding?.name || 'AI Video Agency';
   }
 
   /**
@@ -258,7 +258,7 @@ export class WhiteLabelManager {
     }
 
     // Reset title
-    document.title = 'Open Higgsfield AI - Video Editor';
+    document.title = 'AI Video Agency - Video Editor';
 
     // Reset favicon
     const favicon = document.querySelector('link[rel="icon"]');
