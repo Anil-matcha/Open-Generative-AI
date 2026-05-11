@@ -17,7 +17,7 @@ const capabilityRows = [
   {
     name: "多图对比",
     input: "2-6 张参考图",
-    output: "一致性、差异、可复用提示词",
+    output: "一致性、差异矩阵、风格规则",
     status: "可测",
   },
   {
@@ -84,6 +84,8 @@ const runbook = [
 const outputItems = [
   "analysis.md",
   "analysis-draft.md",
+  "multi-image-comparison.md",
+  "multi-image-comparison-draft.md",
   "prompt-pack.json",
   "prompt-retrospective.md",
   "shot-list.md",

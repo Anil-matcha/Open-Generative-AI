@@ -61,6 +61,14 @@
       "input": "input/screenshots",
       "output": "output/analysis-draft.md",
       "runtimeApiIntegration": false
+    },
+    {
+      "id": "compare-draft",
+      "command": "npm run codex-lab:compare-draft",
+      "options": ["--asset-index", "--out", "--all-statuses", "--min-assets"],
+      "input": "output/asset-index.json",
+      "output": "output/multi-image-comparison-draft.md",
+      "runtimeApiIntegration": false
     }
   ],
   "capabilities": [
@@ -75,7 +83,7 @@
       "id": "multi-image-comparison",
       "label": "多图对比",
       "inputs": ["image-set"],
-      "outputs": ["comparison.md", "style-rules.md"],
+      "outputs": ["multi-image-comparison.md", "style-rules", "prompt-notes"],
       "status": "testable"
     },
     {

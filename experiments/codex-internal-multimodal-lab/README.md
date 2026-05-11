@@ -21,6 +21,8 @@ experiments/codex-internal-multimodal-lab/
   output/
     analysis-template.md         # 中文分析报告模板
     analysis-draft.md            # 本地脚本生成的待补充分析草稿
+    multi-image-comparison.md     # 当前多图对比分析样例
+    multi-image-comparison-draft.md
     prompt-pack.example.json     # Prompt / 分镜 / 参数建议示例
     prompt-retrospective.md      # 三张概念图的 Prompt 复盘
     imagegen-prompts.example.jsonl
@@ -50,6 +52,13 @@ public/assets/codex-lab/          # 项目可直接引用的最终概念图
    - 候选输出：`output/generated-assets/`
    - 最终资产：`public/assets/codex-lab/`
    - 资产索引：`output/asset-index.json`
+
+## 可扩展测试：多图对比
+
+- 输入：`output/asset-index.json` 中的 accepted 资产，或人工指定的 2-6 张参考图。
+- 草稿：`output/multi-image-comparison-draft.md`
+- 样例：`output/multi-image-comparison.md`
+- 验收：输出整体一致性、单图分工、两两差异矩阵、可复用风格规则和下游 Prompt 线索。
 
 ## 当前资产
 
@@ -91,10 +100,13 @@ npm run codex-lab:analysis-draft
 ```bash
 npm run codex-lab:analysis-draft -- --latest-only
 npm run codex-lab:analysis-draft -- --changed-only
+npm run codex-lab:compare-draft
 ```
 
 - `--latest-only`：只保留最新一张截图。
 - `--changed-only`：只处理比输出草稿更新的截图。
+
+`codex-lab:compare-draft` 默认读取 `output/asset-index.json` 中的 accepted 资产，并生成 `output/multi-image-comparison-draft.md`。
 
 ## 接入决策
 
