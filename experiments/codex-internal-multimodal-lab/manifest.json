@@ -69,6 +69,15 @@
       "input": "output/asset-index.json",
       "output": "output/multi-image-comparison-draft.md",
       "runtimeApiIntegration": false
+    },
+    {
+      "id": "prompt-pack-draft",
+      "command": "npm run codex-lab:prompt-pack-draft",
+      "options": ["--brief", "--analysis", "--out", "--imagegen-out", "--no-imagegen-out"],
+      "input": "input/brief.md",
+      "output": "output/prompt-pack-draft.json",
+      "secondaryOutput": "output/imagegen-prompts-draft.jsonl",
+      "runtimeApiIntegration": false
     }
   ],
   "capabilities": [
@@ -90,7 +99,7 @@
       "id": "prompt-pack",
       "label": "创作 Prompt 生成",
       "inputs": ["brief", "style-notes", "target-platform"],
-      "outputs": ["prompt-pack.json"],
+      "outputs": ["prompt-pack-draft.json", "imagegen-prompts-draft.jsonl"],
       "status": "testable"
     },
     {

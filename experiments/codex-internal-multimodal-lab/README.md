@@ -24,8 +24,10 @@ experiments/codex-internal-multimodal-lab/
     multi-image-comparison.md     # 当前多图对比分析样例
     multi-image-comparison-draft.md
     prompt-pack.example.json     # Prompt / 分镜 / 参数建议示例
+    prompt-pack-draft.json       # 本地脚本从 brief 生成的 Prompt Pack 草稿
     prompt-retrospective.md      # 三张概念图的 Prompt 复盘
     imagegen-prompts.example.jsonl
+    imagegen-prompts-draft.jsonl
     asset-index.example.json
     asset-index.json
     integration-decision.md
@@ -101,12 +103,21 @@ npm run codex-lab:analysis-draft
 npm run codex-lab:analysis-draft -- --latest-only
 npm run codex-lab:analysis-draft -- --changed-only
 npm run codex-lab:compare-draft
+npm run codex-lab:prompt-pack-draft
 ```
 
 - `--latest-only`：只保留最新一张截图。
 - `--changed-only`：只处理比输出草稿更新的截图。
 
 `codex-lab:compare-draft` 默认读取 `output/asset-index.json` 中的 accepted 资产，并生成 `output/multi-image-comparison-draft.md`。
+
+`codex-lab:prompt-pack-draft` 默认读取 `input/brief.md`，生成 `output/prompt-pack-draft.json` 和 `output/imagegen-prompts-draft.jsonl`。常用参数：
+
+```bash
+npm run codex-lab:prompt-pack-draft -- --brief experiments/codex-internal-multimodal-lab/input/brief.md
+npm run codex-lab:prompt-pack-draft -- --out experiments/codex-internal-multimodal-lab/output/prompt-pack-draft.json
+npm run codex-lab:prompt-pack-draft -- --no-imagegen-out
+```
 
 ## 接入决策
 

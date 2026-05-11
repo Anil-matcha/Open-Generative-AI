@@ -29,7 +29,7 @@ const capabilityRows = [
   {
     name: "创作 Prompt 生成",
     input: "中文需求、角色设定、目标平台",
-    output: "结构化中英提示词与参数建议",
+    output: "Prompt Pack 草稿、分镜、参数建议",
     status: "可测",
   },
   {
@@ -87,9 +87,11 @@ const outputItems = [
   "multi-image-comparison.md",
   "multi-image-comparison-draft.md",
   "prompt-pack.json",
+  "prompt-pack-draft.json",
   "prompt-retrospective.md",
   "shot-list.md",
   "imagegen-prompts.jsonl",
+  "imagegen-prompts-draft.jsonl",
   "asset-index.json",
   "integration-decision.md",
   "generated-assets/",
