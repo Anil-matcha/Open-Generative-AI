@@ -43,7 +43,7 @@
     "dev:packages": "npm run dev --workspaces --if-present",
     "performance:analyze": "node scripts/performance-analysis.js",
     "performance:budget": "node -e \"import('./src/lib/performance-budget.js').then(m => m.performanceBudget.runCIChecks())\"",
-    "dev:cinegen": "cd modules/CineGen && npm run dev",
+
     "dev:ltx-desktop": "cd modules/LTX-Desktop && npm run dev",
     "dev:director": "cd apps/director && npm run dev",
     "dev:vimax": "cd apps/vimax && npm run dev",
