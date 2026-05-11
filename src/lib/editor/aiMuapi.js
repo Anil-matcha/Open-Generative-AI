@@ -1,4 +1,4 @@
-import { aiService } from '../services/AIService.js';
+import { aiService } from '../services/aiService.js';
 
 export class AiMuAPI {
   static async generateVideo(prompt, model = 'wan2.1-text-to-video', options = {}) {
