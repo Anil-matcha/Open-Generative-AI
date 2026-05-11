@@ -8,9 +8,6 @@
 	path = modules/chatvideo-yucut
 	url = https://github.com/laozuzhen/chatvideo-yucut.git
 
-[submodule "modules/CutAI"]
-	path = modules/CutAI
-	url = https://github.com/deangilmoreremix/CutAI.git
 [submodule "packages/Vibe-Workflow"]
 	path = packages/Vibe-Workflow
 	url = https://github.com/SamurAIGPT/Vibe-Workflow.git
@@ -20,6 +17,4 @@
 [submodule "modules/impeccable"]
 	path = modules/impeccable
 	url = https://github.com/deangilmoreremix/impeccable.git
-[submodule "videoremixai-vfx"]
-	path = videoremixai-vfx
-	url = https://github.com/deangilmoreremix/videoremixai-vfx.git
+
