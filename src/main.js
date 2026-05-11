@@ -24,6 +24,7 @@ import { loadConfig } from './lib/muapiConfig.js';
 import { errorReporter } from './lib/error-reporter.js';
 import { setupGlobalErrorHandling } from './lib/error-boundary.js';
 import { initializeHealthChecks } from './lib/health-check.js';
+import { LandingPage } from './components/landing/index.js';
 // Initialize environment validation
 const envConfig = initializeEnvironmentValidation();
 
