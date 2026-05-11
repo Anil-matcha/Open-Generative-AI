@@ -1,20 +1,2 @@
-[submodule "modules/rendiv"]
-	path = modules/rendiv
-	url = https://github.com/deangilmoreremix/rendiv.git
-[submodule "modules/LTX-Desktop"]
-	path = modules/LTX-Desktop
-	url = https://github.com/deangilmoreremix/LTX-Desktop.git
-[submodule "modules/chatvideo-yucut"]
-	path = modules/chatvideo-yucut
-	url = https://github.com/laozuzhen/chatvideo-yucut.git
 
-[submodule "packages/Vibe-Workflow"]
-	path = packages/Vibe-Workflow
-	url = https://github.com/SamurAIGPT/Vibe-Workflow.git
-[submodule "packages/Open-Poe-AI"]
-	path = packages/Open-Poe-AI
-	url = https://github.com/Anil-matcha/Open-Poe-AI.git
-[submodule "modules/impeccable"]
-	path = modules/impeccable
-	url = https://github.com/deangilmoreremix/impeccable.git
 
