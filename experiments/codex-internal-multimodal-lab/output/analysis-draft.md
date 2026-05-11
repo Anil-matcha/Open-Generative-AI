@@ -2,9 +2,10 @@
 
 ## 基本信息
 
-- 草稿生成时间：2026-05-10T23:49:54.928Z
+- 草稿生成时间：2026-05-11T00:36:46.199Z
 - 输入目录：`experiments/codex-internal-multimodal-lab/input/screenshots`
 - 输出文件：`experiments/codex-internal-multimodal-lab/output/analysis-draft.md`
+- 扫描模式：all screenshots
 - 工作流设定：本脚本只生成结构化草稿，不调用外部 API，不替代 Codex 多模态观察。
 
 ## 待分析截图

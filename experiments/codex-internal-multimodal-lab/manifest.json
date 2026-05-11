@@ -57,6 +57,7 @@
     {
       "id": "analysis-draft",
       "command": "npm run codex-lab:analysis-draft",
+      "options": ["--latest-only", "--changed-only"],
       "input": "input/screenshots",
       "output": "output/analysis-draft.md",
       "runtimeApiIntegration": false

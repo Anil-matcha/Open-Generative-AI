@@ -8,7 +8,8 @@
       "types": ["hero", "character", "scene"],
       "statuses": ["accepted"],
       "modes": ["Codex imagegen built-in"]
-    }
+    },
+    "default_sort": "scores.usability:desc"
   },
   "types": [
     {
@@ -42,6 +43,13 @@
       "imagegen_mode": "Codex imagegen built-in",
       "status": "accepted",
       "created_at": "2026-05-11",
+      "scores": {
+        "usability": 92,
+        "prompt_control": 82,
+        "visual_fit": 94,
+        "text_risk": 66,
+        "reuse": 90
+      },
       "tags": ["workflow", "hero", "asset-preview", "dark-ui"],
       "usage": ["Codex Lab page asset preview", "experiment documentation"]
     },
@@ -59,6 +67,13 @@
       "imagegen_mode": "Codex imagegen built-in",
       "status": "accepted",
       "created_at": "2026-05-11",
+      "scores": {
+        "usability": 87,
+        "prompt_control": 88,
+        "visual_fit": 90,
+        "text_risk": 84,
+        "reuse": 86
+      },
       "tags": ["assistant", "identity", "thumbnail", "dark-ui"],
       "usage": ["assistant concept avatar", "experiment documentation"]
     },
@@ -76,6 +91,13 @@
       "imagegen_mode": "Codex imagegen built-in",
       "status": "accepted",
       "created_at": "2026-05-11",
+      "scores": {
+        "usability": 84,
+        "prompt_control": 78,
+        "visual_fit": 92,
+        "text_risk": 62,
+        "reuse": 82
+      },
       "tags": ["scene", "storyboard", "workflow", "style-board"],
       "usage": ["scene style board", "storyboard reference", "experiment documentation"]
     }

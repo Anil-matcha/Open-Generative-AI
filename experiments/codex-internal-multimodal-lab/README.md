@@ -65,6 +65,7 @@ public/assets/codex-lab/          # 项目可直接引用的最终概念图
 - `types`：类型标签与说明。
 - `assets[].type`：资产类型。
 - `assets[].tags`：资产标签。
+- `assets[].scores.usability`：页面按可用性分数降序展示。
 
 ## 执行方式
 
@@ -84,6 +85,16 @@ npm run codex-lab:analysis-draft
 ```
 
 脚本会扫描截图目录并生成 `output/analysis-draft.md`。它只生成结构化草稿，不调用外部 API，也不替代 Codex 多模态观察。
+
+常用参数：
+
+```bash
+npm run codex-lab:analysis-draft -- --latest-only
+npm run codex-lab:analysis-draft -- --changed-only
+```
+
+- `--latest-only`：只保留最新一张截图。
+- `--changed-only`：只处理比输出草稿更新的截图。
 
 ## 接入决策
 

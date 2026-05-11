@@ -25,6 +25,8 @@ function getArg(name, fallback) {
 
 const inputDir = getArg("--input", defaultInput);
 const outFile = getArg("--out", defaultOut);
+const latestOnly = args.includes("--latest-only");
+const changedOnly = args.includes("--changed-only");
 const titleIndex = args.indexOf("--title");
 const title =
   titleIndex !== -1 && titleIndex < args.length - 1
@@ -54,21 +56,43 @@ function toRepoPath(filePath) {
   return path.relative(repoRoot, filePath).replace(/\\/g, "/");
 }
 
-const images = walk(inputDir)
+let images = walk(inputDir)
   .map((filePath) => {
     const stat = fs.statSync(filePath);
     return {
       filePath,
       repoPath: toRepoPath(filePath),
       bytes: stat.size,
+      mtimeMs: stat.mtimeMs,
       updatedAt: stat.mtime.toISOString(),
     };
   })
   .sort((a, b) => a.repoPath.localeCompare(b.repoPath));
 
+const sourceCount = images.length;
+const modeNotes = [];
+
+if (changedOnly) {
+  const baselineMs = fs.existsSync(outFile) ? fs.statSync(outFile).mtimeMs : 0;
+  const baselineLabel =
+    baselineMs === 0 ? "no existing output" : new Date(baselineMs).toISOString();
+  images = images.filter((image) => image.mtimeMs > baselineMs);
+  modeNotes.push(
+    `changed-only: ${images.length} of ${sourceCount} screenshot(s) newer than ${baselineLabel}`
+  );
+}
+
+if (latestOnly) {
+  images = [...images].sort((a, b) => b.mtimeMs - a.mtimeMs).slice(0, 1);
+  modeNotes.push("latest-only: keeping the newest screenshot after other filters");
+}
+
 if (images.length === 0) {
-  console.error(`No screenshots found in ${toRepoPath(inputDir)}`);
-  process.exitCode = 1;
+  const reason = changedOnly
+    ? "No changed screenshots found; existing draft is already newer than the input set."
+    : `No screenshots found in ${toRepoPath(inputDir)}`;
+  console.log(reason);
+  process.exitCode = changedOnly ? 0 : 1;
   return;
 }
 
@@ -94,6 +118,7 @@ const markdown = `# ${title}
 - 草稿生成时间：${generatedAt}
 - 输入目录：\`${toRepoPath(inputDir)}\`
 - 输出文件：\`${toRepoPath(outFile)}\`
+- 扫描模式：${modeNotes.length > 0 ? modeNotes.join("；") : "all screenshots"}
 - 工作流设定：本脚本只生成结构化草稿，不调用外部 API，不替代 Codex 多模态观察。
 
 ## 待分析截图

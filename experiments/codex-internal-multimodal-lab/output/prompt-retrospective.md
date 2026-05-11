@@ -15,6 +15,7 @@
 - 类型：主视觉
 - Prompt id：`codex-lab-hero`
 - 用途：页面主视觉、工作流总览、实验文档封面。
+- 评分：可用性 92 / Prompt 控制 82 / 视觉贴合 94 / 文本风险 66 / 复用性 90
 
 ### 有效约束
 
@@ -39,6 +40,7 @@ Show exactly three loop cards: analysis report, prompt pack, accepted image asse
 - 类型：角色/智能体
 - Prompt id：`codex-lab-agent`
 - 用途：智能体头像、能力卡片、内部角色化表达。
+- 评分：可用性 87 / Prompt 控制 88 / 视觉贴合 90 / 文本风险 84 / 复用性 86
 
 ### 有效约束
 
@@ -64,6 +66,7 @@ Make it readable at 96px square.
 - 类型：场景风格板
 - Prompt id：`codex-lab-scene`
 - 用途：分镜参考、流程说明、场景气质板。
+- 评分：可用性 84 / Prompt 控制 78 / 视觉贴合 92 / 文本风险 62 / 复用性 82
 
 ### 有效约束
 
@@ -90,3 +93,17 @@ Reduce secondary paper notes; make the final asset board the single brightest fo
 3. 对项目资产，继续保留 `no external service logos, no watermark, no random brand marks`。
 4. 对系列一致性，固定：深色工作台、黑玻璃面板、柔白报告块、酸性黄绿色信号点。
 5. 对下游页面，所有 accepted 图片必须进入 `public/assets/codex-lab/` 并写入 `asset-index.json`。
+
+## 评分口径
+
+- 可用性：当前资产是否能直接用于页面、文档或卡片。
+- Prompt 控制：输出是否遵守主体、构图、禁止项和画幅方向。
+- 视觉贴合：是否贴合 Codex Lab 的深色实验台气质。
+- 文本风险：分数越高代表错误文字越少、越不影响使用。
+- 复用性：能否作为后续批量资产的风格基准。
+
+## 当前排序
+
+1. `concept-hero.png`：92，优先用于页面主视觉和工作流总览。
+2. `concept-character.png`：87，适合智能体头像和能力卡片，但小尺寸需要再简化。
+3. `concept-scene.png`：84，适合风格板和分镜参考，页面小图使用时建议裁切。

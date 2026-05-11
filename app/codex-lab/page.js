@@ -1,4 +1,5 @@
 import Link from "next/link";
+import AssetLibraryClient from "./AssetLibraryClient";
 import assetIndex from "../../experiments/codex-internal-multimodal-lab/output/asset-index.json";
 
 export const metadata = {
@@ -101,15 +102,20 @@ const assetTypeFilters = assetIndex.types.map((type) => ({
   count: assetIndex.assets.filter((asset) => asset.type === type.id).length,
 }));
 
-const assetSlots = assetIndex.assets.map((asset) => ({
-  name: asset.filename,
-  type: assetTypes[asset.type]?.label ?? asset.type,
-  purpose: asset.purpose,
-  source: asset.source_prompt_id,
-  status: asset.status === "accepted" ? "已生成" : "待生成",
-  preview: `/${asset.workspace_path.replace(/^public\//, "")}`,
-  tags: asset.tags ?? [],
-}));
+const assetSlots = assetIndex.assets
+  .map((asset) => ({
+    name: asset.filename,
+    id: asset.id,
+    assetType: asset.type,
+    type: assetTypes[asset.type]?.label ?? asset.type,
+    purpose: asset.purpose,
+    source: asset.source_prompt_id,
+    status: asset.status === "accepted" ? "已生成" : "待生成",
+    preview: `/${asset.workspace_path.replace(/^public\//, "")}`,
+    usability: asset.scores?.usability ?? 0,
+    tags: asset.tags ?? [],
+  }))
+  .sort((a, b) => b.usability - a.usability);
 
 export default function CodexLabPage() {
   return (
@@ -323,61 +329,7 @@ export default function CodexLabPage() {
                 /assets/codex-lab/*
               </span>
             </div>
-            <div className="mb-4 flex flex-wrap gap-2">
-              {assetTypeFilters.map((type) => (
-                <span
-                  key={type.id}
-                  className="rounded-md border border-white/10 bg-white/[0.04] px-2.5 py-1 text-xs text-white/55"
-                >
-                  {type.label} · {type.count}
-                </span>
-              ))}
-            </div>
-            <div className="grid gap-3 md:grid-cols-3">
-              {assetSlots.map((slot) => (
-                <div
-                  key={slot.name}
-                  className="rounded-lg border border-white/10 bg-black/35 p-4"
-                >
-                  {slot.preview ? (
-                    <img
-                      src={slot.preview}
-                      alt={`${slot.name} 预览`}
-                      className="mb-4 aspect-video w-full rounded-md border border-[#d9ff00]/25 object-cover"
-                    />
-                  ) : null}
-                  <div className="mb-3 flex items-center justify-between gap-3">
-                    <span
-                      className={`rounded-md px-2 py-1 text-xs font-bold ${
-                        slot.status === "已生成"
-                          ? "bg-emerald-400/10 text-emerald-300"
-                          : "bg-white/[0.06] text-white/40"
-                      }`}
-                    >
-                      {slot.status}
-                    </span>
-                    <span className="rounded-md border border-white/10 px-2 py-1 text-xs text-white/40">
-                      {slot.type}
-                    </span>
-                  </div>
-                  <div className="font-mono text-sm font-bold text-[#d9ff00]">
-                    {slot.name}
-                  </div>
-                  <p className="mt-2 text-sm leading-6 text-white/55">{slot.purpose}</p>
-                  <p className="mt-3 text-xs text-white/35">source: {slot.source}</p>
-                  <div className="mt-3 flex flex-wrap gap-1.5">
-                    {slot.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="rounded border border-white/10 px-1.5 py-0.5 text-[11px] text-white/35"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
+            <AssetLibraryClient filters={assetTypeFilters} assets={assetSlots} />
           </section>
         </div>
       </section>
