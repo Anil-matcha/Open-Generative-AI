@@ -7,9 +7,7 @@
 [submodule "modules/chatvideo-yucut"]
 	path = modules/chatvideo-yucut
 	url = https://github.com/laozuzhen/chatvideo-yucut.git
-[submodule "modules/CineGen"]
-	path = modules/CineGen
-	url = https://github.com/deangilmoreremix/CineGen.git
+
 [submodule "modules/CutAI"]
 	path = modules/CutAI
 	url = https://github.com/deangilmoreremix/CutAI.git
