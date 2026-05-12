@@ -20,29 +20,24 @@ export default {
             'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
             'Access-Control-Allow-Headers': 'Content-Type, Authorization'
         },
-    proxy: {
-         "/api": {
-                  target: process.env.VITE_MUAPI_URL || "https://api.muapi.ai",
-                  changeOrigin: true,
-                  secure: true,
-                  rewrite: (path) => path.replace(/^\/api/, "")
-               },
-               "/apps/vibe-workflow": {
-                  target: "http://localhost:5174",
-                  changeOrigin: true,
-                  rewrite: (path) => path.replace(/^\/apps\/vibe-workflow/, "")
-               },
-               "/apps/videco-ai-platform": {
-                  target: "http://localhost:3002",
-                  changeOrigin: true,
-                  rewrite: (path) => path.replace(/^\/apps\/videco-ai-platform/, "")
-               },
-               "/apps/ai-headshot-generator": {
-                  target: "http://localhost:3003",
-                  changeOrigin: true,
-                  rewrite: (path) => path.replace(/^\/apps\/ai-headshot-generator/, "")
-               }
-          }
+     proxy: {
+          "/api": {
+                   target: process.env.VITE_MUAPI_URL || "https://api.muapi.ai",
+                   changeOrigin: true,
+                   secure: true,
+                   rewrite: (path) => path.replace(/^\/api/, "")
+                },
+                "/apps/videco-ai-platform": {
+                   target: "http://localhost:3002",
+                   changeOrigin: true,
+                   rewrite: (path) => path.replace(/^\/apps\/videco-ai-platform/, "")
+                },
+                "/apps/ai-headshot-generator": {
+                   target: "http://localhost:3003",
+                   changeOrigin: true,
+                   rewrite: (path) => path.replace(/^\/apps\/ai-headshot-generator/, "")
+                }
+           }
     },
     build: {
         target: 'esnext',

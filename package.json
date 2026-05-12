@@ -9,12 +9,15 @@
     "packages/*",
     "apps/*/frontend",
     "apps/*",
-    "modules/*"
+    "modules/*",
+    "apps/marketing-studio",
+    "apps/workflows",
+    "apps/agents"
   ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:all": "pnpm run build:remix-go && pnpm run build:ai-vfx && pnpm run build:vibe-workflow && pnpm run build:videco-ai-platform && pnpm run build:ai-headshot-generator && pnpm run build",
+    "build:all": "npm run build:remix-go && npm run build:ai-vfx && npm run build:vibe-workflow && npm run build:videco-ai-platform && npm run build:ai-headshot-generator && npm run build:marketing-studio && npm run build:workflows && npm run build:agents && npm run build",
     "build:remix-go": "pnpm --filter remix-go run build && mkdir -p public/apps/remix-go && cp -r apps/remix-go/dist/* public/apps/remix-go/",
     "build:vibe-workflow": "pnpm --filter vibe-workflow run build && mkdir -p public/apps/vibe-workflow && cp -r apps/vibe-workflow/dist/* public/apps/vibe-workflow/",
     "build:videco-ai-platform": "cd apps/videco-ai-platform && npm install && pnpm run build && mkdir -p public/apps/videco-ai-platform && cp -r apps/videco-ai-platform/dist/* public/apps/videco-ai-platform/",
@@ -45,7 +48,6 @@
     "dev:packages": "npm run dev --workspaces --if-present",
     "performance:analyze": "node scripts/performance-analysis.js",
     "performance:budget": "node -e \"import('./src/lib/performance-budget.js').then(m => m.performanceBudget.runCIChecks())\"",
-
     "dev:ltx-desktop": "cd modules/LTX-Desktop && npm run dev",
     "dev:director": "cd apps/director && npm run dev",
     "dev:vimax": "cd apps/vimax && npm run dev",
@@ -55,7 +57,13 @@
     "demo:automated": "node demo-scripts/automated-demo.js",
     "demo:videos": "node demo-scripts/demo-video-runner.js",
     "demo:view": "open demo-viewer.html",
-    "demo:full": "npm run demo:create && npm run demo:view"
+    "demo:full": "npm run demo:create && npm run demo:view",
+    "build:marketing-studio": "pnpm --filter marketing-studio run build && mkdir -p public/apps/marketing-studio && cp -r apps/marketing-studio/dist/* public/apps/marketing-studio/",
+    "build:workflows": "pnpm --filter workflows run build && mkdir -p public/apps/workflows && cp -r apps/workflows/dist/* public/apps/workflows/",
+    "build:agents": "pnpm --filter agents run build && mkdir -p public/apps/agents && cp -r apps/agents/dist/* public/apps/agents/",
+    "dev:marketing-studio": "cd apps/marketing-studio && npm run dev",
+    "dev:workflows": "cd apps/workflows && npm run dev",
+    "dev:agents": "cd apps/agents && npm run dev"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
