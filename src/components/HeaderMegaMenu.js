@@ -113,23 +113,23 @@ export function HeaderMegaMenu({ navigate, currentPage }) {
   // Create app card element
   const createAppCard = (app) => {
     const card = document.createElement('button');
-    card.className = `flex items-start gap-2 p-2 rounded-lg hover:bg-white/5 transition-colors text-left w-full ${currentPage === app.id ? 'bg-primary/10' : ''}`;
+    card.className = `flex items-start gap-2 p-2 rounded-lg hover:bg-elevated-bg transition-colors text-left w-full ${currentPage === app.id ? 'bg-panel-bg' : ''}`;
     card.onclick = () => handleNavigate(app.id);
 
     const iconSpan = document.createElement('span');
-    iconSpan.className = 'w-8 h-8 flex items-center justify-center bg-white/5 rounded-md flex-shrink-0';
+    iconSpan.className = 'w-8 h-8 flex items-center justify-center bg-panel-bg rounded-md flex-shrink-0';
     iconSpan.innerHTML = getIconForApp(app.id);
 
     const textDiv = document.createElement('div');
     textDiv.className = 'flex-1 min-w-0';
 
     const labelDiv = document.createElement('div');
-    labelDiv.className = 'text-sm font-bold text-white flex items-center gap-1';
+    labelDiv.className = 'text-sm font-bold text-primary flex items-center gap-1';
     labelDiv.textContent = app.label;
 
     if (app.badge) {
       const badge = document.createElement('span');
-      badge.className = 'px-1.5 py-0.5 text-[9px] font-bold bg-primary/20 text-primary rounded';
+      badge.className = 'px-1.5 py-0.5 text-[9px] font-bold bg-accent text-primary rounded';
       badge.textContent = app.badge;
       labelDiv.appendChild(badge);
     }
@@ -190,7 +190,7 @@ export function HeaderMegaMenu({ navigate, currentPage }) {
 
     // Trigger Button
     const triggerBtn = document.createElement('button');
-    triggerBtn.className = `flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-bold ${isOpen ? 'text-white bg-white/10' : 'text-secondary hover:text-white hover:bg-white/5'} transition-all`;
+    triggerBtn.className = `flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-bold ${isOpen ? 'text-primary bg-panel-bg' : 'text-secondary hover:text-primary hover:bg-elevated-bg'} transition-all`;
     triggerBtn.onclick = toggleMenu;
     triggerBtn.innerHTML = `
       Apps
@@ -202,17 +202,16 @@ export function HeaderMegaMenu({ navigate, currentPage }) {
     // Dropdown
     if (isOpen) {
       const dropdown = document.createElement('div');
-      dropdown.className = 'absolute top-full left-0 mt-2 w-screen max-w-4xl bg-[#0a0b0f] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden';
-      dropdown.style.boxShadow = '0 0 20px rgba(217, 255, 0, 0.1)';
+      dropdown.className = 'absolute top-full left-0 mt-2 w-screen max-w-4xl bg-card-bg border border-color rounded-xl z-50 overflow-hidden';
 
       // Search
       const searchDiv = document.createElement('div');
-      searchDiv.className = 'p-4 border-b border-white/5';
+      searchDiv.className = 'p-4 border-b border-color';
       const searchInput = document.createElement('input');
       searchInput.type = 'text';
       searchInput.placeholder = 'Search apps...';
       searchInput.value = searchQuery;
-      searchInput.className = 'w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:border-primary/50';
+      searchInput.className = 'w-full px-4 py-2 bg-panel-bg border border-color rounded-lg text-primary text-sm focus:outline-none focus:border-primary';
       searchInput.oninput = (e) => {
         searchQuery = e.target.value;
         render();
@@ -242,7 +241,7 @@ export function HeaderMegaMenu({ navigate, currentPage }) {
       // Recent Apps
       if (recentApps.length > 0 && !searchQuery) {
         const recentDiv = document.createElement('div');
-        recentDiv.className = 'mb-4 p-4 border-b border-white/5';
+        recentDiv.className = 'mb-4 p-4 border-b border-color';
         const recentTitle = document.createElement('div');
         recentTitle.className = 'text-xs font-bold text-secondary uppercase tracking-wider mb-2';
         recentTitle.textContent = 'Recent';
@@ -252,7 +251,7 @@ export function HeaderMegaMenu({ navigate, currentPage }) {
         recentFlex.className = 'flex gap-2';
         recentApps.forEach(app => {
           const btn = document.createElement('button');
-          btn.className = 'flex items-center gap-2 px-3 py-2 bg-white/5 rounded-lg hover:bg-white/10 transition-colors text-sm text-white';
+          btn.className = 'flex items-center gap-2 px-3 py-2 bg-panel-bg rounded-lg hover:bg-elevated-bg transition-colors text-sm text-primary';
           btn.onclick = () => handleNavigate(app.id);
           btn.innerHTML = `<span class="w-5 h-5 flex items-center justify-center">${getIconForApp(app.id)}</span><span>${app.label}</span>`;
           recentFlex.appendChild(btn);
@@ -271,13 +270,13 @@ export function HeaderMegaMenu({ navigate, currentPage }) {
 
       // Quick Links & View All
       const footerDiv = document.createElement('div');
-      footerDiv.className = 'p-4 border-t border-white/5 flex items-center justify-between';
+      footerDiv.className = 'p-4 border-t border-color flex items-center justify-between';
 
       const linksDiv = document.createElement('div');
       linksDiv.className = 'flex gap-2';
       quickLinks.forEach(link => {
         const btn = document.createElement('button');
-        btn.className = 'px-3 py-1 text-xs font-bold text-secondary hover:text-white transition-colors';
+        btn.className = 'px-3 py-1 text-xs font-bold text-secondary hover:text-primary transition-colors';
         btn.textContent = link.label;
         btn.onclick = () => handleNavigate(link.id);
         linksDiv.appendChild(btn);
@@ -285,7 +284,7 @@ export function HeaderMegaMenu({ navigate, currentPage }) {
       footerDiv.appendChild(linksDiv);
 
       const viewAllBtn = document.createElement('button');
-      viewAllBtn.className = 'px-4 py-2 bg-primary/10 text-primary text-xs font-bold rounded-lg hover:bg-primary/20 transition-colors';
+      viewAllBtn.className = 'px-4 py-2 bg-panel-bg text-primary text-xs font-bold rounded-lg hover:bg-elevated-bg transition-colors';
       viewAllBtn.onclick = () => window.open('#/apps', '_blank');
       viewAllBtn.textContent = 'View All Apps →';
       footerDiv.appendChild(viewAllBtn);
