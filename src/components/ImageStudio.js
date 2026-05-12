@@ -23,8 +23,8 @@ function createInlineInstructions(type) {
 }
 
 export function ImageStudio() {
-    const container = document.createElement('div');
-    container.className = 'w-full h-full flex flex-col items-center justify-center bg-app-bg relative p-4 md:p-6 overflow-y-auto custom-scrollbar overflow-x-hidden';
+  const container = document.createElement('div');
+  container.className = 'w-full h-full flex flex-col items-center overflow-hidden bg-app-bg relative p-4 md:p-6';
 
     // --- State ---
     const defaultModel = t2iModels[0];
@@ -278,7 +278,7 @@ export function ImageStudio() {
         <div class="h-1.5 rounded-full bg-white/10 overflow-hidden">
             <div id="local-progress-fill" class="h-full bg-primary transition-all duration-200" style="width:0%"></div>
         </div>
-        <div class="flex justify-end">
+        <div class="flex justify-center items-center">
             <button id="local-cancel-btn" class="text-xs text-red-400 hover:text-red-300 transition-colors">Cancel</button>
         </div>
     `;

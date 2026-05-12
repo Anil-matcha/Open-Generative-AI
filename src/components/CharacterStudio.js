@@ -13,7 +13,7 @@ const CHARACTER_MODELS = [
 
 export function CharacterStudio() {
   const container = document.createElement('div');
-  container.className = 'w-full h-full flex flex-col bg-app-bg overflow-y-auto relative';
+  container.className = 'w-full h-full flex flex-col overflow-hidden bg-app-bg';
 
   let uploadedUrl = null;
   let selectedModel = CHARACTER_MODELS[0];
@@ -52,7 +52,7 @@ export function CharacterStudio() {
   formCard.appendChild(modelLabel);
 
   const modelRow = document.createElement('div');
-  modelRow.className = 'flex gap-2';
+  modelRow.className = 'flex gap-2 justify-center';
   const modelBtns = {};
   CHARACTER_MODELS.forEach(m => {
     const btn = document.createElement('button');

@@ -6,7 +6,7 @@ import { savePendingJob, removePendingJob, getPendingJobs } from '../lib/pending
 
 export function LipSyncStudio() {
     const container = document.createElement('div');
-    container.className = 'w-full h-full flex flex-col items-center justify-center bg-app-bg relative p-4 md:p-6 overflow-y-auto custom-scrollbar overflow-x-hidden';
+    container.className = 'w-full h-full flex flex-col items-center overflow-hidden bg-app-bg relative p-4 md:p-6';
 
     // --- State ---
     // 'image' mode: portrait image + audio → video
@@ -280,7 +280,7 @@ export function LipSyncStudio() {
 
     // ── Bottom Controls Row ──
     const bottomRow = document.createElement('div');
-    bottomRow.className = 'flex items-center gap-2 md:gap-3 flex-wrap px-2';
+    bottomRow.className = 'flex items-center justify-center gap-2 md:gap-3 flex-wrap px-2';
 
     // Model selector
     const modelBtn = document.createElement('button');
@@ -300,7 +300,7 @@ export function LipSyncStudio() {
     const generateBtn = document.createElement('button');
     generateBtn.id = 'ls-generate-btn';
     generateBtn.type = 'button';
-    generateBtn.className = 'ml-auto px-6 py-2.5 bg-primary text-black font-black text-sm rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-glow disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100';
+    generateBtn.className = 'px-6 py-2.5 bg-primary text-black font-black text-sm rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-glow disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100';
     generateBtn.textContent = 'Generate ✨';
 
     bottomRow.appendChild(modelBtn);

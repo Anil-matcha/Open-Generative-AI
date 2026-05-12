@@ -24,7 +24,7 @@ const EXAMPLE_EFFECTS = [
 
 export function EffectsPage() {
   const container = document.createElement('div');
-  container.className = 'w-full h-full flex flex-col items-center bg-app-bg relative p-4 md:p-6 overflow-y-auto custom-scrollbar overflow-x-hidden';
+  container.className = 'w-full h-full flex flex-col items-center overflow-hidden bg-app-bg relative p-4 md:p-6';
 
   // Hero
   const hero = createHeroSection('effects', 'h-64 md:h-80 lg:h-96 mb-4');

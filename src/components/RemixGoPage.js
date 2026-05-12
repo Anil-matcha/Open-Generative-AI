@@ -1,9 +1,20 @@
 import { createSecureIframe } from "../lib/security/index.js";
+import { createHeroSection } from '../lib/thumbnails.js';
 export function RemixGoPage() {
   const element = document.createElement('div');
   element.className = 'w-full h-full relative';
   element.style.overflow = 'hidden';
-
+  const heroBanner = createHeroSection('remix-go', 'h-64 md:h-80 lg:h-96 mb-4');
+  if (heroBanner) {
+    element.appendChild(heroBanner);
+    const overlay = heroBanner.querySelector('.bg-gradient-to-t');
+    if (overlay) {
+      const title = document.createElement('h1');
+      title.className = 'absolute bottom-6 left-6 text-white text-3xl font-bold';
+      title.textContent = 'Remix Go';
+      overlay.appendChild(title);
+    }
+}
   // Loading state
   const loadingContainer = document.createElement('div');
   loadingContainer.className = 'absolute inset-0 flex items-center justify-center bg-gray-50 z-10';

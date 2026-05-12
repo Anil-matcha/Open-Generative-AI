@@ -10,20 +10,20 @@ export function initOnboarding() {
   // Create onboarding overlay
   const overlay = document.createElement('div');
   overlay.id = 'onboarding-overlay';
-  overlay.style.cssText = `
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: oklch(10% 0 0 / 0.95);
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-family: Inter, sans-serif;
-  `;
+   overlay.style.cssText = `
+     position: fixed;
+     top: 0;
+     left: 0;
+     width: 100%;
+     height: 100%;
+     background: rgba(0, 0, 0, 0.95);
+     z-index: 9999;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     color: white;
+     font-family: Inter, sans-serif;
+   `;
 
   // Step 1: Welcome
   const step1 = createStep(1, {
@@ -71,13 +71,13 @@ export function initOnboarding() {
   const skipBtn = document.createElement('button');
   skipBtn.textContent = 'Skip Tour';
   skipBtn.className = 'btn-secondary';
-  skipBtn.style.cssText = 'padding: 0.5rem 1rem; background: transparent; color: oklch(70% 0 0); border: 1px solid oklch(70% 0 0 / 0.3); border-radius: 0.5rem; cursor: pointer;';
+   skipBtn.style.cssText = 'padding: 0.5rem 1rem; background: transparent; color: #a7a7a7; border: 1px solid rgba(167, 167, 167, 0.3); border-radius: 0.5rem; cursor: pointer;';
   skipBtn.onclick = () => completeOnboarding(overlay);
   
   const nextBtn = document.createElement('button');
   nextBtn.textContent = 'Next →';
   nextBtn.className = 'btn-primary';
-  nextBtn.style.cssText = 'padding: 0.5rem 1.5rem; background: oklch(30% 25% 270deg); color: white; border: none; border-radius: 0.5rem; cursor: pointer;';
+   nextBtn.style.cssText = 'padding: 0.5rem 1.5rem; background: #404040; color: white; border: none; border-radius: 0.5rem; cursor: pointer;';
   
   let currentStep = 1;
   nextBtn.onclick = () => {
@@ -102,22 +102,22 @@ function createStep(stepNum, data) {
   const step = document.createElement('div');
   step.style.cssText = 'text-align: center; max-width: 600px; padding: 2rem;';
   
-  step.innerHTML = `
-    <div style="font-size: 4rem; margin-bottom: 1rem;">${data.icon}</div>
-    <h2 style="font-size: 2rem; margin-bottom: 0.5rem; color: oklch(85% 0 0);">${data.title}</h2>
-    <p style="font-size: 1.125rem; margin-bottom: 2rem; color: oklch(70% 0 0);">${data.description}</p>
-    <div style="text-align: left; display: inline-block;">
-      ${data.tips.map((tip, i) => `
-        <div style="padding: 0.5rem 0; color: oklch(80% 0 0);">
-          <span style="color: oklch(30% 25% 270deg); margin-right: 0.5rem;">✓</span>
-          ${tip}
-        </div>
-      `).join('')}
-    </div>
-    <div style="margin-top: 2rem; color: oklch(60% 0 0); font-size: 0.875rem;">
-      Step ${stepNum} of 3
-    </div>
-  `;
+   step.innerHTML = `
+     <div style="font-size: 4rem; margin-bottom: 1rem;">${data.icon}</div>
+     <h2 style="font-size: 2rem; margin-bottom: 0.5rem; color: #ffffff;">${data.title}</h2>
+     <p style="font-size: 1.125rem; margin-bottom: 2rem; color: #a7a7a7;">${data.description}</p>
+     <div style="text-align: left; display: inline-block;">
+       ${data.tips.map((tip, i) => `
+         <div style="padding: 0.5rem 0; color: #e0e0e0;">
+           <span style="color: #767d88; margin-right: 0.5rem;">✓</span>
+           ${tip}
+         </div>
+       `).join('')}
+     </div>
+     <div style="margin-top: 2rem; color: #7d848e; font-size: 0.875rem;">
+       Step ${stepNum} of 3
+     </div>
+   `;
   
   return step;
 }
@@ -129,5 +129,4 @@ function completeOnboarding(overlay) {
   setTimeout(() => overlay.remove(), 300);
 }
 
-// Export initOnboarding function to be called manually from main app
-export { initOnboarding };
+// initOnboarding function exported above

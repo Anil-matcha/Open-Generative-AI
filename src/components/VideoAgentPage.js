@@ -57,7 +57,35 @@ export function VideoAgentPage() {
         runtime = directorRuntime;
         runtime.initialize();
     }
-    return createVideoAgentWorkspace(runtime);
+
+    const container = document.createElement('div');
+    container.className = 'w-full h-full flex flex-col bg-app-bg overflow-hidden relative';
+
+    // Add hero section
+    const heroBanner = createHeroSection('video-agent', 'h-64 md:h-80 lg:h-96 mb-4');
+    if (heroBanner) {
+        const bannerText = document.createElement('div');
+        bannerText.className = 'absolute bottom-0 left-0 right-0 p-4 z-10';
+
+        const h1 = document.createElement('h1');
+        h1.className = 'text-2xl md:text-3xl font-black text-white tracking-tight mb-1';
+        h1.textContent = 'Video Agent';
+
+        const p = document.createElement('p');
+        p.className = 'text-white/60 text-xs';
+        p.textContent = 'AI-powered video analysis and enhancement tools';
+
+        bannerText.appendChild(h1);
+        bannerText.appendChild(p);
+        heroBanner.appendChild(bannerText);
+        container.appendChild(heroBanner);
+    }
+
+    // Add the workspace
+    const workspace = createVideoAgentWorkspace(runtime);
+    container.appendChild(workspace);
+
+    return container;
 }
 
 function escapeHtml(text) {

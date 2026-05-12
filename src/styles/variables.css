@@ -1,60 +1,70 @@
 :root {
-  /* Brand Colors - OKLCH Indigo/Purple Palette */
-  --color-primary: oklch(30% 25% 270deg);
-  /* Deep Indigo */
-  --color-primary-hover: oklch(35% 25% 270deg);
-  --color-secondary: oklch(35% 18% 300deg);
-  /* Complementary Purple */
-  --color-accent: oklch(35% 18% 300deg);
-  /* Purple Accent */
-  --color-accent-hover: oklch(40% 18% 300deg);
-  --color-danger: oklch(55% 25% 20deg);
-  /* Red */
+  /* Runway Color Palette - Monochromatic Dark */
+  --color-primary: #ffffff;
+  /* Pure white for primary interactive elements */
+  --color-primary-hover: #c9ccd1;
+  /* Cool silver for hover states */
+  --color-secondary: #767d88;
+  /* Cool slate for secondary elements */
+  --color-accent: #404040;
+  /* Charcoal for accent text */
+  --color-accent-hover: #7d848e;
+  /* Mid slate for accent hover */
+  --color-danger: #a7a7a7;
+  /* Muted gray for danger/warning */
 
-  /* Backgrounds - Layered Dark Surfaces with Indigo Tint */
-  --bg-app: oklch(10% 0.005 270deg);
-  /* Surface Void with slight indigo tint */
-  --bg-deep: oklch(12% 0.008 270deg);
-  /* Surface Deep */
-  --bg-panel: oklch(15% 0.01 270deg);
-  /* Surface Panel */
-  --bg-card: oklch(18% 0.01 270deg);
-  /* Surface Card */
-  --bg-elevated: oklch(20% 0.01 270deg);
-  /* Surface Elevated */
-  --bg-header: oklch(22% 0.01 270deg);
-  /* Surface Header */
-  --bg-glass: oklch(15% 0 270deg / 0.8);
+  /* Backgrounds - Dark Editorial Surfaces */
+  --bg-app: #000000;
+  /* Runway Black */
+  --bg-deep: #030303;
+  /* Deep Black */
+  --bg-panel: #1a1a1a;
+  /* Dark Surface */
+  --bg-card: #1a1a1a;
+  /* Dark Surface */
+  --bg-elevated: #1a1a1a;
+  /* Dark Surface */
+  --bg-header: #000000;
+  /* Runway Black */
+  --bg-glass: rgba(26, 26, 26, 0.8);
+  /* Dark surface with transparency */
 
-  /* Text */
+  /* Text - Cool Gray Hierarchy */
   --text-primary: #ffffff;
-  --text-secondary: #e4e4e7;
-  --text-muted: #71717a;
-  --text-dim: #52525b;
+  /* Pure White */
+  --text-secondary: #767d88;
+  /* Cool Slate */
+  --text-muted: #7d848e;
+  /* Mid Slate */
+  --text-dim: #a7a7a7;
+  /* Muted Gray */
 
-  /* UI Elements */
-  --border-color: rgba(255, 255, 255, 0.08);
-  --border-soft: rgba(255, 255, 255, 0.05);
-  --border-light: rgba(255, 255, 255, 0.1);
+  /* UI Elements - Minimal Borders */
+  --border-color: #27272a;
+  /* Border Dark */
+  --border-soft: #c9ccd1;
+  /* Cool Silver */
+  --border-light: #c9ccd1;
+  /* Cool Silver */
 
-  --border-radius-sm: 6px;
-  --border-radius-md: 10px;
-  --border-radius-lg: 16px;
-  --border-radius-xl: 24px;
+  --border-radius-sm: 4px;
+  --border-radius-md: 6px;
+  --border-radius-lg: 8px;
+  --border-radius-xl: 16px;
   --border-radius-full: 9999px;
 
-  /* Effects - OKLCH */
-  --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px oklch(0% 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px oklch(0% 0 0 / 0.1);
-  --shadow-glow: 0 0 20px oklch(30% 25% 270deg / 0.4);
-  --shadow-glow-accent: 0 0 20px oklch(35% 18% 300deg / 0.4);
+  /* Effects - Zero Shadows (Runway Philosophy) */
+  /* No shadows - depth through content and section alternation */
   --backdrop-blur: blur(20px);
 
   /* Transitions */
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
 
-  /* Typography */
+  /* Typography - Runway Tight Style */
   --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  --letter-spacing-tight: -0.02em;
+  --letter-spacing-negative: -0.016em;
+  --line-height-tight: 1.0;
+  --line-height-compact: 1.3;
 }

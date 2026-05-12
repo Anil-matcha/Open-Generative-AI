@@ -8,7 +8,7 @@ export function HeadshotSettingsModal({ onSave, onClose, currentApiKey = '' }) {
   input.placeholder = 'MUAPI API key';
   input.value = currentApiKey;
   const row = document.createElement('div');
-  row.className = 'mt-4 flex justify-end gap-2';
+  row.className = 'mt-4 flex justify-center items-center gap-2';
   row.innerHTML = '<button class="px-3 py-2 rounded-lg bg-white/10 text-white" data-cancel>Cancel</button><button class="px-3 py-2 rounded-lg bg-primary/20 text-primary" data-save>Save</button>';
   body.appendChild(input); body.appendChild(row);
   row.querySelector('[data-cancel]').onclick = onClose;

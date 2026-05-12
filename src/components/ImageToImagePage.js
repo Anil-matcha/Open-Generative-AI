@@ -42,7 +42,7 @@ const FEATURES = [
 
 export function ImageToImagePage() {
   const container = document.createElement('div');
-  container.className = 'w-full h-full flex flex-col items-center bg-app-bg relative p-4 md:p-6 overflow-y-auto custom-scrollbar overflow-x-hidden';
+  container.className = 'w-full h-full flex flex-col items-center overflow-hidden bg-app-bg relative p-4 md:p-6';
 
   // Hero Section
   const hero = document.createElement('div');

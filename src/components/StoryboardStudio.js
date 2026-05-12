@@ -14,7 +14,7 @@ const SHOT_TYPES = ['Wide Shot', 'Medium Shot', 'Close-Up', 'Extreme Close-Up', 
 
 export function StoryboardStudio() {
   const container = document.createElement('div');
-  container.className = 'w-full h-full flex flex-col bg-app-bg overflow-y-auto relative';
+  container.className = 'w-full h-full flex flex-col overflow-hidden bg-app-bg relative';
 
   const topBar = document.createElement('div');
   topBar.className = 'px-4 md:px-8 pt-6 pb-4 shrink-0';
@@ -107,7 +107,7 @@ export function StoryboardStudio() {
 
   // Add persistence buttons
   const persistenceDiv = document.createElement('div');
-  persistenceDiv.className = 'ml-auto flex gap-2';
+  persistenceDiv.className = 'flex gap-2 justify-center items-center persistence-buttons';
   const saveBtn = document.createElement('button');
   saveBtn.className = 'px-3 py-1 bg-white/5 border border-white/10 rounded text-xs font-bold text-white hover:bg-white/10 transition-all';
   saveBtn.textContent = 'Save';
@@ -138,7 +138,7 @@ export function StoryboardStudio() {
     contentArea.innerHTML = '';
 
     // Update tab buttons (keep persistence buttons)
-    const persistenceDiv = tabBar.querySelector('.ml-auto');
+    const persistenceDiv = tabBar.querySelector('.persistence-buttons');
     tabBar.innerHTML = '';
     tabs.forEach(tab => {
       const tabBtn = document.createElement('button');

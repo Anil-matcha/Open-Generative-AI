@@ -20,7 +20,7 @@ const FORMAT_PRESETS = [
 
 export function InfluencerStudio() {
   const container = document.createElement('div');
-  container.className = 'w-full h-full flex flex-col bg-app-bg overflow-y-auto relative';
+  container.className = 'w-full h-full flex flex-col overflow-hidden bg-app-bg';
 
   let uploadedUrl = null;
   let selectedStyle = STYLE_PRESETS[0];

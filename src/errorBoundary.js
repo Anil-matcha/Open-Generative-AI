@@ -24,24 +24,24 @@ function createErrorUI(error) {
   container.style.cssText = `
     padding: 2rem;
     text-align: center;
-    background: oklch(15% 0 0);
-    border: 1px solid oklch(30% 25% 270deg / 0.3);
+    background: #1a1a1a;
+    border: 1px solid #27272a;
     border-radius: 0.5rem;
-    color: oklch(85% 0 0);
+    color: #ffffff;
     margin: 1rem;
   `;
   
   container.innerHTML = `
     <div style="font-size: 3rem; margin-bottom: 1rem;">😅</div>
-    <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem; color: oklch(90% 0 0);">
+    <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem; color: #ffffff;">
       Oops! Something went wrong
     </h3>
-    <p style="font-size: 0.875rem; color: oklch(70% 0 0); margin-bottom: 1rem;">
+    <p style="font-size: 0.875rem; color: #a7a7a7; margin-bottom: 1rem;">
       ${getFriendlyErrorMessage(error)}
     </p>
     <button onclick="location.reload()" style="
       padding: 0.5rem 1.5rem;
-      background: oklch(30% 25% 270deg);
+      background: #404040;
       color: white;
       border: none;
       border-radius: 0.375rem;
@@ -97,17 +97,17 @@ export function routeErrorBoundary(error, route) {
   container.style.cssText = `
     padding: 3rem;
     text-align: center;
-    color: oklch(85% 0 0);
+    color: #ffffff;
   `;
   
   container.innerHTML = `
     <h2 style="font-size: 1.5rem; margin-bottom: 1rem;">Unable to load this page</h2>
-    <p style="color: oklch(70% 0 0); margin-bottom: 2rem;">
+    <p style="color: #a7a7a7; margin-bottom: 2rem;">
       We couldn't load the ${route} page. Please try again.
     </p>
     <button onclick="window.history.back()" style="
       padding: 0.5rem 1.5rem;
-      background: oklch(30% 25% 270deg);
+      background: #404040;
       color: white;
       border: none;
       border-radius: 0.375rem;
@@ -119,8 +119,8 @@ export function routeErrorBoundary(error, route) {
     <button onclick="location.reload()" style="
       padding: 0.5rem 1.5rem;
       background: transparent;
-      color: oklch(70% 0 0);
-      border: 1px solid oklch(70% 0 0 / 0.3);
+      color: #a7a7a7;
+      border: 1px solid rgba(167, 167, 167, 0.3);
       border-radius: 0.375rem;
       cursor: pointer;
     ">

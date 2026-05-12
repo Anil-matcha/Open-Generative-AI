@@ -6,7 +6,7 @@ import { navigate } from '../lib/router.js';
 
 export function WorkflowRunnerPage(slug) {
   const workflow = workflowRegistryBySlug[slug];
-  const root = document.createElement('div'); root.className = 'w-full h-full p-6 text-white overflow-y-auto';
+  const root = document.createElement('div'); root.className = 'w-full h-full flex flex-col overflow-hidden p-6 text-white';
   if (!workflow) { root.textContent = 'Workflow not found'; return root; }
   root.innerHTML = `<h1 class="text-2xl font-bold mb-2">${workflow.title}</h1><p class="text-secondary mb-4">${workflow.description}</p>`;
   const form = WorkflowInputForm(workflow.inputs); root.appendChild(form);

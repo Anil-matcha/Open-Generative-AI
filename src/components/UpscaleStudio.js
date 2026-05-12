@@ -13,7 +13,7 @@ const UPSCALE_METHODS = [
 
 export function UpscaleStudio() {
   const container = document.createElement('div');
-  container.className = 'w-full h-full flex flex-col items-center bg-app-bg overflow-y-auto p-6 md:p-10 relative';
+  container.className = 'w-full h-full flex flex-col items-center overflow-hidden bg-app-bg p-6 md:p-10 relative';
 
   let selectedMethod = UPSCALE_METHODS[0];
   let selectedFactor = '2';

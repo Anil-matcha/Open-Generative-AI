@@ -1,8 +1,16 @@
+import { createHeroSection } from "../lib/thumbnails.js";
 export function SendsparkPage() {
   const element = document.createElement('div');
   element.className = 'w-full h-full relative';
   element.style.overflow = 'hidden';
-
+  const heroBanner = createHeroSection('sendspark', 'h-64 md:h-80 lg:h-96 mb-4');
+  if (heroBanner) {
+    element.appendChild(heroBanner);
+    const textOverlay = document.createElement('div');
+    textOverlay.className = 'absolute bottom-4 left-4 z-10';
+    textOverlay.innerHTML = '<h1 class="text-2xl md:text-3xl font-bold text-white">Sendspark Workflow Studio</h1>';
+    heroBanner.appendChild(textOverlay);
+  }
   // Loading state
   const loadingContainer = document.createElement('div');
   loadingContainer.className = 'absolute inset-0 flex items-center justify-center bg-gray-900 z-10';

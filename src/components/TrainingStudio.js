@@ -8,7 +8,7 @@ import { securityService } from '../lib/services/SecurityService.js';
 
 export function TrainingStudio() {
   const container = document.createElement('div');
-  container.className = 'w-full h-full flex flex-col bg-app-bg overflow-y-auto relative';
+  container.className = 'w-full h-full flex flex-col overflow-hidden bg-app-bg';
 
   let selectedModel = trainingModels[0];
   let loraName = '';

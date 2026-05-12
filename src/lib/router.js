@@ -51,10 +51,10 @@ const pageLoaders = {
   videotools: () => import('../components/VideoToolsStudio.js').then(m => m.VideoToolsStudio()),
   chat: () => import('../components/ChatStudio.js').then(m => m.ChatStudio()),
   lipsync: () => import('../components/LipSyncStudio.js').then(m => m.LipSyncStudio()),
-  workflows: () => import('../components/WorkflowStudio.js').then(m => m.WorkflowStudio('workflows')),
-  'workflows/editor': () => import('../components/WorkflowStudio.js').then(m => m.WorkflowStudio('workflows/editor')),
-  'workflows/history': () => import('../components/WorkflowStudio.js').then(m => m.WorkflowStudio('workflows/history')),
-  'workflows/settings': () => import('../components/WorkflowStudio.js').then(m => m.WorkflowStudio('workflows/settings')),
+   workflows: () => import('../components/VibeWorkflowPage.js').then(m => m.VibeWorkflowPage()),
+   'workflows/editor': () => import('../components/VibeWorkflowPage.js').then(m => m.VibeWorkflowPage()),
+   'workflows/history': () => import('../components/VibeWorkflowPage.js').then(m => m.VibeWorkflowPage()),
+   'workflows/settings': () => import('../components/VibeWorkflowPage.js').then(m => m.VibeWorkflowPage()),
   agents: () => import('../components/AgentStudio.js').then(m => m.AgentStudio()),
   'mcp-cli': () => import('../components/McpCliStudio.js').then(m => m.McpCliStudio()),
   'video-outreach': () => import('../components/VideoOutreachStudio.js').then(m => m.VideoOutreachStudio()),
@@ -82,6 +82,7 @@ const pageLoaders = {
   'timeline-test': () => import('../components/TimelineTestPage.jsx').then(m => m.TimelineTestPage),
    'remix-go': () => import('../components/RemixGoPage.js').then(m => m.RemixGoPage()),
    'sendspark': () => import('../components/SendsparkPage.js').then(m => m.SendsparkPage()),
+  'ai-headshot': () => import('../components/AIHeadshotPage.js').then(m => m.AIHeadshotPage()),
   'runway-motion': () => import('../components/RunwayMotionStudio.js').then(m => m.RunwayMotionStudio()),
   'tiktok-carousel': () => import('../components/TikTokCarouselStudio.js').then(m => m.TikTokCarouselStudio()),
   'advanced-dubbing': () => import('../components/AdvancedDubbingStudio.js').then(m => m.AdvancedDubbingStudio()),
@@ -166,8 +167,8 @@ export async function navigate(page, params = {}) {
       const mod = await import('../components/TemplateStudio.js');
       element = mod.TemplateStudio(templateId);
     } else if (page.startsWith('workflows/')) {
-      const mod = await import('../components/WorkflowStudio.js');
-      element = mod.WorkflowStudio(page);
+      const mod = await import('../components/VibeWorkflowPage.js');
+      element = mod.VibeWorkflowPage();
     } else if (pageLoaders[page]) {
       element = await pageLoaders[page]();
     } else {

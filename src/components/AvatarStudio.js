@@ -9,7 +9,7 @@ import { GTMPromptModal } from './modals/GTMPromptModal.jsx';
 
 export function AvatarStudio() {
   const container = document.createElement('div');
-  container.className = 'w-full h-full flex flex-col bg-app-bg overflow-y-auto relative';
+  container.className = 'w-full h-full flex flex-col overflow-hidden bg-app-bg';
 
   let selectedModel = avatarModels[0];
   let uploadedVideoUrl = null;

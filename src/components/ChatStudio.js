@@ -8,7 +8,7 @@ import { showToast } from '../lib/loading.js';
 
 export function ChatStudio() {
   const container = document.createElement('div');
-  container.className = 'w-full h-full flex flex-col bg-app-bg overflow-y-auto relative';
+  container.className = 'w-full h-full flex flex-col overflow-hidden bg-app-bg';
 
   let selectedModel = textModels[0];
   const messages = []; // Chat history

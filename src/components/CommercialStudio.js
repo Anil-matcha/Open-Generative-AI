@@ -21,7 +21,7 @@ const FORMAT_PRESETS = [
 
 export function CommercialStudio() {
   const container = document.createElement('div');
-  container.className = 'w-full h-full flex flex-col items-center bg-app-bg overflow-y-auto p-6 md:p-10 relative';
+  container.className = 'w-full h-full flex flex-col items-center overflow-hidden bg-app-bg p-6 md:p-10 relative';
 
   let uploadedUrl = null;
   let selectedScene = SCENE_PRESETS[0];

@@ -50,10 +50,14 @@ import { LandingPageBuilder } from './modals/LandingPageBuilder.jsx';
 import { LeadGeneratorModal } from './modals/LeadGeneratorModal.jsx';
 import { GTMPromptModal } from './modals/GTMPromptModal.jsx';
 // Category C Editor Surface imports removed - not implemented
+import { createHeroSection } from '../lib/thumbnails.js';
 
 export function TimelineEditorPage() {
   const container = document.createElement('div');
-  container.className = 'w-full h-full bg-app-bg overflow-hidden relative';
+  container.className = 'w-full h-full flex flex-col overflow-hidden bg-app-bg relative';
+
+  const heroBanner = createHeroSection('timeline', 'h-64 md:h-80 lg:h-96 mb-4');
+  if (heroBanner) container.appendChild(heroBanner);
 
   // Initialize design system enforcement
   enforceDesignSystem();
@@ -97,7 +101,7 @@ button, input, textarea, select { font: inherit; }
 .project-head { text-align: center; }
 .project-head .title { font-size: 16px; font-weight: 700; }
 .project-head .sub { font-size: 10px; color: var(--dim); }
-.top-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; max-width: 420px; }
+.top-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; max-width: 420px; }
 .top-icon { width: 36px; height: 36px; border-radius: 10px; font-size: 18px; }
 .top-icon.active { border-color: rgba(34,211,238,0.4); background: rgba(34,211,238,0.2); }
 .ready-pill {
@@ -269,7 +273,7 @@ button, input, textarea, select { font: inherit; }
 .transition-description { font-size: 12px; color: rgba(255,255,255,0.6); }
 .duration-controls { display: flex; align-items: center; gap: 12px; }
 .duration-controls input { flex: 1; }
-.transition-settings__actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; }
+.transition-settings__actions { display: flex; gap: 12px; justify-content: center; margin-top: 20px; }
 .preview-btn, .create-btn { padding: 10px 16px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-weight: 600; }
 .preview-btn { background: rgba(255,255,255,0.1); color: white; }
 .create-btn { background: var(--cyan); color: black; }
@@ -324,7 +328,7 @@ button, input, textarea, select { font: inherit; }
 .control-group { margin-bottom: 8px; }
 .control-group label { display: flex; align-items: center; gap: 8px; font-size: 12px; color: rgba(255,255,255,0.7); cursor: pointer; }
 
-.transition-editor__actions { display: flex; gap: 8px; justify-content: flex-end; }
+.transition-editor__actions { display: flex; gap: 8px; justify-content: center; }
 
 .transition-drop-zone { position: relative; width: 20px; height: 62px; background: rgba(34,211,238,0.1); border: 1px dashed rgba(34,211,238,0.3); border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s ease; }
 .transition-drop-zone.drag-over { background: rgba(34,211,238,0.2); border-color: var(--cyan); }
@@ -389,7 +393,7 @@ button, input, textarea, select { font: inherit; }
 .timeline-controls-enhanced {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   padding: 12px 16px;
   background: rgba(0, 0, 0, 0.2);
   border-bottom: 1px solid var(--border);
@@ -407,7 +411,7 @@ button, input, textarea, select { font: inherit; }
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-left: auto;
+  
 }
 
 .element-controls {
@@ -430,7 +434,7 @@ button, input, textarea, select { font: inherit; }
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-left: auto;
+  
 }
 
 .popcorn-element {

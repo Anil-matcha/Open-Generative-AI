@@ -23,7 +23,7 @@ const EDIT_TOOLS = [
 
 export function EditStudio() {
   const container = document.createElement('div');
-  container.className = 'w-full h-full flex flex-col bg-app-bg overflow-y-auto relative';
+  container.className = 'w-full h-full flex flex-col overflow-hidden bg-app-bg relative';
 
   let activeTool = null;
   let uploadedUrl = null;

@@ -13,7 +13,6 @@ button[class*="bg-purple"] {
 .btn-primary:hover,
 .action-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px oklch(30% 25% 270deg / 0.4);
 }
 
 .btn-primary:active,
@@ -41,16 +40,16 @@ button[class*="bg-purple"] {
 .loading-delight {
   width: 24px;
   height: 24px;
-  border: 3px solid oklch(30% 25% 270deg / 0.3);
-  border-top-color: oklch(30% 25% 270deg);
+  border: 3px solid rgba(118, 125, 136, 0.3);
+  border-top-color: #767d88;
   border-radius: 50%;
   animation: spin-delight 800ms linear infinite;
 }
 
 /* Toast notifications with character */
 .toast-success {
-  background: linear-gradient(135deg, oklch(35% 18% 300deg), oklch(30% 25% 270deg));
-  border-left: 4px solid oklch(70% 20% 300deg);
+  background: #1a1a1a;
+  border-left: 4px solid #767d88;
   animation: slide-in 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
@@ -59,17 +58,17 @@ button[class*="bg-purple"] {
   to { transform: translateX(0); opacity: 1; }
 }
 
-/* Progress bar with gradient */
+/* Progress bar */
 .progress-delight {
   height: 4px;
-  background: oklch(20% 0 0);
+  background: #1a1a1a;
   border-radius: 2px;
   overflow: hidden;
 }
 
 .progress-delight-bar {
   height: 100%;
-  background: linear-gradient(90deg, oklch(30% 25% 270deg), oklch(35% 18% 300deg));
+  background: #767d88;
   transition: width 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
@@ -82,7 +81,6 @@ button[class*="bg-purple"] {
 .glass-card:hover,
 [class*="glass-card"]:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px oklch(0% 0 0 / 0.3);
 }
 
 /* Copy: Playful loading messages */
@@ -101,13 +99,13 @@ button[class*="bg-purple"] {
 .empty-state {
   text-align: center;
   padding: 3rem;
-  color: oklch(70% 0 0);
+  color: #a7a7a7;
 }
 
 .empty-state h3 {
   font-size: 1.5rem;
   margin-bottom: 0.5rem;
-  color: oklch(85% 0 0);
+  color: #ffffff;
 }
 
 .empty-state p {
@@ -117,12 +115,11 @@ button[class*="bg-purple"] {
 
 /* Tooltip with character */
 .tooltip-delight {
-  background: oklch(25% 15% 270deg);
-  color: oklch(95% 0 0);
+  background: #1a1a1a;
+  color: #ffffff;
   padding: 0.5rem 1rem;
   border-radius: 0.5rem;
   font-size: 0.875rem;
-  box-shadow: 0 4px 12px oklch(0% 0 0 / 0.3);
   animation: tooltip-in 200ms ease-out;
 }
 

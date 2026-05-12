@@ -31,7 +31,7 @@ const AI_APPS = [
 
 export function AppsHub() {
   const container = document.createElement('div');
-  container.className = 'w-full h-full overflow-y-auto bg-app-bg';
+  container.className = 'w-full h-full flex flex-col overflow-hidden bg-app-bg';
 
   const inner = document.createElement('div');
   inner.className = 'w-full px-4 md:px-8 py-8 md:py-12';

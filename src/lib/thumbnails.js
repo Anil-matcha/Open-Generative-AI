@@ -19,30 +19,6 @@ const STUDIO_THUMBNAILS = {
   'tiktok-carousel': '/thumbnails/studios/tiktok-carousel.webp.png',
 };
 
-const HERO_THUMBNAILS = {
-  image: '/thumbnails/heroes/image.webp',
-  video: '/thumbnails/heroes/video.webp',
-  videoagent: '/thumbnails/heroes/videoagent.webp',
-  cinema: '/thumbnails/heroes/cinema.webp',
-  storyboard: '/thumbnails/heroes/storyboard.webp',
-  effects: '/thumbnails/heroes/effects.webp',
-  edit: '/thumbnails/heroes/edit.webp',
-  upscale: '/thumbnails/heroes/upscale.webp',
-  character: '/thumbnails/heroes/character.webp',
-  commercial: '/thumbnails/heroes/commercial.webp',
-  influencer: '/thumbnails/heroes/influencer.webp',
-  audio: '/thumbnails/heroes/audio.webp',
-  avatar: '/thumbnails/heroes/avatar.webp',
-  training: '/thumbnails/heroes/training.webp',
-  videotools: '/thumbnails/heroes/videotools.webp',
-  lipsync: '/thumbnails/heroes/lipsync.webp',
-  render: '/thumbnails/heroes/render.webp',
-  chat: '/thumbnails/heroes/chat.webp',
-  'advanced-dubbing': '/thumbnails/heroes/advanced-dubbing.webp',
-  templates: '/thumbnails/heroes/templates.webp',
-  'ai-vfx': '/thumbnails/heroes/ai-vfx.webp',
-};
-
 const TOOL_THUMBNAILS = {
   'ai-object-eraser': '/thumbnails/tools/remove-object.webp',
   'ai-background-remover': '/thumbnails/tools/remove-bg.webp',
@@ -71,6 +47,41 @@ const PAGE_THUMBNAILS = {
   library: '/thumbnails/pages/library.webp',
   assist: '/thumbnails/pages/assist.webp',
   placeholder: '/thumbnails/pages/placeholder.webp',
+};
+
+const HERO_THUMBNAILS = {
+  'image': '/thumbnails/heroes/image.webp',
+  'video': '/thumbnails/heroes/video.webp',
+  'cinema': '/thumbnails/heroes/cinema.webp',
+  'storyboard': '/thumbnails/heroes/storyboard.webp',
+  'effects': '/thumbnails/heroes/effects.webp',
+  'edit': '/thumbnails/heroes/edit.webp',
+  'upscale': '/thumbnails/heroes/upscale.webp',
+  'character': '/thumbnails/heroes/character.webp',
+  'commercial': '/thumbnails/heroes/commercial.webp',
+  'influencer': '/thumbnails/heroes/influencer.webp',
+  'audio': '/thumbnails/heroes/audio.webp.png',
+  'avatar': '/thumbnails/heroes/avatar.webp.png',
+  'training': '/thumbnails/heroes/training.webp.png',
+  'videotools': '/thumbnails/heroes/videotools.webp.png',
+  'render': '/thumbnails/heroes/render.webp.png',
+  'chat': '/thumbnails/heroes/chat.webp.png',
+  'ai-vfx': '/thumbnails/heroes/ai-vfx.webp',
+  'video-agent': '/thumbnails/heroes/videoagent.webp.png',
+  'advanced-dubbing': '/thumbnails/heroes/advanced-dubbing.svg',
+  'runway-motion': '/thumbnails/heroes/runway-motion.svg',
+  'tiktok-carousel': '/thumbnails/heroes/tiktok-carousel.svg',
+  'templates': '/thumbnails/heroes/templates.webp.png',
+  'headshots': '/thumbnails/heroes/headshots.webp',
+  'apps': '/thumbnails/heroes/apps.webp',
+  'explore': '/thumbnails/heroes/explore.webp',
+  'sendspark': '/thumbnails/heroes/sendspark.webp.png',
+  'video-outreach': '/thumbnails/heroes/video-outreach.webp.png',
+  'timeline': '/thumbnails/heroes/timeline.webp.png',
+  'lipsync': '/thumbnails/heroes/lipsync.webp.png',
+  'director': '/thumbnails/heroes/director.webp',
+  'marketing-studio': '/thumbnails/heroes/marketing-studio.webp',
+  'remix-go': '/thumbnails/heroes/remix-go.webp',
 };
 
 export function getStudioThumbnail(studioId) {

@@ -5,7 +5,7 @@ import { navigate } from '../lib/router.js';
 
 export function WorkflowsPage() {
   const root = document.createElement('div');
-  root.className = 'w-full h-full p-6 text-white overflow-y-auto';
+  root.className = 'w-full h-full flex flex-col overflow-hidden p-6 text-white';
   root.innerHTML = `<div class="flex flex-wrap items-center gap-3 mb-4"><h1 class="text-2xl font-bold">Workflow Studio</h1><input placeholder="Search workflows" class="workflow-search rounded-lg bg-white/5 border border-white/10 p-2 text-sm" /></div>`;
   const filters = document.createElement('div'); filters.className = 'flex flex-wrap gap-2 mb-4';
   const grid = document.createElement('div'); grid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4';

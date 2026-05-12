@@ -20,7 +20,7 @@ const adaptLocalToVideoEntry = (m) => ({
 
 export function VideoStudio() {
     const container = document.createElement('div');
-    container.className = 'w-full h-full flex flex-col items-center justify-center bg-app-bg relative p-4 md:p-6 overflow-y-auto custom-scrollbar overflow-x-hidden';
+    container.className = 'w-full h-full flex flex-col items-center overflow-hidden bg-app-bg relative p-4 md:p-6';
 
     // Merge Wan2GP video models in only when running inside Electron AND the
     // user has a Wan2GP server configured. We can't probe synchronously, so

@@ -1,6 +1,10 @@
+import { createHeroSection } from '../lib/thumbnails.js';
+
 export function VideoOutreachStudio() {
   const container = document.createElement('div');
-  container.className = 'w-full h-full overflow-y-auto bg-gradient-to-br from-[#090d1a] via-[#0d1324] to-[#090b16] text-white';
+  container.className = 'w-full h-full flex flex-col overflow-hidden bg-gradient-to-br from-[#090d1a] via-[#0d1324] to-[#090b16] text-white';
+
+  const heroBanner = createHeroSection('video-outreach', 'h-64 md:h-80 lg:h-96 mb-4');
 
   container.innerHTML = `
     <div class="mx-auto max-w-7xl px-6 py-8 md:px-10">
@@ -55,7 +59,12 @@ export function VideoOutreachStudio() {
         </div>
       </div>
     </div>
-  `;
+    `;
+
+  if (heroBanner) {
+    const innerDiv = container.querySelector('.mx-auto.max-w-7xl');
+    if (innerDiv) innerDiv.prepend(heroBanner);
+  }
 
   return container;
 }

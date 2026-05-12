@@ -8,13 +8,13 @@ import { MarketingOutputGallery } from './MarketingOutputGallery.js';
 import { MarketingStudioSettingsModal } from './MarketingStudioSettingsModal.js';
 import { createMarketingStudioController } from '../lib/marketingStudioController.js';
 import { MarketingStudioDiagnosticsPanel } from './MarketingStudioDiagnosticsPanel.js';
-
+import { createHeroSection } from '../lib/thumbnails.js';
 export function MarketingStudioPage() {
   const appUrl = import.meta.env.VITE_OPEN_POMELLI_APP_URL;
   const controller = createMarketingStudioController();
 
   const container = document.createElement('div');
-  container.className = 'w-full h-full overflow-y-auto p-6 space-y-4';
+  container.className = 'w-full h-full flex flex-col overflow-hidden bg-app-bg';
   const status = document.createElement('div'); status.className = 'text-xs text-muted';
   const dnaPanelHost = document.createElement('div');
   const galleryHost = document.createElement('div');
@@ -30,7 +30,8 @@ export function MarketingStudioPage() {
   };
 
   container.innerHTML = `<div class="bg-white/5 border border-white/10 rounded-2xl p-6"><h1 class="text-3xl font-black text-white">AI Marketing Studio</h1><p class="text-secondary mt-2">Paste any website URL and turn it into Brand DNA, campaign concepts, product creatives, and short-form video ideas.</p>${appUrl ? `<div class="mt-3 flex gap-3"><a href="${appUrl}" target="_blank" class="inline-block text-primary">Open Full Marketing Studio</a><button id="saveLib" class="text-xs px-3 py-1 rounded bg-white/10 text-white">Save to Library (TODO)</button></div><iframe src="${appUrl}" class="w-full h-64 rounded-xl border border-white/10 mt-3" loading="lazy"></iframe>` : '<p class="text-amber-400 text-sm mt-3">Set VITE_OPEN_POMELLI_APP_URL to embed standalone Marketing Studio.</p>'}</div>`;
-
+  const heroBanner = createHeroSection('marketing-studio', 'h-64 md:h-80 lg:h-96 mb-4');
+  if (heroBanner) container.insertBefore(heroBanner, container.firstChild);
   const extractor = BrandDNAExtractor({ onAnalyze: async (url) => {
     try {
       if (!url) throw new Error('Enter a valid website URL.');

@@ -1,6 +1,6 @@
 export function McpCliStudio() {
     const container = document.createElement('div');
-    container.className = 'w-full h-full overflow-y-auto bg-app-bg text-white';
+    container.className = 'w-full h-full flex flex-col overflow-hidden bg-app-bg text-white';
 
     const inner = document.createElement('div');
     inner.className = 'max-w-5xl mx-auto px-6 py-12 flex flex-col gap-12';

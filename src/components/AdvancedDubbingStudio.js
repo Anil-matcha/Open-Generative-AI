@@ -6,7 +6,7 @@ import { createInlineInstructions } from './InlineInstructions.js';
 
 export function AdvancedDubbingStudio() {
     const container = document.createElement('div');
-    container.className = 'w-full h-full flex flex-col bg-app-bg overflow-y-auto custom-scrollbar overflow-x-hidden relative';
+    container.className = 'w-full h-full flex flex-col overflow-hidden bg-app-bg relative';
 
     // ==========================================
     // STATE MANAGEMENT

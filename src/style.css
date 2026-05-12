@@ -1,5 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 @import './styles/variables.css';
 @import './styles/global.css';
 @import './styles/studio.css';
@@ -44,7 +43,7 @@ main {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.1);
+  background: #27272a;
   border-radius: 3px;
 }
 
@@ -143,10 +142,7 @@ main {
   display: none;
 }
 
-/* Primary button glow */
-button.bg-primary {
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
-}
+/* Primary button - no glow per Runway philosophy */
 
 /* Gradient text utility */
 .bg-clip-text.text-transparent {

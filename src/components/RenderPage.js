@@ -421,7 +421,7 @@ function titleCasePipelineStep(step) {
 
 export function RenderPage() {
   const container = document.createElement('div');
-  container.className = 'min-h-screen w-full bg-[#0a0a0b] p-4 text-white md:p-8 overflow-y-auto custom-scrollbar';
+  container.className = 'w-full h-full flex flex-col overflow-hidden bg-[#0a0a0b] p-4 text-white md:p-8';
 
   const urlParams = new URLSearchParams(window.location.search);
   const videoId = urlParams.get('videoId') || 'vid_preview';

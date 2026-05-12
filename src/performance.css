@@ -39,7 +39,7 @@ body {
 
 /* Lazy loading placeholder */
 .lazy-load {
-  background: oklch(20% 0 0);
+  background: #1a1a1a;
   min-height: 100px;
 }
 

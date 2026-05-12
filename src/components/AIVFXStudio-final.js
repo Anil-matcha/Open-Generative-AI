@@ -39,7 +39,7 @@ export function AIVFXStudio() {
 
   // Container setup
   const container = document.createElement('div');
-  container.className = 'w-full h-full overflow-y-auto bg-app-bg text-white';
+  container.className = 'w-full h-full flex flex-col overflow-hidden bg-app-bg text-white';
 
 
 

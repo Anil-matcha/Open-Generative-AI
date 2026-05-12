@@ -1,3 +1,4 @@
+import { createHeroSection } from "../lib/thumbnails.js";
 import { navigate } from '../lib/router.js';
 import { showToast } from '../lib/loading.js';
 import { escapeHtml } from '../lib/security.js';
@@ -49,6 +50,22 @@ const AGENT_CATEGORIES = {
 export function DirectorPage() {
     const container = document.createElement('div');
     container.className = 'w-full h-full flex flex-col overflow-hidden bg-app-bg';
+    // Add hero section
+    const heroBanner = createHeroSection("director", "h-64 md:h-80 lg:h-96 mb-4");
+    if (heroBanner) {
+        const bannerText = document.createElement("div");
+        bannerText.className = "absolute bottom-0 left-0 right-0 p-4 z-10";
+        const h1 = document.createElement("h1");
+        h1.className = "text-2xl md:text-3xl font-black text-white tracking-tight mb-1";
+        h1.textContent = "Director Studio";
+        const p = document.createElement("p");
+        p.className = "text-white/60 text-xs";
+        p.textContent = "AI-powered video direction and timeline management";
+        bannerText.appendChild(h1);
+        bannerText.appendChild(p);
+        heroBanner.appendChild(bannerText);
+        container.appendChild(heroBanner);
+    }
     
     const urlParams = new URLSearchParams(window.location.search);
     const videoId = urlParams.get('videoId') || '';
