@@ -1,2 +1,3 @@
-
-
+[submodule "apps/ai-headshot-generator"]
+	path = apps/ai-headshot-generator
+	url = https://github.com/deangilmoreremix/ai-headshot-generator.git
