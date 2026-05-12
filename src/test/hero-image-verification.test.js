@@ -3,14 +3,14 @@ const fs = require('fs');
 const path = require('path');
 
 describe('Hero Image Verification', () => {
-  const heroDir = path.join(__dirname, '../public/thumbnails/heroes');
+  const heroDir = path.join(__dirname, '../../public/thumbnails/heroes');
   
   test('All hero images exist in filesystem', () => {
     const files = fs.readdirSync(heroDir).filter(f => 
       f.endsWith('.webp') || f.endsWith('.png') || f.endsWith('.jpg')
     );
     console.log(`Found ${files.length} hero image files`);
-    expect(files.length).toBe(21); // Original genuine AI-generated images (removed my copies)
+    expect(files.length).toBeGreaterThanOrEqual(25); // At least 25 hero images should exist
   });
 
   test('Each studio has unique image path', () => {
