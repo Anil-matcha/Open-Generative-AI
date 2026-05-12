@@ -1,0 +1,42 @@
+{
+  "name": "studio",
+  "version": "1.0.0",
+  "description": "Open Generative AI studio components for Muapi",
+  "main": "src/index.js",
+  "module": "src/index.js",
+  "files": [
+    "src",
+    "dist"
+  ],
+  "scripts": {
+    "build:css": "tailwindcss -i ./src/tailwind.css -o ./dist/tailwind.css --minify",
+    "build": "npm run build:css && babel src --out-dir dist --extensions .js,.jsx"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@xyflow/react": "^12.10.2",
+    "axios": "^1.7.0",
+    "lucide-react": "^1.8.0",
+    "react-hot-toast": "^2.4.1",
+    "react-icons": "^5.0.1",
+    "react-markdown": "^10.1.0",
+    "react-syntax-highlighter": "^16.1.1",
+    "react-toastify": "^11.1.0",
+    "reactflow": "^11.11.4",
+    "remark-gfm": "^4.0.1",
+    "workflow-builder": "file:../Vibe-Workflow/packages/workflow-builder",
+    "ai-agent": "file:../Open-Poe-AI/packages/agents"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.28.3",
+    "@babel/preset-env": "^7.28.5",
+    "@babel/preset-react": "^7.28.5",
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.24",
+    "tailwindcss": "^3.3.3"
+  }
+}
