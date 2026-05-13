@@ -1,12 +1,8 @@
-import { prisma } from "@/lib/prisma";
+const { prisma } = require("@/lib/prisma");
 
-/**
- * Service to manage User data and Credits.
- */
-export const UserService = {
-  /**
-   * Get user credits by ID
-   */
+const DEFAULT_CREDITS = 100;
+
+const UserService = {
   async getCredits(userId) {
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -15,9 +11,6 @@ export const UserService = {
     return user?.credits || 0;
   },
 
-  /**
-   * Add credits to a user
-   */
   async addCredits(userId, amount) {
     return await prisma.user.update({
       where: { id: userId },
@@ -29,9 +22,6 @@ export const UserService = {
     });
   },
 
-  /**
-   * Deduct credits from a user
-   */
   async deductCredits(userId, amount = 1) {
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -52,12 +42,32 @@ export const UserService = {
     });
   },
 
-  /**
-   * Find or create user by email (helper for non-OIDC flows if needed)
-   */
   async findByEmail(email) {
     return await prisma.user.findUnique({
       where: { email },
     });
+  },
+
+  async getUserOrCreate(session) {
+    if (!session?.user?.email) return null;
+    
+    let user = await prisma.user.findUnique({
+      where: { email: session.user.email }
+    });
+    
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          email: session.user.email,
+          name: session.user.name || null,
+          image: session.user.image || null,
+          credits: DEFAULT_CREDITS,
+        }
+      });
+    }
+    
+    return user;
   }
 };
+
+module.exports = { UserService };

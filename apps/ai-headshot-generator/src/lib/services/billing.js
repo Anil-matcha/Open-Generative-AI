@@ -1,14 +1,8 @@
-import { stripe } from "@/lib/stripe";
-import config from "@/lib/config";
-import { UserService } from "./user";
+const { stripe } = require("@/lib/stripe");
+const config = require("@/lib/config");
+const { UserService } = require("./user");
 
-/**
- * Service to manage Stripe Payments and Fulfillment.
- */
-export const BillingService = {
-  /**
-   * Create a checkout session for credits
-   */
+module.exports = {
   async createCheckoutSession(userId, price, credits) {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -20,14 +14,14 @@ export const BillingService = {
               name: "Credits Top-up",
               description: `Purchase ${credits} credits for generative manifestations.`,
             },
-            unit_amount: price * 100, // Amount in cents
+            unit_amount: price * 100,
           },
           quantity: 1,
         },
       ],
       mode: "payment",
-      success_url: `${config.auth.url}/?success=true`,
-      cancel_url: `${config.auth.url}/pricing?canceled=true`,
+      success_url: `${config.database.url || "http://localhost:3000"}/?success=true`,
+      cancel_url: `${config.database.url || "http://localhost:3000"}/pricing?canceled=true`,
       metadata: {
         userId: userId,
         credits: credits.toString(),
@@ -37,9 +31,6 @@ export const BillingService = {
     return session.url;
   },
 
-  /**
-   * Handle Stripe webhook events
-   */
   async handleWebhook(body, signature) {
     let event;
 

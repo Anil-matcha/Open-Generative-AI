@@ -1,19 +1,18 @@
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import { NextResponse } from "next/server";
+const { prisma } = require("@/lib/prisma");
+const { NextResponse } = require("next/server");
 
-export async function GET() {
-  const session = await getServerSession(authOptions);
+module.exports = async function GET(req) {
+  const { searchParams } = new URL(req.url);
+  const userId = searchParams.get("userId");
 
-  if (!session || !session.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!userId) {
+    return NextResponse.json({ error: "User ID is required" }, { status: 401 });
   }
 
   try {
     const creations = await prisma.creation.findMany({
       where: { 
-        userId: session.user.id
+        userId: userId
       },
       orderBy: { createdAt: "desc" },
     });
@@ -23,4 +22,4 @@ export async function GET() {
     console.error("Fetch creations error:", error);
     return NextResponse.json({ error: "Failed to fetch creations" }, { status: 500 });
   }
-}
+};

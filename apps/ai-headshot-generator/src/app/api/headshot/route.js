@@ -1,18 +1,10 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
-import { AIService } from "@/lib/services/ai";
+const { NextResponse } = require("next/server");
+const { AIService } = require("@/lib/services/ai");
 
-export async function POST(req) {
+module.exports = async function POST(req) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const body = await req.json();
-    const { image_url, category, aspect_ratio } = body;
+    const { image_url, category, aspect_ratio, userId } = body;
 
     if (!image_url) {
       return NextResponse.json({ error: "Reference image is required" }, { status: 400 });
@@ -22,7 +14,11 @@ export async function POST(req) {
       return NextResponse.json({ error: "Category is required" }, { status: 400 });
     }
 
-    const result = await AIService.generate(session.user.id, {
+    if (!userId) {
+      return NextResponse.json({ error: "User ID is required" }, { status: 401 });
+    }
+
+    const result = await AIService.generate(userId, {
       image_url,
       category,
       aspect_ratio,
@@ -39,4 +35,4 @@ export async function POST(req) {
     console.error("[AI_HEADSHOT]", error);
     return new NextResponse(error.message || "Internal Error", { status: 500 });
   }
-}
+};

@@ -16,6 +16,7 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@higgsfield/api-config": "workspace:*",
     "@prisma/client": "^5.20.0",
     "next": "16.1.6",
     "playwright": "^1.58.2",

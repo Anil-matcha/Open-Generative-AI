@@ -10,6 +10,7 @@
     "apps/*/frontend",
     "apps/*",
     "modules/*",
+    "modules/api-config",
     "apps/marketing-studio",
     "apps/workflows",
     "apps/agents"

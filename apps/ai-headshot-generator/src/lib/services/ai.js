@@ -1,30 +1,20 @@
-import { prisma } from "@/lib/prisma";
-import { UserService } from "./user";
-import config from "@/lib/config";
+const { prisma } = require("@/lib/prisma");
+const { UserService } = require("./user");
+const { getMuapiKey, config } = require("@higgsfield/api-config");
 
-/**
- * Service to manage AI Headshot Studio generations using muapi.ai
- */
-export const AIService = {
-  /**
-   * Defines the fixed cost for a professional photo pack
-   */
+module.exports = {
   getCreditCost() {
     return 60;
   },
 
-  /**
-   * Execute a headshot generation quest using muapi.ai photo-pack
-   */
   async generate(userId, { image_url, category, aspect_ratio = "1:1" }) {
     const cost = this.getCreditCost();
     await UserService.deductCredits(userId, cost);
 
-    const apiKey = config.ai.headshot.apiKey;
-    if (!apiKey) throw new Error("HEADSHOT_API_KEY is not configured");
+    const apiKey = getMuapiKey();
 
-    const webhookUrl = `${config.auth.webhook_url}/api/webhook/muapi`;
-    const submitUrl = `${config.ai.headshot.endpoint}?webhook=${encodeURIComponent(webhookUrl)}`;
+    const webhookUrl = `${config.api.supabase.url || "http://localhost:3000"}/api/webhook/muapi`;
+    const submitUrl = `${config.api.muapi.baseUrl}/photo-pack?webhook=${encodeURIComponent(webhookUrl)}`;
     
     const submitRes = await fetch(submitUrl, {
       method: "POST",
@@ -64,9 +54,6 @@ export const AIService = {
     return { request_id };
   },
 
-  /**
-   * Check the status of a specific generation (Polling fallback)
-   */
   async checkStatus(requestId, userId, metadata) {
     const creationModel = prisma.creation || prisma.Creation;
     if (!creationModel) return { status: "processing" };

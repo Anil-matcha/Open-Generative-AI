@@ -1,8 +1,9 @@
-const BASE = process.env.MUAPI_BASE_URL ?? "https://api.muapi.ai/api/v1";
+import { getMuapiKey, config } from "@higgsfield/api-config";
+
+const BASE = config.api.muapi.baseUrl || "https://api.muapi.ai/api/v1";
 
 function key(): string {
-  const k = process.env.MUAPI_API_KEY;
-  if (!k) throw new Error("MUAPI_API_KEY is not set");
+  const k = getMuapiKey();
   return k;
 }
 

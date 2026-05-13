@@ -1,0 +1,12 @@
+{
+  "name": "@higgsfield/api-config",
+  "version": "1.0.0",
+  "description": "Unified API configuration for Higgsfield apps",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "files": ["index.js", "index.d.ts"],
+  "dependencies": {
+    "openai": "^4.0.0",
+    "@supabase/supabase-js": "^2.0.0"
+  }
+}
