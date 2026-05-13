@@ -38,3 +38,6 @@ package-lock.json
 
 # Vite timestamp build artifacts
 *vite.config.js.timestamp-*.mjs
+
+# Coverage directory
+coverage/

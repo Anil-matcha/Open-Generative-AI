@@ -5,9 +5,8 @@
   # Publish directory for built assets
   publish = "dist"
   
-  # Build command - uses pnpm with monorepo support
-  # Note: pnpm-lock.yaml is committed, ensuring reproducible builds
-  command = "pnpm run build:all"
+  # Build command - builds the main Vite application
+  command = "npx vite build"
   
   # Netlify Functions directory
   functions = "netlify/functions/dist"
@@ -53,14 +52,14 @@
 [[headers]]
   for = "/*"
     [headers.values]
-    # Prevent clickjacking
-    X-Frame-Options = "DENY"
-    # Prevent MIME sniffing
-    X-Content-Type-Options = "nosniff"
-    # Referrer policy
-    Referrer-Policy = "strict-origin-when-cross-origin"
-    # Content Security Policy (adjust as needed for your assets)
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://api.muapi.ai https://supabase.co wss://*.supabase.co; frame-ancestors 'none';"
+      # Prevent clickjacking
+      X-Frame-Options = "DENY"
+      # Prevent MIME sniffing
+      X-Content-Type-Options = "nosniff"
+      # Referrer policy
+      Referrer-Policy = "strict-origin-when-cross-origin"
+      # Content Security Policy (adjust as needed for your assets)
+      Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://api.muapi.ai https://supabase.co wss://*.supabase.co; frame-ancestors 'none';"
 
 [build.processing]
   skip_processing = false
@@ -75,18 +74,3 @@
 
 [build.processing.html]
   pretty_urls = true
-
-# Plugin configuration (ensure pnpm-lock.toml consistency)
-# Network concurrency for monorepo builds
-[build.conditions]
-  netlify_condition = "build"
-
-# Pre-deploy validation reference (commented)
-# Add scripts/validate-netlify.sh with:
-#   #!/bin/bash
-#   if command -v toml-lint &> /dev/null; then
-#     toml-lint netlify.toml || exit 1
-#   fi
-#   npx netlify-cli build --dry || exit 1
-#
-# Then run: bash scripts/validate-netlify.sh
