@@ -231,3 +231,15 @@ Tests are configured to run in CI environments with:
 - Headless execution
 - HTML test reports in `playwright-report/`
 - Coverage reports in `coverage/`
+
+## Build Configuration
+
+### Node.js Version
+- **Version**: 22.12.0
+- **Files**: `.node-version`, `netlify.toml`
+- **Note**: Node 22.12.0 includes an updated Corepack keyring to resolve pnpm signature verification errors on Netlify.
+
+### Netlify Build Settings
+- **Build Command**: `npx vite build`
+- **Publish Directory**: `dist`
+- **Functions**: `netlify/functions/dist`
