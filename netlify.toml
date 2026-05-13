@@ -13,7 +13,7 @@
 
 [build.environment]
   # Node.js version for build and functions
-  NODE_VERSION = "20"
+  NODE_VERSION = "22.12.0"
   
   # Production optimizations
   NODE_OPTIONS = "--max-old-space-size=4096"
