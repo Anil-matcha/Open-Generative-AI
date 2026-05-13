@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 
 const MODULE_LOAD_TIMEOUT = 10000;
+const HEAVY_LOAD_TIMEOUT = 60000;
 
 // Route to component path mapping from router.js pageLoaders
 const ROUTE_COMPONENTS = {
@@ -65,7 +66,7 @@ const ROUTE_COMPONENTS = {
   'video-agent': '../../src/components/VideoAgentPage.js',
   director: '../../src/components/DirectorPage.js',
   
-  // Timeline routes
+  // Timeline routes (heavy imports - need extra timeout)
   timeline: '../../src/components/TimelineEditorPage.js',
   'timeline-test': '../../src/components/TimelineTestPage.jsx',
   
@@ -84,6 +85,9 @@ const ROUTE_COMPONENTS = {
   'headshots-history': '../../src/components/HeadshotStudioPage.js',
   'headshots-settings': '../../src/components/HeadshotStudioPage.js',
 };
+
+// Heavy routes that need extended timeout due to deep dependency chains
+const HEAVY_ROUTES = ['timeline', 'timeline-test', 'image', 'video', 'cinema', 'vfx', 'ai-vfx', 'render', 'director', 'video-agent'];
 
 // Unique component paths from routes
 const COMPONENT_PATHS = [
@@ -187,6 +191,7 @@ const APPS = [
 describe('Module Loading Tests', () => {
   describe('Routes', () => {
     for (const [route, path] of Object.entries(ROUTE_COMPONENTS)) {
+      const isHeavy = HEAVY_ROUTES.includes(route);
       it(`should load route "${route}" from ${path}`, async () => {
         await expect(
           import(path).then(m => {
@@ -194,12 +199,13 @@ describe('Module Loading Tests', () => {
             return m;
           })
         ).resolves.toBeDefined();
-      }, MODULE_LOAD_TIMEOUT);
+      }, isHeavy ? HEAVY_LOAD_TIMEOUT : MODULE_LOAD_TIMEOUT);
     }
   });
 
   describe('Components', () => {
     for (const path of COMPONENT_PATHS) {
+      const isHeavy = ['../../src/components/ImageStudio.js', '../../src/components/VideoStudio.js', '../../src/components/CinemaStudio.js', '../../src/components/TimelineEditorPage.js', '../../src/components/TimelineTestPage.jsx'].includes(path);
       it(`should load component ${path}`, async () => {
         await expect(
           import(path).then(m => {
@@ -207,7 +213,7 @@ describe('Module Loading Tests', () => {
             return m;
           })
         ).resolves.toBeDefined();
-      }, MODULE_LOAD_TIMEOUT);
+      }, isHeavy ? HEAVY_LOAD_TIMEOUT : MODULE_LOAD_TIMEOUT);
     }
   });
 

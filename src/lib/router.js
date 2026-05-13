@@ -129,6 +129,25 @@ function cleanupContentArea() {
 export function initRouter(container, callback) {
   contentArea = container;
   onNavigateCallback = callback;
+  
+  // Handle hash changes (for navigation via URL)
+  window.addEventListener('hashchange', () => {
+    const hash = window.location.hash;
+    if (hash && hash.startsWith('#/')) {
+      const page = hash.slice(2).split('?')[0];
+      const params = {};
+      const queryString = hash.split('?')[1];
+      if (queryString) {
+        queryString.split('&').forEach(pair => {
+          const [key, value] = pair.split('=');
+          if (key && value) {
+            params[decodeURIComponent(key)] = decodeURIComponent(value);
+          }
+        });
+      }
+      navigate(page, params);
+    }
+  });
 }
 
 export async function navigate(page, params = {}) {

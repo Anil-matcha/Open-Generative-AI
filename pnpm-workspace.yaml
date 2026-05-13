@@ -5,11 +5,18 @@ packages:
   - 'modules/*'
 allowBuilds:
   '@google/genai': true
+  '@prisma/client': set this to true or false
+  '@prisma/engines': set this to true or false
+  aws-sdk: set this to true or false
   canvas: true
   core-js: true
   core-js-pure: true
+  es5-ext: set this to true or false
   esbuild: true
+  husky: set this to true or false
+  prisma: set this to true or false
   protobufjs: true
   puppeteer: true
   sharp: true
+  unrs-resolver: set this to true or false
   workerd: true

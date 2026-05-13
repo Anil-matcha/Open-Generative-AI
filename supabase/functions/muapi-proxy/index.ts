@@ -54,6 +54,47 @@ interface GenerateRequest {
   studioType?: string;
 }
 
+export const ALLOWED_ENDPOINTS = [
+  'predictions',
+  'image-generation',
+  'video-generation',
+  'image-to-image',
+  'image-to-video',
+  'video-to-video',
+  'flux-dev-image',
+  'generate_wan_ai_effects',
+  'ai-image-face-swap',
+  'api/storyboard/projects',
+  'upload_file',
+  'sync-lipsync',
+  'latentsync-video',
+  'mmaudio-v2/text-to-audio',
+  'mmaudio-v2/video-to-video',
+  'suno-create-music',
+  'suno-remix-music',
+  'suno-extend-music',
+  'suno-add-vocals',
+  'suno-generate-mashup',
+  'suno-generate-lyrics',
+  'ai-ghibli-style',
+  'ai-anime-generator',
+  'ltx-2-pro-text-to-video',
+  'ltx-2-fast-text-to-video',
+  'ltx-2-19b-text-to-video',
+  'ltx-2-pro-image-to-video',
+  'ltx-2-fast-image-to-video',
+  'ltx-2-19b-image-to-video',
+  'seedance-*',
+  'kling-*',
+  'veo3-*',
+  'wan2-*',
+  'minimax-hailuo-*',
+  'openai-sora-*',
+  'pixverse-*',
+  'runway-*',
+  'hunyuan-*',
+];
+
 function validateEndpoint(endpoint: string): boolean {
   // Prevent SSRF by blocking dangerous paths
   if (endpoint.includes('..') || endpoint.startsWith('/') || endpoint.includes('://')) {

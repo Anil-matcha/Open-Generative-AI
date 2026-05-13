@@ -91,6 +91,13 @@ export default defineConfig({
       name: 'accessibility',
       use: { ...devices['Desktop Chrome'], headless: true },
       testMatch: '**/accessibility/**/*.spec.js'
+    },
+
+    // Module click error testing
+    {
+      name: 'module-click-errors',
+      use: { ...devices['Desktop Chrome'], headless: true },
+      testMatch: '**/module-click-errors.e2e.spec.ts'
     }
   ],
 
