@@ -1,0 +1,24 @@
+# Ignore sub-applications - they have their own deployment configs
+apps/videco-ai-platform
+apps/vibe-workflow
+apps/open-pomelli
+apps/ai-headshot-generator
+apps/marketing-studio
+apps/workflows
+apps/agents
+apps/remix-go
+apps/ai-vfx
+apps/sendspark
+apps/director
+apps/vimax
+apps/ai-storyboarder
+
+# Ignore modules and packages
+modules/
+packages/
+
+# Ignore development files
+*.md
+*.txt
+.git/
+node_modules/
