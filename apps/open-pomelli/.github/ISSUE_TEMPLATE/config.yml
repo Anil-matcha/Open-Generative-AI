@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 GitHub Discussions
+    url: https://github.com/yourusername/marketing_agent/discussions
+    about: Ask questions and discuss ideas with the community
+  - name: 🔒 Security Vulnerability
+    url: https://github.com/yourusername/marketing_agent/security/advisories/new
+    about: Report security vulnerabilities privately

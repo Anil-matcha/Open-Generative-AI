@@ -1,0 +1,28 @@
+[tool.ruff]
+# Enable pycodestyle (`E`), Pyflakes (`F`), undefined names (`F401`, `F821`)
+select = ["E", "F", "W", "I", "N", "UP"]
+ignore = []
+
+# Exclude common directories
+exclude = [
+    ".git",
+    "__pycache__",
+    "venv",
+    ".venv",
+    "env",
+]
+
+# Same as Black.
+line-length = 88
+
+[tool.ruff.lint]
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.pylint.messages_control]
+disable = [
+    "C0111",  # missing-docstring
+]
+
+[tool.pylint.format]
+max-line-length = 88

@@ -1,0 +1,25 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Deploy to Production
+
+on:
+  workflow_dispatch:
+     inputs:
+      release_tag:
+        description: 'Tag to release. Find this in github releases UI.'
+        required: true
+        type: string
+
+concurrency:
+  group: ci-tests-${{ github.ref }}-1
+  cancel-in-progress: true
+
+jobs:
+  call-deployment-workflow:
+    name: "Deploy To Production"
+    uses: ./.github/workflows/deployment-workflow-call.yml
+    secrets: inherit
+    with:
+      environment: production
+      release_tag: ${{ inputs.release_tag }} 

@@ -1,0 +1,24 @@
+{
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "cSpell.words": [
+    "apng",
+    "msword",
+    "officedocument",
+    "opendocument",
+    "openxmlformats",
+    "photoshop",
+    "presentationml",
+    "Protrail",
+    "spreadsheetml",
+    "wordprocessingml"
+  ],
+  "deno.enablePaths": [
+    "supabase/functions"
+  ],
+  "deno.lint": true,
+  "deno.unstable": true,
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "typescript.tsdk": "node_modules/typescript/lib"
+}

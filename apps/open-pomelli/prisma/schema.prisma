@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model BrandDNA {
+  id               String   @id @default(cuid())
+  url              String
+  brandName        String?
+  industry         String?
+  tagline          String?
+  valueProposition String?
+  toneOfVoice      String?
+  brandPersonality String?
+  targetAudience   String?
+  keyMessages      String?
+  primaryColors    String?
+  secondaryColors  String?
+  fonts            String?
+  logoUrl          String?
+  screenshotUrl    String?
+  imageryStyle     String?
+  layoutStyle      String?
+  rawJson          String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  campaigns   Campaign[]
+  photoshoots Photoshoot[]
+  animations  Animation[]
+}
+
+model Campaign {
+  id        String   @id @default(cuid())
+  brandId   String
+  brand     BrandDNA @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  goal      String
+  prompt    String?
+  concepts  String?
+  createdAt DateTime @default(now())
+
+  assets Asset[]
+}
+
+model Photoshoot {
+  id              String    @id @default(cuid())
+  brandId         String?
+  brand           BrandDNA? @relation(fields: [brandId], references: [id], onDelete: SetNull)
+  productImageUrl String
+  category        String
+  styleId         String
+  styleLabel      String
+  prompt          String?
+  imageUrl        String?
+  aspect          String    @default("1:1")
+  resolution      String    @default("2k")
+  createdAt       DateTime  @default(now())
+}
+
+model Animation {
+  id             String    @id @default(cuid())
+  brandId        String?
+  brand          BrandDNA? @relation(fields: [brandId], references: [id], onDelete: SetNull)
+  sourceImageUrl String
+  sourceType     String
+  sourceId       String?
+  prompt         String
+  videoUrl       String?
+  duration       Int       @default(5)
+  resolution     String    @default("720p")
+  createdAt      DateTime  @default(now())
+}
+
+model Asset {
+  id         String   @id @default(cuid())
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  platform   String
+  format     String
+  imageUrl   String?
+  videoUrl   String?
+  headline   String?
+  body       String?
+  cta        String?
+  variants   String?
+  createdAt  DateTime @default(now())
+}

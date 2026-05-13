@@ -1,0 +1,22 @@
+# npm
+node_modules
+# next.js build files
+.next
+# environment variables
+.env
+build
+.env.*
+!.env.example
+
+# Sentry
+next.config.original.js
+
+# Jest coverage generated files #
+eslint-report.json
+reports/
+coverage/
+
+# Sentry Config File
+.env.sentry-build-plugin
+
+.trigger

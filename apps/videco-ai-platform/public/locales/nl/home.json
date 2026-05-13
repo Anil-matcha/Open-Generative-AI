@@ -1,0 +1,10 @@
+{
+    "title": "Laten we beginnen",
+    "desc": "U staat op het punt om het proces van het indienen van een claim te starten. Om met succes een claim in te dienen, moet u de volgende stappen uitvoeren",
+    "list": {
+        "your_claim": "Jouw bewering",
+        "personal_details": "Persoonlijke gegevens",
+        "approval": "Goedkeuring"
+    },
+    "button_start": "Start uw claim"
+}

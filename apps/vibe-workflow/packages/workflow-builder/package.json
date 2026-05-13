@@ -1,0 +1,35 @@
+{
+  "name": "workflow-builder",
+  "version": "1.0.0",
+  "description": "Shared UI components and utilities for my Next.js apps",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build:css": "tailwindcss -i ./src/tailwind.css -o ./dist/tailwind.css --minify",
+    "build": "npm run build:css && babel src --out-dir dist --extensions .js,.jsx"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.7.0",
+    "react-icons": "^5.0.1",
+    "react-hot-toast": "^2.4.1",
+    "reactflow": "^11.11.4",
+    "react-markdown": "^9.0.0",
+    "remark-gfm": "^4.0.0"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.28.3",
+    "@babel/preset-env": "^7.28.5",
+    "@babel/preset-react": "^7.28.5",
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.24",
+    "tailwindcss": "^3.3.3"
+  }
+}

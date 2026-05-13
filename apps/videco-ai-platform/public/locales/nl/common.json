@@ -1,0 +1,12 @@
+{
+    "success": {
+        "title": "Uw claim is succesvol ingediend.",
+        "desc": "We hebben uw claim ontvangen en een samenvatting naar uw e-mail gestuurd. We nemen zo snel mogelijk contact met je op.",
+        "button": "Ga terug"
+    },
+    "validation": {
+        "email": "Gelieve een geldig e-mailadres in te geven.",
+        "required": "dit is een verplicht veld.",
+        "date": "Moet een geldige datum zijn."
+    }
+}

@@ -1,0 +1,84 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "baseUrl": ".",
+    "paths": {
+      "@definitions/*": [
+        "src/definitions/*"
+      ],
+      "@definitions": [
+        "src/definitions"
+      ],
+      "@components/*": [
+        "src/components/*"
+      ],
+      "@components": [
+        "src/components"
+      ],
+      "@public/*": [
+        "public/*"
+      ],
+      "@public": [
+        "public"
+      ],
+      "@interfaces/*": [
+        "src/interfaces/*"
+      ],
+      "@interfaces": [
+        "src/interfaces"
+      ],
+      "@styles/*": [
+        "src/styles/*"
+      ],
+      "@styles": [
+        "src/styles"
+      ],
+      "@i18n": [
+        "./i18n"
+      ],
+      "@test/*": [
+        "test/*"
+      ],
+      "@test": [
+        "test"
+      ],
+      "vectors/*": [
+        "src/assets/vectors/*"
+      ]
+    },
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "types": []  // Add this line to explicitly set the types array to empty
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "trigger.config.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "test/*"
+  ]
+}

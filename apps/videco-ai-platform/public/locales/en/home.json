@@ -1,0 +1,10 @@
+{
+    "title": "Let’s get started",
+    "desc": "You are about to start the process of filing a claim. In order to successfully file a claim, you'll need to complete the following steps",
+    "list": {
+        "your_claim": "Your Claim",
+        "personal_details": "Personal Details",
+        "approval": "Approval"
+    },
+    "button_start": "Start your claim"
+}

@@ -1,0 +1,24 @@
+{
+    "root": true,
+    "parser": "@typescript-eslint/parser",
+    "plugins": ["@typescript-eslint"],
+    "overrides": [
+      {
+        "files": ["*.js", "**/*.stories.*"],
+        "rules": {
+          "@typescript-eslint/no-var-requires": "off",
+          "import/no-anonymous-default-export": "off"
+        }
+      }
+    ],
+    "env": {
+      "node": true,
+      "browser": true,
+      "amd": true
+    },
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:prettier/recommended"
+    ]
+}  

@@ -1,0 +1,36 @@
+{
+  "name": "ai-headshot-generator",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma generate && next build",
+    "start": "next start",
+    "lint": "eslint",
+    "postinstall": "prisma generate"
+  },
+  "dependencies": {
+    "@next-auth/prisma-adapter": "^1.0.7",
+    "@prisma/adapter-pg": "^7.7.0",
+    "@prisma/client": "^7.7.0",
+    "@stripe/stripe-js": "^9.2.0",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.38.0",
+    "next": "16.2.3",
+    "next-auth": "^4.24.13",
+    "pg": "^8.20.0",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "react-icons": "^5.6.0",
+    "stripe": "^22.0.1",
+    "tailwind-merge": "^3.5.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/pg": "^8.20.0",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.3",
+    "prisma": "^7.7.0",
+    "tailwindcss": "^4"
+  }
+}

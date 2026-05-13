@@ -1,0 +1,82 @@
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# Node.js artifacts
+node_modules
+**/node_modules
+npm-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Build outputs
+.next
+**/dist
+build
+out
+
+# Python artifacts
+__pycache__
+**/__pycache__
+*.py[cod]
+*$py.class
+.Python
+*.so
+.eggs
+*.egg-info
+*.egg
+
+# Virtual environments
+venv
+.venv
+env
+.env.local
+.env.*.local
+
+# Development tools
+.vscode
+.idea
+.editorconfig
+.eslintcache
+.prettierignore
+
+# Environment files (keep .env.example)
+.env
+.env.local
+.env.development
+.env.production.local
+server/.env
+
+# Testing artifacts
+coverage
+.nyc_output
+**/*.test.js
+**/*.spec.js
+__tests__
+jest.config.js
+.pytest_cache
+htmlcov
+
+# Documentation
+*.md
+!README.md
+docs
+LICENSE
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Misc
+tmp
+temp
+*.log
+.turbo
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore

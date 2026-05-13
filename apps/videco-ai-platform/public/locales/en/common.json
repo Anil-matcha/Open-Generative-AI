@@ -1,0 +1,12 @@
+{
+    "success": {
+        "title": "Your claim has been filed successfully.",
+        "desc": "We've received your claim and have sent a summary to your e-mail. We'll contact you as soon as possible.",
+        "button": "Go back"
+    },
+    "validation": {
+        "email": "Please enter a valid email address.",
+        "required": "This is a required field.",
+        "date": "Should be a valid date."
+    }
+}

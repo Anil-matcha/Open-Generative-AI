@@ -1,0 +1,75 @@
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'Environment to be used when running the workflow'
+        required: true
+        type: string
+      release_tag:
+        description: 'Environment to be used when running the workflow'
+        required: false
+        type: string
+
+jobs:
+  prod-deploy:
+    if:  inputs.environment == 'production'
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    strategy:
+      matrix:
+        node-version: [16.x]
+    env:
+      REACT_APP_ENV: ${{ inputs.environment }}
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: ${{ inputs.release_tag }}
+    - name: Deploying Claims to ${{ inputs.environment }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+  stage-deploy:
+    if:  inputs.environment == 'stage'
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    strategy:
+      matrix:
+        node-version: [16.x]
+    env:
+      REACT_APP_ENV: ${{ inputs.environment }}
+    steps:
+    - uses: actions/checkout@v3
+    - name: Deploying Claims to ${{ inputs.environment }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: "Trigger Stage Amplify Build"
+      run: |
+        curl -X POST -d {} "https://webhooks.amplify.eu-central-1.amazonaws.com/prod/webhooks?id=${{ secrets.AMPLIFY_WEBHOOK_ID }}&token=${{ secrets.AMPLIFY_WEBHOOK_TOKEN }}&operation=startbuild" -H "Content-Type:application/json"
+    
+  qa-deploy:
+    if:  inputs.environment == 'qa'
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    strategy:
+      matrix:
+        node-version: [16.x]
+    env:
+      REACT_APP_ENV: ${{ inputs.environment }}
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        repository: malithmcr/videco
+        token: ${{ secrets.ACCESS_GITHUB_TOKEN }}
+    - name: "Trigger QA Amplify Build"
+      run: |
+        curl -X POST -d {} "https://webhooks.amplify.eu-central-1.amazonaws.com/prod/webhooks?id=${{ secrets.AMPLIFY_WEBHOOK_ID }}&token=${{ secrets.AMPLIFY_WEBHOOK_TOKEN }}&operation=startbuild" -H "Content-Type:application/json"
+    - uses: ravsamhq/notify-slack-action@v2
+      if: always()
+      with:
+        status: ${{ job.status }}
+        mention_users: "Malith"
+        mention_users_when: "failure,warnings"
+        footer: "Linked Repo <{repo_url}|{repo}> | <{workflow_url}|View Workflow>"
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.ACTION_MONITORING_SLACK }}
