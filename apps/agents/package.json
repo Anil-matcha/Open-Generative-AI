@@ -1,5 +1,5 @@
 {
-  "name": "studio",
+  "name": "@higgsfield/agents-studio",
   "version": "1.0.0",
   "description": "Open Generative AI studio components for Muapi",
   "main": "src/index.js",
@@ -24,8 +24,7 @@
     "react-toastify": "^11.1.0",
     "reactflow": "^11.11.4",
     "remark-gfm": "^4.0.1",
-    "workflow-builder": "file:../Vibe-Workflow/packages/workflow-builder",
-    "ai-agent": "file:../Open-Poe-AI/packages/agents"
+     "workflow-builder": "file:../vibe-workflow/packages/workflow-builder"
   },
   "peerDependencies": {
     "react": ">=18.0.0",
