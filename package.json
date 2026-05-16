@@ -45,6 +45,9 @@
     "test:media-processing:coverage": "vitest run --coverage tests/unit/media-processing*.test.js",
     "test:lint": "eslint src tests --ext .js,.ts,.jsx,.tsx",
     "test:typecheck": "tsc --noEmit",
+    "test:security": "node scripts/verify-sri-hashes.js && pnpm --filter backend run test:security",
+    "test:security:audit": "pnpm audit --audit-level=moderate && cd backend && pnpm audit --audit-level=moderate",
+    "test:security:csp": "node scripts/verify-csp.js",
     "clean": "rm -rf dist",
     "build:packages": "npm run build --workspaces --if-present",
     "dev:packages": "npm run dev --workspaces --if-present",
@@ -65,7 +68,9 @@
     "build:agents": "pnpm --filter agents run build && mkdir -p public/apps/agents && cp -r apps/agents/dist/* public/apps/agents/",
     "dev:marketing-studio": "cd apps/marketing-studio && npm run dev",
     "dev:workflows": "cd apps/workflows && npm run dev",
-    "dev:agents": "cd apps/agents && npm run dev"
+    "dev:agents": "cd apps/agents && npm run dev",
+    "security:fix": "node scripts/generate-sri-hashes.js",
+    "security:scan": "npm run test:security:audit && npm run test:security:csp"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

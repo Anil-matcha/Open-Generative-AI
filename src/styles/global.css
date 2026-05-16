@@ -159,10 +159,10 @@
     left: 50%;
     transform: translateX(-50%) translateY(8px);
     border: 6px solid transparent;
-    border-top-color: #1a1a1a;
+    border-top-color: rgba(10, 10, 10, 0.95);
     opacity: 0;
     pointer-events: none;
-    transition: all 0.2s ease;
+    transition: opacity 0.2s ease, transform 0.2s ease;
     z-index: 9999;
 }
 
@@ -173,19 +173,24 @@
     bottom: 100%;
     left: 50%;
     transform: translateX(-50%) translateY(12px);
-    padding: 8px 14px;
-    background: #1a1a1a;
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 10px;
-    font-size: 12px;
+    padding: 6px 12px;
+    background: rgba(10, 10, 10, 0.95);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    font-size: 11px;
     font-weight: 600;
-    color: #fff;
+    line-height: 1.4;
+    color: #e5e5e5;
     white-space: nowrap;
+    max-width: 280px;
+    overflow: hidden;
+    text-overflow: ellipsis;
     opacity: 0;
     pointer-events: none;
-    transition: all 0.2s ease;
+    transition: opacity 0.2s ease, transform 0.2s ease;
     z-index: 9999;
-    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.3);
+    backdrop-filter: blur(8px);
 }
 
 /* Show tooltip on hover */
@@ -195,12 +200,19 @@
     transform: translateX(-50%) translateY(-6px);
 }
 
+/* Multi-line tooltip variant */
+[data-tooltip-multiline]::after {
+    white-space: pre-line;
+    max-width: 320px;
+    text-align: left;
+}
+
 /* Tooltip positioning variants */
 [data-tooltip-bottom]::before {
     bottom: auto;
     top: 100%;
     border-top-color: transparent;
-    border-bottom-color: #1a1a1a;
+    border-bottom-color: rgba(10, 10, 10, 0.95);
     transform: translateX(-50%) translateY(-8px);
 }
 
@@ -217,34 +229,131 @@
 
 /* Tooltip for left-aligned elements */
 [data-tooltip-left]::before {
-    left: 0;
-    transform: translateX(-100%) translateY(-50%);
+    bottom: auto;
+    top: 50%;
+    left: auto;
+    right: 100%;
+    border-top-color: transparent;
+    border-left-color: rgba(10, 10, 10, 0.95);
+    transform: translateX(8px) translateY(-50%);
 }
 
 [data-tooltip-left]::after {
-    left: 0;
-    transform: translateX(calc(-100% - 10px)) translateY(-50%);
+    bottom: auto;
+    top: 50%;
+    left: auto;
+    right: 100%;
+    transform: translateX(12px) translateY(-50%);
 }
 
 [data-tooltip-left]:hover::before,
 [data-tooltip-left]:hover::after {
-    transform: translateX(calc(-100% - 6px)) translateY(-50%);
+    transform: translateX(-6px) translateY(-50%);
 }
 
 /* Tooltip for right-aligned elements */
 [data-tooltip-right]::before {
-    left: auto;
-    right: 0;
-    transform: translateX(100%) translateY(-50%);
+    bottom: auto;
+    top: 50%;
+    left: 100%;
+    border-top-color: transparent;
+    border-right-color: rgba(10, 10, 10, 0.95);
+    transform: translateX(-8px) translateY(-50%);
 }
 
 [data-tooltip-right]::after {
-    left: auto;
-    right: 0;
-    transform: translateX(calc(100% + 10px)) translateY(-50%);
+    bottom: auto;
+    top: 50%;
+    left: 100%;
+    transform: translateX(-12px) translateY(-50%);
 }
 
 [data-tooltip-right]:hover::before,
 [data-tooltip-right]:hover::after {
-    transform: translateX(calc(100% + 6px)) translateY(-50%);
+    transform: translateX(6px) translateY(-50%);
+}
+
+/* Drag tooltip (used by dragDrop.js) */
+.drag-tooltip {
+    position: fixed;
+    padding: 10px 14px;
+    background: rgba(10, 10, 10, 0.95);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #e5e5e5;
+    pointer-events: none;
+    z-index: 9999;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.3);
+    backdrop-filter: blur(8px);
+    animation: tooltip-fade-in 0.15s ease-out;
+    max-width: 320px;
+    line-height: 1.5;
+}
+
+.drag-tooltip .tooltip-header {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #22d3ee;
+    margin-bottom: 4px;
+}
+
+.drag-tooltip .tooltip-body {
+    color: #d4d4d4;
+}
+
+.drag-tooltip .tooltip-body + .tooltip-body {
+    margin-top: 4px;
+}
+
+.drag-tooltip .tooltip-hint {
+    font-size: 10px;
+    color: #a3a3a3;
+    margin-top: 4px;
+    font-style: italic;
+}
+
+.drag-tooltip .tooltip-actions {
+    margin-top: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.drag-tooltip .tooltip-actions span {
+    font-size: 10px;
+    color: #a3a3a3;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.drag-tooltip .tooltip-actions span::before {
+    content: '›';
+    color: #22d3ee;
+    font-weight: 700;
+}
+
+@keyframes tooltip-fade-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Tooltip delay utility - prevents accidental tooltips */
+[data-tooltip-delay]::after,
+[data-tooltip-delay]::before {
+    transition-delay: 0.3s;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    [data-tooltip]::before,
+    [data-tooltip]::after,
+    .drag-tooltip {
+        transition: none !important;
+        animation: none !important;
+    }
 }

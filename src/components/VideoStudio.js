@@ -21,6 +21,7 @@ const adaptLocalToVideoEntry = (m) => ({
 export function VideoStudio() {
     const container = document.createElement('div');
     container.className = 'w-full h-full flex flex-col items-center overflow-hidden bg-app-bg relative p-4 md:p-6';
+    container.setAttribute('data-testid', 'video-studio');
 
     // Merge Wan2GP video models in only when running inside Electron AND the
     // user has a Wan2GP server configured. We can't probe synchronously, so
@@ -156,10 +157,11 @@ export function VideoStudio() {
     container.appendChild(picker.panel);
 
     // --- Video Upload Picker (Video-to-Video) ---
-    const videoFileInput = document.createElement('input');
-    videoFileInput.type = 'file';
-    videoFileInput.accept = 'video/*';
-    videoFileInput.className = 'hidden';
+     const videoFileInput = document.createElement('input');
+     videoFileInput.type = 'file';
+     videoFileInput.accept = 'video/*';
+     videoFileInput.className = 'hidden';
+     videoFileInput.setAttribute('data-testid', 'reference-video-input');
 
     const videoPickerBtn = document.createElement('button');
     videoPickerBtn.type = 'button';
@@ -267,10 +269,11 @@ export function VideoStudio() {
 
     topRow.appendChild(videoPickerBtn);
 
-    const textarea = document.createElement('textarea');
-    textarea.placeholder = 'Describe the video you want to create';
-    textarea.className = 'flex-1 bg-transparent border-none text-white text-base md:text-xl placeholder:text-muted focus:outline-none resize-none pt-2.5 leading-relaxed min-h-[40px] max-h-[150px] md:max-h-[250px] overflow-y-auto custom-scrollbar';
-    textarea.rows = 1;
+     const textarea = document.createElement('textarea');
+     textarea.placeholder = 'Describe the video you want to create';
+     textarea.className = 'flex-1 bg-transparent border-none text-white text-base md:text-xl placeholder:text-muted focus:outline-none resize-none pt-2.5 leading-relaxed min-h-[40px] max-h-[250px] md:max-h-[250px] overflow-y-auto custom-scrollbar';
+     textarea.rows = 1;
+     textarea.setAttribute('data-testid', 'video-prompt-input');
     textarea.oninput = () => {
         textarea.style.height = 'auto';
         const maxHeight = window.innerWidth < 768 ? 150 : 250;
@@ -315,21 +318,24 @@ export function VideoStudio() {
         </div>
     `, selectedModelName, 'v-model-btn', 'Select AI video model');
 
-    const arBtn = createControlBtn(`
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="opacity-60 text-secondary"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg>
-    `, selectedAr, 'v-ar-btn', 'Change aspect ratio');
+     const arBtn = createControlBtn(`
+         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="opacity-60 text-secondary"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg>
+     `, selectedAr, 'v-ar-btn', 'Change aspect ratio');
+     arBtn.setAttribute('data-testid', 'video-aspect-ratio-select');
 
-    const durationBtn = createControlBtn(`
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="opacity-60 text-secondary"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-    `, `${selectedDuration}s`, 'v-duration-btn', 'Set video duration');
+     const durationBtn = createControlBtn(`
+         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="opacity-60 text-secondary"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+     `, `${selectedDuration}s`, 'v-duration-btn', 'Set video duration');
+     durationBtn.setAttribute('data-testid', 'duration-select');
 
-    const resolutionBtn = createControlBtn(`
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="opacity-60 text-secondary"><path d="M6 2L3 6v15a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z"/></svg>
-    `, selectedResolution || '720p', 'v-resolution-btn', 'Set output resolution');
+     const resolutionBtn = createControlBtn(`
+         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="opacity-60 text-secondary"><path d="M6 2L3 6v15a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z"/></svg>
+     `, selectedResolution || '720p', 'v-resolution-btn', 'Set output resolution');
 
-    const qualityBtn = createControlBtn(`
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="opacity-60 text-secondary"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-    `, selectedQuality || 'basic', 'v-quality-btn', 'Set output quality');
+     const qualityBtn = createControlBtn(`
+         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="opacity-60 text-secondary"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+     `, selectedQuality || 'basic', 'v-quality-btn', 'Set output quality');
+     qualityBtn.setAttribute('data-testid', 'quality-select');
 
     const modeBtn = createControlBtn(`
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="opacity-60 text-secondary"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -346,10 +352,11 @@ export function VideoStudio() {
     controlsLeft.appendChild(qualityBtn);
     controlsLeft.appendChild(effectNameBtn);
 
-    // Advanced options toggle button
-    const advancedBtn = createControlBtn(`
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="opacity-60 text-secondary"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 001.82-.33 1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-1.82.33A1.65 1.65 0 0019.4 9a1.65 1.65 0 00-1.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-    `, 'Advanced', 'v-advanced-btn', 'Show advanced options');
+     // Advanced options toggle button
+     const advancedBtn = createControlBtn(`
+         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="opacity-60 text-secondary"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 001.82-.33 1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-1.82.33A1.65 1.65 0 0019.4 9a1.65 1.65 0 00-1.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+     `, 'Advanced', 'v-advanced-btn', 'Show advanced options');
+     advancedBtn.setAttribute('data-testid', 'advanced-settings-btn');
     controlsLeft.appendChild(advancedBtn);
 
     // Initial visibility (t2v mode)
@@ -361,10 +368,11 @@ export function VideoStudio() {
     modeBtn.style.display = getModesForModel(defaultModel.id).length > 0 ? 'flex' : 'none';
     effectNameBtn.style.display = 'none';
 
-    const generateBtn = document.createElement('button');
-    generateBtn.className = 'bg-primary text-black px-6 md:px-8 py-3 md:py-3.5 rounded-xl md:rounded-[1.5rem] font-black text-sm md:text-base hover:shadow-glow hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2.5 w-full sm:w-auto shadow-lg';
-    generateBtn.setAttribute('data-tooltip', 'Generate AI video from prompt');
-    generateBtn.innerHTML = `Generate ✨`;
+     const generateBtn = document.createElement('button');
+     generateBtn.className = 'bg-primary text-black px-6 md:px-8 py-3 md:py-3.5 rounded-xl md:rounded-[1.5rem] font-black text-sm md:text-base hover:shadow-glow hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2.5 w-full sm:w-auto shadow-lg';
+     generateBtn.setAttribute('data-tooltip', 'Generate AI video from prompt');
+     generateBtn.setAttribute('data-testid', 'generate-video-btn');
+     generateBtn.innerHTML = `Generate ✨`;
 
     bottomRow.appendChild(controlsLeft);
     bottomRow.appendChild(generateBtn);
@@ -511,9 +519,10 @@ export function VideoStudio() {
     // ==========================================
     // ADVANCED OPTIONS PANEL
     // ==========================================
-    const advancedPanel = document.createElement('div');
-    advancedPanel.className = 'w-full mt-6 animate-fade-in-up hidden';
-    advancedPanel.id = 'v-advanced-panel';
+     const advancedPanel = document.createElement('div');
+     advancedPanel.className = 'w-full mt-6 animate-fade-in-up hidden';
+     advancedPanel.id = 'v-advanced-panel';
+     advancedPanel.setAttribute('data-testid', 'advanced-panel');
     advancedPanel.innerHTML = `
         <div class="bg-[#111]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-5 flex flex-col gap-4">
             <div class="flex items-center justify-between pb-3 border-b border-white/5">
@@ -523,25 +532,40 @@ export function VideoStudio() {
                 </button>
             </div>
             
-            <!-- Negative Prompt -->
-            <div class="flex flex-col gap-2">
-                <label class="text-xs font-bold text-secondary uppercase tracking-wider">Negative Prompt</label>
-                <input type="text" id="v-negative-prompt-input" 
-                    placeholder="What to exclude from the video (e.g., blurry, distorted, watermark)"
-                    class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder:text-muted focus:outline-none focus:border-primary/50 transition-colors">
-            </div>
+             <!-- Negative Prompt -->
+             <div class="flex flex-col gap-2" id="v-negative-prompt-section">
+                 <div class="flex items-center justify-between">
+                     <label class="text-xs font-bold text-secondary uppercase tracking-wider">Negative Prompt</label>
+                     <button id="v-negative-prompt-toggle" class="text-xs font-bold text-primary hover:text-primary/80 transition-colors" data-testid="negative-prompt-toggle">Show</button>
+                 </div>
+                 <input type="text" id="v-negative-prompt-input"
+                     placeholder="What to exclude from the video (e.g., blurry, distorted, watermark)"
+                     class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder:text-muted focus:outline-none focus:border-primary/50 transition-colors"
+                     data-testid="negative-prompt-input">
+             </div>
             
-            <!-- Seed -->
-            <div class="flex flex-col gap-2">
-                <div class="flex items-center justify-between">
-                    <label class="text-xs font-bold text-secondary uppercase tracking-wider">Seed</label>
-                    <button id="v-randomize-seed-btn" class="text-xs font-bold text-primary hover:text-primary/80 transition-colors">Randomize</button>
-                </div>
-                <input type="number" id="v-seed-input" 
-                    placeholder="-1 for random"
-                    value="-1"
-                    class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder:text-muted focus:outline-none focus:border-primary/50 transition-colors">
-            </div>
+             <!-- Seed -->
+             <div class="flex flex-col gap-2">
+                 <div class="flex items-center justify-between">
+                     <label class="text-xs font-bold text-secondary uppercase tracking-wider">Seed</label>
+                     <button id="v-randomize-seed-btn" class="text-xs font-bold text-primary hover:text-primary/80 transition-colors">Randomize</button>
+                 </div>
+                  <input type="number" id="v-seed-input"
+                      placeholder="-1 for random"
+                      value="-1"
+                      class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder:text-muted focus:outline-none focus:border-primary/50 transition-colors"
+                      data-testid="seed-input">
+             </div>
+
+             <!-- Guidance Scale -->
+             <div class="flex flex-col gap-2">
+                 <div class="flex items-center justify-between">
+                     <label class="text-xs font-bold text-secondary uppercase tracking-wider">Guidance Scale</label>
+                     <span id="v-guidance-value" class="text-xs font-bold text-primary">7.5</span>
+                 </div>
+                 <input type="range" id="v-guidance-slider" min="1" max="20" step="0.5" value="7.5"
+                     class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-primary" data-testid="guidance-scale-input">
+             </div>
         </div>
     `;
     container.appendChild(advancedPanel);
@@ -774,10 +798,11 @@ export function VideoStudio() {
             const list = document.createElement('div');
             list.className = 'flex flex-col gap-1';
             const availableArs = getCurrentAspectRatios(selectedModel);
-            availableArs.forEach(r => {
-                const item = document.createElement('div');
-                item.className = 'flex items-center justify-between p-3.5 hover:bg-white/5 rounded-2xl cursor-pointer transition-all group';
-                item.innerHTML = `
+             availableArs.forEach(r => {
+                 const item = document.createElement('div');
+                 item.className = 'flex items-center justify-between p-3.5 hover:bg-white/5 rounded-2xl cursor-pointer transition-all group';
+                 item.setAttribute('data-testid', `video-ratio-${r.replace(':', '-')}`);
+                 item.innerHTML = `
                     <div class="flex items-center gap-4">
                         <div class="w-6 h-6 border-2 border-white/20 rounded-md shadow-inner flex items-center justify-center group-hover:border-primary/50 transition-colors">
                              <div class="w-3 h-3 bg-white/10 rounded-sm"></div>
@@ -801,11 +826,12 @@ export function VideoStudio() {
             dropdown.innerHTML = `<div class="text-[10px] font-bold text-secondary uppercase tracking-widest px-3 py-2 border-b border-white/5 mb-2">Duration</div>`;
             const list = document.createElement('div');
             list.className = 'flex flex-col gap-1';
-            const durations = getCurrentDurations(selectedModel);
-            durations.forEach(d => {
-                const item = document.createElement('div');
-                item.className = 'flex items-center justify-between p-3.5 hover:bg-white/5 rounded-2xl cursor-pointer transition-all group';
-                item.innerHTML = `
+             const durations = getCurrentDurations(selectedModel);
+             durations.forEach(d => {
+                 const item = document.createElement('div');
+                 item.className = 'flex items-center justify-between p-3.5 hover:bg-white/5 rounded-2xl cursor-pointer transition-all group';
+                 item.setAttribute('data-testid', `duration-${d}s`);
+                 item.innerHTML = `
                     <span class="text-xs font-bold text-white opacity-80 group-hover:opacity-100">${d}s</span>
                      ${selectedDuration === d ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d9ff00" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
                 `;
@@ -824,10 +850,11 @@ export function VideoStudio() {
             dropdown.innerHTML = `<div class="text-[10px] font-bold text-secondary uppercase tracking-widest px-3 py-2 border-b border-white/5 mb-2">Quality</div>`;
             const list = document.createElement('div');
             list.className = 'flex flex-col gap-1';
-            getQualitiesForModel(selectedModel).forEach(q => {
-                const item = document.createElement('div');
-                item.className = 'flex items-center justify-between p-3.5 hover:bg-white/5 rounded-2xl cursor-pointer transition-all group';
-                item.innerHTML = `
+             getQualitiesForModel(selectedModel).forEach(q => {
+                 const item = document.createElement('div');
+                 item.className = 'flex items-center justify-between p-3.5 hover:bg-white/5 rounded-2xl cursor-pointer transition-all group';
+                 item.setAttribute('data-testid', `quality-${q.toLowerCase()}`);
+                 item.innerHTML = `
                     <span class="text-xs font-bold text-white opacity-80 group-hover:opacity-100 capitalize">${q}</span>
                     ${selectedQuality === q ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d9ff00" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
                 `;
@@ -972,8 +999,9 @@ export function VideoStudio() {
     const videoContainer = document.createElement('div');
     videoContainer.className = 'relative group';
 
-    const resultVideo = document.createElement('video');
-    resultVideo.className = 'max-h-[60vh] max-w-[80vw] rounded-3xl shadow-3xl border border-white/10 interactive-glow object-contain';
+     const resultVideo = document.createElement('video');
+     resultVideo.className = 'max-h-[60vh] max-w-[80vw] rounded-3xl shadow-3xl border border-white/10 interactive-glow object-contain';
+     resultVideo.setAttribute('data-testid', 'generated-video');
     resultVideo.controls = true;
     resultVideo.loop = true;
     resultVideo.autoplay = true;

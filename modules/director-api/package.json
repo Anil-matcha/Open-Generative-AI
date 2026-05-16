@@ -1,0 +1,9 @@
+{
+  "name": "@app/director-api",
+  "version": "1.0.0",
+  "description": "API configuration module for Director application",
+  "main": "index.js",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.0.0"
+  }
+}

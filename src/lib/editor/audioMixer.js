@@ -44,9 +44,9 @@ export class AudioMixer {
       <div class="mixer-header">
         <h3>Audio Mixer</h3>
         <div class="mixer-tabs">
-          <button class="mixer-tab active" data-tab="tracks">Tracks</button>
-          <button class="mixer-tab" data-tab="effects">Effects</button>
-          <button class="mixer-tab" data-tab="automation">Automation</button>
+          <button class="mixer-tab active" data-tab="tracks" data-tooltip="Tracks View - Show and manage all audio track channels">Tracks</button>
+          <button class="mixer-tab" data-tab="effects" data-tooltip="Effects View - Add and configure audio effects for each track">Effects</button>
+          <button class="mixer-tab" data-tab="automation" data-tooltip="Automation View - Edit volume and pan automation keyframes over time">Automation</button>
         </div>
       </div>
 
@@ -83,12 +83,12 @@ export class AudioMixer {
         <div class="track-controls">
           <div class="fader-section">
             <label>Volume</label>
-            <input type="range" class="volume-fader" data-track="master" min="0" max="100" value="80" orient="vertical">
+            <input type="range" class="volume-fader" data-track="master" min="0" max="100" value="80" orient="vertical" data-tooltip="Master Volume Fader - Adjust the overall output volume level for the entire mix">
             <span class="fader-value">0 dB</span>
           </div>
           <div class="pan-section">
             <label>Pan</label>
-            <input type="range" class="pan-knob" data-track="master" min="-100" max="100" value="0">
+            <input type="range" class="pan-knob" data-track="master" min="-100" max="100" value="0" data-tooltip="Master Pan Control - Set the stereo balance for the master output (Left to Right)">
             <span class="pan-value">C</span>
           </div>
         </div>
@@ -105,8 +105,8 @@ export class AudioMixer {
       <div class="track-header ${track.muted ? 'muted' : ''} ${track.solo ? 'solo' : ''}">
         <span class="track-name">${track.name}</span>
         <div class="track-buttons">
-          <button class="track-btn mute-btn" data-action="mute" title="Mute">M</button>
-          <button class="track-btn solo-btn" data-action="solo" title="Solo">S</button>
+          <button class="track-btn mute-btn" data-action="mute" title="Mute" data-tooltip="Mute Track - Silence this track's audio output while keeping it in the mix">M</button>
+          <button class="track-btn solo-btn" data-action="solo" title="Solo" data-tooltip="Solo Track - Isolate this track so only soloed tracks are audible">S</button>
         </div>
         <div class="track-meters">
           <div class="level-meter"></div>
@@ -114,11 +114,11 @@ export class AudioMixer {
       </div>
       <div class="track-controls">
         <div class="fader-section">
-          <input type="range" class="volume-fader" data-track="${track.id}" min="0" max="100" value="${track.volume || 80}" orient="vertical">
+          <input type="range" class="volume-fader" data-track="${track.id}" min="0" max="100" value="${track.volume || 80}" orient="vertical" data-track="${track.id}" data-tooltip="Track Volume Fader - Adjust the volume level for this individual audio track">
           <span class="fader-value">${this.volumeToDb(track.volume || 80)} dB</span>
         </div>
         <div class="pan-section">
-          <input type="range" class="pan-knob" data-track="${track.id}" min="-100" max="100" value="${track.pan || 0}">
+          <input type="range" class="pan-knob" data-track="${track.id}" min="-100" max="100" value="${track.pan || 0}" data-tooltip="Track Pan Control - Set the stereo position for this track (Left, Center, or Right)">
           <span class="pan-value">${this.panToText(track.pan || 0)}</span>
         </div>
         <div class="eq-section">
@@ -127,10 +127,10 @@ export class AudioMixer {
       </div>
       <div class="track-effects">
         <div class="effects-chain">
-          <div class="effect-slot" data-effect="eq">EQ</div>
-          <div class="effect-slot" data-effect="compressor">Comp</div>
-          <div class="effect-slot" data-effect="reverb">Reverb</div>
-          <div class="effect-slot" data-effect="delay">Delay</div>
+          <div class="effect-slot" data-effect="eq" data-tooltip="Equalizer - Adjust frequency bands to shape the tonal character of this track">EQ</div>
+          <div class="effect-slot" data-effect="compressor" data-tooltip="Compressor - Control dynamic range by reducing loud peaks and boosting quiet passages">Comp</div>
+          <div class="effect-slot" data-effect="reverb" data-tooltip="Reverb - Add spatial depth and room ambience to this track">Reverb</div>
+          <div class="effect-slot" data-effect="delay" data-tooltip="Delay - Create echo and repeat effects with adjustable timing and feedback">Delay</div>
         </div>
       </div>
     `;

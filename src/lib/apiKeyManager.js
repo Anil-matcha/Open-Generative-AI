@@ -3,15 +3,13 @@ import { securityService } from './services/SecurityService.js';
 /**
  * API Key Manager - Wrapper around SecurityService
  *
- * Provides a simplified interface for API key management
+ * Supports multiple named API keys (openai, muapi, videodb, etc.)
  * using the secure SecurityService for storage.
  */
 
-// Storage keys
-const API_KEY_STORAGE = 'openhiggsfield_api_key';
-const API_KEY_HASH_STORAGE = 'openhiggsfield_api_key_hash';
+const API_KEY_PREFIX = 'openhiggsfield_api_key_';
+const API_KEY_HASH_PREFIX = 'openhiggsfield_api_key_hash_';
 
-// Hash the key for quick validation without exposing it
 async function hashKey(key) {
     const encoder = new TextEncoder();
     const data = encoder.encode(key);
@@ -20,18 +18,27 @@ async function hashKey(key) {
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
+function storageKey(name) {
+    return `${API_KEY_PREFIX}${name}`;
+}
+
+function hashStorageKey(name) {
+    return `${API_KEY_HASH_PREFIX}${name}`;
+}
+
 export class ApiKeyManager {
     constructor() {
-        this._cachedKey = null;
-        this._cachedHash = null;
+        this._cachedKeys = {};
+        this._cachedHashes = {};
         this._listeners = new Set();
     }
 
     /**
-     * Set the API key using SecurityService
+     * Set an API key for a specific service
      * @param {string} key - The API key
+     * @param {string} name - Service name (e.g. 'openai', 'muapi', 'videodb')
      */
-    async setKey(key) {
+    async setKey(key, name = 'default') {
         if (!key || typeof key !== 'string') {
             throw new Error('Invalid API key');
         }
@@ -41,76 +48,118 @@ export class ApiKeyManager {
             throw new Error('API key too short');
         }
 
-        // Store using SecurityService (includes validation)
-        await securityService.storeEncryptedKey(trimmedKey);
+        await securityService.storeEncryptedKey(trimmedKey, storageKey(name));
 
-        this._cachedKey = trimmedKey;
-        this._cachedHash = await hashKey(trimmedKey);
+        this._cachedKeys[name] = trimmedKey;
+        this._cachedHashes[name] = await hashKey(trimmedKey);
 
         this._notifyListeners();
     }
 
     /**
-     * Get the API key from SecurityService
+     * Get an API key for a specific service
+     * @param {string} name - Service name
      * @returns {Promise<string|null>}
      */
-    async getKey() {
-        if (this._cachedKey) {
-            return this._cachedKey;
+    async getKey(name = 'default') {
+        if (this._cachedKeys[name]) {
+            return this._cachedKeys[name];
         }
 
-        // Get from SecurityService
-        this._cachedKey = await securityService.getDecryptedKey();
-        if (this._cachedKey) {
-            this._cachedHash = await hashKey(this._cachedKey);
+        const key = await securityService.getDecryptedKey(storageKey(name));
+        if (key) {
+            this._cachedKeys[name] = key;
+            this._cachedHashes[name] = await hashKey(key);
         }
 
-        return this._cachedKey || null;
+        return key || null;
     }
 
-
     /**
-     * Check if API key exists (sync, fast)
+     * Check if a specific API key exists
+     * @param {string} name - Service name
      */
-    hasKey() {
-        if (this._cachedKey) return true;
-        
+    hasKey(name = 'default') {
+        if (this._cachedKeys[name]) return true;
         return !!(
-            sessionStorage.getItem(API_KEY_STORAGE) ||
-            localStorage.getItem(API_KEY_STORAGE)
+            sessionStorage.getItem(storageKey(name)) ||
+            localStorage.getItem(storageKey(name))
         );
     }
 
     /**
-     * Validate a key against stored hash
+     * Validate a key against stored hash for a service
      */
-    async validateKey(key) {
+    async validateKey(key, name = 'default') {
         const hash = await hashKey(key);
-        const storedHash = this._getStoredHash();
+        const storedHash = this._getStoredHash(name);
         return hash === storedHash;
     }
 
-    _getStoredHash() {
-        return sessionStorage.getItem(API_KEY_HASH_STORAGE) ||
-               localStorage.getItem(API_KEY_HASH_STORAGE);
+    _getStoredHash(name) {
+        return sessionStorage.getItem(hashStorageKey(name)) ||
+               localStorage.getItem(hashStorageKey(name));
     }
 
     /**
-     * Clear the API key
+     * Clear a specific API key
+     * @param {string} name - Service name
      */
-    clearKey() {
-        this._cachedKey = null;
-        this._cachedHash = null;
-        sessionStorage.removeItem(API_KEY_STORAGE);
-        sessionStorage.removeItem(API_KEY_HASH_STORAGE);
-        localStorage.removeItem(API_KEY_STORAGE);
-        localStorage.removeItem(API_KEY_HASH_STORAGE);
+    clearKey(name = 'default') {
+        delete this._cachedKeys[name];
+        delete this._cachedHashes[name];
+        sessionStorage.removeItem(storageKey(name));
+        sessionStorage.removeItem(hashStorageKey(name));
+        localStorage.removeItem(storageKey(name));
+        localStorage.removeItem(hashStorageKey(name));
         this._notifyListeners();
     }
 
     /**
-     * Add a listener for key changes
+     * Clear all API keys
      */
+    clearAllKeys() {
+        this._cachedKeys = {};
+        this._cachedHashes = {};
+        const keysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i);
+            if (k && (k.startsWith(API_KEY_PREFIX) || k.startsWith(API_KEY_HASH_PREFIX))) {
+                keysToRemove.push(k);
+            }
+        }
+        keysToRemove.forEach(k => localStorage.removeItem(k));
+        const sessionKeysToRemove = [];
+        for (let i = 0; i < sessionStorage.length; i++) {
+            const k = sessionStorage.key(i);
+            if (k && (k.startsWith(API_KEY_PREFIX) || k.startsWith(API_KEY_HASH_PREFIX))) {
+                sessionKeysToRemove.push(k);
+            }
+        }
+        sessionKeysToRemove.forEach(k => sessionStorage.removeItem(k));
+        this._notifyListeners();
+    }
+
+    /**
+     * Get all configured key names
+     */
+    getConfiguredKeyNames() {
+        const names = new Set();
+        for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i);
+            if (k && k.startsWith(API_KEY_PREFIX)) {
+                names.add(k.replace(API_KEY_PREFIX, ''));
+            }
+        }
+        for (let i = 0; i < sessionStorage.length; i++) {
+            const k = sessionStorage.key(i);
+            if (k && k.startsWith(API_KEY_PREFIX)) {
+                names.add(k.replace(API_KEY_PREFIX, ''));
+            }
+        }
+        return Array.from(names);
+    }
+
     addListener(callback) {
         this._listeners.add(callback);
         return () => this._listeners.delete(callback);
@@ -119,23 +168,18 @@ export class ApiKeyManager {
     _notifyListeners() {
         for (const callback of this._listeners) {
             try {
-                callback(this.hasKey());
+                callback();
             } catch (e) {
                 console.error('[ApiKeyManager] Listener error:', e);
             }
         }
     }
 
-    /**
-     * Migrate old localStorage key to new format
-     */
     migrateFromLegacy() {
         const legacyKey = localStorage.getItem('muapi_key');
-        if (legacyKey && !localStorage.getItem(API_KEY_STORAGE)) {
-            // Clear legacy key first
+        if (legacyKey && !localStorage.getItem(storageKey('muapi'))) {
             localStorage.removeItem('muapi_key');
-            // Set in new format
-            this.setKey(legacyKey, true).catch(console.error);
+            this.setKey(legacyKey, 'muapi').catch(console.error);
             return true;
         }
         return false;
@@ -144,5 +188,4 @@ export class ApiKeyManager {
 
 export const apiKeyManager = new ApiKeyManager();
 
-// Auto-migrate on load
 apiKeyManager.migrateFromLegacy();

@@ -15,6 +15,7 @@ import { FiDownload } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { downloadImage, headshotsExamples } from "@/lib/utils";
+import { saveGeneratedAsset } from "../../../../../src/lib/assets/assetActions.js";
 
 const ASPECT_RATIOS = [
   { label: "1:1 Square", value: "1:1" },
@@ -133,6 +134,7 @@ export default function Home() {
   const [downloading, setDownloading] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
   const [resultUrl, setResultUrl] = useState(null);
+  const [generatedAssetId, setGeneratedAssetId] = useState(null);
   const [error, setError] = useState(null);
 
   // Close dropdowns on outside click
@@ -213,6 +215,7 @@ export default function Home() {
       setLoading(true);
       setError(null);
       setResultUrl(null);
+      setGeneratedAssetId(null);
       setStatusMessage("CALIBRATING SESSION...");
 
       const res = await fetch("/api/headshot", {
@@ -257,6 +260,23 @@ export default function Home() {
         setResultUrl(data.imageUrl);
         setStatusMessage("");
         setLoading(false);
+        
+        const imageArray = Array.isArray(data.imageUrl) ? data.imageUrl : [data.imageUrl];
+        const asset = await saveGeneratedAsset('image', {
+          title: `${category} Portrait - ${new Date().toLocaleDateString()}`,
+          media: {
+            url: imageArray[0],
+            thumbnail: imageArray[0],
+            type: 'image/jpeg'
+          },
+          metadata: {
+            category: category,
+            aspectRatio: aspectRatio.value,
+            count: imageArray.length
+          },
+          sourceApp: 'ai-headshot-generator'
+        });
+        setGeneratedAssetId(asset.id);
       } else if (data.status === "failed") {
         throw new Error(data.error || "Generation failed.");
       } else {

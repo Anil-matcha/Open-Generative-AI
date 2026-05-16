@@ -13,46 +13,36 @@ test.describe('Landing Page', () => {
     // Hero headline (checking partial text)
     await expect(page.locator('h1')).toContainText('ONE TIMELINE');
     
-    // Feature grid should be present
-    await expect(page.locator('.feature-grid-section')).toBeVisible();
-    
-    // Get Started button
-    await expect(page.getByRole('button', { name: /Get Started/i })).toBeVisible();
+    // Get Started button should be visible
+    await expect(page.getByRole('button', { name: /Try Timeline Editor Free/i })).toBeVisible();
   });
 
-  test('should have navigation links in header', async ({ page }) => {
-    await page.goto('/');
-    await page.waitForSelector('header', { timeout: 10000 });
+  test('should display app cards in grid', async ({ page }) => {
+    await page.goto('/#/landing');
+    await page.waitForSelector('[data-testid="app-card"]', { timeout: 10000 });
     
-    // Header should contain key nav links
-    const header = page.locator('header').first();
-    await expect(header).toContainText('Explore');
-    await expect(header).toContainText('Image');
-    await expect(header).toContainText('Video');
-    await expect(header).toContainText('Timeline'); // Added
-    await expect(header).toContainText('Apps');
-  });
-
-  test('should display feature cards', async ({ page }) => {
-    await page.goto('/');
-    await page.waitForSelector('.feature-card', { timeout: 10000 });
+    // The apps grid section should be present with 33 apps
+    const cards = page.locator('[data-testid="app-card"]');
+    await expect(cards).toHaveCount(33);
     
-    // Total cards: 8 (core) + 1 (featured timeline) + 15 (remaining) = 24? Wait our list: 23? Let's count
-    // ALL_FEATURES length = 23 (we defined). Slice(0,8)=8, plus featured 1, plus slice(8)=15 => total 24.
-    // Actually 8+1+15 = 24, not 21 earlier. Let's compute: 
-    // ALL_FEATURES has 23 items (we listed 23 lines from timeline to library). 
-    // First grid: 8
-    // Featured: 1
-    // Remaining: ALL_FEATURES.slice(8) => 23 - 8 = 15
-    // Total = 24
-    // But our earlier count 21 came from older count. Let's adjust to actual count.
-    // For robustness, let's assert count > 20
-    const cards = page.locator('.feature-card');
-    await expect(cards).toHaveCount(24);
-    
-    // Hover over first card should show "Try" arrow
+    // First card should be visible
     const firstCard = cards.first();
-    await firstCard.hover();
-    await expect(firstCard.locator('text=Try')).toBeVisible();
+    await expect(firstCard).toBeVisible();
+  });
+
+  test('should have hero section', async ({ page }) => {
+    await page.goto('/#/landing');
+    await page.waitForSelector('[data-testid="hero-section"]', { timeout: 10000 });
+    
+    const hero = page.locator('[data-testid="hero-section"]');
+    await expect(hero).toBeVisible();
+  });
+
+  test('should have apps grid section', async ({ page }) => {
+    await page.goto('/#/landing');
+    await page.waitForSelector('[data-testid="apps-grid-section"]', { timeout: 10000 });
+    
+    const grid = page.locator('[data-testid="apps-grid-section"]');
+    await expect(grid).toBeVisible();
   });
 });

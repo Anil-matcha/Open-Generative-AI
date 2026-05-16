@@ -41,6 +41,7 @@ export class UrlVideoModal extends BaseModal {
               class="url-input"
               placeholder="Paste the URL to external video hosting (YouTube, Vimeo, etc.)"
               value="${this.currentValue}"
+              data-tooltip="Paste a video URL from YouTube, Vimeo, or other hosting"
             />
           </div>
 
@@ -49,6 +50,7 @@ export class UrlVideoModal extends BaseModal {
           <button
             id="add-url-btn"
             class="url-add-btn ${!this.currentValue ? 'disabled' : ''}"
+            data-tooltip="${!this.currentValue ? 'Enter a URL to add' : 'Add video to timeline'}"
             ${!this.currentValue ? 'disabled' : ''}
           >
             ${this.isLoading ? '<div class="btn-spinner"></div> Adding...' : 'Add to Timeline'}
@@ -92,7 +94,6 @@ export class UrlVideoModal extends BaseModal {
 
     let url = this.currentValue.trim();
 
-    // Add protocol if missing
     if (!/^https?:\/\//i.test(url)) {
       url = `https://${url}`;
     }
@@ -150,10 +151,8 @@ export class UrlVideoModal extends BaseModal {
     this.setupEventListeners();
 
     try {
-      // Simulate processing
       await new Promise(resolve => setTimeout(resolve, 1500));
 
-      // Return the URL data
       const videoData = {
         url: this.currentValue,
         type: 'video',

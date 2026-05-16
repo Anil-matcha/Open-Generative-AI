@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { generateAnimation } from "@/lib/animate";
+import { saveGeneratedAsset } from "@/lib/assets/assetActions";
 
 const Body = z.object({
   sourceImageUrl: z.string().url(),
@@ -32,16 +33,36 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  try {
-    const videoUrl = await generateAnimation(parsed.data.sourceImageUrl, parsed.data.prompt, {
-      duration: parsed.data.duration,
-      resolution: parsed.data.resolution,
-    });
-    if (!videoUrl) {
-      await prisma.animation.delete({ where: { id: row.id } });
-      return NextResponse.json({ error: "video generation returned no url" }, { status: 502 });
-    }
-    const updated = await prisma.animation.update({
+   try {
+     const videoUrl = await generateAnimation(parsed.data.sourceImageUrl, parsed.data.prompt, {
+       duration: parsed.data.duration,
+       resolution: parsed.data.resolution,
+     });
+     if (!videoUrl) {
+       await prisma.animation.delete({ where: { id: row.id } });
+       return NextResponse.json({ error: "video generation returned no url" }, { status: 502 });
+     }
+
+     // Save to universal asset pipeline (non-blocking)
+     try {
+       await saveGeneratedAsset('video', {
+         title: `Animation - ${new Date().toLocaleDateString()}`,
+         media: { url: videoUrl, type: 'video/mp4' },
+         metadata: {
+           duration: parsed.data.duration,
+           resolution: parsed.data.resolution,
+           prompt: parsed.data.prompt,
+           sourceType: parsed.data.sourceType,
+           sourceImageUrl: parsed.data.sourceImageUrl,
+           sourceId: parsed.data.sourceId,
+           brandId: parsed.data.brandId
+         }
+       }, 'open-pomelli');
+     } catch (err) {
+       console.warn('[Asset Pipeline] Failed to save animation asset:', err.message);
+     }
+
+     const updated = await prisma.animation.update({
       where: { id: row.id },
       data: { videoUrl },
     });

@@ -12,6 +12,7 @@ export function renderTopActions(state, els) {
     const btn = document.createElement('button');
     btn.className = 'top-icon ' + (i === 3 ? 'active' : '');
     btn.textContent = icon;
+    btn.dataset.tooltip = 'Top action: ' + icon;
     btn.addEventListener('click', () => showToast(icon + ' action clicked'));
     els.topActions.appendChild(btn);
   });
@@ -27,6 +28,7 @@ export function renderTools(state, els) {
     const btn = document.createElement('button');
     btn.className = 'tool-btn ' + (state.selectedTool === label ? 'active' : '');
     btn.title = label;
+    btn.dataset.tooltip = 'Select ' + label + ' tool';
     btn.textContent = icon;
     // Tool click handling is now in the new interface
     // This old code can be removed once fully migrated
@@ -40,6 +42,7 @@ export function renderPills(state, els) {
     const span = document.createElement('span');
     span.className = 'pill';
     span.textContent = pill;
+    span.dataset.tooltip = 'Filter by ' + pill;
     els.pillRow.appendChild(span);
   });
 }
@@ -69,6 +72,8 @@ export function renderTracks(state, els, showToast) {
     meta.className = 'track-meta';
     meta.innerHTML = '<div class="track-name">' + track.name + '</div><div class="track-actions"><button class="track-toggle ' + (track.muted ? 'locked' : '') + '" data-toggle="mute">M</button><button class="track-toggle ' + (track.locked ? 'locked' : '') + '" data-toggle="lock">L</button></div><div class="track-count">' + track.items.length + ' items</div>';
     meta.querySelectorAll('.track-toggle').forEach((btn) => {
+      const toggleType = btn.dataset.toggle;
+      btn.dataset.tooltip = (toggleType === 'mute' ? 'Toggle mute for ' + track.name + ' track' : 'Toggle lock for ' + track.name + ' track');
       btn.addEventListener('click', () => {
         const key = btn.dataset.toggle;
         if (key === 'mute') track.muted = !track.muted;
@@ -79,6 +84,7 @@ export function renderTracks(state, els, showToast) {
     });
     const lane = document.createElement('div');
     lane.className = 'track-lane';
+    lane.dataset.tooltip = 'Click to move playhead on ' + track.name + ' track';
     lane.addEventListener('click', (event) => {
       if (event.target !== lane) return;
       const rect = lane.getBoundingClientRect();
@@ -106,6 +112,7 @@ export function renderTracks(state, els, showToast) {
       itemEl.style.width = widthPercent + '%';
       itemEl.dataset.itemId = item.id;
       itemEl.dataset.trackId = track.id;
+      itemEl.dataset.tooltip = (item.name || item.text || 'Item') + ' — click to select, drag to move';
       let innerHTML = '<span class="clip-label">' + (item.name || item.text || 'Item') + '</span>';
       if (item.type === 'audio' && item.waveformData) {
         innerHTML += '<canvas class="waveform-canvas" width="200" height="40"></canvas>';
@@ -144,6 +151,7 @@ export function renderMedia(state, els, showToast) {
   state.media.forEach((media, index) => {
     const item = document.createElement('button');
     item.className = 'media-item';
+    item.dataset.tooltip = 'Add ' + media.label + ' to timeline — ' + media.desc;
     item.innerHTML = '<span class="media-icon">' + media.icon + '</span><span class="media-copy"><div class="media-label">' + media.label + '</div><div class="media-desc">' + media.desc + '</div></span>';
     item.addEventListener('click', () => {
       const targetTrack = media.label === 'Audio Track' ? (state.tracks.find((t) => t.name === 'Audio') || state.tracks[1] || state.tracks[0]) : media.label === 'Image Frame' ? (state.tracks.find((t) => t.name === 'Text') || state.tracks[0]) : media.label === 'B-Roll Asset' ? (state.tracks.find((t) => t.name === 'B-Roll') || state.tracks[0]) : (state.tracks.find((t) => t.name === 'Video') || state.tracks[0]);
@@ -180,6 +188,7 @@ export function renderGenerateTypes(state, els, showToast) {
   state.generateTypes.forEach(([icon, label]) => {
     const btn = document.createElement('button');
     btn.className = 'generate-type ' + (state.generateType === label ? 'active' : '');
+    btn.dataset.tooltip = 'Switch to ' + label + ' generation mode';
     btn.innerHTML = '<span class="emoji">' + icon + '</span><span>' + label + '</span>';
     btn.addEventListener('click', () => { state.generateType = label; renderGenerateTypes(state, els, showToast); showToast(label + ' mode selected'); });
     els.generateTypes.appendChild(btn);
@@ -202,6 +211,7 @@ export function renderQuickCommands(state, els, handleChatSubmit) {
     const btn = document.createElement('button');
     btn.className = 'command-btn';
     btn.textContent = command;
+    btn.dataset.tooltip = 'Send command: ' + command;
     btn.addEventListener('click', () => { els.chatInput.value = command; handleChatSubmit(); });
     els.quickCommands.appendChild(btn);
   });
@@ -212,6 +222,7 @@ export function renderRail(state, els, showToast) {
   state.railActions.forEach(([icon, label, active]) => {
     const btn = document.createElement('button');
     btn.className = 'rail-btn ' + (active ? 'active' : '');
+    btn.dataset.tooltip = label + ' action';
     btn.innerHTML = '<span class="emoji">' + icon + '</span><span>' + label + '</span>';
     btn.addEventListener('click', () => showToast(label + ' action triggered'));
     els.floatingRail.appendChild(btn);

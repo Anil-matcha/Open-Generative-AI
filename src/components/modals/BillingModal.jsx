@@ -52,20 +52,20 @@ export class BillingModal extends BaseModal {
     return `
       <div class="billing-container">
         <div class="billing-tabs">
-          <button class="billing-tab ${this.currentTab === 'plans' ? 'active' : ''}" data-tab="plans">
+          <button class="billing-tab ${this.currentTab === 'plans' ? 'active' : ''}" data-tab="plans" data-tooltip="View subscription plans">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
             </svg>
             Plans
           </button>
-          <button class="billing-tab ${this.currentTab === 'payment' ? 'active' : ''}" data-tab="payment">
+          <button class="billing-tab ${this.currentTab === 'payment' ? 'active' : ''}" data-tab="payment" data-tooltip="Manage payment methods">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
               <line x1="1" y1="10" x2="23" y2="10"/>
             </svg>
             Payment
           </button>
-          <button class="billing-tab ${this.currentTab === 'invoices' ? 'active' : ''}" data-tab="invoices">
+          <button class="billing-tab ${this.currentTab === 'invoices' ? 'active' : ''}" data-tab="invoices" data-tooltip="View invoice history">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
               <polyline points="14 2 14 8 20 8"/>
@@ -109,6 +109,7 @@ export class BillingModal extends BaseModal {
             </ul>
             <button class="modal-btn ${this.currentPlan === plan.id ? 'modal-btn-secondary' : 'modal-btn-primary'} plan-action-btn" 
                     data-plan="${plan.id}" 
+                    data-tooltip="${this.currentPlan === plan.id ? 'This is your current plan' : plan.price > PLANS.find(p => p.id === this.currentPlan).price ? 'Upgrade to ' + plan.name + ' plan' : 'Downgrade to ' + plan.name + ' plan'}"
                     ${this.currentPlan === plan.id ? 'disabled' : ''}>
               ${this.currentPlan === plan.id ? 'Current Plan' : plan.price > PLANS.find(p => p.id === this.currentPlan).price ? 'Upgrade' : 'Downgrade'}
             </button>
@@ -134,12 +135,12 @@ export class BillingModal extends BaseModal {
               </div>
               ${method.isDefault ? '<span class="default-badge">Default</span>' : ''}
               <div class="card-actions">
-                <button class="icon-btn set-default-btn" data-id="${method.id}" ${method.isDefault ? 'disabled' : ''} aria-label="Set as default">
+                <button class="icon-btn set-default-btn" data-id="${method.id}" data-tooltip="Set as default payment method" ${method.isDefault ? 'disabled' : ''} aria-label="Set as default">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="20 6 9 17 4 12"/>
                   </svg>
                 </button>
-                <button class="icon-btn remove-card-btn" data-id="${method.id}" aria-label="Remove card">
+                <button class="icon-btn remove-card-btn" data-id="${method.id}" data-tooltip="Remove this payment method" aria-label="Remove card">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="3 6 5 6 21 6"/>
                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
@@ -148,7 +149,7 @@ export class BillingModal extends BaseModal {
               </div>
             </div>
           `).join('')}
-          <button class="modal-btn modal-btn-secondary add-payment-btn">
+          <button class="modal-btn modal-btn-secondary add-payment-btn" data-tooltip="Add a new payment method">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="12" y1="5" x2="12" y2="19"/>
               <line x1="5" y1="12" x2="19" y2="12"/>
@@ -163,30 +164,30 @@ export class BillingModal extends BaseModal {
             <div class="form-row">
               <div class="form-group">
                 <label>Full Name</label>
-                <input type="text" class="form-input" value="John Doe" />
+                <input type="text" class="form-input" value="John Doe" data-tooltip="Enter your full name for billing" />
               </div>
             </div>
             <div class="form-row">
               <div class="form-group">
                 <label>Address</label>
-                <input type="text" class="form-input" value="123 Main Street" />
+                <input type="text" class="form-input" value="123 Main Street" data-tooltip="Enter your street address" />
               </div>
             </div>
             <div class="form-row-group">
               <div class="form-group">
                 <label>City</label>
-                <input type="text" class="form-input" value="San Francisco" />
+                <input type="text" class="form-input" value="San Francisco" data-tooltip="Enter your city" />
               </div>
               <div class="form-group">
                 <label>State</label>
-                <input type="text" class="form-input" value="CA" />
+                <input type="text" class="form-input" value="CA" data-tooltip="Enter your state or province" />
               </div>
               <div class="form-group">
                 <label>ZIP</label>
-                <input type="text" class="form-input" value="94102" />
+                <input type="text" class="form-input" value="94102" data-tooltip="Enter your ZIP or postal code" />
               </div>
             </div>
-            <button class="modal-btn modal-btn-primary save-address-btn">Save Address</button>
+            <button class="modal-btn modal-btn-primary save-address-btn" data-tooltip="Save your billing address">Save Address</button>
           </div>
         </div>
       </div>
@@ -212,7 +213,7 @@ export class BillingModal extends BaseModal {
               <span class="invoice-amount">$${invoice.amount.toFixed(2)}</span>
               <span class="invoice-status ${invoice.status}">${invoice.status}</span>
               <div class="invoice-actions">
-                <button class="icon-btn download-invoice-btn" data-id="${invoice.id}" aria-label="Download">
+                <button class="icon-btn download-invoice-btn" data-id="${invoice.id}" data-tooltip="Download invoice ${invoice.id}" aria-label="Download">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                     <polyline points="7 10 12 15 17 10"/>

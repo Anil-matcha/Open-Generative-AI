@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { findStyle } from "@/lib/photo-styles";
 import { generatePhotoshoot } from "@/lib/photo-studio";
+import { saveGeneratedAsset } from "@/lib/assets/assetActions";
 
 const Body = z.object({
   productImageUrl: z.string().url(),
@@ -30,16 +31,36 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "brand not found" }, { status: 404 });
   }
 
-  try {
-    const url = await generatePhotoshoot(
-      parsed.data.productImageUrl,
-      found.style,
-      brand,
-      parsed.data.prompt ?? null,
-      { aspect: found.style.aspect, resolution: parsed.data.resolution },
-    );
+   try {
+     const url = await generatePhotoshoot(
+       parsed.data.productImageUrl,
+       found.style,
+       brand,
+       parsed.data.prompt ?? null,
+       { aspect: found.style.aspect, resolution: parsed.data.resolution },
+     );
 
-    const saved = await prisma.photoshoot.create({
+     // Save to universal asset pipeline (non-blocking)
+     try {
+       await saveGeneratedAsset('image', {
+         title: `Product photo - ${found.category.id} / ${found.style.id}`,
+         media: { url: url },
+         metadata: {
+           category: found.category.id,
+           styleId: found.style.id,
+           styleLabel: found.style.label,
+           prompt: parsed.data.prompt ?? null,
+           productImageUrl: parsed.data.productImageUrl,
+           aspect: found.style.aspect,
+           resolution: parsed.data.resolution ?? "2k",
+           brandId: parsed.data.brandId ?? null
+         }
+       }, 'open-pomelli');
+     } catch (err) {
+       console.warn('[Asset Pipeline] Failed to save photoshoot asset:', err.message);
+     }
+
+     const saved = await prisma.photoshoot.create({
       data: {
         brandId: brand?.id ?? null,
         productImageUrl: parsed.data.productImageUrl,

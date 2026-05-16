@@ -4,6 +4,7 @@ import { navigate } from "../../../lib/router.js";
 export function LandingHeader() {
   const header = document.createElement('header');
   header.className = 'sticky top-0 z-50 w-full h-16 backdrop-blur-md bg-[#0a0b0f] border-b border-white/10';
+  header.setAttribute('data-testid', 'landing-header');
   
   // Navigation links mapping
   const navItems = [
@@ -52,12 +53,8 @@ export function LandingHeader() {
       
       <!-- Right actions -->
       <div class="shrink-0 flex items-center gap-3">
-        <button id="sign-in-btn" class="px-4 py-2 text-sm text-[#e4e4e7] hover:text-[#22d3ee] transition font-medium" style="border-radius: 0;">
-          Sign In
-        </button>
-        <button id="get-started-btn" class="px-4 py-2 text-sm bg-cyan-400 text-[#020205] hover:bg-cyan-300 transition font-medium" style="border-radius: 0; letter-spacing: 0.05em; text-transform: uppercase;">
-          Get Started
-        </button>
+        <a href="/#/signin" class="px-4 py-2 text-sm text-[#e4e4e7] hover:text-[#22d3ee] transition font-medium">Sign In</a>
+        <a href="/#/signup" class="px-4 py-2 text-sm bg-cyan-400 text-[#020205] hover:bg-cyan-300 transition font-medium" style="letter-spacing: 0.05em; text-transform: uppercase;">Get Started</a>
       </div>
     </nav>
   `;

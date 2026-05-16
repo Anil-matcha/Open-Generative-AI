@@ -111,11 +111,13 @@ export function LibraryPage() {
     const grid = document.createElement('div');
     grid.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3';
 
-    items.forEach(item => {
-      const card = document.createElement('div');
-      card.className = 'relative group cursor-pointer rounded-xl overflow-hidden border border-white/5 hover:border-white/20 transition-all aspect-square bg-white/[0.02]';
+     items.forEach(item => {
+       const card = document.createElement('div');
+       card.className = 'relative group cursor-pointer rounded-xl overflow-hidden border border-white/5 hover:border-white/20 transition-all aspect-square bg-white/[0.02]';
+       // Add test ID for E2E tests
+       card.setAttribute('data-testid', item.type === 'video' ? 'saved-video' : 'saved-image');
 
-      // Safe media creation - prevents XSS from user-provided URLs
+       // Safe media creation - prevents XSS from user-provided URLs
       if (item.type === 'video') {
         const video = createSafeVideo(item.url, 'w-full h-full object-cover');
         card.appendChild(video);

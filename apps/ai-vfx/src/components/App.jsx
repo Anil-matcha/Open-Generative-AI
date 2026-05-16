@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ApiKeyModal from './ApiKeyModal.jsx';
 import ImageUpload from './ImageUpload.jsx';
 import EffectGrid from './EffectGrid.jsx';
@@ -6,6 +6,7 @@ import SettingsPanel from './SettingsPanel.jsx';
 import GenerationProgress from './GenerationProgress.jsx';
 import VideoPlayer from './VideoPlayer.jsx';
 import { muAPIClient } from '../lib/muapi.js';
+import { saveGeneratedAsset } from '../../../../src/lib/assets/assetActions.js';
 
 function App() {
   const [apiKey, setApiKey] = useState(localStorage.getItem('muapi_key') || '');
@@ -21,9 +22,10 @@ function App() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationProgress, setGenerationProgress] = useState(0);
   const [generatedVideo, setGeneratedVideo] = useState(null);
+  const [generatedAssetId, setGeneratedAssetId] = useState(null);
   const [error, setError] = useState(null);
+  const assetActionsRef = useRef(null);
 
-  // Initialize API client on mount
   useEffect(() => {
     if (apiKey) {
       muAPIClient.setApiKey(apiKey);
@@ -67,7 +69,6 @@ function App() {
     setError(null);
 
     try {
-      // Start generation with image URL and effect
       const generationParams = {
         imageUrl: uploadedImage.url || uploadedImage.preview,
         effect: selectedEffect.id,
@@ -79,18 +80,37 @@ function App() {
 
       const result = await muAPIClient.generateVFX(generationParams);
 
-      // Poll for completion with progress updates
       await muAPIClient.pollForCompletion(result.requestId, {
         onProgress: (status) => {
           setGenerationProgress(status.progress || 0);
         },
-        interval: 3000, // Check every 3 seconds
-        timeout: 300000 // 5 minute timeout
+        interval: 3000,
+        timeout: 300000
       });
 
-      // If we get here, generation completed successfully
       const finalStatus = await muAPIClient.checkStatus(result.requestId);
-      setGeneratedVideo(finalStatus.videoUrl);
+      const videoUrl = finalStatus.videoUrl;
+      
+      const asset = await saveGeneratedAsset('video', {
+        title: `${selectedEffect.name} - ${new Date().toLocaleDateString()}`,
+        media: {
+          url: videoUrl,
+          thumbnail: uploadedImage.preview,
+          type: 'video/mp4'
+        },
+        metadata: {
+          duration: settings.duration,
+          effect: selectedEffect.id,
+          effectName: selectedEffect.name,
+          aspectRatio: settings.aspectRatio,
+          resolution: settings.resolution,
+          prompt: generationParams.imageUrl
+        },
+        sourceApp: 'ai-vfx'
+      });
+      
+      setGeneratedVideo(videoUrl);
+      setGeneratedAssetId(asset.id);
       setIsGenerating(false);
 
     } catch (err) {
@@ -103,9 +123,19 @@ function App() {
     setUploadedImage(null);
     setSelectedEffect(null);
     setGeneratedVideo(null);
+    setGeneratedAssetId(null);
     setError(null);
     setGenerationProgress(0);
   };
+
+  useEffect(() => {
+    if (generatedAssetId && assetActionsRef.current) {
+      const { createAssetActionsBar } = require('../../../../src/components/shared/AssetActionsBar.js');
+      const bar = createAssetActionsBar(generatedAssetId);
+      assetActionsRef.current.innerHTML = '';
+      assetActionsRef.current.appendChild(bar);
+    }
+  }, [generatedAssetId]);
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6">
@@ -116,13 +146,11 @@ function App() {
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Panel - Upload & Settings */}
           <div className="space-y-6">
             <ImageUpload onUpload={handleImageUpload} />
             <SettingsPanel settings={settings} onChange={handleSettingsChange} />
           </div>
 
-          {/* Center Panel - Effects */}
           <div className="space-y-6">
             <EffectGrid onSelect={handleEffectSelect} selectedEffect={selectedEffect} />
 
@@ -137,11 +165,13 @@ function App() {
             )}
 
             {generatedVideo && (
-              <VideoPlayer videoUrl={generatedVideo} />
+              <div className="space-y-4">
+                <VideoPlayer videoUrl={generatedVideo} />
+                <div ref={assetActionsRef} className="asset-actions-container"></div>
+              </div>
             )}
           </div>
 
-          {/* Right Panel - Preview & Actions */}
           <div className="space-y-6">
             <div className="bg-gray-800 rounded-lg p-6">
               <h3 className="text-xl font-semibold mb-4">Generation Summary</h3>

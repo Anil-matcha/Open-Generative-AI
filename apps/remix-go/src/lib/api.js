@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { saveGeneratedAsset } from '../../src/lib/assets/assetActions.js';
 
 class ApiClient {
   constructor() {
@@ -132,6 +133,22 @@ class ApiClient {
       .single();
 
     if (error) throw error;
+
+    // Save to universal asset pipeline (non-blocking)
+    try {
+      await saveGeneratedAsset('video', {
+        title: data.title || 'Published Project',
+        media: { url: publishedUrl },
+        metadata: {
+          projectId: projectId,
+          type: 'remix-go-project',
+          published_at: new Date().toISOString()
+        }
+      }, 'remix-go');
+    } catch (err) {
+      console.warn('[Asset Pipeline] Failed to save published project:', err.message);
+    }
+
     return { ...data, url: publishedUrl };
   }
 

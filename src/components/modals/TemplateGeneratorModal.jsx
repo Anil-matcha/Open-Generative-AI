@@ -28,7 +28,7 @@ export class TemplateGeneratorModal extends BaseModal {
         <div class="generator-offer">
           <div class="generator-text-box">
             <p class="generator-text">Do you want to use the Video Automation Creator?</p>
-            <div class="help-icon">
+            <div class="help-icon" data-tooltip="Get help with Video Automation Creator">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="10"/>
                 <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
@@ -45,10 +45,10 @@ export class TemplateGeneratorModal extends BaseModal {
           </div>
 
           <div class="generator-buttons">
-            <button class="generator-btn generator-yes" id="accept-generator">
+            <button class="generator-btn generator-yes" id="accept-generator" data-tooltip="Accept and use the Video Automation Creator">
               Yes
             </button>
-            <button class="generator-btn generator-no" id="decline-generator">
+            <button class="generator-btn generator-no" id="decline-generator" data-tooltip="Decline the Video Automation Creator">
               No, thanks
             </button>
           </div>
@@ -71,14 +71,14 @@ export class TemplateGeneratorModal extends BaseModal {
           <div class="warning-content">
             <span class="warning-text">
               We recommend using
-              <a href="https://www.google.com/chrome/" class="warning-link" target="_blank" rel="noopener noreferrer">Google Chrome</a>
+              <a href="https://www.google.com/chrome/" class="warning-link" target="_blank" rel="noopener noreferrer" data-tooltip="Open Google Chrome download page">Google Chrome</a>
               browser for the best experience.
             </span>
             <p class="warning-small-text">
               Safari may have limited functionality with the Video Automation Creator.
             </p>
           </div>
-          <button class="generator-btn generator-yes" id="accept-warning">
+          <button class="generator-btn generator-yes" id="accept-warning" data-tooltip="Accept the warning and continue">
             Accept
           </button>
         </div>
@@ -87,7 +87,6 @@ export class TemplateGeneratorModal extends BaseModal {
   }
 
   renderFooter() {
-    // No footer for this modal
     return '';
   }
 

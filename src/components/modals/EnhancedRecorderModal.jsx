@@ -52,39 +52,39 @@ export class EnhancedRecorderModal extends BaseModal {
 
           <div class="recorder-controls">
             ${this.recordingState === 'idle' ? `
-              <button class="recorder-main-btn start-btn" aria-label="Start Recording">
+              <button class="recorder-main-btn start-btn" data-tooltip="Start recording" aria-label="Start Recording">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                   <circle cx="12" cy="12" r="10"/>
                 </svg>
               </button>
             ` : ''}
             ${this.recordingState === 'recording' ? `
-              <button class="recorder-main-btn pause-btn" aria-label="Pause">
+              <button class="recorder-main-btn pause-btn" data-tooltip="Pause recording" aria-label="Pause">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                   <rect x="6" y="4" width="4" height="16"/>
                   <rect x="14" y="4" width="4" height="16"/>
                 </svg>
               </button>
-              <button class="recorder-main-btn stop-btn" aria-label="Stop">
+              <button class="recorder-main-btn stop-btn" data-tooltip="Stop recording" aria-label="Stop">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                   <rect x="4" y="4" width="16" height="16" rx="2"/>
                 </svg>
               </button>
             ` : ''}
             ${this.recordingState === 'paused' ? `
-              <button class="recorder-main-btn resume-btn" aria-label="Resume">
+              <button class="recorder-main-btn resume-btn" data-tooltip="Resume recording" aria-label="Resume">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                   <polygon points="5 3 19 12 5 21 5 3"/>
                 </svg>
               </button>
-              <button class="recorder-main-btn stop-btn" aria-label="Stop">
+              <button class="recorder-main-btn stop-btn" data-tooltip="Stop recording" aria-label="Stop">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                   <rect x="4" y="4" width="16" height="16" rx="2"/>
                 </svg>
               </button>
             ` : ''}
             ${this.recordingState === 'stopped' ? `
-              <button class="recorder-main-btn re-record-btn" aria-label="Record Again">
+              <button class="recorder-main-btn re-record-btn" data-tooltip="Record again" aria-label="Record Again">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M2.5 2v6h6M21.5 22v-6h-6"/>
                   <path d="M22 11.5A10 10 0 0 0 3.2 7.2M2 12.5a10 10 0 0 0 18.8 4.3"/>
@@ -109,6 +109,7 @@ export class EnhancedRecorderModal extends BaseModal {
                 <label class="source-item ${!source.enabled ? 'disabled' : ''}">
                   <input type="checkbox" 
                          value="${source.id}" 
+                         data-tooltip="${source.enabled ? 'Toggle ' + source.name + ' source' : source.name + ' (unavailable)'}"
                          ${this.selectedSources.includes(source.id) ? 'checked' : ''} 
                          ${!source.enabled ? 'disabled' : ''} />
                   <span class="source-icon">
@@ -128,7 +129,7 @@ export class EnhancedRecorderModal extends BaseModal {
             <h4>Audio</h4>
             <div class="audio-options">
               <label class="audio-item">
-                <input type="checkbox" ${this.microphoneEnabled ? 'checked' : ''} data-audio="microphone" />
+                <input type="checkbox" ${this.microphoneEnabled ? 'checked' : ''} data-audio="microphone" data-tooltip="Toggle microphone audio" />
                 <span class="audio-icon">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
@@ -140,7 +141,7 @@ export class EnhancedRecorderModal extends BaseModal {
                 <span>Microphone</span>
               </label>
               <label class="audio-item">
-                <input type="checkbox" ${this.systemAudioEnabled ? 'checked' : ''} data-audio="system" />
+                <input type="checkbox" ${this.systemAudioEnabled ? 'checked' : ''} data-audio="system" data-tooltip="Toggle system audio" />
                 <span class="audio-icon">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
@@ -157,7 +158,7 @@ export class EnhancedRecorderModal extends BaseModal {
             <div class="quality-options">
               ${QUALITY_PRESETS.map(preset => `
                 <label class="quality-option ${this.selectedQuality === preset.id ? 'selected' : ''}">
-                  <input type="radio" name="quality" value="${preset.id}" ${this.selectedQuality === preset.id ? 'checked' : ''} />
+                  <input type="radio" name="quality" value="${preset.id}" data-tooltip="${preset.name} - ${preset.resolution} at ${preset.fps}fps (${preset.bitrate})" ${this.selectedQuality === preset.id ? 'checked' : ''} />
                   <div class="quality-info">
                     <span class="quality-name">${preset.name}</span>
                     <span class="quality-details">${preset.resolution} • ${preset.fps}fps</span>
@@ -171,7 +172,7 @@ export class EnhancedRecorderModal extends BaseModal {
             <div class="sidebar-section">
               <h4>Actions</h4>
               <div class="action-buttons">
-                <button class="modal-btn modal-btn-primary download-btn">
+                <button class="modal-btn modal-btn-primary download-btn" data-tooltip="Download recording to file">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                     <polyline points="7 10 12 15 17 10"/>
@@ -179,7 +180,7 @@ export class EnhancedRecorderModal extends BaseModal {
                   </svg>
                   Download
                 </button>
-                <button class="modal-btn modal-btn-secondary save-btn">
+                <button class="modal-btn modal-btn-secondary save-btn" data-tooltip="Save recording to media library">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
                     <polyline points="17 21 17 13 7 13 7 21"/>
@@ -274,7 +275,7 @@ export class EnhancedRecorderModal extends BaseModal {
     return `
       <div class="annotation-toolbar">
         <div class="annotation-tools">
-          <button class="annotation-btn ${this.annotationTool === 'pen' ? 'active' : ''}" data-tool="pen" aria-label="Pen">
+          <button class="annotation-btn ${this.annotationTool === 'pen' ? 'active' : ''}" data-tool="pen" data-tooltip="Draw freehand annotations" aria-label="Pen">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 19l7-7 3 3-7 7-3-3z"/>
               <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
@@ -282,38 +283,38 @@ export class EnhancedRecorderModal extends BaseModal {
               <circle cx="11" cy="11" r="2"/>
             </svg>
           </button>
-          <button class="annotation-btn ${this.annotationTool === 'arrow' ? 'active' : ''}" data-tool="arrow" aria-label="Arrow">
+          <button class="annotation-btn ${this.annotationTool === 'arrow' ? 'active' : ''}" data-tool="arrow" data-tooltip="Draw arrow annotations" aria-label="Arrow">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="5" y1="12" x2="19" y2="12"/>
               <polyline points="12 5 19 12 12 19"/>
             </svg>
           </button>
-          <button class="annotation-btn ${this.annotationTool === 'rect' ? 'active' : ''}" data-tool="rect" aria-label="Rectangle">
+          <button class="annotation-btn ${this.annotationTool === 'rect' ? 'active' : ''}" data-tool="rect" data-tooltip="Draw rectangle annotations" aria-label="Rectangle">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
             </svg>
           </button>
-          <button class="annotation-btn ${this.annotationTool === 'text' ? 'active' : ''}" data-tool="text" aria-label="Text">
+          <button class="annotation-btn ${this.annotationTool === 'text' ? 'active' : ''}" data-tool="text" data-tooltip="Add text annotations" aria-label="Text">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="4 7 4 4 20 4 20 7"/>
               <line x1="9" y1="20" x2="15" y2="20"/>
               <line x1="12" y1="4" x2="12" y2="20"/>
             </svg>
           </button>
-          <button class="annotation-btn ${this.annotationTool === 'none' ? 'active' : ''}" data-tool="none" aria-label="Select">
+          <button class="annotation-btn ${this.annotationTool === 'none' ? 'active' : ''}" data-tool="none" data-tooltip="Select and move annotations" aria-label="Select">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/>
             </svg>
           </button>
         </div>
         <div class="annotation-colors">
-          <button class="color-btn active" style="background: #22d3ee" data-color="#22d3ee"></button>
-          <button class="color-btn" style="background: #34d399" data-color="#34d399"></button>
-          <button class="color-btn" style="background: #f472b6" data-color="#f472b6"></button>
-          <button class="color-btn" style="background: #fbbf24" data-color="#fbbf24"></button>
-          <button class="color-btn" style="background: #ffffff" data-color="#ffffff"></button>
+          <button class="color-btn active" style="background: #22d3ee" data-color="#22d3ee" data-tooltip="Cyan annotation color"></button>
+          <button class="color-btn" style="background: #34d399" data-color="#34d399" data-tooltip="Green annotation color"></button>
+          <button class="color-btn" style="background: #f472b6" data-color="#f472b6" data-tooltip="Pink annotation color"></button>
+          <button class="color-btn" style="background: #fbbf24" data-color="#fbbf24" data-tooltip="Yellow annotation color"></button>
+          <button class="color-btn" style="background: #ffffff" data-color="#ffffff" data-tooltip="White annotation color"></button>
         </div>
-        <button class="annotation-btn clear-btn" aria-label="Clear annotations">
+        <button class="annotation-btn clear-btn" data-tooltip="Clear all annotations" aria-label="Clear annotations">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="3 6 5 6 21 6"/>
             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>

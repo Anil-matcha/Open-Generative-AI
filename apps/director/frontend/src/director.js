@@ -6,6 +6,14 @@
 import './styles.css';
 import axios from 'axios';
 import { io } from 'socket.io-client';
+import { assetStore } from '../../../src/lib/assets/assetStore.js';
+import { ASSET_TYPES } from '../../../src/lib/assets/assetSchema.js';
+
+// Expose assetStore globally for router and other scripts
+if (typeof window !== 'undefined') {
+  window.assetStore = assetStore;
+  window.ASSET_TYPES = ASSET_TYPES;
+}
 
 // ==================== MODULE SCOPE (original main.js top-level code) ====================
 

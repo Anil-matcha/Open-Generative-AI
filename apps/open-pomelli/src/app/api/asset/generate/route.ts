@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { getPlatform } from "@/lib/platforms";
 import { generateAsset } from "@/lib/asset-generator";
+import { saveGeneratedAsset } from "@/lib/assets/assetActions";
 import type { CampaignConcept } from "@/lib/campaign-generator";
 
 const Body = z.object({
@@ -41,6 +42,27 @@ export async function POST(req: NextRequest) {
 
   try {
     const result = await generateAsset(campaign.brand, concept, spec);
+
+    // Save to universal asset pipeline (non-blocking)
+    try {
+      await saveGeneratedAsset('image', {
+        title: `${spec.platform} ad - ${concept.headline?.substring(0, 30) || 'Untitled'}`,
+        media: { url: result.imageUrl },
+        metadata: {
+          platform: spec.platform,
+          format: spec.format,
+          aspect: spec.aspect,
+          headline: result.headline,
+          body: result.body,
+          cta: result.cta,
+          campaignId: campaignId,
+          conceptIndex: conceptIndex
+        }
+      }, 'open-pomelli');
+    } catch (err) {
+      console.warn('[Asset Pipeline] Failed to save asset:', err.message);
+    }
+
     const saved = await prisma.asset.create({
       data: {
         campaignId,

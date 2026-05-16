@@ -1,4 +1,5 @@
 import { getModelById, getVideoModelById, getI2IModelById, getI2VModelById, getV2VModelById, getLipSyncModelById } from './models.js';
+import { saveGeneratedAsset } from '../../src/lib/assets/assetActions.js';
 
 // In an http(s) browser we route through the host app's proxy (Next.js routes
 // under /api/* re-issue the call server-side) so api.muapi.ai CORS is bypassed.
@@ -32,7 +33,7 @@ async function pollForResult(requestId, key, maxAttempts = 900, interval = 2000)
     throw new Error('Generation timed out after polling.');
 }
 
-async function submitAndPoll(endpoint, payload, key, onRequestId, maxAttempts = 60) {
+async function submitAndPoll(endpoint, payload, key, onRequestId, maxAttempts = 60, options = {}) {
     const url = `${BASE_URL}/api/v1/${endpoint}`;
     const response = await fetch(url, {
         method: 'POST',
@@ -49,6 +50,29 @@ async function submitAndPoll(endpoint, payload, key, onRequestId, maxAttempts = 
     if (onRequestId) onRequestId(requestId);
     const result = await pollForResult(requestId, key, maxAttempts);
     const outputUrl = result.outputs?.[0] || result.url || result.output?.url;
+
+    // Save to universal asset pipeline if asset type specified
+    if (options.assetType && outputUrl) {
+        try {
+            const assetMetadata = {
+                prompt: payload.prompt,
+                model: endpoint,
+                aspect_ratio: payload.aspect_ratio,
+                duration: payload.duration,
+                resolution: payload.resolution,
+                images_list: payload.images_list,
+                video_files: payload.video_files
+            };
+            await saveGeneratedAsset(options.assetType, {
+                title: `Generated ${options.assetType} - ${new Date().toLocaleDateString()}`,
+                media: { url: outputUrl, type: getMediaType(options.assetType) },
+                metadata: assetMetadata
+            }, 'marketing-studio');
+        } catch (error) {
+            console.warn('[MuAPI] Failed to save asset to pipeline:', error.message);
+        }
+    }
+
     return { ...result, url: outputUrl };
 }
 
@@ -68,7 +92,7 @@ export async function generateImage(apiKey, params) {
         payload.image_url = null;
     }
     if (params.seed && params.seed !== -1) payload.seed = params.seed;
-    return submitAndPoll(endpoint, payload, apiKey, params.onRequestId, 60);
+    return submitAndPoll(endpoint, payload, apiKey, params.onRequestId, 60, { assetType: 'image' });
 }
 
 export async function generateI2I(apiKey, params) {
@@ -85,7 +109,7 @@ export async function generateI2I(apiKey, params) {
     if (params.aspect_ratio) payload.aspect_ratio = params.aspect_ratio;
     if (params.resolution) payload.resolution = params.resolution;
     if (params.quality) payload.quality = params.quality;
-    return submitAndPoll(endpoint, payload, apiKey, params.onRequestId, 60);
+    return submitAndPoll(endpoint, payload, apiKey, params.onRequestId, 60, { assetType: 'image' });
 }
 
 export async function generateVideo(apiKey, params) {
@@ -99,7 +123,7 @@ export async function generateVideo(apiKey, params) {
     if (params.quality) payload.quality = params.quality;
     if (params.mode) payload.mode = params.mode;
     if (params.image_url) payload.image_url = params.image_url;
-    return submitAndPoll(endpoint, payload, apiKey, params.onRequestId, 900);
+    return submitAndPoll(endpoint, payload, apiKey, params.onRequestId, 900, { assetType: 'video' });
 }
 
 export async function generateI2V(apiKey, params) {
@@ -121,7 +145,7 @@ export async function generateI2V(apiKey, params) {
     if (params.resolution) payload.resolution = params.resolution;
     if (params.quality) payload.quality = params.quality;
     if (params.mode) payload.mode = params.mode;
-    return submitAndPoll(endpoint, payload, apiKey, params.onRequestId, 900);
+    return submitAndPoll(endpoint, payload, apiKey, params.onRequestId, 900, { assetType: 'video' });
 }
 
 export async function generateMarketingStudioAd(apiKey, params) {
@@ -133,7 +157,7 @@ export async function generateMarketingStudioAd(apiKey, params) {
         images_list: params.images_list || [],
         video_files: params.video_files || []
     };
-    return submitAndPoll(endpoint, payload, apiKey, params.onRequestId, 900);
+    return submitAndPoll(endpoint, payload, apiKey, params.onRequestId, 900, { assetType: 'video' });
 }
 
 export async function processV2V(apiKey, params) {
@@ -147,7 +171,7 @@ export async function processV2V(apiKey, params) {
     if (modelInfo?.hasPrompt && params.prompt) {
         payload.prompt = params.prompt;
     }
-    return submitAndPoll(endpoint, payload, apiKey, params.onRequestId, 900);
+    return submitAndPoll(endpoint, payload, apiKey, params.onRequestId, 900, { assetType: 'video' });
 }
 
 export async function processLipSync(apiKey, params) {

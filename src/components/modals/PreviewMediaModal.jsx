@@ -35,13 +35,13 @@ export class PreviewMediaModal extends BaseModal {
             <span class="media-name">${this.getFileName()}</span>
           </div>
           <div class="header-controls">
-            <button class="control-btn ${this.loopEnabled ? 'active' : ''}" data-action="loop" aria-label="Toggle loop">
+            <button class="control-btn ${this.loopEnabled ? 'active' : ''}" data-action="loop" aria-label="Toggle loop" data-tooltip="${this.loopEnabled ? 'Disable loop playback' : 'Enable loop playback'}">
               <span>🔁</span>
             </button>
-            <button class="control-btn" data-action="pip" aria-label="Picture in picture">
+            <button class="control-btn" data-action="pip" aria-label="Picture in picture" data-tooltip="Open in picture-in-picture mode">
               <span>⊟</span>
             </button>
-            <button class="control-btn" data-action="fullscreen" aria-label="Toggle fullscreen">
+            <button class="control-btn" data-action="fullscreen" aria-label="Toggle fullscreen" data-tooltip="Toggle fullscreen view">
               <span>⛶</span>
             </button>
           </div>
@@ -51,7 +51,7 @@ export class PreviewMediaModal extends BaseModal {
           <div class="viewport-wrapper" style="aspect-ratio: ${this.aspectRatio};">
             ${this.mediaUrl ? `
               ${this.mediaType === 'video' ? `
-                <video class="media-video" src="${this.mediaUrl}" ${this.isMuted ? 'muted' : ''} playsinline controls>
+                <video class="media-video" src="${this.mediaUrl}" ${this.isMuted ? 'muted' : ''} playsinline controls data-tooltip="Video preview">
                   Your browser does not support video playback.
                 </video>
                 ${this.showWaveform ? `
@@ -73,7 +73,7 @@ export class PreviewMediaModal extends BaseModal {
                   `}
                 </div>
               ` : `
-                <img class="media-image" src="${this.mediaUrl}" alt="Preview" />
+                <img class="media-image" src="${this.mediaUrl}" alt="Preview" data-tooltip="Image preview" />
               `}
             ` : `
               <div class="media-placeholder">
@@ -91,7 +91,7 @@ export class PreviewMediaModal extends BaseModal {
 
         <div class="previewmedia-controls">
           <div class="timeline-scrubber">
-            <div class="scrubber-track">
+            <div class="scrubber-track" data-tooltip="Click or drag to seek through the media">
               <div class="scrubber-progress" style="width: ${this.getProgressPercent()}%"></div>
               <div class="scrubber-handle" style="left: ${this.getProgressPercent()}%"></div>
             </div>
@@ -104,23 +104,23 @@ export class PreviewMediaModal extends BaseModal {
 
           <div class="control-bar">
             <div class="control-group main-controls">
-              <button class="control-btn skip-btn" data-action="skip-back" aria-label="Skip back 10s">
+              <button class="control-btn skip-btn" data-action="skip-back" aria-label="Skip back 10s" data-tooltip="Skip back 10 seconds">
                 <span>⏪</span>
               </button>
-              <button class="control-btn play-btn ${this.isPlaying ? 'playing' : ''}" data-action="play-pause" aria-label="${this.isPlaying ? 'Pause' : 'Play'}">
+              <button class="control-btn play-btn ${this.isPlaying ? 'playing' : ''}" data-action="play-pause" aria-label="${this.isPlaying ? 'Pause' : 'Play'}" data-tooltip="${this.isPlaying ? 'Pause playback' : 'Play media'}">
                 <span>${this.isPlaying ? '⏸' : '▶'}</span>
               </button>
-              <button class="control-btn skip-btn" data-action="skip-forward" aria-label="Skip forward 10s">
+              <button class="control-btn skip-btn" data-action="skip-forward" aria-label="Skip forward 10s" data-tooltip="Skip forward 10 seconds">
                 <span>⏩</span>
               </button>
             </div>
 
             <div class="control-group volume-controls">
-              <button class="control-btn volume-btn ${this.isMuted ? 'muted' : ''}" data-action="toggle-mute" aria-label="${this.isMuted ? 'Unmute' : 'Mute'}">
+              <button class="control-btn volume-btn ${this.isMuted ? 'muted' : ''}" data-action="toggle-mute" aria-label="${this.isMuted ? 'Unmute' : 'Mute'}" data-tooltip="${this.isMuted ? 'Unmute audio' : 'Mute audio'}">
                 <span>${this.getVolumeIcon()}</span>
               </button>
               <div class="volume-slider">
-                <input type="range" class="volume-input" min="0" max="100" value="${this.isMuted ? 0 : this.volume}" />
+                <input type="range" class="volume-input" min="0" max="100" value="${this.isMuted ? 0 : this.volume}" data-tooltip="Adjust volume level" />
                 <div class="volume-fill" style="width: ${this.isMuted ? 0 : this.volume}%"></div>
               </div>
               <span class="volume-value">${this.isMuted ? 0 : this.volume}%</span>
@@ -128,10 +128,10 @@ export class PreviewMediaModal extends BaseModal {
 
             <div class="control-group playback-controls">
               <div class="speed-selector">
-                <button class="speed-btn" data-action="speed">${this.playbackSpeed}x</button>
+                <button class="speed-btn" data-action="speed" data-tooltip="Change playback speed">${this.playbackSpeed}x</button>
                 <div class="speed-dropdown">
                   ${PLAYBACK_SPEEDS.map(speed => `
-                    <button class="speed-option ${this.playbackSpeed === speed ? 'active' : ''}" data-speed="${speed}">
+                    <button class="speed-option ${this.playbackSpeed === speed ? 'active' : ''}" data-speed="${speed}" data-tooltip="Set playback speed to ${speed}x">
                       ${speed}x
                     </button>
                   `).join('')}
@@ -140,11 +140,11 @@ export class PreviewMediaModal extends BaseModal {
             </div>
 
             <div class="control-group view-controls">
-              <button class="control-btn ${this.showWaveform ? 'active' : ''}" data-action="toggle-waveform" aria-label="Toggle waveform">
+              <button class="control-btn ${this.showWaveform ? 'active' : ''}" data-action="toggle-waveform" aria-label="Toggle waveform" data-tooltip="${this.showWaveform ? 'Hide audio waveform' : 'Show audio waveform'}">
                 <span>∿</span>
               </button>
               <div class="aspect-selector">
-                <button class="aspect-btn" data-action="aspect">${this.aspectRatio}</button>
+                <button class="aspect-btn" data-action="aspect" data-tooltip="Change aspect ratio">${this.aspectRatio}</button>
               </div>
             </div>
           </div>
@@ -168,13 +168,13 @@ export class PreviewMediaModal extends BaseModal {
 
       <div class="modal-footer previewmedia-footer">
         <div class="footer-left">
-          <button class="modal-btn modal-btn-secondary" data-action="add-to-timeline">
+          <button class="modal-btn modal-btn-secondary" data-action="add-to-timeline" data-tooltip="Add this media to the timeline">
             <span>Add to Timeline</span>
           </button>
         </div>
         <div class="footer-right">
-          <button class="modal-btn modal-btn-secondary modal-cancel">Close</button>
-          <button class="modal-btn modal-btn-primary" data-action="use-media">
+          <button class="modal-btn modal-btn-secondary modal-cancel" data-tooltip="Close preview">Close</button>
+          <button class="modal-btn modal-btn-primary" data-action="use-media" data-tooltip="Use this media in your project">
             Use Media
           </button>
         </div>

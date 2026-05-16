@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import PersonalizerDialog from '../components/personalizer/PersonalizerDialog';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase, getVideos, getMuapiWorkflows, createGenerationJob } from '../lib/supabase-client';
 
@@ -23,6 +24,7 @@ export function VideoGenerator() {
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
   const [selectedWorkflow, setSelectedWorkflow] = useState('');
   const [generating, setGenerating] = useState(false);
+  const [showPersonalizer, setShowPersonalizer] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -136,13 +138,21 @@ export function VideoGenerator() {
 
       {/* Generate Button */}
       <div className="mb-8">
-        <button
-          onClick={handleGenerate}
-          disabled={generating || !selectedWorkflow || videos.length === 0}
-          className="px-6 py-3 bg-cyan-400 text-slate-900 rounded-lg font-medium hover:bg-cyan-300 transition disabled:opacity-50"
-        >
-          {generating ? 'Generating...' : `Generate Videos for {videos.length} Contacts`}
-        </button>
+        <div className="flex gap-3">
+          <button
+            onClick={handleGenerate}
+            disabled={generating || !selectedWorkflow || videos.length === 0}
+            className="px-6 py-3 bg-cyan-400 text-slate-900 rounded-lg font-medium hover:bg-cyan-300 transition disabled:opacity-50"
+          >
+            {generating ? 'Generating...' : `Generate Videos for {videos.length} Contacts`}
+          </button>
+          <button
+            onClick={() => setShowPersonalizer(true)}
+            className="px-6 py-3 bg-white/10 text-white rounded-lg font-medium hover:bg-white/20 transition border border-white/10"
+          >
+            🤖 Personalize Content
+          </button>
+        </div>
       </div>
 
       {/* Videos List */}
@@ -193,6 +203,14 @@ export function VideoGenerator() {
           </div>
         )}
       </div>
+      {showPersonalizer && (
+        <PersonalizerDialog
+          open={showPersonalizer}
+          onClose={() => setShowPersonalizer(false)}
+          appId="video-outreach"
+          mode="cold-email"
+        />
+      )}
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { navigate } from '../lib/router.js';
 import { showToast, createLoadingSpinner, createLoadingOverlay } from '../lib/loading.js';
 import { createHeroSection } from '../lib/thumbnails.js';
 import { escapeHtml } from '../lib/security.js';
+import { assetStore } from '../lib/assets/assetStore.js';
 import { supabase } from '../lib/hybrid-supabase.js';
 import { VideoUpload } from './common/Upload.js';
 import { Tooltip, addTooltip } from './common/Tooltip.js';
@@ -423,10 +424,31 @@ export function RenderPage() {
   const container = document.createElement('div');
   container.className = 'w-full h-full flex flex-col overflow-hidden bg-[#0a0a0b] p-4 text-white md:p-8';
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const videoId = urlParams.get('videoId') || 'vid_preview';
-  const videoUrl = urlParams.get('videoUrl') || '';
-  const videoTitle = urlParams.get('prompt') || 'Generated Video Prompt Title';
+   const urlParams = new URLSearchParams(window.location.search);
+   let videoId = urlParams.get('videoId') || 'vid_preview';
+   let videoUrl = urlParams.get('videoUrl') || '';
+   let videoTitle = urlParams.get('prompt') || 'Generated Video Prompt Title';
+
+   // Handle universal asset pipeline handoff via ?asset=<id>
+   const assetId = urlParams.get('asset');
+   if (assetId) {
+     (async () => {
+       try {
+         const asset = await assetStore.getAsset(assetId);
+         if (asset && asset.media?.url) {
+           videoId = assetId;
+           videoUrl = asset.media.url;
+           videoTitle = asset.title || 'Asset Video';
+           showToast(`Loaded asset: ${videoTitle}`, 'success');
+         } else {
+           showToast('Asset not found', 'error');
+         }
+       } catch (e) {
+         console.error('Failed to load asset:', e);
+         showToast('Error loading asset', 'error');
+       }
+     })();
+   }
 
   let selectedPreset = 'Luxury Brand Grade';
   let activeAction = 'Export Video';

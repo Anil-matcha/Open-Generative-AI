@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { supabase } from '../lib/supabase-client';
+import { apiKeyManager } from '../lib/apiKeyManager';
+import { supabase, updateUserPassword } from '../lib/supabase-client';
 
 interface Workspace {
   id: string;
@@ -28,7 +29,7 @@ export function Settings() {
   const [workflows, setWorkflows] = useState<MuapiWorkflow[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState<'brand' | 'integrations' | 'billing' | 'team'>('brand');
+  const [activeTab, setActiveTab] = useState<'brand' | 'integrations' | 'billing' | 'team' | 'account' | 'api-keys'>('brand');
 
   // Brand form
   const [brandName, setBrandName] = useState('');
@@ -37,9 +38,28 @@ export function Settings() {
   const [ctaColor, setCtaColor] = useState('#22c55e');
   const [footerText, setFooterText] = useState('');
 
+  // Password form
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordSaving, setPasswordSaving] = useState(false);
+
   useEffect(() => {
     if (campaignId) loadData();
+    loadApiKeys();
   }, [campaignId]);
+
+  async function loadApiKeys() {
+    const openaiKey = await apiKeyManager.getKey('openai');
+    const muapiKey = await apiKeyManager.getKey('muapi');
+    const videodbKey = await apiKeyManager.getKey('videodb');
+    const openaiEl = document.getElementById('openai-key') as HTMLInputElement;
+    const muapiEl = document.getElementById('muapi-key') as HTMLInputElement;
+    const videodbEl = document.getElementById('videodb-key') as HTMLInputElement;
+    if (openaiEl && openaiKey) openaiEl.value = openaiKey;
+    if (muapiEl && muapiKey) muapiEl.value = muapiKey;
+    if (videodbEl && videodbKey) videodbEl.value = videodbKey;
+  }
 
   async function loadData() {
     try {
@@ -127,7 +147,7 @@ export function Settings() {
 
       {/* Tabs */}
       <div className="mb-8 flex gap-4 border-b border-white/10">
-        {(['brand', 'integrations', 'billing', 'team'] as const[]).map((tab) => (
+        {(['brand', 'integrations', 'billing', 'team', 'account', 'api-keys'] as const[]).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -453,6 +473,177 @@ export function Settings() {
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Account */}
+      {activeTab === 'account' && (
+        <div className="space-y-4">
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+            <h2 className="text-xl font-semibold text-white mb-4">Account Settings</h2>
+            <p className="text-sm text-slate-400 mb-6">Manage your account and password</p>
+
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              if (newPassword !== confirmPassword) {
+                alert('Passwords do not match');
+                return;
+              }
+              if (newPassword.length < 6) {
+                alert('Password must be at least 6 characters');
+                return;
+              }
+
+              setPasswordSaving(true);
+              try {
+                const { error } = await updateUserPassword(newPassword);
+                if (error) throw error;
+                alert('Password updated successfully!');
+                setCurrentPassword('');
+                setNewPassword('');
+                setConfirmPassword('');
+              } catch (error: any) {
+                alert('Error updating password: ' + error.message);
+              } finally {
+                setPasswordSaving(false);
+              }
+            }} className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">Current Password</label>
+                <input
+                  type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  required
+                  className="w-full px-4 py-2 bg-slate-800 border border-white/10 rounded-lg text-white focus:outline-none focus:border-cyan-400/50"
+                  placeholder="Enter current password"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">New Password</label>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  required
+                  className="w-full px-4 py-2 bg-slate-800 border border-white/10 rounded-lg text-white focus:outline-none focus:border-cyan-400/50"
+                  placeholder="Enter new password"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">Confirm New Password</label>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  className="w-full px-4 py-2 bg-slate-800 border border-white/10 rounded-lg text-white focus:outline-none focus:border-cyan-400/50"
+                  placeholder="Confirm new password"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={passwordSaving}
+                className="px-6 py-2 bg-cyan-400 text-slate-900 rounded-lg font-medium hover:bg-cyan-300 transition disabled:opacity-50"
+              >
+                {passwordSaving ? 'Updating...' : 'Update Password'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* API Keys */}
+      {activeTab === 'api-keys' && (
+        <div className="space-y-4">
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+            <h2 className="text-xl font-semibold text-white mb-4">API Keys</h2>
+            <p className="text-sm text-slate-400 mb-6">Manage your API keys for external services</p>
+
+            <div className="space-y-6">
+              {/* OpenAI API Key */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">
+                  OpenAI API Key
+                  <span className="text-xs text-slate-400 ml-2">(for LLM writing models)</span>
+                </label>
+                <input
+                  type="password"
+                  id="openai-key"
+                  placeholder="sk-..."
+                  className="w-full px-4 py-2 bg-slate-800 border border-white/10 rounded-lg text-white focus:outline-none focus:border-cyan-400/50"
+                />
+                <p className="text-xs text-slate-400 mt-1">Get your key at <a href="https://platform.openai.com/api-keys" target="_blank" className="text-cyan-400">platform.openai.com/api-keys</a></p>
+              </div>
+
+              {/* MUAPI Key */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">
+                  MUAPI Key
+                  <span className="text-xs text-slate-400 ml-2">(for video and image models)</span>
+                </label>
+                <input
+                  type="password"
+                  id="muapi-key"
+                  placeholder="muapi_..."
+                  className="w-full px-4 py-2 bg-slate-800 border border-white/10 rounded-lg text-white focus:outline-none focus:border-cyan-400/50"
+                />
+                <p className="text-xs text-slate-400 mt-1">Get your key at <a href="https://muapi.ai" target="_blank" className="text-cyan-400">muapi.ai</a></p>
+              </div>
+
+              {/* VideoDB Key */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">
+                  VideoDB Key
+                  <span className="text-xs text-slate-400 ml-2">(for video director application)</span>
+                </label>
+                <input
+                  type="password"
+                  id="videodb-key"
+                  placeholder="videodb_..."
+                  className="w-full px-4 py-2 bg-slate-800 border border-white/10 rounded-lg text-white focus:outline-none focus:border-cyan-400/50"
+                />
+                <p className="text-xs text-slate-400 mt-1">Get your key at <a href="https://console.videodb.io" target="_blank" className="text-cyan-400">console.videodb.io</a></p>
+              </div>
+
+              <button
+                onClick={async () => {
+                  const openaiKey = (document.getElementById('openai-key') as HTMLInputElement)?.value;
+                  const muapiKey = (document.getElementById('muapi-key') as HTMLInputElement)?.value;
+                  const videodbKey = (document.getElementById('videodb-key') as HTMLInputElement)?.value;
+
+                  if (openaiKey) await apiKeyManager.setKey(openaiKey, 'openai');
+                  if (muapiKey) await apiKeyManager.setKey(muapiKey, 'muapi');
+                  if (videodbKey) await apiKeyManager.setKey(videodbKey, 'videodb');
+
+                  alert('API keys saved successfully!');
+                }}
+                className="px-6 py-2 bg-cyan-400 text-slate-900 rounded-lg font-medium hover:bg-cyan-300 transition"
+              >
+                Save API Keys
+              </button>
+            </div>
+          </div>
+
+          {/* Sign Out Section */}
+          <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-6">
+            <h2 className="text-xl font-semibold text-red-400 mb-4">Account Actions</h2>
+            <p className="text-sm text-slate-400 mb-4">These actions cannot be undone</p>
+            <button
+              onClick={async () => {
+                if (window.confirm('Are you sure you want to sign out?')) {
+                  await supabase.auth.signOut();
+                  window.location.href = '/';
+                }
+              }}
+              className="px-6 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-400 transition"
+            >
+              Sign Out
+            </button>
           </div>
         </div>
       )}

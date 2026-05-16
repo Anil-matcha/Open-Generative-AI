@@ -142,6 +142,7 @@ export function initializeTimelineEngine(state, els) {
     // Replace existing button with component
     const playBtnContainer = document.createElement('div');
     playBtnContainer.className = 'play-button-container';
+    playBtnContainer.setAttribute('data-tooltip', 'Play or pause the timeline playback');
     playBtnContainer.appendChild(playButton.render());
     els.playBtn.parentNode.replaceChild(playBtnContainer, els.playBtn);
   }
@@ -376,6 +377,7 @@ export function renderTracks(state, els, showToast) {
     trackName.className = 'track-name';
     trackName.contentEditable = true;
     trackName.textContent = track.name;
+    trackName.setAttribute('data-tooltip', 'Click to edit track name');
     trackName.onblur = () => {
       track.name = trackName.textContent.trim() || 'Track ' + (trackIndex + 1);
   // DISABLED:       showToast(`Track renamed to "${track.name}"`);
@@ -397,6 +399,7 @@ export function renderTracks(state, els, showToast) {
     soloBtn.className = `track-btn solo-btn ${track.solo ? 'active' : ''}`;
     soloBtn.textContent = 'S';
     soloBtn.title = 'Solo track';
+    soloBtn.setAttribute('data-tooltip', 'Solo track - Isolate this track and mute all others');
     soloBtn.onclick = () => {
       track.solo = !track.solo;
       renderTracks(state, els, showToast);
@@ -408,6 +411,7 @@ export function renderTracks(state, els, showToast) {
     muteBtn.className = `track-btn mute-btn ${track.muted ? 'active' : ''}`;
     muteBtn.textContent = 'M';
     muteBtn.title = 'Mute track';
+    muteBtn.setAttribute('data-tooltip', 'Mute track - Silence this track during playback');
     muteBtn.onclick = () => {
       track.muted = !track.muted;
       renderTracks(state, els, showToast);
@@ -419,6 +423,7 @@ export function renderTracks(state, els, showToast) {
     lockBtn.className = `track-btn lock-btn ${track.locked ? 'active' : ''}`;
     lockBtn.textContent = '🔒';
     lockBtn.title = 'Lock track';
+    lockBtn.setAttribute('data-tooltip', 'Lock track - Prevent accidental edits to this track');
     lockBtn.onclick = () => {
       track.locked = !track.locked;
       renderTracks(state, els, showToast);
@@ -460,6 +465,7 @@ export function renderTracks(state, els, showToast) {
     const lane = document.createElement('div');
     lane.className = 'track-lane';
     lane.dataset.trackId = track.id;
+    lane.setAttribute('data-tooltip', 'Click to seek playhead, Alt+click or middle-click to pan');
 
     // Timeline ruler with enhanced line slider
     if (trackIndex === 0) {
@@ -564,6 +570,7 @@ export function createEnhancedClipElement(item, track, state, zoom = 1.0) {
   itemEl.dataset.itemId = item.id;
   itemEl.dataset.trackId = track.id;
   itemEl.title = `Clip: ${item.name || item.text || 'Item'}\nTrack: ${track.name}\nDuration: ${formatTime(item.end - item.start)}\nStart: ${formatTime(item.start)}`;
+  itemEl.setAttribute('data-tooltip', `${item.name || item.text || 'Clip'} - ${item.type} clip on ${track.name}, click to select, double-click to edit`);
 
   // Calculate position and width with zoom
   const leftPercent = (item.start / state.timelineSeconds) * 100 * zoom;
@@ -588,6 +595,7 @@ export function createEnhancedClipElement(item, track, state, zoom = 1.0) {
     waveformCanvas.className = 'waveform-canvas';
     waveformCanvas.width = Math.max(50, widthPercent * 2);
     waveformCanvas.height = 30;
+    waveformCanvas.setAttribute('data-tooltip', 'Audio waveform visualization');
     drawWaveform(waveformCanvas, item.waveformData);
     clipContent.appendChild(waveformCanvas);
   }
@@ -597,16 +605,19 @@ export function createEnhancedClipElement(item, track, state, zoom = 1.0) {
   const durationEl = document.createElement('span');
   durationEl.className = 'clip-duration';
   durationEl.textContent = formatTime(duration);
+  durationEl.setAttribute('data-tooltip', `Clip duration: ${formatTime(duration)}`);
   clipContent.appendChild(durationEl);
 
   // Add drag handles for trimming
   const leftHandle = document.createElement('div');
   leftHandle.className = 'clip-handle clip-handle-left';
   leftHandle.title = 'Drag to trim start';
+  leftHandle.setAttribute('data-tooltip', 'Drag to trim start - Adjust the beginning of this clip');
 
   const rightHandle = document.createElement('div');
   rightHandle.className = 'clip-handle clip-handle-right';
   rightHandle.title = 'Drag to trim end';
+  rightHandle.setAttribute('data-tooltip', 'Drag to trim end - Adjust the end of this clip');
 
   itemEl.appendChild(leftHandle);
   itemEl.appendChild(clipContent);
@@ -697,11 +708,11 @@ export function renderCompositingOverlay(state, container) {
       `;
 
       overlayHTML += `
-        <div class="pip-window" style="${style}" data-pip-id="${pip.id}">
+        <div class="pip-window" style="${style}" data-pip-id="${pip.id}" data-tooltip="Picture-in-Picture window: ${clip.name || 'Clip'}">
           <div class="pip-label" style="position: absolute; top: 4px; left: 8px; font-size: 10px; color: white; background: rgba(0,0,0,0.7); padding: 2px 6px; border-radius: 4px;">
             PIP: ${clip.name || 'Clip'}
           </div>
-          <div class="pip-resize-handle" style="position: absolute; bottom: 0; right: 0; width: 16px; height: 16px; cursor: nw-resize; background: rgba(34, 211, 238, 0.8); border-radius: 2px 0 0 0;" data-pip-id="${pip.id}"></div>
+          <div class="pip-resize-handle" style="position: absolute; bottom: 0; right: 0; width: 16px; height: 16px; cursor: nw-resize; background: rgba(34, 211, 238, 0.8); border-radius: 2px 0 0 0;" data-pip-id="${pip.id}" data-tooltip="Drag to resize PIP window"></div>
         </div>
       `;
     });
@@ -759,7 +770,7 @@ export function renderCompositingOverlay(state, container) {
       `;
     }
 
-    overlayHTML += `<div class="split-overlay" style="${splitStyle}"></div>`;
+    overlayHTML += `<div class="split-overlay" style="${splitStyle}" data-tooltip="Split screen: ${config.type} layout at ${config.ratio * 100}%"></div>`;
   }
 
   container.innerHTML = overlayHTML;

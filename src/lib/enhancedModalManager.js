@@ -226,7 +226,8 @@ class EnhancedModalManager {
         'VideoAnalytics': () => import('../components/modals/VideoAnalytics.jsx'),
         'VideoPersonalizer': () => import('../components/modals/VideoPersonalizer.jsx'),
         'VideoPlayerModal': () => import('../components/modals/VideoPlayerModal.jsx'),
-        'VoiceModal': () => import('../components/modals/VoiceModal.jsx')
+        'VoiceModal': () => import('../components/modals/VoiceModal.jsx'),
+        'PersonalizerModal': () => Promise.resolve({ default: { render: () => '<div>Personalizer modal - coming soon</div>' } })
       };
 
       const importFn = modalMap[modalName];
@@ -283,7 +284,8 @@ class EnhancedModalManager {
       'TemplatePreviewModal': 'CATEGORY_J_MODALS_WORKFLOWS',
       'UrlVideoModal': 'CATEGORY_J_MODALS_WORKFLOWS',
       'VideoAnalytics': 'CATEGORY_J_MODALS_WORKFLOWS',
-      'VoiceModal': 'CATEGORY_J_MODALS_WORKFLOWS'
+      'VoiceModal': 'CATEGORY_J_MODALS_WORKFLOWS',
+      'PersonalizerModal': 'CATEGORY_J_MODALS_WORKFLOWS'
     };
 
     return modalCategories[modalName];
@@ -317,7 +319,8 @@ class EnhancedModalManager {
       'VideoAnalytics': 'Video Analytics',
       'VideoPersonalizer': 'Video Personalizer',
       'VideoPlayerModal': 'Video Player',
-      'VoiceModal': 'Voice Tools'
+      'VoiceModal': 'Voice Tools',
+      'PersonalizerModal': 'AI Personalizer'
     };
 
     return titles[modalName] || modalName.replace(/([A-Z])/g, ' $1').trim();

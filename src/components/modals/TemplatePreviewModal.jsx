@@ -9,7 +9,7 @@ export class TemplatePreviewModal extends BaseModal {
     });
 
     this.template = options.template || null;
-    this.previewMode = options.previewMode || 'desktop'; // desktop, tablet, mobile
+    this.previewMode = options.previewMode || 'desktop';
     this.showControls = options.showControls !== false;
   }
 
@@ -47,10 +47,10 @@ export class TemplatePreviewModal extends BaseModal {
           </div>
 
           <div class="preview-actions">
-            <button class="modal-btn modal-btn-secondary preview-edit">
+            <button class="modal-btn modal-btn-secondary preview-edit" data-tooltip="Edit this template">
               Edit Template
             </button>
-            <button class="modal-btn modal-btn-primary preview-use">
+            <button class="modal-btn modal-btn-primary preview-use" data-tooltip="Use this template in your project">
               Use This Template
             </button>
           </div>
@@ -65,7 +65,7 @@ export class TemplatePreviewModal extends BaseModal {
         <div class="control-group">
           <label>Preview Mode:</label>
           <div class="mode-buttons">
-            <button class="mode-btn ${this.previewMode === 'desktop' ? 'active' : ''}" data-mode="desktop">
+            <button class="mode-btn ${this.previewMode === 'desktop' ? 'active' : ''}" data-mode="desktop" data-tooltip="Preview as desktop layout">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
                 <line x1="8" y1="21" x2="16" y2="21"/>
@@ -73,14 +73,14 @@ export class TemplatePreviewModal extends BaseModal {
               </svg>
               Desktop
             </button>
-            <button class="mode-btn ${this.previewMode === 'tablet' ? 'active' : ''}" data-mode="tablet">
+            <button class="mode-btn ${this.previewMode === 'tablet' ? 'active' : ''}" data-mode="tablet" data-tooltip="Preview as tablet layout">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="4" y="2" width="16" height="20" rx="2" ry="2"/>
                 <line x1="12" y1="18" x2="12" y2="18"/>
               </svg>
               Tablet
             </button>
-            <button class="mode-btn ${this.previewMode === 'mobile' ? 'active' : ''}" data-mode="mobile">
+            <button class="mode-btn ${this.previewMode === 'mobile' ? 'active' : ''}" data-mode="mobile" data-tooltip="Preview as mobile layout">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
                 <line x1="12" y1="18" x2="12" y2="18"/>
@@ -91,7 +91,7 @@ export class TemplatePreviewModal extends BaseModal {
         </div>
 
         <div class="control-group">
-          <button class="modal-btn modal-btn-secondary preview-play">
+          <button class="modal-btn modal-btn-secondary preview-play" data-tooltip="Play template preview">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polygon points="5,3 19,12 5,21"/>
             </svg>
@@ -105,8 +105,6 @@ export class TemplatePreviewModal extends BaseModal {
   renderTemplateContent() {
     if (!this.template) return '';
 
-    // This would render the actual template content
-    // For now, show a placeholder representation
     return `
       <div class="template-canvas" style="
         width: 100%;
@@ -195,16 +193,15 @@ export class TemplatePreviewModal extends BaseModal {
   }
 
   playPreview() {
-    // Template preview playback logic
   }
 
   editTemplate() {
-    // Open template editor
     this.close();
   }
 
   useTemplate() {
-    // Use this template
     this.close();
   }
 }
+
+export default TemplatePreviewModal;

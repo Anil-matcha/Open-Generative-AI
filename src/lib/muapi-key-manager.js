@@ -4,18 +4,33 @@
  * All parts of the app should use this to get/set the API key
  * to ensure consistency across all clients.
  * 
- * Storage location: localStorage['muapi_key']
- * Also supports: window.__MUAPI_KEY__ (for injection)
+ * SECURITY: Uses SecurityService for encrypted storage
  */
 
-const MUAPI_KEY_STORAGE = 'muapi_key';
+import { SecurityService } from './services/SecurityService.js';
+
+const MUAPI_KEY_STORAGE = 'muapi_key_encrypted';
+
+// Singleton instance
+let securityService = null;
+
+/**
+ * Get or create security service instance
+ */
+async function getSecurityService() {
+  if (!securityService) {
+    securityService = new SecurityService();
+    await securityService.initialize();
+  }
+  return securityService;
+}
 
 const muapiKeyManager = {
   /**
-   * Set the API key
+   * Set the API key with encryption
    * @param {string} key - The API key to store
    */
-  setKey(key) {
+  async setKey(key) {
     if (!key || typeof key !== 'string') {
       throw new Error('Invalid API key: must be a non-empty string');
     }
@@ -25,34 +40,34 @@ const muapiKeyManager = {
       throw new Error('Invalid API key: too short (minimum 10 characters)');
     }
     
+    if (trimmedKey.length > 200) {
+      throw new Error('Invalid API key: too long (maximum 200 characters)');
+    }
+    
     try {
-      localStorage.setItem(MUAPI_KEY_STORAGE, trimmedKey);
-      // Also set for backward compatibility
-      window.__MUAPI_KEY__ = trimmedKey;
+      const service = await getSecurityService();
+      await service.storeEncryptedKey(trimmedKey);
+      // Set flag for backward compatibility
+      window.__MUAPI_KEY__ = true;
     } catch (error) {
       console.error('[muapiKeyManager] Failed to save API key:', error);
-      throw new Error('Failed to save API key to localStorage');
+      throw new Error('Failed to save API key securely');
     }
   },
 
   /**
-   * Get the API key
+   * Get the API key with decryption
    * @returns {string|null} The API key or null if not set
    */
-  getKey() {
+  async getKey() {
     try {
-      // Check window.__MUAPI_KEY__ first (for injection)
-      if (window.__MUAPI_KEY__) {
-        return window.__MUAPI_KEY__;
+      // Check if flagged as set
+      if (!window.__MUAPI_KEY__) {
+        return null;
       }
       
-      // Then check localStorage
-      const key = localStorage.getItem(MUAPI_KEY_STORAGE);
-      if (key) {
-        return key;
-      }
-      
-      return null;
+      const service = await getSecurityService();
+      return await service.getDecryptedKey();
     } catch (error) {
       console.error('[muapiKeyManager] Failed to get API key:', error);
       return null;
@@ -63,16 +78,18 @@ const muapiKeyManager = {
    * Check if API key is set
    * @returns {boolean}
    */
-  hasKey() {
-    return !!this.getKey();
+  async hasKey() {
+    const key = await this.getKey();
+    return !!key;
   },
 
   /**
-   * Remove the API key
+   * Remove the API key securely
    */
-  removeKey() {
+  async removeKey() {
     try {
-      localStorage.removeItem(MUAPI_KEY_STORAGE);
+      const service = await getSecurityService();
+      await service.clearEncryptedKey();
       delete window.__MUAPI_KEY__;
     } catch (error) {
       console.error('[muapiKeyManager] Failed to remove API key:', error);
@@ -84,8 +101,8 @@ const muapiKeyManager = {
    * @returns {string} The API key
    * @throws {Error} If API key is not set
    */
-  getKeyForHeader() {
-    const key = this.getKey();
+  async getKeyForHeader() {
+    const key = await this.getKey();
     if (!key) {
       throw new Error('API Key missing. Please set it in Settings.');
     }
@@ -101,28 +118,32 @@ const muapiKeyManager = {
     if (!key || typeof key !== 'string') return false;
     const trimmed = key.trim();
     if (trimmed.length < 10) return false;
-    if (trimmed.length > 200) return false; // Reasonable max length
+    if (trimmed.length > 200) return false;
+    // Check for suspicious patterns
+    if (trimmed.includes(' ') || trimmed.includes('\n') || trimmed.includes('\r')) {
+      return false;
+    }
     return true;
   },
 
   /**
    * Migrate from legacy storage locations
    */
-  migrateLegacyKeys() {
+  async migrateLegacyKeys() {
     try {
       // Check for openhiggsfield_api_key
       const legacyKey = localStorage.getItem('openhiggsfield_api_key');
-      if (legacyKey && !this.getKey()) {
+      if (legacyKey && !(await this.hasKey())) {
         console.log('[muapiKeyManager] Migrating from openhiggsfield_api_key');
-        this.setKey(legacyKey);
+        await this.setKey(legacyKey);
         localStorage.removeItem('openhiggsfield_api_key');
       }
       
       // Check for muapi_user_api_key
       const workflowKey = localStorage.getItem('muapi_user_api_key');
-      if (workflowKey && !this.getKey()) {
+      if (workflowKey && !(await this.hasKey())) {
         console.log('[muapiKeyManager] Migrating from muapi_user_api_key');
-        this.setKey(workflowKey);
+        await this.setKey(workflowKey);
         localStorage.removeItem('muapi_user_api_key');
       }
     } catch (error) {

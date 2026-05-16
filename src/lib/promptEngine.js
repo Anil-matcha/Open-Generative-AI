@@ -288,9 +288,65 @@ export function enhanceFieldValue(fieldKey, value, form) {
   return cleanPrompt(uniqueTerms(fieldStrategies[fieldKey] || [raw]).join(', '));
 }
 
+/**
+ * Build a personalized image prompt using scan data
+ */
+export function buildPersonalizedImagePrompt(scanData, inputs = {}) {
+  const tokens = extractTokensFromScan(scanData);
+  const style = inputs.visualStyle || 'cinematic';
+  const aspect = inputs.aspectRatio || '16:9';
+
+  const base = [
+    `Cinematic portrait of ${tokens.full_name || inputs.targetName}`,
+    tokens.company ? `at ${tokens.company}` : '',
+    tokens.bio ? `— ${tokens.bio}` : '',
+    VISUAL_STYLE_BUCKETS[style] ? VISUAL_STYLE_BUCKETS[style][0] : VISUAL_STYLE_BUCKETS.cinematic[0],
+    `optimized for ${aspect} aspect ratio`,
+    inputs.extraInstructions || ''
+  ].filter(Boolean);
+
+  return cleanPrompt(base.join(', '));
+}
+
+/**
+ * Build a complete personalized video prompt pack
+ */
+export function buildPersonalizedVideoPromptPack(scanData, inputs = {}) {
+  const tokens = extractTokensFromScan(scanData);
+  const storyType = inputs.storyType || 'founder-story';
+  const duration = inputs.durationSeconds || 30;
+
+  const storyBlueprint = STORY_STRUCTURES[storyType] || STORY_STRUCTURES['founder-story-film'];
+
+  return {
+    masterPrompt: buildPersonalizedImagePrompt(scanData, inputs),
+    scenePrompts: storyBlueprint.map((beat, i) => ({
+      beat: i + 1,
+      name: beat,
+      prompt: `Scene ${i + 1}: ${beat} — ${tokens.full_name || inputs.targetName} at ${tokens.company || 'their workspace'}`
+    })),
+    voiceoverDirection: `Personalized voiceover for ${tokens.full_name || inputs.targetName}. Tone: ${inputs.tone || 'professional'}. Duration: ${duration}s.`,
+    negativePrompt: 'blurry, low quality, generic stock footage, text overlays, watermark'
+  };
+}
+
+function extractTokensFromScan(scanData) {
+  const tokens = { first_name: '', last_name: '', full_name: '', company: '', bio: '' };
+  if (scanData?.platforms) {
+    const gh = scanData.platforms.find(p => p.platform === 'github');
+    if (gh) {
+      tokens.company = gh.company || '';
+      tokens.bio = gh.bio || '';
+    }
+  }
+  return tokens;
+}
+
 export default {
   generatePromptPack,
   enhanceFieldValue,
+  buildPersonalizedImagePrompt,
+  buildPersonalizedVideoPromptPack,
   CAMERA_TERMS,
   VISUAL_STYLE_BUCKETS,
   NICHE_ENRICHMENT,

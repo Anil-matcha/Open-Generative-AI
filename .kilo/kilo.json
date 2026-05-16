@@ -1,5 +1,8 @@
 {
   "$schema": "https://app.kilo.ai/config.json",
+  "skills": {
+    "paths": ["./.kilo/skills"]
+  },
   "mcp": {
     "supabase": {
       "type": "local",

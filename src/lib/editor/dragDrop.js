@@ -1186,7 +1186,7 @@ export function setupEnhancedTooltips() {
 }
 
 function handleElementHover(e) {
-  const element = e.target.closest('.clip, .media-item, .tool-btn, .track-row, .circle-btn, .mini-btn, .icon-btn, .upload-btn, .primary-btn, .track-toggle');
+  const element = e.target.closest('.clip, .media-item, .tool-btn, .track-row, .circle-btn, .mini-btn, .icon-btn, .upload-btn, .primary-btn, .track-toggle, .top-icon, .pill, .generate-type, .rail-btn, .command-btn, .select-input, .text-input, .text-area, .modal-close, .transition-btn, .category-btn, .transition-item, .param-item input, .param-item select, .duration-control input, .control-group label, .preview-btn, .create-btn, .animation-demo-controls button, .clip-editor__field input, .clip-editor__field select, .clip-editor__field button, .side-card > .card-title, .token-btn, .workflow-card, .merge-field, .line-duration-handle, .transition-drop-zone, .transition-edit-btn, .transition-delete-btn');
   if (!element || dragState.isDragging) return;
 
   let tooltipContent = '';
@@ -1351,7 +1351,7 @@ function handleElementHover(e) {
 }
 
 function handleElementOut(e) {
-  const element = e.target.closest('.clip, .media-item, .tool-btn, .track-row, .circle-btn, .mini-btn, .icon-btn, .upload-btn, .primary-btn, .track-toggle');
+  const element = e.target.closest('.clip, .media-item, .tool-btn, .track-row, .circle-btn, .mini-btn, .icon-btn, .upload-btn, .primary-btn, .track-toggle, .top-icon, .pill, .generate-type, .rail-btn, .command-btn, .select-input, .text-input, .text-area, .modal-close, .transition-btn, .category-btn, .transition-item, .param-item input, .param-item select, .duration-control input, .control-group label, .preview-btn, .create-btn, .animation-demo-controls button, .clip-editor__field input, .clip-editor__field select, .clip-editor__field button, .side-card > .card-title, .token-btn, .workflow-card, .merge-field, .line-duration-handle, .transition-drop-zone, .transition-edit-btn, .transition-delete-btn');
   if (element && !dragState.isDragging) {
     removeTooltip();
   }

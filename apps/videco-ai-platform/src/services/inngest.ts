@@ -3,6 +3,7 @@ import axios from "axios";
 import { Inngest } from "inngest";
 import { v2 as cloudinary } from "cloudinary";
 import { makeAIVoice, makeTextToVoice } from "./api/aiVoice";
+import { saveGeneratedAsset } from "../../../src/lib/assets/assetActions.js";
 
 export const JOB_DETAILS = {
     pending: "pending",
@@ -206,15 +207,36 @@ export const processAIVideos = inngest.createFunction(
                 ],
             });
         }
-        const ai_video_update = await supabase
-            .from("ai_videos")
-            .update({
-                url: videoUrl,
-                status: "completed",
-            })
-            .eq("id", event.data.ai_video_id);
+         const ai_video_update = await supabase
+             .from("ai_videos")
+             .update({
+                 url: videoUrl,
+                 status: "completed",
+             })
+             .eq("id", event.data.ai_video_id);
 
-        const { data, error } = await supabase
+         // Save to universal asset pipeline (non-blocking)
+         try {
+           await saveGeneratedAsset('video', {
+             title: `AI Video - ${event.data.ai_video_id}`,
+             media: { url: videoUrl, type: 'video/mp4' },
+             metadata: {
+               ai_video_id: event.data.ai_video_id,
+               job_id: event.data.job_id,
+               voiceCloningEnabled: event.data.voiceCloningEnabled,
+               background: event.data.background,
+               text: event.data.text,
+               greeting: event.data.greeting,
+               website: event.data.website,
+               language: event.data.language,
+               voice_id: event.data.voice_id
+             }
+           }, 'videco-ai-platform');
+         } catch (err) {
+           console.warn('[Asset Pipeline] Failed to save video asset:', err.message);
+         }
+
+         const { data, error } = await supabase
             .from("jobs")
             .update([
                 {

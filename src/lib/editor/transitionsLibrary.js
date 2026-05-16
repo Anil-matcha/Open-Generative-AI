@@ -17,9 +17,10 @@ export class TransitionsLibrary {
         category: 'fade',
         icon: '🌫️',
         description: 'Crossfade between clips with customizable softness',
+        tooltip: 'Dissolve - Crossfade between clips with adjustable softness for smooth blending',
         params: {
-          softness: { value: 0.5, min: 0, max: 1, step: 0.1 },
-          direction: { value: 'normal', options: ['normal', 'reverse'] }
+          softness: { value: 0.5, min: 0, max: 1, step: 0.1, tooltip: 'Softness - Adjust the feathering at the edge of the dissolve for smoother or sharper transitions' },
+          direction: { value: 'normal', options: ['normal', 'reverse'], tooltip: 'Direction - Choose whether the dissolve plays forward or in reverse' }
         },
         render: this.renderDissolve.bind(this)
       },
@@ -30,9 +31,10 @@ export class TransitionsLibrary {
         category: 'wipe',
         icon: '⬅️',
         description: 'Horizontal wipe from right to left',
+        tooltip: 'Wipe Left - Horizontal wipe that reveals the incoming clip by sliding from right to left',
         params: {
-          softness: { value: 0, min: 0, max: 1, step: 0.1 },
-          direction: { value: 'left', options: ['left', 'right', 'up', 'down'] }
+          softness: { value: 0, min: 0, max: 1, step: 0.1, tooltip: 'Softness - Add feathered edges to the wipe boundary for a softer look' },
+          direction: { value: 'left', options: ['left', 'right', 'up', 'down'], tooltip: 'Direction - Set the direction the wipe moves across the frame' }
         },
         render: this.renderWipe.bind(this)
       },
@@ -41,7 +43,8 @@ export class TransitionsLibrary {
         category: 'wipe',
         icon: '➡️',
         description: 'Horizontal wipe from left to right',
-        params: { softness: { value: 0, min: 0, max: 1, step: 0.1 } },
+        tooltip: 'Wipe Right - Horizontal wipe that reveals the incoming clip by sliding from left to right',
+        params: { softness: { value: 0, min: 0, max: 1, step: 0.1, tooltip: 'Softness - Add feathered edges to the wipe boundary for a softer look' } },
         render: this.renderWipe.bind(this)
       },
       wipeUp: {
@@ -49,7 +52,8 @@ export class TransitionsLibrary {
         category: 'wipe',
         icon: '⬆️',
         description: 'Vertical wipe from bottom to top',
-        params: { softness: { value: 0, min: 0, max: 1, step: 0.1 } },
+        tooltip: 'Wipe Up - Vertical wipe that reveals the incoming clip by sliding from bottom to top',
+        params: { softness: { value: 0, min: 0, max: 1, step: 0.1, tooltip: 'Softness - Add feathered edges to the wipe boundary for a softer look' } },
         render: this.renderWipe.bind(this)
       },
       wipeDown: {
@@ -57,7 +61,8 @@ export class TransitionsLibrary {
         category: 'wipe',
         icon: '⬇️',
         description: 'Vertical wipe from top to bottom',
-        params: { softness: { value: 0, min: 0, max: 1, step: 0.1 } },
+        tooltip: 'Wipe Down - Vertical wipe that reveals the incoming clip by sliding from top to bottom',
+        params: { softness: { value: 0, min: 0, max: 1, step: 0.1, tooltip: 'Softness - Add feathered edges to the wipe boundary for a softer look' } },
         render: this.renderWipe.bind(this)
       },
       wipeDiagonal: {
@@ -65,9 +70,10 @@ export class TransitionsLibrary {
         category: 'wipe',
         icon: '↗️',
         description: 'Diagonal wipe across the frame',
+        tooltip: 'Wipe Diagonal - Diagonal wipe that sweeps across the frame at a customizable angle',
         params: {
-          softness: { value: 0, min: 0, max: 1, step: 0.1 },
-          angle: { value: 45, min: 0, max: 90, step: 15 }
+          softness: { value: 0, min: 0, max: 1, step: 0.1, tooltip: 'Softness - Add feathered edges to the wipe boundary for a softer look' },
+          angle: { value: 45, min: 0, max: 90, step: 15, tooltip: 'Angle - Set the angle of the diagonal wipe from 0 to 90 degrees' }
         },
         render: this.renderWipe.bind(this)
       },
@@ -78,7 +84,8 @@ export class TransitionsLibrary {
         category: 'push',
         icon: '⬅️',
         description: 'Push outgoing clip left while bringing in new clip',
-        params: { softness: { value: 0, min: 0, max: 1, step: 0.1 } },
+        tooltip: 'Push Left - Push the outgoing clip to the left while simultaneously revealing the incoming clip',
+        params: { softness: { value: 0, min: 0, max: 1, step: 0.1, tooltip: 'Softness - Add motion blur effect to the push animation for smoother movement' } },
         render: this.renderPush.bind(this)
       },
       pushRight: {
@@ -86,7 +93,8 @@ export class TransitionsLibrary {
         category: 'push',
         icon: '➡️',
         description: 'Push outgoing clip right while bringing in new clip',
-        params: { softness: { value: 0, min: 0, max: 1, step: 0.1 } },
+        tooltip: 'Push Right - Push the outgoing clip to the right while simultaneously revealing the incoming clip',
+        params: { softness: { value: 0, min: 0, max: 1, step: 0.1, tooltip: 'Softness - Add motion blur effect to the push animation for smoother movement' } },
         render: this.renderPush.bind(this)
       },
       pushUp: {
@@ -94,7 +102,8 @@ export class TransitionsLibrary {
         category: 'push',
         icon: '⬆️',
         description: 'Push outgoing clip up while bringing in new clip',
-        params: { softness: { value: 0, min: 0, max: 1, step: 0.1 } },
+        tooltip: 'Push Up - Push the outgoing clip upward while simultaneously revealing the incoming clip',
+        params: { softness: { value: 0, min: 0, max: 1, step: 0.1, tooltip: 'Softness - Add motion blur effect to the push animation for smoother movement' } },
         render: this.renderPush.bind(this)
       },
       pushDown: {
@@ -102,7 +111,8 @@ export class TransitionsLibrary {
         category: 'push',
         icon: '⬇️',
         description: 'Push outgoing clip down while bringing in new clip',
-        params: { softness: { value: 0, min: 0, max: 1, step: 0.1 } },
+        tooltip: 'Push Down - Push the outgoing clip downward while simultaneously revealing the incoming clip',
+        params: { softness: { value: 0, min: 0, max: 1, step: 0.1, tooltip: 'Softness - Add motion blur effect to the push animation for smoother movement' } },
         render: this.renderPush.bind(this)
       },
 
@@ -112,9 +122,10 @@ export class TransitionsLibrary {
         category: 'zoom',
         icon: '🔍+',
         description: 'Scale incoming clip from small to full size',
+        tooltip: 'Zoom In - Scale the incoming clip from small to full size for a dramatic reveal effect',
         params: {
-          scale: { value: 0.5, min: 0.1, max: 2, step: 0.1 },
-          softness: { value: 0, min: 0, max: 1, step: 0.1 }
+          scale: { value: 0.5, min: 0.1, max: 2, step: 0.1, tooltip: 'Scale - Set the starting scale factor for the zoom; smaller values start more zoomed in' },
+          softness: { value: 0, min: 0, max: 1, step: 0.1, tooltip: 'Softness - Add blur during the zoom motion for a more cinematic feel' }
         },
         render: this.renderZoom.bind(this)
       },
@@ -123,9 +134,10 @@ export class TransitionsLibrary {
         category: 'zoom',
         icon: '🔍-',
         description: 'Scale outgoing clip from full size to small',
+        tooltip: 'Zoom Out - Scale the outgoing clip from full size to small for a shrinking away effect',
         params: {
-          scale: { value: 1.5, min: 1, max: 3, step: 0.1 },
-          softness: { value: 0, min: 0, max: 1, step: 0.1 }
+          scale: { value: 1.5, min: 1, max: 3, step: 0.1, tooltip: 'Scale - Set the ending scale factor for the zoom; larger values zoom out more' },
+          softness: { value: 0, min: 0, max: 1, step: 0.1, tooltip: 'Softness - Add blur during the zoom motion for a more cinematic feel' }
         },
         render: this.renderZoom.bind(this)
       },
@@ -134,11 +146,12 @@ export class TransitionsLibrary {
         category: 'zoom',
         icon: '🎬',
         description: 'Combined zoom and pan transition',
+        tooltip: 'Zoom & Pan - Combine zooming and panning movements for a dynamic camera-like transition',
         params: {
-          scale: { value: 1.2, min: 1, max: 2, step: 0.1 },
-          panX: { value: 0.2, min: -1, max: 1, step: 0.1 },
-          panY: { value: 0.2, min: -1, max: 1, step: 0.1 },
-          softness: { value: 0, min: 0, max: 1, step: 0.1 }
+          scale: { value: 1.2, min: 1, max: 2, step: 0.1, tooltip: 'Scale - Set the zoom intensity; values above 1 zoom in, below 1 zoom out' },
+          panX: { value: 0.2, min: -1, max: 1, step: 0.1, tooltip: 'Pan X - Set the horizontal pan distance; positive values pan right, negative pan left' },
+          panY: { value: 0.2, min: -1, max: 1, step: 0.1, tooltip: 'Pan Y - Set the vertical pan distance; positive values pan down, negative pan up' },
+          softness: { value: 0, min: 0, max: 1, step: 0.1, tooltip: 'Softness - Add motion blur during the zoom and pan for smoother movement' }
         },
         render: this.renderZoomPan.bind(this)
       },
@@ -149,9 +162,10 @@ export class TransitionsLibrary {
         category: 'iris',
         icon: '⭕',
         description: 'Circular iris reveal transition',
+        tooltip: 'Iris Circle - Classic circular iris effect that opens or closes to reveal the next clip',
         params: {
-          softness: { value: 0, min: 0, max: 1, step: 0.1 },
-          reverse: { value: false, type: 'boolean' }
+          softness: { value: 0, min: 0, max: 1, step: 0.1, tooltip: 'Softness - Add feathered edges to the iris boundary for a softer look' },
+          reverse: { value: false, type: 'boolean', tooltip: 'Reverse - Toggle to close the iris instead of opening it' }
         },
         render: this.renderIris.bind(this)
       },
@@ -160,9 +174,10 @@ export class TransitionsLibrary {
         category: 'iris',
         icon: '💎',
         description: 'Diamond-shaped iris reveal',
+        tooltip: 'Iris Diamond - Diamond-shaped iris effect that opens or closes with a geometric pattern',
         params: {
-          softness: { value: 0, min: 0, max: 1, step: 0.1 },
-          reverse: { value: false, type: 'boolean' }
+          softness: { value: 0, min: 0, max: 1, step: 0.1, tooltip: 'Softness - Add feathered edges to the diamond boundary for a softer look' },
+          reverse: { value: false, type: 'boolean', tooltip: 'Reverse - Toggle to close the diamond iris instead of opening it' }
         },
         render: this.renderIris.bind(this)
       },
@@ -171,9 +186,10 @@ export class TransitionsLibrary {
         category: 'iris',
         icon: '▢',
         description: 'Square iris reveal',
+        tooltip: 'Iris Square - Square-shaped iris effect that opens or closes with clean geometric edges',
         params: {
-          softness: { value: 0, min: 0, max: 1, step: 0.1 },
-          reverse: { value: false, type: 'boolean' }
+          softness: { value: 0, min: 0, max: 1, step: 0.1, tooltip: 'Softness - Add feathered edges to the square boundary for a softer look' },
+          reverse: { value: false, type: 'boolean', tooltip: 'Reverse - Toggle to close the square iris instead of opening it' }
         },
         render: this.renderIris.bind(this)
       },
@@ -184,9 +200,10 @@ export class TransitionsLibrary {
         category: 'shape',
         icon: '⭐',
         description: 'Star-shaped wipe transition',
+        tooltip: 'Star Wipe - Star-shaped transition that reveals the incoming clip with a multi-pointed pattern',
         params: {
-          softness: { value: 0, min: 0, max: 1, step: 0.1 },
-          points: { value: 5, min: 3, max: 12, step: 1 }
+          softness: { value: 0, min: 0, max: 1, step: 0.1, tooltip: 'Softness - Add feathered edges to the star boundary for a softer look' },
+          points: { value: 5, min: 3, max: 12, step: 1, tooltip: 'Points - Set the number of points on the star from 3 to 12' }
         },
         render: this.renderShape.bind(this)
       },
@@ -195,7 +212,8 @@ export class TransitionsLibrary {
         category: 'shape',
         icon: '❤️',
         description: 'Heart-shaped wipe transition',
-        params: { softness: { value: 0, min: 0, max: 1, step: 0.1 } },
+        tooltip: 'Heart Wipe - Heart-shaped transition that reveals the incoming clip with a romantic pattern',
+        params: { softness: { value: 0, min: 0, max: 1, step: 0.1, tooltip: 'Softness - Add feathered edges to the heart boundary for a softer look' } },
         render: this.renderShape.bind(this)
       },
       shapeCustom: {
@@ -203,9 +221,10 @@ export class TransitionsLibrary {
         category: 'shape',
         icon: '🎨',
         description: 'Custom SVG path-based transition',
+        tooltip: 'Custom Shape - Create your own transition using a custom SVG path for unique reveal patterns',
         params: {
-          softness: { value: 0, min: 0, max: 1, step: 0.1 },
-          svgPath: { value: '', type: 'text' }
+          softness: { value: 0, min: 0, max: 1, step: 0.1, tooltip: 'Softness - Add feathered edges to the custom shape boundary for a softer look' },
+          svgPath: { value: '', type: 'text', tooltip: 'SVG Path - Enter an SVG path string to define the custom transition shape' }
         },
         render: this.renderCustomShape.bind(this)
       }
@@ -215,19 +234,19 @@ export class TransitionsLibrary {
   initializePresets() {
     return {
       cinematic: [
-        { name: 'Cinematic Fade', transition: 'dissolve', params: { softness: 0.8 } },
-        { name: 'Smooth Wipe', transition: 'wipeLeft', params: { softness: 0.3 } },
-        { name: 'Dramatic Zoom', transition: 'zoomIn', params: { scale: 0.3, softness: 0.2 } }
+        { name: 'Cinematic Fade', transition: 'dissolve', params: { softness: 0.8 }, tooltip: 'Cinematic Fade - A soft, elegant fade transition perfect for dramatic scenes and emotional moments' },
+        { name: 'Smooth Wipe', transition: 'wipeLeft', params: { softness: 0.3 }, tooltip: 'Smooth Wipe - A gentle horizontal wipe with feathered edges for seamless scene changes' },
+        { name: 'Dramatic Zoom', transition: 'zoomIn', params: { scale: 0.3, softness: 0.2 }, tooltip: 'Dramatic Zoom - An intense zoom-in transition that creates impact and draws attention' }
       ],
       modern: [
-        { name: 'Quick Push', transition: 'pushRight', params: { softness: 0 } },
-        { name: 'Modern Iris', transition: 'irisCircle', params: { softness: 0.1 } },
-        { name: 'Tech Zoom', transition: 'zoomPan', params: { scale: 1.1, panX: 0.1, panY: 0.1 } }
+        { name: 'Quick Push', transition: 'pushRight', params: { softness: 0.0 }, tooltip: 'Quick Push - A snappy push transition with no blur for fast-paced, energetic edits' },
+        { name: 'Modern Iris', transition: 'irisCircle', params: { softness: 0.1 }, tooltip: 'Modern Iris - A subtle circular iris with slight feathering for contemporary style' },
+        { name: 'Tech Zoom', transition: 'zoomPan', params: { scale: 1.1, panX: 0.1, panY: 0.1 }, tooltip: 'Tech Zoom - A combined zoom and pan with subtle movement for a tech-forward look' }
       ],
       vintage: [
-        { name: 'Film Dissolve', transition: 'dissolve', params: { softness: 0.9 } },
-        { name: 'Classic Wipe', transition: 'wipeDiagonal', params: { softness: 0, angle: 45 } },
-        { name: 'Old School Iris', transition: 'irisCircle', params: { softness: 0.5, reverse: true } }
+        { name: 'Film Dissolve', transition: 'dissolve', params: { softness: 0.9 }, tooltip: 'Film Dissolve - A heavily softened dissolve that mimics classic film crossfades' },
+        { name: 'Classic Wipe', transition: 'wipeDiagonal', params: { softness: 0, angle: 45 }, tooltip: 'Classic Wipe - A clean diagonal wipe at 45 degrees reminiscent of vintage film transitions' },
+        { name: 'Old School Iris', transition: 'irisCircle', params: { softness: 0.5, reverse: true }, tooltip: 'Old School Iris - A closing iris with medium feathering for a nostalgic film ending' }
       ]
     };
   }

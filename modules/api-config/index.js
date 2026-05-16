@@ -8,6 +8,9 @@ const config = {
       apiKey: process.env.OPENAI_API_KEY || "",
       orgId: process.env.OPENAI_ORG_ID || "",
     },
+    videodb: {
+      apiKey: process.env.VIDEODB_API_KEY || "",
+    },
     supabase: {
       url: process.env.SUPABASE_URL || "https://bzxohkrxcwodllketcpz.supabase.co",
       anonKey: process.env.SUPABASE_ANON_KEY || "",
@@ -46,6 +49,13 @@ function getSupabaseAdminClient() {
   return createClient(config.api.supabase.url, config.api.supabase.serviceKey);
 }
 
+function getVideoDBKey() {
+  if (!config.api.videodb.apiKey) {
+    throw new Error("VIDEODB_API_KEY is not configured");
+  }
+  return config.api.videodb.apiKey;
+}
+
 function getDatabaseUrl() {
   return `postgresql://postgres:${encodeURIComponent(config.api.supabase.serviceKey.split('.')[0])}@${config.api.supabase.url.replace('https://', '').replace('.supabase.co', '.supabase.co:5432/postgres')}`;
 }
@@ -56,5 +66,6 @@ module.exports = {
   getOpenAICredentials,
   getSupabaseClient,
   getSupabaseAdminClient,
+  getVideoDBKey,
   getDatabaseUrl,
 };

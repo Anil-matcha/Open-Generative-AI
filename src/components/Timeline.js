@@ -113,6 +113,7 @@ export class Timeline extends Component {
     zoomOutBtn.dataset.action = 'zoom-out';
     zoomOutBtn.textContent = '🔍-';
     zoomOutBtn.title = 'Zoom out on the timeline';
+    zoomOutBtn.dataset.tooltip = 'Zoom Out — Decrease the timeline zoom level to see more of the project at once';
     toolbarLeft.appendChild(zoomOutBtn);
 
     const zoomInBtn = document.createElement('button');
@@ -120,6 +121,7 @@ export class Timeline extends Component {
     zoomInBtn.dataset.action = 'zoom-in';
     zoomInBtn.textContent = '🔍+';
     zoomInBtn.title = 'Zoom in on the timeline';
+    zoomInBtn.dataset.tooltip = 'Zoom In — Increase the timeline zoom level to see finer detail in your clips';
     toolbarLeft.appendChild(zoomInBtn);
 
     // Add track buttons
@@ -129,6 +131,7 @@ export class Timeline extends Component {
       btn.dataset.addTrack = type;
       btn.textContent = `+${type}`;
       btn.title = `Add a new ${type.toLowerCase()} track`;
+      btn.dataset.tooltip = `Add ${type} Track — Create a new ${type.toLowerCase()} track at the bottom of the timeline for adding ${type.toLowerCase()} clips`;
       toolbarLeft.appendChild(btn);
     });
 
@@ -200,9 +203,9 @@ export class Timeline extends Component {
       meta.innerHTML = `
         <div class="track-name">${track.name}</div>
         <div class="track-actions">
-          <button class="track-toggle ${track.muted ? 'locked' : ''}" data-toggle="mute">M</button>
-          <button class="track-toggle ${track.solo ? 'locked' : ''}" data-toggle="solo">S</button>
-          <button class="track-toggle ${track.locked ? 'locked' : ''}" data-toggle="lock">L</button>
+          <button class="track-toggle ${track.muted ? 'locked' : ''}" data-toggle="mute" title="Mute" data-tooltip="Mute Track — Silence this track's audio during playback">M</button>
+          <button class="track-toggle ${track.solo ? 'locked' : ''}" data-toggle="solo" title="Solo" data-tooltip="Solo Track — Play only this track and mute all others">S</button>
+          <button class="track-toggle ${track.locked ? 'locked' : ''}" data-toggle="lock" title="Lock" data-tooltip="Lock Track — Prevent this track from being edited or moved">L</button>
         </div>
         <div class="track-count">${track.clips.length} clips</div>
       `;
@@ -216,6 +219,8 @@ export class Timeline extends Component {
         clipEl.style.left = `${clip.left}%`;
         clipEl.style.width = `${clip.width}%`;
         clipEl.dataset.clipId = clip.id;
+        clipEl.title = clip.name;
+        clipEl.dataset.tooltip = `${clip.name} — Click to select this ${clip.type} clip for editing`;
         clipEl.innerHTML = `<span class="clip-label">${clip.name}</span>`;
         lane.appendChild(clipEl);
       });
@@ -228,12 +233,13 @@ export class Timeline extends Component {
 
   renderTools(container) {
     container.innerHTML = '';
-    const tools = [['↖', 'Select'], ['✂', 'Blade'], ['⤵', 'Ripple'], ['⤶', 'Roll'], ['⇿', 'Slip'], ['⇆', 'Slide'], ['🔍', 'Zoom'], ['👋', 'Hand']];
-    tools.forEach(([icon, label]) => {
+    const tools = [['↖', 'Select', 'Select Tool — Click and drag to select clips on the timeline'], ['✂', 'Blade', 'Blade Tool — Cut clips at the playhead position'], ['⤵', 'Ripple', 'Ripple Tool — Trim clips and automatically close gaps'], ['⤶', 'Roll', 'Roll Tool — Adjust the edit point between two adjacent clips'], ['⇿', 'Slip', 'Slip Tool — Change the in/out points of a clip without moving it'], ['⇆', 'Slide', 'Slide Tool — Move a clip left or right while keeping its content'], ['🔍', 'Zoom', 'Zoom Tool — Click to zoom in on a specific area of the timeline'], ['👋', 'Hand', 'Hand Tool — Pan and scroll around the timeline']];
+    tools.forEach(([icon, label, tooltip]) => {
       const btn = document.createElement('button');
       btn.className = 'tool-btn';
       btn.textContent = icon;
       btn.title = label;
+      btn.dataset.tooltip = tooltip;
       btn.addEventListener('click', () => {
         this.state.selectedTool = label;
         this.renderTools(container);
@@ -244,11 +250,23 @@ export class Timeline extends Component {
 
   renderPills(container) {
     container.innerHTML = '';
-    const pills = ['Text to Video', 'Image to Video', 'Retake', 'Extend', 'B-Roll', 'Music Gen', 'Audio Sync', 'Fill Gap AI', 'Elements', 'Dual Viewer'];
-    pills.forEach(pill => {
+    const pills = [
+      ['Text to Video', 'Generate a video clip from a text description'],
+      ['Image to Video', 'Animate a static image into a video clip'],
+      ['Retake', 'Regenerate the selected AI clip with a new prompt'],
+      ['Extend', 'Lengthen the selected clip by generating additional frames'],
+      ['B-Roll', 'Add supplementary footage to enhance your edit'],
+      ['Music Gen', 'Generate AI background music for your project'],
+      ['Audio Sync', 'Automatically synchronize audio to match your video'],
+      ['Fill Gap AI', 'Intelligently fill gaps in the timeline with generated content'],
+      ['Elements', 'Add visual elements such as overlays and graphics'],
+      ['Dual Viewer', 'Open a side-by-side viewer to compare two clips']
+    ];
+    pills.forEach(([label, tooltip]) => {
       const span = document.createElement('span');
       span.className = 'pill';
-      span.textContent = pill;
+      span.textContent = label;
+      span.dataset.tooltip = `${label} — ${tooltip}`;
       container.appendChild(span);
     });
   }

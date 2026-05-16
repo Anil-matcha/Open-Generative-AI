@@ -1,0 +1,100 @@
+version: 2
+updates:
+  # Main package.json - weekly security updates
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "04:00"
+    open-pull-requests-limit: 20
+    assignees:
+      - "maintainers"
+    reviewers:
+      - "security-team"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "security"
+      - "automerge-patch"
+    ignore:
+      # Skip major version bumps for now (manual review required)
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # Backend package.json
+  - package-ecosystem: "npm"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "04:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "backend-team"
+    commit-message:
+      prefix: "deps(backend)"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "backend"
+      - "security"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+      time: "04:00"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    labels:
+      - "ci-cd"
+      - "dependencies"
+
+  # Docker (if used)
+  # - package-ecosystem: "docker"
+  #   directory: "/"
+  #   schedule:
+  #     interval: "weekly"
+  #   commit-message:
+  #     prefix: "docker"
+  #     include: "scope"
+  #   labels:
+  #     - "docker"
+  #     - "dependencies"
+
+# Configuration for Renovate bot (alternative/companion to Dependabot)
+renovate-config:
+
+# Group related dependencies to reduce PR noise
+groups:
+  # Group minor/patch updates for fast auto-merge
+  fast-automerge:
+    patterns:
+      - "*"
+    updateTypes:
+      - "minor"
+      - "patch"
+    automerge: true
+    minimumReleaseAge: 3 days
+
+  # Separate group for major updates (manual review)
+  major-updates:
+    patterns:
+      - "*"
+    updateTypes:
+      - "major"
+    automerge: false
+    minimumReleaseAge: 7 days
+
+# Security updates should be prioritized
+security:
+  automerge: true
+  minimumReleaseAge: 1 day
+  branchName:
+    separator: "/"

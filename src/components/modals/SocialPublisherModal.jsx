@@ -55,19 +55,19 @@ export class SocialPublisherModal extends BaseModal {
       <div class="socialpublisher-container">
         <div class="publisher-header">
           <div class="step-tabs">
-            <button class="step-tab ${this.step === 'select' ? 'active' : ''}" data-step="select">
+            <button class="step-tab ${this.step === 'select' ? 'active' : ''}" data-step="select" data-tooltip="Select platforms to publish to">
               <span class="step-num">1</span>
               <span class="step-label">Select Platforms</span>
             </button>
-            <button class="step-tab ${this.step === 'compose' ? 'active' : ''}" data-step="compose">
+            <button class="step-tab ${this.step === 'compose' ? 'active' : ''}" data-step="compose" data-tooltip="Compose your post caption and hashtags">
               <span class="step-num">2</span>
               <span class="step-label">Compose</span>
             </button>
-            <button class="step-tab ${this.step === 'schedule' ? 'active' : ''}" data-step="schedule">
+            <button class="step-tab ${this.step === 'schedule' ? 'active' : ''}" data-step="schedule" data-tooltip="Schedule when to publish your post">
               <span class="step-num">3</span>
               <span class="step-label">Schedule</span>
             </button>
-            <button class="step-tab ${this.step === 'review' ? 'active' : ''}" data-step="review">
+            <button class="step-tab ${this.step === 'review' ? 'active' : ''}" data-step="review" data-tooltip="Review and confirm before publishing">
               <span class="step-num">4</span>
               <span class="step-label">Review</span>
             </button>
@@ -82,7 +82,8 @@ export class SocialPublisherModal extends BaseModal {
                 ${PLATFORMS.map(platform => `
                   <button class="platform-card ${this.selectedPlatforms.includes(platform.id) ? 'selected' : ''}" 
                           data-platform="${platform.id}"
-                          style="--platform-color: ${platform.color}">
+                          style="--platform-color: ${platform.color}"
+                          data-tooltip="Publish to ${platform.name} (${platform.description})">
                     <div class="platform-icon" style="background: ${platform.color}20; color: ${platform.color}">
                       ${platform.icon}
                     </div>
@@ -102,7 +103,7 @@ export class SocialPublisherModal extends BaseModal {
               <h3>Post Type</h3>
               <div class="post-types">
                 ${POST_TYPES.map(type => `
-                  <button class="post-type-btn ${this.postType === type.id ? 'active' : ''}" data-type="${type.id}">
+                  <button class="post-type-btn ${this.postType === type.id ? 'active' : ''}" data-type="${type.id}" data-tooltip="Create a ${type.label.toLowerCase()}">
                     <span class="type-icon">${type.icon}</span>
                     <span class="type-label">${type.label}</span>
                   </button>
@@ -118,7 +119,8 @@ export class SocialPublisherModal extends BaseModal {
                 <div class="caption-input-container">
                   <textarea class="caption-input" 
                             placeholder="Write a caption for your post..."
-                            aria-label="Post caption">${this.caption}</textarea>
+                            aria-label="Post caption"
+                            data-tooltip="Write a caption for your social media post">${this.caption}</textarea>
                   <div class="caption-meta">
                     <span class="char-count">${this.caption.length}/2200</span>
                   </div>
@@ -132,17 +134,18 @@ export class SocialPublisherModal extends BaseModal {
                     ${this.hashtags.map((tag, idx) => `
                       <span class="hashtag">
                         #${tag}
-                        <button class="hashtag-remove" data-index="${idx}">×</button>
+                        <button class="hashtag-remove" data-index="${idx}" data-tooltip="Remove hashtag #${tag}">×</button>
                       </span>
                     `).join('')}
                     <input type="text" class="hashtag-input" 
                            placeholder="${this.hashtags.length === 0 ? 'Add hashtags...' : ''}"
-                           aria-label="Add hashtag" />
+                           aria-label="Add hashtag"
+                           data-tooltip="Type a hashtag and press Enter to add it" />
                   </div>
                   <div class="hashtag-suggestions">
                     <span class="suggestion-label">Suggestions:</span>
                     ${['trending', 'viral', 'fyp', 'newvideo', 'edit'].map(tag => `
-                      <button class="suggestion-chip" data-tag="${tag}">#${tag}</button>
+                      <button class="suggestion-chip" data-tag="${tag}" data-tooltip="Add #${tag} hashtag">#${tag}</button>
                     `).join('')}
                   </div>
                 </div>
@@ -182,7 +185,7 @@ export class SocialPublisherModal extends BaseModal {
                 <h3>When to Publish</h3>
                 <div class="schedule-presets">
                   ${SCHEDULE_PRESETS.map(preset => `
-                    <button class="schedule-btn ${this.scheduleMode === preset.id ? 'active' : ''}" data-schedule="${preset.id}">
+                    <button class="schedule-btn ${this.scheduleMode === preset.id ? 'active' : ''}" data-schedule="${preset.id}" data-tooltip="${preset.label}">
                       <span class="schedule-icon">${preset.icon}</span>
                       <span class="schedule-label">${preset.label}</span>
                     </button>
@@ -195,11 +198,11 @@ export class SocialPublisherModal extends BaseModal {
                   <div class="datetime-row">
                     <div class="datetime-field">
                       <label>Date</label>
-                      <input type="date" class="date-input" />
+                      <input type="date" class="date-input" data-tooltip="Select the date to publish" />
                     </div>
                     <div class="datetime-field">
                       <label>Time</label>
-                      <input type="time" class="time-input" />
+                      <input type="time" class="time-input" data-tooltip="Select the time to publish" />
                     </div>
                   </div>
                 </div>
@@ -274,11 +277,11 @@ export class SocialPublisherModal extends BaseModal {
         <div class="publisher-footer">
           <div class="footer-nav">
             ${this.step !== 'select' ? `
-              <button class="nav-btn back-btn" data-nav="back">
+              <button class="nav-btn back-btn" data-nav="back" data-tooltip="Go back to the previous step">
                 ← Back
               </button>
             ` : ''}
-            <button class="nav-btn next-btn modal-btn modal-btn-primary" data-nav="next">
+            <button class="nav-btn next-btn modal-btn modal-btn-primary" data-nav="next" data-tooltip="${this.step === 'review' ? 'Publish your post now' : 'Go to the next step'}">
               ${this.step === 'review' ? '🚀 Publish Now' : 'Next →'}
             </button>
           </div>
@@ -286,7 +289,7 @@ export class SocialPublisherModal extends BaseModal {
       </div>
 
       <div class="modal-footer" style="display: none;">
-        <button class="modal-btn modal-btn-secondary modal-cancel">Cancel</button>
+        <button class="modal-btn modal-btn-secondary modal-cancel" data-tooltip="Cancel and close">Cancel</button>
       </div>
     `;
   }

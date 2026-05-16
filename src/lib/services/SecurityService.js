@@ -12,7 +12,7 @@ export class SecurityService {
     this.initialized = false;
     this.keyRotationInterval = 30 * 24 * 60 * 60 * 1000; // 30 days
     this.maxKeyAge = 90 * 24 * 60 * 60 * 1000; // 90 days
-    this.minKeyLength = 20;
+    this.minKeyLength = 10;
     this.maxKeyLength = 200;
 
     // Authentication state
@@ -153,8 +153,10 @@ export class SecurityService {
 
   /**
    * Store API key encrypted with current master key
+   * @param {string} apiKey - The API key to encrypt and store
+   * @param {string} [storageKey] - Optional custom localStorage key name (default: this.keyName)
    */
-  async storeEncryptedKey(apiKey) {
+  async storeEncryptedKey(apiKey, storageKey) {
     if (!this.masterKey) {
       await this.initialize();
     }
@@ -164,12 +166,12 @@ export class SecurityService {
       throw new Error(`Invalid API key: ${validation.reason}`);
     }
 
+    const targetKey = storageKey || this.keyName;
+
     try {
-      // Generate random salt and IV
       const salt = crypto.getRandomValues(new Uint8Array(16));
       const iv = crypto.getRandomValues(new Uint8Array(12));
 
-      // Encrypt the API key
       const encodedKey = new TextEncoder().encode(apiKey);
       const encrypted = await crypto.subtle.encrypt(
         {
@@ -180,7 +182,6 @@ export class SecurityService {
         encodedKey
       );
 
-      // Store encrypted key, salt, and IV
       const encryptedData = {
         encrypted: this.arrayBufferToBase64(encrypted),
         salt: this.arrayBufferToBase64(salt),
@@ -188,16 +189,14 @@ export class SecurityService {
         version: this.masterKeyVersion
       };
 
-      localStorage.setItem(this.keyName, JSON.stringify(encryptedData));
+      localStorage.setItem(targetKey, JSON.stringify(encryptedData));
 
-      // Update metadata
       this.updateKeyMetadata({
         created: Date.now(),
         lastUpdated: Date.now(),
         version: this.masterKeyVersion
       });
 
-      // Clear any auth tokens that might be cached
       this.authTokens.clear();
 
     } catch (error) {
@@ -208,14 +207,17 @@ export class SecurityService {
 
   /**
    * Retrieve and decrypt API key
+   * @param {string} [storageKey] - Optional custom localStorage key name (default: this.keyName)
    */
-  async getDecryptedKey() {
+  async getDecryptedKey(storageKey) {
     if (!this.masterKey) {
       await this.initialize();
     }
 
+    const targetKey = storageKey || this.keyName;
+
     try {
-      const encryptedDataStr = localStorage.getItem(this.keyName);
+      const encryptedDataStr = localStorage.getItem(targetKey);
       if (!encryptedDataStr) {
         return null;
       }
@@ -231,7 +233,6 @@ export class SecurityService {
       // Verify key version matches master key
       if (encryptedData.version !== this.masterKeyVersion) {
         console.warn('[SecurityService] Key version mismatch, attempting re-encryption');
-        // This might happen during key rotation, try to recover
         return null;
       }
 
@@ -252,7 +253,6 @@ export class SecurityService {
 
     } catch (error) {
       console.error('[SecurityService] Failed to decrypt API key:', error);
-      // Clear corrupted data
       this.clearStoredKey();
       return null;
     }

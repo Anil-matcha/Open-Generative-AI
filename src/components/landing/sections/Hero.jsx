@@ -6,6 +6,7 @@ export function Hero() {
   section.className = 'relative py-32 px-4 overflow-hidden';
   section.setAttribute('role', 'banner');
   section.setAttribute('aria-labelledby', 'hero-headline');
+  section.setAttribute('data-testid', 'hero-section');
 
   // Background gradient mesh
   section.innerHTML = `

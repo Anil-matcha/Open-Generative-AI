@@ -3,7 +3,7 @@
  * Provides comprehensive color grading tools integrated with keyframe animation
  */
 
-import { KeyframeSystem, ANIMATION_PROPERTIES } from './keyframeSystem.js';
+import { KeyframeSystem, ANIMATION_PROPERTIES } from './keyframeSystem.jsx';
 
 export class ColorCorrectionSystem {
   constructor(timelineContainer, state, keyframeSystem) {
@@ -34,10 +34,10 @@ export class ColorCorrectionSystem {
       <div class="color-panel-header">
         <h3>Color Correction</h3>
         <div class="panel-tabs">
-          <button class="tab-btn active" data-tab="basic">Basic</button>
-          <button class="tab-btn" data-tab="curves">Curves</button>
-          <button class="tab-btn" data-tab="wheels">Wheels</button>
-          <button class="tab-btn" data-tab="lut">LUT</button>
+          <button class="tab-btn active" data-tab="basic" data-tooltip="Basic Adjustments - Quick access to essential color correction controls like brightness, contrast, and saturation">Basic</button>
+          <button class="tab-btn" data-tab="curves" data-tooltip="Curves Editor - Fine-tune color and luminance with customizable bezier curves for precise tonal control">Curves</button>
+          <button class="tab-btn" data-tab="wheels" data-tooltip="Color Wheels - Adjust shadows, midtones, and highlights using intuitive color wheel controls for professional grading">Wheels</button>
+          <button class="tab-btn" data-tab="lut" data-tooltip="LUT Panel - Apply and manage Look-Up Tables for cinematic color grading presets and custom LUT files">LUT</button>
         </div>
       </div>
 
@@ -58,11 +58,11 @@ export class ColorCorrectionSystem {
       </div>
 
       <div class="color-presets">
-        <button class="preset-btn" data-preset="neutral">Reset</button>
-        <button class="preset-btn" data-preset="warm">Warm</button>
-        <button class="preset-btn" data-preset="cool">Cool</button>
-        <button class="preset-btn" data-preset="vintage">Vintage</button>
-        <button class="preset-btn" data-preset="cinematic">Cinematic</button>
+        <button class="preset-btn" data-preset="neutral" data-tooltip="Reset - Restore all color correction settings to their default neutral values">Reset</button>
+        <button class="preset-btn" data-preset="warm" data-tooltip="Warm Preset - Apply a warm color grade that enhances reds and yellows for a cozy, sunlit look">Warm</button>
+        <button class="preset-btn" data-preset="cool" data-tooltip="Cool Preset - Apply a cool color grade that enhances blues and cyans for a crisp, modern look">Cool</button>
+        <button class="preset-btn" data-preset="vintage" data-tooltip="Vintage Preset - Apply a retro film look with faded colors, lifted blacks, and warm tones">Vintage</button>
+        <button class="preset-btn" data-preset="cinematic" data-tooltip="Cinematic Preset - Apply a professional film-style grade with enhanced contrast and teal-orange color balance">Cinematic</button>
       </div>
     `;
 
@@ -77,17 +77,17 @@ export class ColorCorrectionSystem {
         <h4>Exposure & Tone</h4>
         <div class="slider-row">
           <label>Brightness</label>
-          <input type="range" class="color-slider" data-property="brightness" min="0" max="200" step="1">
+          <input type="range" class="color-slider" data-property="brightness" min="0" max="200" step="1" data-tooltip="Brightness - Adjust the overall luminance of the clip, making it brighter or darker">
           <span class="value-display">100%</span>
         </div>
         <div class="slider-row">
           <label>Contrast</label>
-          <input type="range" class="color-slider" data-property="contrast" min="0" max="200" step="1">
+          <input type="range" class="color-slider" data-property="contrast" min="0" max="200" step="1" data-tooltip="Contrast - Control the difference between light and dark areas, increasing or decreasing tonal range">
           <span class="value-display">100%</span>
         </div>
         <div class="slider-row">
           <label>Gamma</label>
-          <input type="range" class="color-slider" data-property="gamma" min="0.1" max="4" step="0.1">
+          <input type="range" class="color-slider" data-property="gamma" min="0.1" max="4" step="0.1" data-tooltip="Gamma - Adjust the midtone response curve without affecting pure black and white points">
           <span class="value-display">1.0</span>
         </div>
       </div>
@@ -98,27 +98,27 @@ export class ColorCorrectionSystem {
           <div class="histogram-container">
             <canvas class="histogram-canvas" width="256" height="80"></canvas>
             <div class="levels-markers">
-              <div class="input-black-marker" data-type="input-black"></div>
-              <div class="input-gamma-marker" data-type="input-gamma"></div>
-              <div class="input-white-marker" data-type="input-white"></div>
-              <div class="output-black-marker" data-type="output-black"></div>
-              <div class="output-white-marker" data-type="output-white"></div>
+              <div class="input-black-marker" data-type="input-black" data-tooltip="Input Black Point - Set the darkest pixel value that will be mapped to pure black"></div>
+              <div class="input-gamma-marker" data-type="input-gamma" data-tooltip="Input Gamma Point - Adjust the midpoint of the input tonal range to brighten or darken midtones"></div>
+              <div class="input-white-marker" data-type="input-white" data-tooltip="Input White Point - Set the brightest pixel value that will be mapped to pure white"></div>
+              <div class="output-black-marker" data-type="output-black" data-tooltip="Output Black Point - Set the minimum brightness level for the darkest output values"></div>
+              <div class="output-white-marker" data-type="output-white" data-tooltip="Output White Point - Set the maximum brightness level for the lightest output values"></div>
             </div>
           </div>
           <div class="levels-values">
             <div class="input-levels">
               <label>Input:</label>
-              <input type="number" class="input-black" min="0" max="255" value="0">
-              <input type="number" class="input-gamma" min="0.1" max="10" step="0.1" value="1.0">
-              <input type="number" class="input-white" min="0" max="255" value="255">
+              <input type="number" class="input-black" min="0" max="255" value="0" data-tooltip="Input Black Level - Define the threshold below which all pixels become pure black (0-255)">
+              <input type="number" class="input-gamma" min="0.1" max="10" step="0.1" value="1.0" data-tooltip="Input Gamma Value - Control the midtone curve shape; values below 1 brighten, above 1 darken midtones">
+              <input type="number" class="input-white" min="0" max="255" value="255" data-tooltip="Input White Level - Define the threshold above which all pixels become pure white (0-255)">
             </div>
             <div class="output-levels">
               <label>Output:</label>
-              <input type="number" class="output-black" min="0" max="255" value="0">
-              <input type="number" class="output-white" min="0" max="255" value="255">
+              <input type="number" class="output-black" min="0" max="255" value="0" data-tooltip="Output Black Level - Set the minimum output brightness; higher values lift the blacks for a faded look">
+              <input type="number" class="output-white" min="0" max="255" value="255" data-tooltip="Output White Level - Set the maximum output brightness; lower values reduce highlight intensity">
             </div>
           </div>
-          <button class="auto-levels-btn">Auto Levels</button>
+          <button class="auto-levels-btn" data-tooltip="Auto Levels - Automatically analyze the image and set optimal input levels for maximum tonal range">Auto Levels</button>
         </div>
       </div>
 
@@ -126,17 +126,17 @@ export class ColorCorrectionSystem {
         <h4>Color</h4>
         <div class="slider-row">
           <label>Saturation</label>
-          <input type="range" class="color-slider" data-property="saturation" min="0" max="200" step="1">
+          <input type="range" class="color-slider" data-property="saturation" min="0" max="200" step="1" data-tooltip="Saturation - Control the intensity of all colors; increase for vivid colors or decrease for muted tones">
           <span class="value-display">100%</span>
         </div>
         <div class="slider-row">
           <label>Hue</label>
-          <input type="range" class="color-slider" data-property="hue" min="-180" max="180" step="1">
+          <input type="range" class="color-slider" data-property="hue" min="-180" max="180" step="1" data-tooltip="Hue Rotation - Shift all colors around the color wheel to create stylized looks or correct color casts">
           <span class="value-display">0°</span>
         </div>
         <div class="slider-row">
           <label>Vibrance</label>
-          <input type="range" class="color-slider" data-property="vibrance" min="-100" max="100" step="1">
+          <input type="range" class="color-slider" data-property="vibrance" min="-100" max="100" step="1" data-tooltip="Vibrance - Intelligently boost less-saturated colors while protecting skin tones and already-vivid areas">
           <span class="value-display">0</span>
         </div>
       </div>
@@ -145,12 +145,12 @@ export class ColorCorrectionSystem {
         <h4>White Balance</h4>
         <div class="slider-row">
           <label>Temperature</label>
-          <input type="range" class="color-slider" data-property="temperature" min="2000" max="12000" step="50">
+          <input type="range" class="color-slider" data-property="temperature" min="2000" max="12000" step="50" data-tooltip="Color Temperature - Adjust the warm-cool balance of the image; lower values are cooler (blue), higher values are warmer (orange)">
           <span class="value-display">6500K</span>
         </div>
         <div class="slider-row">
           <label>Tint</label>
-          <input type="range" class="color-slider" data-property="tint" min="-50" max="50" step="1">
+          <input type="range" class="color-slider" data-property="tint" min="-50" max="50" step="1" data-tooltip="Tint - Shift the color balance along the green-magenta axis to correct or stylize the white balance">
           <span class="value-display">0</span>
         </div>
       </div>
@@ -160,17 +160,17 @@ export class ColorCorrectionSystem {
         <div class="rgb-controls">
           <div class="channel-control">
             <label>Red Gain</label>
-            <input type="range" class="color-slider" data-property="redGain" min="0" max="200" step="1">
+            <input type="range" class="color-slider" data-property="redGain" min="0" max="200" step="1" data-tooltip="Red Channel Gain - Amplify or reduce the intensity of the red color channel independently">
             <span class="value-display">100%</span>
           </div>
           <div class="channel-control">
             <label>Green Gain</label>
-            <input type="range" class="color-slider" data-property="greenGain" min="0" max="200" step="1">
+            <input type="range" class="color-slider" data-property="greenGain" min="0" max="200" step="1" data-tooltip="Green Channel Gain - Amplify or reduce the intensity of the green color channel independently">
             <span class="value-display">100%</span>
           </div>
           <div class="channel-control">
             <label>Blue Gain</label>
-            <input type="range" class="color-slider" data-property="blueGain" min="0" max="200" step="1">
+            <input type="range" class="color-slider" data-property="blueGain" min="0" max="200" step="1" data-tooltip="Blue Channel Gain - Amplify or reduce the intensity of the blue color channel independently">
             <span class="value-display">100%</span>
           </div>
         </div>
@@ -182,11 +182,11 @@ export class ColorCorrectionSystem {
     return `
       <div class="curves-editor">
         <div class="curve-tabs">
-          <button class="curve-tab active" data-curve="rgb">RGB</button>
-          <button class="curve-tab" data-curve="red">Red</button>
-          <button class="curve-tab" data-curve="green">Green</button>
-          <button class="curve-tab" data-curve="blue">Blue</button>
-          <button class="curve-tab" data-curve="luma">Luma</button>
+          <button class="curve-tab active" data-curve="rgb" data-tooltip="RGB Curve - Adjust the combined red, green, and blue channels to control overall tonal response">RGB</button>
+          <button class="curve-tab" data-curve="red" data-tooltip="Red Channel Curve - Adjust the red color channel independently for targeted color grading">Red</button>
+          <button class="curve-tab" data-curve="green" data-tooltip="Green Channel Curve - Adjust the green color channel independently for targeted color grading">Green</button>
+          <button class="curve-tab" data-curve="blue" data-tooltip="Blue Channel Curve - Adjust the blue color channel independently for targeted color grading">Blue</button>
+          <button class="curve-tab" data-curve="luma" data-tooltip="Luma Curve - Adjust luminance independently from color for precise brightness control">Luma</button>
         </div>
         <div class="curve-canvas-container">
           <canvas class="curve-canvas" width="256" height="256"></canvas>
@@ -194,10 +194,10 @@ export class ColorCorrectionSystem {
           <div class="curve-histogram"></div>
         </div>
         <div class="curve-controls">
-          <button class="curve-reset-btn">Reset Curve</button>
-          <button class="curve-invert-btn">Invert</button>
-          <button class="curve-linear-btn">Linear</button>
-          <input type="range" class="curve-spline-tension" min="0" max="1" step="0.1" value="0.5" title="Spline Tension">
+          <button class="curve-reset-btn" data-tooltip="Reset Curve - Remove all control points and restore the curve to a straight linear diagonal">Reset Curve</button>
+          <button class="curve-invert-btn" data-tooltip="Invert Curve - Flip the curve vertically to create a negative or inverted tonal effect">Invert</button>
+          <button class="curve-linear-btn" data-tooltip="Linear Curve - Reset the curve to a perfectly straight line with no tonal adjustments applied">Linear</button>
+          <input type="range" class="curve-spline-tension" min="0" max="1" step="0.1" value="0.5" title="Spline Tension" data-tooltip="Spline Tension - Control the smoothness of the curve interpolation between control points">
         </div>
         <div class="curve-info">
           <div class="curve-input">Input: <span class="input-value">0</span></div>
@@ -212,21 +212,21 @@ export class ColorCorrectionSystem {
       <div class="color-wheels">
         <div class="wheel-group">
           <h4>Lift (Shadows)</h4>
-          <div class="color-wheel" data-wheel="lift">
+          <div class="color-wheel" data-wheel="lift" data-tooltip="Lift Wheel - Color grading wheel for shadows; drag to tint the darkest areas of the image with a specific color">
             <canvas class="wheel-canvas" width="120" height="120"></canvas>
             <div class="wheel-indicator"></div>
           </div>
         </div>
         <div class="wheel-group">
           <h4>Gamma (Midtones)</h4>
-          <div class="color-wheel" data-wheel="gamma">
+          <div class="color-wheel" data-wheel="gamma" data-tooltip="Gamma Wheel - Color grading wheel for midtones; drag to tint the middle brightness range of the image">
             <canvas class="wheel-canvas" width="120" height="120"></canvas>
             <div class="wheel-indicator"></div>
           </div>
         </div>
         <div class="wheel-group">
           <h4>Gain (Highlights)</h4>
-          <div class="color-wheel" data-wheel="gain">
+          <div class="color-wheel" data-wheel="gain" data-tooltip="Gain Wheel - Color grading wheel for highlights; drag to tint the brightest areas of the image with a specific color">
             <canvas class="wheel-canvas" width="120" height="120"></canvas>
             <div class="wheel-indicator"></div>
           </div>
@@ -241,10 +241,10 @@ export class ColorCorrectionSystem {
         <div class="lut-browser">
           <h4>LUT Library</h4>
           <div class="lut-categories">
-            <button class="lut-category active" data-category="film">Film</button>
-            <button class="lut-category" data-category="video">Video</button>
-            <button class="lut-category" data-category="cinematic">Cinematic</button>
-            <button class="lut-category" data-category="custom">Custom</button>
+            <button class="lut-category active" data-category="film" data-tooltip="Film LUTs - Browse cinematic LUTs that emulate classic film stocks and analog color responses">Film</button>
+            <button class="lut-category" data-category="video" data-tooltip="Video LUTs - Browse LUTs optimized for video content with broadcast-safe color transformations">Video</button>
+            <button class="lut-category" data-category="cinematic" data-tooltip="Cinematic LUTs - Browse dramatic color grades designed for narrative and commercial film looks">Cinematic</button>
+            <button class="lut-category" data-category="custom" data-tooltip="Custom LUTs - Access your personal collection of imported LUT files for custom color styles">Custom</button>
           </div>
           <div class="lut-grid">
             <!-- LUT thumbnails will be populated here -->
@@ -253,10 +253,10 @@ export class ColorCorrectionSystem {
         <div class="lut-controls">
           <div class="slider-row">
             <label>Strength</label>
-            <input type="range" class="lut-slider" data-property="lutStrength" min="0" max="100" step="1">
+            <input type="range" class="lut-slider" data-property="lutStrength" min="0" max="100" step="1" data-tooltip="LUT Strength - Control the intensity of the applied LUT effect from subtle to full strength">
             <span class="value-display">100%</span>
           </div>
-          <button class="lut-load-btn">Load LUT File</button>
+          <button class="lut-load-btn" data-tooltip="Load LUT File - Import a custom LUT file (.cube or .3dl format) from your computer to apply as a color grade">Load LUT File</button>
           <input type="file" class="lut-file-input" accept=".cube,.3dl" style="display: none;">
         </div>
       </div>
@@ -270,17 +270,17 @@ export class ColorCorrectionSystem {
       <div class="scopes-header">
         <h4>Color Scopes</h4>
         <div class="scope-tabs">
-          <button class="scope-tab active" data-scope="waveform">Waveform</button>
-          <button class="scope-tab" data-scope="vectorscope">Vectorscope</button>
-          <button class="scope-tab" data-scope="rgb-histogram">RGB Histogram</button>
-          <button class="scope-tab" data-scope="parade">Parade</button>
+          <button class="scope-tab active" data-scope="waveform" data-tooltip="Waveform Monitor - Display luminance levels across the image horizontally to evaluate exposure and contrast">Waveform</button>
+          <button class="scope-tab" data-scope="vectorscope" data-tooltip="Vectorscope - Display color information in a circular graph to analyze hue and saturation distribution">Vectorscope</button>
+          <button class="scope-tab" data-scope="rgb-histogram" data-tooltip="RGB Histogram - Display separate red, green, and blue channel histograms to evaluate color balance and clipping">RGB Histogram</button>
+          <button class="scope-tab" data-scope="parade" data-tooltip="RGB Parade - Display red, green, and blue channels side by side to compare luminance levels across each color channel">Parade</button>
         </div>
         <div class="scope-controls">
           <label class="checkbox-label">
-            <input type="checkbox" class="scope-overlay-checkbox" checked>
+            <input type="checkbox" class="scope-overlay-checkbox" checked data-tooltip="Show on Preview - Toggle whether the selected scope overlay is displayed on the video preview window">
             Show on preview
           </label>
-          <select class="scope-intensity-select">
+          <select class="scope-intensity-select" data-tooltip="Scope Intensity - Adjust the brightness and opacity of the scope overlay displayed on the preview">
             <option value="low">Low</option>
             <option value="medium" selected>Medium</option>
             <option value="high">High</option>
@@ -1420,5 +1420,4 @@ class EnhancedCurveEditor {
 
     return lut;
   }
-}</content>
-<parameter name="filePath">src/lib/editor/colorCorrectionSystem.js
+}

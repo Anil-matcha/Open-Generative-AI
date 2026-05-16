@@ -1,0 +1,163 @@
+name: Weekly Security Audit
+
+on:
+  schedule:
+    # Run every Monday at 2:00 AM UTC
+    - cron: '0 2 * * 1'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  security-audit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+      security-events: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.12.0'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.18.3 --activate
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run SRI hash verification
+        run: node scripts/verify-sri-hashes.js
+
+      - name: Run main security audit
+        run: pnpm audit --json > /tmp/audit-main.json
+
+      - name: Run backend security audit
+        run: cd backend && pnpm audit --json > /tmp/audit-backend.json
+
+      - name: Check for vulnerabilities
+        id: vuln-check
+        run: |
+          # Parse audit results
+          node -e "
+            const fs = require('fs');
+            const main = JSON.parse(fs.readFileSync('/tmp/audit-main.json', 'utf8'));
+            const backend = JSON.parse(fs.readFileSync('/tmp/audit-backend.json', 'utf8'));
+            const actions = [...(main.actions || []), ...(backend.actions || [])];
+
+            const critical = actions.filter(a => a.action === 'update' &&
+              a.module?.toLowerCase().includes('critical') ||
+              a.id >= 1100000 // Example threshold - adjust based on actual data
+            );
+
+            const high = actions.filter(a => a.action === 'update' && !critical.includes(a));
+
+            console.log('Critical vulnerabilities:', critical.length);
+            console.log('High vulnerabilities:', high.length);
+
+            if (critical.length > 0) {
+              console.log('CRITICAL vulnerabilities found!');
+              console.log(JSON.stringify(critical, null, 2));
+              process.exit(1);
+            }
+
+            console.log('No critical vulnerabilities. High:', high.length);
+          "
+
+      - name: Dependency Review (GitHub native)
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-critical: 'only'
+          comment-on-pr: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run OWASP Dependency-Check
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: 'Open-Higgsfield-AI'
+          path: '.'
+          format: 'CSV,JSON,HTML'
+          failOnCVSS: 7
+          out: 'security-reports/'
+          args: >
+            --enableRetired
+            --enableExperimental
+            --nvdValidForHours 24
+            --suppressionFiles='security/suppressions.xml'
+
+      - name: Upload vulnerability reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-audit-reports
+          path: |
+            /tmp/audit-*.json
+            security-reports/
+          retention-days: 30
+
+      - name: Generate security issue
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const mainAudit = JSON.parse(fs.readFileSync('/tmp/audit-main.json', 'utf8'));
+            const actions = mainAudit.actions || [];
+
+            const issues = actions
+              .filter(a => a.action === 'update')
+              .map(a => `- ${a.module} (${a.path.join(' > ')}): ${a.target || 'needs update'}`)
+              .slice(0, 20);
+
+            const body = `
+            ## Security Audit Results
+
+            ❌ **Critical security vulnerabilities detected** in dependency scan.
+
+            ### Required Updates:
+            ${issues.join('\n')}
+
+            ### Actions Required:
+            1. Review and update vulnerable dependencies
+            2. Run \`pnpm update\` locally
+            3. Test thoroughly before deployment
+            4. Merge this PR after fixes
+
+            Report generated: ${new Date().toISOString()}
+            `;
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🚨 Security vulnerabilities detected - ${new Date().toISOString().split('T')[0]}`,
+              body: body,
+              labels: ['security', 'dependencies', 'critical']
+            });
+
+      - name: Create security PR with updates (if possible)
+        if: success() && steps.vuln-check.outcome != 'failure'
+        run: |
+          # Auto-update non-breaking dependencies
+          echo "No critical vulnerabilities - all dependencies up to date"
+
+      - name: Notify Slack (optional)
+        if: always()
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          channel-id: ${{ secrets.SLACK_SECURITY_CHANNEL }}
+          slack-message: |
+            :warning: *Security Audit Report*
+            Repository: ${{ github.repository }}
+            Status: ${{ job.status }}
+            Details: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}

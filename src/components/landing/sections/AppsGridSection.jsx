@@ -4,6 +4,7 @@ export function AppsGridSection({ apps }) {
   const section = document.createElement('section');
   section.className = 'py-20 px-4 bg-gradient-to-b from-[#05070b] to-[#020205]';
   section.setAttribute('aria-labelledby', 'apps-heading');
+  section.setAttribute('data-testid', 'apps-grid-section');
 
   // Get unique categories from apps
   const categories = ['All', 'Create', 'Enhance', 'Produce', 'Localize', 'Automate', 'Scale'];
@@ -61,7 +62,7 @@ export function AppsGridSection({ apps }) {
       <!-- Apps Grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12" id="apps-grid">
         ${apps.map((app, index) => `
-          <a href="${app.link}" class="app-card group block p-6 bg-gradient-to-br from-white/5 to-white/2 border border-white/10 rounded-xl hover:border-cyan-400/50 hover:bg-cyan-400/5 transition-all duration-300 hover:transform hover:scale-105 hover:shadow-2xl hover:shadow-cyan-400/20 opacity-0 translate-y-4" data-app-id="${app.id}" data-index="${index}">
+          <a href="${app.link}" class="app-card group block p-6 bg-gradient-to-br from-white/5 to-white/2 border border-white/10 rounded-xl hover:border-cyan-400/50 hover:bg-cyan-400/5 transition-all duration-300 hover:transform hover:scale-105 hover:shadow-2xl hover:shadow-cyan-400/20 opacity-0 translate-y-4" data-app-id="${app.id}" data-index="${index}" data-testid="app-card">
             <div class="flex items-start gap-4">
               <div class="w-12 h-12 bg-cyan-400/20 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-cyan-400/30 transition-colors">
                 <span class="text-2xl">${getAppIcon(app.id)}</span>

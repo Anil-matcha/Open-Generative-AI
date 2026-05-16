@@ -94,13 +94,13 @@ export class ConnectModal extends BaseModal {
               <circle cx="11" cy="11" r="8"/>
               <line x1="21" y1="21" x2="16.65" y2="16.65"/>
             </svg>
-            <input type="text" class="search-input" placeholder="Search services..." value="${this.searchQuery}" />
+            <input type="text" class="search-input" placeholder="Search services..." value="${this.searchQuery}" data-tooltip="Search for a service to connect" />
           </div>
           <div class="filter-tabs">
-            <button class="filter-tab ${this.activeFilter === 'all' ? 'active' : ''}" data-filter="all">All</button>
-            <button class="filter-tab ${this.activeFilter === 'connected' ? 'active' : ''}" data-filter="connected">Connected</button>
-            <button class="filter-tab ${this.activeFilter === 'storage' ? 'active' : ''}" data-filter="storage">Storage</button>
-            <button class="filter-tab ${this.activeFilter === 'social' ? 'active' : ''}" data-filter="social">Social</button>
+            <button class="filter-tab ${this.activeFilter === 'all' ? 'active' : ''}" data-filter="all" data-tooltip="Show all services">All</button>
+            <button class="filter-tab ${this.activeFilter === 'connected' ? 'active' : ''}" data-filter="connected" data-tooltip="Show only connected services">Connected</button>
+            <button class="filter-tab ${this.activeFilter === 'storage' ? 'active' : ''}" data-filter="storage" data-tooltip="Show cloud storage services">Storage</button>
+            <button class="filter-tab ${this.activeFilter === 'social' ? 'active' : ''}" data-filter="social" data-tooltip="Show social media services">Social</button>
           </div>
         </div>
 
@@ -159,9 +159,9 @@ export class ConnectModal extends BaseModal {
               </svg>
               Connected
             </span>
-            <button class="modal-btn modal-btn-secondary disconnect-btn" data-service="${service.id}">Disconnect</button>
+            <button class="modal-btn modal-btn-secondary disconnect-btn" data-service="${service.id}" data-tooltip="Disconnect ${service.name}">Disconnect</button>
           ` : `
-            <button class="modal-btn modal-btn-primary connect-btn" data-service="${service.id}">
+            <button class="modal-btn modal-btn-primary connect-btn" data-service="${service.id}" data-tooltip="Connect to ${service.name}">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
                 <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
@@ -195,7 +195,7 @@ export class ConnectModal extends BaseModal {
           <div class="oauth-spinner"></div>
           <h3>Connecting to ${this.services.find(s => s.id === this.oauthInProgress)?.name}</h3>
           <p>Please wait while we authorize your account...</p>
-          <button class="modal-btn modal-btn-secondary cancel-oauth-btn">Cancel</button>
+          <button class="modal-btn modal-btn-secondary cancel-oauth-btn" data-tooltip="Cancel the connection process">Cancel</button>
         </div>
       </div>
     `;

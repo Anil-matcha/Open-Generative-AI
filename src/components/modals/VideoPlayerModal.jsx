@@ -28,6 +28,7 @@ export class VideoPlayerModal extends BaseModal {
             class="video-player"
             src="${this.url}"
             poster=""
+            data-tooltip="Video player - use controls to play, pause, and adjust volume"
           >
             Your browser does not support the video tag.
           </video>
@@ -45,7 +46,6 @@ export class VideoPlayerModal extends BaseModal {
       addVideoErrorRecovery(video, {
         onError: (message, error) => {
           console.error('VideoPlayerModal error:', message, error);
-          // Could show error in modal
         }
       });
     }
@@ -53,7 +53,7 @@ export class VideoPlayerModal extends BaseModal {
 
   renderFooter() {
     return `
-      <button class="modal-btn modal-btn-secondary modal-cancel">Close</button>
+      <button class="modal-btn modal-btn-secondary modal-cancel" data-tooltip="Close video player">Close</button>
     `;
   }
 }

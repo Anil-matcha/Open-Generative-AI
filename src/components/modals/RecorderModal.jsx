@@ -39,19 +39,19 @@ export class RecorderModal extends BaseModal {
     return `
       <div class="recorder-container">
         <div class="recorder-type-selector">
-          <button class="type-btn ${this.recordingType === 'screen' ? 'active' : ''}" data-type="screen">
+          <button class="type-btn ${this.recordingType === 'screen' ? 'active' : ''}" data-type="screen" data-tooltip="Record your screen">
             <span class="type-icon">🖥</span>
             <span class="type-label">Screen</span>
           </button>
-          <button class="type-btn ${this.recordingType === 'camera' ? 'active' : ''}" data-type="camera">
+          <button class="type-btn ${this.recordingType === 'camera' ? 'active' : ''}" data-type="camera" data-tooltip="Record from webcam">
             <span class="type-icon">📷</span>
             <span class="type-label">Webcam</span>
           </button>
-          <button class="type-btn ${this.recordingType === 'both' ? 'active' : ''}" data-type="both">
+          <button class="type-btn ${this.recordingType === 'both' ? 'active' : ''}" data-type="both" data-tooltip="Record screen and webcam together">
             <span class="type-icon">⊕</span>
             <span class="type-label">Screen + Cam</span>
           </button>
-          <button class="type-btn ${this.recordingType === 'audio' ? 'active' : ''}" data-type="audio">
+          <button class="type-btn ${this.recordingType === 'audio' ? 'active' : ''}" data-type="audio" data-tooltip="Record audio only">
             <span class="type-icon">🎤</span>
             <span class="type-label">Audio</span>
           </button>
@@ -109,7 +109,7 @@ export class RecorderModal extends BaseModal {
           </div>
 
           <div class="preview-controls">
-            <button class="preview-toggle ${this.includeWebcam ? 'active' : ''}" data-action="toggle-webcam">
+            <button class="preview-toggle ${this.includeWebcam ? 'active' : ''}" data-action="toggle-webcam" data-tooltip="${this.includeWebcam ? 'Disable webcam overlay' : 'Enable webcam overlay'}">
               <span>📷</span> Webcam
             </button>
           </div>
@@ -120,7 +120,7 @@ export class RecorderModal extends BaseModal {
             <label class="option-label">Quality</label>
             <div class="quality-options">
               ${QUALITY_OPTIONS.map(q => `
-                <button class="quality-btn ${this.selectedQuality === q.id ? 'active' : ''}" data-quality="${q.id}">
+                <button class="quality-btn ${this.selectedQuality === q.id ? 'active' : ''}" data-quality="${q.id}" data-tooltip="${q.name}${q.resolution ? ' - ' + q.resolution + ' at ' + q.fps + 'fps' : ''}">
                   <span class="quality-name">${q.name}</span>
                   ${q.resolution ? `<span class="quality-res">${q.resolution}</span>` : ''}
                 </button>
@@ -130,9 +130,9 @@ export class RecorderModal extends BaseModal {
 
           <div class="option-group">
             <label class="option-label">Microphone</label>
-            <select class="mic-select">
+            <select class="mic-select" data-tooltip="Select microphone input source">
               ${MIC_OPTIONS.map(mic => `
-                <option value="${mic.id}" ${this.selectedMic === mic.id ? 'selected' : ''}>${mic.label}</option>
+                <option value="${mic.id}" ${this.selectedMic === mic.id ? 'selected' : ''} data-tooltip="${mic.label}">${mic.label}</option>
               `).join('')}
             </select>
           </div>
@@ -143,10 +143,10 @@ export class RecorderModal extends BaseModal {
             <h4>Recording Preview</h4>
             <video class="recorded-playback" src="${URL.createObjectURL(this.recordedBlob)}" controls></video>
             <div class="recording-actions">
-              <button class="action-btn" data-action="discard">
+              <button class="action-btn" data-action="discard" data-tooltip="Discard this recording">
                 <span>🗑</span> Discard
               </button>
-              <button class="action-btn" data-action="save">
+              <button class="action-btn" data-action="save" data-tooltip="Save recording to file">
                 <span>💾</span> Save Recording
               </button>
             </div>
@@ -157,27 +157,27 @@ export class RecorderModal extends BaseModal {
       <div class="modal-footer recorder-footer">
         <div class="footer-left">
           ${!this.isRecording && !this.recordedBlob ? `
-            <button class="modal-btn modal-btn-secondary" data-action="settings">
+            <button class="modal-btn modal-btn-secondary" data-action="settings" data-tooltip="Open recorder settings">
               <span>⚙</span> Settings
             </button>
           ` : ''}
         </div>
         <div class="footer-right">
           ${this.isRecording ? `
-            <button class="modal-btn ${this.isPaused ? 'modal-btn-primary' : 'modal-btn-secondary'}" data-action="${this.isPaused ? 'resume' : 'pause'}">
+            <button class="modal-btn ${this.isPaused ? 'modal-btn-primary' : 'modal-btn-secondary'}" data-action="${this.isPaused ? 'resume' : 'pause'}" data-tooltip="${this.isPaused ? 'Resume recording' : 'Pause recording'}">
               ${this.isPaused ? '▶ Resume' : '⏸ Pause'}
             </button>
-            <button class="modal-btn modal-btn-danger" data-action="stop">
+            <button class="modal-btn modal-btn-danger" data-action="stop" data-tooltip="Stop recording">
               ⏹ Stop
             </button>
           ` : this.recordedBlob ? `
-            <button class="modal-btn modal-btn-secondary modal-cancel">Cancel</button>
-            <button class="modal-btn modal-btn-primary" data-action="use-recording">
+            <button class="modal-btn modal-btn-secondary modal-cancel" data-tooltip="Cancel and close">Cancel</button>
+            <button class="modal-btn modal-btn-primary" data-action="use-recording" data-tooltip="Use this recording in your project">
               Use Recording
             </button>
           ` : `
-            <button class="modal-btn modal-btn-secondary modal-cancel">Cancel</button>
-            <button class="modal-btn modal-btn-primary" data-action="start" ${this.recordingType === 'screen' ? '' : ''}>
+            <button class="modal-btn modal-btn-secondary modal-cancel" data-tooltip="Cancel and close">Cancel</button>
+            <button class="modal-btn modal-btn-primary" data-action="start" data-tooltip="Start recording" ${this.recordingType === 'screen' ? '' : ''}>
               ⏺ Start Recording
             </button>
           `}

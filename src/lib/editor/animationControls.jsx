@@ -279,43 +279,43 @@ export class AnimationControls {
     this.container.innerHTML = `
       <div class="animation-controls">
         <div class="playback-controls">
-          <button id="playBtn" class="control-btn primary">
+          <button id="playBtn" class="control-btn primary" data-tooltip="Play animation - Starts playing the animation from the current position">
             <span class="icon">▶</span>
             <span class="label">Play</span>
           </button>
-          <button id="pauseBtn" class="control-btn">
+          <button id="pauseBtn" class="control-btn" data-tooltip="Pause animation - Pauses the animation at the current frame">
             <span class="icon">⏸</span>
             <span class="label">Pause</span>
           </button>
-          <button id="stopBtn" class="control-btn">
+          <button id="stopBtn" class="control-btn" data-tooltip="Stop animation - Stops playback and resets to the beginning">
             <span class="icon">⏹</span>
             <span class="label">Stop</span>
           </button>
-          <button id="rewindBtn" class="control-btn">
+          <button id="rewindBtn" class="control-btn" data-tooltip="Rewind - Jumps back to the start of the timeline">
             <span class="icon">⏮</span>
             <span class="label">Rewind</span>
           </button>
         </div>
 
         <div class="loop-controls">
-          <label class="control-label">
-            <input type="checkbox" id="loopToggle">
+          <label class="control-label" data-tooltip="Loop - When enabled, animation repeats continuously">
+            <input type="checkbox" id="loopToggle" data-tooltip="Toggle loop playback">
             Loop
           </label>
-          <label class="control-label">
-            <input type="checkbox" id="reverseToggle">
+          <label class="control-label" data-tooltip="Reverse - When enabled, animation plays backwards">
+            <input type="checkbox" id="reverseToggle" data-tooltip="Toggle reverse playback">
             Reverse
           </label>
         </div>
 
         <div class="speed-control">
           <label class="control-label">Speed:</label>
-          <input type="range" id="speedSlider" min="0.1" max="4" step="0.1" value="1">
+          <input type="range" id="speedSlider" min="0.1" max="4" step="0.1" value="1" data-tooltip="Playback speed - Adjust animation speed from 0.1x to 4x">
           <span id="speedValue">1.0x</span>
         </div>
 
         <div class="easing-preview">
-          <canvas id="easingCanvas" width="200" height="60"></canvas>
+          <canvas id="easingCanvas" width="200" height="60" data-tooltip="Easing curve preview - Visual representation of the current easing function"></canvas>
         </div>
 
         <div class="animation-info">
@@ -775,32 +775,32 @@ export class EasingCurveEditor {
         <div class="editor-header">
           <h4>Easing Curve Editor</h4>
           <div class="preset-buttons">
-            <button class="preset-btn" data-preset="linear">Linear</button>
-            <button class="preset-btn" data-preset="ease-in">Ease In</button>
-            <button class="preset-btn" data-preset="ease-out">Ease Out</button>
-            <button class="preset-btn" data-preset="ease-in-out">Ease In/Out</button>
+            <button class="preset-btn" data-preset="linear" data-tooltip="Linear - Constant speed animation with no acceleration">Linear</button>
+            <button class="preset-btn" data-preset="ease-in" data-tooltip="Ease In - Animation starts slow and accelerates">Ease In</button>
+            <button class="preset-btn" data-preset="ease-out" data-tooltip="Ease Out - Animation starts fast and decelerates">Ease Out</button>
+            <button class="preset-btn" data-preset="ease-in-out" data-tooltip="Ease In/Out - Animation accelerates then decelerates smoothly">Ease In/Out</button>
           </div>
         </div>
         <div class="curve-canvas-container">
-          <canvas id="easingCurveCanvas" width="300" height="200"></canvas>
+          <canvas id="easingCurveCanvas" width="300" height="200" data-tooltip="Curve editor - Drag control points to customize the easing curve"></canvas>
         </div>
         <div class="curve-controls">
           <div class="point-controls">
             <div class="control-group">
               <label>P1 X:</label>
-              <input type="number" id="p1x" step="0.01" min="0" max="1" value="0.25">
+              <input type="number" id="p1x" step="0.01" min="0" max="1" value="0.25" data-tooltip="Control point 1 X - Horizontal position of the first bezier handle">
             </div>
             <div class="control-group">
               <label>P1 Y:</label>
-              <input type="number" id="p1y" step="0.01" min="0" max="1" value="0.10">
+              <input type="number" id="p1y" step="0.01" min="0" max="1" value="0.10" data-tooltip="Control point 1 Y - Vertical position of the first bezier handle">
             </div>
             <div class="control-group">
               <label>P2 X:</label>
-              <input type="number" id="p2x" step="0.01" min="0" max="1" value="0.25">
+              <input type="number" id="p2x" step="0.01" min="0" max="1" value="0.25" data-tooltip="Control point 2 X - Horizontal position of the second bezier handle">
             </div>
             <div class="control-group">
               <label>P2 Y:</label>
-              <input type="number" id="p2y" step="0.01" min="0" max="1" value="1.00">
+              <input type="number" id="p2y" step="0.01" min="0" max="1" value="1.00" data-tooltip="Control point 2 Y - Vertical position of the second bezier handle">
             </div>
           </div>
           <div class="curve-info">

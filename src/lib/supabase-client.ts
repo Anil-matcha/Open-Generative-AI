@@ -143,3 +143,11 @@ export async function getLeads(campaignId: string) {
   if (error) throw error;
   return data || [];
 }
+
+// Password update service
+export async function updateUserPassword(newPassword: string) {
+  const { data, error } = await supabase.auth.updateUser({
+    password: newPassword
+  });
+  return { data, error };
+}

@@ -1,6 +1,7 @@
 /* eslint-disable */
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import StoryboardPanel from '../components/StoryboardPanel';
+import { saveGeneratedAsset } from '../../../../../src/lib/assets/assetActions.js';
 import './ResultStep.css';
 
 const STAR_LABELS = ['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent'];
@@ -24,10 +25,29 @@ export default function ResultStep({ jobId, scenes = [], onStartNew, onSubmitFee
   const [storyboardMode, setStoryboardMode] = useState('grid');
   const [videoDuration, setVideoDuration] = useState(0);
   const [videoCurrentTime, setVideoCurrentTime] = useState(0);
+  const [generatedAssetId, setGeneratedAssetId] = useState(null);
   const videoRef = useRef(null);
 
   const apiBase = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
   const videoUrl = jobId ? `${apiBase}/job/${jobId}/download` : null;
+
+  useEffect(() => {
+    if (videoUrl && !generatedAssetId) {
+      saveGeneratedAsset('video', {
+        title: `ViMax Video - ${new Date().toLocaleDateString()}`,
+        media: {
+          url: videoUrl,
+          type: 'video/mp4'
+        },
+        metadata: {
+          jobId: jobId,
+          sceneCount: scenes.length,
+          pipeline: 'vimax'
+        },
+        sourceApp: 'vimax'
+      }).then(asset => setGeneratedAssetId(asset.id)).catch(console.error);
+    }
+  }, [videoUrl, generatedAssetId, jobId, scenes]);
 
   const completedScenes = scenes.filter(s => s.image_url);
   const posterUrl = completedScenes.length > 0
@@ -134,6 +154,7 @@ export default function ResultStep({ jobId, scenes = [], onStartNew, onSubmitFee
       )}
 
       <div className="result-actions">
+        <div id="asset-actions-bar" className="asset-actions-container"></div>
         <div className="result-format-row">
           <span className="result-format-label">Download as:</span>
           {['mp4', 'webm', 'mov'].map((f) => (
@@ -175,6 +196,21 @@ export default function ResultStep({ jobId, scenes = [], onStartNew, onSubmitFee
           New Video
         </button>
       </div>
+
+      {generatedAssetId && typeof window !== 'undefined' && (
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            if (typeof createAssetActionsBar === 'function') {
+              const bar = createAssetActionsBar('${generatedAssetId}');
+              const container = document.getElementById('asset-actions-bar');
+              if (container) {
+                container.innerHTML = '';
+                container.appendChild(bar);
+              }
+            }
+          `
+        }} />
+      )}
 
       {showStoryboard && completedScenes.length > 0 && (
         <div className="result-storyboard-section animate-fade-in">

@@ -5,6 +5,7 @@ import WorkflowSettings from './WorkflowSettings.jsx';
 import WorkflowProgress from './WorkflowProgress.jsx';
 import WorkflowResults from './WorkflowResults.jsx';
 import { muAPIClient } from '../lib/muapi.js';
+import { saveGeneratedAsset } from '../../src/lib/assets/assetActions.js';
 
 function App() {
   const [apiKey, setApiKey] = useState(localStorage.getItem('muapi_key') || '');
@@ -77,10 +78,31 @@ function App() {
         timeout: 600000 // 10 minute timeout
       });
 
-      // If we get here, workflow completed successfully
-      const finalStatus = await muAPIClient.checkWorkflowStatus(result.workflowId);
-      setWorkflowResults(finalStatus.results);
-      setIsRunning(false);
+       // If we get here, workflow completed successfully
+       const finalStatus = await muAPIClient.checkWorkflowStatus(result.workflowId);
+       
+       // Save generated videos to universal asset pipeline
+       if (finalStatus?.results?.videos) {
+         for (const video of finalStatus.results.videos) {
+           try {
+             await saveGeneratedAsset('video', {
+               title: video.title || `Workflow Video - ${result.workflowId}`,
+               media: { url: video.url, thumbnail: video.thumbnail },
+               metadata: {
+                 workflowId: result.workflowId,
+                 workflow: selectedWorkflow.id,
+                 duration: video.duration,
+                 platforms: finalStatus.results.publishing?.map(p => p.platform) || []
+               }
+             }, 'sendspark');
+           } catch (err) {
+             console.warn('[Asset Pipeline] Failed to save video:', err.message);
+           }
+         }
+       }
+       
+       setWorkflowResults(finalStatus.results);
+       setIsRunning(false);
 
     } catch (err) {
       setError(err.message);

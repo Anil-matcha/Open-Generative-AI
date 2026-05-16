@@ -55,6 +55,7 @@ export class Clip extends Component {
     clip.style.width = `${width}%`;
     clip.dataset.clipId = this.state.id;
     clip.title = `${name} (${type})`;
+    clip.dataset.tooltip = `Clip: ${name} - Click to select or deselect this ${type} clip on the timeline`;
 
     const label = document.createElement('span');
     label.className = 'clip-label';

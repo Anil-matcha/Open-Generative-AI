@@ -28,6 +28,7 @@ import TextGeneration from "./TextNode";
 import ImageGeneration from "./ImageNode";
 import VideoGeneration from "./VideoNode";
 import { setWorkflowIds } from "./WorkflowStore";
+import { saveGeneratedAsset } from '../../../../../src/lib/assets/assetActions.js';
 import { apiNodeModels, audioModels, concatModels, imageModels, textModels, videoModels, videoCombinerModels, presets } from "./utility";
 import Link from "next/link";
 import RenderField from "./RenderField";
@@ -479,16 +480,55 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
     });
   }, [edges, setNodes]);
 
-  const onDataChange = (id, newData, targetNodeId = null) => {
-    setNodes((prevNodes) => {
-      let updatedNodes = prevNodes.map((node) => {
-        const match = node.id.toLowerCase().replace(/\s+/g, '') === id.toLowerCase().replace(/\s+/g, '');
-        return match
-          ? { ...node, data: { ...node.data, ...newData } }
-          : node;
-      });
+   const onDataChange = (id, newData, targetNodeId = null) => {
+     setNodes((prevNodes) => {
+       let updatedNodes = prevNodes.map((node) => {
+         const match = node.id.toLowerCase().replace(/\s+/g, '') === id.toLowerCase().replace(/\s+/g, '');
+         return match
+           ? { ...node, data: { ...node.data, ...newData } }
+           : node;
+       });
 
-      if (newData.errorMsg && newData.errorMsg !== null) {
+       // ── Universal Asset Pipeline Integration ──────────────────────────────────
+       // If this node just produced a result URL, save it to the shared asset store
+       const resultUrl = newData.resultUrl || newData.outputs?.[0]?.value;
+       if (resultUrl) {
+         const sourceNode = prevNodes.find(n => n.id === id);
+         // Avoid duplicate saves if resultUrl already existed
+         if (sourceNode && sourceNode.data.resultUrl !== resultUrl) {
+           (async () => {
+             try {
+               let assetType = 'unknown';
+               switch (sourceNode.type) {
+                 case 'imageNode': assetType = 'image'; break;
+                 case 'videoNode': assetType = 'video'; break;
+                 case 'audioNode': assetType = 'audio'; break;
+                 case 'vidConcatNode': assetType = 'video'; break;
+                 case 'textNode': assetType = 'text'; break;
+               }
+               if (assetType !== 'unknown') {
+                 await saveGeneratedAsset(assetType, {
+                   title: `${assetType} from ${sourceNode.type}`,
+                   media: { url: resultUrl },
+                   metadata: {
+                     nodeId: id,
+                     nodeType: sourceNode.type,
+                     workflowId: getWorkflowId(),
+                     runId: getRunId(),
+                     formValues: sourceNode.data.formValues || {},
+                     outputs: newData.outputs || []
+                   }
+                 }, 'vibe-workflow');
+               }
+             } catch (e) {
+               console.warn('[Asset Pipeline] Save failed:', e);
+             }
+           })();
+         }
+       }
+       // ────────────────────────────────────────────────────────────────────────────
+
+       if (newData.errorMsg && newData.errorMsg !== null) {
         updatedNodes = updatedNodes.map((node) =>
           node.id === id
             ? { ...node, data: { ...node.data, errorMsg: newData.errorMsg } }

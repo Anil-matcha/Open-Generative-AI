@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import api from '../services/api'
+import { saveGeneratedAsset } from '../../../../../src/lib/assets/assetActions.js'
 
 const useProjectStore = create((set, get) => ({
   projects: [],
@@ -47,6 +48,24 @@ const useProjectStore = create((set, get) => ({
     const { data } = await api.duplicateProject(id)
     set((s) => ({ projects: [data, ...s.projects] }))
     return data
+  },
+
+  saveProjectAsAsset: async (project) => {
+    const asset = await saveGeneratedAsset('image', {
+      title: project.title || 'Storyboard',
+      media: {
+        url: project.thumbnail || '',
+        thumbnail: project.thumbnail || '',
+        type: 'image/jpeg'
+      },
+      metadata: {
+        sceneCount: project.scenes?.length || 0,
+        genre: project.genre,
+        projectId: project.id
+      },
+      sourceApp: 'ai-storyboarder'
+    });
+    return asset;
   },
 
   clearCurrentProject: () => set({ currentProject: null }),

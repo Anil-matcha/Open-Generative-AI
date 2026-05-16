@@ -13,6 +13,7 @@ export function renderMultiCameraToolbar(state, container) {
   multiCameraBtn.className = `tool-btn ${state.multiCameraMode ? 'active' : ''}`;
   multiCameraBtn.innerHTML = '<span class="emoji">📺</span><span>Multi-Camera</span>';
   multiCameraBtn.title = 'Toggle multi-camera editing mode';
+  multiCameraBtn.setAttribute('data-tooltip', 'Multi-Camera Mode: Toggle multi-camera editing to work with multiple camera angles simultaneously');
   multiCameraBtn.onclick = () => {
     state.multiCameraMode = !state.multiCameraMode;
     renderMultiCameraToolbar(state, container);
@@ -27,6 +28,7 @@ export function renderMultiCameraToolbar(state, container) {
   pipBtn.className = `tool-btn ${state.pipMode ? 'active' : ''}`;
   pipBtn.innerHTML = '<span class="emoji">🖼️</span><span>PIP</span>';
   pipBtn.title = 'Picture-in-Picture mode';
+  pipBtn.setAttribute('data-tooltip', 'Picture-in-Picture (PIP): Overlay a smaller video window on top of the main video for simultaneous playback');
   pipBtn.onclick = () => {
     state.togglePipMode();
     renderMultiCameraToolbar(state, container);
@@ -39,6 +41,7 @@ export function renderMultiCameraToolbar(state, container) {
   splitBtn.className = `tool-btn ${state.splitScreenMode ? 'active' : ''}`;
   splitBtn.innerHTML = '<span class="emoji">📱</span><span>Split</span>';
   splitBtn.title = 'Split-screen mode';
+  splitBtn.setAttribute('data-tooltip', 'Split Screen: Divide the screen into multiple sections to display multiple video feeds side by side');
   splitBtn.onclick = () => {
     if (!state.splitScreenMode) {
       state.setSplitScreen('horizontal', 0.5);
@@ -55,6 +58,7 @@ export function renderMultiCameraToolbar(state, container) {
   anglesBtn.className = 'tool-btn';
   anglesBtn.innerHTML = '<span class="emoji">🎬</span><span>Angles</span>';
   anglesBtn.title = 'Manage camera angles';
+  anglesBtn.setAttribute('data-tooltip', 'Camera Angles: Open the camera angles panel to create, switch between, and manage different camera perspectives');
   anglesBtn.onclick = () => showCameraAnglesPanel(state);
   container.appendChild(anglesBtn);
 }
@@ -65,7 +69,7 @@ export function renderCameraAnglesPanel(state) {
   panel.innerHTML = `
     <h3 class="text-lg font-bold mb-4">Camera Angles</h3>
     <div class="camera-angles-list mb-4"></div>
-    <button class="add-angle-btn w-full py-2 bg-primary text-black rounded-lg font-semibold hover:bg-primary/80 transition-colors">
+    <button class="add-angle-btn w-full py-2 bg-primary text-black rounded-lg font-semibold hover:bg-primary/80 transition-colors" data-tooltip="Add a new camera angle: Create a new camera perspective that you can switch to during editing">
       + Add Camera Angle
     </button>
   `;
@@ -81,8 +85,8 @@ export function renderCameraAnglesPanel(state) {
         <span class="text-sm text-white/60">${angle.tracks.length} tracks</span>
       </div>
       <div class="flex gap-2">
-        <button class="text-white/60 hover:text-white text-sm" onclick="switchToAngle('${angle.id}')">Switch</button>
-        <button class="text-red-400 hover:text-red-300 text-sm" onclick="removeAngle('${angle.id}')">×</button>
+        <button class="text-white/60 hover:text-white text-sm" data-tooltip="Switch to this camera angle: Change the active view to this camera perspective" onclick="switchToAngle('${angle.id}')">Switch</button>
+        <button class="text-red-400 hover:text-red-300 text-sm" data-tooltip="Remove this camera angle: Delete this camera perspective from the project" onclick="removeAngle('${angle.id}')">×</button>
       </div>
     `;
     list.appendChild(angleEl);
@@ -118,7 +122,7 @@ export function renderPipControls(state, container) {
     <div class="pip-controls glass-panel p-4 rounded-xl">
       <h4 class="text-sm font-bold mb-3">PIP Controls</h4>
       <div class="pip-windows-list"></div>
-      <button class="add-pip-btn w-full py-2 bg-primary/20 border border-primary/50 rounded-lg text-sm hover:bg-primary/30 transition-colors mt-3">
+      <button class="add-pip-btn w-full py-2 bg-primary/20 border border-primary/50 rounded-lg text-sm hover:bg-primary/30 transition-colors mt-3" data-tooltip="Add PIP Window: Create a new picture-in-picture overlay from the selected timeline clip">
         + Add PIP Window
       </button>
     </div>
@@ -131,12 +135,12 @@ export function renderPipControls(state, container) {
     pipEl.innerHTML = `
       <div class="flex items-center justify-between mb-2">
         <span class="text-sm font-medium">PIP Window ${state.pipWindows.indexOf(pip) + 1}</span>
-        <button class="text-red-400 hover:text-red-300 text-sm" onclick="removePip('${pip.id}')">×</button>
+        <button class="text-red-400 hover:text-red-300 text-sm" data-tooltip="Remove PIP Window: Delete this picture-in-picture overlay from the composition" onclick="removePip('${pip.id}')">×</button>
       </div>
       <div class="grid grid-cols-2 gap-2 text-xs">
         <div>
           <label class="block text-white/60 mb-1">Position</label>
-          <select class="w-full bg-white/10 border border-white/20 rounded px-2 py-1" onchange="updatePipPosition('${pip.id}', this.value)">
+          <select class="w-full bg-white/10 border border-white/20 rounded px-2 py-1" data-tooltip="PIP Position: Choose where the picture-in-picture window appears on screen" onchange="updatePipPosition('${pip.id}', this.value)">
             <option value="top-left" ${pip.position === 'top-left' ? 'selected' : ''}>Top Left</option>
             <option value="top-right" ${pip.position === 'top-right' ? 'selected' : ''}>Top Right</option>
             <option value="bottom-left" ${pip.position === 'bottom-left' ? 'selected' : ''}>Bottom Left</option>
@@ -146,7 +150,7 @@ export function renderPipControls(state, container) {
         </div>
         <div>
           <label class="block text-white/60 mb-1">Opacity</label>
-          <input type="range" min="0" max="1" step="0.1" value="${pip.opacity}" class="w-full" onchange="updatePipOpacity('${pip.id}', this.value)">
+          <input type="range" min="0" max="1" step="0.1" value="${pip.opacity}" class="w-full" data-tooltip="PIP Opacity: Adjust the transparency of the picture-in-picture window from invisible to fully opaque" onchange="updatePipOpacity('${pip.id}', this.value)">
         </div>
       </div>
     `;
@@ -188,7 +192,7 @@ export function renderSplitScreenControls(state, container) {
       <div class="grid grid-cols-2 gap-3">
         <div>
           <label class="block text-white/60 text-xs mb-1">Type</label>
-          <select class="w-full bg-white/10 border border-white/20 rounded px-2 py-1 text-sm" onchange="updateSplitType(this.value)">
+          <select class="w-full bg-white/10 border border-white/20 rounded px-2 py-1 text-sm" data-tooltip="Split Type: Choose how to divide the screen — horizontal splits stack vertically, vertical splits arrange side by side, and quad divides into four sections" onchange="updateSplitType(this.value)">
             <option value="horizontal" ${state.splitScreenConfig.type === 'horizontal' ? 'selected' : ''}>Horizontal</option>
             <option value="vertical" ${state.splitScreenConfig.type === 'vertical' ? 'selected' : ''}>Vertical</option>
             <option value="quad" ${state.splitScreenConfig.type === 'quad' ? 'selected' : ''}>Quad</option>
@@ -197,7 +201,7 @@ export function renderSplitScreenControls(state, container) {
         <div>
           <label class="block text-white/60 text-xs mb-1">Split Ratio</label>
           <input type="range" min="0.1" max="0.9" step="0.1" value="${state.splitScreenConfig.ratio}"
-                 class="w-full" onchange="updateSplitRatio(this.value)">
+                 class="w-full" data-tooltip="Split Ratio: Adjust the dividing line position between split screen sections to control how much space each section occupies" onchange="updateSplitRatio(this.value)">
         </div>
       </div>
     </div>
@@ -256,7 +260,7 @@ function showModal(title, content) {
     <div class="modal-content bg-panel-bg rounded-xl max-w-md w-full mx-4 max-h-96 overflow-y-auto">
       <div class="modal-header p-4 border-b border-white/10 flex items-center justify-between">
         <h2 class="text-lg font-bold">${title}</h2>
-        <button class="modal-close text-white/60 hover:text-white text-xl" onclick="this.closest('.modal-overlay').remove()">×</button>
+        <button class="modal-close text-white/60 hover:text-white text-xl" data-tooltip="Close Modal: Dismiss this dialog and return to the editor" onclick="this.closest('.modal-overlay').remove()">×</button>
       </div>
       <div class="modal-body p-4"></div>
     </div>

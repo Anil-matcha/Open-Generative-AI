@@ -523,6 +523,24 @@ export function renderMediaGrid(mediaItems, container, onMediaSelect, showToast,
       ? `${media.label} - ${media.desc}`
       : `${media.label}\n${media.desc}\nClick to add reference or drag to timeline`;
 
+    if (media.isHeader) {
+      if (media.category === 'ai-tools') {
+        item.dataset.tooltip = `${media.label}: ${media.desc}. Click to expand or collapse the AI tools category.`;
+      } else if (media.category.startsWith('templates-')) {
+        item.dataset.tooltip = `${media.label}: ${media.desc}. Click to expand or collapse this template category.`;
+      } else {
+        item.dataset.tooltip = `${media.label}: ${media.desc}. Click to expand or collapse this element category.`;
+      }
+    } else if (media.type === 'ai-model') {
+      item.dataset.tooltip = `${media.label} - ${media.desc}. ${media.tooltip || 'AI generation model'}. Click to select or drag to timeline to generate content.`;
+    } else if (media.type === 'template') {
+      item.dataset.tooltip = `${media.label} - ${media.desc}. ${media.tooltip || 'Pre-built prompt template'}. Click to use this template for AI generation.`;
+    } else if (media.type === 'element') {
+      item.dataset.tooltip = `${media.label} - ${media.desc}. Reference element for consistent video production. Click to add to timeline or drag directly.`;
+    } else {
+      item.dataset.tooltip = `${media.label} - ${media.desc}. Click to add reference or drag to timeline.`;
+    }
+
     item.addEventListener('click', () => {
       if (media.isHeader) {
         // Toggle category visibility
@@ -573,6 +591,8 @@ export function renderMediaGrid(mediaItems, container, onMediaSelect, showToast,
 
     // Enhanced title for tooltips
     item.title = `${media.label}\n${media.desc}\nClick to add or drag to timeline`;
+
+    item.dataset.tooltip = `${media.label} - ${media.desc}. Media asset in your library. Click to add to timeline or drag directly onto a track.`;
 
     item.addEventListener('click', () => onMediaSelect(media, index, showToast));
 

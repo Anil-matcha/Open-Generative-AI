@@ -32,15 +32,15 @@ export class TransitionEditor {
         <div class="transition-editor__header">
           <h3>Transition Editor</h3>
           <div class="transition-editor__controls">
-            <button class="transition-btn" id="playPreview">▶ Preview</button>
-            <button class="transition-btn" id="stopPreview">⏹ Stop</button>
-            <button class="transition-btn" id="resetPreview">🔄 Reset</button>
+            <button class="transition-btn" id="playPreview" data-tooltip="Preview - Play the transition animation to see how it looks">▶ Preview</button>
+            <button class="transition-btn" id="stopPreview" data-tooltip="Stop - Stop the currently playing transition preview">⏹ Stop</button>
+            <button class="transition-btn" id="resetPreview" data-tooltip="Reset - Reset the transition preview to the beginning">🔄 Reset</button>
           </div>
         </div>
 
         <div class="transition-editor__preview">
-          <canvas id="transitionPreview" width="320" height="180"></canvas>
-          <div class="transition-editor__timeline">
+          <canvas id="transitionPreview" width="320" height="180" data-tooltip="Preview Canvas - Shows a live preview of the selected transition effect"></canvas>
+          <div class="transition-editor__timeline" data-tooltip="Timeline - Shows the progress of the transition animation">
             <div class="preview-progress" id="previewProgress"></div>
             <div class="preview-playhead" id="previewPlayhead"></div>
           </div>
@@ -48,13 +48,13 @@ export class TransitionEditor {
 
         <div class="transition-editor__library">
           <div class="transition-categories">
-            <button class="category-btn active" data-category="all">All</button>
-            <button class="category-btn" data-category="fade">Fade</button>
-            <button class="category-btn" data-category="wipe">Wipe</button>
-            <button class="category-btn" data-category="push">Push</button>
-            <button class="category-btn" data-category="zoom">Zoom</button>
-            <button class="category-btn" data-category="iris">Iris</button>
-            <button class="category-btn" data-category="shape">Shape</button>
+            <button class="category-btn active" data-category="all" data-tooltip="All - Show all available transitions from every category">All</button>
+            <button class="category-btn" data-category="fade" data-tooltip="Fade - Show fade transitions that gradually blend between clips">Fade</button>
+            <button class="category-btn" data-category="wipe" data-tooltip="Wipe - Show wipe transitions that slide one clip over another">Wipe</button>
+            <button class="category-btn" data-category="push" data-tooltip="Push - Show push transitions that push the outgoing clip away">Push</button>
+            <button class="category-btn" data-category="zoom" data-tooltip="Zoom - Show zoom transitions that scale clips in or out">Zoom</button>
+            <button class="category-btn" data-category="iris" data-tooltip="Iris - Show iris transitions that open or close in a circular pattern">Iris</button>
+            <button class="category-btn" data-category="shape" data-tooltip="Shape - Show shape-based transitions using geometric patterns">Shape</button>
           </div>
 
           <div class="transition-grid" id="transitionGrid">
@@ -66,7 +66,7 @@ export class TransitionEditor {
           <div class="params-header">
             <h4 id="transitionTitle">Select a Transition</h4>
             <div class="preset-selector">
-              <select id="presetSelect">
+              <select id="presetSelect" data-tooltip="Preset Selector - Choose a pre-configured transition preset to quickly apply settings">
                 <option value="">Choose Preset...</option>
                 <optgroup label="Cinematic">
                   ${this.library.getPresets('cinematic').map(preset =>
@@ -89,36 +89,35 @@ export class TransitionEditor {
 
           <div class="duration-control">
             <label>Duration: <span id="durationValue">2.0s</span></label>
-            <input type="range" id="durationSlider" min="0.5" max="10.0" step="0.1" value="2.0">
+            <input type="range" id="durationSlider" min="0.5" max="10.0" step="0.1" value="2.0" data-tooltip="Duration Slider - Adjust how long the transition takes from 0.5 to 10 seconds">
           </div>
 
           <div class="params-grid" id="paramsGrid">
-            <!-- Parameters will be rendered here -->
           </div>
 
           <div class="advanced-controls">
             <div class="control-group">
               <label>
-                <input type="checkbox" id="audioSync"> Audio-synced timing
+                <input type="checkbox" id="audioSync" data-tooltip="Audio-synced Timing - Synchronize the transition timing with audio beats"> Audio-synced timing
               </label>
             </div>
             <div class="control-group">
               <label>
-                <input type="checkbox" id="keyframeMode"> Keyframe mode
+                <input type="checkbox" id="keyframeMode" data-tooltip="Keyframe Mode - Enable keyframe animation for custom transition timing"> Keyframe mode
               </label>
             </div>
             <div class="control-group">
               <label>
-                <input type="checkbox" id="multiLayer"> Multi-layer transition
+                <input type="checkbox" id="multiLayer" data-tooltip="Multi-layer Transition - Apply the transition across multiple video layers"> Multi-layer transition
               </label>
             </div>
           </div>
         </div>
 
         <div class="transition-editor__actions">
-          <button class="transition-btn secondary" id="savePreset">💾 Save as Preset</button>
-          <button class="transition-btn secondary" id="exportTransition">📤 Export</button>
-          <button class="transition-btn primary" id="applyTransition">✅ Apply Transition</button>
+          <button class="transition-btn secondary" id="savePreset" data-tooltip="Save as Preset - Save the current transition settings as a reusable preset">💾 Save as Preset</button>
+          <button class="transition-btn secondary" id="exportTransition" data-tooltip="Export - Download the transition configuration as a JSON file">📤 Export</button>
+          <button class="transition-btn primary" id="applyTransition" data-tooltip="Apply Transition - Apply the selected transition to your clips in the timeline">✅ Apply Transition</button>
         </div>
       </div>
     `;
@@ -138,7 +137,7 @@ export class TransitionEditor {
 
     return transitions.map(transition => `
       <div class="transition-item ${this.currentTransition?.key === transition.key ? 'selected' : ''}"
-           data-transition="${transition.key}">
+           data-transition="${transition.key}" data-tooltip="${transition.name} - ${transition.description}">
         <div class="transition-icon">${transition.icon}</div>
         <div class="transition-name">${transition.name}</div>
         <div class="transition-desc">${transition.description}</div>
@@ -158,7 +157,7 @@ export class TransitionEditor {
         return `
           <div class="param-item">
             <label>
-              <input type="checkbox" data-param="${key}" ${currentValue ? 'checked' : ''}>
+              <input type="checkbox" data-param="${key}" ${currentValue ? 'checked' : ''} data-tooltip="${key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')} - Toggle this transition parameter on or off">
               ${key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}
             </label>
           </div>
@@ -169,7 +168,7 @@ export class TransitionEditor {
         return `
           <div class="param-item">
             <label>${key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}</label>
-            <input type="text" data-param="${key}" value="${currentValue}" placeholder="Enter SVG path...">
+            <input type="text" data-param="${key}" value="${currentValue}" placeholder="Enter SVG path..." data-tooltip="${key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')} - Enter a custom value for this transition parameter">
           </div>
         `;
       }
@@ -178,7 +177,7 @@ export class TransitionEditor {
         return `
           <div class="param-item">
             <label>${key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}</label>
-            <select data-param="${key}">
+            <select data-param="${key}" data-tooltip="${key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')} - Select an option to configure this transition parameter">
               ${config.options.map(option => `
                 <option value="${option}" ${currentValue === option ? 'selected' : ''}>
                   ${option.charAt(0).toUpperCase() + option.slice(1)}
@@ -193,7 +192,7 @@ export class TransitionEditor {
       return `
         <div class="param-item">
           <label>${key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}: <span class="param-value">${currentValue}</span></label>
-          <input type="range" data-param="${key}" min="${config.min}" max="${config.max}" step="${config.step}" value="${currentValue}">
+          <input type="range" data-param="${key}" min="${config.min}" max="${config.max}" step="${config.step}" value="${currentValue}" data-tooltip="${key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')} - Drag to adjust the value of this transition parameter">
         </div>
       `;
     }).join('');

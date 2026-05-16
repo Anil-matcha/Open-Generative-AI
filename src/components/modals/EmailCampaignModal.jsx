@@ -89,36 +89,36 @@ export class EmailCampaignModal extends BaseModal {
         <div class="form-section">
           <div class="form-group">
             <label>Campaign Name</label>
-            <input type="text" class="form-input" placeholder="e.g., Summer Sale Announcement" value="${this.campaignName}" />
+            <input type="text" class="form-input" placeholder="e.g., Summer Sale Announcement" value="${this.campaignName}" data-tooltip="Enter an internal name to identify this campaign" />
             <span class="form-hint">Internal name for your reference</span>
           </div>
 
           <div class="form-group">
             <label>Subject Line</label>
-            <input type="text" class="form-input" placeholder="e.g., Don't miss our biggest sale of the year!" value="${this.subject}" />
+            <input type="text" class="form-input" placeholder="e.g., Don't miss our biggest sale of the year!" value="${this.subject}" data-tooltip="The subject line recipients will see in their inbox" />
             <span class="form-hint">This appears in recipients' inboxes</span>
           </div>
 
           <div class="form-group">
             <label>Preview Text</label>
-            <input type="text" class="form-input" placeholder="e.g., Get up to 50% off this weekend only" value="${this.previewText}" />
+            <input type="text" class="form-input" placeholder="e.g., Get up to 50% off this weekend only" value="${this.previewText}" data-tooltip="Short text shown after the subject line in the inbox" />
             <span class="form-hint">Short text shown after the subject</span>
           </div>
 
           <div class="form-group">
             <label>From Name</label>
-            <input type="text" class="form-input" placeholder="Your Brand" value="Your Brand" />
+            <input type="text" class="form-input" placeholder="Your Brand" value="Your Brand" data-tooltip="The sender name recipients will see" />
           </div>
 
           <div class="form-group">
             <label>Reply-To Email</label>
-            <input type="email" class="form-input" placeholder="support@yourbrand.com" value="support@yourbrand.com" />
+            <input type="email" class="form-input" placeholder="support@yourbrand.com" value="support@yourbrand.com" data-tooltip="Email address where replies will be sent" />
           </div>
         </div>
 
         <div class="step-actions">
-          <button class="modal-btn modal-btn-secondary modal-cancel">Cancel</button>
-          <button class="modal-btn modal-btn-primary next-btn" ${!this.campaignName || !this.subject ? 'disabled' : ''}>Continue</button>
+          <button class="modal-btn modal-btn-secondary modal-cancel" data-tooltip="Cancel and close">Cancel</button>
+          <button class="modal-btn modal-btn-primary next-btn" ${!this.campaignName || !this.subject ? 'disabled' : ''} data-tooltip="Continue to template selection">Continue</button>
         </div>
       </div>
     `;
@@ -132,7 +132,7 @@ export class EmailCampaignModal extends BaseModal {
 
         <div class="template-grid">
           ${EMAIL_TEMPLATES.map(template => `
-            <div class="template-card ${this.selectedTemplate === template.id ? 'selected' : ''}" data-template="${template.id}">
+            <div class="template-card ${this.selectedTemplate === template.id ? 'selected' : ''}" data-template="${template.id}" data-tooltip="${template.name}: ${template.description} (${template.emails} email${template.emails > 1 ? 's' : ''})">
               <div class="template-preview">
                 <div class="preview-mockup">
                   <div class="mockup-header"></div>
@@ -154,8 +154,8 @@ export class EmailCampaignModal extends BaseModal {
         </div>
 
         <div class="step-actions">
-          <button class="modal-btn modal-btn-secondary back-btn">Back</button>
-          <button class="modal-btn modal-btn-primary next-btn" ${!this.selectedTemplate ? 'disabled' : ''}>Continue</button>
+          <button class="modal-btn modal-btn-secondary back-btn" data-tooltip="Go back to campaign setup">Back</button>
+          <button class="modal-btn modal-btn-primary next-btn" ${!this.selectedTemplate ? 'disabled' : ''} data-tooltip="Continue to recipient selection">Continue</button>
         </div>
       </div>
     `;
@@ -171,7 +171,7 @@ export class EmailCampaignModal extends BaseModal {
           <h4>When to Send</h4>
           <div class="schedule-options">
             ${SCHEDULE_OPTIONS.map(option => `
-              <button class="schedule-option ${this.scheduleType === option.id ? 'selected' : ''}" data-schedule="${option.id}">
+              <button class="schedule-option ${this.scheduleType === option.id ? 'selected' : ''}" data-schedule="${option.id}" data-tooltip="${option.name}">
                 ${option.id === 'immediate' ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>' : ''}
                 ${option.id === 'scheduled' ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>' : ''}
                 ${option.id === 'automated' ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>' : ''}
@@ -184,11 +184,11 @@ export class EmailCampaignModal extends BaseModal {
             <div class="schedule-datetime">
               <div class="form-group">
                 <label>Date</label>
-                <input type="date" class="form-input" value="${this.scheduledDate || '2026-04-20'}" />
+                <input type="date" class="form-input" value="${this.scheduledDate || '2026-04-20'}" data-tooltip="Select the date to send the campaign" />
               </div>
               <div class="form-group">
                 <label>Time</label>
-                <input type="time" class="form-input" value="${this.scheduledTime || '09:00'}" />
+                <input type="time" class="form-input" value="${this.scheduledTime || '09:00'}" data-tooltip="Select the time to send the campaign" />
               </div>
             </div>
           ` : ''}
@@ -199,7 +199,7 @@ export class EmailCampaignModal extends BaseModal {
           <div class="segment-list">
             ${SEGMENTS.map(segment => `
               <label class="segment-option ${this.selectedSegment === segment.id ? 'selected' : ''}">
-                <input type="radio" name="segment" value="${segment.id}" ${this.selectedSegment === segment.id ? 'checked' : ''} />
+                <input type="radio" name="segment" value="${segment.id}" ${this.selectedSegment === segment.id ? 'checked' : ''} data-tooltip="Send to ${segment.name} (${segment.count.toLocaleString()} subscribers)" />
                 <div class="segment-info">
                   <span class="segment-name">${segment.name}</span>
                   <span class="segment-count">${segment.count.toLocaleString()} subscribers</span>
@@ -210,8 +210,8 @@ export class EmailCampaignModal extends BaseModal {
         </div>
 
         <div class="step-actions">
-          <button class="modal-btn modal-btn-secondary back-btn">Back</button>
-          <button class="modal-btn modal-btn-primary next-btn">Review Campaign</button>
+          <button class="modal-btn modal-btn-secondary back-btn" data-tooltip="Go back to template selection">Back</button>
+          <button class="modal-btn modal-btn-primary next-btn" data-tooltip="Review your campaign before sending">Review Campaign</button>
         </div>
       </div>
     `;
@@ -276,8 +276,8 @@ export class EmailCampaignModal extends BaseModal {
         </div>
 
         <div class="step-actions">
-          <button class="modal-btn modal-btn-secondary back-btn">Back</button>
-          <button class="modal-btn modal-btn-primary send-btn">
+          <button class="modal-btn modal-btn-secondary back-btn" data-tooltip="Go back to recipient selection">Back</button>
+          <button class="modal-btn modal-btn-primary send-btn" data-tooltip="${this.scheduleType === 'immediate' ? 'Send the campaign now' : 'Schedule the campaign for later'}">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
             </svg>

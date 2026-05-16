@@ -3,6 +3,7 @@ import { getPageThumbnail, createThumbnailImg } from '../lib/thumbnails.js';
 export function PlaceholderPage(pageName) {
   const container = document.createElement('div');
   container.className = 'w-full h-full flex flex-col items-center justify-center bg-app-bg p-6';
+  container.setAttribute('data-testid', 'placeholder-page');
 
   const wrapper = document.createElement('div');
   wrapper.className = 'text-center animate-fade-in-up max-w-md w-full';

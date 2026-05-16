@@ -20,6 +20,7 @@ export function Header(navigate) {
     // Logo
     const logoContainer = document.createElement('div');
     logoContainer.className = 'cursor-pointer hover:scale-110 transition-transform';
+    logoContainer.setAttribute('data-tooltip', 'Home — Return to the main dashboard');
     logoContainer.innerHTML = `
         <div class="w-8 h-8 bg-white rounded-lg flex items-center justify-center p-1.5 shadow-lg">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -64,6 +65,17 @@ export function Header(navigate) {
         link.dataset.route = item.route;
         link.className = 'hover:text-white transition-all cursor-pointer relative group text-secondary';
 
+        const tooltipDescriptions = {
+            image: 'Image — Create and edit images with AI-powered tools',
+            video: 'Video — Edit and produce video content with advanced timeline',
+            cinema: 'Cinema — Professional video editing and cinematic effects',
+            library: 'Library — Browse and manage your media assets',
+            templates: 'Templates — Access pre-built project templates',
+            explore: 'Explore — Discover new features and community content',
+            assist: 'Assist — Get AI-powered help and suggestions'
+        };
+        link.setAttribute('data-tooltip', tooltipDescriptions[item.route] || `${item.label} — Navigate to ${item.label}`);
+
         // Active Indicator dot
         const dot = document.createElement('div');
         dot.className = 'nav-dot absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-primary rounded-full';
@@ -88,6 +100,7 @@ export function Header(navigate) {
     const settingsBtn = document.createElement('button');
     settingsBtn.className = 'flex items-center gap-2 px-3 py-1.5 rounded-md border border-white/10 bg-white/5 text-[13px] font-bold text-white/80 hover:text-white hover:bg-white/10 hover:border-white/20 transition-colors';
     settingsBtn.title = 'Settings — API key, local models, preferences';
+    settingsBtn.setAttribute('data-tooltip', 'Settings — Configure API keys, local models, and app preferences');
     settingsBtn.innerHTML = `
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="3"/>
