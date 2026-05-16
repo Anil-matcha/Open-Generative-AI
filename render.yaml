@@ -1,0 +1,140 @@
+# Render Blueprint — Open Generative AI (Higgsfield)
+# https://render.com/docs/blueprint-spec
+#
+# This file defines the complete Render deployment for the director app
+# and supporting services. It replicates the Netlify + Supabase stack on Render.
+#
+# Prerequisites:
+#   1. A Supabase project (create at https://supabase.com)
+#   2. An OpenAI API key (get from https://platform.openai.com)
+#   3. A MuAPI API key (get from https://muapi.ai)
+#
+# To deploy:
+#   1. Push this repo to GitHub
+#   2. In Render Dashboard, go to Blueprints → New Blueprint Instance
+#   3. Connect this repo and select render.yaml
+#   4. Set the required environment variables (marked sync: false)
+#   5. Deploy
+
+databases:
+  - name: director-db
+    databaseName: director
+    plan: free
+    region: singapore
+    ipAllowList: [] # Allow all IPs (required for Supabase connectivity)
+
+services:
+  # ─── Main Web Application (Next.js frontend + API routes) ───
+  - type: web
+    name: higgsfield-web
+    runtime: node
+    plan: starter
+    region: singapore
+    buildCommand: npx vite build
+    startCommand: npx vite preview --host 0.0.0.0 --port $PORT
+    healthCheckPath: /
+    envVars:
+      # Supabase
+      - key: VITE_SUPABASE_URL
+        sync: false # Set to your Supabase project URL
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false # Set to your Supabase anon key
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false # Set to your Supabase service role key
+      - key: SUPABASE_URL
+        sync: false # Same as VITE_SUPABASE_URL but for server-side
+
+      # OpenAI (for video analysis agents via Responses API)
+      - key: OPENAI_API_KEY
+        sync: false # Set to your OpenAI API key
+      - key: OPENAI_MODEL
+        value: gpt-4.1-mini
+      - key: OPENAI_TIMEOUT
+        value: "120"
+
+      # MuAPI (for image/video generation)
+      - key: MUAPI_API_KEY
+        sync: false # Set to your MuAPI API key
+      - key: MUAPI_API_URL
+        value: https://api.muapi.ai
+
+      # Stripe (optional, for payments)
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+
+      # Site URL
+      - key: PUBLIC_SITE_URL
+        value: https://higgsfield-web.onrender.com
+
+      # Node version
+      - key: NODE_VERSION
+        value: "22.12.0"
+      - key: NODE_ENV
+        value: production
+
+  # ─── Supabase Edge Function: Video Agent ───
+  # This runs as a separate web service that proxies to Supabase Edge Functions
+  # Alternatively, deploy edge functions directly via Supabase CLI:
+  #   supabase functions deploy videoagent --project-ref <your-ref>
+  - type: web
+    name: director-videoagent
+    runtime: docker
+    plan: starter
+    region: singapore
+    dockerfilePath: ./supabase/functions/videoagent/Dockerfile
+    dockerContext: ./supabase/functions/videoagent
+    healthCheckPath: /health
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-4.1-mini
+      - key: OPENAI_TIMEOUT
+        value: "120"
+      - key: MUAPI_API_KEY
+        sync: false
+      - key: MUAPI_API_URL
+        value: https://api.muapi.ai
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: LLM_TYPE
+        value: openai
+      - key: LLM_CHAT_MODEL
+        value: gpt-4.1-mini
+      - key: LLM_TEMPERATURE
+        value: "0.7"
+      - key: LLM_TOP_P
+        value: "0.9"
+      - key: LLM_MAX_TOKENS
+        value: "4096"
+      - key: LLM_TIMEOUT
+        value: "120"
+      - key: WHISPER_MODEL
+        value: whisper-1
+      - key: NODE_ENV
+        value: production
+
+  # ─── Supabase Edge Function: Rendiv Render ───
+  - type: web
+    name: director-rendiv
+    runtime: docker
+    plan: starter
+    region: singapore
+    dockerfilePath: ./supabase/functions/rendiv-render/Dockerfile
+    dockerContext: ./supabase/functions/rendiv-render
+    healthCheckPath: /health
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: DIRECTOR_API_BASE_URL
+        value: https://director-videoagent.onrender.com
+      - key: DIRECTOR_API_KEY
+        sync: false
+      - key: NODE_ENV
+        value: production
