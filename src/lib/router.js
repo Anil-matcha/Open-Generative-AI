@@ -87,10 +87,12 @@ const pageLoaders = {
   'tiktok-carousel': () => import('../components/TikTokCarouselStudio.js').then(m => m.TikTokCarouselStudio()),
   'advanced-dubbing': () => import('../components/AdvancedDubbingStudio.js').then(m => m.AdvancedDubbingStudio()),
   landing: () => import('../components/landing/LandingPage.jsx').then(m => m.LandingPage()),
+  signin: () => import('../components/landing/SignInPage.jsx').then(m => m.SignInPage()),
   headshots: () => import('../components/HeadshotStudioPage.js').then(m => m.HeadshotStudioPage()),
   'headshots-generate': () => import('../components/HeadshotStudioPage.js').then(m => m.HeadshotStudioPage()),
   'headshots-history': () => import('../components/HeadshotStudioPage.js').then(m => m.HeadshotStudioPage()),
   'headshots-settings': () => import('../components/HeadshotStudioPage.js').then(m => m.HeadshotStudioPage()),
+  personalizer: () => import('../components/PlaceholderPage.js').then(m => () => m.PlaceholderPage('Personalizer')),
 };
 
 let currentPage = null;
