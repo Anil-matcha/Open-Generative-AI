@@ -340,6 +340,9 @@ importers:
       next:
         specifier: 16.1.6
         version: 16.1.6(@opentelemetry/api@1.9.1)(@playwright/test@1.59.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      playwright:
+        specifier: ^1.58.2
+        version: 1.59.1
       react:
         specifier: 19.2.3
         version: 19.2.3
@@ -811,6 +814,12 @@ importers:
       openai:
         specifier: ^4.0.0
         version: 4.104.0(ws@8.20.0)(zod@3.25.76)
+
+  modules/director-api:
+    dependencies:
+      '@supabase/supabase-js':
+        specifier: ^2.0.0
+        version: 2.105.4
 
   modules/layout: {}
 
