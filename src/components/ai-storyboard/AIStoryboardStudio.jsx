@@ -330,7 +330,6 @@ export function AIStoryboardStudio() {
       alert(errorMessage);
     }
   }
-  }
 
   function openProject(project, projectScenes) {
     currentView = 'editor';
@@ -518,17 +517,27 @@ export function AIStoryboardStudio() {
             ${scene.location ? `<span class="flex items-center gap-1">📍 ${scene.location}</span>` : ''}
           </div>
           
-          <div class="mt-3 pt-2 border-t border-white/5">
-            <div class="flex items-center justify-between text-[10px] text-white/40 mb-1">
-              <span>Soundtrack</span>
-              <span>🎵</span>
-            </div>
-            <p class="text-xs text-white/60 truncate">${scene.soundtrack_genre || 'TBD'}</p>
-            ${scene.soundtrack_reference ? `<p class="text-[10px] text-primary/70 mt-1 truncate">♪ ${scene.soundtrack_reference}</p>` : ''}
-          </div>
-        </div>
-      </div>
-    `;
+           <div class="mt-3 pt-2 border-t border-white/5">
+             <div class="flex items-center justify-between text-[10px] text-white/40 mb-1">
+               <span>Soundtrack</span>
+               <span>🎵</span>
+             </div>
+             <p class="text-xs text-white/60 truncate">${scene.soundtrack_genre || 'TBD'}</p>
+             ${scene.soundtrack_reference ? `<p class="text-[10px] text-primary/70 mt-1 truncate">♪ ${scene.soundtrack_reference}</p>` : ''}
+           </div>
+           
+           <div class="mt-2">
+             <div class="flex items-center justify-between text-[9px] text-white/40 mb-0.5">
+               <span>Mood</span>
+               <span>${scene.mood || 'Neutral'}</span>
+             </div>
+             <div class="h-1 bg-white/10 rounded-full overflow-hidden">
+               <div class="h-full bg-gradient-to-r from-primary to-accent transition-all" style="width: ${Math.min((scene.mood_intensity || 0.5) * 100, 100)}%"></div>
+             </div>
+           </div>
+         </div>
+       </div>
+     `;
   }
 
   function attachSceneCardListeners() {
@@ -674,7 +683,7 @@ export function AIStoryboardStudio() {
           
           return `
             <div class="flex items-center gap-2">
-              <div class="scene-timeline-node w-48 bg-[#141417] border border-white/10 rounded-xl overflow-hidden cursor-pointer hover:border-primary/30 transition-all" data-scene-id="${scene.id}">
+              <div class="scene-timeline-node w-48 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] border border-white/10 rounded-2xl overflow-hidden cursor-pointer hover:border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.4)] transition-all" data-scene-id="${scene.id}">
                 <div class="h-24 bg-gradient-to-br ${moodGradient} flex items-center justify-center relative">
                   <span class="text-3xl">${getMoodEmoji(scene)}</span>
                   <div class="absolute top-2 left-2 px-2 py-0.5 bg-black/60 rounded text-xs text-white/80">
@@ -687,7 +696,7 @@ export function AIStoryboardStudio() {
                 </div>
               </div>
               ${nextScene ? `
-                <div class="timeline-connector w-12 flex items-center justify-center">
+                <div class="timeline-connector w-12 flex items-center justify-center text-white/30">
                   <svg width="48" height="24" viewBox="0 0 48 24" class="text-primary/50">
                     <path d="M0 12h40M32 4l8 8-8 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
                   </svg>
@@ -895,31 +904,38 @@ export function AIStoryboardStudio() {
     const modal = document.createElement('div');
     modal.className = 'fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4';
     modal.innerHTML = `
-      <div class="bg-[#141417] border border-white/10 rounded-2xl w-full max-w-sm p-6 shadow-2xl">
-        <h2 class="text-lg font-bold text-white mb-4">Export Storyboard</h2>
-        <div class="space-y-3">
-          <button id="exportJSON" class="w-full flex items-center justify-between px-4 py-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all">
+      <div class="bg-[#0d0d0f] border border-white/10 rounded-2xl w-full max-w-sm p-6 shadow-2xl">
+        <div class="flex items-center justify-between mb-5">
+          <div>
+            <div class="text-xs text-white/50 tracking-[1px]">EXPORT</div>
+            <h2 class="text-lg font-semibold text-white mt-1">Storyboard</h2>
+          </div>
+          <button id="closeModal" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/60">✕</button>
+        </div>
+        
+        <div class="space-y-2">
+          <button id="exportJSON" class="w-full flex items-center justify-between px-4 py-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all group">
             <div class="flex items-center gap-3">
-              <span class="text-xl">📄</span>
+              <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center text-lg">📄</div>
               <div class="text-left">
-                <p class="text-sm font-semibold text-white">JSON</p>
-                <p class="text-xs text-white/50">Raw data export</p>
+                <p class="text-sm font-semibold text-white">JSON Export</p>
+                <p class="text-xs text-white/50">Raw structured data</p>
               </div>
             </div>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-white/40"><path d="M9 18l6-6-6-6"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-white/40 group-hover:text-white/70"><path d="M9 18l6-6-6-6"/></svg>
           </button>
-          <button id="exportPDF" class="w-full flex items-center justify-between px-4 py-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all">
+          
+          <button id="exportPDF" class="w-full flex items-center justify-between px-4 py-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all group">
             <div class="flex items-center gap-3">
-              <span class="text-xl">📄</span>
+              <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center text-lg">📕</div>
               <div class="text-left">
-                <p class="text-sm font-semibold text-white">HTML</p>
-                <p class="text-xs text-white/50">Web document</p>
+                <p class="text-sm font-semibold text-white">PDF Export</p>
+                <p class="text-xs text-white/50">Professional document</p>
               </div>
             </div>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-white/40"><path d="M9 18l6-6-6-6"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-white/40 group-hover:text-white/70"><path d="M9 18l6-6-6-6"/></svg>
           </button>
         </div>
-        <button id="closeModal" class="w-full mt-4 px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm font-semibold text-white/70 hover:bg-white/10 transition-all">Cancel</button>
       </div>
     `;
 
@@ -933,7 +949,6 @@ export function AIStoryboardStudio() {
       modal.remove();
       await exportPDF();
     };
-    modal.querySelector('#closeModal').onclick = () => modal.remove();
     modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
   }
 
@@ -965,6 +980,7 @@ export function AIStoryboardStudio() {
       a.download = `${currentProject.name.replace(/\s+/g, '-').toLowerCase()}-storyboard.html`;
       a.click();
       URL.revokeObjectURL(url);
+      // TODO: integrate jsPDF for true PDF once dependency added
     } catch (e) {
       console.error('Export failed:', e);
       alert('Export failed');

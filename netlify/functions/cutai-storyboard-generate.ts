@@ -149,7 +149,7 @@ For SD prompts: Write them as detailed visual descriptions optimized for Stable 
         model: 'gpt-4',
         messages: [
           { role: 'system', content: parsePrompt },
-          { role: 'user', content: `Analyze this ${genre || 'drama'} script and break it into detailed scenes with shot-by-shot breakdowns.\n\nSCRIPT:\n${finalScriptText}\n\nRespond with a single JSON object matching this EXACT schema:\n${jsonSchema}\n\nRequirements:\n- Each scene MUST have at least 2 shots\n- Each shot MUST have an sd_prompt optimized for Stable Diffusion 1.5\n- All mood scores MUST be floats between 0.0 and 1.0\n- All fields are required, dialogue can be null\n- frame_image_path should be null` }
+            { role: 'user', content: `Analyze this ${genre || 'drama'} script and break it into detailed scenes with shot-by-shot breakdowns.\n\nSCRIPT:\n${finalScriptText}\n\nRespond with a single JSON object matching this EXACT schema:\n${jsonSchema}\n\nRequirements:\n- Each scene MUST have at least 3 shots\n- Each shot MUST have an sd_prompt optimized for Stable Diffusion 1.5\n- All mood scores MUST be floats between 0.0 and 1.0\n- All fields are required, dialogue can be null\n- frame_image_path should be null\n- total_duration_seconds should be realistic` }
         ],
         temperature: 0.3,
         max_tokens: 3000,
@@ -163,9 +163,15 @@ For SD prompts: Write them as detailed visual descriptions optimized for Stable 
     }
 
     const parseData = await parseCompletion.json();
-    const parsedScript = JSON.parse(parseData.choices[0]?.message?.content);
+    let parsedScript;
+    try {
+      parsedScript = JSON.parse(parseData.choices[0]?.message?.content);
+    } catch (e) {
+      console.error('Failed to parse storyboard JSON:', e);
+      throw new Error('AI returned invalid JSON for storyboard');
+    }
 
-    // Fill in any missing defaults
+    // Fill in any missing defaults with sensible values
     if (parsedScript.scenes) {
       parsedScript.scenes.forEach(scene => {
         if (!scene.mood) {
@@ -176,7 +182,14 @@ For SD prompts: Write them as detailed visual descriptions optimized for Stable 
             darkness: 0.5,
             overall_mood: 'neutral'
           };
+        } else {
+          scene.mood.tension = scene.mood.tension ?? 0.5;
+          scene.mood.emotion = scene.mood.emotion ?? 0.5;
+          scene.mood.energy = scene.mood.energy ?? 0.5;
+          scene.mood.darkness = scene.mood.darkness ?? 0.5;
+          scene.mood.overall_mood = scene.mood.overall_mood || 'neutral';
         }
+
         if (!scene.soundtrack) {
           scene.soundtrack = {
             genre: 'ambient',
@@ -185,7 +198,14 @@ For SD prompts: Write them as detailed visual descriptions optimized for Stable 
             reference_track: 'N/A',
             energy_level: 0.5
           };
+        } else {
+          scene.soundtrack.genre = scene.soundtrack.genre || 'ambient';
+          scene.soundtrack.tempo = scene.soundtrack.tempo || 'moderate';
+          scene.soundtrack.instruments = scene.soundtrack.instruments || ['piano'];
+          scene.soundtrack.reference_track = scene.soundtrack.reference_track || 'N/A';
+          scene.soundtrack.energy_level = scene.soundtrack.energy_level ?? 0.5;
         }
+
         if (!scene.frame_image_path) {
           scene.frame_image_path = null;
         }
@@ -202,6 +222,11 @@ For SD prompts: Write them as detailed visual descriptions optimized for Stable 
           scene.shots[j] = { ...shot, sd_prompt: refinedPrompt };
         }
       }
+    }
+
+    // Final safety check
+    if (!parsedScript.scenes || parsedScript.scenes.length === 0) {
+      throw new Error('Storyboard generation failed to produce any scenes');
     }
 
     // Phase 4: Save to database
