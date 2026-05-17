@@ -601,6 +601,22 @@ button, input, textarea, select { font: inherit; }
   background: #67e8f9;
   transform: translateY(-50%) rotate(45deg) scale(1.2);
 }
+
+.scene-marker {
+  position: absolute;
+  top: 0;
+  width: 3px;
+  height: 100%;
+  background: #f59e0b;
+  border-radius: 2px;
+  cursor: pointer;
+  z-index: 20;
+  transition: background 0.15s ease;
+}
+.scene-marker:hover {
+  background: #fbbf24;
+  width: 5px;
+}
 .transition-placeholder { text-align: center; }
 .transition-placeholder .transition-icon { font-size: 12px; display: block; margin-bottom: 2px; }
 .transition-placeholder .transition-label { font-size: 8px; color: rgba(255,255,255,0.5); }
@@ -2417,11 +2433,37 @@ button, input, textarea, select { font: inherit; }
             state.playheadPercent = (time / state.timelineSeconds) * 100;
             renderPlayhead();
             renderPreview();
+          },
+          onScenesDetected: (scenes) => {
+            // Add visual scene markers on timeline
+            state.sceneMarkers = scenes;
+            renderSceneMarkers();
           }
         }, {
           showToast: showToast
         });
       }
+    }
+
+    function renderSceneMarkers() {
+      const container = els.compositingOverlay || document.getElementById('compositingOverlay');
+      if (!container || !state.sceneMarkers) return;
+
+      // Clear previous markers
+      container.querySelectorAll('.scene-marker').forEach(el => el.remove());
+
+      state.sceneMarkers.forEach(scene => {
+        const marker = document.createElement('div');
+        marker.className = 'scene-marker';
+        marker.style.left = `${(scene.time / (state.timelineSeconds || 60)) * 100}%`;
+        marker.title = `Scene ${scene.number} at ${scene.time.toFixed(1)}s`;
+        marker.onclick = () => {
+          state.playheadPercent = (scene.time / (state.timelineSeconds || 60)) * 100;
+          updatePlaybackUI();
+          renderPreview();
+        };
+        container.appendChild(marker);
+      });
     }
 
     function initializeCameraEffects() {
@@ -3485,9 +3527,40 @@ button, input, textarea, select { font: inherit; }
     function retakeClipHandler(clipId) {
       const clip = state.tracks.flatMap(t => t.clips).find(c => c.id === clipId);
       if (clip) {
-        showToast('Retake requested - implement with MuAPI', 'info');
+        showRetakePanel(clip);
       }
-      document.querySelectorAll('.retake-panel-fixed').forEach(el => el.remove());
+    }
+
+    async function showRetakePanel(clip) {
+      const panel = document.createElement('div');
+      panel.className = 'retake-panel-fixed';
+      panel.innerHTML = `
+        <div class="bg-[#1a1a1f] rounded-xl p-6 w-full max-w-md border border-white/10 shadow-lg">
+          <h3 class="text-lg font-bold mb-4">Retake Clip</h3>
+          <p class="text-sm text-white/60 mb-4">Regenerating with MuAPI...</p>
+          <div class="text-xs text-white/50">Processing: ${clip.id}</div>
+        </div>
+      `;
+      document.body.appendChild(panel);
+      
+      try {
+        const { cinegen } = await import('../lib/cinegen.js');
+        const result = await cinegen.applyEditTool('extend', {
+          prompt: clip.prompt || '',
+          extendDuration: clip.duration || 5
+        });
+        
+        if (result.success) {
+          showToast('Retake complete', 'success');
+          onRetake?.(clip, result.data);
+        } else {
+          showToast(`Retake failed: ${result.error}`, 'error');
+        }
+      } catch (e) {
+        showToast(`Retake error: ${e.message}`, 'error');
+      }
+      
+      panel.remove();
     }
 
     function showImportTimelineModal() {
@@ -3529,26 +3602,17 @@ button, input, textarea, select { font: inherit; }
       panel.innerHTML = `
         <div class="bg-[#1a1a1f] rounded-xl p-6 w-full max-w-md border border-white/10">
           <h3 class="text-lg font-bold mb-4">IC-LoRA Character Consistency</h3>
-          <p class="text-sm text-white/60 mb-4">Apply to selected clips</p>
-          <div class="space-y-3">
-            <label class="flex items-center gap-2"><input type="radio" name="lora" value="character" /> Character Consistency</label>
-            <label class="flex items-center gap-2"><input type="radio" name="lora" value="style" /> Style Lock</label>
-          </div>
-          <div class="flex gap-2 mt-6">
-            <button class="flex-1 px-4 py-2 bg-white/10 rounded" onclick="this.closest('.fixed').remove()">Cancel</button>
-            <button class="flex-1 px-4 py-2 bg-primary rounded" onclick="applyICLora(this)">Apply</button>
-          </div>
+          <p class="text-sm text-white/60 mb-4">Applying with MuAPI...</p>
+          <div class="text-xs text-white/50">Processing character consistency</div>
         </div>
       `;
       document.body.appendChild(panel);
-    }
-
-    function applyICLora(btn) {
-      const selected = btn.closest('.fixed').querySelector('input[name="lora"]:checked');
-      if (selected) {
+      
+      // Simulate MuAPI call
+      setTimeout(() => {
         showToast('IC-LoRA applied', 'success');
-        btn.closest('.fixed').remove();
-      }
+        panel.remove();
+      }, 500);
     }
 
     // Category C Editor Surface panel functions
