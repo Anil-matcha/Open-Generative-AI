@@ -1,7 +1,7 @@
 # Dockerfile for director-rendiv Supabase Edge Function
 # Deployed on Render as a Docker web service
 
-FROM denoland/deno:1.40
+FROM denoland/deno:2.7.14
 
 WORKDIR /app
 

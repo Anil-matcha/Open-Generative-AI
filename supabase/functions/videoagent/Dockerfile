@@ -2,7 +2,7 @@
 # Deployed on Render as a Docker web service
 # Requires Deno to be installed in the container
 
-FROM denoland/deno:1.40
+FROM denoland/deno:2.7.14
 
 WORKDIR /app
 
