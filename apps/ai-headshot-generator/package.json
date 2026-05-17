@@ -4,14 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "postinstall": "prisma generate"
+    "lint": "eslint"
   },
   "dependencies": {
     "@higgsfield/api-config": "workspace:*",
-    "@prisma/client": "^7.7.0",
     "@supabase/supabase-js": "^2.0.0",
     "@stripe/stripe-js": "^9.2.0",
     "clsx": "^2.1.1",
@@ -29,7 +27,6 @@
     "@types/pg": "^8.20.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.3",
-    "prisma": "^7.7.0",
     "tailwindcss": "^4"
   }
 }
