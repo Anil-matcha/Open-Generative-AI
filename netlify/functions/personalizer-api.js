@@ -52,12 +52,13 @@ async function checkGitHub(username) {
   } catch { return null; }
 }
 
-async function callMaigretWorker(username, maigretUrl, maigretSecret) {
+async function callMaigretWorker(username, options, maigretUrl, maigretSecret) {
+  const payload = { username, ...options };
   const res = await fetchWithTimeout(`${maigretUrl}/scan`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'X-API-Key': maigretSecret },
-    body: JSON.stringify({ username })
-  }, 30000);
+    body: JSON.stringify(payload)
+  }, 60000);
   if (!res.ok) { const text = await res.text(); throw new Error(`Maigret worker failed (${res.status}): ${text}`); }
   return res.json();
 }
@@ -129,10 +130,22 @@ export async function handler(event, context) {
       const targetName = validateInput(body.targetName, 'username');
       if (!targetName) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Valid targetName required' }) };
 
+      const opts = body.options || body;
+      const maigretOptions = {
+        top: opts.top ? parseInt(opts.top) : 500,
+        tags: opts.tags || undefined,
+        proxy: opts.proxy || undefined,
+        retries: opts.retries ? parseInt(opts.retries) : 1,
+        noRecursion: opts.noRecursion === true || opts.disableRecursive === true,
+        isParsingEnabled: opts.isParsingEnabled !== false && opts.disableParsing !== true,
+        permute: opts.enablePermutations === true,
+        checkDomains: opts.withDomains === true,
+      };
+
       let scanData;
       if (process.env.MAIGRET_WORKER_URL && process.env.MAIGRET_WORKER_SECRET) {
         try {
-          scanData = await callMaigretWorker(targetName, process.env.MAIGRET_WORKER_URL, process.env.MAIGRET_WORKER_SECRET);
+          scanData = await callMaigretWorker(targetName, maigretOptions, process.env.MAIGRET_WORKER_URL, process.env.MAIGRET_WORKER_SECRET);
         } catch (maigretError) {
           console.error('Maigret worker failed:', maigretError.message);
           const github = await checkGitHub(targetName);

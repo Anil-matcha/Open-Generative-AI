@@ -44,8 +44,12 @@ const APPS = [
 ];
 
 const REPORT_FORMATS = [
-  { id: 'html', label: 'HTML' }, { id: 'json', label: 'JSON' },
-  { id: 'markdown', label: 'Markdown' }, { id: 'csv', label: 'CSV' }
+  { id: 'html', label: 'HTML' },
+  { id: 'json', label: 'JSON' },
+  { id: 'markdown', label: 'Markdown' },
+  { id: 'csv', label: 'CSV' },
+  { id: 'txt', label: 'TXT' },
+  { id: 'pdf', label: 'PDF' }
 ];
 
 const ERROR_MESSAGES = {
@@ -90,9 +94,13 @@ export default function PersonalizerDialog({
   const [excludedTags, setExcludedTags] = useState([]);
   const [enablePermutations, setEnablePermutations] = useState(false);
   const [disableRecursive, setDisableRecursive] = useState(false);
-  const [disableParsing, setDisableParsing] = useState(false);
-  const [withDomains, setWithDomains] = useState(false);
-  const [scanProgress, setScanProgress] = useState(0);
+   const [disableParsing, setDisableParsing] = useState(false);
+   const [withDomains, setWithDomains] = useState(false);
+   const [enableAiSummary, setEnableAiSummary] = useState(false);
+   const [enableCloudflareBypass, setEnableCloudflareBypass] = useState(false);
+   const [parseUrl, setParseUrl] = useState('');
+   const [retries, setRetries] = useState(1);
+   const [scanProgress, setScanProgress] = useState(0);
 
   // Visual personalization state
   const [visualStyle, setVisualStyle] = useState('cinematic');
@@ -159,6 +167,23 @@ export default function PersonalizerDialog({
       case 'markdown':
         content = `# Personalization Report: ${targetName}\n\n${scanResults.summary || 'No summary'}\n\n- **Confidence:** ${Math.round((scanResults.confidence || 0) * 100)}%\n- **Platforms Found:** ${platforms.length}\n\n| Platform | URL | Status | Rank | HTTP |\n|----------|-----|--------|------|------|\n${platforms.map(p => `| ${p.platform || 'Unknown'} | ${p.url || 'N/A'} | ${p.exists ? 'Found' : 'Not Found'} | ${p.rank || 'N/A'} | ${p.http_status || 'N/A'} |`).join('\n')}`;
         filename += '.md'; mimeType = 'text/markdown'; break;
+      case 'txt':
+        content = `Personalization Report: ${targetName}\n\n${scanResults.summary || 'No summary'}\nConfidence: ${Math.round((scanResults.confidence || 0) * 100)}%\nPlatforms Found: ${platforms.length}\n\n` +
+          platforms.map(p => `${p.platform || 'Unknown'}: ${p.url || 'N/A'} [${p.exists ? 'Found' : 'Not Found'}]`).join('\n');
+        filename += '.txt'; mimeType = 'text/plain'; break;
+      case 'pdf':
+        // Generate a printable HTML and trigger print-to-PDF
+        content = `<!DOCTYPE html><html><head><title>Report - ${targetName}</title><style>body{font-family:system-ui;max-width:900px;margin:40px auto;padding:20px}table{width:100%;border-collapse:collapse}th,td{padding:8px;border-bottom:1px solid #ccc;text-align:left}</style></head><body><h1>Personalization Report: ${targetName}</h1><p>${scanResults.summary || ''}</p><table><thead><tr><th>Platform</th><th>URL</th><th>Status</th></tr></thead><tbody>${platforms.map(p => `<tr><td>${p.platform || ''}</td><td>${p.url || ''}</td><td>${p.exists ? 'Found' : 'Not Found'}</td></tr>`).join('')}</tbody></table></body></html>`;
+        filename += '.html';
+        mimeType = 'text/html';
+        // For true PDF, user can use "Print > Save as PDF"
+        const pdfWindow = window.open('', '_blank');
+        if (pdfWindow) {
+          pdfWindow.document.write(content);
+          pdfWindow.document.close();
+          setTimeout(() => pdfWindow.print(), 300);
+        }
+        return;
     }
     const blob = new Blob([content], { type: mimeType });
     const url = URL.createObjectURL(blob);
@@ -183,10 +208,16 @@ export default function PersonalizerDialog({
       const res = await fetch('/api/personalizer/scan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
-        body: JSON.stringify({
-          targetName: validatedName, targetCompany,
-          options: { topSites, tags: selectedTags, excludedTags, enablePermutations, disableRecursive, disableParsing, withDomains }
-        }),
+          body: JSON.stringify({
+            targetName: validatedName, targetCompany,
+            options: {
+              topSites, tags: selectedTags, excludedTags,
+              enablePermutations, disableRecursive, disableParsing, withDomains,
+              enableAiSummary, enableCloudflareBypass,
+              parseUrl: parseUrl || undefined,
+              retries
+            }
+          }),
         signal: scanAbortRef.current.signal
       });
       const data = await res.json();
@@ -460,18 +491,28 @@ export default function PersonalizerDialog({
                       <label className={labelCls}>Number of Sites</label>
                       <input type="number" value={topSites} onChange={e => setTopSites(Math.min(parseInt(e.target.value) || 500, 10000))} className={inputCls} min={1} max={10000} />
                     </div>
-                    <div>
-                      <label className={labelCls}>Timeout (seconds)</label>
-                      <input type="number" defaultValue={30} className={inputCls} />
-                    </div>
-                  </div>
+                     <div>
+                       <label className={labelCls}>Timeout (seconds)</label>
+                       <input type="number" defaultValue={30} className={inputCls} />
+                     </div>
+                     <div>
+                       <label className={labelCls}>Retries</label>
+                       <input type="number" value={retries} onChange={e => setRetries(Math.max(1, parseInt(e.target.value) || 1))} className={inputCls} min={1} max={5} />
+                     </div>
+                     <div>
+                       <label className={labelCls}>Parse from URL (optional)</label>
+                       <input type="text" value={parseUrl} onChange={e => setParseUrl(e.target.value)} placeholder="https://github.com/user" className={inputCls} />
+                     </div>
+                   </div>
                   <div className="space-y-2">
-                    {[
-                      { label: 'Enable username permutations', checked: enablePermutations, set: setEnablePermutations },
-                      { label: 'Disable recursive search', checked: disableRecursive, set: setDisableRecursive },
-                      { label: 'Disable information extraction', checked: disableParsing, set: setDisableParsing },
-                      { label: 'Check domains', checked: withDomains, set: setWithDomains }
-                    ].map(opt => (
+                     {[
+                       { label: 'Enable username permutations', checked: enablePermutations, set: setEnablePermutations },
+                       { label: 'Disable recursive search', checked: disableRecursive, set: setDisableRecursive },
+                       { label: 'Disable information extraction', checked: disableParsing, set: setDisableParsing },
+                       { label: 'Check domains', checked: withDomains, set: setWithDomains },
+                       { label: 'Enable AI summary', checked: enableAiSummary, set: setEnableAiSummary },
+                       { label: 'Enable Cloudflare bypass', checked: enableCloudflareBypass, set: setEnableCloudflareBypass }
+                     ].map(opt => (
                       <label key={opt.label} className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
                         <input type="checkbox" checked={opt.checked} onChange={e => opt.set(e.target.checked)} className="rounded border-white/20 bg-black/50" />
                         {opt.label}
@@ -536,14 +577,17 @@ export default function PersonalizerDialog({
                       {showResultsView === 'table' && (
                         <div className="overflow-x-auto max-h-48 overflow-y-auto">
                           <table className="w-full text-[11px]">
-                            <thead><tr className="border-b border-white/5"><th className="text-left p-1.5 text-gray-500">Platform</th><th className="text-left p-1.5 text-gray-500">URL</th><th className="text-left p-1.5 text-gray-500">Status</th></tr></thead>
-                            <tbody>{scanResults.platforms.map((p, i) => (
-                              <tr key={i} className="border-b border-white/5 hover:bg-white/5">
-                                <td className="p-1.5 text-white">{p.platform || 'Unknown'}</td>
-                                <td className="p-1.5 text-blue-400">{p.url ? <a href={p.url} target="_blank" rel="noopener" className="hover:underline truncate block max-w-40">{p.url}</a> : 'N/A'}</td>
-                                <td className="p-1.5"><span className={`px-1.5 py-0.5 rounded text-[10px] ${p.exists ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>{p.exists ? 'Found' : 'Not Found'}</span></td>
-                              </tr>
-                            ))}</tbody>
+                             <thead><tr className="border-b border-white/5"><th className="text-left p-1.5 text-gray-500">Platform</th><th className="text-left p-1.5 text-gray-500">URL</th><th className="text-left p-1.5 text-gray-500">Status</th><th className="text-left p-1.5 text-gray-500">Bio / Info</th></tr></thead>
+                             <tbody>{scanResults.platforms.map((p, i) => {
+                               const info = p.bio || p.location || p.fullname || (p.ids_data ? Object.keys(p.ids_data).slice(0,3).join(', ') : '');
+                               return (
+                               <tr key={i} className="border-b border-white/5 hover:bg-white/5">
+                                 <td className="p-1.5 text-white">{p.platform || 'Unknown'}</td>
+                                 <td className="p-1.5 text-blue-400">{p.url ? <a href={p.url} target="_blank" rel="noopener" className="hover:underline truncate block max-w-40">{p.url}</a> : 'N/A'}</td>
+                                 <td className="p-1.5"><span className={`px-1.5 py-0.5 rounded text-[10px] ${p.exists ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>{p.exists ? 'Found' : 'Not Found'}</span></td>
+                                 <td className="p-1.5 text-gray-400 text-[10px] truncate max-w-48">{info || '—'}</td>
+                               </tr>
+                             )})}</tbody>
                           </table>
                         </div>
                       )}
