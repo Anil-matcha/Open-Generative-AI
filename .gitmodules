@@ -1,0 +1,6 @@
+[submodule "modules/CineGen"]
+	path = modules/CineGen
+	url = https://github.com/deangilmoreremix/CineGen.git
+[submodule "modules/LTX-Desktop"]
+	path = modules/LTX-Desktop
+	url = https://github.com/deangilmoreremix/LTX-Desktop.git
