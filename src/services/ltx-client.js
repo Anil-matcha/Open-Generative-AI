@@ -1,7 +1,7 @@
 /**
  * LTX Client Service
  * Handles communication with the LTX backend for AI video generation
- * Includes demo fallback, rate limiting, and circuit breaker patterns
+ * Rate limiting and circuit breaker patterns
  */
 
 import { RateLimiter } from '../lib/services/RateLimiter.js';
@@ -10,10 +10,9 @@ import { CircuitBreaker } from '../lib/services/CircuitBreaker.js';
 class LtxClient {
   constructor(options = {}) {
     // Configuration from environment variables
-    this.baseUrl = options.baseUrl || import.meta.env.VITE_LTX_API_URL || 'https://api.ltx.ai';
+    this.baseUrl = options.baseUrl || import.meta.env.VITE_LTX_API_URL;
     this.apiKey = options.apiKey || import.meta.env.VITE_LTX_API_KEY || '';
     this.enabled = options.enabled !== false && (import.meta.env.VITE_LTX_ENABLED !== 'false');
-    this.demoMode = options.demoMode || import.meta.env.VITE_LTX_DEMO_MODE === 'true';
 
     // Initialize supporting services
     this.rateLimiter = new RateLimiter({
@@ -37,18 +36,17 @@ class LtxClient {
       requests: 0,
       cacheHits: 0,
       cacheMisses: 0,
-      errors: 0,
-      demoFallbacks: 0
+      errors: 0
     };
 
-    console.log(`[LtxClient] Initialized with baseUrl: ${this.baseUrl}, demoMode: ${this.demoMode}`);
+    console.log(`[LtxClient] Initialized with baseUrl: ${this.baseUrl}`);
   }
 
   /**
    * Check if service is available
    */
   isAvailable() {
-    return this.enabled && !this.demoMode;
+    return this.enabled;
   }
 
   /**
@@ -59,45 +57,43 @@ class LtxClient {
    * @param {string} params.aspectRatio - Aspect ratio (16:9, 9:16, etc.)
    * @returns {Promise<Object>} - Generation result with video URL and metadata
    */
-  async generateVideo(params) {
-    if (!this.enabled) {
-      return this.getDemoVideo(params);
-    }
+   async generateVideo(params) {
+     if (!this.enabled) {
+       throw new Error('LTX service is disabled. Configure VITE_LTX_ENABLED=true and valid API URL.');
+     }
 
-    // Circuit breaker check
-    if (!this.circuitBreaker.canProceed('ltx')) {
-      console.warn('[LtxClient] Circuit breaker OPEN, using demo fallback');
-      return this.getDemoVideo(params);
-    }
+     // Circuit breaker check
+     if (!this.circuitBreaker.canProceed('ltx')) {
+       throw new Error('LTX circuit breaker is open. Service temporarily unavailable.');
+     }
 
-    // Rate limit check
-    if (!this.rateLimiter.canProceed()) {
-      console.warn('[LtxClient] Rate limit exceeded, using demo fallback');
-      return this.getDemoVideo(params);
-    }
+     // Rate limit check
+     if (!this.rateLimiter.canProceed()) {
+       throw new Error('LTX rate limit exceeded. Please slow down requests.');
+     }
 
-    try {
-      const response = await this.makeRequest('/generate', {
-        method: 'POST',
-        body: JSON.stringify(params),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.apiKey}`
-        }
-      });
+     try {
+       const response = await this.makeRequest('/generate', {
+         method: 'POST',
+         body: JSON.stringify(params),
+         headers: {
+           'Content-Type': 'application/json',
+           'Authorization': `Bearer ${this.apiKey}`
+         }
+       });
 
-      const result = await response.json();
+       const result = await response.json();
 
-      // Record success
-      this.circuitBreaker.recordSuccess('ltx');
-      this.stats.requests++;
+       // Record success
+       this.circuitBreaker.recordSuccess('ltx');
+       this.stats.requests++;
 
-      return {
-        success: true,
-        videoUrl: result.video_url,
-        thumbnailUrl: result.thumbnail_url,
-        duration: result.duration,
-        aspectRatio: result.aspect_ratio,
+       return {
+         success: true,
+         videoUrl: result.video_url,
+         thumbnailUrl: result.thumbnail_url,
+         duration: result.duration,
+         aspectRatio: result.aspect_ratio,
         prompt: params.prompt,
         generatedAt: new Date().toISOString(),
         source: 'ltx'
@@ -108,8 +104,8 @@ class LtxClient {
       this.circuitBreaker.recordFailure('ltx');
       this.stats.errors++;
 
-      // Fallback to demo mode on error
-      return this.getDemoVideo(params);
+      // Service unavailable - throw error (no demo fallback)
+      throw new Error('LTX service unavailable');
     }
   }
 
@@ -120,11 +116,11 @@ class LtxClient {
    */
   async getGenerationStatus(jobId) {
     if (!this.isAvailable()) {
-      return this.getDemoStatus(jobId);
+      throw new Error('LTX service unavailable');
     }
 
     if (!this.circuitBreaker.canProceed('ltx')) {
-      return this.getDemoStatus(jobId);
+      throw new Error('LTX service unavailable');
     }
 
     try {
@@ -145,7 +141,7 @@ class LtxClient {
     } catch (error) {
       console.error('[LtxClient] Status check failed:', error);
       this.stats.errors++;
-      return this.getDemoStatus(jobId);
+      throw new Error('LTX service unavailable');
     }
   }
 
@@ -182,47 +178,17 @@ class LtxClient {
     }
   }
 
-  /**
-   * Get demo video data when service is unavailable
+/**
+   * LTX service methods - no demo fallbacks (production-ready)
    */
-  getDemoVideo(params) {
-    this.stats.demoFallbacks++;
-
-    // Mock video generation with realistic delay
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          success: true,
-          videoUrl: 'https://demo.ltx.ai/videos/demo-generated.mp4',
-          thumbnailUrl: 'https://demo.ltx.ai/thumbnails/demo-thumb.jpg',
-          duration: params.duration || 5,
-          aspectRatio: params.aspectRatio || '16:9',
-          prompt: params.prompt,
-          generatedAt: new Date().toISOString(),
-          source: 'demo',
-          isDemo: true,
-          message: 'Demo mode: Service unavailable, returning mock data'
-        });
-      }, 2000); // 2 second delay to simulate processing
-    });
+  getDemoVideo() {
+    throw new Error('LTX service unavailable - demo mode disabled');
   }
 
-  /**
-   * Get demo status data
-   */
-  getDemoStatus(jobId) {
-    return {
-      jobId,
-      status: 'completed',
-      progress: 100,
-      estimatedTimeRemaining: 0,
-      result: {
-        videoUrl: 'https://demo.ltx.ai/videos/demo-generated.mp4',
-        thumbnailUrl: 'https://demo.ltx.ai/thumbnails/demo-thumb.jpg'
-      },
-      isDemo: true
-    };
+  getDemoStatus() {
+    throw new Error('LTX service unavailable - demo mode disabled');
   }
+
 
   /**
    * Get client statistics
@@ -246,8 +212,7 @@ class LtxClient {
       requests: 0,
       cacheHits: 0,
       cacheMisses: 0,
-      errors: 0,
-      demoFallbacks: 0
+      errors: 0
     };
   }
 }
