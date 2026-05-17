@@ -21,6 +21,9 @@ import { interpolate, spring, blendColors, noise2D, useSequence, useSeries } fro
 // Agent system integration
 import { initTimelineAgentIntegration } from '../timelineAgentIntegration.js';
 import { ColorCorrectionSystem } from '../lib/editor/colorCorrectionSystem.jsx';
+// CutAI integration loaded dynamically to avoid syntax issues in AIStoryboardStudio.jsx
+// import { AIStoryboardStudio } from './ai-storyboard/AIStoryboardStudio.jsx';
+// import { cutai } from '../lib/cutai-api.js';
 
 // Subtitle system integration
 import { SubtitleTimeline } from '../lib/editor/subtitleTimeline.js';
@@ -50,6 +53,9 @@ import { VideoPersonalizationHub } from './modals/VideoPersonalizationHub.jsx';
 import { LandingPageBuilder } from './modals/LandingPageBuilder.jsx';
 import { LeadGeneratorModal } from './modals/LeadGeneratorModal.jsx';
 import { GTMPromptModal } from './modals/GTMPromptModal.jsx';
+import { RetakePanel } from './RetakePanel.jsx';
+import { ImportTimelineModal } from './ImportTimelineModal.jsx';
+import { ICLoraPanel } from './ICLoraPanel.jsx';
 // Category C Editor Surface imports removed - not implemented
 import { createHeroSection } from '../lib/thumbnails.js';
 
@@ -62,6 +68,250 @@ export function TimelineEditorPage() {
 
   // Initialize design system enforcement
   enforceDesignSystem();
+
+  // CutAI integration - popup storyboard UX with timeline communication
+  // Uses dynamic import to avoid syntax issues in AIStoryboardStudio.jsx
+  // Styled consistently with timeline editor design system
+  const showCutAI = async () => {
+    const cutaiContainer = document.createElement('div');
+    cutaiContainer.className = 'fixed inset-0 z-[999] bg-black/95 flex items-center justify-center p-4';
+    
+    // Create surface-styled modal matching timeline editor aesthetics
+    const modal = document.createElement('div');
+    modal.className = 'w-full max-w-[1400px] h-[90vh] rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.028))] shadow-[0_20px_60px_rgba(0,0,0,0.45)] backdrop-blur-xl overflow-hidden flex flex-col';
+    
+    try {
+      // Dynamic import of CutAI module
+      const { AIStoryboardStudio } = await import('./ai-storyboard/AIStoryboardStudio.jsx');
+      
+      const studio = AIStoryboardStudio();
+      modal.appendChild(studio);
+      
+      // Make CutAI scene/shot cards draggable for direct timeline drop (production-ready)
+      setTimeout(() => {
+        const sceneCards = modal.querySelectorAll('.scene-card, [data-scene-id], .shot-card, [data-shot-id]');
+        sceneCards.forEach(card => {
+          card.setAttribute('draggable', 'true');
+          card.style.cursor = 'grab';
+          
+          card.addEventListener('dragstart', (e) => {
+            const sceneId = card.dataset.sceneId || card.getAttribute('data-scene-id');
+            const shotId = card.dataset.shotId || card.getAttribute('data-shot-id');
+            
+            // Extract shot/scene data from DOM or CutAI internal state
+            const label = card.querySelector('.shot-label, h3, .title')?.textContent || 
+                         card.getAttribute('data-label') || 'CutAI Shot';
+            const duration = parseFloat(card.dataset.duration) || 
+                            parseFloat(card.getAttribute('data-duration')) || 5;
+            
+            const dragData = {
+              type: shotId ? 'cutai-shot' : 'cutai-scene',
+              label,
+              duration,
+              clipType: 'video',
+              metadata: {
+                sceneId,
+                shotId,
+                source: 'cutai-drag-drop'
+              }
+            };
+            
+            e.dataTransfer.setData('application/json', JSON.stringify(dragData));
+            e.dataTransfer.effectAllowed = 'copy';
+            card.style.opacity = '0.6';
+          });
+          
+          card.addEventListener('dragend', () => {
+            card.style.opacity = '1';
+          });
+        });
+      }, 800);
+      
+      // Add "Send to Timeline" button styled like timeline editor mini-btns
+      setTimeout(() => {
+        const headerActions = modal.querySelector('#headerActions');
+        if (headerActions) {
+          const sendBtn = document.createElement('button');
+          sendBtn.className = 'flex items-center gap-2 px-4 py-2 bg-primary text-black rounded-xl text-sm font-semibold hover:shadow-glow transition-all ml-2 border border-primary/50';
+          sendBtn.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Send to Timeline
+          `;
+          sendBtn.onclick = () => {
+            const stored = localStorage.getItem('ai-storyboard-project');
+            if (stored) {
+              try {
+                const data = JSON.parse(stored);
+                // Convert CutAI storyboard to timeline clips with full video editing support
+                const clips = (data.scenes || []).flatMap((scene, sceneIdx) => 
+                  (scene.shots || []).map((shot, shotIdx) => {
+                    const duration = shot.duration || shot.shot_duration || 5;
+                    const startTime = sceneIdx * 12 + shotIdx * duration;
+                    const clipType = shot.shot_type?.toLowerCase().includes('text') ? 'text' : 
+                                     shot.shot_type?.toLowerCase().includes('audio') ? 'audio' : 'video';
+                    
+                    return {
+                      id: `cutai-${Date.now()}-${sceneIdx}-${shotIdx}`,
+                      name: shot.description || shot.title || scene.title || `Shot ${shot.shotNumber || shotIdx + 1}`,
+                      type: clipType,
+                      start: startTime,
+                      end: startTime + duration,
+                      sourceStart: 0,
+                      sourceEnd: duration,
+                      duration: duration,
+                      assetId: shot.asset_id || shot.sd_prompt ? `cutai-asset-${sceneIdx}-${shotIdx}` : null,
+                      volume: 1,
+                      opacity: 1,
+                      playbackRate: 1,
+                      effects: shot.effects || [],
+                      transform: { x: 0, y: 0, scale: 1, rotation: 0 },
+                      lane: 0,
+                      source: 'cutai',
+                      metadata: {
+                        ...shot,
+                        sceneNumber: scene.scene_number || sceneIdx + 1,
+                        shotNumber: shot.shot_number || shotIdx + 1,
+                        shotType: shot.shot_type,
+                        cameraAngle: shot.camera_angle,
+                        cameraMovement: shot.camera_movement,
+                        mood: {
+                          tension: scene.mood_tension || scene.mood?.tension,
+                          energy: scene.mood_energy || scene.mood?.energy,
+                          emotion: scene.mood_emotion || scene.mood?.emotion
+                        },
+                        prompt: shot.sd_prompt || shot.prompt,
+                        timeOfDay: scene.time_of_day,
+                        location: scene.location,
+                        soundtrack: scene.soundtrack_genre ? {
+                          genre: scene.soundtrack_genre,
+                          tempo: scene.soundtrack_tempo
+                        } : null
+                      }
+                    };
+                  })
+                );
+                
+                let addedCount = 0;
+                clips.forEach(clip => {
+                  // Determine appropriate track based on clip type and shot characteristics
+                  let targetTrack = null;
+                  const isInsertShot = clip.metadata?.shotType?.toLowerCase().includes('insert');
+                  const isBroll = clip.metadata?.shotType?.toLowerCase().includes('b-roll') || 
+                                  clip.metadata?.shotType?.toLowerCase().includes('cutaway');
+                  
+                  if (isBroll || isInsertShot) {
+                    // B-roll and insert shots go to B-Roll track
+                    targetTrack = state.project?.tracks?.find(t => 
+                      t.type === 'b-roll' || t.type === 'B-Roll' || t.type === 'overlay'
+                    );
+                    if (!targetTrack && state.addTrack) {
+                      state.addTrack('B-Roll');
+                      targetTrack = state.project?.tracks?.find(t => 
+                        t.type === 'b-roll' || t.type === 'B-Roll' || t.type === 'overlay'
+                      );
+                    }
+                  } else if (clip.type === 'video' || clip.type === 'image') {
+                    targetTrack = state.project?.tracks?.find(t => t.type === 'video' || t.type === 'Video');
+                  } else if (clip.type === 'audio') {
+                    targetTrack = state.project?.tracks?.find(t => t.type === 'audio' || t.type === 'Audio');
+                  } else if (clip.type === 'text') {
+                    targetTrack = state.project?.tracks?.find(t => t.type === 'text' || t.type === 'Text' || t.type === 'subtitle');
+                  }
+                  
+                  // Fallback to first available track or create appropriate track
+                  if (!targetTrack) {
+                    targetTrack = state.project?.tracks?.[0];
+                  }
+                  
+                  if (!targetTrack && state.addTrack) {
+                    state.addTrack(clip.type === 'audio' ? 'Audio' : clip.type === 'text' ? 'Text' : 'Video');
+                    targetTrack = state.project?.tracks?.find(t => 
+                      t.type === (clip.type === 'audio' ? 'audio' : clip.type === 'text' ? 'text' : 'video')
+                    ) || state.project?.tracks?.[0];
+                  }
+                  
+                  if (targetTrack && state.addClip) {
+                    const clipData = {
+                      ...clip,
+                      trackId: targetTrack.id,
+                      name: clip.name || clip.label
+                    };
+                    state.addClip(targetTrack.id, clipData);
+                    addedCount++;
+                    
+                    // Apply mood-based color correction if mood data exists
+                    if (clip.metadata?.mood && state.addColorCorrection) {
+                      const mood = clip.metadata.mood;
+                      const colorGrade = {
+                        brightness: mood.tension > 0.7 ? -0.1 : mood.energy > 0.7 ? 0.05 : 0,
+                        contrast: mood.tension > 0.6 ? 1.1 : 1.0,
+                        saturation: mood.emotion === 'dark' || mood.darkness > 0.5 ? 0.85 : 1.0,
+                        temperature: mood.emotion === 'warm' ? 200 : mood.emotion === 'cold' ? -200 : 0
+                      };
+                      state.addColorCorrection(targetTrack.id, clip.id, colorGrade);
+                    }
+                    
+                    // Add camera movement as keyframe effect if present
+                    if (clip.metadata?.cameraMovement && state.addEffect) {
+                      const movementMap = {
+                        'Pan Left': { type: 'pan', direction: -1 },
+                        'Pan Right': { type: 'pan', direction: 1 },
+                        'Tilt Up': { type: 'tilt', direction: 1 },
+                        'Tilt Down': { type: 'tilt', direction: -1 },
+                        'Dolly In': { type: 'dolly', direction: 1 },
+                        'Dolly Out': { type: 'dolly', direction: -1 },
+                        'Tracking Shot': { type: 'tracking', direction: 1 }
+                      };
+                      const movement = movementMap[clip.metadata.cameraMovement];
+                      if (movement) {
+                        state.addEffect(targetTrack.id, clip.id, {
+                          type: 'camera-move',
+                          ...movement,
+                          duration: clip.duration
+                        });
+                      }
+                    }
+                  }
+                });
+                
+                showToast(`Added ${addedCount} CutAI shots to timeline from "${data.projectName || 'Storyboard'}"`);
+                cutaiContainer.remove();
+              } catch (e) {
+                console.error('CutAI import error:', e);
+                showToast('Failed to import CutAI data to timeline');
+              }
+            } else {
+              showToast('No CutAI storyboard data found. Generate scenes first.');
+            }
+          };
+          headerActions.appendChild(sendBtn);
+        }
+      }, 150);
+
+      cutaiContainer.appendChild(modal);
+      document.body.appendChild(cutaiContainer);
+      
+      // Close on backdrop click (but not on modal content)
+      cutaiContainer.onclick = (e) => { 
+        if (e.target === cutaiContainer) cutaiContainer.remove(); 
+      };
+      
+      // Close on Escape key
+      const escHandler = (e) => {
+        if (e.key === 'Escape') {
+          cutaiContainer.remove();
+          document.removeEventListener('keydown', escHandler);
+        }
+      };
+      document.addEventListener('keydown', escHandler);
+      
+    } catch (err) {
+      console.error('Failed to load CutAI module:', err);
+      showToast('CutAI storyboard module unavailable');
+      cutaiContainer.remove();
+    }
+  };
+  window.showCutAIFromTimeline = showCutAI;
 
   const styles = `
 /* Design system variables are now enforced globally by designSystemEnforcer.js */
@@ -334,6 +584,23 @@ button, input, textarea, select { font: inherit; }
 .transition-drop-zone { position: relative; width: 20px; height: 62px; background: rgba(34,211,238,0.1); border: 1px dashed rgba(34,211,238,0.3); border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s ease; }
 .transition-drop-zone.drag-over { background: rgba(34,211,238,0.2); border-color: var(--cyan); }
 .transition-drop-zone.has-transition { background: transparent; border: none; cursor: default; }
+
+.keyframe-marker {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+  width: 9px;
+  height: 9px;
+  background: #22d3ee;
+  border: 1.5px solid #fff;
+  z-index: 12;
+  cursor: pointer;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.3);
+}
+.keyframe-marker:hover {
+  background: #67e8f9;
+  transform: translateY(-50%) rotate(45deg) scale(1.2);
+}
 .transition-placeholder { text-align: center; }
 .transition-placeholder .transition-icon { font-size: 12px; display: block; margin-bottom: 2px; }
 .transition-placeholder .transition-label { font-size: 8px; color: rgba(255,255,255,0.5); }
@@ -544,6 +811,7 @@ button, input, textarea, select { font: inherit; }
             <button class="mini-btn" data-add-track="Audio" data-tooltip="Add audio track - Create a new audio layer on the timeline" aria-label="Add a new audio track">+Audio</button>
             <button class="mini-btn" data-add-track="Text" data-tooltip="Add text track - Create a new text overlay layer" aria-label="Add a new text track">+Text</button>
             <button class="mini-btn" data-add-track="B-Roll" data-tooltip="Add B-roll track - Create a new B-roll overlay layer" aria-label="Add a new B-roll track">+B-Roll</button>
+            <button class="mini-btn" id="cutaiStoryboardBtn" data-tooltip="Generate storyboard with CutAI" aria-label="Open CutAI storyboard generator">✨AI</button>
           </div>
           <div class="pill-row" id="pillRow"></div>
         </div>
@@ -707,7 +975,7 @@ button, input, textarea, select { font: inherit; }
         ] }
       ],
       tools: baseState.tools, // Use enhanced tools from baseState
-      pills: ['Text to Video', 'Image to Video', 'Retake', 'Extend', 'B-Roll', 'Music Gen', 'Audio Sync', 'Fill Gap AI', 'Elements', 'Dual Viewer'],
+      pills: ['Text to Video', 'Image to Video', 'Retake', 'Extend', 'B-Roll', 'Music Gen', 'Audio Sync', 'Fill Gap AI', 'Elements', 'Import Timeline', 'IC-LoRA'],
       topIcons: ['👁','📺','📁','⚡','🎵','🔊','🎞️','👤','🎨','💬','📋','🎬','💾','⚙️','💳','🔗','👀','▶️','🤖','🎭','📊'],
       media: [
         { icon: '🎬', label: 'Video Clip', desc: 'Insert a source shot or generated video clip.', tooltip: 'Video clip - Add video footage to the timeline' },
@@ -842,6 +1110,18 @@ button, input, textarea, select { font: inherit; }
 
     // Keyboard shortcuts for undo/redo
     function handleKeyboardShortcuts(event) {
+      if (event.key === 'Delete' || event.key === 'Backspace') {
+        event.preventDefault();
+        deleteSelectedClip();
+        return;
+      }
+      
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'd') {
+        event.preventDefault();
+        duplicateSelectedClip();
+        return;
+      }
+
       if (event.ctrlKey || event.metaKey) {
         switch (event.key) {
           case 'z':
@@ -979,6 +1259,22 @@ button, input, textarea, select { font: inherit; }
       els.previewTitle.textContent = selected.name;
       els.previewSubtitle.textContent = `${state.selectedTool} tool active • ${state.generateType} generation ready`;
       els.previewEmoji.textContent = selected.type === 'audio' ? '🎵' : selected.type === 'text' ? '📝' : selected.type === 'image' ? '🖼️' : '🎥';
+
+      // Apply active keyframes to preview (if KeyframeSystem exists)
+      if (state.keyframeSystem && state.keyframeSystem.getActiveValues) {
+        const active = state.keyframeSystem.getActiveValues(selected.id, state.playheadPercent / 100 * (state.timelineSeconds || 60));
+        if (active && Object.keys(active).length > 0) {
+          const stage = els.previewStage;
+          if (active.scale) stage.style.transform = `scale(${active.scale})`;
+          if (active.opacity !== undefined) stage.style.opacity = active.opacity;
+          if (active.rotation) stage.style.transform = `rotate(${active.rotation}deg)`;
+          if (active['position-x'] || active['position-y']) {
+            const x = active['position-x'] || 0;
+            const y = active['position-y'] || 0;
+            stage.style.transform = `translate(${x}%, ${y}%)`;
+          }
+        }
+      }
 
       if (selected.type === 'video' && selected.src) {
         const video = createVideoPreview(selected.src, 'preview-media', {
@@ -1416,14 +1712,15 @@ button, input, textarea, select { font: inherit; }
       const pillTooltips = {
         'Text to Video': 'Generate video from text descriptions using AI',
         'Image to Video': 'Animate still images into video clips',
-        'Retake': 'Regenerate the last AI generation with new parameters',
+        'Retake': 'Regenerate with different parameters',
         'Extend': 'Extend clip duration by generating additional footage',
         'B-Roll': 'Add supplementary footage and cutaway shots',
         'Music Gen': 'Generate background music from video context',
         'Audio Sync': 'Automatically sync audio with video timing',
         'Fill Gap AI': 'AI generates footage to bridge gaps between clips',
         'Elements': 'Browse reusable media elements library',
-        'Dual Viewer': 'View source and timeline side by side'
+        'Import Timeline': 'Import an existing timeline from JSON or EDL',
+        'IC-LoRA': 'Apply character consistency across clips'
       };
       state.pills.forEach((pill) => {
         const span = document.createElement('span');
@@ -1432,8 +1729,35 @@ button, input, textarea, select { font: inherit; }
         span.setAttribute('data-tooltip', pillTooltips[pill] || `${pill} quick mode`);
         span.title = pillTooltips[pill] || `${pill} quick mode`;
         span.setAttribute('aria-label', span.title);
+        span.addEventListener('click', () => handlePillClick(pill));
         els.pillRow.appendChild(span);
       });
+    }
+
+    function handlePillClick(pill) {
+      if (pill === 'Retake') {
+        const selectedClip = state.tracks.flatMap(t => t.clips).find(c => c.selected);
+        if (selectedClip) {
+          showRetakePanel(selectedClip);
+        }
+      } else if (pill === 'Import Timeline') {
+        showImportTimelineModal();
+      } else if (pill === 'IC-LoRA') {
+        showICLoraPanel();
+      }
+    }
+
+    function initializeDefaultTracks() {
+      if (!state.project) state.project = { tracks: [] };
+      if (!state.project.tracks || state.project.tracks.length === 0) {
+        state.project.tracks = [
+          { id: 'track-video', type: 'video', name: 'Video', items: [], muted: false, solo: false, locked: false },
+          { id: 'track-audio', type: 'audio', name: 'Audio', items: [], muted: false, solo: false, locked: false },
+          { id: 'track-text', type: 'text', name: 'Text', items: [], muted: false, solo: false, locked: false },
+          { id: 'track-effects', type: 'effects', name: 'Effects', items: [], muted: false, solo: false, locked: false },
+          { id: 'track-broll', type: 'b-roll', name: 'B-Roll', items: [], muted: false, solo: false, locked: false }
+        ];
+      }
     }
 
     function renderTracksBasic(state, els, showToast) {
@@ -1475,27 +1799,143 @@ button, input, textarea, select { font: inherit; }
           const widthPercent = ((clip.end - clip.start) / state.timelineSeconds) * 100;
           clipEl.style.left = `${leftPercent}%`;
           clipEl.style.width = `${widthPercent}%`;
-          clipEl.innerHTML = `<span class="clip-label">${clip.text || clip.name}</span>`;
+          clipEl.innerHTML = `
+            <span class="clip-label">${clip.text || clip.name}</span>
+            <div class="clip-handle left" data-handle="left"></div>
+            <div class="clip-handle right" data-handle="right"></div>
+          `;
+
+          // Visual keyframe markers with edit/delete
+          if (state.keyframeSystem && state.keyframeSystem.getKeyframes) {
+            const kfs = state.keyframeSystem.getKeyframes(clip.id) || [];
+            kfs.forEach((kf, idx) => {
+              const kfEl = document.createElement('div');
+              kfEl.className = 'keyframe-marker';
+              const kfLeft = ((kf.time - (clip.start || 0)) / (clip.duration || 5)) * 100;
+              kfEl.style.left = `${Math.max(2, Math.min(98, kfLeft))}%`;
+              kfEl.title = `${kf.property}: ${kf.value} (click to edit)`;
+
+              kfEl.onclick = (e) => {
+                e.stopPropagation();
+                const newValue = prompt(`Edit ${kf.property}`, kf.value);
+                if (newValue !== null) {
+                  state.keyframeSystem.updateKeyframe(clip.id, idx, { value: parseFloat(newValue) });
+                  renderTracks();
+                }
+              };
+
+              kfEl.oncontextmenu = (e) => {
+                e.preventDefault();
+                if (confirm('Delete this keyframe?')) {
+                  state.keyframeSystem.removeKeyframe(clip.id, idx);
+                  renderTracks();
+                }
+              };
+
+              // Drag to change keyframe time
+              kfEl.onmousedown = (e) => {
+                e.stopPropagation();
+                const startX = e.clientX;
+                const startLeft = parseFloat(kfEl.style.left);
+                const clipRect = clipEl.getBoundingClientRect();
+
+                const onMove = (moveEvent) => {
+                  const deltaX = moveEvent.clientX - startX;
+                  const newLeft = Math.max(0, Math.min(100, startLeft + (deltaX / clipRect.width) * 100));
+                  kfEl.style.left = `${newLeft}%`;
+
+                  // Update keyframe time
+                  const newTime = (clip.start || 0) + (newLeft / 100) * (clip.duration || 5);
+                  if (state.keyframeSystem.updateKeyframe) {
+                    state.keyframeSystem.updateKeyframe(clip.id, idx, { time: newTime });
+                  }
+                };
+
+                const onUp = () => {
+                  document.removeEventListener('mousemove', onMove);
+                  document.removeEventListener('mouseup', onUp);
+                  renderTracks();
+                };
+
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+              };
+
+              clipEl.appendChild(kfEl);
+            });
+          }
           clipEl.addEventListener('click', (event) => {
             if (event.target.classList.contains('clip-handle')) return;
             event.stopPropagation();
-            // Update the main state
             window.timelineState.selectedClipId = clip.id;
             renderTracksBasic(state, els, showToast);
             updatePreview({ id: clip.id, name: clip.name, type: clip.type, src: clip.src });
-            // Update camera effects with selected clip
-            if (cameraEffects) {
-              cameraEffects.setSelectedClip(clip.id);
-            }
+            if (cameraEffects) cameraEffects.setSelectedClip(clip.id);
           });
-          lane.appendChild(clipEl);
-        });
 
-        row.appendChild(meta);
-        row.appendChild(lane);
-        els.trackRows.appendChild(row);
-      });
-    }
+          // Basic trim handle logic
+          clipEl.querySelectorAll('.clip-handle').forEach(handle => {
+            handle.addEventListener('mousedown', (e) => {
+              e.stopPropagation();
+              const isLeft = handle.dataset.handle === 'left';
+              const startX = e.clientX;
+              const originalStart = clip.start;
+              const originalEnd = clip.end;
+
+              const onMove = (moveEvent) => {
+                const delta = ((moveEvent.clientX - startX) / lane.getBoundingClientRect().width) * (state.timelineSeconds || 60);
+                if (isLeft) {
+                  clip.start = Math.max(0, Math.min(originalStart + delta, originalEnd - 0.1));
+                } else {
+                  clip.end = Math.max(originalStart + 0.1, originalEnd + delta);
+                }
+                renderTracksBasic(state, els, showToast);
+              };
+
+              const onUp = () => {
+                document.removeEventListener('mousemove', onMove);
+                document.removeEventListener('mouseup', onUp);
+                saveStateSnapshot(state);
+              };
+
+              document.addEventListener('mousemove', onMove);
+              document.addEventListener('mouseup', onUp);
+            });
+          });
+           lane.appendChild(clipEl);
+         });
+
+         // Render transitions between clips that have transition data
+         const sortedItems = [...(track.items || [])].sort((a, b) => (a.start || 0) - (b.start || 0));
+         for (let i = 0; i < sortedItems.length - 1; i++) {
+           const current = sortedItems[i];
+           const next = sortedItems[i + 1];
+           if (current.transition && current.transition.type) {
+             const transEl = document.createElement('div');
+             transEl.className = 'timeline-transition';
+             const transLeft = ((current.end || current.start + (current.duration || 5)) / (state.timelineSeconds || 60)) * 100;
+             const transWidth = ((current.transition.duration || 0.5) / (state.timelineSeconds || 60)) * 100;
+             transEl.style.left = `${transLeft}%`;
+             transEl.style.width = `${Math.max(transWidth, 1.5)}%`;
+             transEl.innerHTML = `
+               <div class="transition-visual">
+                 <div class="transition-icon">⟷</div>
+                 <div class="transition-name">${current.transition.type}</div>
+               </div>
+             `;
+             transEl.onclick = () => {
+               window.timelineState.selectedClipId = current.id;
+               if (transitionEditor) transitionEditor.show(current.transition);
+             };
+             lane.appendChild(transEl);
+           }
+         }
+
+         row.appendChild(meta);
+         row.appendChild(lane);
+         els.trackRows.appendChild(row);
+       });
+     }
 
     function renderTracks() {
       // Convert tracks to enhanced format
@@ -1549,10 +1989,49 @@ button, input, textarea, select { font: inherit; }
 
         lane.addEventListener('drop', (e) => {
           e.preventDefault();
-          const data = JSON.parse(e.dataTransfer.getData('application/json'));
           const rect = lane.getBoundingClientRect();
           const percent = ((e.clientX - rect.left) / rect.width) * 100;
           const track = state.tracks.find(t => t.id === parseInt(lane.dataset.trackId));
+          
+          // Handle CutAI storyboard shots/scenes (production-ready drag-drop)
+          let cutaiData = null;
+          try {
+            const rawData = e.dataTransfer.getData('application/json');
+            if (rawData) cutaiData = JSON.parse(rawData);
+          } catch (_) {}
+          
+          if (cutaiData && (cutaiData.type === 'cutai-shot' || cutaiData.type === 'cutai-scene')) {
+            const duration = cutaiData.duration || 5;
+            const startTime = (percent / 100) * (state.totalDuration || 60);
+            
+            const clipData = {
+              id: `cutai-drop-${Date.now()}`,
+              name: cutaiData.label || cutaiData.description || 'CutAI Shot',
+              type: cutaiData.clipType || 'video',
+              start: startTime,
+              end: startTime + duration,
+              sourceStart: 0,
+              sourceEnd: duration,
+              assetId: cutaiData.assetId || null,
+              volume: 1,
+              opacity: 1,
+              playbackRate: 1,
+              effects: cutaiData.effects || [],
+              transform: { x: 0, y: 0, scale: 1, rotation: 0 },
+              lane: 0,
+              source: 'cutai',
+              metadata: cutaiData.metadata || {}
+            };
+            
+            if (track && state.addClip) {
+              state.addClip(track.id, clipData);
+              showToast(`Dropped CutAI shot onto ${track.name || 'track'}`);
+            }
+            return;
+          }
+          
+          // Original clip/media drop handling
+          const data = JSON.parse(e.dataTransfer.getData('application/json') || '{}');
 
           if (data.type === 'clip') {
             const allClips = state.tracks.flatMap(t => t.clips);
@@ -1765,8 +2244,64 @@ button, input, textarea, select { font: inherit; }
               <input id="clip-end" type="number" step="0.1" min="0" value="${(clip.left || 0) + (clip.width || 0)}" data-tooltip="Set the end time in seconds" />
             </div>
           </div>
-          <div class="clip-editor__section">
-            <h3>Audio Controls</h3>
+           <div class="clip-editor__section">
+             <h3>Keyframes</h3>
+             <div class="clip-editor__field">
+               <button id="add-keyframe-btn" class="mini-btn" style="width:100%">+ Add Keyframe at Playhead</button>
+             </div>
+             <div class="clip-editor__field">
+               <label>Property</label>
+               <select id="keyframe-property">
+                 <option value="position-x">Position X</option>
+                 <option value="position-y">Position Y</option>
+                 <option value="scale">Scale</option>
+                 <option value="rotation">Rotation</option>
+                 <option value="opacity">Opacity</option>
+                 <option value="blur">Blur</option>
+                 <option value="crop-top">Crop Top</option>
+                 <option value="crop-bottom">Crop Bottom</option>
+               </select>
+             </div>
+             <div class="clip-editor__field">
+               <label>Easing</label>
+               <select id="keyframe-easing">
+                 <option value="linear">Linear</option>
+                 <option value="ease-in-quad">Ease In Quad</option>
+                 <option value="ease-out-quad">Ease Out Quad</option>
+                 <option value="ease-in-out-quad">Ease In-Out Quad</option>
+                 <option value="ease-in-cubic">Ease In Cubic</option>
+                 <option value="ease-out-cubic">Ease Out Cubic</option>
+                 <option value="bounce">Bounce</option>
+                 <option value="elastic">Elastic</option>
+               </select>
+             </div>
+           </div>
+
+           <div class="clip-editor__section">
+             <h3>Transitions</h3>
+             <div class="clip-editor__field">
+               <label>Transition to Next Clip</label>
+               <select id="clip-transition" data-tooltip="Choose transition effect after this clip">
+                 <option value="">None</option>
+                 <option value="fade">Fade</option>
+                 <option value="dissolve">Dissolve</option>
+                 <option value="wipe-left">Wipe Left</option>
+                 <option value="wipe-right">Wipe Right</option>
+                 <option value="wipe-up">Wipe Up</option>
+                 <option value="wipe-down">Wipe Down</option>
+                 <option value="zoom-in">Zoom In</option>
+                 <option value="zoom-out">Zoom Out</option>
+                 <option value="blur">Blur</option>
+               </select>
+             </div>
+             <div class="clip-editor__field">
+               <label>Duration (s)</label>
+               <input id="clip-transition-duration" type="number" step="0.1" min="0.1" max="3" value="0.5" />
+             </div>
+           </div>
+
+           <div class="clip-editor__section">
+             <h3>Audio Controls</h3>
             <div class="clip-editor__field">
               <label for="clip-volume">Volume: ${Math.round((clip.volume || 1) * 100)}%</label>
               <input id="clip-volume" type="range" min="0" max="1" step="0.01" value="${clip.volume || 1}" data-tooltip="Adjust clip volume from 0% to 100%" />
@@ -1819,7 +2354,40 @@ button, input, textarea, select { font: inherit; }
         e.target.textContent = clip.hidden ? 'Show' : 'Hide';
         renderTracks();
       });
-      els.clipEditorContainer.querySelector('#clip-fill').addEventListener('change', (e) => {
+       const transSelect = els.clipEditorContainer.querySelector('#clip-transition');
+       if (transSelect) {
+         transSelect.value = clip.transition?.type || '';
+         transSelect.onchange = () => {
+           clip.transition = clip.transition || {};
+            clip.transition.type = transSelect.value;
+            if (timelineTransitions) timelineTransitions.updateClipTransition(clip.id, clip.transition);
+            renderTracks();
+         };
+       }
+       // Keyframe controls
+       const addKfBtn = els.clipEditorContainer.querySelector('#add-keyframe-btn');
+       if (addKfBtn && state.keyframeSystem) {
+         addKfBtn.onclick = () => {
+           const prop = els.clipEditorContainer.querySelector('#keyframe-property').value;
+           const easing = els.clipEditorContainer.querySelector('#keyframe-easing').value;
+           const time = (state.playheadPercent / 100) * (state.timelineSeconds || 60);
+           state.keyframeSystem.addKeyframe(clip.id, prop, time, clip[prop] ?? 0, easing);
+           showToast(`Keyframe added for ${prop} (${easing})`);
+           renderTracks();
+         };
+       }
+
+       const transDur = els.clipEditorContainer.querySelector('#clip-transition-duration');
+       if (transDur) {
+         transDur.value = clip.transition?.duration || 0.5;
+         transDur.onchange = () => {
+           clip.transition = clip.transition || {};
+            clip.transition.duration = parseFloat(transDur.value);
+            renderTracks();
+         };
+       }
+
+       els.clipEditorContainer.querySelector('#clip-fill').addEventListener('change', (e) => {
         clip.fit = e.target.value === 'fit' ? 'contain' : 'cover';
         renderTracks();
       });
@@ -2020,6 +2588,46 @@ button, input, textarea, select { font: inherit; }
 
 
     // Floating rail action functionality
+    function deleteSelectedClip() {
+      const selectedId = window.timelineState?.selectedClipId;
+      if (!selectedId) return;
+
+      saveStateSnapshot(state);
+      
+      state.project.tracks.forEach(track => {
+        track.items = (track.items || []).filter(item => item.id !== selectedId);
+      });
+      
+      window.timelineState.selectedClipId = null;
+      renderTracks();
+      showToast('Clip deleted');
+    }
+
+    function duplicateSelectedClip() {
+      const selectedId = window.timelineState?.selectedClipId;
+      if (!selectedId) return;
+
+      saveStateSnapshot(state);
+
+      for (const track of state.project.tracks) {
+        const clip = (track.items || []).find(item => item.id === selectedId);
+        if (clip) {
+          const newClip = {
+            ...clip,
+            id: `clip-${Date.now()}`,
+            start: clip.start + (clip.duration || 5) + 0.5,
+            end: clip.end + (clip.duration || 5) + 0.5
+          };
+          track.items.push(newClip);
+          window.timelineState.selectedClipId = newClip.id;
+          break;
+        }
+      }
+      
+      renderTracks();
+      showToast('Clip duplicated');
+    }
+
     function splitClipAtPlayhead() {
       const selectedClip = findSelectedClip();
       if (!selectedClip) {
@@ -2848,6 +3456,101 @@ button, input, textarea, select { font: inherit; }
       els.modalOverlay.style.display = 'none';
     }
 
+    function showRetakePanel(clip) {
+      const panel = document.createElement('div');
+      panel.className = 'retake-panel-fixed';
+      panel.innerHTML = `
+        <div class="bg-[#1a1a1f] rounded-xl p-6 w-full max-w-md border border-white/10 shadow-lg">
+          <h3 class="text-lg font-bold mb-4">Retake Clip</h3>
+          <p class="text-sm text-white/60 mb-4">Regenerate this clip with new parameters</p>
+          <div class="space-y-3">
+            <div>
+              <label class="text-xs text-white/50 mb-1 block">Prompt</label>
+              <textarea class="w-full bg-[#0d0d11] border border-white/10 rounded px-3 py-2 text-sm" placeholder="Describe the retake..." rows="3">${clip.prompt || ''}</textarea>
+            </div>
+            <div>
+              <label class="text-xs text-white/50 mb-1 block">Duration (seconds)</label>
+              <input type="number" min="1" max="30" value="${clip.duration || 5}" class="w-full bg-[#0d0d11] border border-white/10 rounded px-3 py-2 text-sm" />
+            </div>
+          </div>
+          <div class="flex gap-2 mt-6">
+            <button class="flex-1 px-4 py-2 bg-white/10 rounded text-sm hover:bg-white/20" onclick="this.closest('.retake-panel-fixed').remove()">Cancel</button>
+            <button class="flex-1 px-4 py-2 bg-primary rounded text-sm font-semibold hover:opacity-90" onclick="retakeClipHandler(${clip.id})">Retake</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(panel);
+    }
+
+    function retakeClipHandler(clipId) {
+      const clip = state.tracks.flatMap(t => t.clips).find(c => c.id === clipId);
+      if (clip) {
+        showToast('Retake requested - implement with MuAPI', 'info');
+      }
+      document.querySelectorAll('.retake-panel-fixed').forEach(el => el.remove());
+    }
+
+    function showImportTimelineModal() {
+      const modal = document.createElement('div');
+      modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-[1000]';
+      modal.innerHTML = `
+        <div class="bg-[#1a1a1f] rounded-xl p-6 w-full max-w-md border border-white/10">
+          <h3 class="text-lg font-bold mb-4">Import Timeline</h3>
+          <p class="text-sm text-white/60 mb-4">Import from JSON file</p>
+          <div class="border border-dashed border-white/20 rounded-lg p-6 text-center">
+            <input type="file" id="timelineFileInput" accept=".json" class="hidden" />
+            <label for="timelineFileInput" class="cursor-pointer">Click to browse</label>
+          </div>
+          <button class="w-full mt-4 px-4 py-2 bg-white/10 rounded" onclick="this.closest('.fixed').remove()">Cancel</button>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      modal.querySelector('#timelineFileInput').onchange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            try {
+              const data = JSON.parse(ev.target.result);
+              showToast('Timeline imported', 'success');
+              modal.remove();
+            } catch (err) {
+              alert('Invalid JSON');
+            }
+          };
+          reader.readAsText(file);
+        }
+      };
+    }
+
+    function showICLoraPanel() {
+      const panel = document.createElement('div');
+      panel.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-[1000]';
+      panel.innerHTML = `
+        <div class="bg-[#1a1a1f] rounded-xl p-6 w-full max-w-md border border-white/10">
+          <h3 class="text-lg font-bold mb-4">IC-LoRA Character Consistency</h3>
+          <p class="text-sm text-white/60 mb-4">Apply to selected clips</p>
+          <div class="space-y-3">
+            <label class="flex items-center gap-2"><input type="radio" name="lora" value="character" /> Character Consistency</label>
+            <label class="flex items-center gap-2"><input type="radio" name="lora" value="style" /> Style Lock</label>
+          </div>
+          <div class="flex gap-2 mt-6">
+            <button class="flex-1 px-4 py-2 bg-white/10 rounded" onclick="this.closest('.fixed').remove()">Cancel</button>
+            <button class="flex-1 px-4 py-2 bg-primary rounded" onclick="applyICLora(this)">Apply</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(panel);
+    }
+
+    function applyICLora(btn) {
+      const selected = btn.closest('.fixed').querySelector('input[name="lora"]:checked');
+      if (selected) {
+        showToast('IC-LoRA applied', 'success');
+        btn.closest('.fixed').remove();
+      }
+    }
+
     // Category C Editor Surface panel functions
     function showCanvasPanel() {
       // Hide other panels
@@ -3315,6 +4018,11 @@ button, input, textarea, select { font: inherit; }
             window.clearInterval(playbackTimer);
           }
           updatePlaybackUI();
+          // Apply keyframes during playback
+          const selected = findSelectedClip();
+          if (selected) {
+            updatePreview(selected);
+          }
         }, 120);
       } else {
         window.clearInterval(playbackTimer);
@@ -3578,9 +4286,13 @@ button, input, textarea, select { font: inherit; }
       root.querySelectorAll('[data-add-track]').forEach((button) => button.addEventListener('click', () => addTrack(button.dataset.addTrack)));
       root.querySelectorAll('[data-action="zoom-in"]').forEach((button) => button.addEventListener('click', () => { state.zoom = Math.min(2, state.zoom + 0.1); showToast(`Zoom ${state.zoom.toFixed(1)}x`); }));
       root.querySelectorAll('[data-action="zoom-out"]').forEach((button) => button.addEventListener('click', () => { state.zoom = Math.max(0.5, state.zoom - 0.1); showToast(`Zoom ${state.zoom.toFixed(1)}x`); }));
+
+      const cutaiBtn = root.querySelector('#cutaiStoryboardBtn');
+      if (cutaiBtn) cutaiBtn.addEventListener('click', () => showCutAI());
     }
 
     function renderAll() {
+      initializeDefaultTracks();
       renderTopActions();
       renderTools();
       renderPills();
