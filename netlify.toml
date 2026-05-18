@@ -15,6 +15,7 @@
   # Node.js version for build and functions
   NODE_VERSION = "20.18.1"
   COREPACK_INTEGRITY_KEYS = "0"
+  PNPM_FLAGS = "--no-frozen-lockfile"
 
   # Production optimizations
   NODE_OPTIONS = "--max-old-space-size=4096"
