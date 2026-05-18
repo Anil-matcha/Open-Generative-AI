@@ -3,7 +3,6 @@
  * Handles rendering of tracks, media, pills, and UI elements
  */
 
-import { showToast } from '../loading.js';
 import { updatePlaybackUI, panState, handlePanMove, handlePanUp, handleItemMouseDown } from './timelinePlayback.js';
 
 export function renderTopActions(state, els) {
@@ -13,7 +12,7 @@ export function renderTopActions(state, els) {
     btn.className = 'top-icon ' + (i === 3 ? 'active' : '');
     btn.textContent = icon;
     btn.dataset.tooltip = 'Top action: ' + icon;
-    btn.addEventListener('click', () => showToast(icon + ' action clicked'));
+    btn.addEventListener('click', () => console.log(icon + ' action clicked'));
     els.topActions.appendChild(btn);
   });
   const ready = document.createElement('div');
@@ -79,7 +78,7 @@ export function renderTracks(state, els, showToast) {
         if (key === 'mute') track.muted = !track.muted;
         if (key === 'lock') track.locked = !track.locked;
         renderTracks(state, els, showToast);
-  // DISABLED:         showToast(track.name + ' ' + key + ' toggled');
+  // DISABLED:         
       });
     });
     const lane = document.createElement('div');
@@ -123,7 +122,7 @@ export function renderTracks(state, els, showToast) {
         state.selectedClipId = item.id;
         updatePreview(state, els, item);
         renderTracks(state, els, showToast);
-  // DISABLED:         showToast('Item selected');
+  // DISABLED:         
       });
       itemEl.addEventListener('mousedown', (e) => handleItemMouseDown(e, state, els, showToast));
       if (item.type === 'caption') {
@@ -177,7 +176,7 @@ export function renderMedia(state, els, showToast) {
       state.selectedClipId = newId;
       renderTracks(state, els, showToast);
       updatePreview(state, els);
-  // DISABLED:       showToast(media.label + ' inserted into ' + targetTrack.name + ' track');
+  // DISABLED:       
     });
     els.mediaGrid.appendChild(item);
   });
@@ -190,7 +189,7 @@ export function renderGenerateTypes(state, els, showToast) {
     btn.className = 'generate-type ' + (state.generateType === label ? 'active' : '');
     btn.dataset.tooltip = 'Switch to ' + label + ' generation mode';
     btn.innerHTML = '<span class="emoji">' + icon + '</span><span>' + label + '</span>';
-    btn.addEventListener('click', () => { state.generateType = label; renderGenerateTypes(state, els, showToast); showToast(label + ' mode selected'); });
+    btn.addEventListener('click', () => { state.generateType = label; renderGenerateTypes(state, els, showToast);  });
     els.generateTypes.appendChild(btn);
   });
 }
@@ -224,7 +223,7 @@ export function renderRail(state, els, showToast) {
     btn.className = 'rail-btn ' + (active ? 'active' : '');
     btn.dataset.tooltip = label + ' action';
     btn.innerHTML = '<span class="emoji">' + icon + '</span><span>' + label + '</span>';
-    btn.addEventListener('click', () => showToast(label + ' action triggered'));
+    btn.addEventListener('click', () => console.log(label + ' action triggered'));
     els.floatingRail.appendChild(btn);
   });
 }

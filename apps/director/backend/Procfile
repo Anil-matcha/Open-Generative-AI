@@ -1,1 +1,0 @@
-web: python -m director.entrypoint.api.server

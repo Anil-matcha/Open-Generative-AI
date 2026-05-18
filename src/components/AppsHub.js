@@ -17,16 +17,14 @@ const TOOL_STUDIOS = [
   { id: 'commercial', name: 'Commercial Studio', description: 'Product photography and ads', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>', badge: 'Ads', color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
 ];
 
-const AI_APPS = [
-  { id: 'marketing-studio', name: 'AI Marketing Studio', description: 'Brand DNA extraction, campaign concepts, creatives, and short-form video ideas', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 5h18v14H3z"/><path d="M7 9h10"/><path d="M7 13h6"/></svg>', badge: 'Brand Campaigns', color: 'bg-green-500/10 text-green-400 border-green-500/20' },
-  { id: 'audio', name: 'Audio Studio', description: 'Generate music, speech, and sound effects', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>', badge: 'AI Audio', color: 'bg-purple-500/10 text-purple-400 border-purple-500/20' },
-  { id: 'avatar', name: 'Avatar Studio', description: 'AI avatars and lip sync video generation', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/><path d="M12 11v2"/><path d="M8 13h8"/></svg>', badge: 'AI Avatars', color: 'bg-pink-500/10 text-pink-400 border-pink-500/20' },
-  { id: 'training', name: 'Training Studio', description: 'Train custom LoRA models from your images', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>', badge: 'LoRA', color: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' },
-  { id: 'videotools', name: 'Video Tools', description: 'Upscale, edit, translate, and enhance videos', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M10 9l5 3-5 3V9z"/></svg>', badge: 'Video Tools', color: 'bg-violet-500/10 text-violet-400 border-violet-500/20' },
-  { id: 'chat', name: 'Chat Studio', description: 'AI-powered text generation and conversation', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>', badge: 'LLM', color: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20' },
-  { id: 'runway-motion', name: 'Motion Controls', description: 'Advanced camera movements and motion effects', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/><path d="M12 13l1.5 2.5"/></svg>', badge: 'Motion', color: 'bg-blue-500/10 text-blue-400 border-blue-500/20' },
-  { id: 'tiktok-carousel', name: 'TikTok Carousel', description: 'Create multi-image carousels optimized for TikTok', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="2"/><rect x="6" y="6" width="12" height="12" rx="1"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="9" r="1"/><circle cx="15" cy="15" r="1"/></svg>', badge: 'Social', color: 'bg-pink-500/10 text-pink-400 border-pink-500/20' },
-  { id: 'advanced-dubbing', name: 'Advanced Dubbing', description: 'Professional video translation and dubbing with voice cloning', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/><path d="M9 9l12-2"/><path d="M9 13l12-2"/></svg>', badge: 'AI Voices', color: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' },
+// New AI Command Center apps
+const AI_COMMAND_CENTER = [
+  { id: 'studio', name: 'Unified Studio', description: 'Launch all creative tools from one dashboard', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2z"/></svg>', badge: 'Studio', color: 'bg-purple-500/10 text-purple-400 border-purple-500/20' },
+  { id: 'workflow-builder', name: 'Workflow Builder', description: 'Build multi-step AI pipelines', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="5" r="3"/><circle cx="5" cy="19" r="3"/><circle cx="19" cy="19" r="3"/><line x1="12" y1="8" x2="5" y2="16"/><line x1="12" y1="8" x2="19" y2="16"/><line x1="5" y1="19" x2="19" y2="19"/></svg>', badge: 'Automation', color: 'bg-teal-500/10 text-teal-400 border-teal-500/20' },
+  { id: 'ai-agent', name: 'AI Agent', description: 'Create and run AI agents for production', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4 4 4 0 0 1 4-4zm7 10a4 4 0 0 1-4 4v.5a8 8 0 0 1-8 0V16a4 4 0 0 1 4-4h8z"/></svg>', badge: 'Agents', color: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20' },
+  { id: 'design-agent', name: 'Design Agent', description: 'AI design assistant for layouts', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M14 9l3 3-3 3"/><circle cx="8" cy="12" r="2"/></svg>', badge: 'Design', color: 'bg-pink-500/10 text-pink-400 border-pink-500/20' },
+  { id: 'marketing-studio', name: 'Marketing Studio', description: 'Brand campaigns and creatives', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 5h18v14H3z"/><path d="M7 9h10"/><path d="M7 13h6"/></svg>', badge: 'Brand Campaigns', color: 'bg-green-500/10 text-green-400 border-green-500/20' },
+  { id: 'apps-studio', name: 'Apps Studio', description: 'Browse all creative tools', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="2"/><rect x="6" y="6" width="12" height="12" rx="1"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="9" r="1"/><circle cx="15" cy="15" r="1"/><circle cx="9" cy="15" r="1"/></svg>', badge: 'Gallery', color: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' },
 ];
 
 export function AppsHub() {
@@ -69,7 +67,7 @@ export function AppsHub() {
     onClick: () => { saveRecent(s.id, s.name); navigate(s.id); },
   })), true));
 
-  inner.appendChild(createSection('AI Apps', AI_APPS.map(s => ({
+  inner.appendChild(createSection('AI Command Center', AI_COMMAND_CENTER.map(s => ({
     ...s,
     thumbnail: getStudioThumbnail(s.id),
     onClick: () => { saveRecent(s.id, s.name); navigate(s.id); },
@@ -174,8 +172,7 @@ function createRecentRow() {
       chip.className = 'px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs font-bold text-white hover:bg-white/10 transition-all whitespace-nowrap';
       chip.textContent = r.name;
       chip.onclick = () => {
-        if (r.id.includes('-') || r.id.includes('_')) navigate(`template/${r.id}`);
-        else navigate(r.id);
+        navigate(r.id);
       };
       row.appendChild(chip);
     });

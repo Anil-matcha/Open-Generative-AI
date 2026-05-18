@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="240" viewBox="0 0 400 240" fill="none">
+  <defs>
+    <linearGradient id="agentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ca8a04"/>
+      <stop offset="100%" stop-color="#eab308"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="240" rx="16" fill="#0a0a0a" stroke="#ffffff" stroke-opacity="0.1"/>
+  <circle cx="200" cy="80" r="30" fill="#ca8a04"/>
+  <path d="M200 60 L210 90 L230 90 L190 100 L210 110 L170 110" fill="#eab308"/>
+  <rect x="120" y="140" width="160" height="50" rx="8" fill="#ffffff" fill-opacity="0.1"/>
+  <circle cx="150" cy="160" r="8" fill="#ca8a04"/>
+  <circle cx="200" cy="160" r="8" fill="#ca8a04"/>
+  <circle cx="250" cy="160" r="8" fill="#ca8a04"/>
+</svg>

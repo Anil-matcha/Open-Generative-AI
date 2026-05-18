@@ -351,7 +351,7 @@ export function RunwayMotionStudio() {
 
   async function handleApply() {
     if (!uploadedVideoUrl) {
-      alert('Please upload a video first');
+      
       return;
     }
     const apiKey = await securityService.getDecryptedKey();

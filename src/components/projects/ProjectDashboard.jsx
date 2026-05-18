@@ -1,6 +1,5 @@
 import { projectService } from '../../lib/projects/projectService.js';
 import { ProjectCard } from './ProjectCard.jsx';
-import { showToast } from '../../lib/loading.js';
 
 /**
  * ProjectDashboard Component - Main project listing and management interface
@@ -191,7 +190,7 @@ export function ProjectDashboard() {
       }
     } catch (error) {
       console.error('[ProjectDashboard] Failed to load projects:', error);
-      showToast('Failed to load projects', 'error');
+      
       grid.innerHTML = '';
       grid.appendChild(emptyState);
     }
@@ -247,7 +246,7 @@ export function ProjectDashboard() {
   const handleProjectClick = (project) => {
     // Navigate to project editor
     // TODO: Navigate to project editor with project ID
-    showToast(`Opening project: ${project.title}`, 'info');
+    
   };
 
   const handleProjectEdit = (project) => {
@@ -258,11 +257,11 @@ export function ProjectDashboard() {
     if (confirm(`Are you sure you want to delete "${project.title}"? This action cannot be undone.`)) {
       try {
         await projectService.deleteProject(project.id);
-        showToast('Project deleted successfully', 'success');
+        
         loadProjects();
       } catch (error) {
         console.error('[ProjectDashboard] Failed to delete project:', error);
-        showToast('Failed to delete project', 'error');
+        
       }
     }
   };
@@ -273,23 +272,23 @@ export function ProjectDashboard() {
       if (!newTitle) return;
 
       await projectService.duplicateProject(project.id, newTitle);
-      showToast('Project duplicated successfully', 'success');
+      
       loadProjects();
     } catch (error) {
       console.error('[ProjectDashboard] Failed to duplicate project:', error);
-      showToast('Failed to duplicate project', 'error');
+      
     }
   };
 
   // Modal functions
   const showCreateProjectModal = () => {
     // TODO: Implement create project modal
-    showToast('Create project modal - Coming soon!', 'info');
+    
   };
 
   const showEditProjectModal = (project) => {
     // TODO: Implement edit project modal
-    showToast(`Edit project: ${project.title} - Coming soon!`, 'info');
+    
   };
 
   // Initialize

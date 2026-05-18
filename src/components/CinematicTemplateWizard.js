@@ -4,7 +4,6 @@
  */
 
 import { navigate } from '../lib/router.js';
-import { showToast } from '../lib/loading.js';
 import { escapeHtml } from '../lib/security.js';
 import { muapi } from '../lib/muapi.js';
 import { AuthModal } from './AuthModal.js';
@@ -491,7 +490,7 @@ export function CinematicTemplateWizard(template, onComplete, onBack) {
     
     storyboardBuilder.generateFromScenes(sceneBuilder.getScenes());
     renderScenes();
-  // DISABLED:     showToast('Scenes generated!', 'success');
+  // DISABLED:     
   }
 
   function renderScenes() {
@@ -598,7 +597,7 @@ export function CinematicTemplateWizard(template, onComplete, onBack) {
     
     previewCard.querySelector('#copy-prompt-btn').onclick = () => {
       navigator.clipboard.writeText(promptPreview);
-  // DISABLED:       showToast('Prompt copied!', 'success');
+  // DISABLED:       
     };
     
     previewCard.querySelector('#regenerate-prompt-btn').onclick = () => {
@@ -695,7 +694,7 @@ export function CinematicTemplateWizard(template, onComplete, onBack) {
       }
       
       if (result && result.url) {
-  // DISABLED:         showToast('Generation complete!', 'success');
+  // DISABLED:         
         if (onComplete) {
           onComplete(result.url, prompt);
         }
@@ -704,7 +703,7 @@ export function CinematicTemplateWizard(template, onComplete, onBack) {
       }
     } catch (err) {
       console.error('[CinematicTemplateWizard]', err);
-  // DISABLED:       showToast(`Error: ${err.message}`, 'error');
+  // DISABLED:       
       genBtn.disabled = false;
       genBtn.innerHTML = '✨ Start Generation';
     }
@@ -729,7 +728,7 @@ export function CinematicTemplateWizard(template, onComplete, onBack) {
       modal.open();
     } catch (error) {
       console.error('GTM Prompt Modal error:', error);
-  // DISABLED:       showToast('Failed to open GTM Prompt Enhancer', 'error');
+  // DISABLED:       
     }
   }
 

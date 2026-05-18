@@ -1,5 +1,5 @@
 import { navigate } from '../lib/router.js';
-import { showToast, createLoadingSpinner, createLoadingOverlay } from '../lib/loading.js';
+import { createLoadingSpinner, createLoadingOverlay } from '../lib/loading.js';
 import { createHeroSection } from '../lib/thumbnails.js';
 import { escapeHtml } from '../lib/security.js';
 import { assetStore } from '../lib/assets/assetStore.js';
@@ -434,19 +434,17 @@ export function RenderPage() {
    if (assetId) {
      (async () => {
        try {
-         const asset = await assetStore.getAsset(assetId);
-         if (asset && asset.media?.url) {
-           videoId = assetId;
-           videoUrl = asset.media.url;
-           videoTitle = asset.title || 'Asset Video';
-           showToast(`Loaded asset: ${videoTitle}`, 'success');
-         } else {
-           showToast('Asset not found', 'error');
-         }
-       } catch (e) {
-         console.error('Failed to load asset:', e);
-         showToast('Error loading asset', 'error');
-       }
+const asset = await assetStore.getAsset(assetId);
+          if (asset && asset.media?.url) {
+            videoId = assetId;
+            videoUrl = asset.media.url;
+            videoTitle = asset.title || 'Asset Video';
+          } else {
+            console.warn('Asset not found');
+          }
+        } catch (e) {
+          console.error('Failed to load asset:', e);
+        }
      })();
    }
 
@@ -637,16 +635,15 @@ export function RenderPage() {
     loadVideo(videoUrl, videoContainer);
   } else {
     // Upload component for when no video URL is provided
-    const uploadComponent = VideoUpload({
+const uploadComponent = VideoUpload({
       placeholder: 'Upload video to render',
       maxSize: 1000, // 1GB for render page
       onUpload: (file) => {
         const url = URL.createObjectURL(file);
         loadVideo(url, videoContainer);
-  // DISABLED:         showToast('Video uploaded for rendering', 'success');
       },
       onError: (errors) => {
-        errors.forEach(error => showToast(error, 'error'));
+        errors.forEach(error => console.error('Upload error:', error));
       }
     });
     videoContainer.appendChild(uploadComponent);
@@ -1097,7 +1094,7 @@ export function RenderPage() {
   sidebar.appendChild(gpuEngine);
 
   // Real LTX-Desktop capability detection (replaces fake "Detecting...")
-  import('./services/ltx-client.js').then(async ({ default: ltxClient }) => {
+  import('../services/ltx-client.js').then(async ({ default: ltxClient }) => {
     try {
       const caps = await ltxClient.checkCapabilities();
       const cudaEl = container.querySelector('#cudaCores');
@@ -1207,13 +1204,11 @@ export function RenderPage() {
       if (progressStatus) progressStatus.textContent = pipeline.statusLabel;
     }
 
-  // DISABLED:     showToast(`${action} started`);
-
-    // Real API processing
+  // DISABLED:     
     try {
       const result = await executeRepositoryTask(action, pipeline);
       isRunning = false;
-  // DISABLED:       showToast(`${action} completed!`);
+  // DISABLED:       
 
       // Update outputs section with results
       updateOutputsSection(action, result);
@@ -1227,7 +1222,7 @@ export function RenderPage() {
     } catch (error) {
       console.error('Action failed:', error);
       isRunning = false;
-  // DISABLED:       showToast(`Action failed: ${error.message}`, 'error');
+  // DISABLED:       
 
       // Reset progress on error
       const progressBar = container.querySelector('#progressBar');
@@ -1263,7 +1258,7 @@ export function RenderPage() {
 
   async function executeGapFiller(options) {
     // AI-powered gap filling between clips
-    showToast('Analyzing clip gaps and generating filler content...', 'info');
+    
 
     // Simulate AI analysis and content generation
     const analysis = {
@@ -1307,7 +1302,7 @@ export function RenderPage() {
 
   async function executeClipExtender(options) {
     // AI-powered clip extension forward/backward
-    showToast('Analyzing clip content and extending with AI generation...', 'info');
+    
 
     const extension = {
       direction: options.direction || 'forward',
@@ -1343,7 +1338,7 @@ export function RenderPage() {
 
   async function executeMusicGenerator(options) {
     // AI music generation based on video mood and content
-    showToast('Analyzing video mood and generating custom music track...', 'info');
+    
 
     // Analyze video content for mood detection
     const moodAnalysis = {
@@ -1382,7 +1377,7 @@ export function RenderPage() {
 
   async function executeSceneAnalyzer(options) {
     // AI-powered scene analysis for editing suggestions
-    showToast('Analyzing video scenes and generating editing recommendations...', 'info');
+    
 
     const analysis = {
       scenes: [
@@ -1414,7 +1409,7 @@ export function RenderPage() {
 
   async function executePacingOptimizer(options) {
     // AI-powered pacing optimization
-    showToast('Analyzing video pacing and optimizing timing...', 'info');
+    
 
     const pacingAnalysis = {
       currentPacing: {
@@ -1574,7 +1569,9 @@ export function RenderPage() {
               icon.classList.remove('animate-pulse');
             }
           }
-    });
+        });
+      }
+    }
   }
 
   // Performance Profiling Event Listener (Rendiv Feature #10)
@@ -1585,10 +1582,10 @@ export function RenderPage() {
       RENDIV_RENDER_OPTIONS.profiling.enabled = e.target.checked;
       if (e.target.checked) {
         startPerformanceMonitoring();
-        showToast('Performance profiling enabled');
+        
       } else {
         stopPerformanceMonitoring();
-        showToast('Performance profiling disabled');
+        
       }
     });
   }
@@ -1604,7 +1601,7 @@ export function RenderPage() {
       btn.classList.add('active-format', 'bg-white', 'text-black', 'border-white');
       exportSettings.format = btn.dataset.format;
       updateCodecDisplay();
-      showToast(`Format: ${btn.dataset.format.toUpperCase()}`);
+      console.log(`Format: ${btn.dataset.format.toUpperCase()}`);
     });
   });
 
@@ -1619,7 +1616,7 @@ export function RenderPage() {
       // Add active class to clicked button
       btn.classList.add('active-resolution', 'bg-white', 'text-black', 'border-white');
       exportSettings.resolution = resolution;
-      showToast(`Resolution: ${resolution}`);
+      
     });
   });
 
@@ -1629,7 +1626,7 @@ export function RenderPage() {
     addTooltip(gpuToggleElement.parentElement, { text: 'Enable hardware-accelerated rendering for faster exports', placement: 'left' });
     gpuToggleElement.addEventListener('change', (e) => {
       exportSettings.gpuAcceleration = e.target.checked;
-      showToast(`GPU Acceleration: ${e.target.checked ? 'Enabled' : 'Disabled'}`);
+      
     });
   }
 
@@ -1679,21 +1676,21 @@ export function RenderPage() {
       loadModelsBtn.disabled = true;
 
       try {
-        const { default: ltxClient } = await import('./services/ltx-client.js');
+        const { default: ltxClient } = await import('../services/ltx-client.js');
         if (isLoading) {
           const caps = await ltxClient.checkCapabilities();
           gpuStatus.modelsLoaded = caps.available;
           loadModelsBtn.textContent = 'Unload Models';
-          showToast(caps.available ? 'LTX models ready' : 'Using cloud fallback');
+          
         } else {
           gpuStatus.modelsLoaded = false;
           loadModelsBtn.textContent = 'Load Models';
-          showToast('Models released');
+          
         }
       } catch (error) {
         console.error('GPU model operation failed:', error);
         loadModelsBtn.textContent = isLoading ? 'Load Models' : 'Unload Models';
-        showToast('GPU model operation failed', 'error');
+        
       } finally {
         loadModelsBtn.disabled = false;
       }
@@ -1748,7 +1745,7 @@ export function RenderPage() {
     addTooltip(cancelSignalCheckbox.parentElement, { text: 'Allow cancellation of async frame processing', placement: 'top' });
     cancelSignalCheckbox.addEventListener('change', (e) => {
       RENDIV_RENDER_OPTIONS.asyncFrameControl.cancelSignal = e.target.checked;
-      showToast(`Cancellation signal ${e.target.checked ? 'enabled' : 'disabled'}`);
+      
     });
   }
 
@@ -1770,7 +1767,7 @@ export function RenderPage() {
     addTooltip(presetSelect, { text: 'Encoding speed preset (affects compression time)', placement: 'top' });
     presetSelect.addEventListener('change', (e) => {
       RENDIV_RENDER_OPTIONS.advancedEncoding.preset = e.target.value;
-      showToast(`Encoding preset: ${e.target.value}`);
+      
     });
   }
 
@@ -1778,7 +1775,7 @@ export function RenderPage() {
     addTooltip(encoderSelect, { text: 'Video codec encoder for different formats', placement: 'top' });
     encoderSelect.addEventListener('change', (e) => {
       RENDIV_RENDER_OPTIONS.advancedEncoding.videoEncoder = e.target.value;
-      showToast(`Video encoder: ${e.target.value}`);
+      
     });
   }
 
@@ -1788,7 +1785,7 @@ export function RenderPage() {
     addTooltip(detectScenesBtn, { text: 'Use TransNet V2 to automatically detect scene changes', placement: 'top' });
     detectScenesBtn.addEventListener('click', async () => {
       if (!videoUrl) {
-        showToast('No video loaded for scene detection', 'error');
+        
         return;
       }
 
@@ -1808,10 +1805,10 @@ export function RenderPage() {
         displayDetectedScenes();
         const sceneResults = container.querySelector('#sceneResults');
         if (sceneResults) sceneResults.classList.remove('hidden');
-        showToast(`Detected ${detectedScenes.length} scenes`);
+        
       } catch (error) {
         console.error('Scene detection failed:', error);
-        showToast('Scene detection failed', 'error');
+        
       } finally {
         detectScenesBtn.disabled = false;
         detectScenesBtn.innerHTML = `
@@ -1831,7 +1828,7 @@ export function RenderPage() {
     addTooltip(concurrencySelect, { text: 'Number of parallel rendering threads', placement: 'top' });
     concurrencySelect.addEventListener('change', (e) => {
       RENDIV_RENDER_OPTIONS.parallelProcessing.concurrency = parseInt(e.target.value);
-      showToast(`Concurrency: ${e.target.value} threads`);
+      
     });
   }
 
@@ -1839,7 +1836,7 @@ export function RenderPage() {
     addTooltip(batchSizeSelect, { text: 'Frames processed per batch', placement: 'top' });
     batchSizeSelect.addEventListener('change', (e) => {
       RENDIV_RENDER_OPTIONS.parallelProcessing.batchSize = parseInt(e.target.value);
-      showToast(`Batch size: ${e.target.value} frames`);
+      
     });
   }
 
@@ -1857,7 +1854,7 @@ export function RenderPage() {
       if (startFrameInput) startFrameInput.disabled = !e.target.checked;
       if (endFrameInput) endFrameInput.disabled = !e.target.checked;
       if (cancelSignalCheckbox) cancelSignalCheckbox.disabled = !e.target.checked;
-      showToast(`Async frame control ${e.target.checked ? 'enabled' : 'disabled'}`, 'info');
+      
     });
   }
 
@@ -1872,7 +1869,7 @@ export function RenderPage() {
       if (crfInput) crfInput.disabled = !e.target.checked;
       if (presetSelect) presetSelect.disabled = !e.target.checked;
       if (encoderSelect) encoderSelect.disabled = !e.target.checked;
-      showToast(`Quality encoding ${e.target.checked ? 'enabled' : 'disabled'}`, 'info');
+      
     });
   }
 
@@ -2073,6 +2070,4 @@ export function RenderPage() {
   };
 
   return container;
-}
-}
 }

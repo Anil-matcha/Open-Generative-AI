@@ -155,7 +155,7 @@ export function CommercialStudio() {
   container.appendChild(resultArea);
 
   genBtn.onclick = async () => {
-    if (!uploadedUrl) { alert('Upload a product image or video first'); return; }
+    if (!uploadedUrl) {  return; }
     const apiKey = await securityService.getDecryptedKey();
     if (!apiKey) { AuthModal(() => genBtn.click()); return; }
 
@@ -184,7 +184,7 @@ export function CommercialStudio() {
         resultArea.querySelector('.regen-btn').onclick = () => genBtn.click();
       }
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      
     } finally {
       genBtn.disabled = false;
       genBtn.textContent = 'Generate Product Shot';

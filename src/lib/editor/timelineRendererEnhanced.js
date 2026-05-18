@@ -6,7 +6,6 @@
 
 import { updatePlaybackUI } from './timelinePlayback.js';
 import { updatePreview } from './timelineRendererOriginal.js';
-import { showToast } from '../loading.js';
 import { initializeAdvancedDragDrop, setupEnhancedTooltips, initializeVideoPlaybackControls } from './dragDrop.js';
 import { renderMultiCameraToolbar, renderPipControls, renderSplitScreenControls } from './multiCamera.js';
 
@@ -250,7 +249,7 @@ export function initializeTimelineEngine(state, els) {
         // Remove track logic
         state.tracks = state.tracks.filter(t => t.id !== layerItem.id);
         renderTracks(state, els, showToast);
-  // DISABLED:         showToast(`Track "${layerItem.name}" removed`);
+  // DISABLED:         
       }
     });
   });
@@ -380,7 +379,7 @@ export function renderTracks(state, els, showToast) {
     trackName.setAttribute('data-tooltip', 'Click to edit track name');
     trackName.onblur = () => {
       track.name = trackName.textContent.trim() || 'Track ' + (trackIndex + 1);
-  // DISABLED:       showToast(`Track renamed to "${track.name}"`);
+  // DISABLED:       
     };
 
     const trackStats = document.createElement('div');
@@ -403,7 +402,7 @@ export function renderTracks(state, els, showToast) {
     soloBtn.onclick = () => {
       track.solo = !track.solo;
       renderTracks(state, els, showToast);
-  // DISABLED:       showToast(`${track.name} ${track.solo ? 'soloed' : 'unsoloed'}`);
+  // DISABLED:       
     };
 
     // Mute button
@@ -415,7 +414,7 @@ export function renderTracks(state, els, showToast) {
     muteBtn.onclick = () => {
       track.muted = !track.muted;
       renderTracks(state, els, showToast);
-  // DISABLED:       showToast(`${track.name} ${track.muted ? 'muted' : 'unmuted'}`);
+  // DISABLED:       
     };
 
     // Lock button
@@ -427,7 +426,7 @@ export function renderTracks(state, els, showToast) {
     lockBtn.onclick = () => {
       track.locked = !track.locked;
       renderTracks(state, els, showToast);
-  // DISABLED:       showToast(`${track.name} ${track.locked ? 'locked' : 'unlocked'}`);
+  // DISABLED:       
     };
 
     trackControls.appendChild(soloBtn);
@@ -442,7 +441,7 @@ export function renderTracks(state, els, showToast) {
       layer: { ...track, blendMode: track.blendMode || 'normal' },
       onChange: (newBlendMode) => {
         track.blendMode = newBlendMode;
-  // DISABLED:         showToast(`Track blend mode set to ${newBlendMode}`);
+  // DISABLED:         
       }
     });
 
@@ -450,7 +449,7 @@ export function renderTracks(state, els, showToast) {
       layer: { ...track, opacity: track.opacity || 1 },
       onChange: (newOpacity) => {
         track.opacity = newOpacity;
-  // DISABLED:         showToast(`Track opacity set to ${(newOpacity * 100).toFixed(0)}%`);
+  // DISABLED:         console.log(`Track opacity set to ${(newOpacity * 100).toFixed(0)}%`);
       }
     });
 
@@ -639,7 +638,7 @@ export function createEnhancedClipElement(item, track, state, zoom = 1.0) {
     if (e.target.classList.contains('clip-handle')) return;
 
     // Open clip editor
-  // DISABLED:     showToast(`Opening ${item.name} in editor`);
+  // DISABLED:     
   });
 
   // Add mouse enter/leave for enhanced tooltips

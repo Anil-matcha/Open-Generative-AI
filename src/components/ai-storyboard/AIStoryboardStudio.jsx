@@ -111,7 +111,7 @@ export function AIStoryboardStudio() {
       renderProjectGallery();
     } catch (e) {
       console.error('Failed to load projects:', e);
-      showToast('Failed to load projects. Please check your connection.', 'error');
+      
     }
   }
 
@@ -224,7 +224,7 @@ export function AIStoryboardStudio() {
     } catch (e) {
       console.error('Failed to duplicate:', e);
       removeLoadingOverlay();
-      alert('Failed to duplicate project');
+      
     }
   }
 
@@ -234,7 +234,7 @@ export function AIStoryboardStudio() {
       await loadProjects();
     } catch (e) {
       console.error('Failed to delete:', e);
-      alert('Failed to delete project');
+      
     }
   }
 
@@ -252,7 +252,7 @@ export function AIStoryboardStudio() {
       const errorMessage = e.message?.includes('404') ?
         'Project not found.' :
         'Failed to load project. Please check your connection.';
-      alert(errorMessage);
+      
     }
   }
 
@@ -327,7 +327,7 @@ export function AIStoryboardStudio() {
       const errorMessage = error.message?.includes('fetch') ?
         'Network error: Please check your connection and ensure the backend server is running.' :
         error.message || 'Failed to generate storyboard. Please try again.';
-      alert(errorMessage);
+      
     }
   }
 
@@ -965,7 +965,7 @@ export function AIStoryboardStudio() {
       URL.revokeObjectURL(url);
     } catch (e) {
       console.error('Export failed:', e);
-      alert('Export failed');
+      
     }
   }
 
@@ -983,7 +983,7 @@ export function AIStoryboardStudio() {
       // TODO: integrate jsPDF for true PDF once dependency added
     } catch (e) {
       console.error('Export failed:', e);
-      alert('Export failed');
+      
     }
   }
 

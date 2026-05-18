@@ -915,14 +915,14 @@ export class LandingPageBuilder extends BaseModal {
                 });
 
                 if (response.ok) {
-                    alert('Thank you for subscribing!');
+                    
                     e.target.reset();
                 } else {
-                    alert('Something went wrong. Please try again.');
+                    
                 }
             } catch (error) {
                 console.error('Form submission error:', error);
-                alert('Network error. Please try again.');
+                
             }
         });
 

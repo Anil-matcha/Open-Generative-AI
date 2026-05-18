@@ -192,7 +192,7 @@ export function CharacterStudio() {
       if (char) {
         uploadedUrl = char.imageUrl;
         promptInput.value = char.description || '';
-        alert(`Loaded character: ${char.name}`);
+        
       }
     };
   });
@@ -202,7 +202,7 @@ export function CharacterStudio() {
   contentArea.appendChild(resultArea);
 
   genBtn.onclick = async () => {
-    if (!uploadedUrl) { alert('Upload a reference face first'); return; }
+    if (!uploadedUrl) {  return; }
     const apiKey = await securityService.getDecryptedKey();
     if (!apiKey) { AuthModal(() => genBtn.click()); return; }
 
@@ -230,7 +230,7 @@ export function CharacterStudio() {
         resultArea.querySelector('button').onclick = () => genBtn.click();
       }
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      
     } finally {
       genBtn.disabled = false;
       genBtn.textContent = 'Generate Character';
@@ -259,7 +259,7 @@ export function CharacterStudio() {
       modal.open();
     } catch (error) {
       console.error('GTM Prompt Modal error:', error);
-      alert('Failed to open GTM Prompt Enhancer');
+      
     }
   }
 

@@ -362,7 +362,7 @@ export class AIEditingTools {
     const toast = document.createElement('div');
     toast.className = 'ai-tool-toast success';
     toast.textContent = result.success ? 'Successfully generated!' : 'Operation completed';
-    this.showToast(toast);
+    this.
     this.closeModal();
   }
 
@@ -370,10 +370,10 @@ export class AIEditingTools {
     const toast = document.createElement('div');
     toast.className = 'ai-tool-toast error';
     toast.textContent = message;
-    this.showToast(toast);
+    this.
   }
 
-  // DISABLED:   showToast(toast) {
+  // DISABLED:   console.log(toast) {
     toast.style.position = 'fixed';
     toast.style.bottom = '20px';
     toast.style.right = '20px';

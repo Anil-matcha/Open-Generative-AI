@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="240" viewBox="0 0 400 240" fill="none">
+  <defs>
+    <linearGradient id="wfGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d9488"/>
+      <stop offset="100%" stop-color="#0f766e"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="240" rx="16" fill="#0a0a0a" stroke="#ffffff" stroke-opacity="0.1"/>
+  <circle cx="100" cy="80" r="20" fill="#0d9488"/>
+  <circle cx="200" cy="80" r="20" fill="#0d9488"/>
+  <circle cx="300" cy="80" r="20" fill="#0d9488"/>
+  <line x1="90" y1="80" x2="190" y2="80" stroke="#0d9488" stroke-width="3" stroke-linecap="round"/>
+  <line x1="210" y1="80" x2="290" y2="80" stroke="#0d9488" stroke-width="3" stroke-linecap="round"/>
+  <path d="M190 80 L210 90 L230 70" stroke="#0d9488" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="100" y="140" width="200" height="50" rx="8" fill="#ffffff" fill-opacity="0.1"/>
+  <rect x="120" y="160" width="160" height="10" rx="5" fill="#ffffff" fill-opacity="0.3"/>
+  <rect x="120" y="175" width="120" height="10" rx="5" fill="#ffffff" fill-opacity="0.3"/>
+</svg>

@@ -1,6 +1,5 @@
 import { isFeatureUnlocked, getRequiredTier } from './featureFlags';
 import { getSubscription } from './subscriptionService';
-import { showToast } from './loading';
 
 const ROUTE_FEATURE_MAP = {
   'timeline': 'timeline-editor',

@@ -729,7 +729,7 @@ export function TemplateStudio(templateId) {
       modal.open();
     } catch (error) {
       console.error('GTM Prompt Modal error:', error);
-      alert('Failed to open GTM Prompt Enhancer');
+      
     }
   }
 

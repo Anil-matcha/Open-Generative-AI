@@ -6,7 +6,6 @@
 /* eslint-disable no-undef, prefer-const, no-unused-vars */
 
 import { navigate } from '../lib/router.js';
-import { showToast } from '../lib/loading.js';
 import { escapeHtml } from '../lib/security.js';
 import { GTMPromptModal } from './modals/GTMPromptModal.jsx';
 import { 
@@ -294,7 +293,7 @@ export function CinemaTemplateStudio() {
         inputs: currentInputs,
         mode: currentMode
       });
-  // DISABLED:       showToast('Project saved!', 'success');
+  // DISABLED:       
     };
 
     container.querySelector('#generate-btn').onclick = () => {
@@ -477,7 +476,7 @@ export function CinemaTemplateStudio() {
     const errors = formBuilder.validateInputs(currentInputs);
     
     if (errors.length > 0) {
-  // DISABLED:       showToast(`Please fill in required fields: ${errors.map(e => e.field).join(', ')}`, 'error');
+  // DISABLED:       console.log(`Please fill in required fields: ${errors.map(e => e.field).join(', ')}`, 'error');
       return;
     }
 
@@ -576,7 +575,7 @@ export function CinemaTemplateStudio() {
     container.querySelector('#export-btn')?.addEventListener('click', () => {
       const text = storyboardBuilder.exportAsText();
       navigator.clipboard.writeText(text);
-  // DISABLED:       showToast('Storyboard copied to clipboard!', 'success');
+  // DISABLED:       
     });
 
     const autoGenBtn = container.querySelector('#auto-generate-btn') || container.querySelector('#auto-generate-empty-btn');
@@ -605,7 +604,7 @@ export function CinemaTemplateStudio() {
     // Generate storyboard from scenes
     storyboardBuilder.generateFromScenes(sceneBuilder.getScenes());
     renderStoryboardPanels();
-  // DISABLED:     showToast('Storyboard generated!', 'success');
+  // DISABLED:     
   }
 
   function renderStoryboardPanels() {
@@ -750,7 +749,7 @@ export function CinemaTemplateStudio() {
       });
       overlay.remove();
       renderStoryboardPanels();
-  // DISABLED:       showToast('Board updated!', 'success');
+  // DISABLED:       
     };
   }
 
@@ -914,7 +913,7 @@ export function CinemaTemplateStudio() {
     });
 
     container.querySelector('#start-btn')?.addEventListener('click', () => {
-  // DISABLED:       showToast('Starting generation process...', 'success');
+  // DISABLED:       
       // Here you would integrate with the actual video generation engine
       // For now, we just show a toast
     });
@@ -945,7 +944,7 @@ export function CinemaTemplateStudio() {
       modal.open();
     } catch (error) {
       console.error('GTM Prompt Modal error:', error);
-      alert('Failed to open GTM Prompt Enhancer');
+      
     }
   }
 

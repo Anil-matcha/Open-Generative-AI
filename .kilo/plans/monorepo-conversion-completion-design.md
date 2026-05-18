@@ -99,13 +99,13 @@
 
 ---
 
-### 2.5 SendSpark — 0% Complete (Missing Source)
+### 2.5 AI Video Outreach — 0% Complete (Missing Source)
 
 **Status:** Directory exists but no frontend source; requires extraction from `remix-new-editor` repo.
 
 **Current State:**
-- `apps/sendspark/` has backend/ and some configs but no `src/`
-- CONVERSION_PLAN.md specifies cloning `deangilmoredemix/remix-new-editor` and copying `apps/sendspark/`
+- `apps/ai-video-outreach/` has backend/ and some configs but no `src/`
+- CONVERSION_PLAN.md specifies cloning `deangilmoredemix/remix-new-editor` and copying `apps/ai-video-outreach/`
 - Backend appears to be Python/Node hybrid with uploads/
 
 **Critical Path:** Must extract source before conversion can begin.
@@ -246,19 +246,19 @@ Most complex due to React Flow + DnD Kit.
 
 ---
 
-### Phase E: SendSpark Extraction & Conversion (2-3 hours)
+### Phase E: AI Video Outreach Extraction & Conversion (2-3 hours)
 
 **Precondition:** Git access to `deangilmoredemix/remix-new-editor` repo.
 
 **Tasks:**
 - Task E1: Clone remix-new-editor to temp location
-- Task E2: Copy complete `apps/sendspark/` into Open-Higgsfield-AI
+- Task E2: Copy complete `apps/ai-video-outreach/` into Open-Higgsfield-AI
 - Task E3: If already React/Vue, begin conversion to vanilla; if vanilla, just integrate
 - Task E4: Update backend URLs to main app's endpoints
-- Task E5: Add route to main router for `/sendspark`
+- Task E5: Add route to main router for `/ai-video-outreach`
 - Task E6: Test workflow creation and publishing (mocked if needed)
 
-**Deliverable:** SendSpark accessible via main app; workflow automation functional.
+**Deliverable:** AI Video Outreach accessible via main app; workflow automation functional.
 
 ---
 

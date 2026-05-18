@@ -633,13 +633,13 @@
 
 ---
 
-### 39. Sendspark
-**Description**: Video messaging and communication platform
+### 39. AI Video Outreach
+**Description**: AI Video Outreach platform
 
 **Features**:
-- Personalized video messages
+- AI-generated video messages
 - Template library
-- Recording tools
+- Personalization tools
 - Analytics
 - Integration with email/SMS
 

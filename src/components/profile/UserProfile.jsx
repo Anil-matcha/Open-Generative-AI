@@ -1,6 +1,5 @@
 import { profileService } from '../../lib/profile/profileService.js';
 import { supabase } from '../../lib/hybrid-supabase.js';
-import { showToast } from '../../lib/loading.js';
 
 /**
  * UserProfile Component - Main user profile management interface
@@ -90,7 +89,7 @@ export function UserProfile() {
       updateStatsSection();
     } catch (error) {
       console.error('[UserProfile] Failed to load profile:', error);
-      showToast('Failed to load profile', 'error');
+      
     }
   };
 
@@ -154,14 +153,14 @@ export function UserProfile() {
       // Save changes
       if (Object.keys(updates).length > 0) {
         await profileService.updateProfile(updates);
-        showToast('Profile updated successfully', 'success');
+        
         await loadProfile(); // Reload to get fresh data
       } else {
-        showToast('No changes to save', 'info');
+        
       }
     } catch (error) {
       console.error('[UserProfile] Failed to save profile:', error);
-      showToast('Failed to save profile', 'error');
+      
     }
   };
 
@@ -405,10 +404,10 @@ export function UserProfile() {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      showToast('Data exported successfully', 'success');
+      
     } catch (error) {
       console.error('[UserProfile] Failed to export data:', error);
-      showToast('Failed to export data', 'error');
+      
     }
   };
 
@@ -427,13 +426,13 @@ export function UserProfile() {
     );
 
     if (finalConfirmation !== 'DELETE') {
-      showToast('Account deletion cancelled', 'info');
+      
       return;
     }
 
     try {
       await profileService.deleteAccount();
-      showToast('Account deletion initiated. You will be logged out.', 'warning');
+      
 
       // Sign out user
       await supabase.auth.signOut();
@@ -441,7 +440,7 @@ export function UserProfile() {
       window.location.reload();
     } catch (error) {
       console.error('[UserProfile] Failed to delete account:', error);
-      showToast('Failed to delete account', 'error');
+      
     }
   };
 

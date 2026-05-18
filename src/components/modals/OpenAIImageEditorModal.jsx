@@ -1019,7 +1019,7 @@ export class OpenAIImageEditorModal extends BaseModal {
 
   showError(message) {
     // Simple error display - you might want to enhance this
-    alert(`Error: ${message}`);
+    
   }
 }
 

@@ -21,7 +21,7 @@ export function ICLoraPanel({ onApply, onClose }) {
       onApply?.(selected, strength);
       onClose?.();
     } else {
-      alert(`Failed: ${result.error}`);
+      
     }
   };
 

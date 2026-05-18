@@ -1,21 +1,20 @@
 import { createSecureIframe } from "../lib/security/index.js";
+
 export function VibeWorkflowPage() {
   const element = document.createElement('div');
   element.className = 'w-full h-full relative';
   element.style.overflow = 'hidden';
 
-  // Loading state
   const loadingContainer = document.createElement('div');
   loadingContainer.className = 'absolute inset-0 flex items-center justify-center bg-gray-900 z-10';
   loadingContainer.innerHTML = `
     <div class="text-center">
       <div class="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-      <p class="text-secondary">Loading Vibe Workflow...</p>
+      <p class="text-secondary">Loading Workflow Studio...</p>
     </div>
   `;
   element.appendChild(loadingContainer);
 
-  // Error state container
   const errorContainer = document.createElement('div');
   errorContainer.className = 'absolute inset-0 flex items-center justify-center bg-gray-900 z-10 hidden';
   errorContainer.innerHTML = `
@@ -27,8 +26,8 @@ export function VibeWorkflowPage() {
           <line x1="9" y1="9" x2="15" y2="15"/>
         </svg>
       </div>
-      <h3 class="text-lg font-semibold mb-2 text-white">Vibe Workflow Unavailable</h3>
-      <p class="text-secondary mb-4">The Vibe Workflow application is currently unavailable. Please try again later.</p>
+      <h3 class="text-lg font-semibold mb-2 text-white">Workflow Studio Unavailable</h3>
+      <p class="text-secondary mb-4">The Workflow Studio application is currently unavailable. Please try again later.</p>
       <button class="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90 transition-colors" onclick="location.reload()">
         Try Again
       </button>
@@ -36,9 +35,8 @@ export function VibeWorkflowPage() {
   `;
   element.appendChild(errorContainer);
 
-  // Iframe container - loads the full Vite app
   const iframe = document.createElement('iframe');
-  iframe.src = '/apps/vibe-workflow/';
+  iframe.src = import.meta.env.DEV ? '/apps/vibe-workflow/index.html' : '/apps/vibe-workflow/';
   iframe.className = 'w-full h-full border-0';
   iframe.style.display = 'none';
   let hasLoaded = false;
@@ -59,11 +57,10 @@ export function VibeWorkflowPage() {
 
   element.appendChild(iframe);
 
-  // Development-only auto-retry mechanism
   if (import.meta.env.DEV) {
     let retryCount = 0;
     const maxRetries = 3;
-    const retryInterval = 5000; // 5 seconds
+    const retryInterval = 5000;
 
     const checkAvailability = () => {
       if (retryCount < maxRetries) {
@@ -72,7 +69,7 @@ export function VibeWorkflowPage() {
           testIframe.src = 'http://localhost:5174';
           testIframe.style.display = 'none';
           testIframe.onload = () => {
-            location.reload(); // Reload to show the iframe
+            location.reload();
           };
           testIframe.onerror = () => {
             retryCount++;

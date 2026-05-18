@@ -1,5 +1,0 @@
-# Demo Video for VideoRemix Go
-
-This is a placeholder for demo video content. In a real application, this would be an actual video file.
-
-For demo purposes, the application will simulate video playback and editing functionality.

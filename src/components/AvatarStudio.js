@@ -175,7 +175,7 @@ export function AvatarStudio() {
   // Generate button handler
   genBtn.onclick = async () => {
     if (!uploadedVideoUrl && selectedModel.hasVideo) {
-      alert('Upload a source video or image first');
+      
       return;
     }
     const apiKey = await securityService.getDecryptedKey();
@@ -207,7 +207,7 @@ export function AvatarStudio() {
         `;
       }
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      
     } finally {
       genBtn.disabled = false;
       genBtn.textContent = 'Generate Avatar Video';
@@ -233,7 +233,7 @@ export function AvatarStudio() {
       modal.open();
     } catch (error) {
       console.error('GTM Prompt Modal error:', error);
-      alert('Failed to open GTM Prompt Enhancer');
+      
     }
   }
 

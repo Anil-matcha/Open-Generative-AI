@@ -7,7 +7,7 @@ const APPS = [
   'videotools', 'render', 'video-agent', 'video-outreach', 'director',
   'timeline', 'motion', 'tiktok-carousel', 'dubbing', 'chat',
   'commercial', 'templates', 'explore', 'library', 'community',
-  'marketing', 'assist', 'remix-go', 'sendspark'
+  'marketing', 'assist', 'remix-go', 'ai-video-outreach'
 ];
 
 const PORT = process.env.PORT || 8080;

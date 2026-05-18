@@ -4,7 +4,6 @@
  */
 
 import { addMediaToTimeline } from './mediaLibrary.js';
-import { showToast } from '../loading.js';
 
 /**
  * Initialize Pexels integration with timeline state
@@ -52,7 +51,7 @@ function addPexelsAssetToTimeline(asset, state, showToast, trackType = 'video', 
   const targetTrack = getTargetTrackForPexels(asset.type, state.tracks);
   
   if (!targetTrack) {
-  // DISABLED:     showToast('No suitable track found. Create a track first.', 'error');
+  // DISABLED:     
     return null;
   }
   
@@ -110,7 +109,7 @@ function addPexelsAssetToTimeline(asset, state, showToast, trackType = 'video', 
   state.selectedClipId = newClip.id;
   
   // Show success message
-  // DISABLED:   showToast(`✅ Added "${asset.alt || asset.type}" to timeline`, 'success');
+  // DISABLED:   
   
   // Dispatch custom event for other systems (analytics, etc.)
   window.dispatchEvent(new CustomEvent('pexelsAssetAdded', {

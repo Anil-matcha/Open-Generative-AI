@@ -139,7 +139,7 @@ export class VideoPersonalizer extends BaseModal {
 
     // Import contacts button
     this.content.querySelector('.import-contacts-btn')?.addEventListener('click', () => {
-      alert('Import contacts feature - connects to ContactImporterModal');
+      
     });
 
     // Footer buttons
@@ -154,7 +154,7 @@ export class VideoPersonalizer extends BaseModal {
 
   handlePersonalize() {
     if (this.selectedContacts.length === 0) {
-      alert('Please select at least one contact');
+      
       return;
     }
 

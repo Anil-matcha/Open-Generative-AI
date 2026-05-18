@@ -139,7 +139,7 @@ export function InfluencerStudio() {
   contentArea.appendChild(resultArea);
 
   genBtn.onclick = async () => {
-    if (!uploadedUrl) { alert('Upload a photo first'); return; }
+    if (!uploadedUrl) {  return; }
     const apiKey = await securityService.getDecryptedKey();
     if (!apiKey) { AuthModal(() => genBtn.click()); return; }
 
@@ -170,7 +170,7 @@ export function InfluencerStudio() {
         resultArea.querySelector('.regen-btn').onclick = () => genBtn.click();
       }
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      
     } finally {
       genBtn.disabled = false;
       genBtn.textContent = 'Generate Content';

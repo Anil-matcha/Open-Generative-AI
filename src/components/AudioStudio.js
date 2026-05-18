@@ -187,7 +187,7 @@ export function AudioStudio() {
   // Generate button handler
   genBtn.onclick = async () => {
     if (!prompt && selectedModel.hasPrompt) {
-        alert('Enter a prompt');
+        
         return;
       }
       const apiKey = await securityService.getDecryptedKey();
@@ -222,7 +222,7 @@ export function AudioStudio() {
         `;
       }
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      
     } finally {
       genBtn.disabled = false;
       genBtn.textContent = 'Generate Audio';
@@ -248,7 +248,7 @@ export function AudioStudio() {
       modal.open();
     } catch (error) {
       console.error('GTM Prompt Modal error:', error);
-      alert('Failed to open GTM Prompt Enhancer');
+      
     }
   }
 

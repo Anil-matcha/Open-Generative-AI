@@ -1,4 +1,3 @@
-import { showToast } from '../lib/loading.js';
 import { MuapiClient } from '../lib/muapi.js';
 import { supabase } from '../lib/hybrid-supabase.js';
 import { VideoUpload } from './common/Upload.js';
@@ -678,7 +677,7 @@ export function createVideoAgentWorkspace(runtime = null) {
 
   async function executeYucutSceneDetection(params) {
     // TransNet V2 Advanced Scene Detection
-    showToast('Running TransNet V2 scene detection...', 'info');
+    
 
     const result = await muapiClient.processVideo({
       model: 'transnet-v2',
@@ -704,7 +703,7 @@ export function createVideoAgentWorkspace(runtime = null) {
 
   async function executeYucutMediaScraper(params) {
     // Free Media Scraper from Mixkit, Pexels, YouTube
-    showToast('Scraping free media assets...', 'info');
+    
 
     const sources = ['mixkit', 'pexels', 'youtube-free'];
     const mediaResults = [];
@@ -749,7 +748,7 @@ export function createVideoAgentWorkspace(runtime = null) {
 
   async function executeYucutAnimationIDE(params) {
     // Time-synchronized code editing with instant preview
-    showToast('Opening Animation IDE...', 'info');
+    
 
     const animationCode = `// Generated animation code
 const keyframes = [
@@ -786,7 +785,7 @@ function animate(frame) {
 
   async function executeYucutKeyframeEffects(params) {
     // Advanced camera movements: shake, zoom, orbit, Hitchcock
-    showToast('Applying cinematic camera effects...', 'info');
+    
 
     const effects = params.effects || ['shake', 'zoom', 'orbit'];
     const result = await muapiClient.applyEffects({
@@ -812,7 +811,7 @@ function animate(frame) {
 
   async function executeYucutSpeechEditing(params) {
     // One-click speech editing - auto-detect and remove stutters/repetitions
-    showToast('Analyzing and cleaning speech patterns...', 'info');
+    
 
     const result = await muapiClient.processAudio({
       model: 'speech-editor',
@@ -836,7 +835,7 @@ function animate(frame) {
 
   async function executeYucutSemanticSearch(params) {
     // CLIP-based semantic search and analysis
-    showToast('Performing semantic content analysis...', 'info');
+    
 
     const result = await muapiClient.searchVideo({
       model: 'clip-semantic',
@@ -862,7 +861,7 @@ function animate(frame) {
 
   async function executeYucut3DCamera(params) {
     // Advanced 3D camera movements with orbit, pan, tilt, dolly
-    showToast('Applying advanced 3D camera movements...', 'info');
+    
 
     const movements = params.movements || [
       { type: 'orbit', duration: 3, radius: 2 },
@@ -891,13 +890,13 @@ function animate(frame) {
 
   async function executeYucutMultiStageAgent(params) {
     // Plan→Execute→Verify→Fix automation workflow
-    showToast('Starting multi-stage agent workflow...', 'info');
+    
 
     const stages = ['Planning', 'Executing', 'Verifying', 'Fixing'];
     const workflowResults = [];
 
     for (const stage of stages) {
-      showToast(`${stage} stage in progress...`, 'info');
+      
 
       const stageResult = await muapiClient.runAgentStage({
         model: 'multi-stage-agent',
@@ -932,7 +931,7 @@ function animate(frame) {
 
   async function executeYucutMCPProtocol(params) {
     // MCP Protocol for seamless AI IDE integration
-    showToast('Initializing MCP protocol integration...', 'info');
+    
 
     // This would establish WebSocket connection to external AI IDE
     const mcpConnection = {
@@ -1221,7 +1220,7 @@ function animate(frame) {
       // Show error in outputs section
       updateOutputsSection();
 
-  // DISABLED:       showToast(`Video processing failed: ${error.message}`, 'error');
+  // DISABLED:       
     }
   }
 
@@ -1773,7 +1772,7 @@ function animate(frame) {
 
       if (!uploadedVideoUrl) {
         log('Please upload a video first', 'agent');
-  // DISABLED:         showToast('Please upload a video before running actions', 'warning');
+  // DISABLED:         
         return;
       }
 
@@ -1823,12 +1822,12 @@ function animate(frame) {
 
   function handleVideoFile(file) {
     if (!file.type.startsWith('video/')) {
-  // DISABLED:       showToast('Please select a video file.', 'error');
+  // DISABLED:       
       return;
     }
 
     if (file.size > 2 * 1024 * 1024 * 1024) { // 2GB limit
-  // DISABLED:       showToast('File size must be less than 2GB.', 'error');
+  // DISABLED:       
       return;
     }
 
@@ -1947,7 +1946,7 @@ function animate(frame) {
         }
         updateVideoToggle();
       } else {
-  // DISABLED:         showToast('No AI processed videos available', 'info');
+  // DISABLED:         
       }
     });
   }
@@ -1962,7 +1961,7 @@ function animate(frame) {
         handleVideoFile(file);
       },
       onError: (errors) => {
-        errors.forEach(error => showToast(error, 'error'));
+        errors.forEach(error => console.log(error, 'error'));
       }
     });
     uploadContainer.appendChild(videoUpload);

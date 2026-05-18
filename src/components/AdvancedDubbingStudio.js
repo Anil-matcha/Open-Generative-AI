@@ -336,17 +336,17 @@ export function AdvancedDubbingStudio() {
 
     function handleTranslate() {
         // TODO: implement translate
-        alert('Translate clicked');
+        
     }
 
     function handleDub() {
         // TODO: implement dub
-        alert('Dub clicked');
+        
     }
 
     function handlePreview() {
         // TODO: implement preview
-        alert('Preview clicked');
+        
     }
 
     return container;

@@ -57,7 +57,7 @@ This document provides comprehensive integration documentation for all applicati
 | **Assist** | AI assistant interface | Main app | fal.ai, OpenAI, Anthropic, Google Gemini |
 | **Commits** | Version control | Main app | Git integration |
 | **Remix Go** | Remix-based application | apps/remix-go | fal.ai, Supabase |
-| **Sendspark** | Sendspark platform | apps/sendspark | fal.ai, Supabase |
+| **AI Video Outreach** | AI Video Outreach platform | Main app | fal.ai, Supabase |
 | **Settings** | Application settings | Main app | Local storage |
 
 ### Bottom Navigation Items
@@ -80,7 +80,7 @@ This document provides comprehensive integration documentation for all applicati
 | rendiv | Code-first video editor | `modules/rendiv` |
 | LTX-Desktop | Local video generation | `modules/LTX-Desktop` |
 | remix-go | Remix-based application | `apps/remix-go` |
-| sendspark | Sendspark platform | `apps/sendspark` |
+| ai-video-outreach | AI Video Outreach platform | `apps/ai-video-outreach` |
 
 ---
 
@@ -141,7 +141,7 @@ This document provides comprehensive integration documentation for all applicati
 
 ### Marketing & Distribution
 - Marketing, Apps, Remix Go
-- Sendspark, Templates
+- AI Video Outreach, Templates
 
 ### Utilities
 - Avatar, Settings

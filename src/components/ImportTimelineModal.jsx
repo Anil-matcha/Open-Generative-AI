@@ -8,7 +8,7 @@ export function ImportTimelineModal({ onImport, onClose }) {
         onImport?.(content);
         onClose?.();
       } catch (err) {
-        alert('Invalid file format');
+        
       }
     };
     reader.readAsText(file);

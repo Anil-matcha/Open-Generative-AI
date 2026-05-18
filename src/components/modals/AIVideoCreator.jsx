@@ -190,7 +190,7 @@ export class AIVideoCreator extends BaseModal {
 
   handleGenerate() {
     if (!this.prompt.trim()) {
-      alert('Please enter a prompt description');
+      
       return;
     }
 

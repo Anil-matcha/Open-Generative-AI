@@ -17,7 +17,7 @@ export function renderMultiCameraToolbar(state, container) {
   multiCameraBtn.onclick = () => {
     state.multiCameraMode = !state.multiCameraMode;
     renderMultiCameraToolbar(state, container);
-  // DISABLED:     showToast(`${state.multiCameraMode ? 'Enabled' : 'Disabled'} multi-camera editing`);
+  // DISABLED:     
   };
   container.appendChild(multiCameraBtn);
 
@@ -32,7 +32,7 @@ export function renderMultiCameraToolbar(state, container) {
   pipBtn.onclick = () => {
     state.togglePipMode();
     renderMultiCameraToolbar(state, container);
-  // DISABLED:     showToast(`${state.pipMode ? 'Enabled' : 'Disabled'} PIP mode`);
+  // DISABLED:     
   };
   container.appendChild(pipBtn);
 
@@ -49,7 +49,7 @@ export function renderMultiCameraToolbar(state, container) {
       state.disableSplitScreen();
     }
     renderMultiCameraToolbar(state, container);
-  // DISABLED:     showToast(`${state.splitScreenMode ? 'Enabled' : 'Disabled'} split-screen mode`);
+  // DISABLED:     
   };
   container.appendChild(splitBtn);
 
@@ -105,7 +105,7 @@ function addNewCameraAngle(state) {
     const randomColor = colors[Math.floor(Math.random() * colors.length)];
     const angleId = state.addCameraAngle(angleName, randomColor);
     renderCameraAnglesPanel(state);
-  // DISABLED:     showToast(`Added camera angle: ${angleName}`);
+  // DISABLED:     
   }
 }
 
@@ -162,19 +162,19 @@ export function renderPipControls(state, container) {
 
 function addPipWindow(state) {
   if (state.tracks.flatMap(t => t.items).length === 0) {
-  // DISABLED:     showToast('Add clips to timeline first');
+  // DISABLED:     
     return;
   }
 
   const clip = state.tracks.flatMap(t => t.items).find(c => c.id === state.selectedClipId);
   if (!clip) {
-  // DISABLED:     showToast('Select a clip to add as PIP');
+  // DISABLED:     
     return;
   }
 
   state.addPipWindow(clip.id);
   renderPipControls(state, document.querySelector('.pip-controls-container'));
-  // DISABLED:   showToast('Added PIP window');
+  // DISABLED:   
 }
 
 export function renderSplitScreenControls(state, container) {
@@ -213,27 +213,27 @@ window.switchToAngle = (angleId) => {
   const state = window.timelineState;
   state.switchToCameraAngle(angleId);
   renderCameraAnglesPanel(state);
-  // DISABLED:   showToast('Switched camera angle');
+  // DISABLED:   
 };
 
 window.removeAngle = (angleId) => {
   const state = window.timelineState;
   state.removeCameraAngle(angleId);
   renderCameraAnglesPanel(state);
-  // DISABLED:   showToast('Removed camera angle');
+  // DISABLED:   
 };
 
 window.removePip = (pipId) => {
   const state = window.timelineState;
   state.removePipWindow(pipId);
   renderPipControls(state, document.querySelector('.pip-controls-container'));
-  // DISABLED:   showToast('Removed PIP window');
+  // DISABLED:   
 };
 
 window.updatePipPosition = (pipId, position) => {
   const state = window.timelineState;
   state.updatePipWindow(pipId, { position });
-  // DISABLED:   showToast('Updated PIP position');
+  // DISABLED:   
 };
 
 window.updatePipOpacity = (pipId, opacity) => {
@@ -270,10 +270,10 @@ function showModal(title, content) {
   document.body.appendChild(modal);
 }
 
-function showToast(message) {
+function console.log(message) {
   // Use existing toast system
   if (window.showToast) {
-    window.showToast(message);
+    window.
   } else {
   }
 }

@@ -1,5 +1,4 @@
 import { navigate } from '../lib/router.js';
-import { showToast } from '../lib/loading.js';
 import { createHeroSection } from '../lib/thumbnails.js';
 import { getSupabaseUrl, isSupabaseConfigured } from '../lib/hybrid-supabase.js';
 import { createVideoAgentWorkspace } from './video-agent-workspace.js';

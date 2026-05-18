@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vibe Workflow</title>
+  <style>
+    body { margin: 0; font-family: system-ui, sans-serif; background: #0f0f0f; color: #fff; }
+    #workflow-canvas { width: 100vw; height: 100vh; position: relative; background: #111; overflow: hidden; }
+    .node { position: absolute; background: #222; border: 2px solid #444; border-radius: 8px; padding: 12px; min-width: 150px; cursor: move; user-select: none; }
+    .node-header { font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid #444; padding-bottom: 4px; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="workflow-canvas"></div>
+  </div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

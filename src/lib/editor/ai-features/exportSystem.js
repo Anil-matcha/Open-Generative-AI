@@ -199,7 +199,7 @@ export class ExportSystem {
       <span>Export complete!</span>
       <a href="${result.outputUrl}" download>Download Video</a>
     `;
-    this.showToast(toast);
+    this.
     this.closeModal();
   }
 
@@ -207,10 +207,10 @@ export class ExportSystem {
     const toast = document.createElement('div');
     toast.className = 'export-toast error';
     toast.textContent = `Export failed: ${message}`;
-    this.showToast(toast);
+    this.
   }
 
-  // DISABLED:   showToast(toast) {
+  // DISABLED:   console.log(toast) {
     toast.style.position = 'fixed';
     toast.style.bottom = '20px';
     toast.style.right = '20px';

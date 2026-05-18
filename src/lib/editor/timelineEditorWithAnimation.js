@@ -4,7 +4,6 @@
  */
 
 import { supabase, uploadFileToStorage } from '../lib/hybrid-supabase.js';
-import { showToast } from '../lib/loading.js';
 import { initializeTimelineDragDrop, createEnhancedClipElement, renderCompositingOverlay } from '../lib/editor/timelineRendererEnhanced.js';
 import { initializeMediaLibraryDragDrop, setupEnhancedTooltips } from '../lib/editor/dragDrop.js';
 import { renderMediaGrid, addMediaToTimeline } from '../lib/editor/mediaLibrary.js';

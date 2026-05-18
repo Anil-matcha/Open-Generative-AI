@@ -589,23 +589,23 @@ export function EffectsStudio() {
   async function handleGenerate() {
     // Special validation for different tab types
     if (activeTab.id === 'ai-video-effects' && !selectedEffect) {
-      alert('Please select an effect template first');
+      
       return;
     }
     if (activeTab.id === 'custom-ai-video-effects') {
       const customPrompt = promptInput.value.trim() || mobilePrompt.value.trim();
       if (!customPrompt) {
-        alert('Please enter a prompt describing the desired effect');
+        
         return;
       }
     } else if (activeTab.id === 'pixverse-advanced-effects' && !selectedEffect) {
-      alert('Please select a Pixverse advanced effect first');
+      
       return;
     } else if (!selectedEffect) {
-      alert('Select an effect first');
+      
       return;
     }
-    if (!uploadedUrl) { alert('Upload an image or video first'); return; }
+    if (!uploadedUrl) {  return; }
     const apiKey = await securityService.getDecryptedKey();
     if (!apiKey) { AuthModal(() => handleGenerate()); return; }
 

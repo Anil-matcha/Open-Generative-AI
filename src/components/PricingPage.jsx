@@ -10,11 +10,11 @@ const PricingPage = () => {
     setIsPurchasing(true);
     try {
       addPurchase(productId, { status: 'active', type: 'one-time' });
-      alert(`Purchase initiated for ${productId}. In production, this would redirect to Stripe checkout.`);
+      
       window.location.href = '/';
     } catch (error) {
       console.error('Purchase failed:', error);
-      alert('Purchase failed. Please try again.');
+      
     } finally {
       setIsPurchasing(false);
     }

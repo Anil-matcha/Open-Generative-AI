@@ -1,5 +1,4 @@
 import { supabase } from '../../lib/hybrid-supabase.js';
-import { showToast } from '../../lib/loading.js';
 import { MuapiClient } from '../../lib/muapi.js';
 
 export class AIChatPanel {
@@ -77,7 +76,7 @@ export class AIChatPanel {
 
     this.recognition.onerror = (event) => {
       console.error('Speech recognition error:', event.error);
-      showToast('Voice input failed', 'error');
+      
     };
 
     // Add voice button
@@ -88,7 +87,7 @@ export class AIChatPanel {
     voiceBtn.title = 'Voice input';
     voiceBtn.onclick = () => {
       this.recognition.start();
-      showToast('Listening...', 'info');
+      
     };
     inputContainer.appendChild(voiceBtn);
   }

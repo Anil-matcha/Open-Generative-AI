@@ -409,15 +409,15 @@ Each application should include:
 **Requirements**: Node.js, Remix
 **Workflow: Create project → Develop → Deploy → Collaborate
 
-### 38. Sendspark
-**Description**: Video messaging and communication platform
-**Repository**: `apps/sendspark`
+### 38. AI Video Outreach
+**Description**: AI Video Outreach platform
+**Repository**: `apps/ai-video-outreach`
 **APIs**: fal.ai, Supabase
 **Features**: Personalized video messages, templates, analytics
 **Audience**: Businesses, sales teams
 **Integration**: SocialPublisher, EmailCampaign
 **Requirements**: Business account
-**Workflow**: Record message → Add personalization → Send → Track
+**Workflow**: Create message → Add personalization → Send → Track
 
 ### 39. Settings
 **Description**: Application configuration and preferences

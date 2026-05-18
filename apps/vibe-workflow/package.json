@@ -1,16 +1,19 @@
 {
-    "name": "vibe-workflow-monorepo",
-    "version": "1.0.0",
-    "private": true,
-    "workspaces": [
-        "packages/*",
-        "client",
-        "server"
-    ],
-    "scripts": {
-        "dev:app": "npm run dev -w client",
-        "build:app": "npm run build -w client",
-        "build:lib": "npm run build -w packages/workflow-builder",
-        "install:all": "npm install"
-    }
+  "name": "vibe-workflow",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "deploy": "npm run build && netlify deploy --prod",
+    "preview": "vite preview",
+    "test": "node tests/e2e/complete.spec.js"
+  },
+  "devDependencies": {
+    "vite": "^5.2.0"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.105.4"
+  }
 }

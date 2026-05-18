@@ -1,5 +1,3 @@
-import { showToast } from '../../lib/loading.js';
-
 /**
  * Reusable Upload Component
  * @param {Object} options - Configuration options
@@ -128,7 +126,7 @@ export function Upload(options = {}) {
 
     // Show errors
     if (errors.length > 0) {
-      errors.forEach(error => showToast(error, 'error'));
+      errors.forEach(error => console.log(error, 'error'));
       if (onError) onError(errors);
     }
 
@@ -153,7 +151,7 @@ export function Upload(options = {}) {
 
         // Complete upload
         progressText.textContent = 'Upload complete!';
-  // DISABLED:         showToast(`${validFiles.length} file(s) uploaded successfully`, 'success');
+  // DISABLED:         console.log(`${validFiles.length} file(s) uploaded successfully`, 'success');
 
         if (onUpload) {
           onUpload(multiple ? validFiles : validFiles[0]);
@@ -169,7 +167,7 @@ export function Upload(options = {}) {
 
       } catch (error) {
         console.error('Upload error:', error);
-  // DISABLED:         showToast('Upload failed', 'error');
+  // DISABLED:         
         if (onError) onError([error.message]);
 
         // Reset on error

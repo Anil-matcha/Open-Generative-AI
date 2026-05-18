@@ -250,15 +250,7 @@ export class ErrorHandler {
    * @param {Object} friendlyError - User-friendly error info
    */
   showErrorNotification(friendlyError) {
-    // Import showToast dynamically to avoid circular dependencies
-    import('../loading.js').then(({ showToast }) => {
-      const toastType = friendlyError.category === this.errorCategories.AUTHENTICATION ? 'warning' : 'error';
-      const duration = friendlyError.recoverable ? 5000 : 10000;
-      
-  // DISABLED:       showToast(friendlyError.message, toastType, duration);
-    }).catch(err => {
-      console.warn('[ErrorHandler] Could not show error notification:', err);
-    });
+    console.error(`[ErrorHandler] ${friendlyError.title}: ${friendlyError.message}`);
   }
 
   /**

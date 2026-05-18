@@ -186,7 +186,7 @@ export function TrainingStudio() {
   // Train button handler
   trainBtn.onclick = async () => {
     if (!loraName) {
-      alert('Enter a LoRA name');
+      
       return;
     }
     if (uploadedImages.length < 5) {
@@ -224,7 +224,7 @@ export function TrainingStudio() {
         `;
       }
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      
     } finally {
       trainBtn.disabled = false;
       trainBtn.textContent = 'Train LoRA';

@@ -322,7 +322,7 @@ export function TikTokCarouselStudio() {
         window.open(result.url, '_blank');
       }
     } catch (error) {
-      alert(`Error generating carousel: ${error.message}`);
+      
     } finally {
       isGenerating = false;
       generateBtn.disabled = false;

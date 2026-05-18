@@ -736,7 +736,7 @@ function addCineGenElementToTimeline(media, state, showToast) {
 
   // Show success toast with element details
   if (showToast) {
-    showToast(`Added ${elementData.name} reference to timeline`, 'success');
+    
   }
 
   return { newItem, targetTrack };
@@ -944,7 +944,7 @@ export function addGeneratedAssetToLibrary(asset, state) {
 
 export function handleUpload(showToast) {
   // Placeholder for upload functionality
-  // DISABLED:   showToast('Upload flow placeholder triggered');
+  // DISABLED:   
 }
 
 export function searchMedia(query, mediaItems) {

@@ -8,7 +8,6 @@ apps/workflows
 apps/agents
 apps/remix-go
 apps/ai-vfx
-apps/sendspark
 apps/director
 apps/vimax
 apps/ai-storyboarder

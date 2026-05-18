@@ -1,5 +1,4 @@
 import { muapi } from '../lib/muapi.js';
-import { showToast } from '../lib/loading.js';
 
 export function AIVFXStudio() {
   // State management
@@ -69,7 +68,7 @@ export function AIVFXStudio() {
     } else {
       uploadedFile = null;
       previewUrl = null;
-      if (file) showToast('Please upload a valid image or video file.', 'error');
+      if (file) 
     }
   };
 
@@ -101,7 +100,7 @@ export function AIVFXStudio() {
       } else {
         uploadedFile = null;
         previewUrl = null;
-  // DISABLED:         showToast('Please upload a valid image or video file.', 'error');
+  // DISABLED:         
       }
     }
   };
@@ -868,7 +867,7 @@ export function AIVFXStudio() {
       imageUrl = url;
       updatePreview();
     } else if (url) {
-  // DISABLED:       showToast('Please enter a valid image URL (http/https)', 'error');
+  // DISABLED:       console.log('Please enter a valid image URL (http/https)', 'error');
     }
   };
 
@@ -880,11 +879,11 @@ export function AIVFXStudio() {
   const generateBtn = inputBar.querySelector('.generate-btn');
   generateBtn.onclick = () => {
     if (!selectedEffect) {
-  // DISABLED:       showToast('Please select an effect first', 'error');
+  // DISABLED:       
       return;
     }
     if (!imageUrl && !inputText.trim()) {
-  // DISABLED:       showToast('Please provide an image URL or prompt', 'error');
+  // DISABLED:       
       return;
     }
     showApiKeyModal = true;

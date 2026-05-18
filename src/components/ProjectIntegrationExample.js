@@ -150,7 +150,7 @@ export function TimelineEditorWithProjects() {
 
     } catch (error) {
       console.error('Failed to create project:', error);
-      alert('Failed to create project: ' + error.message);
+      
     }
   }
 
@@ -174,7 +174,7 @@ export function TimelineEditorWithProjects() {
 
     } catch (error) {
       console.error('Failed to load project:', error);
-      alert('Failed to load project: ' + error.message);
+      
     }
   }
 

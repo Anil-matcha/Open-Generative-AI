@@ -8,7 +8,6 @@ import { memoryLeakDetector } from './lib/memory-leak-detector.js';
 import { mediaLoader } from './lib/media-loader.js';
 import { performanceBudget } from './lib/performance-budget.js';
 import { analytics } from './lib/analytics.js';
-import { showToast } from './lib/loading.js';
 import { generationService } from './lib/editor/generationService.js';
 import { initializeAuthHardening } from './lib/auth-hardening.js';
 import { initializeEnvironmentValidation } from './lib/environment-config.js';
@@ -91,25 +90,25 @@ const muapiConfig = loadConfig();
 initializeEnhancedMuAPI(muapiConfig).then(async (success) => {
   if (success) {
     console.log('[App] Enhanced MuAPI initialized successfully');
-  // DISABLED:     showToast('Enhanced AI features enabled', 'success', 3000);
+  // DISABLED:     
 
     // Initialize AI service optimizations after MuAPI is ready
     console.log('[App] Initializing AI service optimizations...');
     const aiResult = await initializeAIOptimizations();
     if (aiResult.success) {
       console.log('[App] AI optimizations enabled successfully');
-  // DISABLED:       showToast('AI optimizations active', 'success', 2000);
+  // DISABLED:       
     } else {
       console.warn('[App] AI optimizations failed to initialize:', aiResult.error);
-  // DISABLED:       showToast('AI optimizations unavailable', 'warning', 3000);
+  // DISABLED:       
     }
   } else {
     console.log('[App] Enhanced MuAPI initialization failed, using basic features');
-  // DISABLED:     showToast('Using basic AI features', 'info', 3000);
+  // DISABLED:     
   }
 }).catch(error => {
   console.warn('[App] Enhanced MuAPI initialization error:', error);
-  // DISABLED:   showToast('AI features unavailable', 'warning', 5000);
+  // DISABLED:   
 });
 
 // Start memory leak detection in development
@@ -170,7 +169,7 @@ window.addEventListener('error', (event) => {
     return;
   }
   // Show error toast notification instead of full page crash
-  //   showToast('Something went wrong. Please refresh the page.', 'error', 10000);
+  //   
 });
 
 window.addEventListener('unhandledrejection', (event) => {
@@ -191,7 +190,7 @@ window.addEventListener('unhandledrejection', (event) => {
   } else {
     return;
   }
-  //   showToast('An operation failed. Please try again.', 'error', 5000);
+  //   
 });
 
 // Service worker registration for offline support (production)
@@ -217,11 +216,11 @@ document.addEventListener('visibilitychange', () => {
 
 // Online/offline detection
 window.addEventListener('online', () => {
-  // DISABLED:   showToast('Connection restored', 'success', 3000);
+  // DISABLED:   
 });
 
 window.addEventListener('offline', () => {
-  // DISABLED:   showToast('You are offline. Some features may not work.', 'warning', 10000);
+  // DISABLED:   
 });
 
 try {

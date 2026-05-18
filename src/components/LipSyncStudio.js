@@ -174,7 +174,7 @@ export function LipSyncStudio() {
         try {
             uploadedVideoUrl = await muapi.uploadFile(file);
             showVideoReady(file.name);
-        } catch (err) { showVideoIcon(); alert(`Video upload failed: ${err.message}`); }
+        } catch (err) { showVideoIcon();  }
         videoFileInput.value = '';
     };
 
@@ -242,7 +242,7 @@ export function LipSyncStudio() {
         try {
             uploadedAudioUrl = await muapi.uploadFile(file);
             showAudioReady(file.name);
-        } catch (err) { showAudioIcon(); alert(`Audio upload failed: ${err.message}`); }
+        } catch (err) { showAudioIcon();  }
         audioFileInput.value = '';
     };
 
@@ -655,15 +655,15 @@ export function LipSyncStudio() {
 
         // Validation
         if (!uploadedAudioUrl) {
-            alert('Please upload an audio file first.');
+            
             return;
         }
         if (inputMode === 'image' && !uploadedImageUrl) {
-            alert('Please upload a portrait image first.');
+            
             return;
         }
         if (inputMode === 'video' && !uploadedVideoUrl) {
-            alert('Please upload a source video first.');
+            
             return;
         }
 

@@ -365,7 +365,7 @@ export class VoiceModal extends BaseModal {
 
   previewWithText() {
     if (!this.selectedVoice || !this.text.trim()) {
-      alert('Please select a voice and enter text first.');
+      
       return;
     }
 
@@ -374,7 +374,7 @@ export class VoiceModal extends BaseModal {
 
   testVoice() {
     if (!this.selectedVoice) {
-      alert('Please select a voice first.');
+      
       return;
     }
 
@@ -392,12 +392,12 @@ export class VoiceModal extends BaseModal {
 
   handleConfirm() {
     if (!this.selectedVoice) {
-      alert('Please select a voice first.');
+      
       return;
     }
 
     if (!this.text.trim()) {
-      alert('Please enter some text to convert to speech.');
+      
       return;
     }
 

@@ -37,7 +37,7 @@
 | timeline | `/thumbnails/heroes/timeline.webp` | ❌ | No component found |
 | runway-motion | `/thumbnails/heroes/runway-motion.webp` | ❌ | RunwayMotionStudio.js (uses 'video' instead) |
 | tiktok-carousel | `/thumbnails/heroes/tiktok-carousel.webp` | ❌ | TikTokCarouselStudio.js (uses 'video' instead) |
-| sendspark | `/thumbnails/heroes/sendspark.webp` | ❌ | No component found |
+| ai-video-outreach | `/thumbnails/heroes/ai-video-outreach.webp` | ❌ | No component found |
 | remix-go | `/thumbnails/heroes/remix-go.webp` | ❌ | No component found |
 | marketing-studio | `/thumbnails/heroes/marketing-studio.webp` | ❌ | No component found |
 | apps | N/A | ❌ | No component found |
@@ -95,7 +95,7 @@
 ### Medium Priority (Additional Studios)
 6. video-outreach, director, timeline
 7. runway-motion, tiktok-carousel (unique versions)
-8. sendspark, remix-go, marketing-studio
+8. ai-video-outreach, remix-go, marketing-studio
 
 ### Low Priority (Nice to Have)
 9. apps, commits - May not need hero images

@@ -7,7 +7,6 @@
 import { muapi } from './muapi.js';
 import { securityService } from './services/SecurityService.js';
 import { AuthModal } from '../components/AuthModal.js';
-import { showToast } from './loading.js';
 import { navigate } from './router.js';
 import { sanitizeUrl } from './security.js';
 import {

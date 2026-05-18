@@ -15,8 +15,13 @@ const STUDIO_THUMBNAILS = {
   chat: '/thumbnails/studios/chat.webp.png',
   'advanced-dubbing': '/thumbnails/studios/advanced-dubbing.webp.png',
   'ai-vfx': '/thumbnails/studios/ai-vfx.webp',
-  'runway-motion': '/thumbnails/studios/runway-motion.webp.png',
-  'tiktok-carousel': '/thumbnails/studios/tiktok-carousel.webp.png',
+  'runway-motion': '/thumbnails/studios/runway-motion.webp',
+  'tiktok-carousel': '/thumbnails/studios/tiktok-carousel.webp',
+  studio: '/thumbnails/studios/studio.webp.svg',
+  'workflow-builder': '/thumbnails/studios/workflow-builder.webp.svg',
+  'ai-agent': '/thumbnails/studios/ai-agent.webp.svg',
+  'design-agent': '/thumbnails/studios/design-agent.webp.svg',
+  'marketing-studio': '/thumbnails/studios/marketing-studio.webp',
 };
 
 const TOOL_THUMBNAILS = {
@@ -75,7 +80,7 @@ const HERO_THUMBNAILS = {
   'headshots': '/thumbnails/heroes/headshots.webp',
   'apps': '/thumbnails/heroes/apps.webp',
   'explore': '/thumbnails/heroes/explore.webp',
-  'sendspark': '/thumbnails/heroes/sendspark.webp.png',
+  'ai-video-outreach': '/thumbnails/heroes/ai-video-outreach.webp.png',
   'video-outreach': '/thumbnails/heroes/video-outreach.webp.png',
   'timeline': '/thumbnails/heroes/timeline.webp.png',
   'lipsync': '/thumbnails/heroes/lipsync.webp.png',
@@ -139,10 +144,15 @@ export function createThumbnailImg(src, alt, className = '') {
         const parent = img.parentElement;
         if (parent) parent.classList.add('thumb-fallback');
       };
-    } else if (src.includes('/thumbnails/studios/')) {
-      // Studios might be .webp, .webp.png, or .svg
+    } else if (src.includes('/thumbnails/studios/') && (src.endsWith('.webp') || src.endsWith('.svg'))) {
       if (src.endsWith('.webp')) {
         img.src = src + '.png';
+        img.onerror = () => {
+          img.style.display = 'none';
+          const parent = img.parentElement;
+          if (parent) parent.classList.add('thumb-fallback');
+        };
+      } else if (src.endsWith('.svg')) {
         img.onerror = () => {
           img.style.display = 'none';
           const parent = img.parentElement;
@@ -178,4 +188,9 @@ export function createHeroSection(studioId, className = '') {
   overlay.className = 'absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent';
   wrapper.appendChild(overlay);
   return wrapper;
+}
+
+// Default thumbnail fallback helper
+export function getDefaultThumbnail() {
+  return '/thumbnails/studios/studio.webp.svg';
 }

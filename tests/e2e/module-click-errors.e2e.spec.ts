@@ -34,7 +34,7 @@ const advancedRoutes = [
 ];
 
 const marketingRoutes = [
-  'remix-go', 'sendspark', 'ai-headshot', 'runway-motion',
+  'remix-go', 'ai-video-outreach', 'ai-headshot', 'runway-motion',
   'tiktok-carousel', 'advanced-dubbing'
 ];
 

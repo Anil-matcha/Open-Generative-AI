@@ -70,7 +70,7 @@ const sidebarApps = [
   'timeline', 'motion', 'tiktok-carousel', 'dubbing',
   'chat', 'commercial', 'templates', 'explore', 'library',
   'community', 'marketing', 'assist', 'remix-go', 'ai-vfx',
-  'sendspark'
+  'ai-video-outreach'
 ];
 
 test.describe('All Applications Smoke Test', () => {

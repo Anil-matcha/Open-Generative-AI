@@ -114,11 +114,11 @@ esbuild: {
                     secure: true,
                     rewrite: (path) => path.replace(/^\/api/, "")
                  },
-                 "/apps/videco-ai-platform": {
+"/apps/videco-ai-platform": {
                     target: "http://localhost:3002",
                     changeOrigin: true,
                     rewrite: (path) => path.replace(/^\/apps\/videco-ai-platform/, "")
-                 },
+                  },
                  "/apps/ai-headshot-generator": {
                     target: "http://localhost:3003",
                     changeOrigin: true,

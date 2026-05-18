@@ -262,7 +262,7 @@ export function VideoStudio() {
         } catch (err) {
             console.error('[VideoStudio] Video upload failed:', err);
             showVideoIcon();
-            alert(`Video upload failed: ${err.message}`);
+            
         }
         videoFileInput.value = '';
     };
@@ -386,13 +386,13 @@ export function VideoStudio() {
     const applySelectedWanEffect = async () => {
         const effectType = document.getElementById('wan-ai-effect').value;
         if (!effectType) {
-            alert('Please select a Wan AI effect first');
+            
             return;
         }
 
         const currentVideo = resultVideo.src;
         if (!currentVideo) {
-            alert('Please generate or upload a video first');
+            
             return;
         }
 
@@ -410,7 +410,7 @@ export function VideoStudio() {
 
             if (result.success) {
                 resultVideo.src = result.url;
-                showToast(`Wan AI ${effectType} effect applied successfully`, 'success');
+                
             } else {
                 showWanEffectError(new Error(result.error || 'Unknown error'), effectType);
             }
@@ -1235,22 +1235,22 @@ export function VideoStudio() {
 
         if (v2vMode) {
             if (!uploadedVideoUrl) {
-                alert('Please upload a video first.');
+                
                 return;
             }
         } else if (isExtendMode) {
             if (!lastGenerationId) {
-                alert('No Seedance 2.0 generation found to extend. Generate a video first.');
+                
                 return;
             }
         } else if (imageMode) {
             if (!uploadedImageUrl) {
-                alert('Please upload a start frame image first.');
+                
                 return;
             }
         } else {
             if (!prompt) {
-                alert('Please enter a prompt to generate a video.');
+                
                 return;
             }
         }
@@ -1372,7 +1372,7 @@ export function VideoStudio() {
 
             if (effectsMode) {
                 if (!uploadedImageUrl) {
-                    alert('Please upload an image first for video effects.');
+                    
                     return;
                 }
                 const effectsParams = {

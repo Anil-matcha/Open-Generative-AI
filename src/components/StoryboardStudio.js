@@ -4,7 +4,6 @@ import { securityService } from '../lib/services/SecurityService.js';
 import { AuthModal } from './AuthModal.js';
 import { createHeroSection } from '../lib/thumbnails.js';
 import { createInlineInstructions } from './InlineInstructions.js';
-import { showToast } from '../lib/loading.js';
 import { t2iModels } from '../lib/models.js';
 import { GTMPromptModal } from './modals/GTMPromptModal.jsx';
 
@@ -50,7 +49,7 @@ export function StoryboardStudio() {
       timestamp: Date.now()
     };
     localStorage.setItem('storyboard_project', JSON.stringify(projectData));
-  // DISABLED:     showToast('Project saved locally', 'success');
+  // DISABLED:     
   }
 
   function loadProject() {
@@ -65,12 +64,12 @@ export function StoryboardStudio() {
         storyboardResult = projectData.storyboardResult;
         currentProjectId = projectData.projectId;
         renderTabs();
-  // DISABLED:         showToast('Project loaded from local storage', 'success');
+  // DISABLED:         
       } catch (err) {
-  // DISABLED:         showToast('Failed to load project', 'error');
+  // DISABLED:         
       }
     } else {
-  // DISABLED:       showToast('No saved project found', 'warning');
+  // DISABLED:       
     }
   }
 
@@ -82,7 +81,7 @@ export function StoryboardStudio() {
       currentProjectId = null;
       localStorage.removeItem('storyboard_project');
       renderTabs();
-  // DISABLED:       showToast('Project cleared', 'info');
+  // DISABLED:       
     }
   }
 
@@ -277,7 +276,7 @@ export function StoryboardStudio() {
   async function generateCharacter(idx, btn, imageArea) {
     const char = characters[idx];
     if (!char.traits.trim()) {
-  // DISABLED:       showToast('Please enter character traits first', 'warning');
+  // DISABLED:       
       return;
     }
         const apiKey = await securityService.getDecryptedKey();
@@ -296,11 +295,11 @@ export function StoryboardStudio() {
       if (result?.url) {
         char.imageUrl = result.url;
         imageArea.innerHTML = `<img src="${result.url}" class="w-full h-full object-cover">`;
-  // DISABLED:         showToast('Character image generated successfully!', 'success');
+  // DISABLED:         
       }
     } catch (err) {
       console.error('Character generation error:', err);
-  // DISABLED:       showToast(`Failed to generate character image: ${err.message}`, 'error');
+  // DISABLED:       
     } finally {
       btn.disabled = false;
       btn.textContent = 'Generate Character Image';
@@ -536,14 +535,14 @@ export function StoryboardStudio() {
 
   async function generateStoryboard(btn) {
     if (characters.length === 0 || scenes.length === 0) {
-  // DISABLED:       showToast('Please create at least one character and one scene.', 'warning');
+  // DISABLED:       
       return;
     }
     // No API key needed for CutAI backend
 
     btn.disabled = true;
     btn.innerHTML = '<span class="animate-spin inline-block mr-2">&#9711;</span> Generating...';
-  // DISABLED:     showToast('Generating storyboard...', 'info');
+  // DISABLED:     
 
     try {
       // Prepare data for createStoryboard
@@ -563,13 +562,13 @@ export function StoryboardStudio() {
       currentTab = 'Results';
       renderTabs();
       saveProject(); // Auto-save after successful generation
-  // DISABLED:       showToast('Storyboard generated successfully!', 'success');
+  // DISABLED:       
     } catch (err) {
       console.error('Storyboard generation error:', err);
       const errorMessage = err.message?.includes('fetch') ?
         'Network error: Please check your connection and ensure the backend is running.' :
         err.message || 'Generation failed. Please try again.';
-  // DISABLED:       showToast(errorMessage, 'error');
+  // DISABLED:       
     } finally {
       btn.disabled = false;
       btn.textContent = 'Generate Storyboard';
@@ -578,7 +577,7 @@ export function StoryboardStudio() {
 
   function exportStoryboard() {
     if (!storyboardResult) {
-  // DISABLED:       showToast('No storyboard to export', 'warning');
+  // DISABLED:       
       return;
     }
     try {
@@ -590,10 +589,10 @@ export function StoryboardStudio() {
       a.download = `storyboard-project-${Date.now()}.json`;
       a.click();
       URL.revokeObjectURL(url);
-  // DISABLED:       showToast('Storyboard exported successfully!', 'success');
+  // DISABLED:       
     } catch (err) {
       console.error('Export error:', err);
-  // DISABLED:       showToast('Failed to export storyboard', 'error');
+  // DISABLED:       
     }
   }
 
@@ -615,7 +614,7 @@ export function StoryboardStudio() {
       modal.open();
     } catch (error) {
       console.error('GTM Prompt Modal error:', error);
-  // DISABLED:       showToast('Failed to open GTM Prompt Enhancer', 'error');
+  // DISABLED:       
     }
   }
 

@@ -1,6 +1,5 @@
 import { createHeroSection } from "../lib/thumbnails.js";
 import { navigate } from '../lib/router.js';
-import { showToast } from '../lib/loading.js';
 import { escapeHtml } from '../lib/security.js';
 import { directorRuntime } from '../lib/directorAgentRuntime.js';
 import { supabase } from '../lib/hybrid-supabase.js';
@@ -825,7 +824,7 @@ export function DirectorPage() {
         btn.onclick = async () => {
             const format = btn.dataset.format;
             try {
-  // DISABLED:                 showToast(`Starting export as ${format.toUpperCase()}...`, 'info');
+  // DISABLED:                 console.log(`Starting export as ${format.toUpperCase()}...`, 'info');
 
                 const { data, error } = await supabase.functions.invoke('videoagent', {
                     body: {
@@ -840,10 +839,10 @@ export function DirectorPage() {
 
                 if (error) throw error;
 
-  // DISABLED:                 showToast(`Export job started. Job ID: ${data.jobId}`, 'success');
+  // DISABLED:                 
             } catch (error) {
                 console.error('Export failed:', error);
-  // DISABLED:                 showToast(`Export failed: ${error.message}`, 'error');
+  // DISABLED:                 
             }
         };
     });
@@ -911,13 +910,13 @@ export function DirectorPage() {
         if (!directorRuntimeInstance) return;
 
         try {
-  // DISABLED:             showToast('Generating storyboard frame...', 'info');
+  // DISABLED:             
             await directorRuntimeInstance.generateFrame(frameId);
             updateStoryboardFrames();
-  // DISABLED:             showToast('Storyboard frame generated successfully!', 'success');
+  // DISABLED:             
         } catch (error) {
             console.error('Frame generation failed:', error);
-  // DISABLED:             showToast(`Frame generation failed: ${error.message}`, 'error');
+  // DISABLED:             
         }
     };
 
@@ -925,13 +924,13 @@ export function DirectorPage() {
         if (!directorRuntimeInstance) return;
 
         try {
-  // DISABLED:             showToast('Generating all storyboard frames...', 'info');
+  // DISABLED:             
             await directorRuntimeInstance.generateAllFrames();
             updateStoryboardFrames();
-  // DISABLED:             showToast('All storyboard frames generated successfully!', 'success');
+  // DISABLED:             
         } catch (error) {
             console.error('Batch frame generation failed:', error);
-  // DISABLED:             showToast(`Batch generation failed: ${error.message}`, 'error');
+  // DISABLED:             
         }
     };
 
@@ -954,11 +953,11 @@ export function DirectorPage() {
                         videoElement.style.display = 'block';
                         uploadPlaceholder.style.display = 'none';
                     }
-  // DISABLED:                     showToast('Video uploaded successfully', 'success');
+  // DISABLED:                     
                     updateTimelinePreview();
                 },
                 onError: (errors) => {
-                    errors.forEach(error => showToast(error, 'error'));
+                    errors.forEach(error => console.log(error, 'error'));
                 }
             });
             uploadPlaceholder.appendChild(videoUpload);

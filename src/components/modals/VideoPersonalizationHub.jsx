@@ -527,7 +527,7 @@ export class VideoPersonalizationHub extends BaseModal {
     // Import buttons
     this.content.querySelectorAll('.import-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        alert('Import functionality - connects to ContactImporterModal');
+        
       });
     });
 
@@ -543,14 +543,14 @@ export class VideoPersonalizationHub extends BaseModal {
     const createPagesBtn = this.content.querySelector('.create-pages-btn');
     if (createPagesBtn && !createPagesBtn.disabled) {
       createPagesBtn.addEventListener('click', () => {
-        alert('Landing page generation - connects to LandingPageBuilder');
+        
       });
     }
   }
 
   handleGenerate() {
     if (this.contacts.length === 0) {
-      alert('Please import contacts first');
+      
       return;
     }
 

@@ -100,7 +100,7 @@ export async function handleItemMouseDown(e, state, els, showToast) {
     // Re-render tracks
     const renderTracks = await getRenderTracks();
     renderTracks(state, els, showToast);
-  // DISABLED:     showToast('Item split');
+  // DISABLED:     
     return;
   }
   const rect = itemEl.getBoundingClientRect();

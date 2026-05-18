@@ -1,5 +1,4 @@
 import { profileService } from '../../lib/profile/profileService.js';
-import { showToast } from '../../lib/loading.js';
 
 /**
  * ProfileSettings Component - Quick profile settings modal/page
@@ -168,13 +167,13 @@ export function ProfileSettings() {
     if (!file) return;
 
     try {
-      showToast('Uploading avatar...', 'info');
+      
       const avatarUrl = await profileService.uploadAvatar(file);
       avatarImg.innerHTML = `<img src="${avatarUrl}" class="w-full h-full rounded-full object-cover" alt="Avatar">`;
-      showToast('Avatar updated successfully', 'success');
+      
     } catch (error) {
       console.error('[ProfileSettings] Failed to upload avatar:', error);
-      showToast('Failed to upload avatar', 'error');
+      
     }
   };
 
@@ -217,13 +216,13 @@ export function ProfileSettings() {
 
       if (Object.keys(updates).length > 0) {
         await profileService.updateProfile(updates);
-        showToast('Settings saved successfully', 'success');
+        
       } else {
-        showToast('No changes to save', 'info');
+        
       }
     } catch (error) {
       console.error('[ProfileSettings] Failed to save settings:', error);
-      showToast('Failed to save settings', 'error');
+      
     }
   };
 

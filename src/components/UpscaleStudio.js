@@ -113,7 +113,7 @@ export function UpscaleStudio() {
   }
 
   genBtn.onclick = async () => {
-    if (!uploadedUrl) { alert('Upload an image or video first'); return; }
+    if (!uploadedUrl) {  return; }
     const apiKey = await securityService.getDecryptedKey();
     if (!apiKey) { AuthModal(() => genBtn.click()); return; }
 
@@ -134,7 +134,7 @@ export function UpscaleStudio() {
         `;
       }
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      
     } finally {
       genBtn.disabled = false;
       genBtn.textContent = 'Upscale Image';

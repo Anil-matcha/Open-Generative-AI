@@ -105,7 +105,7 @@ export function SettingsModal(onClose) {
             localStorage.setItem('muapi_key', key);
             close();
         } else {
-            alert('Please enter a valid API key.');
+            
         }
     };
 

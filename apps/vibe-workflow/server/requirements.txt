@@ -1,7 +1,0 @@
-fastapi
-uvicorn
-sqlalchemy
-asyncpg
-httpx
-python-dotenv
-ruff

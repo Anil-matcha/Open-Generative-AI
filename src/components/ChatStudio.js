@@ -4,7 +4,6 @@ import { AuthModal } from './AuthModal.js';
 import { createHeroSection } from '../lib/thumbnails.js';
 import { createInlineInstructions } from './InlineInstructions.js';
 import { GTMPromptModal } from './modals/GTMPromptModal.jsx';
-import { showToast } from '../lib/loading.js';
 
 export function ChatStudio() {
   const container = document.createElement('div');
@@ -297,7 +296,7 @@ export function ChatStudio() {
       modal.open();
     } catch (error) {
       console.error('GTM Prompt Modal error:', error);
-  // DISABLED:       showToast('Failed to open GTM Prompt Enhancer', 'error');
+  // DISABLED:       
     }
   }
 

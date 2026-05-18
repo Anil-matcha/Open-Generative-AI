@@ -1,5 +1,4 @@
 import { projectIntegrationService } from '../../lib/projects/projectService.js';
-import { showToast } from '../../lib/loading.js';
 
 /**
  * ProjectHeader Component - Header bar with project controls for all apps
@@ -94,10 +93,10 @@ export function ProjectHeader({
       updateSaveStatus('saving');
       const result = await onSave();
       updateSaveStatus('saved');
-      showToast('Project saved successfully', 'success');
+      
     } catch (error) {
       updateSaveStatus('error');
-      showToast('Failed to save project', 'error');
+      
     }
   };
 
@@ -159,10 +158,10 @@ export function ProjectHeader({
     if (projectId) {
       if (autoSaveEnabled) {
         projectIntegrationService.enableAutoSave(projectId);
-        showToast('Auto-save enabled', 'success');
+        
       } else {
         projectIntegrationService.disableAutoSave(projectId);
-        showToast('Auto-save disabled', 'info');
+        
       }
     }
   };

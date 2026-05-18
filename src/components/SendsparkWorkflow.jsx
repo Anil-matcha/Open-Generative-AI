@@ -423,7 +423,7 @@ const SendsparkWorkflow = ({
   );
 
   return (
-    <div className="sendspark-workflow" style={{
+    <div className="ai-video-outreach-workflow" style={{
       backgroundColor: '#111827',
       border: '1px solid #374151',
       borderRadius: '12px',
@@ -432,7 +432,7 @@ const SendsparkWorkflow = ({
       margin: '0 auto'
     }}>
       <div style={{ marginBottom: '20px' }}>
-        <h2 style={{ margin: '0 0 16px 0', color: '#e5e7eb' }}>Sendspark Workflow Automation</h2>
+        <h2 style={{ margin: '0 0 16px 0', color: '#e5e7eb' }}>AI Video Outreach Workflow Automation</h2>
         <p style={{ margin: 0, color: '#9ca3af' }}>
           Automate your video creation, personalization, and distribution workflows
         </p>

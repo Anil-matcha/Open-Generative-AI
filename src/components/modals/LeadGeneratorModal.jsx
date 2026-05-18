@@ -168,7 +168,7 @@ export class LeadGeneratorModal extends BaseModal {
 
   async handleSave() {
     if (!this.lead.email) {
-      alert('Email is required');
+      
       return;
     }
 
@@ -208,12 +208,12 @@ export class LeadGeneratorModal extends BaseModal {
         emailSent: true
       });
 
-      alert('Lead saved and welcome email sent!');
+      
       this.close();
 
     } catch (error) {
       console.error('Lead processing error:', error);
-      alert('Lead saved but email delivery failed. Please try again.');
+      
     }
   }
 }

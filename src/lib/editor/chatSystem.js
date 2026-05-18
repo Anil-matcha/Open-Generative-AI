@@ -49,7 +49,7 @@ export function handleChatSubmit(chatHistory, inputElement, showToast, onChatUpd
 
   // Update UI
   onChatUpdate();
-  // DISABLED:   showToast('AI command processed');
+  // DISABLED:   
 }
 
 export function processAICommand(command, state, showToast) {

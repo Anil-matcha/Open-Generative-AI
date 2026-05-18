@@ -122,7 +122,7 @@ export function setupGlobalErrorHandling() {
 
     // Show toast notification instead of crashing
     if (window.showToast) {
-      window.showToast('An unexpected error occurred. Please refresh the page.', 'error', 10000);
+      window.
     }
 
     // Don't prevent default - let other handlers run
@@ -135,7 +135,7 @@ export function setupGlobalErrorHandling() {
     // Only show for significant errors
     if (event.reason?.name !== 'AbortError' && !event.reason?.message?.includes('cancelled')) {
       if (window.showToast) {
-        window.showToast('A background operation failed.', 'warning', 5000);
+        window.
       }
     }
   });

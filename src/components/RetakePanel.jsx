@@ -17,7 +17,7 @@ export function RetakePanel({ clip, onRetake, onClose }) {
       onRetake?.(clip, result.data);
       onClose?.();
     } else {
-      alert(`Retake failed: ${result.error}`);
+      
     }
   };
 

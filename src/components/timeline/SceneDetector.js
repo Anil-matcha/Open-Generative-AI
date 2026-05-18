@@ -298,7 +298,7 @@ export class SceneDetector {
 
     const videoTrack = this.timeline.tracks.find(track => track.type === 'video');
     if (!videoTrack || videoTrack.clips.length === 0) {
-      this.showToast('No video clips found for scene detection', 'error');
+      this.
       return;
     }
 
@@ -329,11 +329,11 @@ export class SceneDetector {
       this.addTimelineMarkers();
       this.showSceneActions(true);
 
-      this.showToast(`Detected ${this.scenes.length} scenes`, 'success');
+      this.
 
     } catch (error) {
       console.error('Scene detection failed:', error);
-      this.showToast('Scene detection unavailable: MuAPI service is required. Please check connection or try again later.', 'error');
+      this.
     } finally {
       this.isProcessing = false;
       this.showProgress(false);
@@ -487,7 +487,7 @@ export class SceneDetector {
     this.scenes = mergedScenes;
     this.renderSceneGrid();
     this.addTimelineMarkers();
-    this.showToast(`Merged to ${this.scenes.length} scenes`, 'info');
+    this.
   }
 
   exportSceneMarkers() {
@@ -508,7 +508,7 @@ export class SceneDetector {
     a.click();
 
     URL.revokeObjectURL(url);
-    this.showToast('Scene markers exported', 'success');
+    this.
   }
 
   clearScenes() {
@@ -516,7 +516,7 @@ export class SceneDetector {
     this.renderSceneGrid();
     this.clearTimelineMarkers();
     this.showSceneActions(false);
-    this.showToast('Scenes cleared', 'info');
+    this.
   }
 
   showProgress(show) {
@@ -557,8 +557,8 @@ export class SceneDetector {
     `)}`;
   }
 
-  showToast(message, type = 'info') {
-    this.showToast(message, type);
+  console.log(message, type = 'info') {
+    this.
   }
 
   destroy() {

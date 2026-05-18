@@ -1,6 +1,5 @@
 import { supabase } from '../../lib/hybrid-supabase.js';
 import { whiteLabelManager } from '../../lib/theming/whiteLabelManager.js';
-import { showToast } from '../../lib/loading.js';
 
 /**
  * WhiteLabelAdmin Component - Administrative interface for white label management
@@ -80,7 +79,7 @@ export function WhiteLabelAdmin() {
       renderWhiteLabels();
     } catch (error) {
       console.error('[WhiteLabelAdmin] Failed to load white labels:', error);
-      showToast('Failed to load white labels', 'error');
+      
       listContainer.innerHTML = '';
       listContainer.appendChild(createEmptyState());
     }
@@ -258,12 +257,12 @@ export function WhiteLabelAdmin() {
   // Modal functions
   const showCreateWhiteLabelModal = () => {
     // TODO: Implement create white label modal
-    showToast('Create white label modal - Coming soon!', 'info');
+    
   };
 
   const showEditWhiteLabelModal = (whiteLabel) => {
     // TODO: Implement edit white label modal
-    showToast(`Edit white label: ${whiteLabel.name} - Coming soon!`, 'info');
+    
   };
 
   // Toggle white label status
@@ -277,11 +276,11 @@ export function WhiteLabelAdmin() {
 
       if (error) throw error;
 
-      showToast(`White label ${newStatus ? 'activated' : 'deactivated'}`, 'success');
+      
       loadWhiteLabels();
     } catch (error) {
       console.error('[WhiteLabelAdmin] Failed to toggle status:', error);
-      showToast('Failed to update white label status', 'error');
+      
     }
   };
 
@@ -299,11 +298,11 @@ export function WhiteLabelAdmin() {
 
       if (error) throw error;
 
-      showToast('White label deleted successfully', 'success');
+      
       loadWhiteLabels();
     } catch (error) {
       console.error('[WhiteLabelAdmin] Failed to delete white label:', error);
-      showToast('Failed to delete white label', 'error');
+      
     }
   };
 

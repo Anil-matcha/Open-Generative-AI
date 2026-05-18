@@ -1,7 +1,6 @@
 import { directorRuntime } from '../lib/directorAgentRuntime.js';
 import { supabase } from '../lib/hybrid-supabase.js';
 import { VideoUpload } from './common/Upload.js';
-import { showToast } from '../lib/loading.js';
 import { escapeHtml } from '../lib/security.js';
 import { navigate } from '../lib/router.js';
 
@@ -510,14 +509,14 @@ export function DirectorPageRenderThemeRedesign() {
     if (!directorRuntimeInstance) return;
 
     try {
-      showToast('Generating storyboard frame...', 'info');
+      
       await directorRuntimeInstance.generateFrame(frameId);
       updateState({ storyboardFrames: directorRuntimeInstance.getFrames() });
       updateStoryboardFramesDisplay();
-      showToast('Storyboard frame generated successfully!', 'success');
+      
     } catch (error) {
       console.error('Frame generation failed:', error);
-      showToast(`Frame generation failed: ${error.message}`, 'error');
+      
     }
   };
 
@@ -525,14 +524,14 @@ export function DirectorPageRenderThemeRedesign() {
     if (!directorRuntimeInstance) return;
 
     try {
-      showToast('Generating all storyboard frames...', 'info');
+      
       await directorRuntimeInstance.generateAllFrames();
       updateState({ storyboardFrames: directorRuntimeInstance.getFrames() });
       updateStoryboardFramesDisplay();
-      showToast('All storyboard frames generated successfully!', 'success');
+      
     } catch (error) {
       console.error('Batch frame generation failed:', error);
-      showToast(`Batch generation failed: ${error.message}`, 'error');
+      
     }
   };
 
@@ -646,16 +645,16 @@ export function DirectorPageRenderThemeRedesign() {
     if (!directorRuntimeInstance) return;
 
     try {
-      showToast('Saving storyboard...', 'info');
+      
       const result = await directorRuntimeInstance.saveStoryboard('current-project');
       if (result.success) {
-        showToast('Storyboard saved successfully!', 'success');
+        
       } else {
         throw new Error(result.error);
       }
     } catch (error) {
       console.error('Save storyboard failed:', error);
-      showToast(`Save failed: ${error.message}`, 'error');
+      
     }
   };
 
@@ -663,7 +662,7 @@ export function DirectorPageRenderThemeRedesign() {
     if (!directorRuntimeInstance) return;
 
     try {
-      showToast('Loading storyboard...', 'info');
+      
       const result = await directorRuntimeInstance.loadStoryboard('current-project');
       if (result.success) {
         updateState({
@@ -671,13 +670,13 @@ export function DirectorPageRenderThemeRedesign() {
           selectedFrameId: directorRuntimeInstance.getSelectedFrame()?.id || 1
         });
         updateStoryboardFramesDisplay();
-        showToast('Storyboard loaded successfully!', 'success');
+        
       } else {
         throw new Error(result.error);
       }
     } catch (error) {
       console.error('Load storyboard failed:', error);
-      showToast(`Load failed: ${error.message}`, 'error');
+      
     }
   };
 
@@ -698,10 +697,10 @@ export function DirectorPageRenderThemeRedesign() {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      showToast('Storyboard exported successfully!', 'success');
+      
     } catch (error) {
       console.error('Export storyboard failed:', error);
-      showToast(`Export failed: ${error.message}`, 'error');
+      
     }
   };
 
@@ -723,13 +722,13 @@ export function DirectorPageRenderThemeRedesign() {
               selectedFrameId: directorRuntimeInstance.getSelectedFrame()?.id || 1
             });
             updateStoryboardFramesDisplay();
-            showToast('Storyboard imported successfully!', 'success');
+            
           } else {
             throw new Error('Invalid storyboard file');
           }
         } catch (error) {
           console.error('Import storyboard failed:', error);
-          showToast(`Import failed: ${error.message}`, 'error');
+          
         }
       };
       reader.readAsText(file);
@@ -742,7 +741,7 @@ export function DirectorPageRenderThemeRedesign() {
     if (!directorRuntimeInstance) return;
 
     try {
-      showToast('Starting storyboard compilation...', 'info');
+      
 
       // Get compilation options from UI
       const transition = container.querySelector('#transition-select')?.value || 'fade';
@@ -780,7 +779,7 @@ export function DirectorPageRenderThemeRedesign() {
           });
         }
 
-        showToast('Storyboard compiled successfully!', 'success');
+        
 
         // Optionally download the compiled video
         if (result.url) {
@@ -797,7 +796,7 @@ export function DirectorPageRenderThemeRedesign() {
 
     } catch (error) {
       console.error('Storyboard compilation failed:', error);
-      showToast(`Compilation failed: ${error.message}`, 'error');
+      
     }
 
     // Clear processing status after delay
@@ -811,20 +810,20 @@ export function DirectorPageRenderThemeRedesign() {
 
     try {
       const duration = parseInt(container.querySelector('#duration-select')?.value || '3');
-      showToast(`Generating video clip for frame ${frameId}...`, 'info');
+      
 
       const result = await directorRuntimeInstance.frameToVideo(frameId, null, null, duration);
 
       if (result.success) {
         updateState({ storyboardFrames: directorRuntimeInstance.getFrames() });
         updateStoryboardFramesDisplay();
-        showToast(`Frame ${frameId} video clip generated!`, 'success');
+        
       } else {
         throw new Error(result.error || 'Frame video generation failed');
       }
     } catch (error) {
       console.error('Frame video generation failed:', error);
-      showToast(`Frame video generation failed: ${error.message}`, 'error');
+      
     }
   };
 
@@ -832,7 +831,7 @@ export function DirectorPageRenderThemeRedesign() {
     if (!directorRuntimeInstance) return;
 
     try {
-      showToast('Generating full video from all frames...', 'info');
+      
 
       updateState({
         processingStatus: {
@@ -861,7 +860,7 @@ export function DirectorPageRenderThemeRedesign() {
         updateState({ storyboardFrames: directorRuntimeInstance.getFrames() });
         updateStoryboardFramesDisplay();
 
-        showToast(`Full video generated with ${result.clips?.length || 0} clips!`, 'success');
+        
 
         if (result.clips && result.clips.length > 0) {
         }
@@ -871,7 +870,7 @@ export function DirectorPageRenderThemeRedesign() {
 
     } catch (error) {
       console.error('Full video generation failed:', error);
-      showToast(`Full video generation failed: ${error.message}`, 'error');
+      
     }
 
     setTimeout(() => {
@@ -1288,14 +1287,14 @@ export function DirectorPageRenderThemeRedesign() {
           if (playBtn) {
             playBtn.onclick = () => {
               // Implement storyboard playback
-              showToast('Storyboard playback feature coming soon!', 'info');
+              
             };
           }
 
           if (downloadBtn) {
             downloadBtn.onclick = () => {
               // Implement storyboard download
-              showToast('Storyboard download feature coming soon!', 'info');
+              
             };
           }
         }, 100);
@@ -1335,11 +1334,11 @@ export function DirectorPageRenderThemeRedesign() {
               uploadedAt: new Date().toISOString()
             }
           });
-          showToast('Video uploaded successfully', 'success');
+          
           updateTimelinePreview();
         },
         onError: (errors) => {
-          errors.forEach(error => showToast(error, 'error'));
+          errors.forEach(error => console.log(error, 'error'));
         }
       });
       uploadContainer.appendChild(videoUpload);
@@ -1735,7 +1734,7 @@ export function DirectorPageRenderThemeRedesign() {
       btn.onclick = async () => {
         const format = btn.dataset.format;
         try {
-          showToast(`Starting export as ${format.toUpperCase()}...`, 'info');
+          console.log(`Starting export as ${format.toUpperCase()}...`, 'info');
 
           // Update processing status
           updateState({
@@ -1774,7 +1773,7 @@ export function DirectorPageRenderThemeRedesign() {
             });
           }
 
-          showToast(`Export completed! Job ID: ${data.jobId}`, 'success');
+          
 
           // Clear processing status
           setTimeout(() => {
@@ -1783,7 +1782,7 @@ export function DirectorPageRenderThemeRedesign() {
 
         } catch (error) {
           console.error('Export failed:', error);
-          showToast(`Export failed: ${error.message}`, 'error');
+          
           updateState({ processingStatus: null });
         }
       };

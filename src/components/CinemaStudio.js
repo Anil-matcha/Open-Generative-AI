@@ -583,7 +583,7 @@ export function CinemaStudio() {
 
         } catch (e) {
             console.error(e);
-            alert('Generation Failed: ' + e.message);
+            
         } finally {
             generateBtn.disabled = false;
             generateBtn.innerHTML = `GENERATE ✨`;

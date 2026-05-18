@@ -373,7 +373,7 @@ export class GTMPromptModal extends BaseModal {
 
   async handleGenerate() {
     if (!this.basePrompt.trim()) {
-      alert('Please enter a base prompt first');
+      
       return;
     }
 
@@ -452,7 +452,7 @@ export class GTMPromptModal extends BaseModal {
       this.close();
     }).catch(err => {
       console.error('Failed to copy prompt:', err);
-      alert('Failed to copy prompt to clipboard');
+      
     });
   }
 }

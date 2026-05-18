@@ -52,7 +52,7 @@
 | Marketing | ✅ | 200 | 1015 | SPA shell loads |
 | Assist | ✅ | 200 | 1015 | SPA shell loads |
 | Remix Go | ✅ | 200 | 1015 | SPA shell loads |
-| Sendspark | ✅ | 200 | 1015 | SPA shell loads |
+| AI Video Outreach | ✅ | 200 | 1015 | SPA shell loads |
 
 **Note**: Apps return SPA shell HTML (same content for all routes). React renders actual UI client-side.
 
@@ -158,7 +158,7 @@ Since apps are SPAs, full functionality requires browser execution:
 | timeline | TimelineEditorPage.js | ✅ |
 | timeline-test | TimelineTestPage.jsx | ✅ |
 | remix-go | RemixGoPage.js | ✅ |
-| sendspark | SendsparkPage.js | ✅ |
+| ai-video-outreach | AIVideoOutreachPage.js | ✅ |
 | ai-headshot | AIHeadshotPage.js | ✅ |
 | runway-motion | RunwayMotionStudio.js | ✅ |
 | tiktok-carousel | TikTokCarouselStudio.js | ✅ |

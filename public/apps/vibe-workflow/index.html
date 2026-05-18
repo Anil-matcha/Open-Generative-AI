@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vibe Workflow — Open-Source AI Pipeline Builder</title>
-    <meta name="description" content="Free, self-hostable, node-based AI workflow builder. The open-source alternative to Weavy AI, Krea Nodes, Freepik Spaces, and FloraFauna AI." />
-    <meta name="keywords" content="weavy ai alternative, krea nodes alternative, freepik spaces alternative, florafauna ai alternative, open source ai workflow builder, node based ai editor" />
-    <script type="module" src="/apps/vibe-workflow/assets/index-CZ4JWlHe.js"></script>
-    <link rel="stylesheet" href="/apps/vibe-workflow/assets/index-Fd0xVSp_.css">
-  </head>
-  <body class="bg-[#030303] text-white">
-    <div id="root"></div>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vibe Workflow</title>
+  <style>
+    body { margin: 0; font-family: system-ui, sans-serif; background: #0f0f0f; color: #fff; }
+    #workflow-canvas { width: 100vw; height: 100vh; position: relative; background: #111; overflow: hidden; }
+    .node { position: absolute; background: #222; border: 2px solid #444; border-radius: 8px; padding: 12px; min-width: 150px; cursor: move; user-select: none; }
+    .node-header { font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid #444; padding-bottom: 4px; }
+  </style>
+  <script type="module" crossorigin src="/assets/index-DNgZk1Wu.js"></script>
+</head>
+<body>
+  <div id="app">
+    <div id="workflow-canvas"></div>
+  </div>
+</body>
 </html>

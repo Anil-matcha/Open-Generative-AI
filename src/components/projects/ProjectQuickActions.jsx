@@ -1,5 +1,4 @@
 import { projectIntegrationService } from '../../lib/projects/projectService.js';
-import { showToast } from '../../lib/loading.js';
 
 /**
  * ProjectQuickActions Component - Quick project actions overlay
@@ -35,9 +34,9 @@ export function ProjectQuickActions({ appId, projectId, onSave, onLoad, onNew })
       action: async () => {
         try {
           await onSave();
-          showToast('Project saved successfully', 'success');
+          
         } catch (error) {
-          showToast('Failed to save project', 'error');
+          
         }
         hideMenu();
       }

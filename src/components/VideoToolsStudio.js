@@ -130,7 +130,7 @@ export function VideoToolsStudio() {
   // Generate button handler
   genBtn.onclick = async () => {
     if (!uploadedVideoUrl && selectedModel.videoField) {
-      alert('Upload a source video first');
+      
       return;
     }
     const apiKey = await securityService.getDecryptedKey();
@@ -163,7 +163,7 @@ export function VideoToolsStudio() {
         `;
       }
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      
     } finally {
       genBtn.disabled = false;
       genBtn.textContent = 'Process Video';

@@ -23,6 +23,8 @@ const ROUTE_MAP = {
   'Agents': 'agents',
   'MCP & CLI': 'mcp-cli',
   'Video Outreach': 'video-outreach',
+  'Assistant': 'assistant',
+  'Studio': 'studio',
 };
 
 export function getRouteForItem(item) {
@@ -51,11 +53,18 @@ const pageLoaders = {
   videotools: () => import('../components/VideoToolsStudio.js').then(m => m.VideoToolsStudio()),
   chat: () => import('../components/ChatStudio.js').then(m => m.ChatStudio()),
   lipsync: () => import('../components/LipSyncStudio.js').then(m => m.LipSyncStudio()),
-   workflows: () => import('../components/VibeWorkflowPage.js').then(m => m.VibeWorkflowPage()),
-   'workflows/editor': () => import('../components/VibeWorkflowPage.js').then(m => m.VibeWorkflowPage()),
-   'workflows/history': () => import('../components/VibeWorkflowPage.js').then(m => m.VibeWorkflowPage()),
-   'workflows/settings': () => import('../components/VibeWorkflowPage.js').then(m => m.VibeWorkflowPage()),
+  workflows: () => import('../components/VibeWorkflowPage.js').then(m => m.VibeWorkflowPage()),
+  'workflows/editor': () => import('../components/VibeWorkflowPage.js').then(m => m.VibeWorkflowPage()),
+  'workflows/history': () => import('../components/VibeWorkflowPage.js').then(m => m.VibeWorkflowPage()),
+  'workflows/settings': () => import('../components/VibeWorkflowPage.js').then(m => m.VibeWorkflowPage()),
   agents: () => import('../components/AgentStudio.js').then(m => m.AgentStudio()),
+  assistant: () => import('../components/AssistantStudio.js').then(m => m.AssistantStudio()),
+  studio: () => import('../components/StudioApp.js').then(m => m.StudioApp()),
+  'workflow-builder': () => import('../components/WorkflowBuilderApp.js').then(m => m.WorkflowBuilderApp()),
+  'ai-agent': () => import('../components/AIAgentApp.js').then(m => m.AIAgentApp()),
+  'design-agent': () => import('../components/DesignAgentApp.js').then(m => m.DesignAgentApp()),
+  'marketing-studio': () => import('../components/MarketingStudioApp.js').then(m => m.MarketingStudioApp()),
+  'apps-studio': () => import('../components/AppsStudioApp.js').then(m => m.AppsStudioApp()),
   'mcp-cli': () => import('../components/McpCliStudio.js').then(m => m.McpCliStudio()),
   'video-outreach': () => import('../components/VideoOutreachStudio.js').then(m => m.VideoOutreachStudio()),
 
@@ -78,10 +87,10 @@ const pageLoaders = {
   render: () => import('../components/RenderPage.js').then(m => m.RenderPage()),
   'video-agent': () => import('../components/VideoAgentPage.js').then(m => m.VideoAgentPage()),
   director: () => import('../components/DirectorPage.js').then(m => m.DirectorPage()),
-  timeline: () => import('../components/TimelineEditorPage.jsx').then(m => m.TimelineEditorPage()),
+  timeline: () => import('../components/PlaceholderPage.js').then(m => () => m.PlaceholderPage('Timeline')),
   'timeline-test': () => import('../components/TimelineTestPage.jsx').then(m => m.TimelineTestPage),
-   'remix-go': () => import('../components/RemixGoPage.js').then(m => m.RemixGoPage()),
-   'sendspark': () => import('../components/SendsparkPage.js').then(m => m.SendsparkPage()),
+  'remix-go': () => import('../components/RemixGoPage.js').then(m => m.RemixGoPage()),
+  'ai-video-outreach': () => import('../components/AIVideoOutreachPage.js').then(m => m.AIVideoOutreachPage()),
   'ai-headshot': () => import('../components/AIHeadshotPage.js').then(m => m.AIHeadshotPage()),
   'runway-motion': () => import('../components/RunwayMotionStudio.js').then(m => m.RunwayMotionStudio()),
   'tiktok-carousel': () => import('../components/TikTokCarouselStudio.js').then(m => m.TikTokCarouselStudio()),
@@ -93,6 +102,11 @@ const pageLoaders = {
   'headshots-history': () => import('../components/HeadshotStudioPage.js').then(m => m.HeadshotStudioPage()),
   'headshots-settings': () => import('../components/HeadshotStudioPage.js').then(m => m.HeadshotStudioPage()),
   personalizer: () => import('../components/PlaceholderPage.js').then(m => () => m.PlaceholderPage('Personalizer')),
+  'open-pomelli': () => import('../components/OpenPomelliPage.js').then(m => m.OpenPomelliPage()),
+  'pomelli-studio': () => import('../components/PomelliStudio.js').then(m => m.PomelliStudio()),
+  'workflow-studio': () => import('../components/WorkflowStudioApp.js').then(m => m.WorkflowStudioApp()),
+  'agents/create': () => import('../components/AIAgentApp.js').then(m => m.AIAgentApp()),
+  'agents/edit': () => import('../components/AIAgentApp.js').then(m => m.AIAgentApp()),
 };
 
 let currentPage = null;
@@ -190,6 +204,9 @@ export async function navigate(page, params = {}) {
     } else if (page.startsWith('workflows/')) {
       const mod = await import('../components/VibeWorkflowPage.js');
       element = mod.VibeWorkflowPage();
+    } else if (page.startsWith('agents/')) {
+      const mod = await import('../components/AIAgentApp.js');
+      element = mod.AIAgentApp();
     } else if (pageLoaders[page]) {
       element = await pageLoaders[page]();
     } else {

@@ -10,7 +10,6 @@
  * - Accessibility features (keyboard navigation, screen reader support)
  */
 
-import { showToast } from '../loading.js';
 import { uploadFileToStorage } from '../hybrid-supabase.js';
 import { mediaWorker } from '../media-worker-manager.js';
 
@@ -137,11 +136,11 @@ export function processMultipleFiles(files, dropZone, state) {
   });
 
   if (errors.length > 0) {
-  // DISABLED:     showToast(`Some files were rejected:\n${errors.join('\n')}`, 'warning');
+  // DISABLED:     console.log(`Some files were rejected:\n${errors.join('\n')}`, 'warning');
   }
 
   if (validFiles.length === 0) {
-  // DISABLED:     showToast('No valid files to upload', 'error');
+  // DISABLED:     
     return;
   }
 
@@ -164,7 +163,7 @@ export async function uploadFile(fileData, dropZone, state) {
     createUploadProgress(uploadId, file.name, file.size);
 
     // Show upload started
-  // DISABLED:     showToast(`Uploading ${file.name}...`, 'info');
+  // DISABLED:     
 
     // Upload to storage
     const publicUrl = await uploadFileToStorage(file);
@@ -178,12 +177,12 @@ export async function uploadFile(fileData, dropZone, state) {
     // Add to timeline based on drop zone
     await addAssetToTimeline(asset, dropZone, state);
 
-  // DISABLED:     showToast(`${file.name} uploaded successfully`, 'success');
+  // DISABLED:     
 
   } catch (error) {
     console.error('[DragDrop] Upload failed:', error);
     updateUploadProgress(uploadId, 0, 'error');
-  // DISABLED:     showToast(`Failed to upload ${file.name}: ${error.message}`, 'error');
+  // DISABLED:     
   } finally {
     // Cleanup after delay
     setTimeout(() => removeUploadProgress(uploadId), 3000);
@@ -195,7 +194,7 @@ export async function uploadMultipleFiles(filesData, dropZone, state) {
   const uploadPromises = [];
   const batchId = `batch_${Date.now()}`;
 
-  // DISABLED:   showToast(`Uploading ${filesData.length} files...`, 'info');
+  // DISABLED:   
 
   // Create batch progress indicator
   createBatchProgress(batchId, filesData.length);
@@ -942,7 +941,7 @@ function handleClipDrop(dropTarget, e) {
   // Here we would update the state with new position/track
   // For now, just show a toast
   const message = `Moved clip ${itemId} to track ${newTrackId}${newStartTime ? ` at ${newStartTime.toFixed(1)}s` : ''}`;
-  showToast(message);
+  
 }
 
 function cancelClipDrag() {
@@ -1106,7 +1105,7 @@ function findTimelineDropTarget(e) {
 function handleMediaDrop() {
   // Add media to timeline at drop position
   const mediaData = dragState.dragData.mediaData;
-  // DISABLED:   showToast(`Added ${mediaData.label} to timeline`);
+  // DISABLED:   
 
   // Here we would call the media library function to add to timeline
   // addMediaToTimeline(mediaData, index, state, showToast);
@@ -1614,10 +1613,10 @@ function toggleVideoPlayback(clipEl, asset) {
   if (videoEl) {
     if (videoEl.paused) {
       videoEl.play();
-  // DISABLED:       showToast('Video playback started', 'info');
+  // DISABLED:       
     } else {
       videoEl.pause();
-  // DISABLED:       showToast('Video playback paused', 'info');
+  // DISABLED:       
     }
   } else {
     // Create video element for preview
@@ -1638,7 +1637,7 @@ function createVideoPreview(clipEl, asset) {
   clipEl.appendChild(videoEl);
 
   videoEl.play();
-  // DISABLED:   showToast('Video preview loaded', 'success');
+  // DISABLED:   
 }
 
 function showVideoContextMenu(e, clipEl, asset) {

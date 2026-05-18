@@ -5,7 +5,6 @@ import { createInlineInstructions } from './InlineInstructions.js';
 import { createHeroSection, getToolThumbnail, createThumbnailImg } from '../lib/thumbnails.js';
 import { securityService } from '../lib/services/SecurityService.js';
 import { assetStore } from '../lib/assets/assetStore.js';
-import { showToast } from '../lib/loading.js';
 
 const EDIT_TOOLS = [
   { id: 'ai-object-eraser', name: 'Remove Object', description: 'Erase unwanted objects from images', icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 5H9l-7 7 7 7h11a2 2 0 002-2V7a2 2 0 00-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg>', hasPrompt: true, promptPlaceholder: 'What to remove...' },
@@ -158,9 +157,9 @@ export function EditStudio() {
            previewImg.classList.remove('hidden');
            uploadHint.textContent = asset.title;
            clearBtn.classList.remove('hidden');
-           showToast(`Loaded "${asset.title}" for editing`, 'success');
+           
          } else {
-           showToast('Asset not found or not an image/video', 'error');
+           
          }
        }
      } catch (e) {
@@ -209,7 +208,7 @@ export function EditStudio() {
 
   editBtn.onclick = async () => {
     if (!activeTool) return;
-    if (!uploadedUrl) { alert('Upload an image or video first'); return; }
+    if (!uploadedUrl) {  return; }
     const apiKey = await securityService.getDecryptedKey();
     if (!apiKey) { AuthModal(() => editBtn.click()); return; }
 
@@ -230,7 +229,7 @@ export function EditStudio() {
         `;
       }
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      
     } finally {
       editBtn.disabled = false;
       editBtn.textContent = 'Apply Edit';

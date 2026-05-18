@@ -1,6 +1,5 @@
 import { templateBrowserService } from '../../lib/templates/templateBrowser.js';
 import { TemplateCard } from './TemplateCard.jsx';
-import { showToast } from '../../lib/loading.js';
 
 /**
  * TemplateBrowser Component - Template selection and browsing interface
@@ -121,7 +120,7 @@ export function TemplateBrowser() {
       renderTemplates();
     } catch (error) {
       console.error('[TemplateBrowser] Failed to load data:', error);
-      showToast('Failed to load templates', 'error');
+      
       grid.innerHTML = '';
       grid.appendChild(emptyState);
     }
@@ -220,7 +219,7 @@ export function TemplateBrowser() {
   // Event handlers
   const handleTemplateClick = (template) => {
     // TODO: Navigate to template usage or project creation with template
-    showToast(`Selected template: ${template.name}`, 'info');
+    
   };
 
   const handleTemplatePreview = (template) => {
@@ -230,12 +229,12 @@ export function TemplateBrowser() {
   // Modal functions
   const showCreateTemplateModal = () => {
     // TODO: Implement create template modal
-    showToast('Create template modal - Coming soon!', 'info');
+    
   };
 
   const showTemplatePreviewModal = (template) => {
     // TODO: Implement template preview modal
-    showToast(`Preview template: ${template.name} - Coming soon!`, 'info');
+    
   };
 
   // Initialize

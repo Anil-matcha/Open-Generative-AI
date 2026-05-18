@@ -1,4 +1,4 @@
-import { muapi } from '../lib/muapi.js';
+import { uploadFile } from '../lib/muapi.js';
 import { AuthModal } from './AuthModal.js';
 import { getUploadHistory, saveUpload, removeUpload, generateThumbnail } from '../lib/uploadHistory.js';
 
@@ -17,7 +17,7 @@ export function createUploadPicker({ anchorContainer, onSelect, onClear, maxImag
     // uploadFn(file) → Promise<string url>. Defaults to Muapi-hosted upload.
     // requireApiKey() → boolean. Lets the caller suppress the AuthModal when
     // the active provider doesn't need a Muapi key (e.g. local Wan2GP).
-    const doUpload = uploadFn || ((file) => muapi.uploadFile(file));
+    const doUpload = uploadFile || ((file) => muapi.uploadFile(file));
     const needsKey = typeof requireApiKey === 'function' ? requireApiKey : () => true;
     let panelOpen = false;
     let maxImages = initialMaxImages;
@@ -376,7 +376,7 @@ export function createUploadPicker({ anchorContainer, onSelect, onClear, maxImag
         } catch (err) {
             console.error('[UploadPicker] Upload failed:', err);
             updateTrigger();
-            alert(`Image upload failed: ${err.message}`);
+            
         }
 
         fileInput.value = '';

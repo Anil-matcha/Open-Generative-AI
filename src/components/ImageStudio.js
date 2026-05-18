@@ -1281,12 +1281,12 @@ export function ImageStudio() {
         const prompt = textarea.value.trim();
         if (imageMode) {
             if (uploadedImageUrls.length === 0) {
-                alert('Please upload a reference image first.');
+                
                 return;
             }
         } else {
             if (!prompt) {
-                alert('Please enter a prompt to generate an image.');
+                
                 return;
             }
         }
@@ -1294,7 +1294,7 @@ export function ImageStudio() {
         // ── Local inference path ──────────────────────────────────────────────
         if (useLocalModel) {
             const lm = getLocalModelById(selectedLocalModel);
-            if (!lm) { alert('No local model selected.'); return; }
+            if (!lm) {  return; }
 
             hero.classList.add('opacity-0', 'scale-95', '-translate-y-10', 'pointer-events-none');
             generateBtn.disabled = true;
