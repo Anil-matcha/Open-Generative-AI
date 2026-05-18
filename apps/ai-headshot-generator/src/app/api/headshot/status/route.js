@@ -1,23 +1,20 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
 import { AIService } from "@/lib/services/ai";
 
 export async function POST(req) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const { requestId, metadata } = await req.json();
 
     if (!requestId) {
       return NextResponse.json({ error: "Request ID is required" }, { status: 400 });
     }
 
-    const result = await AIService.checkStatus(requestId, session.user.id, metadata);
+    const result = await AIService.checkStatus(requestId);
+
+    // When status is completed, save to main asset system (Director / AI Agent / Library)
+    if (result.status === "completed" && result.imageUrl) {
+      await AIService.saveToAssetSystem(result.imageUrl, metadata);
+    }
 
     return NextResponse.json(result);
   } catch (error) {

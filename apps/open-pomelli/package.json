@@ -10,14 +10,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "db:push": "prisma db push",
-    "db:studio": "prisma studio",
-    "postinstall": "prisma generate"
+    "lint": "next lint"
   },
   "dependencies": {
     "@higgsfield/api-config": "workspace:*",
-    "@prisma/client": "^5.20.0",
     "next": "16.1.6",
     "playwright": "^1.58.2",
     "react": "19.2.3",
@@ -30,7 +26,6 @@
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "prisma": "^5.20.0",
     "tailwindcss": "^4.0.0",
     "tsx": "^4.21.0",
     "typescript": "^5.6.0"

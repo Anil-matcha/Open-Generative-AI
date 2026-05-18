@@ -9,6 +9,7 @@ export { CharacterExtractorAgent, characterExtractorAgent } from './characterExt
 export { DirectorAgent, directorAgent } from './directorAgent.js';
 export { CameraOperatorAgent, cameraOperatorAgent } from './cameraOperatorAgent.js';
 export { EditorAgent, editorAgent } from './editorAgent.js';
+export { runCineGenTool, CINEGEN_TOOLS } from '../cinegenIntegration.js';
 
 import { agentOrchestrator } from './baseAgent.js';
 import { screenwriterAgent } from './screenwriterAgent.js';
@@ -22,6 +23,12 @@ agentOrchestrator.register('CharacterExtractor', characterExtractorAgent);
 agentOrchestrator.register('Director', directorAgent);
 agentOrchestrator.register('CameraOperator', cameraOperatorAgent);
 agentOrchestrator.register('Editor', editorAgent);
+agentOrchestrator.register('CineGen', {
+  runTool: runCineGenTool,
+  tools: CINEGEN_TOOLS,
+  version: '1.1',
+  autoApply: true
+});
 
 agentOrchestrator.createWorkflow('analyze_timeline', [
   { name: 'Analyze Structure', agent: 'Director', contextKey: 'structureResult' },
@@ -42,6 +49,12 @@ agentOrchestrator.createWorkflow('script_assistance', [
 agentOrchestrator.createWorkflow('camera_analysis', [
   { name: 'Clip Analysis', agent: 'CameraOperator', contextKey: 'clipAnalysis' },
   { name: 'Assembly Review', agent: 'Editor', contextKey: 'assemblyResult' }
+]);
+
+agentOrchestrator.createWorkflow('cinegen_edit', [
+  { name: 'Gap Fill', agent: 'CineGen', contextKey: 'gapFillResult' },
+  { name: 'Extend Clip', agent: 'CineGen', contextKey: 'extendResult' },
+  { name: 'Music Generation', agent: 'CineGen', contextKey: 'musicResult' }
 ]);
 
 export const AGENT_WORKFLOWS = {

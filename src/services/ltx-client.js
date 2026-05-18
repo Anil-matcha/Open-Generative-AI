@@ -191,6 +191,22 @@ class LtxClient {
 
 
   /**
+   * Check LTX backend capabilities (used by UI to show real status)
+   */
+  async checkCapabilities() {
+    if (!this.isAvailable()) {
+      return { available: false, reason: 'LTX service disabled' };
+    }
+    try {
+      const response = await this.makeRequest('/capabilities');
+      const data = await response.json();
+      return { available: true, ...data };
+    } catch (e) {
+      return { available: false, reason: e.message };
+    }
+  }
+
+  /**
    * Get client statistics
    */
   getStats() {

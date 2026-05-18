@@ -102,6 +102,14 @@ body { padding: 18px; }
 .tool-btn { width: 32px; height: 32px; border-radius: 8px; font-size: 14px; }
 .tool-btn.active, .generate-type.active, .rail-btn.active { border-color: rgba(34,211,238,0.45); background: rgba(34,211,238,0.22); color: #cffafe; }
 .mini-btn, .command-btn { border-radius: 10px; padding: 8px 12px; font-size: 12px; }
+.mini-btn:focus-visible, .command-btn:focus-visible {
+  outline: 3px solid #22d3ee;
+  outline-offset: 2px;
+  border-color: #67e8f9;
+  background: rgba(103,232,249,0.15);
+  color: #e0f2fe;
+  box-shadow: 0 0 0 1px rgba(103,232,249,0.5);
+}
 .pill-row { gap: 6px; }
 .pill { border-radius: 999px; padding: 7px 12px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); font-size: 10px; color: rgba(255,255,255,0.55); }
 .timeline-shell { position: relative; overflow: hidden; border-radius: 20px; border: 1px solid var(--border-soft); background: rgba(0,0,0,0.2); }

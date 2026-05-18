@@ -83,12 +83,17 @@ export default defineConfig({
     root: './',
     publicDir: 'public',
     optimizeDeps: {
-        exclude: ['src/components/EffectsStudio.js']
+        exclude: ['src/components/EffectsStudio.js'],
+        esbuildOptions: {
+          loader: {
+            '.js': 'js'
+          }
+        }
     },
 esbuild: {
-         include: ['src/**/*.{js,jsx,ts,tsx}'],
-         exclude: ['src/components/EffectsStudio.js', 'src/components/TimelineEditorPage.js', 'director/**/*', 'apps/**/*', 'external-repos/**/*', 'modules/**/*']
-     },
+          include: ['src/**/*.{js,jsx,ts,tsx}'],
+          exclude: ['src/components/EffectsStudio.js', 'src/components/TimelineEditorPage.jsx', 'director/**/*', 'apps/**/*', 'external-repos/**/*', 'modules/**/*']
+      },
 
     server: {
         host: '0.0.0.0',

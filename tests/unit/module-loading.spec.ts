@@ -67,7 +67,7 @@ const ROUTE_COMPONENTS = {
   director: '../../src/components/DirectorPage.js',
   
   // Timeline routes (heavy imports - need extra timeout)
-  timeline: '../../src/components/TimelineEditorPage.js',
+  timeline: '../../src/components/TimelineEditorPage.jsx',
   'timeline-test': '../../src/components/TimelineTestPage.jsx',
   
   // Additional routes
@@ -134,7 +134,7 @@ const COMPONENT_PATHS = [
   '../../src/components/RenderPage.js',
   '../../src/components/VideoAgentPage.js',
   '../../src/components/DirectorPage.js',
-  '../../src/components/TimelineEditorPage.js',
+  '../../src/components/TimelineEditorPage.jsx',
   '../../src/components/TimelineTestPage.jsx',
   '../../src/components/RemixGoPage.js',
   '../../src/components/SendsparkPage.js',
@@ -205,7 +205,7 @@ describe('Module Loading Tests', () => {
 
   describe('Components', () => {
     for (const path of COMPONENT_PATHS) {
-      const isHeavy = ['../../src/components/ImageStudio.js', '../../src/components/VideoStudio.js', '../../src/components/CinemaStudio.js', '../../src/components/TimelineEditorPage.js', '../../src/components/TimelineTestPage.jsx'].includes(path);
+      const isHeavy = ['../../src/components/ImageStudio.js', '../../src/components/VideoStudio.js', '../../src/components/CinemaStudio.js', '../../src/components/TimelineEditorPage.jsx', '../../src/components/TimelineTestPage.jsx'].includes(path);
       it(`should load component ${path}`, async () => {
         await expect(
           import(path).then(m => {

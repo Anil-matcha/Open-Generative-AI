@@ -1,7 +1,7 @@
 /**
  * Rendiv Client Service
  * Handles communication with the Rendiv backend for animation and effects
- * Includes demo fallback, rate limiting, and circuit breaker patterns
+ * Rate limiting and circuit breaker patterns
  */
 
 import { RateLimiter } from '../lib/services/RateLimiter.js';
@@ -10,10 +10,9 @@ import { CircuitBreaker } from '../lib/services/CircuitBreaker.js';
 class RendivClient {
   constructor(options = {}) {
     // Configuration from environment variables
-    this.baseUrl = options.baseUrl || import.meta.env.VITE_RENDIV_API_URL || 'https://api.rendiv.ai';
+    this.baseUrl = options.baseUrl || import.meta.env.VITE_RENDIV_API_URL;
     this.apiKey = options.apiKey || import.meta.env.VITE_RENDIV_API_KEY || '';
     this.enabled = options.enabled !== false && (import.meta.env.VITE_RENDIV_ENABLED !== 'false');
-    this.demoMode = options.demoMode || import.meta.env.VITE_RENDIV_DEMO_MODE === 'true';
 
     // Initialize supporting services
     this.rateLimiter = new RateLimiter({
@@ -37,18 +36,17 @@ class RendivClient {
       requests: 0,
       cacheHits: 0,
       cacheMisses: 0,
-      errors: 0,
-      demoFallbacks: 0
+      errors: 0
     };
 
-    console.log(`[RendivClient] Initialized with baseUrl: ${this.baseUrl}, demoMode: ${this.demoMode}`);
+    console.log(`[RendivClient] Initialized with baseUrl: ${this.baseUrl}`);
   }
 
   /**
    * Check if service is available
    */
   isAvailable() {
-    return this.enabled && !this.demoMode;
+    return this.enabled;
   }
 
   /**
@@ -59,70 +57,85 @@ class RendivClient {
    * @param {Object} params.settings - Effect-specific settings
    * @returns {Promise<Object>} - Animation result with processed video URL
    */
-  async applyAnimation(params) {
-    if (!this.enabled) {
-      return this.getDemoAnimation(params);
-    }
+   async applyAnimation(params) {
+     if (!this.enabled) {
+       throw new Error('Rendiv service is disabled. Configure VITE_RENDIV_ENABLED=true and valid API URL.');
+     }
 
-    // Circuit breaker check
-    if (!this.circuitBreaker.canProceed('rendiv')) {
-      console.warn('[RendivClient] Circuit breaker OPEN, using demo fallback');
-      return this.getDemoAnimation(params);
-    }
+     // Circuit breaker check
+     if (!this.circuitBreaker.canProceed('rendiv')) {
+       throw new Error('Rendiv circuit breaker is open. Service temporarily unavailable.');
+     }
 
-    // Rate limit check
-    if (!this.rateLimiter.canProceed()) {
-      console.warn('[RendivClient] Rate limit exceeded, using demo fallback');
-      return this.getDemoAnimation(params);
-    }
+     // Rate limit check
+     if (!this.rateLimiter.canProceed()) {
+       throw new Error('Rendiv rate limit exceeded. Please slow down requests.');
+     }
 
-    try {
-      const response = await this.makeRequest('/animate', {
-        method: 'POST',
-        body: JSON.stringify(params),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.apiKey}`
-        }
-      });
+     try {
+       const response = await this.makeRequest('/animate', {
+         method: 'POST',
+         body: JSON.stringify(params),
+         headers: {
+           'Content-Type': 'application/json',
+           'Authorization': `Bearer ${this.apiKey}`
+         }
+       });
 
-      const result = await response.json();
+       const result = await response.json();
 
-      // Record success
-      this.circuitBreaker.recordSuccess('rendiv');
-      this.stats.requests++;
+       // Record success
+       this.circuitBreaker.recordSuccess('rendiv');
+       this.stats.requests++;
 
-      return {
-        success: true,
-        videoUrl: result.animated_video_url,
-        thumbnailUrl: result.thumbnail_url,
-        effectType: params.effectType,
-        duration: result.duration,
-        appliedAt: new Date().toISOString(),
-        source: 'rendiv'
-      };
+       return {
+         success: true,
+         videoUrl: result.animated_video_url,
+         thumbnailUrl: result.thumbnail_url,
+         effectType: params.effectType,
+         duration: result.duration,
+         appliedAt: new Date().toISOString(),
+         source: 'rendiv'
+       };
 
-    } catch (error) {
-      console.error('[RendivClient] Animation failed:', error);
-      this.circuitBreaker.recordFailure('rendiv');
-      this.stats.errors++;
-
-      // Fallback to demo mode on error
-      return this.getDemoAnimation(params);
-    }
-  }
+     } catch (error) {
+       console.error('[RendivClient] Animation failed:', error);
+       this.circuitBreaker.recordFailure('rendiv');
+       this.stats.errors++;
+       throw error;
+     }
+   }
 
   /**
    * Get available animation effects
    * @returns {Promise<Array>} - List of available effects
    */
-  async getEffects() {
-    if (!this.isAvailable()) {
-      return this.getDemoEffects();
-    }
+   async getEffects() {
+     if (!this.isAvailable()) {
+       throw new Error('Rendiv service is not available. Configure VITE_RENDIV_API_URL and VITE_RENDIV_ENABLED=true.');
+     }
+
+     if (!this.circuitBreaker.canProceed('rendiv')) {
+       throw new Error('Rendiv circuit breaker is open.');
+     }
+
+     try {
+       const response = await this.makeRequest('/effects');
+       const result = await response.json();
+
+       this.stats.requests++;
+
+       return result.effects || [];
+
+     } catch (error) {
+       console.error('[RendivClient] Failed to get effects:', error);
+       this.circuitBreaker.recordFailure('rendiv');
+       throw error;
+     }
+   }
 
     if (!this.circuitBreaker.canProceed('rendiv')) {
-      return this.getDemoEffects();
+      throw new Error('Rendiv service unavailable');
     }
 
     try {
@@ -136,7 +149,7 @@ class RendivClient {
     } catch (error) {
       console.error('[RendivClient] Get effects failed:', error);
       this.stats.errors++;
-      return this.getDemoEffects();
+      throw new Error('Rendiv service unavailable');
     }
   }
 
@@ -147,11 +160,11 @@ class RendivClient {
    */
   async getAnimationStatus(jobId) {
     if (!this.isAvailable()) {
-      return this.getDemoAnimationStatus(jobId);
+      throw new Error('Rendiv service unavailable');
     }
 
     if (!this.circuitBreaker.canProceed('rendiv')) {
-      return this.getDemoAnimationStatus(jobId);
+      throw new Error('Rendiv service unavailable');
     }
 
     try {
@@ -172,7 +185,7 @@ class RendivClient {
     } catch (error) {
       console.error('[RendivClient] Status check failed:', error);
       this.stats.errors++;
-      return this.getDemoAnimationStatus(jobId);
+      throw new Error('Rendiv service unavailable');
     }
   }
 
@@ -210,60 +223,6 @@ class RendivClient {
   }
 
   /**
-   * Get demo animation data when service is unavailable
-   */
-  getDemoAnimation(params) {
-    this.stats.demoFallbacks++;
-
-    // Mock animation processing with realistic delay
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          success: true,
-          videoUrl: 'https://demo.rendiv.ai/videos/demo-animated.mp4',
-          thumbnailUrl: 'https://demo.rendiv.ai/thumbnails/demo-anim-thumb.jpg',
-          effectType: params.effectType,
-          duration: 5,
-          appliedAt: new Date().toISOString(),
-          source: 'demo',
-          isDemo: true,
-          message: 'Demo mode: Service unavailable, returning mock animation data'
-        });
-      }, 3000); // 3 second delay to simulate processing
-    });
-  }
-
-  /**
-   * Get demo effects list
-   */
-  getDemoEffects() {
-    return [
-      { id: 'fade-in', name: 'Fade In', category: 'transitions' },
-      { id: 'slide-up', name: 'Slide Up', category: 'motion' },
-      { id: 'zoom-in', name: 'Zoom In', category: 'scale' },
-      { id: 'rotate', name: 'Rotate', category: 'transform' },
-      { id: 'bounce', name: 'Bounce', category: 'physics' }
-    ];
-  }
-
-  /**
-   * Get demo animation status
-   */
-  getDemoAnimationStatus(jobId) {
-    return {
-      jobId,
-      status: 'completed',
-      progress: 100,
-      estimatedTimeRemaining: 0,
-      result: {
-        videoUrl: 'https://demo.rendiv.ai/videos/demo-animated.mp4',
-        thumbnailUrl: 'https://demo.rendiv.ai/thumbnails/demo-anim-thumb.jpg'
-      },
-      isDemo: true
-    };
-  }
-
-  /**
    * Get client statistics
    */
   getStats() {
@@ -285,8 +244,7 @@ class RendivClient {
       requests: 0,
       cacheHits: 0,
       cacheMisses: 0,
-      errors: 0,
-      demoFallbacks: 0
+      errors: 0
     };
   }
 }

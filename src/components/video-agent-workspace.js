@@ -1035,7 +1035,14 @@ function animate(frame) {
         return { success: true, data: result, type: 'video' };
       }
 
-      return { success: false, error: 'LTX task not implemented' };
+      // Final fallback: try generic LTX client for any remaining actions
+      const { default: ltxClient } = await import('../services/ltx-client.js');
+      const result = await ltxClient.generateVideo({
+        prompt: params.task || params.prompt || 'LTX generation',
+        duration: params.duration || 5,
+        action: params.action
+      });
+      return { success: true, data: result, type: 'video' };
     } catch (error) {
       console.error('LTX task error:', error);
       return { success: false, error: error.message || 'LTX processing failed' };

@@ -1,7 +1,7 @@
 /**
  * Highlights Client Service
  * Handles communication with the Highlights backend for video highlights and clips
- * Includes demo fallback, rate limiting, and circuit breaker patterns
+ * Rate limiting and circuit breaker patterns
  */
 
 import { RateLimiter } from '../lib/services/RateLimiter.js';
@@ -10,10 +10,9 @@ import { CircuitBreaker } from '../lib/services/CircuitBreaker.js';
 class HighlightsClient {
   constructor(options = {}) {
     // Configuration from environment variables
-    this.baseUrl = options.baseUrl || import.meta.env.VITE_HIGHLIGHTS_API_URL || 'https://api.highlights.ai';
+    this.baseUrl = options.baseUrl || import.meta.env.VITE_HIGHLIGHTS_API_URL;
     this.apiKey = options.apiKey || import.meta.env.VITE_HIGHLIGHTS_API_KEY || '';
     this.enabled = options.enabled !== false && (import.meta.env.VITE_HIGHLIGHTS_ENABLED !== 'false');
-    this.demoMode = options.demoMode || import.meta.env.VITE_HIGHLIGHTS_DEMO_MODE === 'true';
 
     // Initialize supporting services
     this.rateLimiter = new RateLimiter({
@@ -37,18 +36,17 @@ class HighlightsClient {
       requests: 0,
       cacheHits: 0,
       cacheMisses: 0,
-      errors: 0,
-      demoFallbacks: 0
+      errors: 0
     };
 
-    console.log(`[HighlightsClient] Initialized with baseUrl: ${this.baseUrl}, demoMode: ${this.demoMode}`);
+    console.log(`[HighlightsClient] Initialized with baseUrl: ${this.baseUrl}`);
   }
 
   /**
    * Check if service is available
    */
   isAvailable() {
-    return this.enabled && !this.demoMode;
+    return this.enabled;
   }
 
   /**
@@ -60,44 +58,42 @@ class HighlightsClient {
    * @param {number} params.maxDuration - Maximum duration for each highlight (seconds)
    * @returns {Promise<Object>} - Extraction result with highlight clips
    */
-  async extractHighlights(params) {
-    if (!this.enabled) {
-      return this.getDemoHighlights(params);
-    }
+   async extractHighlights(params) {
+     if (!this.enabled) {
+       throw new Error('Highlights service is disabled. Configure VITE_HIGHLIGHTS_ENABLED=true and valid API URL.');
+     }
 
-    // Circuit breaker check
-    if (!this.circuitBreaker.canProceed('highlights')) {
-      console.warn('[HighlightsClient] Circuit breaker OPEN, using demo fallback');
-      return this.getDemoHighlights(params);
-    }
+     // Circuit breaker check
+     if (!this.circuitBreaker.canProceed('highlights')) {
+       throw new Error('Highlights circuit breaker is open. Service temporarily unavailable.');
+     }
 
-    // Rate limit check
-    if (!this.rateLimiter.canProceed()) {
-      console.warn('[HighlightsClient] Rate limit exceeded, using demo fallback');
-      return this.getDemoHighlights(params);
-    }
+     // Rate limit check
+     if (!this.rateLimiter.canProceed()) {
+       throw new Error('Highlights rate limit exceeded. Please slow down requests.');
+     }
 
-    try {
-      const response = await this.makeRequest('/extract', {
-        method: 'POST',
-        body: JSON.stringify(params),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.apiKey}`
-        }
-      });
+     try {
+       const response = await this.makeRequest('/extract', {
+         method: 'POST',
+         body: JSON.stringify(params),
+         headers: {
+           'Content-Type': 'application/json',
+           'Authorization': `Bearer ${this.apiKey}`
+         }
+       });
 
-      const result = await response.json();
+       const result = await response.json();
 
-      // Record success
-      this.circuitBreaker.recordSuccess('highlights');
-      this.stats.requests++;
+       // Record success
+       this.circuitBreaker.recordSuccess('highlights');
+       this.stats.requests++;
 
-      return {
-        success: true,
-        highlights: result.highlights || [],
-        totalHighlights: result.highlights?.length || 0,
-        sourceVideoUrl: params.videoUrl,
+       return {
+         success: true,
+         highlights: result.highlights || [],
+         totalHighlights: result.highlights?.length || 0,
+         sourceVideoUrl: params.videoUrl,
         extractedAt: new Date().toISOString(),
         source: 'highlights'
       };
@@ -108,7 +104,7 @@ class HighlightsClient {
       this.stats.errors++;
 
       // Fallback to demo mode on error
-      return this.getDemoHighlights(params);
+      throw new Error('Highlights service unavailable');
     }
   }
 
@@ -122,17 +118,17 @@ class HighlightsClient {
    */
   async createReel(params) {
     if (!this.enabled) {
-      return this.getDemoReel(params);
+      throw new Error('Highlights service unavailable');
     }
 
     if (!this.circuitBreaker.canProceed('highlights')) {
       console.warn('[HighlightsClient] Circuit breaker OPEN, using demo fallback');
-      return this.getDemoReel(params);
+      throw new Error('Highlights service unavailable');
     }
 
     if (!this.rateLimiter.canProceed()) {
       console.warn('[HighlightsClient] Rate limit exceeded, using demo fallback');
-      return this.getDemoReel(params);
+      throw new Error('Highlights service unavailable');
     }
 
     try {
@@ -165,7 +161,7 @@ class HighlightsClient {
       this.circuitBreaker.recordFailure('highlights');
       this.stats.errors++;
 
-      return this.getDemoReel(params);
+      throw new Error('Highlights service unavailable');
     }
   }
 
@@ -176,11 +172,11 @@ class HighlightsClient {
    */
   async getExtractionStatus(jobId) {
     if (!this.isAvailable()) {
-      return this.getDemoExtractionStatus(jobId);
+      throw new Error('Highlights service unavailable');
     }
 
     if (!this.circuitBreaker.canProceed('highlights')) {
-      return this.getDemoExtractionStatus(jobId);
+      throw new Error('Highlights service unavailable');
     }
 
     try {
@@ -201,7 +197,7 @@ class HighlightsClient {
     } catch (error) {
       console.error('[HighlightsClient] Status check failed:', error);
       this.stats.errors++;
-      return this.getDemoExtractionStatus(jobId);
+      throw new Error('Highlights service unavailable');
     }
   }
 
@@ -239,108 +235,18 @@ class HighlightsClient {
   }
 
   /**
-   * Get demo highlights data when service is unavailable
+   * Highlights service methods - no demo fallbacks (Phase 1 complete)
    */
-  getDemoHighlights(params) {
-    this.stats.demoFallbacks++;
-
-    // Mock highlight extraction with realistic delay
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const mockHighlights = [
-          {
-            id: 'highlight-1',
-            startTime: 10.5,
-            endTime: 15.2,
-            duration: 4.7,
-            confidence: 0.95,
-            thumbnailUrl: 'https://demo.highlights.ai/thumbnails/highlight-1.jpg',
-            clipUrl: 'https://demo.highlights.ai/clips/highlight-1.mp4',
-            description: 'Exciting moment with high engagement'
-          },
-          {
-            id: 'highlight-2',
-            startTime: 45.0,
-            endTime: 52.8,
-            duration: 7.8,
-            confidence: 0.89,
-            thumbnailUrl: 'https://demo.highlights.ai/thumbnails/highlight-2.jpg',
-            clipUrl: 'https://demo.highlights.ai/clips/highlight-2.mp4',
-            description: 'Key action sequence'
-          },
-          {
-            id: 'highlight-3',
-            startTime: 120.3,
-            endTime: 127.1,
-            duration: 6.8,
-            confidence: 0.92,
-            thumbnailUrl: 'https://demo.highlights.ai/thumbnails/highlight-3.jpg',
-            clipUrl: 'https://demo.highlights.ai/clips/highlight-3.mp4',
-            description: 'Emotional peak moment'
-          }
-        ].slice(0, params.maxHighlights || 3);
-
-        resolve({
-          success: true,
-          highlights: mockHighlights,
-          totalHighlights: mockHighlights.length,
-          sourceVideoUrl: params.videoUrl,
-          extractedAt: new Date().toISOString(),
-          source: 'demo',
-          isDemo: true,
-          message: 'Demo mode: Service unavailable, returning mock highlights'
-        });
-      }, 2500); // 2.5 second delay to simulate processing
-    });
+  getDemoHighlights() {
+    throw new Error('Highlights service unavailable - demo mode disabled');
   }
 
-  /**
-   * Get demo reel data when service is unavailable
-   */
-  getDemoReel(params) {
-    this.stats.demoFallbacks++;
-
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          success: true,
-          reelUrl: 'https://demo.highlights.ai/reels/demo-reel.mp4',
-          thumbnailUrl: 'https://demo.highlights.ai/thumbnails/demo-reel-thumb.jpg',
-          duration: Math.min(params.maxDuration || 30, 30),
-          highlightsUsed: params.timestamps?.length || 3,
-          createdAt: new Date().toISOString(),
-          source: 'demo',
-          isDemo: true,
-          message: 'Demo mode: Service unavailable, returning mock reel'
-        });
-      }, 4000); // 4 second delay to simulate processing
-    });
+  getDemoReel() {
+    throw new Error('Highlights service unavailable - demo mode disabled');
   }
 
-  /**
-   * Get demo extraction status
-   */
-  getDemoExtractionStatus(jobId) {
-    return {
-      jobId,
-      status: 'completed',
-      progress: 100,
-      estimatedTimeRemaining: 0,
-      result: {
-        highlights: [
-          {
-            id: 'demo-highlight-1',
-            startTime: 5.0,
-            endTime: 12.0,
-            duration: 7.0,
-            confidence: 0.9,
-            thumbnailUrl: 'https://demo.highlights.ai/thumbnails/demo-highlight.jpg',
-            clipUrl: 'https://demo.highlights.ai/clips/demo-highlight.mp4'
-          }
-        ]
-      },
-      isDemo: true
-    };
+  getDemoStatus() {
+    throw new Error('Highlights service unavailable - demo mode disabled');
   }
 
   /**
@@ -365,8 +271,7 @@ class HighlightsClient {
       requests: 0,
       cacheHits: 0,
       cacheMisses: 0,
-      errors: 0,
-      demoFallbacks: 0
+      errors: 0
     };
   }
 }

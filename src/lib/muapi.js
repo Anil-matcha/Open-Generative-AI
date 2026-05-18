@@ -8,17 +8,19 @@ export class MuapiClient {
         this.offlineMode = this.detectOfflineMode();
         this.localAI = localAI;
 
-        // Validate that Supabase URL is configured before building proxy URL
         const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        const muapiKey = import.meta.env.VITE_MUAPI_KEY || window.__MUAPI_KEY__;
+
         if (!supabaseUrl) {
             this.offlineMode = true;
-            this.proxyUrl = '/functions/v1/muapi-proxy'; // Fallback to relative path
+            this.proxyUrl = '/functions/v1/muapi-proxy';
+            this.baseUrl = 'https://api.muapi.ai';
         } else {
             this.proxyUrl = `${supabaseUrl}/functions/v1/muapi-proxy`;
+            this.baseUrl = muapiKey ? 'https://api.muapi.ai' : '/functions/v1/muapi-proxy';
         }
-        this.activeControllers = new Map(); // For request cancellation
+        this.activeControllers = new Map();
 
-        // Repository processor URLs
         this.processorUrls = {
             yucut: supabaseUrl ? `${supabaseUrl}/functions/v1/yucut-processor` : '/functions/v1/yucut-processor',
             cinegen: supabaseUrl ? `${supabaseUrl}/functions/v1/cinegen-processor` : '/functions/v1/cinegen-processor',
@@ -54,7 +56,7 @@ export class MuapiClient {
     }
 
     getKey() {
-        const key = window.__MUAPI_KEY__ || localStorage.getItem('muapi_key');
+        const key = window.__MUAPI_KEY__ || import.meta.env.VITE_MUAPI_KEY || localStorage.getItem('muapi_key');
         if (!key) throw new Error('API Key missing. Please set it in Settings.');
         return key;
     }
@@ -1379,18 +1381,28 @@ export class MuapiClient {
     }
 
     async generateMusic(params, signal) {
-        const finalPayload = {};
+        const model = params.model || 'suno-create';
+        const endpointMap = {
+          'suno-create': 'suno-create',
+          'suno-remix': 'suno-remix',
+          'suno-extend': 'suno-extend',
+          'mmaudio-t2a': 'mmaudio-t2a',
+          'mmaudio-v2v': 'mmaudio-v2v'
+        };
+        const endpoint = endpointMap[model] || 'suno-create';
 
+        const finalPayload = { model };
         if (params.prompt) finalPayload.prompt = params.prompt;
         if (params.style) finalPayload.style = params.style;
         if (params.duration) finalPayload.duration = params.duration;
+        if (params.audio_url) finalPayload.audio_url = params.audio_url;
 
         try {
             const response = await fetch(this.proxyUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    endpoint: 'suno-create-music',
+                    endpoint,
                     params: finalPayload,
                     generationType: 'music',
                     studioType: 'audio'

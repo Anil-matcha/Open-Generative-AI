@@ -1,50 +1,37 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { supabase } from "@/lib/supabase";
 
 export async function POST(req) {
   try {
     const data = await req.json();
-    const requestId = data.id;
+    const requestId = data.id || data.request_id;
 
     if (!requestId) {
-      console.error("[MUAPI_WEBHOOK_ERROR] Missing request id in payload", data);
+      console.error("[MUAPI_WEBHOOK_ERROR] Missing request id", data);
       return NextResponse.json({ error: "Missing request id" }, { status: 400 });
     }
 
-    const creation = await prisma.creation.findUnique({
-      where: { requestId }
-    });
-
-    if (!creation) {
-      console.warn(`[MUAPI_WEBHOOK] Creation with requestId ${requestId} not found.`);
-      return NextResponse.json({ error: "Creation not found" }, { status: 404 });
-    }
-
-    if (data.error && data.error !== "") {
-      await prisma.creation.update({
-        where: { id: creation.id },
-        data: {
-          status: "failed",
-          error: data.error
-        }
-      });
-      // Credits refund logic could go here if implemented
+    if (data.error) {
+      await supabase
+        .from('creations')
+        .update({ status: 'failed', error: data.error })
+        .eq('request_id', requestId);
     } else {
-      const outputs = data.outputs || [];
+      const outputs = data.outputs || data.images || [];
       const imageUrl = JSON.stringify(outputs);
 
-      await prisma.creation.update({
-        where: { id: creation.id },
-        data: {
-          status: "completed",
-          imageUrl: imageUrl,
-          isPack: true,
-        }
-      });
+      await supabase
+        .from('creations')
+        .update({
+          status: 'completed',
+          image_url: imageUrl,
+          is_pack: true,
+          updated_at: new Date().toISOString()
+        })
+        .eq('request_id', requestId);
     }
 
     return NextResponse.json({ success: true });
-
   } catch (error) {
     console.error("[MUAPI_WEBHOOK_ERROR]", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

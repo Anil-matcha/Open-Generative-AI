@@ -467,6 +467,16 @@ export function RenderPage() {
     quality: 82
   };
 
+  // CineGen metadata and applied AI edits for render pipeline integration
+  let cinegenMetadata = {
+    appliedEdits: [],
+    gapFills: [],
+    extensions: [],
+    masks: [],
+    musicTracks: [],
+    lastUpdated: null
+  };
+
   // LLM Chat Assistant state (CineGen Feature #2)
   let chatMessages = [
     { type: 'assistant', content: 'Welcome! I can help optimize your rendering settings, suggest export formats, and provide guidance on cinematic techniques.' }
@@ -1086,6 +1096,27 @@ export function RenderPage() {
   `;
   sidebar.appendChild(gpuEngine);
 
+  // Real LTX-Desktop capability detection (replaces fake "Detecting...")
+  import('./services/ltx-client.js').then(async ({ default: ltxClient }) => {
+    try {
+      const caps = await ltxClient.checkCapabilities();
+      const cudaEl = container.querySelector('#cudaCores');
+      const vramEl = container.querySelector('#vramAvailable');
+      if (caps.available) {
+        if (cudaEl) cudaEl.textContent = caps.gpuInfo || 'Available';
+        if (vramEl) vramEl.textContent = caps.vram || 'Ready';
+      } else {
+        if (cudaEl) cudaEl.textContent = 'API mode';
+        if (vramEl) vramEl.textContent = 'Cloud';
+      }
+    } catch (e) {
+      const cudaEl = container.querySelector('#cudaCores');
+      const vramEl = container.querySelector('#vramAvailable');
+      if (cudaEl) cudaEl.textContent = 'Unavailable';
+      if (vramEl) vramEl.textContent = 'Check API key';
+    }
+  });
+
   // Performance Profiling Dashboard (Rendiv Feature #10)
   const profilingDashboard = document.createElement('div');
   profilingDashboard.className = 'mt-6 rounded-2xl border border-white/10 bg-white/[0.03] p-4';
@@ -1256,13 +1287,19 @@ export function RenderPage() {
       duration: 'auto'
     });
 
+    // Integrate CineGen result into render metadata
+    cinegenMetadata.gapFills.push({ ...analysis, timestamp: Date.now() });
+    cinegenMetadata.appliedEdits.push({ type: 'gap_fill', data: analysis, timestamp: Date.now() });
+    cinegenMetadata.lastUpdated = Date.now();
+
     return {
       success: true,
       data: {
         url: result.url,
         analysis: analysis,
         filledGaps: analysis.gaps.length,
-        type: 'gap-filled-video'
+        type: 'gap-filled-video',
+        cinegenMetadata: cinegenMetadata
       },
       message: `Successfully filled ${analysis.gaps.length} gaps with AI-generated content`
     };
@@ -1287,12 +1324,18 @@ export function RenderPage() {
       preserveMotion: true
     });
 
+    // Integrate CineGen result into render metadata
+    cinegenMetadata.extensions.push({ ...extension, timestamp: Date.now() });
+    cinegenMetadata.appliedEdits.push({ type: 'extend', data: extension, timestamp: Date.now() });
+    cinegenMetadata.lastUpdated = Date.now();
+
     return {
       success: true,
       data: {
         url: result.url,
         extension: extension,
-        type: 'extended-clip'
+        type: 'extended-clip',
+        cinegenMetadata: cinegenMetadata
       },
       message: `Successfully extended clip by ${extension.duration} seconds`
     };
@@ -1320,12 +1363,18 @@ export function RenderPage() {
       duration: moodAnalysis.duration
     });
 
+    // Integrate CineGen result into render metadata
+    cinegenMetadata.musicTracks.push({ ...moodAnalysis, timestamp: Date.now() });
+    cinegenMetadata.appliedEdits.push({ type: 'music_generation', data: moodAnalysis, timestamp: Date.now() });
+    cinegenMetadata.lastUpdated = Date.now();
+
     return {
       success: true,
       data: {
         url: result.url,
         moodAnalysis: moodAnalysis,
-        type: 'generated-music'
+        type: 'generated-music',
+        cinegenMetadata: cinegenMetadata
       },
       message: `Generated ${moodAnalysis.genre} music track synchronized with video`
     };
@@ -1486,12 +1535,14 @@ export function RenderPage() {
     }
 
     // Execute via videoagent function with enhanced options
+    // Include CineGen metadata and AI edits in render pipeline
     const response = await supabase.functions.invoke('videoagent', {
       body: {
         action: videoAction,
         videoId: videoId || 'uploaded-video',
         videoUrl: videoUrl,
-        options: enhancedOptions
+        options: enhancedOptions,
+        cinegenMetadata: cinegenMetadata.appliedEdits.length > 0 ? cinegenMetadata : null
       }
     });
 
@@ -1628,16 +1679,16 @@ export function RenderPage() {
       loadModelsBtn.disabled = true;
 
       try {
+        const { default: ltxClient } = await import('./services/ltx-client.js');
         if (isLoading) {
-          await loadGPUMmodels();
-          gpuStatus.modelsLoaded = true;
+          const caps = await ltxClient.checkCapabilities();
+          gpuStatus.modelsLoaded = caps.available;
           loadModelsBtn.textContent = 'Unload Models';
-          showToast('GPU models loaded successfully');
+          showToast(caps.available ? 'LTX models ready' : 'Using cloud fallback');
         } else {
-          await unloadGPUMmodels();
           gpuStatus.modelsLoaded = false;
           loadModelsBtn.textContent = 'Load Models';
-          showToast('GPU models unloaded');
+          showToast('Models released');
         }
       } catch (error) {
         console.error('GPU model operation failed:', error);

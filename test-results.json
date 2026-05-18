@@ -10,14 +10,18 @@
     "grep": {},
     "grepInvert": null,
     "maxFailures": 0,
-    "metadata": {},
+    "metadata": {
+      "actualWorkers": 4
+    },
     "preserveOutput": "always",
     "projects": [
       {
         "outputDir": "/Users/shasheemoore/Downloads/Higgsfield/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 4
+        },
         "id": "demo-videos",
         "name": "demo-videos",
         "testDir": "/Users/shasheemoore/Downloads/Higgsfield/tests/e2e",
@@ -31,7 +35,9 @@
         "outputDir": "/Users/shasheemoore/Downloads/Higgsfield/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 4
+        },
         "id": "demo-videos-with-server",
         "name": "demo-videos-with-server",
         "testDir": "/Users/shasheemoore/Downloads/Higgsfield/tests/e2e",
@@ -45,7 +51,9 @@
         "outputDir": "/Users/shasheemoore/Downloads/Higgsfield/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 4
+        },
         "id": "main-app-chromium",
         "name": "main-app-chromium",
         "testDir": "/Users/shasheemoore/Downloads/Higgsfield/tests/e2e",
@@ -59,7 +67,9 @@
         "outputDir": "/Users/shasheemoore/Downloads/Higgsfield/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 4
+        },
         "id": "main-app-firefox",
         "name": "main-app-firefox",
         "testDir": "/Users/shasheemoore/Downloads/Higgsfield/tests/e2e",
@@ -73,7 +83,9 @@
         "outputDir": "/Users/shasheemoore/Downloads/Higgsfield/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 4
+        },
         "id": "main-app-mobile",
         "name": "main-app-mobile",
         "testDir": "/Users/shasheemoore/Downloads/Higgsfield/tests/e2e",
@@ -87,7 +99,9 @@
         "outputDir": "/Users/shasheemoore/Downloads/Higgsfield/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 4
+        },
         "id": "modules-chromium",
         "name": "modules-chromium",
         "testDir": "/Users/shasheemoore/Downloads/Higgsfield/tests/e2e",
@@ -101,7 +115,9 @@
         "outputDir": "/Users/shasheemoore/Downloads/Higgsfield/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 4
+        },
         "id": "apps-chromium",
         "name": "apps-chromium",
         "testDir": "/Users/shasheemoore/Downloads/Higgsfield/tests/e2e",
@@ -115,7 +131,9 @@
         "outputDir": "/Users/shasheemoore/Downloads/Higgsfield/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 4
+        },
         "id": "performance",
         "name": "performance",
         "testDir": "/Users/shasheemoore/Downloads/Higgsfield/tests/e2e",
@@ -129,7 +147,9 @@
         "outputDir": "/Users/shasheemoore/Downloads/Higgsfield/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 4
+        },
         "id": "accessibility",
         "name": "accessibility",
         "testDir": "/Users/shasheemoore/Downloads/Higgsfield/tests/e2e",
@@ -143,7 +163,9 @@
         "outputDir": "/Users/shasheemoore/Downloads/Higgsfield/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 4
+        },
         "id": "module-click-errors",
         "name": "module-click-errors",
         "testDir": "/Users/shasheemoore/Downloads/Higgsfield/tests/e2e",
@@ -185,17 +207,166 @@
     "workers": 4,
     "webServer": null
   },
-  "suites": [],
-  "errors": [
+  "suites": [
     {
-      "message": "TypeError: Cannot redefine property: Symbol($$jest-matchers-object)",
-      "stack": "TypeError: Cannot redefine property: Symbol($$jest-matchers-object)\n    at /Users/shasheemoore/Downloads/Higgsfield/node_modules/.pnpm/@vitest+expect@1.6.1/node_modules/@vitest/expect/dist/index.js:21:10"
+      "title": "main-app/cinegen.e2e.spec.ts",
+      "file": "main-app/cinegen.e2e.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "CineGen Tools and UI Buttons E2E",
+          "file": "main-app/cinegen.e2e.spec.ts",
+          "line": 3,
+          "column": 6,
+          "specs": [
+            {
+              "title": "button clicks trigger correct runCineGenTool calls and results panel updates",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "main-app-chromium",
+                  "projectName": "main-app-chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 28931,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-18T00:27:00.999Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "46ae034c6b3cbd72c086-ccbc246c91ec8be706c8",
+              "file": "main-app/cinegen.e2e.spec.ts",
+              "line": 9,
+              "column": 3
+            },
+            {
+              "title": "keyboard shortcuts trigger CineGen tools",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "main-app-chromium",
+                  "projectName": "main-app-chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 28371,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-18T00:27:00.924Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "46ae034c6b3cbd72c086-2ea2dd08cc58b51644a8",
+              "file": "main-app/cinegen.e2e.spec.ts",
+              "line": 33,
+              "column": 3
+            },
+            {
+              "title": "error cases: failed tool call shows error in results",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "main-app-chromium",
+                  "projectName": "main-app-chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 28371,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-18T00:27:01.074Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "46ae034c6b3cbd72c086-ffcba8782c74a9851c60",
+              "file": "main-app/cinegen.e2e.spec.ts",
+              "line": 43,
+              "column": 3
+            },
+            {
+              "title": "clear results button works",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "main-app-chromium",
+                  "projectName": "main-app-chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 28273,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-18T00:27:00.994Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "46ae034c6b3cbd72c086-e6bc966405e9449b8105",
+              "file": "main-app/cinegen.e2e.spec.ts",
+              "line": 53,
+              "column": 3
+            }
+          ]
+        }
+      ]
     }
   ],
+  "errors": [],
   "stats": {
-    "startTime": "2026-05-14T07:57:09.262Z",
-    "duration": 3188.9269999999997,
-    "expected": 0,
+    "startTime": "2026-05-18T00:26:36.829Z",
+    "duration": 56472.641,
+    "expected": 4,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0

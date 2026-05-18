@@ -25,6 +25,28 @@ export class EditorAgent extends BaseAgent {
     this.reset();
     this.setStatus('running', 0);
 
+    // If server-side execution is enabled, call Netlify function
+    if (options.useServer === true) {
+      try {
+        const response = await fetch('/.netlify/functions/director-agent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            agents: ['editor_agent'],
+            content: [{ text: options.prompt || 'Analyze timeline' }],
+            actions: options.actions || [],
+            options: { timelineState, ...options }
+          })
+        });
+
+        const result = await response.json();
+        this.setResult(result);
+        return;
+      } catch (err) {
+        console.warn('Server-side EditorAgent failed, falling back to client:', err);
+      }
+    }
+
     try {
       this.setStatus('analyzing_timeline', 15);
       

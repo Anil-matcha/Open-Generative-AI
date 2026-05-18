@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FaMagic,
@@ -13,20 +12,11 @@ import { downloadImage } from "@/lib/utils";
 import { FiDownload } from "react-icons/fi";
 
 export default function CreationsPage() {
-  const { data: session, status } = useSession();
   const router = useRouter();
   const [creations, setCreations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-
-  useEffect(() => {
-    if (status === "authenticated") {
-      fetchCreations();
-    } else if (status === "unauthenticated") {
-      router.push("/");
-    }
-  }, [status]);
 
   const fetchCreations = async () => {
     try {
@@ -41,6 +31,13 @@ export default function CreationsPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const load = async () => {
+      await fetchCreations();
+    };
+    load();
+  }, []);
 
   const parseImageUrl = (url) => {
     try {

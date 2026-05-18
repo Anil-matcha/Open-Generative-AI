@@ -452,5 +452,3 @@ async function cloneVoice(params: any): Promise<any> {
   };
 }
 
-Deno.serve(handler);</content>
-<parameter name="filePath">supabase/functions/ltx-processor/index.ts

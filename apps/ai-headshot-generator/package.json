@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3003",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
@@ -12,6 +12,7 @@
     "@higgsfield/api-config": "workspace:*",
     "@supabase/supabase-js": "^2.0.0",
     "@stripe/stripe-js": "^9.2.0",
+    "next-auth": "^4.24.5",
     "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
     "next": "16.2.3",

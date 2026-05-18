@@ -1,6 +1,5 @@
 "use client";
 
-import { useSession, signIn } from "next-auth/react";
 import { useState, useRef, useEffect } from "react";
 import {
   FaBolt,
@@ -15,7 +14,7 @@ import { FiDownload } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { downloadImage, headshotsExamples } from "@/lib/utils";
-import { saveGeneratedAsset } from "../../../../../src/lib/assets/assetActions.js";
+import { saveGeneratedAsset } from "../../../../src/lib/assets/assetActions.js";
 
 const ASPECT_RATIOS = [
   { label: "1:1 Square", value: "1:1" },
@@ -112,7 +111,6 @@ const HeadshotCarousel = () => {
 };
 
 export default function Home() {
-  const { data: session, status } = useSession();
   const router = useRouter();
 
   // UI State
@@ -161,10 +159,7 @@ export default function Home() {
       return;
     }
 
-    if (!session) {
-      signIn();
-      return;
-    }
+    // No auth - direct upload allowed
 
     if (file.size > 5 * 1024 * 1024) {
       setError("File size exceeds 5MB limit.");
@@ -199,10 +194,7 @@ export default function Home() {
   };
 
   const handleGenerate = async () => {
-    if (!session) {
-      signIn();
-      return;
-    }
+    // No auth - direct upload allowed
 
     if (!referenceImage && !newImageUrl) {
       setError("Please provide a reference image.");

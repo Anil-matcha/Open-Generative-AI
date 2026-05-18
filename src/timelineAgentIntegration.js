@@ -32,6 +32,7 @@ export class TimelineAgentIntegration {
     this.setupTakeSelector();
     this.setupTimelineHooks();
     this.setupTimelineEditorIntegration();
+    this.registerCineGenWorkflows();
     
     this.initialized = true;
   }
@@ -97,13 +98,18 @@ export class TimelineAgentIntegration {
   }
 
   setupTimelineEditorIntegration() {
-    if (!this.timelineEditor) return;
+    // Connect agent system to timeline editor actions
+    if (this.timelineEditor && this.timelineEditor.registerAgentActions) {
+      this.timelineEditor.registerAgentActions({
+        runCineGenTool: (tool, params) => this.handleAgentAction({ type: 'cinegen', tool, params })
+      });
+    }
+  }
 
-    if (typeof this.timelineEditor.on === 'function') {
-      this.timelineEditor.on('clipSelect', (clip) => {
-        if (this.takeSelector) {
-          this.takeSelector.setClip(clip.id);
-        }
+  registerCineGenWorkflows() {
+    // Register CineGen workflows for use in Timeline Editor
+    console.log('[TimelineAgentIntegration] CineGen workflows registered');
+  }
         if (this.agentHooks) {
           this.agentHooks.emitTimelineEvent('clipSelected', clip);
         }

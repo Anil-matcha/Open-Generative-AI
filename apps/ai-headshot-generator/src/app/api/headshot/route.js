@@ -14,11 +14,7 @@ module.exports = async function POST(req) {
       return NextResponse.json({ error: "Category is required" }, { status: 400 });
     }
 
-    if (!userId) {
-      return NextResponse.json({ error: "User ID is required" }, { status: 401 });
-    }
-
-    const result = await AIService.generate(userId, {
+    const result = await AIService.generate({
       image_url,
       category,
       aspect_ratio,

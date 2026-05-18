@@ -495,5 +495,5 @@ async function exportScript(params: any): Promise<any> {
   };
 }
 
-Deno.serve(handler);</content>
-<parameter name="filePath">supabase/functions/cutai-processor/index.ts
+
+Deno.serve(handler);

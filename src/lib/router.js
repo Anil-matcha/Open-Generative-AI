@@ -78,7 +78,7 @@ const pageLoaders = {
   render: () => import('../components/RenderPage.js').then(m => m.RenderPage()),
   'video-agent': () => import('../components/VideoAgentPage.js').then(m => m.VideoAgentPage()),
   director: () => import('../components/DirectorPage.js').then(m => m.DirectorPage()),
-  timeline: () => import('../components/TimelineEditorPage.js').then(m => m.TimelineEditorPage()),
+  timeline: () => import('../components/TimelineEditorPage.jsx').then(m => m.TimelineEditorPage()),
   'timeline-test': () => import('../components/TimelineTestPage.jsx').then(m => m.TimelineTestPage),
    'remix-go': () => import('../components/RemixGoPage.js').then(m => m.RemixGoPage()),
    'sendspark': () => import('../components/SendsparkPage.js').then(m => m.SendsparkPage()),

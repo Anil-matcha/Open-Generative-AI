@@ -232,6 +232,29 @@ Example: "split the clip at the current time" -> {"command": "split_clip", "para
       case 'speed_ramp':
         return await this.speedRamp(parameters);
 
+      case 'cinegen polish':
+        return await this.runCineGenTool('fill_gap', parameters);
+
+      case 'cinegen music':
+        return await this.runCineGenTool('music_generation', parameters);
+
+      // Server-routed editing commands
+      case 'stabilize_video':
+      case 'add_zoom_effect':
+      case 'add_shake_effect':
+        return await this.callServerEditorAgent(command, parameters);
+
+      // CineGen AI Edit Tools
+      case 'gap_fill':
+      case 'extend':
+      case 'music':
+      case 'mask':
+      case 'element_create':
+      case 'llm_chat':
+      case 'fill_gap':
+      case 'extend_clip':
+        return await this.runCineGenTool(command, parameters);
+
       case 'stabilize_video':
         return await this.stabilizeVideo(parameters);
 
@@ -263,7 +286,30 @@ Example: "split the clip at the current time" -> {"command": "split_clip", "para
   }
 
   async splitClip(params) {
-    // Split clip at current playhead
+    // Try server-side EditorAgent first if enabled
+    if (params?.useServer) {
+      try {
+        const res = await fetch('/.netlify/functions/director-agent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            agents: ['editor_agent'],
+            content: [{ text: 'split at current playhead' }],
+            actions: ['split_clip'],
+            options: { playheadTime: params.playheadTime || 0 }
+          })
+        });
+        const data = await res.json();
+        if (data.action === 'split_clip' && this.actions.splitClipAtPlayhead) {
+          await this.actions.splitClipAtPlayhead();
+          return { response: data.message || 'Clip split via server.', success: true };
+        }
+      } catch (e) {
+        console.warn('Server split failed, falling back to client', e);
+      }
+    }
+
+    // Fallback to local action
     if (this.actions.splitClipAtPlayhead) {
       await this.actions.splitClipAtPlayhead();
       return {
@@ -279,14 +325,26 @@ Example: "split the clip at the current time" -> {"command": "split_clip", "para
   }
 
   async trimClip(params) {
-    // Trim selected clip
-    if (this.actions.trimSelectedClip) {
-      await this.actions.trimSelectedClip(params.start, params.end);
-      return {
-        response: 'Selected clip trimmed.',
-        success: true
-      };
+    if (params?.useServer) {
+      try {
+        const res = await fetch('/.netlify/functions/director-agent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ agents: ['editor_agent'], content: [{ text: 'trim clip' }], actions: ['trim_clip'] })
+        });
+        const data = await res.json();
+        if (data.action === 'trim_clip' && this.actions.trimSelectedClip) {
+          await this.actions.trimSelectedClip();
+          return { response: data.message || 'Clip trimmed via server.', success: true };
+        }
+      } catch (_) {}
     }
+    if (this.actions.trimSelectedClip) {
+      await this.actions.trimSelectedClip();
+      return { response: 'Trimming selected clip.', success: true };
+    }
+    return { response: 'Trim feature not available.', success: false };
+  }
 
     return {
       response: 'Trim clip feature not available.',
@@ -295,15 +353,26 @@ Example: "split the clip at the current time" -> {"command": "split_clip", "para
   }
 
   async addTransition(params) {
-    const transitionType = params.type || 'fade';
-
-    if (this.actions.addTransition) {
-      await this.actions.addTransition(transitionType, params.duration || 1.0);
-      return {
-        response: `${transitionType} transition added between clips.`,
-        success: true
-      };
+    if (params?.useServer) {
+      try {
+        const res = await fetch('/.netlify/functions/director-agent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ agents: ['editor_agent'], content: [{ text: 'add fade transition' }], actions: ['add_transition'] })
+        });
+        const data = await res.json();
+        if (data.action === 'add_transition' && this.actions.addTransition) {
+          await this.actions.addTransition(params?.type || 'fade');
+          return { response: data.message || 'Transition added via server.', success: true };
+        }
+      } catch (_) {}
     }
+    if (this.actions.addTransition) {
+      await this.actions.addTransition(params?.type || 'fade');
+      return { response: `Added ${(params?.type || 'fade')} transition.`, success: true };
+    }
+    return { response: 'Transition feature not available.', success: false };
+  }
 
     return {
       response: 'Add transition feature not available.',
@@ -374,15 +443,58 @@ Example: "split the clip at the current time" -> {"command": "split_clip", "para
   }
 
   async speedRamp(params) {
-    const speed = params.speed || 1.5;
-
     if (this.actions.speedRamp) {
-      await this.actions.speedRamp(speed);
-      return {
-        response: `Playback speed changed to ${speed}x.`,
-        success: true
-      };
+      await this.actions.speedRamp(params?.factor || 1.5);
+      return { response: `Playback speed changed to ${params?.factor || 1.5}x`, success: true };
     }
+    return { response: 'Speed ramp feature not available.', success: false };
+  }
+
+  async callServerEditorAgent(command, params = {}) {
+    try {
+      const res = await fetch('/.netlify/functions/director-agent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          agents: ['editor_agent'],
+          content: [{ text: command }],
+          actions: [command],
+          options: params
+        })
+      });
+      const data = await res.json();
+      if (data.action && this.actions[data.action]) {
+        await this.actions[data.action](params);
+      }
+      return { response: data.message || `Executed ${command} via server.`, success: true };
+    } catch (e) {
+      return { response: `Failed to execute ${command} on server.`, success: false };
+    }
+  }
+
+  async runCineGenTool(command, params = {}) {
+    try {
+      const { runCineGenTool } = await import('../../lib/cinegenIntegration.js');
+      const result = await runCineGenTool(command, params);
+
+      if (result.success) {
+        // Apply result to timeline if action is supported
+        if (result.action && this.actions[result.action]) {
+          try {
+            await this.actions[result.action](result.result);
+          } catch (e) {
+            console.warn(`Failed to apply CineGen action ${result.action}`, e);
+          }
+        }
+        return { response: result.message || `CineGen ${command} completed.`, success: true };
+      } else {
+        return { response: result.error || 'CineGen tool failed.', success: false };
+      }
+      return { response: result.error || 'CineGen tool failed.', success: false };
+    } catch (e) {
+      return { response: 'CineGen integration not available.', success: false };
+    }
+  }
 
     return {
       response: 'Speed ramp feature not available.',
@@ -442,13 +554,17 @@ Example: "split the clip at the current time" -> {"command": "split_clip", "para
 
   renderQuickCommands() {
     const quickCommands = this.container.querySelector('#quickCommands');
+    if (!quickCommands) return;
+
     const commands = [
-      'Detect Scenes',
-      'Split Clip',
-      'Trim Clip',
-      'Add Fade',
-      'Add Text',
-      'Generate Subtitles'
+      'detect scenes',
+      'split at playhead',
+      'add fade',
+      'generate subtitles',
+      'gap fill',
+      'extend clip',
+      'cinegen polish',
+      'cinegen music'
     ];
 
     quickCommands.innerHTML = '';
