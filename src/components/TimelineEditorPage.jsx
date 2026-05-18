@@ -2279,24 +2279,6 @@ button, input, textarea, select { font: inherit; }
         insertClipIntoTrack(clipData, targetTrackType);
         showToast(`${media.label} added to timeline`);
       }, showToast, state);
-        // Handle media selection (click)
-        const generatedId = Date.now();
-        let clip;
-        if (media.label === 'Video Clip') {
-          clip = { id: generatedId, name: `Video Clip ${generatedId.toString().slice(-3)}`, start: 0, end: 14, type: 'video', src: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4' };
-          insertClipIntoTrack(clip, 'Video');
-        } else if (media.label === 'Image Frame' || media.label === 'B-Roll Asset') {
-          clip = { id: generatedId, name: media.label, start: 0, end: 14, type: 'image', src: svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720"><defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#111827"/><stop offset="1" stop-color="#0f766e"/></linearGradient></defs><rect width="1280" height="720" fill="url(#g)"/><text x="90" y="320" fill="white" font-size="74" font-family="Arial" font-weight="700">${media.label}</text></svg>`), fit: 'contain' };
-          insertClipIntoTrack(clip, media.label === 'B-Roll Asset' ? 'B-Roll' : 'Text');
-        } else if (media.label === 'Audio Track') {
-          clip = { id: generatedId, name: `Audio ${generatedId.toString().slice(-3)}`, start: 0, end: 16, type: 'audio', src: 'https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3' };
-          insertClipIntoTrack(clip, 'Audio');
-        } else {
-          clip = { id: generatedId, name: media.label, start: 0, end: 12, type: 'text', text: media.label, style: { fontSize: 24, color: '#ffffff', background: 'rgba(0,0,0,0.7)' } };
-          insertClipIntoTrack(clip, 'Text');
-        }
-  // DISABLED:         showToast(`${media.label} inserted into timeline`);
-      }, showToast, state);
 
       // Extend media library with enhancement features
       extendMediaLibrary(els.mediaGrid, state, showToast);
@@ -2560,11 +2542,6 @@ button, input, textarea, select { font: inherit; }
             renderSceneMarkers();
             showToast(`Detected ${scenes.length} scenes`);
           }
-        }, {
-          showToast: showToast
-        });
-      }
-    }
         }, {
           showToast: showToast
         });
@@ -2836,9 +2813,6 @@ button, input, textarea, select { font: inherit; }
 
     function addTiltEffect(direction = 'up', distance = 15) {
       applyCameraEffect(`tilt-${direction}`, { distance, duration: 1.5 });
-    }
-        });
-      }
     }
 
     function initializeAIChatPanel() {
@@ -4994,11 +4968,8 @@ button, input, textarea, select { font: inherit; }
 
           applyCameraEffect(effect);
         });
-      });
-    }
-          showToast('CineGen LLM Assistant ready');
-        });
       }
+    }
 
       const clearBtn = root.querySelector('#clearCineGenResults');
       if (clearBtn) {
