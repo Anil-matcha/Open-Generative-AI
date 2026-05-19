@@ -1,0 +1,131 @@
+[
+  {
+    "appId": "agents",
+    "status": "partial",
+    "missingFiles": [
+      "index.js",
+      "FEATURE_CHECKLIST.md"
+    ],
+    "missingFolders": [],
+    "missingServices": [],
+    "missingAssets": [],
+    "recommendation": "Add missing pieces and re-run audit"
+  },
+  {
+    "appId": "ai-headshot-generator",
+    "status": "partial",
+    "missingFiles": [
+      "index.js",
+      "FEATURE_CHECKLIST.md"
+    ],
+    "missingFolders": [
+      "assets",
+      "data"
+    ],
+    "missingServices": [],
+    "missingAssets": [
+      "assets/"
+    ],
+    "recommendation": "Add missing pieces and re-run audit"
+  },
+  {
+    "appId": "design-agent",
+    "status": "partial",
+    "missingFiles": [
+      "index.js",
+      "FEATURE_CHECKLIST.md"
+    ],
+    "missingFolders": [],
+    "missingServices": [],
+    "missingAssets": [],
+    "recommendation": "Add missing pieces and re-run audit"
+  },
+  {
+    "appId": "marketing-studio",
+    "status": "partial",
+    "missingFiles": [
+      "index.js",
+      "FEATURE_CHECKLIST.md"
+    ],
+    "missingFolders": [],
+    "missingServices": [],
+    "missingAssets": [],
+    "recommendation": "Add missing pieces and re-run audit"
+  },
+  {
+    "appId": "open-pomelli",
+    "status": "partial",
+    "missingFiles": [
+      "index.js",
+      "FEATURE_CHECKLIST.md"
+    ],
+    "missingFolders": [
+      "assets",
+      "data"
+    ],
+    "missingServices": [],
+    "missingAssets": [
+      "assets/"
+    ],
+    "recommendation": "Add missing pieces and re-run audit"
+  },
+  {
+    "appId": "remix-go",
+    "status": "partial",
+    "missingFiles": [
+      "index.js",
+      "FEATURE_CHECKLIST.md"
+    ],
+    "missingFolders": [
+      "assets",
+      "data"
+    ],
+    "missingServices": [],
+    "missingAssets": [
+      "assets/"
+    ],
+    "recommendation": "Add missing pieces and re-run audit"
+  },
+  {
+    "appId": "vibe-workflow",
+    "status": "partial",
+    "missingFiles": [
+      "index.js",
+      "FEATURE_CHECKLIST.md"
+    ],
+    "missingFolders": [
+      "components",
+      "assets",
+      "hooks",
+      "data"
+    ],
+    "missingServices": [],
+    "missingAssets": [
+      "assets/"
+    ],
+    "recommendation": "Add missing pieces and re-run audit"
+  },
+  {
+    "appId": "workflows",
+    "status": "partial",
+    "missingFiles": [
+      "index.js",
+      "routes.js",
+      "FEATURE_CHECKLIST.md"
+    ],
+    "missingFolders": [
+      "components",
+      "services",
+      "assets",
+      "hooks",
+      "data"
+    ],
+    "missingServices": [
+      "services/"
+    ],
+    "missingAssets": [
+      "assets/"
+    ],
+    "recommendation": "Add missing pieces and re-run audit"
+  }
+]
