@@ -46,6 +46,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Render Deployment**: Fixed ERR_PNPM_OUTDATED_LOCKFILE error for ai-video-outreach workspace
+  - Added missing `apps/ai-video-outreach` importer section to pnpm-lock.yaml
+  - next@14.x, react@^18, react-dom@^18 dependencies now properly tracked in lockfile
+  - Resolves "Cannot install with frozen-lockfile" error during Render builds
+
 ### Added
 - **VFX Navigation**: Added dedicated VFX menu item in sidebar
   - VFX effects now accessible via dedicated menu option
