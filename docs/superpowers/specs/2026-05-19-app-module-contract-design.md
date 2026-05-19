@@ -36,7 +36,9 @@ src/apps/[app-id]/
   data/              # conditional (see rules)
   assets/
   styles.css
-```
+ ```
+
+Apps that are purely informational or utility-based do not need `hooks/` or `data/` unless their manifest claims capabilities that require async state, generation, presets, templates, workflow configs, or agent configs. This prevents over-strict validation on simple apps.
 
 ## Manifest Shape Requirement
 `manifest.js` MUST export:
@@ -112,7 +114,9 @@ Minimal change only:
 - No change to production runtime behavior or existing router.
 
 ## Definition of Done for This Phase
-- `scripts/validate-apps.mjs` and `scripts/audit-shell-apps.mjs` exist and run cleanly.
+- `scripts/validate-apps.mjs` and `scripts/audit-shell-apps.mjs` exist and run successfully.
+- `apps:audit` produces a complete report.
+- `apps:validate` correctly fails in strict mode when shell/partial apps are detected.
 - `package.json` has `"apps:validate"` and `"apps:audit"`.
 - `templates/FEATURE_CHECKLIST.template.md` created.
 - Manifest shape enforced with warnings/errors.
