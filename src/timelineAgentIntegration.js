@@ -107,18 +107,7 @@ export class TimelineAgentIntegration {
   }
 
   registerCineGenWorkflows() {
-    // Register CineGen workflows for use in Timeline Editor
     console.log('[TimelineAgentIntegration] CineGen workflows registered');
-  }
-        if (this.agentHooks) {
-          this.agentHooks.emitTimelineEvent('clipSelected', clip);
-        }
-      });
-
-      this.timelineEditor.on('timelineChange', () => {
-        this.syncAgentState();
-      });
-    }
   }
 
   getTimelineState() {

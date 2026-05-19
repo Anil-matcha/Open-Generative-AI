@@ -97,8 +97,8 @@
       Referrer-Policy = "strict-origin-when-cross-origin"
       # Permissions Policy
       Permissions-Policy = "geolocation=(), microphone=(), camera=(), payment=(), usb=()"
-      # Content Security Policy - tightened, no unsafe-inline/unsafe-eval
-      Content-Security-Policy = "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'nonce-${NONCE}'; style-src 'self' https://fonts.googleapis.com 'nonce-${NONCE}'; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://api.muapi.ai https://supabase.co https://*.supabase.co https://api.openai.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests; block-all-mixed-content;"
+      # Content Security Policy - allows unsafe-inline for styles from external repos
+      Content-Security-Policy = "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'nonce-${NONCE}'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://api.muapi.ai https://supabase.co https://*.supabase.co https://api.openai.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests; block-all-mixed-content;"
 
 [build.processing]
   skip_processing = false
