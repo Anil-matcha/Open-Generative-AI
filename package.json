@@ -119,6 +119,7 @@
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.4.1",
     "studio": "*",
+    "undici": "^6.21.0",
     "workflow-builder": "file:./packages/Vibe-Workflow/packages/workflow-builder",
     "ai-agent": "file:./packages/Open-Poe-AI/packages/agents"
   },
