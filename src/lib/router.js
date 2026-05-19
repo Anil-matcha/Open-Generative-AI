@@ -95,6 +95,7 @@ const pageLoaders = {
   'runway-motion': () => import('../components/RunwayMotionStudio.js').then(m => m.RunwayMotionStudio()),
   'tiktok-carousel': () => import('../components/TikTokCarouselStudio.js').then(m => m.TikTokCarouselStudio()),
   'advanced-dubbing': () => import('../components/AdvancedDubbingStudio.js').then(m => m.AdvancedDubbingStudio()),
+  documentation: () => import('../components/DocumentationPage.js').then(m => m.DocumentationPage()),
   landing: () => import('../components/landing/LandingPage.jsx').then(m => m.LandingPage()),
   signin: () => import('../components/landing/SignInPage.jsx').then(m => m.SignInPage()),
   headshots: () => import('../components/HeadshotStudio.js').then(m => m.HeadshotStudio()),
