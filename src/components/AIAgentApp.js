@@ -1,5 +1,7 @@
 import { muapi } from '../lib/muapi.js';
+import { openaiService } from '../lib/openaiService.js';
 import { navigate } from '../lib/router.js';
+import { getTemplateAgents } from '../lib/muapi.js';
 
 const STORAGE_KEY = 'higgsfield.agents';
 const HANDOFF_KEYS = {
@@ -51,6 +53,25 @@ function safeWriteStorage(key, value) {
   try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* ignore */ }
 }
 
+async function getOpenAIResponse(agent, message) {
+  try {
+    const systemPrompt = agent.instructions || `You are a ${AGENT_ROLES.find(r => r.id === agent.role)?.name || 'AI assistant'}.`;
+    const response = await openaiService.generateResponse({
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: message }
+      ],
+      model: 'gpt-4',
+      maxTokens: 1000,
+      temperature: 0.7
+    });
+    return response || simulateAgentResponse(agent, message);
+  } catch (err) {
+    console.warn('OpenAI failed, using simulated response:', err);
+    return simulateAgentResponse(agent, message);
+  }
+}
+
 function simulateAgentResponse(agent, message) {
   const responses = {
     'creative-director': `As your Creative Director, I suggest we approach this with a cinematic vision. Consider using a wide establishing shot followed by close-ups for emotional impact. The lighting should follow the rule of thirds with dramatic shadows. For the color grade, think ${agent.style || 'moody and cinematic'}.`,
@@ -61,7 +82,7 @@ function simulateAgentResponse(agent, message) {
     'workflow': `I'll build a workflow for: "${message}". Suggested steps: 1) Text Prompt, 2) Image Generation, 3) Upscale, 4) Edit, 5) Render. Models to use: Flux for image, Seedance for video, ESRGAN for upscale.`,
     'render': `For optimal rendering: Resolution 1920x1080, Quality 95%, Codec H.264, FPS 30. Consider using the Render Studio for final export with these settings.`,
   };
-  return responses[agent.role] || `I'm processing your request. This would connect to an LLM API in production. For now, I'm simulating a thoughtful response.`;
+  return responses[agent.role] || `I'm processing your request. For now, I'm simulating a thoughtful response.`;
 }
 
 export function AIAgentApp() {
@@ -167,11 +188,13 @@ export function AIAgentApp() {
       <input type="text" id="message-input" placeholder="Type your message..." class="flex-1 px-4 py-2 text-sm bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-muted focus:outline-none focus:border-primary/50">
       <button id="send-btn" class="px-4 py-2 text-sm font-bold text-black bg-primary border-none rounded-lg hover:bg-primary/80">Send</button>
     </div>
-    <div class="flex gap-2 mt-2">
-      <button id="send-workflow" class="flex-1 text-xs text-white bg-teal-500/10 border border-teal-500/20 rounded px-2 py-1">Send to Workflow</button>
-      <button id="send-design" class="flex-1 text-xs text-white bg-pink-500/10 border border-pink-500/20 rounded px-2 py-1">Send to Design</button>
-      <button id="send-marketing" class="flex-1 text-xs text-white bg-green-500/10 border border-green-500/20 rounded px-2 py-1">Send to Marketing</button>
-    </div>
+<div class="flex gap-2 mt-2">
+        <button id="send-workflow" class="flex-1 text-xs text-white bg-teal-500/10 border border-teal-500/20 rounded px-2 py-1">Send to Workflow</button>
+        <button id="send-design" class="flex-1 text-xs text-white bg-pink-500/10 border border-pink-500/20 rounded px-2 py-1">Send to Design</button>
+        <button id="send-marketing" class="flex-1 text-xs text-white bg-green-500/10 border border-green-500/20 rounded px-2 py-1">Send to Marketing</button>
+        <button id="send-director" class="flex-1 text-xs text-white bg-purple-500/10 border border-purple-500/20 rounded px-2 py-1">Send to Director</button>
+        <button id="send-library" class="flex-1 text-xs text-white bg-yellow-500/10 border border-yellow-500/20 rounded px-2 py-1">Send to Library</button>
+      </div>
   `;
 
   chatPanel.appendChild(messagesContainer);
@@ -186,9 +209,11 @@ export function AIAgentApp() {
   document.getElementById('save-btn').onclick = saveAgent;
   document.getElementById('export-btn').onclick = exportAgent;
   document.getElementById('send-btn').onclick = sendMessage;
-  document.getElementById('send-workflow').onclick = () => sendOutput('workflow');
-  document.getElementById('send-design').onclick = () => sendOutput('design');
-  document.getElementById('send-marketing').onclick = () => sendOutput('marketing');
+document.getElementById('send-workflow').onclick = () => sendOutput('workflow');
+   document.getElementById('send-design').onclick = () => sendOutput('design');
+   document.getElementById('send-marketing').onclick = () => sendOutput('marketing');
+   document.getElementById('send-director').onclick = () => sendOutput('director');
+   document.getElementById('send-library').onclick = () => sendOutput('library');
 
   configPanel.addEventListener('change', (e) => {
     if (e.target.matches('input[type="checkbox"]')) {
@@ -229,11 +254,23 @@ export function AIAgentApp() {
     input.value = '';
     renderMessages();
 
-    setTimeout(() => {
-      const response = simulateAgentResponse(agent, message);
+    // Show typing indicator
+    const typingEl = document.createElement('div');
+    typingEl.className = 'flex gap-2 max-w-[80%]';
+    typingEl.innerHTML = `<div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs">🤖</div><div class="rounded-lg p-3 text-sm bg-white/5 border border-white/10"><span class="animate-pulse">Thinking...</span></div>`;
+    messagesContainer.appendChild(typingEl);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+    // Get response from OpenAI or simulate
+    getOpenAIResponse(agent, message).then(response => {
+      typingEl.remove();
       agent.messages.push({ role: 'assistant', content: response, timestamp: new Date().toISOString() });
       renderMessages();
-    }, 500);
+    }).catch(err => {
+      typingEl.remove();
+      agent.messages.push({ role: 'assistant', content: simulateAgentResponse(agent, message), timestamp: new Date().toISOString() });
+      renderMessages();
+    });
   }
 
   function renderMessages() {

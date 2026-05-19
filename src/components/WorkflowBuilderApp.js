@@ -1,35 +1,22 @@
-import { muapi } from '../lib/muapi.js';
+import { 
+  getTemplateWorkflows, 
+  getUserWorkflows, 
+  getPublishedWorkflows,
+  createWorkflow,
+  executeWorkflow,
+  getNodeStatus
+} from '../lib/muapi.js';
 import { navigate } from '../lib/router.js';
+import * as vibeWorkflowService from '../apps/vibe-workflow/services/vibeWorkflowService.js';
 
 const STORAGE_KEY = 'higgsfield.workflows';
-const HANDOFF_KEYS = {
-  render: 'higgsfield.pendingRenderWorkflow',
-  director: 'higgsfield.pendingDirectorWorkflow',
-  agent: 'higgsfield.pendingWorkflowAgentOutput'
-};
-
 const NODE_TYPES = [
-  { id: 'text-prompt', name: 'Text Prompt', icon: '📝', description: 'Input text prompt for generation' },
-  { id: 'image-generation', name: 'Image Generation', icon: '🎨', description: 'Generate images from text' },
-  { id: 'image-to-video', name: 'Image to Video', icon: '🎬', description: 'Animate images to video' },
-  { id: 'video-generation', name: 'Video Generation', icon: '🎥', description: 'Generate video from text' },
-  { id: 'lipsync', name: 'Lip Sync', icon: '🗣️', description: 'Sync audio to video' },
-  { id: 'upscale', name: 'Upscale', icon: '🔍', description: 'Enhance resolution' },
-  { id: 'edit', name: 'Edit', icon: '✏️', description: 'Edit and refine media' },
-  { id: 'render', name: 'Render', icon: '📤', description: 'Export final output' },
-  { id: 'director', name: 'Director', icon: '🎬', description: 'Cinematic scene planning' },
-  { id: 'ai-agent', name: 'AI Agent', icon: '🤖', description: 'Run AI agent tasks' },
-  { id: 'design-agent', name: 'Design Agent', icon: '✨', description: 'Generate designs' },
-  { id: 'webhook', name: 'Webhook/API', icon: '🔗', description: 'Call external API' },
+  { id: 'text', name: 'Text Input', icon: '📝', color: 'bg-blue-500/20 border-blue-500/50' },
+  { id: 'image', name: 'Image Gen', icon: '🎨', color: 'bg-purple-500/20 border-purple-500/50' },
+  { id: 'video', name: 'Video Gen', icon: '🎬', color: 'bg-red-500/20 border-red-500/50' },
+  { id: 'openai', name: 'OpenAI', icon: '🤖', color: 'bg-green-500/20 border-green-500/50' },
+  { id: 'output', name: 'Output', icon: '📤', color: 'bg-yellow-500/20 border-yellow-500/50' }
 ];
-
-const MODELS = {
-  'image-generation': ['flux-dev', 'flux-schnell', 'midjourney', 'hidream-fast'],
-  'video-generation': ['veo3', 'kling-master', 'wan2.1', 'seedance-pro'],
-  'lipsync': ['wav2lip', 'first-order-model'],
-  'upscale': ['esrgan', 'real-esrgan', 'swinir'],
-  'edit': ['lama', 'deletion', 'inpainting'],
-};
 
 function safeReadStorage(key, fallback) {
   try {
@@ -42,25 +29,40 @@ function safeWriteStorage(key, value) {
   try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* ignore */ }
 }
 
-function createId(prefix) {
-  return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+function handoffOutput(target, output) {
+  const HANDOFF_KEYS = {
+    library: 'higgsfield.pendingLibraryOutput',
+    render: 'higgsfield.pendingRenderOutput',
+    director: 'higgsfield.pendingDirectorOutput',
+    timeline: 'higgsfield.pendingTimelineOutput',
+    'edit-studio': 'higgsfield.pendingEditStudioOutput'
+  };
+  if (HANDOFF_KEYS[target]) {
+    sessionStorage.setItem(HANDOFF_KEYS[target], JSON.stringify({ content: output, app: 'vibe-workflow' }));
+  }
 }
 
 export function WorkflowBuilderApp() {
   const container = document.createElement('div');
   container.className = 'w-full h-full flex flex-col bg-app-bg overflow-hidden';
 
-  let workflow = {
-    id: createId('workflow'),
-    name: 'Untitled Workflow',
-    goal: '',
-    category: 'Video Generation',
-    steps: [],
-    executionLog: [],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+  // State
+  let state = {
+    activeTab: 'templates',
+    workflows: [],
+    currentWorkflow: null,
+    nodes: [],
+    runStatus: null,
+    isRunning: false
   };
 
+  // Load from storage
+  const persisted = safeReadStorage(STORAGE_KEY, null);
+  if (persisted) {
+    state = { ...state, ...persisted };
+  }
+
+  // Header
   const header = document.createElement('div');
   header.className = 'flex items-center justify-between p-4 border-b border-white/10 bg-black/20';
   header.innerHTML = `
@@ -69,288 +71,222 @@ export function WorkflowBuilderApp() {
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="5" x2="5" y2="19"/><line x1="5" y1="19" x2="19" y2="5"/></svg>
       </button>
       <div>
-        <p class="text-xs font-bold text-muted uppercase tracking-wider">Workflow Builder</p>
+        <p class="text-xs font-bold text-muted uppercase tracking-wider">Workflows</p>
         <h1 class="text-lg font-bold text-white">AI Workflow Builder</h1>
       </div>
     </div>
     <div class="flex items-center gap-2">
-      <button id="load-btn" class="px-3 py-1.5 text-xs font-bold text-white bg-white/5 border border-white/10 rounded-lg hover:bg-white/10">Load</button>
-      <button id="save-btn" class="px-3 py-1.5 text-xs font-bold text-white bg-primary/10 border border-primary/20 rounded-lg hover:bg-primary/20">Save</button>
-      <button id="run-btn" class="px-3 py-1.5 text-xs font-bold text-black bg-primary border-none rounded-lg hover:bg-primary/80">Run</button>
+      <button id="run-btn" class="px-3 py-1.5 text-xs font-bold text-white bg-primary border-none rounded-lg hover:bg-primary/80">Run Workflow</button>
+      <button id="save-btn" class="px-3 py-1.5 text-xs font-bold text-white bg-white/5 border border-white/10 rounded-lg hover:bg-white/10">Save</button>
     </div>
   `;
   container.appendChild(header);
 
-  const main = document.createElement('flex-1 flex flex-col lg:flex-row overflow-hidden');
-  main.className = 'flex-1 flex flex-col lg:flex-row overflow-hidden';
+  // Main content
+  const main = document.createElement('div');
+  main.className = 'flex-1 flex overflow-hidden';
 
+  // Sidebar - Node Palette
   const sidebar = document.createElement('div');
-  sidebar.className = 'w-full lg:w-64 border-r border-white/10 bg-black/20 p-3 overflow-y-auto';
+  sidebar.className = 'w-64 border-r border-white/10 bg-black/20 p-4 overflow-y-auto';
   sidebar.innerHTML = `
-    <p class="text-xs font-bold text-muted uppercase tracking-wider mb-3">Node Types</p>
-    <div id="node-types" class="space-y-1"></div>
+    <p class="text-xs font-bold text-muted uppercase tracking-wider mb-3">Node Palette</p>
+    <div id="node-palette" class="space-y-2"></div>
   `;
-
-  const nodeTypesContainer = sidebar.querySelector('#node-types');
-  NODE_TYPES.forEach(nt => {
-    const nodeBtn = document.createElement('button');
-    nodeBtn.className = 'w-full text-left p-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all';
-    nodeBtn.dataset.type = nt.id;
-    nodeBtn.innerHTML = `
-      <div class="flex items-center gap-2">
-        <span>${nt.icon}</span>
-        <div class="flex-1 min-w-0">
-          <div class="text-xs font-bold text-white">${nt.name}</div>
-          <div class="text-[10px] text-secondary">${nt.description}</div>
-        </div>
-      </div>
-    `;
-    nodeBtn.ondragstart = (e) => e.preventDefault();
-    nodeBtn.onclick = () => addNode(nt.id);
-    nodeTypesContainer.appendChild(nodeBtn);
+  
+  // Populate node palette
+  const nodePalette = sidebar.querySelector('#node-palette');
+  NODE_TYPES.forEach(nodeType => {
+    const btn = document.createElement('div');
+    btn.className = `p-3 rounded-lg border cursor-pointer hover:scale-105 transition-transform ${nodeType.color} text-white`;
+    btn.innerHTML = `<div class="flex items-center gap-2"><span class="text-lg">${nodeType.icon}</span><span class="text-sm font-bold">${nodeType.name}</span></div>`;
+    btn.dataset.nodeType = nodeType.id;
+    btn.onclick = () => addNode(nodeType.id);
+    nodePalette.appendChild(btn);
   });
+  main.appendChild(sidebar);
 
-  const canvasArea = document.createElement('flex-1 flex flex-col');
-  canvasArea.className = 'flex-1 flex flex-col';
-
-  const toolbar = document.createElement('div');
-  toolbar.className = 'flex items-center gap-2 p-3 border-b border-white/10 bg-black/20';
-  toolbar.innerHTML = `
-    <input type="text" id="workflow-name" placeholder="Workflow name..." value="${workflow.name}" class="flex-1 px-3 py-1.5 text-sm bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-muted focus:outline-none focus:border-primary/50">
-    <select id="workflow-category" class="px-3 py-1.5 text-sm bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none">
-      <option value="Video Generation">Video Generation</option>
-      <option value="Image Generation">Image Generation</option>
-      <option value="Marketing Automation">Marketing Automation</option>
-      <option value="Design Production">Design Production</option>
-      <option value="Rendering Pipeline">Rendering Pipeline</option>
-      <option value="Social Content">Social Content</option>
-      <option value="Custom">Custom</option>
-    </select>
-    <button id="add-step-btn" class="px-3 py-1.5 text-xs font-bold text-white bg-white/5 border border-white/10 rounded-lg hover:bg-white/10">Add Step</button>
-  `;
-
+  // Canvas Area
   const canvas = document.createElement('div');
-  canvas.className = 'flex-1 flex flex-col p-4 overflow-y-auto';
+  canvas.className = 'flex-1 relative bg-black/40 overflow-hidden';
   canvas.innerHTML = `
-    <div id="steps-container" class="space-y-3">
-      <div class="empty-state text-center py-10">
-        <p class="text-secondary text-sm">No steps yet. Add a step to begin building your workflow.</p>
+    <svg id="canvas-svg" class="absolute inset-0 w-full h-full"></svg>
+    <div id="canvas-placeholder" class="absolute inset-0 flex items-center justify-center text-secondary">
+      <div class="text-center">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="mx-auto mb-3 opacity-30"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <p>Drag nodes from the palette to build your workflow</p>
       </div>
     </div>
+    <div id="nodes-container" class="absolute inset-0"></div>
   `;
+  main.appendChild(canvas);
 
-  const footer = document.createElement('div');
-  footer.className = 'p-4 border-t border-white/10 bg-black/20 flex items-center justify-between';
-  footer.innerHTML = `
-    <div class="text-xs text-secondary">Workflows connect AI models in automated pipelines</div>
-    <div class="flex gap-2">
-      <button id="export-btn" class="px-3 py-1.5 text-xs font-bold text-white bg-white/5 border border-white/10 rounded-lg hover:bg-white/10">Export JSON</button>
-      <button id="import-btn" class="px-3 py-1.5 text-xs font-bold text-white bg-white/5 border border-white/10 rounded-lg hover:bg-white/10">Import JSON</button>
+  // Properties Panel
+  const properties = document.createElement('div');
+  properties.className = 'w-80 border-l border-white/10 bg-black/20 p-4 overflow-y-auto';
+  properties.innerHTML = `
+    <p class="text-xs font-bold text-muted uppercase tracking-wider mb-3">Properties</p>
+    <div id="properties-content" class="text-sm text-secondary">Select a node to edit its properties</div>
+  `;
+  main.appendChild(properties);
+
+  container.appendChild(main);
+
+  // Run status overlay
+  const runOverlay = document.createElement('div');
+  runOverlay.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black/80 hidden';
+  runOverlay.innerHTML = `
+    <div class="bg-[#111] border border-white/10 rounded-xl p-6 max-w-sm w-full mx-4">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full"></div>
+        <span class="text-white font-bold">Running workflow...</span>
+      </div>
+      <div id="run-status-text" class="text-sm text-secondary">Initializing</div>
+      <button id="cancel-run" class="mt-4 px-4 py-2 text-xs font-bold text-white bg-white/5 border border-white/10 rounded-lg hover:bg-white/10">Cancel</button>
     </div>
   `;
-
-  main.appendChild(sidebar);
-  main.appendChild(canvasArea);
-  canvasArea.appendChild(toolbar);
-  canvasArea.appendChild(canvas);
-  canvasArea.appendChild(footer);
-  container.appendChild(main);
+  document.body.appendChild(runOverlay);
 
   // Event listeners
   document.getElementById('back-btn').onclick = () => window.history.back();
-
-  document.getElementById('save-btn').onclick = saveWorkflow;
-  document.getElementById('load-btn').onclick = loadWorkflow;
   document.getElementById('run-btn').onclick = runWorkflow;
-  document.getElementById('add-step-btn').onclick = addStep;
-  document.getElementById('export-btn').onclick = exportWorkflow;
-  document.getElementById('import-btn').onclick = importWorkflow;
-
-  canvas.addEventListener('input', (e) => {
-    if (e.target.matches('.step-input')) {
-      const stepId = e.target.dataset.step;
-      const field = e.target.dataset.field;
-      const step = workflow.steps.find(s => s.id === stepId);
-      if (step) step[field] = e.target.value;
-    }
-  });
-
-  canvas.addEventListener('change', (e) => {
-    if (e.target.matches('.step-select')) {
-      const stepId = e.target.dataset.step;
-      const field = e.target.dataset.field;
-      const step = workflow.steps.find(s => s.id === stepId);
-      if (step) step[field] = e.target.value;
-    }
-  });
-
-  canvas.addEventListener('click', (e) => {
-    if (e.target.matches('[data-remove]')) {
-      const id = e.target.dataset.remove;
-      workflow.steps = workflow.steps.filter(s => s.id !== id);
-      renderSteps();
-    }
-    if (e.target.matches('[data-move-up]')) {
-      const id = e.target.dataset.moveUp;
-      const index = workflow.steps.findIndex(s => s.id === id);
-      if (index > 0) {
-        const temp = workflow.steps[index];
-        workflow.steps[index] = workflow.steps[index - 1];
-        workflow.steps[index - 1] = temp;
-        renderSteps();
-      }
-    }
-    if (e.target.matches('[data-move-down]')) {
-      const id = e.target.dataset.moveDown;
-      const index = workflow.steps.findIndex(s => s.id === id);
-      if (index < workflow.steps.length - 1) {
-        const temp = workflow.steps[index];
-        workflow.steps[index] = workflow.steps[index + 1];
-        workflow.steps[index + 1] = temp;
-        renderSteps();
-      }
-    }
-    if (e.target.matches('[data-duplicate]')) {
-      const id = e.target.dataset.duplicate;
-      const step = workflow.steps.find(s => s.id === id);
-      if (step) {
-        workflow.steps.push({ ...step, id: createId('step') });
-        renderSteps();
-      }
-    }
-  });
+  document.getElementById('save-btn').onclick = saveWorkflow;
+  document.getElementById('cancel-run').onclick = () => {
+    runOverlay.classList.add('hidden');
+    state.isRunning = false;
+  };
 
   function addNode(type) {
-    addStep(type);
-  }
-
-  function addStep(type = 'text-prompt') {
-    const step = {
-      id: createId('step'),
+    const node = {
+      id: 'node_' + Date.now(),
       type: type,
-      label: NODE_TYPES.find(nt => nt.id === type)?.name || type,
-      model: MODELS[type]?.[0] || '',
-      input: {},
-      config: {},
-      status: 'pending'
+      name: NODE_TYPES.find(n => n.id === type)?.name || 'Node',
+      x: 100,
+      y: 100,
+      config: {}
     };
-    workflow.steps.push(step);
-    renderSteps();
+    state.nodes.push(node);
+    renderNodes();
   }
 
-  function renderSteps() {
-    const container = document.getElementById('steps-container');
-    if (!container) return;
-
-    if (workflow.steps.length === 0) {
-      container.innerHTML = '<div class="empty-state text-center py-10"><p class="text-secondary text-sm">No steps yet. Add a step to begin building your workflow.</p></div>';
+  function renderNodes() {
+    const container = document.getElementById('nodes-container');
+    const placeholder = document.getElementById('canvas-placeholder');
+    
+    if (state.nodes.length === 0) {
+      placeholder.classList.remove('hidden');
       return;
     }
-
+    placeholder.classList.add('hidden');
+    
     container.innerHTML = '';
-    workflow.steps.forEach((step, index) => {
-      const stepEl = document.createElement('div');
-      stepEl.className = 'flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10';
-      stepEl.innerHTML = `
-        <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary font-bold text-xs">${index + 1}</div>
-        <div class="flex-1">
-          <input type="text" class="step-input text-sm font-bold text-white bg-transparent border-none focus:outline-none w-full" data-step="${step.id}" data-field="label" value="${step.label || step.type}">
-          <select class="step-select text-[10px] text-secondary bg-transparent border-none focus:outline-none w-full mt-1" data-step="${step.id}" data-field="type">
-            ${NODE_TYPES.map(nt => `<option value="${nt.id}" ${nt.id === step.type ? 'selected' : ''}>${nt.name}</option>`).join('')}
-          </select>
-          ${MODELS[step.type] ? `
-          <select class="step-select text-[10px] text-muted bg-transparent border-none focus:outline-none w-full mt-1" data-step="${step.id}" data-field="model">
-            ${MODELS[step.type].map(m => `<option value="${m}" ${m === step.model ? 'selected' : ''}>${m}</option>`).join('')}
-          </select>` : ''}
-        </div>
-        <div class="flex gap-1">
-          <button data-move-up="${step.id}" class="w-6 h-6 rounded bg-white/10 text-white/70 hover:bg-white/20">↑</button>
-          <button data-move-down="${step.id}" class="w-6 h-6 rounded bg-white/10 text-white/70 hover:bg-white/20">↓</button>
-          <button data-duplicate="${step.id}" class="w-6 h-6 rounded bg-white/10 text-white/70 hover:bg-white/20">⎘</button>
-          <button data-remove="${step.id}" class="w-6 h-6 rounded bg-red-500/10 text-red-400 hover:bg-red-500/20">×</button>
-        </div>
+    state.nodes.forEach(node => {
+      const nodeEl = document.createElement('div');
+      nodeEl.className = 'absolute w-48 bg-white/5 border border-white/10 rounded-lg cursor-move';
+      nodeEl.style.left = node.x + 'px';
+      nodeEl.style.top = node.y + 'px';
+      nodeEl.dataset.nodeId = node.id;
+      nodeEl.innerHTML = `
+        <div class="p-3 border-b border-white/10 font-bold text-sm text-white">${node.name}</div>
+        <div class="p-2 text-xs text-secondary">${node.type}</div>
       `;
-      container.appendChild(stepEl);
+      
+      // Make draggable
+      let isDragging = false;
+      let startX, startY;
+      
+      nodeEl.onmousedown = (e) => {
+        isDragging = true;
+        startX = e.clientX - node.x;
+        startY = e.clientY - node.y;
+        e.preventDefault();
+      };
+      
+      document.onmousemove = (e) => {
+        if (!isDragging) return;
+        node.x = e.clientX - startX;
+        node.y = e.clientY - startY;
+        nodeEl.style.left = node.x + 'px';
+        nodeEl.style.top = node.y + 'px';
+      };
+      
+      document.onmouseup = () => {
+        isDragging = false;
+      };
+      
+      nodeEl.onclick = (e) => {
+        if (isDragging) return;
+        e.stopPropagation();
+        selectNode(node);
+      };
+      
+      container.appendChild(nodeEl);
     });
   }
 
-  function saveWorkflow() {
-    workflow.name = document.getElementById('workflow-name').value;
-    workflow.category = document.getElementById('workflow-category').value;
-    workflow.updatedAt = new Date().toISOString();
-    const saved = safeReadStorage(STORAGE_KEY, []);
-    saved.push(workflow);
-    safeWriteStorage(STORAGE_KEY, saved);
+  function selectNode(node) {
+    const propsContent = document.getElementById('properties-content');
+    propsContent.innerHTML = `
+      <div class="space-y-3">
+        <div>
+          <label class="text-xs text-secondary">Node Name</label>
+          <input type="text" value="${node.name}" class="w-full px-2 py-1 text-xs bg-white/5 border border-white/10 rounded text-white" />
+        </div>
+        <div>
+          <label class="text-xs text-secondary">Type</label>
+          <div class="px-2 py-1 text-xs bg-white/5 border border-white/10 rounded text-white">${node.type}</div>
+        </div>
+      </div>
+    `;
   }
 
-  function loadWorkflow() {
-    const saved = safeReadStorage(STORAGE_KEY, []);
-    if (saved.length > 0) {
-      workflow = saved[saved.length - 1];
-      document.getElementById('workflow-name').value = workflow.name;
-      document.getElementById('workflow-category').value = workflow.category;
-      renderSteps();
+  async function runWorkflow() {
+    if (state.nodes.length === 0) {
+      alert('Add nodes to your workflow first');
+      return;
+    }
+    
+    runOverlay.classList.remove('hidden');
+    state.isRunning = true;
+    state.runStatus = 'running';
+    
+    try {
+      document.getElementById('run-status-text').textContent = 'Creating workflow...';
+      
+      const workflow = await vibeWorkflowService.createWorkflowLocal({
+        name: 'Higgsfield Workflow',
+        nodes: state.nodes
+      });
+      
+      document.getElementById('run-status-text').textContent = 'Executing workflow...';
+      
+      const result = await vibeWorkflowService.runWorkflow(workflow, { prompt: 'test' });
+      
+      state.runStatus = 'completed';
+      runOverlay.classList.add('hidden');
+      
+      if (result.url) {
+        await vibeWorkflowService.saveOutputToLibrary(result);
+        if (confirm('Workflow completed! Save to Library?')) {
+          handoffOutput('library', result);
+        }
+      }
+      alert('Workflow completed! Output: ' + JSON.stringify(result).slice(0, 100));
+    } catch (err) {
+      state.runStatus = 'error';
+      document.getElementById('run-status-text').textContent = 'Error: ' + err.message;
+      setTimeout(() => runOverlay.classList.add('hidden'), 3000);
     }
   }
 
-  function exportWorkflow() {
-    const data = JSON.stringify(workflow, null, 2);
-    const blob = new Blob([data], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${workflow.name || 'workflow'}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+  async function saveWorkflow() {
+    await vibeWorkflowService.saveWorkflowRun(state.currentWorkflow?.id || 'local', state);
+    safeWriteStorage(STORAGE_KEY, state);
+    alert('Workflow saved!');
   }
 
-  function importWorkflow() {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
-    input.onchange = (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          try {
-            workflow = JSON.parse(event.target.result);
-            document.getElementById('workflow-name').value = workflow.name;
-            document.getElementById('workflow-category').value = workflow.category;
-            renderSteps();
-          } catch (err) {
-            alert('Invalid JSON file');
-          }
-        };
-        reader.readAsText(file);
-      }
-    };
-    input.click();
-  }
-
-  function runWorkflow() {
-    saveWorkflow();
-    workflow.executionLog = [];
-    
-    workflow.steps.forEach((step, index) => {
-      workflow.executionLog.push({ step: step.id, status: 'running', startedAt: new Date().toISOString() });
-      
-      setTimeout(() => {
-        workflow.executionLog = workflow.executionLog.map(log => 
-          log.step === step.id ? { ...log, status: 'completed', finishedAt: new Date().toISOString() } : log
-        );
-      }, 1000);
-    });
-
-    // After completion, offer to send to render/director
-    setTimeout(() => {
-      const modal = confirm('Workflow completed! Send to Render Studio?');
-      if (modal) {
-        safeWriteStorage(HANDOFF_KEYS.render, JSON.stringify(workflow));
-        navigate('render');
-      }
-    }, workflow.steps.length * 1000 + 500);
-  }
+  // Initialize
+  renderNodes();
 
   return container;
 }

@@ -178,6 +178,7 @@ export function DesignAgentApp() {
         <div class="flex gap-2 justify-center mt-4">
           <button id="send-image" class="px-3 py-1.5 text-xs text-white bg-blue-500/10 border border-blue-500/20 rounded">Send to Image Studio</button>
           <button id="send-workflow" class="px-3 py-1.5 text-xs text-white bg-teal-500/10 border border-teal-500/20 rounded">Send to Workflow</button>
+          <button id="send-library" class="px-3 py-1.5 text-xs text-white bg-yellow-500/10 border border-yellow-500/20 rounded">Send to Library</button>
         </div>
       </div>
     </div>
@@ -192,8 +193,9 @@ export function DesignAgentApp() {
   document.getElementById('save-btn').onclick = saveProject;
   document.getElementById('export-btn').onclick = exportProject;
   document.getElementById('generate-btn').onclick = generateDesign;
-  document.getElementById('send-image').onclick = () => sendOutput('image');
-  document.getElementById('send-workflow').onclick = () => sendOutput('workflow');
+document.getElementById('send-image').onclick = () => sendOutput('image');
+   document.getElementById('send-workflow').onclick = () => sendOutput('workflow');
+   document.getElementById('send-library').onclick = () => sendOutput('library');
 
   function saveProject() {
     project.name = document.getElementById('project-name').value;

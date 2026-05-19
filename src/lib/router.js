@@ -53,10 +53,10 @@ const pageLoaders = {
   videotools: () => import('../components/VideoToolsStudio.js').then(m => m.VideoToolsStudio()),
   chat: () => import('../components/ChatStudio.js').then(m => m.ChatStudio()),
   lipsync: () => import('../components/LipSyncStudio.js').then(m => m.LipSyncStudio()),
-  workflows: () => import('../components/VibeWorkflowPage.js').then(m => m.VibeWorkflowPage()),
-  'workflows/editor': () => import('../components/VibeWorkflowPage.js').then(m => m.VibeWorkflowPage()),
-  'workflows/history': () => import('../components/VibeWorkflowPage.js').then(m => m.VibeWorkflowPage()),
-  'workflows/settings': () => import('../components/VibeWorkflowPage.js').then(m => m.VibeWorkflowPage()),
+  workflows: () => import('../components/WorkflowBuilderApp.js').then(m => m.WorkflowBuilderApp()),
+  'workflows/editor': () => import('../components/WorkflowBuilderApp.js').then(m => m.WorkflowBuilderApp()),
+  'workflows/history': () => import('../components/WorkflowBuilderApp.js').then(m => m.WorkflowBuilderApp()),
+  'workflows/settings': () => import('../components/WorkflowBuilderApp.js').then(m => m.WorkflowBuilderApp()),
   agents: () => import('../components/AgentStudio.js').then(m => m.AgentStudio()),
   assistant: () => import('../components/AssistantStudio.js').then(m => m.AssistantStudio()),
   studio: () => import('../components/StudioApp.js').then(m => m.StudioApp()),
@@ -89,20 +89,19 @@ const pageLoaders = {
   director: () => import('../components/DirectorPage.js').then(m => m.DirectorPage()),
   timeline: () => import('../components/PlaceholderPage.js').then(m => () => m.PlaceholderPage('Timeline')),
   'timeline-test': () => import('../components/TimelineTestPage.jsx').then(m => m.TimelineTestPage),
-  'remix-go': () => import('../components/RemixGoPage.js').then(m => m.RemixGoPage()),
+  'remix-go': () => import('../apps/remix-go/index.js').then(m => m.RemixGoApp()),
   'ai-video-outreach': () => import('../components/AIVideoOutreachPage.js').then(m => m.AIVideoOutreachPage()),
-  'ai-headshot': () => import('../components/AIHeadshotPage.js').then(m => m.AIHeadshotPage()),
+  'ai-headshot': () => import('../components/HeadshotStudio.js').then(m => m.HeadshotStudio()),
   'runway-motion': () => import('../components/RunwayMotionStudio.js').then(m => m.RunwayMotionStudio()),
   'tiktok-carousel': () => import('../components/TikTokCarouselStudio.js').then(m => m.TikTokCarouselStudio()),
   'advanced-dubbing': () => import('../components/AdvancedDubbingStudio.js').then(m => m.AdvancedDubbingStudio()),
   landing: () => import('../components/landing/LandingPage.jsx').then(m => m.LandingPage()),
   signin: () => import('../components/landing/SignInPage.jsx').then(m => m.SignInPage()),
-  headshots: () => import('../components/HeadshotStudioPage.js').then(m => m.HeadshotStudioPage()),
-  'headshots-generate': () => import('../components/HeadshotStudioPage.js').then(m => m.HeadshotStudioPage()),
-  'headshots-history': () => import('../components/HeadshotStudioPage.js').then(m => m.HeadshotStudioPage()),
-  'headshots-settings': () => import('../components/HeadshotStudioPage.js').then(m => m.HeadshotStudioPage()),
+  headshots: () => import('../components/HeadshotStudio.js').then(m => m.HeadshotStudio()),
+  'headshots-generate': () => import('../components/HeadshotStudio.js').then(m => m.HeadshotStudio()),
+  'headshots-history': () => import('../components/HeadshotStudio.js').then(m => m.HeadshotStudio()),
+  'headshots-settings': () => import('../components/HeadshotStudio.js').then(m => m.HeadshotStudio()),
   personalizer: () => import('../components/PlaceholderPage.js').then(m => () => m.PlaceholderPage('Personalizer')),
-  'open-pomelli': () => import('../components/OpenPomelliPage.js').then(m => m.OpenPomelliPage()),
   'pomelli-studio': () => import('../components/PomelliStudio.js').then(m => m.PomelliStudio()),
   'workflow-studio': () => import('../components/WorkflowStudioApp.js').then(m => m.WorkflowStudioApp()),
   'agents/create': () => import('../components/AIAgentApp.js').then(m => m.AIAgentApp()),
@@ -202,8 +201,8 @@ export async function navigate(page, params = {}) {
       const mod = await import('../components/TemplateStudio.js');
       element = mod.TemplateStudio(templateId);
     } else if (page.startsWith('workflows/')) {
-      const mod = await import('../components/VibeWorkflowPage.js');
-      element = mod.VibeWorkflowPage();
+      const mod = await import('../components/WorkflowBuilderApp.js');
+      element = mod.WorkflowBuilderApp();
     } else if (page.startsWith('agents/')) {
       const mod = await import('../components/AIAgentApp.js');
       element = mod.AIAgentApp();

@@ -3,6 +3,9 @@ import { generateMarketingStudioAd, uploadFile } from '../lib/muapi.js';
 import { MARKETING_STUDIO_ASSETS, MARKETING_STUDIO_OPTIONS } from '../data/importedStudioAssets.js';
 
 const STORAGE_KEY = 'higgsfield.marketingStudio';
+const HANDOFF_KEYS = {
+  library: 'higgsfield.pendingLibraryOutput'
+};
 
 function safeReadStorage(key, fallback) {
   try {
@@ -316,6 +319,7 @@ export function MarketingStudioApp() {
       <button class="absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white">✕</button>
       <video src="${url}" controls autoplay class="max-w-[95vw] max-h-[90vh] rounded-lg"></video>
       <div class="absolute bottom-6 flex gap-3">
+        <button id="library-btn" class="px-4 py-2 text-white bg-yellow-500/10 border border-yellow-500/20 rounded font-bold">Save to Library</button>
         <button id="download-btn" class="px-4 py-2 bg-primary text-black rounded font-bold">Download</button>
       </div>
     `;
@@ -325,6 +329,10 @@ export function MarketingStudioApp() {
       a.href = url;
       a.download = `marketing-ad-${Date.now()}.mp4`;
       a.click();
+    };
+    modal.querySelector('#library-btn').onclick = () => {
+      safeWriteStorage(HANDOFF_KEYS.library, JSON.stringify({ url, app: 'marketing-studio' }));
+      navigate('library');
     };
     document.body.appendChild(modal);
   }
