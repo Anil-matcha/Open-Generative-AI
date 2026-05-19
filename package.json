@@ -107,14 +107,21 @@
     "@supabase/supabase-js": "^2.99.0",
     "@tailwindcss/postcss": "^4.1.18",
     "@tailwindcss/vite": "^4.2.4",
+    "axios": "^1.16.0",
     "canvas-confetti": "^1.9.4",
     "dompurify": "^3.3.3",
     "framer-motion": "^12.38.0",
     "interactjs": "^1.10.27",
+    "konva": "^10.3.0",
     "lucide-react": "^1.8.0",
     "mobx-react-lite": "^4.1.1",
     "moment": "^2.30.1",
-    "react-intersection-observer": "^10.0.3"
+    "react-hot-toast": "^2.6.0",
+    "react-intersection-observer": "^10.0.3",
+    "react-konva": "^19.2.4",
+    "react-markdown": "^10.1.0",
+    "react-syntax-highlighter": "^16.1.1",
+    "remark-gfm": "^4.0.1"
   },
   "engines": {
     "node": ">=18.0.0"

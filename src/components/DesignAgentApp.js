@@ -105,7 +105,7 @@ export function DesignAgentApp() {
   `;
   container.appendChild(header);
 
-  const main = document.createElement('flex-1 flex flex-row overflow-hidden');
+  const main = document.createElement('div');
   main.className = 'flex-1 flex flex-row overflow-hidden';
 
   const configPanel = document.createElement('div');

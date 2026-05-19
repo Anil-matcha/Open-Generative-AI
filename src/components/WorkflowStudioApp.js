@@ -214,8 +214,11 @@ export function WorkflowStudioApp() {
   }
 
   // Event listeners
-  document.getElementById('back-btn').onclick = () => window.history.back();
-  document.getElementById('new-workflow-btn').onclick = () => navigate('workflow-builder');
+  const backBtn = container.querySelector('#back-btn');
+  const newWorkflowBtn = container.querySelector('#new-workflow-btn');
+  
+  if (backBtn) backBtn.onclick = () => window.history.back();
+  if (newWorkflowBtn) newWorkflowBtn.onclick = () => navigate('workflow-builder');
 
   tabs.querySelectorAll('.tab-btn').forEach(btn => {
     btn.onclick = () => renderTab(btn.dataset.tab);

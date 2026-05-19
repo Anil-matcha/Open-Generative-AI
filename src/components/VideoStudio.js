@@ -426,7 +426,7 @@ export function VideoStudio() {
     // ==========================================
     // WAN AI EFFECTS SECTION
     // ==========================================
-    wanAiSection = document.createElement('div');
+    const wanAiSection = document.createElement('div');
     wanAiSection.className = 'w-full mt-6 animate-fade-in-up';
     wanAiSection.innerHTML = `
         <div class="bg-[#111]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-5 flex flex-col gap-4">

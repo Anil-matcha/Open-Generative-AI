@@ -65,8 +65,8 @@ const PRODUCTION_CSP = [
 
 const DEVELOPMENT_CSP = [
   "default-src 'self'",
-  "script-src 'self' https://cdn.jsdelivr.net",
-  "style-src 'self' https://fonts.googleapis.com",
+  "script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'",
+  "style-src 'self' https://fonts.googleapis.com 'unsafe-inline'",
   "img-src 'self' data: https: blob:",
   "font-src 'self' https://fonts.gstatic.com",
   "connect-src 'self' https://api.supabase.co https://api.muapi.ai https://api.openai.com",
@@ -74,7 +74,6 @@ const DEVELOPMENT_CSP = [
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",
-  "upgrade-insecure-requests",
   "referrer-policy 'strict-origin-when-cross-origin'"
 ].join('; ');
 
@@ -83,16 +82,16 @@ export default defineConfig({
     root: './',
     publicDir: 'public',
     optimizeDeps: {
-        exclude: ['src/components/EffectsStudio.js'],
+        exclude: ['src/components/EffectsStudio.js', 'workflow-builder', 'ai-agent', 'design-agent'],
         esbuildOptions: {
           loader: {
             '.js': 'js'
           }
         }
     },
-esbuild: {
+    esbuild: {
           include: ['src/**/*.{js,jsx,ts,tsx}'],
-          exclude: ['src/components/EffectsStudio.js', 'src/components/TimelineEditorPage.jsx', 'director/**/*', 'apps/**/*', 'external-repos/**/*', 'modules/**/*']
+          exclude: ['src/components/EffectsStudio.js', 'src/components/TimelineEditorPage.jsx', 'director/**/*', 'apps/**/*', 'external-repos/**/*', 'modules/**/*', 'node_modules/workflow-builder/**/*', 'node_modules/ai-agent/**/*', 'node_modules/design-agent/**/*']
       },
 
     server: {

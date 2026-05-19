@@ -22,6 +22,62 @@ export const MARKETING_STUDIO_ASSETS = {
   ]
 };
 
+export const WORKFLOW_STUDIO_ASSETS = {
+  templates: [
+    { id: "text-to-image-flow", name: "Text to Image Flow", description: "Generate images from text prompts" },
+    { id: "image-to-video-flow", name: "Image to Video Flow", description: "Animate images into videos" },
+    { id: "batch-processing", name: "Batch Processing", description: "Process multiple inputs at once" },
+    { id: "storyboard-generator", name: "Storyboard Generator", description: "Create storyboards from concepts" }
+  ],
+  nodeSchemas: {}
+};
+
+export const AGENT_STUDIO_ASSETS = {
+  roles: [
+    { id: "creative-director", name: "Creative Director Agent", icon: "🎨", description: "Plan cinematic creative direction" },
+    { id: "prompt-engineer", name: "Prompt Engineer Agent", icon: "📝", description: "Optimize prompts for AI models" },
+    { id: "video-planning", name: "Video Planning Agent", icon: "🎬", description: "Plan video scenes and storyboards" },
+    { id: "storyboard", name: "Storyboard Agent", icon: "📋", description: "Create visual storyboards" },
+    { id: "marketing", name: "Marketing Agent", icon: "📈", description: "Generate marketing content" },
+    { id: "design", name: "Design Agent", icon: "✨", description: "Create UI designs and layouts" },
+    { id: "workflow", name: "Workflow Agent", icon: "🔗", description: "Build AI workflows" },
+    { id: "render", name: "Render Assistant", icon: "📤", description: "Optimize render settings" }
+  ],
+  tools: [
+    "generate-image", "generate-video", "create-storyboard", "rewrite-prompt",
+    "build-workflow", "landing-copy", "analyze-brand", "camera-movement",
+    "suggest-effects", "send-render", "send-director", "save-library"
+  ]
+};
+
+export const DESIGN_AGENT_ASSETS = {
+  categories: [
+    { id: "posters-flyers", name: "Posters/Flyers", icon: "🖼️" },
+    { id: "social-posts", name: "Social Posts", icon: "📱" },
+    { id: "logos", name: "Logos", icon: "🔤" },
+    { id: "brand-identity", name: "Brand Identity Boards", icon: "🎨" },
+    { id: "ui-mockups", name: "UI Mockups/App Screens", icon: "💻" },
+    { id: "product-mockups", name: "Product Mockups/Lifestyle", icon: "🛍️" },
+    { id: "illustrations", name: "Illustrations", icon: "🎨" },
+    { id: "youtube-thumbnails", name: "YouTube Thumbnails", icon: "▶️" },
+    { id: "print", name: "Print", icon: "🖨️" },
+    { id: "packaging-merch", name: "Packaging/Merch", icon: "📦" },
+    { id: "motion-ads", name: "Motion Ads/Social Video", icon: "🎥" },
+    { id: "animated-logos", name: "Animated Logos", icon: "🔤" },
+    { id: "spokesperson", name: "Spokesperson/Talking Head", icon: "👤" }
+  ],
+  styles: [
+    { id: "luxury-saas", name: "Luxury SaaS", description: "Premium, sophisticated design" },
+    { id: "dark-glassmorphism", name: "Dark Glassmorphism", description: "Modern glass-like effects" },
+    { id: "cinematic-ai", name: "Cinematic AI", description: "Movie-style visuals" },
+    { id: "futuristic-tech", name: "Futuristic Tech", description: "Sci-fi inspired" },
+    { id: "clean-minimal", name: "Clean Minimal", description: "Simple, uncluttered" },
+    { id: "bold-drm", name: "Bold Direct Response", description: "High-converting designs" },
+    { id: "premium-agency", name: "Premium Agency", description: "Professional studio look" },
+    { id: "neon-creator", name: "Neon Creator Studio", description: "Glowing, vibrant" }
+  ]
+};
+
 export const MARKETING_STUDIO_OPTIONS = {
   ratio: ["9:16", "3:4", "4:3", "16:9", "1:1"],
   res: ["720p", "1080p"],
@@ -38,4 +94,20 @@ export function getAvatarByName(name) {
 
 export function getVideoFormatByName(name) {
   return MARKETING_STUDIO_ASSETS.ugc.find(u => u.name === name) || MARKETING_STUDIO_ASSETS.ugc[0];
+}
+
+export function getDefaultWorkflowTemplate() {
+  return WORKFLOW_STUDIO_ASSETS.templates[0];
+}
+
+export function getAgentRoleById(id) {
+  return AGENT_STUDIO_ASSETS.roles.find(r => r.id === id) || AGENT_STUDIO_ASSETS.roles[0];
+}
+
+export function getDesignCategoryById(id) {
+  return DESIGN_AGENT_ASSETS.categories.find(c => c.id === id) || DESIGN_AGENT_ASSETS.categories[0];
+}
+
+export function getDesignStyleById(id) {
+  return DESIGN_AGENT_ASSETS.styles.find(s => s.id === id) || DESIGN_AGENT_ASSETS.styles[0];
 }

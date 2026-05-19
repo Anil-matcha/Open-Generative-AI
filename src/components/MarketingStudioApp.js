@@ -76,24 +76,28 @@ export function MarketingStudioApp() {
         <textarea id="prompt" placeholder="Describe your ad scene..." class="w-full px-3 py-2 text-sm bg-white/5 border border-white/10 rounded-lg text-white resize-y min-h-[80px]"></textarea>
       </div>
 
-      <!-- Uploads -->
-      <div>
-        <label class="text-xs text-secondary mb-1 block">Assets</label>
-        <div class="flex gap-2">
-          <div class="flex-1">
-            <button id="upload-product" class="w-full px-3 py-2 text-xs bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 flex items-center justify-center gap-2">
-              <span>📦 Product</span>
-            </button>
-            <div id="product-preview" class="mt-1 h-16 rounded bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden"></div>
-          </div>
-          <div class="flex-1">
-            <button id="upload-avatar" class="w-full px-3 py-2 text-xs bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 flex items-center justify-center gap-2">
-              <span>👤 Avatar</span>
-            </button>
-            <div id="avatar-preview" class="mt-1 h-16 rounded bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden"></div>
-          </div>
-        </div>
-      </div>
+<!-- Uploads -->
+       <div>
+         <label class="text-xs text-secondary mb-1 block">Assets</label>
+         <div class="flex gap-2">
+           <div class="flex-1">
+             <button id="upload-product" class="w-full px-3 py-2 text-xs bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 flex items-center justify-center gap-2">
+               <span>📦 Product</span>
+             </button>
+             <div id="product-preview" class="mt-1 h-16 rounded bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden"></div>
+           </div>
+           <div class="flex-1">
+             <button id="upload-avatar" class="w-full px-3 py-2 text-xs bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 flex items-center justify-center gap-2">
+               <span>👤 Avatar</span>
+             </button>
+             <div id="avatar-preview" class="mt-1 h-16 rounded bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden"></div>
+           </div>
+         </div>
+         <button id="upload-reference" class="w-full px-3 py-1.5 text-xs bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 flex items-center justify-center gap-2 mt-2">
+           <span>📎 Additional Reference</span>
+         </button>
+         <div id="reference-preview" class="mt-1 flex gap-1 flex-wrap"></div>
+       </div>
 
       <!-- Avatar Presets -->
       <div>
