@@ -32,21 +32,65 @@
     memory = 1024
 
 # Redirects: SPA routing, API proxy, and app-specific routing
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-  force = false
-
+# API proxy - must be before SPA fallback
 [[redirects]]
   from = "/api/*"
   to = "https://api.muapi.ai/:splat"
   status = 200
   force = false
 
+# App redirects - must be before SPA fallback
 [[redirects]]
   from = "/apps/storyboarder/*"
   to = "/apps/storyboarder/index.html"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/apps/agents-studio/*"
+  to = "/apps/agents-studio/index.html"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/apps/studio/*"
+  to = "/apps/studio/index.html"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/apps/assistant/*"
+  to = "/apps/assistant/index.html"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/apps/workflow/*"
+  to = "/apps/workflow/index.html"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/apps/vibe-workflow/*"
+  to = "/apps/vibe-workflow/index.html"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/apps/remix-go/*"
+  to = "/apps/remix-go/index.html"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/apps/open-pomelli/*"
+  to = "/apps/open-pomelli/index.html"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/apps/ai-vfx/*"
+  to = "/apps/ai-vfx/index.html"
   status = 200
   force = false
 
@@ -57,48 +101,45 @@
   status = 200
   force = false
 
+# Static asset pass-through — MUST be before SPA fallback to prevent MIME type errors
+# Files in /assets/* and /apps/*/assets/* are real build artifacts, not routes
 [[redirects]]
-  from = "/api/pomelli-generate-campaign"
-  to = "https://bzxohkrxcwodllketcpz.supabase.co/functions/v1/pomelli-generate-campaign"
+  from = "/assets/*"
+  to = "/assets/:splat"
   status = 200
-  force = false
+  force = true
 
 [[redirects]]
-  from = "/api/pomelli-generate-asset"
-  to = "https://bzxohkrxcwodllketcpz.supabase.co/functions/v1/pomelli-generate-asset"
+  from = "/apps/*/assets/*"
+  to = "/apps/:1/assets/:splat"
   status = 200
-  force = false
-
-[[redirects]]
-  from = "/api/pomelli-generate-video"
-  to = "https://bzxohkrxcwodllketcpz.supabase.co/functions/v1/pomelli-generate-video"
-  status = 200
-  force = false
-
-[[redirects]]
-  from = "/api/pomelli-save-asset"
-  to = "https://bzxohkrxcwodllketcpz.supabase.co/functions/v1/pomelli-save-asset"
-  status = 200
-  force = false
+  force = true
 
 # Security Headers
 [[headers]]
   for = "/*"
-    [headers.values]
-      # Prevent clickjacking
-      X-Frame-Options = "DENY"
-      # Prevent MIME sniffing
-      X-Content-Type-Options = "nosniff"
-      # XSS protection
-      X-XSS-Protection = "1; mode=block"
-      # Strict Transport Security (HSTS) - enable after validation
-      Strict-Transport-Security = "max-age=31536000; includeSubDomains"
-      # Referrer policy
-      Referrer-Policy = "strict-origin-when-cross-origin"
-      # Permissions Policy
-      Permissions-Policy = "geolocation=(), microphone=(), camera=(), payment=(), usb=()"
-      # Content Security Policy - allows unsafe-inline for styles from external repos
-      Content-Security-Policy = "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'nonce-${NONCE}'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://api.muapi.ai https://supabase.co https://*.supabase.co https://api.openai.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests; block-all-mixed-content;"
+  [headers.values]
+    # Prevent clickjacking
+    X-Frame-Options = "DENY"
+    # Prevent MIME sniffing
+    X-Content-Type-Options = "nosniff"
+    # XSS protection
+    X-XSS-Protection = "1; mode=block"
+    # Strict Transport Security (HSTS) - enable after validation
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+    # Referrer policy
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    # Permissions Policy
+    Permissions-Policy = "geolocation=(), microphone=(), camera=(), payment=(), usb=()"
+    # Content Security Policy - allows unsafe-inline for styles from external repos
+    Content-Security-Policy = "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'nonce-${NONCE}'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://api.muapi.ai https://supabase.co https://*.supabase.co https://api.openai.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests; block-all-mixed-content;"
+
+# SPA fallback - must be LAST
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = false
 
 [build.processing]
   skip_processing = false

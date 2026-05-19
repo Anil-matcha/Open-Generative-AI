@@ -189,13 +189,13 @@ export function DesignAgentApp() {
   container.appendChild(main);
 
   // Event listeners
-  document.getElementById('back-btn').onclick = () => window.history.back();
-  document.getElementById('save-btn').onclick = saveProject;
-  document.getElementById('export-btn').onclick = exportProject;
-  document.getElementById('generate-btn').onclick = generateDesign;
-document.getElementById('send-image').onclick = () => sendOutput('image');
-   document.getElementById('send-workflow').onclick = () => sendOutput('workflow');
-   document.getElementById('send-library').onclick = () => sendOutput('library');
+  container.querySelector('#back-btn').onclick = () => window.history.back();
+  container.querySelector('#save-btn').onclick = saveProject;
+  container.querySelector('#export-btn').onclick = exportProject;
+  container.querySelector('#generate-btn').onclick = generateDesign;
+  container.querySelector('#send-image').onclick = () => sendOutput('image');
+  container.querySelector('#send-workflow').onclick = () => sendOutput('workflow');
+  container.querySelector('#send-library').onclick = () => sendOutput('library');
 
   function saveProject() {
     project.name = document.getElementById('project-name').value;
@@ -242,11 +242,11 @@ document.getElementById('send-image').onclick = () => sendOutput('image');
   }
 
   function renderOutputs() {
-    const container = document.getElementById('outputs-container');
-    container.innerHTML = '';
+    const el = container.querySelector('#outputs-container');
+    el.innerHTML = '';
 
     const selectedOutputs = [];
-    document.querySelectorAll('input[data-output]:checked').forEach(cb => selectedOutputs.push(cb.dataset.output));
+    container.querySelectorAll('input[data-output]:checked').forEach(cb => selectedOutputs.push(cb.dataset.output));
 
     selectedOutputs.forEach(outputType => {
       const outputEl = document.createElement('div');
@@ -259,15 +259,19 @@ document.getElementById('send-image').onclick = () => sendOutput('image');
       const content = document.createElement('div');
       content.className = 'text-xs text-secondary space-y-1';
       content.id = `output-${outputType}`;
-      content.textContent = project.outputs[outputType] || '';
+
+      const text = typeof project.outputs[outputType] === 'string'
+        ? project.outputs[outputType]
+        : JSON.stringify(project.outputs[outputType]);
+      content.textContent = text || '';
 
       outputEl.appendChild(title);
       outputEl.appendChild(content);
-      container.appendChild(outputEl);
+      el.appendChild(outputEl);
     });
 
     if (selectedOutputs.length === 0) {
-      container.innerHTML = '<div class="empty-state text-center py-10"><p class="text-secondary text-sm">Select output formats and click "Generate Design" to see results.</p></div>';
+      el.innerHTML = '<div class="empty-state text-center py-10"><p class="text-secondary text-sm">Select output formats and click "Generate Design" to see results.</p></div>';
     }
   }
 

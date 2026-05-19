@@ -167,13 +167,13 @@ export function MarketingStudioApp() {
   container.appendChild(main);
 
   // Event listeners
-  document.getElementById('back-btn').onclick = () => window.history.back();
-  document.getElementById('clear-btn').onclick = clearAll;
-  document.getElementById('generate-btn').onclick = generateAd;
-  document.getElementById('clear-history').onclick = clearHistory;
+  container.querySelector('#back-btn').onclick = () => window.history.back();
+  container.querySelector('#clear-btn').onclick = clearAll;
+  container.querySelector('#generate-btn').onclick = generateAd;
+  container.querySelector('#clear-history').onclick = clearHistory;
 
   // Avatar presets
-  const avatarPresetsContainer = document.getElementById('avatar-presets');
+  const avatarPresetsContainer = container.querySelector('#avatar-presets');
   MARKETING_STUDIO_ASSETS.avatar.forEach(avatar => {
     const btn = document.createElement('button');
     btn.className = 'aspect-square rounded-lg overflow-hidden border border-white/10 hover:border-primary/50 transition-all';
@@ -186,24 +186,24 @@ export function MarketingStudioApp() {
   });
 
   // Format select
-  document.getElementById('format-select').value = state.params.format;
-  document.getElementById('format-select').onchange = (e) => {
+  container.querySelector('#format-select').value = state.params.format;
+  container.querySelector('#format-select').onchange = (e) => {
     const format = MARKETING_STUDIO_ASSETS.ugc.find(u => u.name === e.target.value);
     state.params.format = format.name;
     state.params.videoUrl = format.url;
   };
 
   // Other selects
-  document.getElementById('ratio-select').value = state.params.ratio;
-  document.getElementById('ratio-select').onchange = (e) => state.params.ratio = e.target.value;
-  document.getElementById('res-select').value = state.params.res;
-  document.getElementById('res-select').onchange = (e) => state.params.res = e.target.value;
-  document.getElementById('duration-select').value = state.params.duration;
-  document.getElementById('duration-select').onchange = (e) => state.params.duration = parseInt(e.target.value);
+  container.querySelector('#ratio-select').value = state.params.ratio;
+  container.querySelector('#ratio-select').onchange = (e) => state.params.ratio = e.target.value;
+  container.querySelector('#res-select').value = state.params.res;
+  container.querySelector('#res-select').onchange = (e) => state.params.res = e.target.value;
+  container.querySelector('#duration-select').value = state.params.duration;
+  container.querySelector('#duration-select').onchange = (e) => state.params.duration = parseInt(e.target.value);
 
   // Upload handlers
-  document.getElementById('upload-product').onclick = () => triggerUpload('product');
-  document.getElementById('upload-avatar').onclick = () => triggerUpload('avatar');
+  container.querySelector('#upload-product').onclick = () => triggerUpload('product');
+  container.querySelector('#upload-avatar').onclick = () => triggerUpload('avatar');
 
   function triggerUpload(target) {
     const input = document.createElement('input');
@@ -226,15 +226,15 @@ export function MarketingStudioApp() {
   }
 
   function updatePreviews() {
-    const productPreview = document.getElementById('product-preview');
-    const avatarPreview = document.getElementById('avatar-preview');
+    const productPreview = container.querySelector('#product-preview');
+    const avatarPreview = container.querySelector('#avatar-preview');
 
-    productPreview.innerHTML = state.productImage 
-      ? `<img src="${state.productImage}" class="w-full h-full object-cover">` 
+    productPreview.innerHTML = state.productImage
+      ? `<img src="${state.productImage}" class="w-full h-full object-cover">`
       : '<span class="text-xs text-muted">No product</span>';
 
-    avatarPreview.innerHTML = state.avatarImage 
-      ? `<img src="${state.avatarImage}" class="w-full h-full object-cover">` 
+    avatarPreview.innerHTML = state.avatarImage
+      ? `<img src="${state.avatarImage}" class="w-full h-full object-cover">`
       : '<span class="text-xs text-muted">No avatar</span>';
   }
 
@@ -244,9 +244,9 @@ export function MarketingStudioApp() {
 
   async function generateAd() {
     if (!state.prompt.trim()) return alert('Please enter an ad script.');
-    if (!state.productImage) return alert('Please upload a product image.');
+     if (!state.productImage) return alert('Please upload a product image.');
 
-    const btn = document.getElementById('generate-btn');
+    const btn = container.querySelector('#generate-btn');
     btn.disabled = true;
     btn.innerHTML = '<span>Generating...</span>';
 
@@ -284,8 +284,8 @@ export function MarketingStudioApp() {
   }
 
   function renderHistory() {
-    const grid = document.getElementById('history-grid');
-    const empty = document.getElementById('empty-state');
+    const grid = container.querySelector('#history-grid');
+    const empty = container.querySelector('#empty-state');
 
     grid.innerHTML = '';
     if (state.history.length === 0) {
@@ -342,7 +342,7 @@ export function MarketingStudioApp() {
     state.productImage = null;
     state.avatarImage = null;
     state.additionalImages = [];
-    document.getElementById('prompt').value = '';
+    container.querySelector('#prompt').value = '';
     updatePreviews();
     persistState();
   }
@@ -354,8 +354,9 @@ export function MarketingStudioApp() {
   }
 
   // Initialize
-  document.getElementById('prompt').value = state.prompt;
-  document.getElementById('prompt').oninput = (e) => { state.prompt = e.target.value; persistState(); };
+  const promptEl = container.querySelector('#prompt');
+  promptEl.value = state.prompt;
+  promptEl.oninput = (e) => { state.prompt = e.target.value; persistState(); };
   updatePreviews();
   renderHistory();
 

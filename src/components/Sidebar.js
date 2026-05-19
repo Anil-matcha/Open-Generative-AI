@@ -7,7 +7,7 @@ export function Sidebar(navigate) {
     { id: 'apps', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>', label: 'Apps', tooltip: 'Apps — Browse and launch all available AI creative tools and applications' },
     { id: 'studio', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>', label: 'Studio', tooltip: 'Studio — Open Generative AI creative studio dashboard' },
     { id: 'assistant', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/></svg>', label: 'Assistant', tooltip: 'Assistant — Chat with AI assistants to brainstorm and get creative help' },
-    { id: 'workflow', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="3"/><circle cx="5" cy="19" r="3"/><circle cx="19" cy="19" r="3"/><line x1="12" y1="8" x2="5" y2="16"/><line x1="12" y1="8" x2="19" y2="16"/><line x1="5" y1="19" x2="19" y2="19"/></svg>', label: 'Workflow', tooltip: 'Workflow — Create and manage automated multi-step creative pipelines' },
+    { id: 'workflows', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="3"/><circle cx="5" cy="19" r="3"/><circle cx="19" cy="19" r="3"/><line x1="12" y1="8" x2="5" y2="16"/><line x1="12" y1="8" x2="19" y2="16"/><line x1="5" y1="19" x2="19" y2="19"/></svg>', label: 'Workflows', tooltip: 'Workflows — Create and manage automated multi-step AI workflows' },
     { id: 'agents', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4 4 4 0 0 1 4-4"/><path d="M8 14a6 6 0 0 0-6 6h20a6 6 0 0 0-6-6H8z"/><path d="M9 9h.01M15 9h.01"/></svg>', label: 'Agents', tooltip: 'Agents — Create and manage AI agents for creative tasks' },
     { id: 'image', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>', label: 'Image', tooltip: 'Image — Generate, edit, and enhance images using AI-powered tools' },
     { id: 'video', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>', label: 'Video', tooltip: 'Video — Create, edit, and produce AI-generated or imported video content' },
@@ -41,14 +41,12 @@ export function Sidebar(navigate) {
     { id: 'library', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>', label: 'Library', tooltip: 'Library — Access your media library of uploaded and generated assets' },
     { id: 'community', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>', label: 'Community', tooltip: 'Community — Connect with other creators, share work, and collaborate' },
     { id: 'marketing-studio', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18v14H3z"/><path d="M7 9h10"/><path d="M7 13h6"/></svg>', label: 'Marketing', tooltip: 'Marketing — Create marketing materials, ads, and promotional content with AI' },
-    { id: 'workflow-studio', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="3"/><circle cx="5" cy="19" r="3"/><circle cx="19" cy="19" r="3"/><line x1="12" y1="8" x2="5" y2="16"/><line x1="12" y1="8" x2="19" y2="16"/><line x1="5" y1="19" x2="19" y2="19"/></svg>', label: 'Workflow', tooltip: 'Workflow — Create and manage automated multi-step creative pipelines' },
+    { id: 'ai-workflow', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="3"/><circle cx="5" cy="19" r="3"/><circle cx="19" cy="19" r="3"/><line x1="12" y1="8" x2="5" y2="16"/><line x1="12" y1="8" x2="19" y2="16"/><line x1="5" y1="19" x2="19" y2="19"/></svg>', label: 'AI Workflow', tooltip: 'AI Workflow — Build and run AI-powered multi-step workflows' },
     { id: 'design-agent', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l1.09 3.26L16 6l-2.91.74L12 10l-1.09-3.26L8 6l2.91-.74L12 2z"/><path d="M5 15l.54 1.63L7 17.17l-1.46.37L5 19.17l-.54-1.63L3 17.17l1.46-.37L5 15z"/><path d="M19 11l.54 1.63L21 13.17l-1.46.37L19 15.17l-.54-1.63L17 13.17l1.46-.37L19 11z"/></svg>', label: 'Design Agent', tooltip: 'Design Agent — AI design assistant for layouts and creative projects' },
     { id: 'pomelli-studio', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18v14H3z"/><path d="M7 9h10"/><path d="M7 13h6"/></svg>', label: 'Pomelli', tooltip: 'Pomelli Studio — Full AI marketing studio for brand DNA, campaigns, photo studio, and animation' },
     { id: 'assist', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l1.09 3.26L16 6l-2.91.74L12 10l-1.09-3.26L8 6l2.91-.74L12 2z"/><path d="M5 15l.54 1.63L7 17.17l-1.46.37L5 19.17l-.54-1.63L3 17.17l1.46-.37L5 15z"/><path d="M19 11l.54 1.63L21 13.17l-1.46.37L19 15.17l-.54-1.63L17 13.17l1.46-.37L19 11z"/></svg>', label: 'Assist', tooltip: 'Assist — Get AI-powered suggestions and automated help for your creative tasks' },
     { id: 'commits', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h1a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3"/><path d="M8 3v2a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V3"/><path d="M14 9h-4"/><path d="M14 12h-2"/><path d="M14 15h-4"/></svg>', label: 'Commits (0)', tooltip: 'Commits — View version history and saved snapshots of your project' },
     { id: 'remix-go', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M10 9l5 3-5 3V9z"/><circle cx="16" cy="14" r="2"/></svg>', label: 'Remix Go', tooltip: 'Remix Go — Quickly remix and iterate on existing projects and templates' },
-    { id: 'ai-vfx', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/><circle cx="12" cy="8" r="1"/><path d="M12 14v4"/></svg>', label: 'AI-VFX', tooltip: 'AI-VFX — Generate cinematic visual effects using AI-powered tools' },
-    { id: 'ai-video-outreach', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/><circle cx="12" cy="19" r="1"/><circle cx="7" cy="4" r="1"/><circle cx="17" cy="4" r="1"/></svg>', label: 'AI Video Outreach', tooltip: 'AI Video Outreach — Create personalized video messages for outreach and engagement' },
   ];
 
   const bottomItems = [
@@ -57,7 +55,6 @@ export function Sidebar(navigate) {
   ];
 
   const buttons = {};
-  const appRoutes = ['studio', 'assistant', 'workflow', 'agents-studio'];
 
   const createButton = (item) => {
     const container = document.createElement('div');
@@ -85,17 +82,6 @@ export function Sidebar(navigate) {
         window.dispatchEvent(event);
         return;
       }
-
-if (appRoutes.includes(item.id)) {
-         window.open(`/apps/${item.id}/index.html`, '_blank');
-         return;
-       }
-
-       if (item.id === 'agents') {
-         window.open('/apps/agents-studio/index.html', '_blank');
-         return;
-       }
-
       navigate(item.id);
     };
 
@@ -120,8 +106,7 @@ if (appRoutes.includes(item.id)) {
 
   element.addEventListener('route-changed', (e) => {
     const page = e.detail.page;
-    const mappedPage = page.startsWith('template/') ? 'apps' : page;
-    const activePage = appRoutes.includes(page) ? page : mappedPage;
+    const activePage = page.startsWith('template/') ? 'apps' : page;
 
     Object.entries(buttons).forEach(([id, { iconBtn, label }]) => {
       if (id === activePage) {

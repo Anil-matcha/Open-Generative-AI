@@ -91,7 +91,7 @@ export default defineConfig({
     },
     esbuild: {
           include: ['src/**/*.{js,jsx,ts,tsx}'],
-          exclude: ['src/components/EffectsStudio.js', 'src/components/TimelineEditorPage.jsx', 'director/**/*', 'apps/**/*', 'external-repos/**/*', 'modules/**/*', 'node_modules/workflow-builder/**/*', 'node_modules/ai-agent/**/*', 'node_modules/design-agent/**/*']
+          exclude: ['src/components/EffectsStudio.js', 'src/components/TimelineEditorPage.jsx', 'director/**/*', 'external-repos/**/*', 'modules/**/*', 'node_modules/workflow-builder/**/*', 'node_modules/ai-agent/**/*', 'node_modules/design-agent/**/*']
       },
 
     server: {

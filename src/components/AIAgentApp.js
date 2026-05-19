@@ -205,15 +205,15 @@ export function AIAgentApp() {
   container.appendChild(main);
 
   // Event listeners
-  document.getElementById('back-btn').onclick = () => window.history.back();
-  document.getElementById('save-btn').onclick = saveAgent;
-  document.getElementById('export-btn').onclick = exportAgent;
-  document.getElementById('send-btn').onclick = sendMessage;
-document.getElementById('send-workflow').onclick = () => sendOutput('workflow');
-   document.getElementById('send-design').onclick = () => sendOutput('design');
-   document.getElementById('send-marketing').onclick = () => sendOutput('marketing');
-   document.getElementById('send-director').onclick = () => sendOutput('director');
-   document.getElementById('send-library').onclick = () => sendOutput('library');
+  container.querySelector('#back-btn').onclick = () => window.history.back();
+  container.querySelector('#save-btn').onclick = saveAgent;
+  container.querySelector('#export-btn').onclick = exportAgent;
+  container.querySelector('#send-btn').onclick = sendMessage;
+  container.querySelector('#send-workflow').onclick = () => sendOutput('workflow');
+  container.querySelector('#send-design').onclick = () => sendOutput('design');
+  container.querySelector('#send-marketing').onclick = () => sendOutput('marketing');
+  container.querySelector('#send-director').onclick = () => sendOutput('director');
+  container.querySelector('#send-library').onclick = () => sendOutput('library');
 
   configPanel.addEventListener('change', (e) => {
     if (e.target.matches('input[type="checkbox"]')) {
@@ -222,11 +222,11 @@ document.getElementById('send-workflow').onclick = () => sendOutput('workflow');
   });
 
   function saveAgent() {
-    agent.name = document.getElementById('agent-name').value;
-    agent.role = document.getElementById('agent-role').value;
-    agent.goal = document.getElementById('agent-goal').value;
-    agent.instructions = document.getElementById('agent-instructions').value;
-    agent.responseStyle = document.getElementById('response-style').value;
+    agent.name = container.querySelector('#agent-name').value;
+    agent.role = container.querySelector('#agent-role').value;
+    agent.goal = container.querySelector('#agent-goal').value;
+    agent.instructions = container.querySelector('#agent-instructions').value;
+    agent.responseStyle = container.querySelector('#response-style').value;
     agent.updatedAt = new Date().toISOString();
     
     const saved = safeReadStorage(STORAGE_KEY, []);

@@ -1,11 +1,3 @@
-import { 
-  getTemplateWorkflows, 
-  getUserWorkflows, 
-  getPublishedWorkflows,
-  createWorkflow,
-  executeWorkflow,
-  getNodeStatus
-} from '../lib/muapi.js';
 import { navigate } from '../lib/router.js';
 import * as vibeWorkflowService from '../apps/vibe-workflow/services/vibeWorkflowService.js';
 
@@ -147,11 +139,11 @@ export function WorkflowBuilderApp() {
   `;
   document.body.appendChild(runOverlay);
 
-  // Event listeners
-  document.getElementById('back-btn').onclick = () => window.history.back();
-  document.getElementById('run-btn').onclick = runWorkflow;
-  document.getElementById('save-btn').onclick = saveWorkflow;
-  document.getElementById('cancel-run').onclick = () => {
+  // Event listeners - query within container since elements aren't in document yet
+  container.querySelector('#back-btn').onclick = () => window.history.back();
+  container.querySelector('#run-btn').onclick = runWorkflow;
+  container.querySelector('#save-btn').onclick = saveWorkflow;
+  container.querySelector('#cancel-run').onclick = () => {
     runOverlay.classList.add('hidden');
     state.isRunning = false;
   };
@@ -170,8 +162,8 @@ export function WorkflowBuilderApp() {
   }
 
   function renderNodes() {
-    const container = document.getElementById('nodes-container');
-    const placeholder = document.getElementById('canvas-placeholder');
+    const nodesContainer = canvas.querySelector('#nodes-container');
+    const placeholder = canvas.querySelector('#canvas-placeholder');
     
     if (state.nodes.length === 0) {
       placeholder.classList.remove('hidden');
@@ -179,7 +171,7 @@ export function WorkflowBuilderApp() {
     }
     placeholder.classList.add('hidden');
     
-    container.innerHTML = '';
+    nodesContainer.innerHTML = '';
     state.nodes.forEach(node => {
       const nodeEl = document.createElement('div');
       nodeEl.className = 'absolute w-48 bg-white/5 border border-white/10 rounded-lg cursor-move';
@@ -220,7 +212,7 @@ export function WorkflowBuilderApp() {
         selectNode(node);
       };
       
-      container.appendChild(nodeEl);
+      nodesContainer.appendChild(nodeEl);
     });
   }
 
