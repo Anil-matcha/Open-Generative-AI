@@ -78,7 +78,9 @@
     "dev:workflows": "cd apps/workflows && npm run dev",
     "dev:agents": "cd apps/agents && npm run dev",
     "security:fix": "node scripts/generate-sri-hashes.js",
-    "security:scan": "npm run test:security:audit && npm run test:security:csp"
+    "security:scan": "npm run test:security:audit && npm run test:security:csp",
+    "apps:validate": "node scripts/validate-apps.mjs",
+    "apps:audit": "node scripts/audit-shell-apps.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
