@@ -3,6 +3,7 @@ import { AuthModal } from './AuthModal.js';
 import { createUploadPicker } from './UploadPicker.js';
 import { createHeroSection } from '../lib/thumbnails.js';
 import { securityService } from '../lib/services/SecurityService.js';
+import { GTMPromptModal } from './modals/GTMPromptModal.jsx';
 
 const STYLE_PRESETS = [
   'Realistic', 'DigitalCam', 'Quiet luxury', 'FashionShow', '90s Grain', 'Sunset beach',
@@ -126,7 +127,21 @@ export function InfluencerStudio() {
   promptInput.className = 'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder:text-muted focus:outline-none focus:border-primary/50 transition-colors resize-none';
   promptInput.rows = 2;
   promptInput.placeholder = 'Additional instructions (optional)';
-  formCard.appendChild(promptInput);
+  
+  // GTM Prompt Enhancer Button
+  const gtmBtn = document.createElement('button');
+  gtmBtn.className = 'absolute top-2 right-2 w-8 h-8 rounded-lg border bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/40 transition-all flex items-center justify-center text-xs';
+  gtmBtn.title = 'GTM Prompt Enhancement - Create conversion-optimized prompts';
+  gtmBtn.innerHTML = '🚀';
+  gtmBtn.onclick = () => {
+    openGTMPromptModal(promptInput);
+  };
+  
+  const promptContainer = document.createElement('div');
+  promptContainer.className = 'relative';
+  promptContainer.appendChild(promptInput);
+  promptContainer.appendChild(gtmBtn);
+  formCard.appendChild(promptContainer);
 
   const genBtn = document.createElement('button');
   genBtn.className = 'w-full bg-primary text-black py-3.5 rounded-xl font-black text-sm hover:shadow-glow transition-all mt-2';
@@ -176,6 +191,23 @@ export function InfluencerStudio() {
       genBtn.textContent = 'Generate Content';
     }
   };
+
+  // GTM Prompt Modal Function
+  function openGTMPromptModal(promptTextarea) {
+    try {
+      const modal = new GTMPromptModal({
+        appTheme: 'influencer-studio',
+        onPromptGenerated: (generatedPrompt) => {
+          promptTextarea.value = generatedPrompt;
+          promptTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+          console.log('GTM-optimized prompt loaded successfully!');
+        }
+      });
+      modal.open();
+    } catch (error) {
+      console.error('GTM Prompt Modal error:', error);
+    }
+  }
 
   return container;
 }

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="240" viewBox="0 0 400 240" fill="none">
+  <defs>
+    <linearGradient id="pomelliGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#dc2626"/>
+      <stop offset="100%" stop-color="#f97316"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" fill-opacity="0.3"/>
+    </filter>
+  </defs>
+  <rect width="400" height="240" rx="16" fill="url(#pomelliGrad)" fill-opacity="0.2"/>
+  <rect x="20" y="20" width="360" height="200" rx="12" fill="#0a0a0a" stroke="#ffffff" stroke-opacity="0.1"/>
+  <circle cx="100" cy="100" r="32" fill="#dc2626" filter="url(#glow)"/>
+  <rect x="80" y="150" width="40" height="8" rx="4" fill="#ffffff" fill-opacity="0.2"/>
+  <rect x="140" y="140" width="120" height="8" rx="4" fill="#ffffff" fill-opacity="0.2"/>
+  <rect x="140" y="160" width="80" height="8" rx="4" fill="#ffffff" fill-opacity="0.2"/>
+</svg>

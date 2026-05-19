@@ -143,12 +143,17 @@ export class GTMPromptModal extends BaseModal {
         accent: '#c084fc',
         secondary: '#6b7280'
       },
-      'cinematic-template-wizard': {
-        primary: '#7c3aed',
-        accent: '#a78bfa',
-        secondary: '#6b7280'
-      }
-    };
+'cinematic-template-wizard': {
+         primary: '#7c3aed',
+         accent: '#a78bfa',
+         secondary: '#6b7280'
+       },
+       'influencer-studio': {
+         primary: '#ec4899',
+         accent: '#f472b6',
+         secondary: '#6b7280'
+       }
+     };
     return schemes[theme] || schemes['timeline-editor'];
   }
 

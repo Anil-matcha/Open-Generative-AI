@@ -1,12 +1,2 @@
-<testsuites id="" name="" tests="4" failures="0" skipped="0" errors="0" time="56.472641">
-<testsuite name="main-app/cinegen.e2e.spec.ts" timestamp="2026-05-18T00:26:47.402Z" hostname="main-app-chromium" tests="4" failures="0" skipped="0" time="113.946" errors="0">
-<testcase name="CineGen Tools and UI Buttons E2E › button clicks trigger correct runCineGenTool calls and results panel updates" classname="main-app/cinegen.e2e.spec.ts" time="28.931">
-</testcase>
-<testcase name="CineGen Tools and UI Buttons E2E › keyboard shortcuts trigger CineGen tools" classname="main-app/cinegen.e2e.spec.ts" time="28.371">
-</testcase>
-<testcase name="CineGen Tools and UI Buttons E2E › error cases: failed tool call shows error in results" classname="main-app/cinegen.e2e.spec.ts" time="28.371">
-</testcase>
-<testcase name="CineGen Tools and UI Buttons E2E › clear results button works" classname="main-app/cinegen.e2e.spec.ts" time="28.273">
-</testcase>
-</testsuite>
+<testsuites id="" name="" tests="0" failures="0" skipped="0" errors="0" time="26.294318999999998">
 </testsuites>

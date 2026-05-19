@@ -59,7 +59,7 @@ const PRODUCTION_CSP = [
   "base-uri 'self'",
   "form-action 'self'",
   "upgrade-insecure-requests",
-  "referrer-policy 'strict-origin-when-cross-origin'",
+  "referrer 'strict-origin-when-cross-origin'",
   "block-all-mixed-content"
 ].join('; ');
 

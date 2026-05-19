@@ -28,7 +28,7 @@ export function FeaturesSection({ categories }) {
 
       <!-- Features Grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8" id="features-grid">
-        ${Object.entries(categories).map(([key, category], index) => `
+        ${(categories && Object.entries(categories).length > 0) ? Object.entries(categories).map(([key, category], index) => `
           <div class="feature-category opacity-0 translate-y-4 transition-all duration-500 ease-out-quart" style="transition-delay: ${index * 100}ms;" data-index="${index}">
             <div class="bg-gradient-to-br ${categoryColors[key].bg} border rounded-2xl p-6 hover:scale-105 transition-transform duration-300">
               <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-3">
@@ -49,7 +49,7 @@ export function FeaturesSection({ categories }) {
               </ul>
             </div>
           </div>
-        `).join('')}
+        `).join('') : ''}
       </div>
 
       <!-- CTA Button -->

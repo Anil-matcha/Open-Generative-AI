@@ -1,4 +1,6 @@
 import { createHeroSection } from '../lib/thumbnails.js';
+import { navigate } from '../lib/router.js';
+import { GTMPromptModal } from './modals/GTMPromptModal.jsx';
 
 export function VideoOutreachStudio() {
   const container = document.createElement('div');
@@ -20,11 +22,18 @@ export function VideoOutreachStudio() {
       </div>
 
       <div class="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        ${['Create Campaign','Import Contacts','Generate Scripts','Create Landing Pages'].map((item) => `
-          <button class="rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-left text-sm font-medium transition hover:border-cyan-300/40 hover:bg-cyan-400/10">
-            ${item}
-          </button>
-        `).join('')}
+        <button id="create-campaign-btn" class="rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-left text-sm font-medium transition hover:border-cyan-300/40 hover:bg-cyan-400/10">
+          Create Campaign
+        </button>
+        <button id="import-contacts-btn" class="rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-left text-sm font-medium transition hover:border-cyan-300/40 hover:bg-cyan-400/10">
+          Import Contacts
+        </button>
+        <button id="generate-scripts-btn" class="rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-left text-sm font-medium transition hover:border-cyan-300/40 hover:bg-cyan-400/10">
+          Generate Scripts
+        </button>
+        <button id="create-landing-btn" class="rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-left text-sm font-medium transition hover:border-cyan-300/40 hover:bg-cyan-400/10">
+          Create Landing Pages
+        </button>
       </div>
 
       <div class="mt-6 grid gap-6 lg:grid-cols-3">
@@ -64,6 +73,25 @@ export function VideoOutreachStudio() {
   if (heroBanner) {
     const innerDiv = container.querySelector('.mx-auto.max-w-7xl');
     if (innerDiv) innerDiv.prepend(heroBanner);
+  }
+
+  // Add event listeners for buttons
+  const createCampaignBtn = container.querySelector('#create-campaign-btn');
+  const importContactsBtn = container.querySelector('#import-contacts-btn');
+  const generateScriptsBtn = container.querySelector('#generate-scripts-btn');
+  const createLandingBtn = container.querySelector('#create-landing-btn');
+
+  if (createCampaignBtn) {
+    createCampaignBtn.addEventListener('click', () => navigate('campaigns/new'));
+  }
+  if (importContactsBtn) {
+    importContactsBtn.addEventListener('click', () => navigate('campaigns'));
+  }
+  if (generateScriptsBtn) {
+    generateScriptsBtn.addEventListener('click', () => navigate('campaigns'));
+  }
+  if (createLandingBtn) {
+    createLandingBtn.addEventListener('click', () => navigate('campaigns'));
   }
 
   return container;

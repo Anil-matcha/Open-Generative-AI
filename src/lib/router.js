@@ -89,7 +89,7 @@ const pageLoaders = {
   director: () => import('../components/DirectorPage.js').then(m => m.DirectorPage()),
   timeline: () => import('../components/PlaceholderPage.js').then(m => () => m.PlaceholderPage('Timeline')),
   'timeline-test': () => import('../components/TimelineTestPage.jsx').then(m => m.TimelineTestPage),
-  'remix-go': () => import('../apps/remix-go/index.js').then(m => m.RemixGoApp()),
+   'remix-go': () => import('../apps/remix-go/index.jsx').then(m => m.default()),
   'ai-video-outreach': () => import('../components/AIVideoOutreachPage.js').then(m => m.AIVideoOutreachPage()),
   'ai-headshot': () => import('../components/HeadshotStudio.js').then(m => m.HeadshotStudio()),
   'runway-motion': () => import('../components/RunwayMotionStudio.js').then(m => m.RunwayMotionStudio()),

@@ -143,7 +143,7 @@ export function WorkflowBuilderApp() {
   container.querySelector('#back-btn').onclick = () => window.history.back();
   container.querySelector('#run-btn').onclick = runWorkflow;
   container.querySelector('#save-btn').onclick = saveWorkflow;
-  container.querySelector('#cancel-run').onclick = () => {
+  document.querySelector('#cancel-run').onclick = () => {
     runOverlay.classList.add('hidden');
     state.isRunning = false;
   };

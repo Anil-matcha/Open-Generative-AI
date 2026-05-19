@@ -13,6 +13,32 @@ export const supabase: SupabaseClient<Database> = createClient<Database>(
   supabaseAnonKey
 );
 
+export async function getCurrentUser() {
+  const { data: { user } } = await supabase.auth.getUser();
+  return user;
+}
+
+export async function getMuapiWorkflows() {
+  const { data, error } = await supabase
+    .from('muapi_workflows')
+    .select('*')
+    .eq('is_active', true);
+  
+  if (error) throw error;
+  return data || [];
+}
+
+export async function createGenerationJob(job: Partial<Database['public']['Tables']['generation_jobs']['Insert']>) {
+  const { data, error } = await supabase
+    .from('generation_jobs')
+    .insert(job)
+    .select()
+    .single();
+  
+  if (error) throw error;
+  return data;
+}
+
 // Helper to check workspace membership
 export async function isWorkspaceMember(workspaceId: string): Promise<boolean> {
   const { data, error } = await supabase
