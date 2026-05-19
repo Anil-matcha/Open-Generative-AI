@@ -66,14 +66,27 @@ async function validateApp(appId) {
 }
 
 async function main() {
+  const strict = process.argv.includes('--strict');
   const apps = fs.readdirSync(APPS_DIR).filter(name => fs.statSync(path.join(APPS_DIR, name)).isDirectory());
   console.log(`Validating ${apps.length} apps in src/apps/...\n`);
+
+  let shellCount = 0;
+  let partialCount = 0;
 
   for (const app of apps) {
     const result = await validateApp(app);
     const icon = result.status === 'complete' ? '✅' : result.status === 'partial' ? '⚠️' : result.status === 'shell' ? '❌' : '💥';
     console.log(`${icon} ${app}: ${result.status}`);
     if (result.issues.length) console.log(`   Issues: ${result.issues.join(', ')}`);
+    if (result.status === 'shell') shellCount++;
+    if (result.status === 'partial') partialCount++;
+  }
+
+  if (strict && (shellCount > 0 || partialCount > 0)) {
+    console.log(`\n❌ Strict mode: ${shellCount} shell, ${partialCount} partial — failing validation.`);
+    process.exit(1);
+  } else if (strict) {
+    console.log(`\n✅ Strict mode: all apps pass.`);
   }
 }
 

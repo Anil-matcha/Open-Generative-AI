@@ -80,6 +80,7 @@
     "security:fix": "node scripts/generate-sri-hashes.js",
     "security:scan": "npm run test:security:audit && npm run test:security:csp",
     "apps:validate": "node scripts/validate-apps.mjs",
+    "apps:validate:strict": "node scripts/validate-apps.mjs --strict",
     "apps:audit": "node scripts/audit-shell-apps.mjs"
   },
   "devDependencies": {
@@ -118,6 +119,8 @@
     "lucide-react": "^1.8.0",
     "mobx-react-lite": "^4.1.1",
     "moment": "^2.30.1",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
     "react-hot-toast": "^2.6.0",
     "react-intersection-observer": "^10.0.3",
     "react-konva": "^19.2.4",
