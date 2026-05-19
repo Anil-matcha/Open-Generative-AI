@@ -5,10 +5,15 @@ const VFX_CATEGORIES = {
   'AI Effects': {
     effects: [
       { name: 'Kiss Me AI', effect: 'https://d3adwkbyhxyrtq.cloudfront.net/webassets/ai_effects/Kiss_Me_AI.webp' },
+      { name: 'Kiss', effect: 'https://d3adwkbyhxyrtq.cloudfront.net/webassets/ai_effects/Kiss.webp' },
       { name: 'Venom', effect: 'https://d3adwkbyhxyrtq.cloudfront.net/webassets/ai_effects/Venom.webp' },
       { name: 'Hulk', effect: 'https://d3adwkbyhxyrtq.cloudfront.net/webassets/ai_effects/Hulk_.webp' },
       { name: 'Muscle Surge', effect: 'https://d3adwkbyhxyrtq.cloudfront.net/webassets/ai_effects/Muscle_Surge.webp' },
       { name: 'The Tiger Touch', effect: 'https://d3adwkbyhxyrtq.cloudfront.net/webassets/ai_effects/The_Tiger_Touch.webp' },
+      { name: 'Anything, Robot', effect: 'https://d3adwkbyhxyrtq.cloudfront.net/webassets/ai_effects/Anything_Robot.webp' },
+      { name: 'Warmth of Jesus', effect: 'https://d3adwkbyhxyrtq.cloudfront.net/webassets/ai_effects/Warmth_of_Jesus.webp' },
+      { name: 'Holy Wings', effect: 'https://d3adwkbyhxyrtq.cloudfront.net/webassets/ai_effects/Holy_Wings.webp' },
+      { name: 'Microwave', effect: 'https://d3adwkbyhxyrtq.cloudfront.net/webassets/ai_effects/Microwave.webp' },
     ],
     icon: '⭐'
   },
@@ -17,8 +22,13 @@ const VFX_CATEGORIES = {
       { name: '360 Orbit', url: 'https://d3adwkbyhxyrtq.cloudfront.net/motioncontrols/360+Orbit.webp', trigger_word: '0rb4it 360 degree orbit', input_type: 'i2v' },
       { name: 'Hero Run', url: 'https://d3adwkbyhxyrtq.cloudfront.net/motioncontrols/Action+Run.webp', trigger_word: '4ct3ion Action Run', input_type: 'i2v' },
       { name: 'Arc Shot', url: 'https://d3adwkbyhxyrtq.cloudfront.net/motioncontrols/Arc.webp', trigger_word: '34Ar2c arc the camera moves in a smooth curve around', input_type: 'i2v' },
-      { name: 'Bullet Time', url: 'https://d3adwkbyhxyrtq.cloudfront.net/motioncontrols/Bullet+Time.webp', trigger_word: 'b4ll3t t1m3 bullet time shot', input_type: 'i2v' },
+      { name: 'Matrix Shot', url: 'https://d3adwkbyhxyrtq.cloudfront.net/motioncontrols/Bullet+Time.webp', trigger_word: 'b4ll3t t1m3 bullet time shot', input_type: 'i2v' },
       { name: 'Car Chase', url: 'https://d3adwkbyhxyrtq.cloudfront.net/motioncontrols/Car+Chasing.webp', trigger_word: 'c4r ch4s3 car chase', input_type: 'i2v' },
+      { name: 'Crane Down', url: 'https://d3adwkbyhxyrtq.cloudfront.net/motioncontrols/Crane+Down.webp', trigger_word: 'cr4n3 crane down camera motion', input_type: 'i2v' },
+      { name: 'Crane Overhead', url: 'https://d3adwkbyhxyrtq.cloudfront.net/motioncontrols/Crane+Over+The+Head.webp', trigger_word: 'cr4n3 crane over the head movement', input_type: 'i2v' },
+      { name: 'Crane Up', url: 'https://d3adwkbyhxyrtq.cloudfront.net/motioncontrols/Crane+Up.webp', trigger_word: 'cr4n3 crane up effect', input_type: 'i2v' },
+      { name: 'Crash Zoom In', url: 'https://d3adwkbyhxyrtq.cloudfront.net/motioncontrols/Crash+Zoom+In.webp', trigger_word: 'cr34sh crash zoom in effect', input_type: 'i2v' },
+      { name: 'Crash Zoom Out', url: 'https://d3adwkbyhxyrtq.cloudfront.net/motioncontrols/Crash+Zoom+Out.webp', trigger_word: 'cr34sh crash zoom out effect', input_type: 'i2v' },
     ],
     icon: '🎬'
   },
@@ -27,8 +37,15 @@ const VFX_CATEGORIES = {
       { name: 'Levitate', url: 'https://d3adwkbyhxyrtq.cloudfront.net/motioncontrols/Levitation.webp', trigger_word: 'lev1tate2_it0 levitate effect', input_type: 'i2v' },
       { name: 'Disintegration', url: 'https://d3adwkbyhxyrtq.cloudfront.net/motioncontrols/Disintegration.webp', trigger_word: 'd1s1nt34gration disintegration effect', input_type: 'i2v' },
       { name: 'Flying', url: 'https://d3adwkbyhxyrtq.cloudfront.net/motioncontrols/Flying.webp', trigger_word: 'f1y1ng smooth gliding flight', input_type: 'i2v' },
+      { name: 'Car Explosion', url: 'https://d3adwkbyhxyrtq.cloudfront.net/motioncontrols/Car+Explosion.webp', trigger_word: 'c3r exp356l0sion the car explodes bursting into flames and debris', input_type: 'i2v' },
+      { name: 'Tornado', url: 'https://d3adwkbyhxyrtq.cloudfront.net/motioncontrols/Tornado.webp', trigger_word: 't0r54d0 realistic tornado', input_type: 't2v' },
+      { name: 'Electricity', url: 'https://d3adwkbyhxyrtq.cloudfront.net/motioncontrols/Electricity.webp', trigger_word: 'e13c7r1c electricity effect', input_type: 'i2v' },
+      { name: 'Huge Explosion', url: 'https://d3adwkbyhxyrtq.cloudfront.net/motioncontrols/Huge+Explosion.webp', trigger_word: '3xp105ion huge explosion', input_type: 'i2v' },
+      { name: 'Decay Time-Lapse', url: 'https://d3adwkbyhxyrtq.cloudfront.net/motioncontrols/Decay+Time-Lapse.webp', trigger_word: 'd3c4y decay time-lapse begins', input_type: 'i2v' },
+      { name: 'Tsunami', url: 'https://d3adwkbyhxyrtq.cloudfront.net/motioncontrols/Tsunami.webp', trigger_word: 't5un@m1 realistic tsunami', input_type: 't2v' },
       { name: 'Fire', url: 'https://d3adwkbyhxyrtq.cloudfront.net/motioncontrols/Fire.webp', trigger_word: '[r3al_f1re]', input_type: 't2v' },
-      { name: 'Explosion', url: 'https://d3adwkbyhxyrtq.cloudfront.net/motioncontrols/Huge+Explosion.webp', trigger_word: '3xp105ion huge explosion', input_type: 'i2v' },
+      { name: 'Robotic Face Reveal', url: 'https://d3adwkbyhxyrtq.cloudfront.net/motioncontrols/Robotic+Face+Reveal.webp', trigger_word: 'r8b8t1c robotic face reveal', input_type: 'i2v' },
+      { name: 'Building Explosion', url: 'https://d3adwkbyhxyrtq.cloudfront.net/motioncontrols/Building+Explosion.webp', trigger_word: 'b32ldi4ng exp39lsion the building explodes in a massive blast', input_type: 'i2v' },
     ],
     icon: '⭐'
   },
@@ -330,7 +347,7 @@ export function AIVFXStudio() {
       <div class="max-w-6xl mx-auto">
         <div class="mb-10">
           <h1 class="text-3xl md:text-5xl font-black text-white tracking-tight mb-3">AI-VFX Studio</h1>
-          <p class="text-secondary text-sm md:text-base max-w-xl">Apply AI-powered visual effects and transformations to your videos and images with 50+ cinematic effects.</p>
+          <p class="text-secondary text-sm md:text-base max-w-xl">Apply AI-powered visual effects and transformations to your videos and images with 37 cinematic effects.</p>
         </div>
 
         <div class="flex items-center gap-2 mb-6 overflow-x-auto pb-2">
