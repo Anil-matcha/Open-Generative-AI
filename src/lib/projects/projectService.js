@@ -315,7 +315,7 @@ export class ProjectIntegrationService {
    * @param {Object} appConfig - App configuration
    */
   registerApp(appId, appConfig = {}) {
-    // Store app configuration for compatibility checking
+    validateAppManifest(appConfig, appId);
     this.appConfig = this.appConfig || {};
     this.appConfig[appId] = {
       version: appConfig.version || '1.0.0',
@@ -780,6 +780,17 @@ export class ProjectIntegrationService {
       });
     }
   }
+}
+
+function validateAppManifest(manifest, appId) {
+  if (!manifest || !manifest.id || !manifest.status) {
+    console.warn(`[AppRegistry] Incomplete manifest for ${appId}`);
+    return false;
+  }
+  if (manifest.status === 'production' && (!manifest.requiredServices || manifest.requiredServices.length === 0)) {
+    throw new Error(`[AppRegistry] Production app ${appId} missing requiredServices`);
+  }
+  return true;
 }
 
 // Export singleton instance
