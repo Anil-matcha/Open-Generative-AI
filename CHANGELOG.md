@@ -51,6 +51,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added missing `apps/ai-video-outreach` importer section to pnpm-lock.yaml
   - next@14.x, react@^18, react-dom@^18 dependencies now properly tracked in lockfile
   - Resolves "Cannot install with frozen-lockfile" error during Render builds
+- **JavaScript Runtime Errors**: Fixed page loading failures for video, workflow-studio, and design-agent routes
+  - VideoStudio: Added missing `const` declaration for wanAiSection variable
+  - WorkflowStudioApp: Replaced document.getElementById with container.querySelector and added null checks
+  - DesignAgentApp: Fixed invalid element tag name (changed to valid 'div')
 
 ### Added
 - **VFX Navigation**: Added dedicated VFX menu item in sidebar
