@@ -404,6 +404,7 @@ Every image you upload is saved locally (URL + thumbnail) so you never upload th
 Pick the entry point that matches your goal:
 
 - **Desktop app (Electron)** → `npm run electron:dev`
+- **Native macOS 26 preview (SwiftUI)** → `./script/build_native_macos.sh`
 - **Hosted web version (Next.js)** → `npm run dev`
 
 ```bash
@@ -421,6 +422,7 @@ npm run setup
 
 # Then start ONE of:
 npm run electron:dev   # Desktop app (Electron + Vite) — recommended
+./script/build_native_macos.sh # Native macOS 26 SwiftUI preview
 npm run dev            # Hosted web version (Next.js) → http://localhost:3000
 ```
 
@@ -454,6 +456,16 @@ npm run electron:build:all
 ```
 
 Installers are output to the `release/` folder. Pre-built binaries are also available on the [Releases page](https://github.com/Anil-matcha/Open-Generative-AI/releases).
+
+### Native macOS 26 Preview
+
+The repository also includes an experimental SwiftUI client in `macos/OpenGenerativeAI`. It is built for macOS 26 with SwiftUI's native sidebar, toolbar, Settings scene, keyboard commands, generated app icon, and Liquid Glass controls.
+
+```bash
+./script/build_native_macos.sh
+```
+
+This builds the SwiftPM app, stages a local `.app` bundle in `dist/macOS`, and launches it. The native client mirrors the Electron app's Image, Video, Cinema, Lip Sync, Workflows, Agents, and MCP CLI studio surfaces with native prompt, model, mode, upload, advanced control, settings, and history views. Image and video MuAPI submission/polling are wired; local engines and the remaining studio execution paths are exposed in the UI so the existing Electron backend services can be connected next.
 
 ## 🏗️ Architecture
 
