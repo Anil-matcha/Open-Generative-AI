@@ -73,7 +73,7 @@ export default function McpCliStudio() {
           </div>
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight">MCP 与 CLI</h1>
           <p className="text-white/60 text-base md:text-lg max-w-2xl">
-            你可以在终端、IDE 或任何兼容 MCP 的助手中使用 Open Generative AI。
+            你可以在终端、IDE 或任何兼容 MCP 的助手中使用 MozenAIGC。
             无需离开现有工作流，就能生成电影感图像、视频和音频。
           </p>
         </section>

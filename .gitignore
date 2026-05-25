@@ -25,6 +25,7 @@ dist-ssr
 
 # Electron build output
 release/
+release-linux-docker/
 .webpack/
 
 # Next.js

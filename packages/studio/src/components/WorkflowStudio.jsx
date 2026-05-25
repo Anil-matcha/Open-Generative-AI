@@ -14,6 +14,7 @@ import {
   getAllNodeSchemas,
   getWorkflowData,
 } from "../muapi.js";
+import { getActiveProvider, providerSupports } from "../apiProviders.js";
 import dynamic from "next/dynamic";
 
 const WorkflowUI = dynamic(() => import("./WorkflowUI"), {
@@ -29,6 +30,7 @@ const WorkflowUI = dynamic(() => import("./WorkflowUI"), {
     </div>
   ),
 });
+const MODULE_IN_DEVELOPMENT = true;
 
 const WORKFLOW_LABELS = {
   prompt: "提示词",
@@ -188,7 +190,7 @@ function AuthRequiredState({ title, message }) {
   );
 }
 
-export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggleHeader }) {
+export default function WorkflowStudio({ apiKey, apiConfig, isHeaderVisible = true, onToggleHeader }) {
   const params = useParams();
   const router = useRouter();
   const slug = params?.slug || [];
@@ -231,6 +233,9 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
   const hasApiKey = typeof normalizedApiKey === "string"
     ? Boolean(normalizedApiKey && normalizedApiKey !== "null" && normalizedApiKey !== "undefined")
     : Boolean(normalizedApiKey);
+  const activeProvider = apiConfig ? getActiveProvider(apiConfig) : null;
+  const providerLabel = activeProvider?.shortName || activeProvider?.name || "当前通道";
+  const supportsWorkflow = apiConfig ? providerSupports(apiConfig, "workflow") : true;
   
 
   // Handlers defined early so they can be used in effects
@@ -317,6 +322,10 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
     async (fromUrl = false) => {
       try {
         setLoading(true);
+        if (!supportsWorkflow) {
+          setError(`当前 ${providerLabel} 未标记支持工作流。请先在 API 管理中切换通道。`);
+          return;
+        }
         if (!fromUrl) {
           const payload = {
             workflow_id: null,
@@ -341,7 +350,7 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
         setLoading(false);
       }
     },
-    [apiKey, router],
+    [apiKey, providerLabel, router, supportsWorkflow],
   );
 
   const handleDeleteWorkflow = async (wfId) => {
@@ -447,13 +456,23 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
         if (activeMainTab === "templates") {
           data = await getTemplateWorkflows(apiKey);
         } else if (activeMainTab === "my-workflows") {
+          if (!supportsWorkflow) {
+            setWorkflows([]);
+            setError(`当前 ${providerLabel} 未标记支持工作流。请在 API 管理切换或开启支持工作流的通道。`);
+            return;
+          }
           if (!hasApiKey) {
             setWorkflows([]);
-            setError("请先在设置中保存 Muapi API Key，再查看你的工作流。");
+            setError(`请先在 API 管理中保存 ${providerLabel} API Key，再查看你的工作流。`);
             return;
           }
           data = await getUserWorkflows(apiKey);
         } else if (activeMainTab === "published") {
+          if (!supportsWorkflow) {
+            setWorkflows([]);
+            setError(`当前 ${providerLabel} 未标记支持工作流。请在 API 管理切换或开启支持工作流的通道。`);
+            return;
+          }
           data = await getPublishedWorkflows(apiKey);
         }
         setWorkflows(data);
@@ -465,7 +484,7 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
       }
     }
     loadWorkflows();
-  }, [apiKey, activeMainTab, hasApiKey]);
+  }, [apiKey, activeMainTab, hasApiKey, providerLabel, supportsWorkflow]);
 
   const handleRun = async (e) => {
     e.preventDefault();
@@ -625,7 +644,7 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
           {!hasApiKey ? (
             <AuthRequiredState
               title="需要 API Key"
-              message="模板可以浏览，但打开工作流详情、试用参数和编辑器需要有效的 Muapi API Key。请在右上角设置里保存后再继续。"
+              message={`模板可以浏览，但打开工作流详情、试用参数和编辑器需要有效的 ${providerLabel} API Key。请在 API 管理中保存后再继续。`}
             />
           ) : activeSubTab === "playground" ? (
             <>
@@ -700,13 +719,17 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
 
                     <button
                       type="submit"
-                      disabled={isExecuting || !selectedWorkflow.id}
+                      disabled={MODULE_IN_DEVELOPMENT || isExecuting || !selectedWorkflow.id}
                       className="w-full py-4 bg-[#d9ff00] text-black text-xs font-black uppercase tracking-[0.2em] rounded-xl hover:bg-white transition-all transform hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:grayscale shadow-[0_0_30px_rgba(217,255,0,0.15)] flex items-center justify-center gap-3 mt-8"
                     >
                       {isExecuting ? (
                         <>
                           <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
                           <span>生成中...</span>
+                        </>
+                      ) : MODULE_IN_DEVELOPMENT ? (
+                        <>
+                          <span>开发中</span>
                         </>
                       ) : (
                         <>
@@ -923,8 +946,14 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
             </div>
             <button
               onClick={() => handleCreateWorkflow()}
-              disabled={!hasApiKey}
-              title={hasApiKey ? "新建工作流" : "请先在设置中保存 Muapi API Key"}
+              disabled={MODULE_IN_DEVELOPMENT || !hasApiKey || !supportsWorkflow}
+              title={
+                !supportsWorkflow
+                  ? `当前 ${providerLabel} 未标记支持工作流`
+                  : hasApiKey
+                    ? "新建工作流"
+                    : `请先在 API 管理中保存 ${providerLabel} API Key`
+              }
               className="px-6 py-3 bg-[#d9ff00] text-black text-xs font-black uppercase tracking-widest rounded-lg hover:bg-white transition-all transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(217,255,0,0.3)] flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#d9ff00] disabled:hover:scale-100"
             >
               <svg
@@ -940,9 +969,15 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
                 <line x1="12" y1="5" x2="12" y2="19"></line>
                 <line x1="5" y1="12" x2="19" y2="12"></line>
               </svg>
-              新建工作流
+              {MODULE_IN_DEVELOPMENT ? "开发中" : "新建工作流"}
             </button>
           </div>
+
+          {!supportsWorkflow && (
+            <div className="rounded-lg border border-yellow-300/15 bg-yellow-400/10 px-4 py-3 text-[12px] leading-5 text-yellow-100/75">
+              当前 {providerLabel} 未标记支持工作流。模板可以浏览，个人工作流、运行和编辑建议切换到支持工作流的通道。
+            </div>
+          )}
 
           <div className="flex items-center gap-2 border-b border-white/5">
             <button

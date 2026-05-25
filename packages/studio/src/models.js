@@ -2249,6 +2249,30 @@ export const t2vModels = [
     }
   },
   {
+    "id": "sd-2",
+    "name": "Seedance 2.0 Flash",
+    "endpoint": "sd-2",
+    "family": "seedance-v2.0",
+    "aliases": ["seedance-v2.0-flash"],
+    "inputs": {
+      "prompt": { "type": "string", "title": "Prompt", "name": "prompt", "description": "The prompt to generate the video" },
+      "aspect_ratio": { "enum": ["16:9", "9:16", "4:3", "3:4"], "title": "Aspect Ratio", "name": "aspect_ratio", "type": "string", "description": "Aspect ratio of the output video.", "default": "16:9" },
+      "duration": { "enum": [5, 10, 15], "title": "Duration", "name": "duration", "type": "int", "description": "The duration of the generated video in seconds", "default": 5 }
+    }
+  },
+  {
+    "id": "sd-2-vip",
+    "name": "Seedance 2.0",
+    "endpoint": "sd-2-vip",
+    "family": "seedance-v2.0",
+    "aliases": ["seedance-v2.0"],
+    "inputs": {
+      "prompt": { "type": "string", "title": "Prompt", "name": "prompt", "description": "The prompt to generate the video" },
+      "aspect_ratio": { "enum": ["16:9", "9:16", "4:3", "3:4"], "title": "Aspect Ratio", "name": "aspect_ratio", "type": "string", "description": "Aspect ratio of the output video.", "default": "16:9" },
+      "duration": { "enum": [5, 10, 15], "title": "Duration", "name": "duration", "type": "int", "description": "The duration of the generated video in seconds", "default": 5 }
+    }
+  },
+  {
     "id": "seedance-v2.0-t2v",
     "name": "Seedance 2.0",
     "inputs": {
@@ -8084,6 +8108,72 @@ export const i2vModels = [
         "name": "generate_audio",
         "description": "Whether to generate audio for the video",
         "default": true
+      }
+    }
+  },
+  {
+    "id": "sd-2",
+    "name": "Seedance 2.0 Flash I2V",
+    "endpoint": "sd-2",
+    "family": "seedance-v2.0",
+    "aliases": ["seedance-v2.0-flash"],
+    "imageField": "images_list",
+    "hasPrompt": true,
+    "inputs": {
+      "prompt": {
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "description": "The prompt to guide video generation from the image."
+      },
+      "aspect_ratio": {
+        "type": "string",
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "description": "Aspect ratio of the output video.",
+        "enum": ["16:9", "9:16", "4:3", "3:4"],
+        "default": "16:9"
+      },
+      "duration": {
+        "type": "int",
+        "title": "Duration",
+        "name": "duration",
+        "description": "The duration of the generated video in seconds",
+        "enum": [5, 10, 15],
+        "default": 5
+      }
+    }
+  },
+  {
+    "id": "sd-2-vip",
+    "name": "Seedance 2.0 I2V",
+    "endpoint": "sd-2-vip",
+    "family": "seedance-v2.0",
+    "aliases": ["seedance-v2.0"],
+    "imageField": "images_list",
+    "hasPrompt": true,
+    "inputs": {
+      "prompt": {
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "description": "The prompt to guide video generation from the image."
+      },
+      "aspect_ratio": {
+        "type": "string",
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "description": "Aspect ratio of the output video.",
+        "enum": ["16:9", "9:16", "4:3", "3:4"],
+        "default": "16:9"
+      },
+      "duration": {
+        "type": "int",
+        "title": "Duration",
+        "name": "duration",
+        "description": "The duration of the generated video in seconds",
+        "enum": [5, 10, 15],
+        "default": 5
       }
     }
   },

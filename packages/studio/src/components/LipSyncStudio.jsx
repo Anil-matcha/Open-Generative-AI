@@ -18,6 +18,7 @@ const UPLOAD_STATE = {
   UPLOADING: "uploading",
   READY: "ready",
 };
+const MODULE_IN_DEVELOPMENT = true;
 
 function MediaPickerButton({
   accept,
@@ -615,6 +616,11 @@ export default function LipSyncStudio({
 
   // ── Generation ──────────────────────────────────────────────────────────
   const handleGenerate = async () => {
+    if (MODULE_IN_DEVELOPMENT) {
+      setGenerateError("开发中，暂未接入可用口型同步通道。");
+      setTimeout(() => setGenerateError(null), 4000);
+      return;
+    }
     if (!audioUrl) {
       alert("请先上传音频。");
       return;
@@ -798,29 +804,7 @@ export default function LipSyncStudio({
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center h-full animate-fade-in-up transition-all duration-700 min-h-[50vh]">
-            <div className="mb-12 relative group">
-              <div className="absolute inset-0 bg-primary/10 blur-[120px] rounded-full opacity-30 group-hover:opacity-60 transition-opacity duration-1000" />
-              <div className="relative w-24 h-24 md:w-32 md:h-32 bg-white/[0.02] rounded-[2rem] flex items-center justify-center border border-white/[0.05] overflow-hidden backdrop-blur-sm">
-                <div className="w-16 h-16 bg-primary/5 rounded-2xl flex items-center justify-center border border-primary/10 relative z-10 transition-transform duration-500 group-hover:scale-110">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-primary opacity-80">
-                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
-                    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-                    <line x1="12" y1="19" x2="12" y2="23" />
-                    <line x1="8" y1="23" x2="16" y2="23" />
-                  </svg>
-                </div>
-                <div className="absolute top-4 right-4 text-[10px] text-primary/40 animate-pulse">🎙</div>
-              </div>
-            </div>
-            <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight mb-4 text-center px-4">
-              <span className="text-white/40 font-medium">开始使用</span><br />
-              <span className="text-white">口型同步</span>
-            </h1>
-            <p className="text-white/40 text-sm md:text-base font-medium tracking-wide text-center max-w-lg leading-relaxed">
-              上传人像或视频，自动对齐音频与口型
-            </p>
-          </div>
+          <div className="min-h-[50vh]" aria-hidden="true" />
         )}
       </div>
 
@@ -1030,7 +1014,7 @@ export default function LipSyncStudio({
             <button
               type="button"
               onClick={handleGenerate}
-              disabled={isGenerating}
+              disabled={MODULE_IN_DEVELOPMENT || isGenerating}
               className="bg-[#d9ff00] text-black px-4 py-2 rounded-md font-medium text-sm hover:bg-[#e5ff33] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 w-full sm:w-auto shadow-lg shadow-[#d9ff00]/10 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isGenerating ? (
@@ -1042,6 +1026,8 @@ export default function LipSyncStudio({
                 </>
               ) : generateError ? (
                 `错误：${generateError}`
+              ) : MODULE_IN_DEVELOPMENT ? (
+                "开发中"
               ) : (
                 <>
                   <span>开始同步</span>

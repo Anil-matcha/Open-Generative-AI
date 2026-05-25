@@ -14,7 +14,7 @@ export function AgentStudio() {
     title.className = 'text-lg font-bold opacity-60';
 
     const sub = document.createElement('p');
-    sub.textContent = 'Available in the web app at open-generative-ai.com';
+    sub.textContent = 'Available in the web app at MozenAIGC';
     sub.className = 'text-sm opacity-40';
 
     container.appendChild(icon);

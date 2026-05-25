@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { generateImage, uploadFile } from "../muapi.js";
 
 // ─── Constants (inlined from promptUtils) ───────────────────────────────────
+const MODULE_IN_DEVELOPMENT = true;
 
 const CAMERA_MAP = {
   "Modular 8K Digital": "模块化 8K 数字电影机",
@@ -582,6 +583,10 @@ export default function CinemaStudio({
 
   // ── Generate ──
   const handleGenerate = useCallback(async () => {
+    if (MODULE_IN_DEVELOPMENT) {
+      alert("电影创作模块开发中，开始键已锁定。");
+      return;
+    }
     const basePrompt = settings.prompt.trim();
     if (!basePrompt || isGenerating) return;
 
@@ -801,27 +806,7 @@ export default function CinemaStudio({
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center h-full text-center px-4 animate-fade-in-up transition-all duration-700 min-h-[50vh]">
-            <div className="mb-12 relative group">
-              <div className="absolute inset-0 bg-primary/10 blur-[120px] rounded-full opacity-30 group-hover:opacity-60 transition-opacity duration-1000" />
-              <div className="relative w-24 h-24 md:w-32 md:h-32 bg-white/[0.02] rounded-[2rem] flex items-center justify-center border border-white/[0.05] overflow-hidden backdrop-blur-sm">
-                <div className="w-16 h-16 bg-primary/5 rounded-2xl flex items-center justify-center border border-primary/10 relative z-10 transition-transform duration-500 group-hover:scale-110">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-primary opacity-80">
-                    <path d="M23 7l-7 5 7 5V7z" />
-                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
-                  </svg>
-                </div>
-                <div className="absolute top-4 right-4 text-[10px] text-primary/40 animate-pulse">REC</div>
-              </div>
-            </div>
-            <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight mb-4 text-center px-4">
-              <span className="text-white/40 font-medium">开始使用</span><br />
-              <span className="text-white uppercase tracking-wider">电影创作</span>
-            </h1>
-            <p className="text-white/40 text-sm md:text-base font-medium tracking-wide text-center max-w-lg leading-relaxed">
-              如果预算无限，你想拍什么镜头？
-            </p>
-          </div>
+          <div className="min-h-[50vh]" aria-hidden="true" />
         )}
       </div>
 
@@ -982,12 +967,16 @@ export default function CinemaStudio({
                 {/* Generate Button */}
                 <button
                   className="h-[50px] px-8 bg-[#d9ff00] text-black rounded-md font-medium text-sm hover:bg-[#e5ff33] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#d9ff00]/10 disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={isGenerating || !settings.prompt.trim()}
+                  disabled={MODULE_IN_DEVELOPMENT || isGenerating || !settings.prompt.trim()}
                   onClick={handleGenerate}
                 >
                   {isGenerating ? (
                     <>
                       <span className="animate-spin inline-block text-black">◌</span> 拍摄中...
+                    </>
+                  ) : MODULE_IN_DEVELOPMENT ? (
+                    <>
+                      <span>开发中</span>
                     </>
                   ) : (
                     <>

@@ -1,5 +1,6 @@
 const { app, BrowserWindow, shell } = require('electron');
 const path = require('path');
+const { startDesktopApiProxy } = require('./lib/desktopApiProxy');
 const { register: registerLocalInference } = require('./lib/localInference');
 const { register: registerWan2gp } = require('./lib/wan2gpProvider');
 
@@ -13,6 +14,7 @@ if (process.platform === 'linux') {
 }
 
 let mainWindow;
+let desktopApiProxy;
 
 function createWindow() {
     const isMac = process.platform === 'darwin';
@@ -27,11 +29,17 @@ function createWindow() {
             contextIsolation: true,
             nodeIntegration: false,
             preload: path.join(__dirname, 'preload.js'),
+            additionalArguments: desktopApiProxy
+                ? [
+                    `--mozen-desktop-api-origin=${desktopApiProxy.origin}`,
+                    `--mozen-desktop-api-token=${desktopApiProxy.token}`,
+                ]
+                : [],
         },
         ...(isMac ? { titleBarStyle: 'hiddenInset' } : {}),
         backgroundColor: '#0d0d0d',
         show: false,
-        title: 'Open Generative AI',
+        title: 'MozenAIGC',
     });
 
     const indexPath = path.join(__dirname, '../dist/index.html');
@@ -58,7 +66,8 @@ function createWindow() {
     });
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
+    desktopApiProxy = await startDesktopApiProxy();
     createWindow();
     registerLocalInference();
     registerWan2gp();
@@ -73,5 +82,14 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
         app.quit();
+    }
+});
+
+app.on('before-quit', () => {
+    if (desktopApiProxy) {
+        desktopApiProxy.close().catch((err) => {
+            console.error('Failed to stop desktop API proxy:', err);
+        });
+        desktopApiProxy = null;
     }
 });

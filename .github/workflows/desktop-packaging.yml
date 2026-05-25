@@ -1,0 +1,154 @@
+name: Desktop Packaging
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "codex/**"
+    paths:
+      - ".github/workflows/desktop-packaging.yml"
+      - "afterPack.js"
+      - "build/**"
+      - "electron/**"
+      - "package-lock.json"
+      - "package.json"
+      - "packages/studio/**"
+      - "src/desktop/**"
+      - "vite.config.mjs"
+  pull_request:
+    paths:
+      - ".github/workflows/desktop-packaging.yml"
+      - "afterPack.js"
+      - "build/**"
+      - "electron/**"
+      - "package-lock.json"
+      - "package.json"
+      - "packages/studio/**"
+      - "src/desktop/**"
+      - "vite.config.mjs"
+
+jobs:
+  linux:
+    name: Linux AppImage and DEB
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install system smoke-test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            binutils \
+            file \
+            xvfb \
+            xauth \
+            libgtk-3-0 \
+            libnotify4 \
+            libnss3 \
+            libxss1 \
+            libxtst6 \
+            xdg-utils \
+            libatspi2.0-0 \
+            libuuid1 \
+            libsecret-1-0 \
+            libasound2t64 \
+            libgbm1
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Linux packages
+        run: npm run electron:build:linux:ci
+
+      - name: Inspect package metadata
+        run: |
+          file release/MozenAIGC-*.AppImage
+          file release/open-generative-ai_*_amd64.deb
+          dpkg-deb --field release/open-generative-ai_*_amd64.deb Package Version Architecture Maintainer
+          dpkg-deb --contents release/open-generative-ai_*_amd64.deb | grep -E 'apparmor.profile|MozenAIGC.desktop|/opt/MozenAIGC/open-generative-ai'
+
+      - name: Smoke test AppImage
+        run: |
+          chmod +x release/MozenAIGC-*.AppImage
+          set +e
+          APPIMAGE_EXTRACT_AND_RUN=1 timeout --kill-after=5s 25s xvfb-run -a release/MozenAIGC-*.AppImage --no-sandbox > /tmp/mozen-appimage-smoke.log 2>&1
+          status=$?
+          set -e
+          tail -n 120 /tmp/mozen-appimage-smoke.log
+          if [ "$status" != "0" ] && [ "$status" != "124" ]; then
+            exit "$status"
+          fi
+
+      - name: Smoke test DEB install
+        run: |
+          sudo apt-get install -y --no-install-recommends ./release/open-generative-ai_*_amd64.deb
+          test -x /opt/MozenAIGC/open-generative-ai
+          test -f /opt/MozenAIGC/resources/apparmor.profile
+          set +e
+          timeout --kill-after=5s 25s xvfb-run -a /opt/MozenAIGC/open-generative-ai --no-sandbox > /tmp/mozen-deb-smoke.log 2>&1
+          status=$?
+          set -e
+          tail -n 120 /tmp/mozen-deb-smoke.log
+          if [ "$status" != "0" ] && [ "$status" != "124" ]; then
+            exit "$status"
+          fi
+
+      - name: Audit packaged artifacts for secrets
+        run: npm run test:secrets-audit
+
+      - name: Upload Linux artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-linux
+          path: |
+            release/*.AppImage
+            release/*.deb
+            release/latest-linux.yml
+            release/linux-unpacked/resources/apparmor.profile
+          if-no-files-found: error
+
+  macos:
+    name: macOS DMG
+    runs-on: macos-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build macOS DMG
+        run: npm run electron:build:mac:ci
+
+      - name: Verify DMG and app signatures
+        run: |
+          ls -lh release/*.dmg
+          for dmg in release/*.dmg; do
+            hdiutil verify "$dmg"
+          done
+          find release -maxdepth 3 -name "MozenAIGC.app" -print -exec codesign --verify --deep --strict --verbose=2 {} \;
+
+      - name: Audit packaged artifacts for secrets
+        run: npm run test:secrets-audit
+
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-macos
+          path: |
+            release/*.dmg
+            release/mac*/MozenAIGC.app
+          if-no-files-found: error

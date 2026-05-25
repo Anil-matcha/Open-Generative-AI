@@ -1,7 +1,7 @@
 import StandaloneShell from '@/components/StandaloneShell';
 
 export const metadata = {
-  title: '工作流 — Open Generative AI',
+  title: '工作流 — MozenAIGC',
 };
 
 export default function WorkflowTabPage() {

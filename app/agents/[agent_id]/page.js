@@ -2,20 +2,20 @@ import { cookies } from "next/headers";
 import AgentChatClient from "./AgentChatClient";
 
 /**
- * Server component — fetches agentDetails from the /api/agents proxy
- * (which forwards to https://api.muapi.ai/agents/by-slug/{id})
- * using the muapi_key cookie for auth, then renders the client chat component.
+ * Server component — fetches agentDetails from the configured Provider
+ * using the unified Provider cookie for auth, then renders the client chat component.
  *
  * URL: /agents/[agent_id]   (new chat — no conversation ID yet)
  */
 export async function generateMetadata({ params }) {
   const { agent_id } = await params;
   return {
-    title: `Agent Chat — Open Generative AI`,
+    title: `Agent Chat — MozenAIGC`,
   };
 }
 
-const BASE_URL = 'https://api.muapi.ai';
+const DEFAULT_PROVIDER_BASE_URL = 'https://api.muapi.ai';
+const PROVIDER_BASE_URL_COOKIE = 'provider_base_url';
 
 function normalizeApiKey(value) {
   if (!value) return null;
@@ -23,17 +23,54 @@ function normalizeApiKey(value) {
   return trimmed && trimmed !== "null" && trimmed !== "undefined" ? trimmed : null;
 }
 
-async function fetchAgentDetails(agentId, apiKey) {
+function decodeCookieValue(value) {
+  if (!value) return null;
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
+function normalizeBaseUrl(value) {
+  const raw = normalizeApiKey(decodeCookieValue(value));
+  if (!raw) return null;
+  try {
+    const parsed = new URL(raw);
+    if (!["http:", "https:"].includes(parsed.protocol)) return null;
+    return raw.replace(/\/+$/, "");
+  } catch {
+    return null;
+  }
+}
+
+function getProviderContext(cookieStore) {
+  const baseUrl = normalizeBaseUrl(cookieStore.get(PROVIDER_BASE_URL_COOKIE)?.value);
+  return {
+    baseUrl: baseUrl || DEFAULT_PROVIDER_BASE_URL,
+    usesProviderBase: Boolean(baseUrl),
+    apiKey:
+      normalizeApiKey(cookieStore.get("provider_api_key")?.value) ||
+      normalizeApiKey(cookieStore.get("yunwu_api_key")?.value) ||
+      normalizeApiKey(cookieStore.get("muapi_key")?.value),
+  };
+}
+
+function buildAccountUrl(baseUrl, usesProviderBase) {
+  return usesProviderBase ? `${baseUrl}/account/balance` : `${baseUrl}/api/v1/account/balance`;
+}
+
+async function fetchAgentDetails(agentId, apiKey, baseUrl) {
   if (!apiKey) return null;
   
   // Try fetching by slug first
   try {
     console.log(`[AgentPage] Fetching agent by slug: ${agentId}`);
     const res = await fetch(
-      `${BASE_URL}/agents/by-slug/${agentId}`,
+      `${baseUrl}/agents/by-slug/${agentId}`,
       {
         cache: "no-store",
-        headers: { "x-api-key": apiKey },
+        headers: { "x-api-key": apiKey, Authorization: `Bearer ${apiKey}` },
       }
     );
     if (res.ok) return await res.json();
@@ -42,10 +79,10 @@ async function fetchAgentDetails(agentId, apiKey) {
     if (agentId.length > 20) {
       console.log(`[AgentPage] Fetch by slug failed, trying by ID: ${agentId}`);
       const resId = await fetch(
-        `${BASE_URL}/agents/${agentId}`,
+        `${baseUrl}/agents/${agentId}`,
         {
           cache: "no-store",
-          headers: { "x-api-key": apiKey },
+          headers: { "x-api-key": apiKey, Authorization: `Bearer ${apiKey}` },
         }
       );
       if (resId.ok) return await resId.json();
@@ -59,12 +96,12 @@ async function fetchAgentDetails(agentId, apiKey) {
   }
 }
 
-async function fetchUserData(apiKey) {
+async function fetchUserData(apiKey, baseUrl, usesProviderBase) {
   if (!apiKey) return null;
   try {
-    const res = await fetch(`${BASE_URL}/api/v1/account/balance`, {
+    const res = await fetch(buildAccountUrl(baseUrl, usesProviderBase), {
       cache: "no-store",
-      headers: { "x-api-key": apiKey },
+      headers: { "x-api-key": apiKey, Authorization: `Bearer ${apiKey}` },
     });
     if (!res.ok) return null;
     return await res.json();
@@ -76,13 +113,13 @@ async function fetchUserData(apiKey) {
 export default async function AgentPage({ params }) {
   const { agent_id } = await params;
   const cookieStore = await cookies();
-  const apiKey = normalizeApiKey(cookieStore.get("muapi_key")?.value);
+  const provider = getProviderContext(cookieStore);
 
-  console.log(`[AgentPage] Loading page for agent: ${agent_id}, hasKey: ${!!apiKey}`);
+  console.log(`[AgentPage] Loading page for agent: ${agent_id}, hasKey: ${!!provider.apiKey}`);
 
   const [agentDetails, userData] = await Promise.all([
-    fetchAgentDetails(agent_id, apiKey),
-    fetchUserData(apiKey)
+    fetchAgentDetails(agent_id, provider.apiKey, provider.baseUrl),
+    fetchUserData(provider.apiKey, provider.baseUrl, provider.usesProviderBase)
   ]);
 
   return (

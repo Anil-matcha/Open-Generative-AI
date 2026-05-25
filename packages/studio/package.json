@@ -1,7 +1,7 @@
 {
   "name": "studio",
   "version": "1.0.0",
-  "description": "Open Generative AI studio components for Muapi",
+  "description": "MozenAIGC studio components for Muapi",
   "main": "src/index.js",
   "module": "src/index.js",
   "files": [

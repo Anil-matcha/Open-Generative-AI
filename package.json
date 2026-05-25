@@ -20,6 +20,10 @@
     "codex-lab:asset-index-validate": "node scripts/codex-lab-asset-index-validate.cjs",
     "codex-lab:asset-check": "node scripts/codex-lab-asset-check.cjs",
     "codex-lab:imagegen-export": "node scripts/codex-lab-imagegen-export.cjs",
+    "test:api-providers": "node scripts/test-api-providers.cjs",
+    "test:desktop-api-proxy": "node scripts/test-desktop-api-proxy.cjs",
+    "test:secrets-audit": "node scripts/test-secrets-audit.cjs",
+    "test:studio-shell-smoke": "node scripts/test-studio-shell-smoke.cjs",
     "build:studio": "npm run build -w studio",
     "build:workflow": "npm run build -w workflow-builder",
     "build:agent": "npm run build -w ai-agent",
@@ -31,11 +35,14 @@
     "electron:build": "vite build && electron-builder --mac",
     "electron:build:win": "vite build && electron-builder --win",
     "electron:build:linux": "vite build && electron-builder --linux",
-    "electron:build:all": "vite build && electron-builder --mac --win --linux"
+    "electron:build:all": "vite build && electron-builder --mac --win --linux",
+    "electron:build:win:ci": "vite build && electron-builder --win --publish never",
+    "electron:build:linux:ci": "vite build && electron-builder --linux --publish never",
+    "electron:build:mac:ci": "vite build && electron-builder --mac --publish never"
   },
   "build": {
     "appId": "ai.generative.open",
-    "productName": "Open Generative AI",
+    "productName": "MozenAIGC",
     "copyright": "Copyright © 2025",
     "directories": {
       "output": "release"
@@ -78,7 +85,7 @@
     "linux": {
       "icon": "public/banner.png",
       "category": "Utility",
-      "maintainer": "Open Generative AI Team",
+      "maintainer": "MozenAIGC Team",
       "extraFiles": [
         {
           "from": "build/linux/apparmor.profile",

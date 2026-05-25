@@ -1,4 +1,4 @@
-# Open Generative AI — 面向 AI 影像平台的开源替代方案
+# MozenAIGC — 面向 AI 影像平台的开源替代方案
 
 > **免费、开源、无约束的 AI 影像平台替代品。** 使用 200+ 个前沿模型生成 AI 图像和视频，没有内容过滤，没有封闭生态，没有订阅费用。
 
@@ -28,9 +28,9 @@
 
 | Platform | Download |
 |---|---|
-| macOS Apple Silicon (M1/M2/M3/M4) | [Open Generative AI-1.0.9-arm64.dmg](https://github.com/Anil-matcha/Open-Generative-AI/releases/download/v1.0.9/Open.Generative.AI-1.0.9-arm64.dmg) |
-| macOS Intel (x64) | [Open Generative AI-1.0.9.dmg](https://github.com/Anil-matcha/Open-Generative-AI/releases/download/v1.0.9/Open.Generative.AI-1.0.9.dmg) |
-| Windows (x64) | [Open Generative AI Setup 1.0.9.exe](https://github.com/Anil-matcha/Open-Generative-AI/releases/download/v1.0.9/Open.Generative.AI.Setup.1.0.9.exe) |
+| macOS Apple Silicon (M1/M2/M3/M4) | [MozenAIGC-1.0.9-arm64.dmg](https://github.com/Anil-matcha/Open-Generative-AI/releases/download/v1.0.9/Open.Generative.AI-1.0.9-arm64.dmg) |
+| macOS Intel (x64) | [MozenAIGC-1.0.9.dmg](https://github.com/Anil-matcha/Open-Generative-AI/releases/download/v1.0.9/Open.Generative.AI-1.0.9.dmg) |
+| Windows (x64) | [MozenAIGC Setup 1.0.9.exe](https://github.com/Anil-matcha/Open-Generative-AI/releases/download/v1.0.9/Open.Generative.AI.Setup.1.0.9.exe) |
 | Linux (Ubuntu x64) | [v1.0.9 release](https://github.com/Anil-matcha/Open-Generative-AI/releases/tag/v1.0.9) (`.AppImage` / `.deb`), or build locally with `npm run electron:build:linux`. |
 
 All releases: [github.com/Anil-matcha/Open-Generative-AI/releases](https://github.com/Anil-matcha/Open-Generative-AI/releases)
@@ -43,7 +43,7 @@ All releases: [github.com/Anil-matcha/Open-Generative-AI/releases](https://githu
 
 **步骤 2** - 打开终端并执行：
 ```bash
-xattr -cr "/Applications/Open Generative AI.app"
+xattr -cr "/Applications/MozenAIGC.app"
 ```
 
 **步骤 3** - 在 `/Applications` 里右键应用 → 点 **打开** → 弹窗里再点一次 **打开**
@@ -53,7 +53,7 @@ xattr -cr "/Applications/Open Generative AI.app"
 **替代方式（不使用终端）：**
 1. 先尝试打开应用，macOS 会拦截
 2. 进入 **系统设置 → 隐私与安全性**
-3. 向下找到 _"Open Generative AI was blocked"_
+3. 向下找到 _"MozenAIGC was blocked"_
 4. 点击 **仍要打开** → **打开**
 
 ### Windows 安装 - SmartScreen 提示处理
@@ -77,7 +77,7 @@ npm run electron:build:linux
 生成文件会输出到 `release/` 目录：
 - **AppImage** - 便携版，赋予可执行权限后即可运行：
   ```bash
-  chmod +x "release/Open Generative AI-*.AppImage"
+  chmod +x "release/MozenAIGC-*.AppImage"
   ./release/Open\ Generative\ AI-*.AppImage
   ```
 - **.deb** - Debian / Ubuntu 可直接安装：
@@ -109,9 +109,9 @@ echo 'kernel.apparmor_restrict_unprivileged_userns=0' | sudo tee /etc/sysctl.d/9
 
 ---
 
-Open Generative AI 是一套免费、开源、无内容限制的 AI 图像、视频、电影和口型同步工作台，面向所有想要自由创作的人。没有内容过滤，没有提示词拒绝，没有守门规则，只保留完整的创作自由。项目基于 [Muapi.ai](https://muapi.ai) 提供能力，支持文生图、图生图、文生视频、图生视频，以及音频驱动的口型同步生成，覆盖 Flux、Nano Banana、Midjourney、Kling、Sora、Veo、Seedream、Infinite Talk、LTX Lipsync、Wan 2.2 等模型，并提供可自托管、可定制的现代界面。
+MozenAIGC 是一套免费、开源、无内容限制的 AI 图像、视频、电影和口型同步工作台，面向所有想要自由创作的人。没有内容过滤，没有提示词拒绝，没有守门规则，只保留完整的创作自由。项目基于 [Muapi.ai](https://muapi.ai) 提供能力，支持文生图、图生图、文生视频、图生视频，以及音频驱动的口型同步生成，覆盖 Flux、Nano Banana、Midjourney、Kling、Sora、Veo、Seedream、Infinite Talk、LTX Lipsync、Wan 2.2 等模型，并提供可自托管、可定制的现代界面。
 
-**为什么选 Open Generative AI？**
+**为什么选 MozenAIGC？**
 - **无内容限制** - 没有过滤器、没有提示词拒绝、没有额外守门规则
 - **免费开源** - 无需订阅，没有厂商锁定
 - **可自托管** - 数据留在本机，创作完全可控
@@ -385,7 +385,7 @@ A healthy run on Apple Silicon prints `total params memory size = 1969.78MB (VRA
 
 ### 环境准备
 
-> **大多数用户其实更适合直接用桌面应用，不必走开发路径。** 如果你只是想在本机使用 Open Generative AI，直接去 [下载预编译安装包](#-download-desktop-app) 就好，不需要安装 Node.js。下面这些步骤主要给从源码开发的贡献者。
+> **大多数用户其实更适合直接用桌面应用，不必走开发路径。** 如果你只是想在本机使用 MozenAIGC，直接去 [下载预编译安装包](#-download-desktop-app) 就好，不需要安装 Node.js。下面这些步骤主要给从源码开发的贡献者。
 
 先选择与你目标一致的入口：
 
@@ -506,9 +506,9 @@ Open-Generative-AI/
 
 ## 🤔 和其他 AI 视频平台有什么不同？
 
-**Open Generative AI** 是一个社区驱动的开源替代方案，保留相近的创作能力，但不把你锁在封闭生态里：
+**MozenAIGC** 是一个社区驱动的开源替代方案，保留相近的创作能力，但不把你锁在封闭生态里：
 
-| | 其他平台 | Open Generative AI |
+| | 其他平台 | MozenAIGC |
 | :--- | :--- | :--- |
 | **费用** | 订阅制 | 免费（开源） |
 | **内容过滤** | 有，会拦截或改写提示词 | 无，完全不设过滤 |
@@ -534,4 +534,4 @@ MIT
 **深入阅读**：如果你想了解更多关于 “AI Influencer” 引擎、即将推出的 “Popcorn” 分镜功能，以及这个项目的未来方向，可以阅读 [完整技术概览](https://medium.com/@anilmatcha/)。
 
 ---
-*想找一个免费、无过滤的 AI 视频平台？Open Generative AI 是一个开源、无限制的 AI 图像和视频生成工作台，支持自托管、可定制、可扩展。*
+*想找一个免费、无过滤的 AI 视频平台？MozenAIGC 是一个开源、无限制的 AI 图像和视频生成工作台，支持自托管、可定制、可扩展。*

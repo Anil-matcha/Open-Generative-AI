@@ -3,7 +3,7 @@ import AssetLibraryClient from "./AssetLibraryClient";
 import assetIndex from "../../experiments/codex-internal-multimodal-lab/output/asset-index.json";
 
 export const metadata = {
-  title: "Codex Lab｜Open Generative AI",
+  title: "Codex Lab｜MozenAIGC",
   description: "本地 Codex 多模态与图像生成实验入口，不接入外部 PAI、视频或语音模型。",
 };
 

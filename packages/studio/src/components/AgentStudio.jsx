@@ -7,6 +7,9 @@ import {
   getUserAgents,
   getUserConversations,
 } from "../muapi.js";
+import { getActiveProvider, providerSupports } from "../apiProviders.js";
+
+const MODULE_IN_DEVELOPMENT = true;
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 function timeAgo(dateStr) {
@@ -122,8 +125,11 @@ const TAB_LABELS = {
   "my-chats": "我的对话",
 };
 
-export default function AgentStudio({ apiKey }) {
+export default function AgentStudio({ apiKey, apiConfig }) {
   const router = useRouter();
+  const activeProvider = apiConfig ? getActiveProvider(apiConfig) : null;
+  const providerLabel = activeProvider?.shortName || activeProvider?.name || "当前通道";
+  const supportsAgent = apiConfig ? providerSupports(apiConfig, "agent") : true;
 
   const [activeMainTab, setActiveMainTab] = useState("templates");
   const [agents, setAgents] = useState([]);
@@ -164,11 +170,19 @@ export default function AgentStudio({ apiKey }) {
     let cancelled = false;
     const needsApiKey = activeMainTab !== "templates";
 
+    if (activeMainTab !== "templates" && !supportsAgent) {
+      setLoading(false);
+      setAgents([]);
+      setConversations([]);
+      setError(`当前 ${providerLabel} 未标记支持智能体。请在 API 管理切换或开启支持智能体的通道。`);
+      return () => { cancelled = true; };
+    }
+
     if (needsApiKey && !apiKey) {
       setLoading(false);
       setAgents([]);
       setConversations([]);
-      setError("请先在设置中保存 Muapi API Key，再查看个人智能体和对话。");
+      setError(`请先在 API 管理中保存 ${providerLabel} API Key，再查看个人智能体和对话。`);
       return () => { cancelled = true; };
     }
 
@@ -198,7 +212,7 @@ export default function AgentStudio({ apiKey }) {
 
     load();
     return () => { cancelled = true; };
-  }, [apiKey, activeMainTab, reloadToken]);
+  }, [apiKey, activeMainTab, reloadToken, providerLabel, supportsAgent]);
 
   // ── Render ──────────────────────────────────────────────────────────────────
   return (
@@ -228,17 +242,28 @@ export default function AgentStudio({ apiKey }) {
 
         <button
           onClick={handleCreateAgent}
-          disabled={!apiKey}
-          title={apiKey ? "新建智能体" : "请先在设置中保存 Muapi API Key"}
+          disabled={MODULE_IN_DEVELOPMENT || !apiKey || !supportsAgent}
+          title={
+            !supportsAgent
+              ? `当前 ${providerLabel} 未标记支持智能体`
+              : apiKey
+                ? "新建智能体"
+                : `请先在 API 管理中保存 ${providerLabel} API Key`
+          }
           className="px-6 py-2 bg-[#d9ff00] text-black text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-[#ebff66] transition-all active:scale-95 flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#d9ff00]"
         >
           <span className="text-sm">+</span>
-          新建
+          {MODULE_IN_DEVELOPMENT ? "开发中" : "新建"}
         </button>
       </div>
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto custom-scrollbar p-8">
+        {!supportsAgent && (
+          <div className="mb-6 rounded-lg border border-yellow-300/15 bg-yellow-400/10 px-4 py-3 text-[12px] leading-5 text-yellow-100/75">
+            当前 {providerLabel} 未标记支持智能体。模板可以浏览，创建智能体和个人对话建议切换到支持智能体的通道。
+          </div>
+        )}
         {loading ? (
           <div className="h-full flex items-center justify-center">
             <div className="w-10 h-10 border-2 border-white/5 border-t-[#d9ff00] rounded-full animate-spin" />

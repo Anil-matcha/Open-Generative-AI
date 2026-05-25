@@ -8,7 +8,10 @@ import {
   FaGithub, FaExternalLinkAlt, FaDollarSign, FaRocket, FaCreditCard 
 } from "react-icons/fa";
 import { registerAppInterest, getAppInterests } from '../muapi.js';
+import { getActiveProvider, providerSupports } from '../apiProviders.js';
 import toast, { Toaster } from 'react-hot-toast';
+
+const MODULE_IN_DEVELOPMENT = false;
 
 const CATEGORY_LABELS = {
   Lifestyle: "生活方式",
@@ -165,10 +168,13 @@ const dummyAppsData = [
   { thumbnail: "https://cdn.muapi.ai/apps/Lumea_Residence.webp", name: "Lumea Residence", description: "Smart home property management and tenant portal.", icon: FaHome, category: "Real Estate" }
 ];
 
-export default function AppsStudio({ apiKey }) {
+export default function AppsStudio({ apiKey, apiConfig }) {
   const [selectedApp, setSelectedApp] = useState(null);
   const [isRequesting, setIsRequesting] = useState(false);
   const [requestedApps, setRequestedApps] = useState([]);
+  const activeProvider = apiConfig ? getActiveProvider(apiConfig) : null;
+  const providerLabel = activeProvider?.shortName || activeProvider?.name || "当前通道";
+  const supportsApps = apiConfig ? providerSupports(apiConfig, "apps") : true;
 
   useEffect(() => {
     if (apiKey) {
@@ -179,7 +185,7 @@ export default function AppsStudio({ apiKey }) {
   }, [apiKey]);
 
   const handleRequestAccess = async () => {
-    if (!selectedApp || !apiKey) return;
+    if (!selectedApp || !apiKey || !supportsApps) return;
     
     setIsRequesting(true);
     try {
@@ -189,7 +195,7 @@ export default function AppsStudio({ apiKey }) {
       setTimeout(() => setSelectedApp(null), 1500);
     } catch (error) {
       console.error(error);
-      toast.error("登记兴趣失败，请稍后再试。");
+      toast.error(`登记兴趣失败，请检查 ${providerLabel} 配置后再试。`);
     } finally {
       setIsRequesting(false);
     }
@@ -306,9 +312,15 @@ export default function AppsStudio({ apiKey }) {
           </h1>
           <p className="text-white/40 text-sm font-medium leading-relaxed max-w-xl mx-auto">
             每个模板都是可直接部署的完整 AI SaaS，已集成 Stripe。
-            你负责收款，muapi 负责 AI 基础设施。
+            你负责收款，当前 API 通道负责 AI 基础设施。
           </p>
         </div>
+
+        {!supportsApps && (
+          <div className="w-full rounded-lg border border-yellow-300/15 bg-yellow-400/10 px-4 py-3 text-[12px] leading-5 text-yellow-100/75">
+            当前 {providerLabel} 未标记支持应用中心。模板浏览不受影响，登记模板和应用接口建议切换到支持应用中心的通道。
+          </div>
+        )}
 
         {/* Monetization Steps */}
         <div className="w-full grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -317,7 +329,7 @@ export default function AppsStudio({ apiKey }) {
               icon: FaRocket,
               step: "01",
               title: "几分钟完成部署",
-              body: "Fork 开源模板，填入你的 muapi key，直接推送到 Vercel，无需额外后端配置。"
+              body: `Fork 开源模板，填入你的 ${providerLabel} Key，直接推送到 Vercel，无需额外后端配置。`
             },
             {
               icon: FaCreditCard,
@@ -355,7 +367,7 @@ export default function AppsStudio({ apiKey }) {
         <div className="pt-24 pb-12 flex flex-col items-center gap-4">
           <div className="inline-flex items-center gap-3 px-4 py-2 bg-white/5 rounded-full border border-white/5">
             <span className="block w-1.5 h-1.5 rounded-full bg-[#d9ff00] animate-pulse" />
-            <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">Muapi 生态系统 - 更多模板即将上线</span>
+            <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">Provider 生态系统 - 更多模板即将上线</span>
           </div>
         </div>
       </div>
@@ -380,10 +392,10 @@ export default function AppsStudio({ apiKey }) {
             <div className="space-y-3">
               <button 
                 onClick={handleRequestAccess}
-                disabled={isRequesting}
+                disabled={MODULE_IN_DEVELOPMENT || isRequesting || !apiKey || !supportsApps}
                 className="w-full py-4 bg-[#d9ff00] text-black rounded-md text-sm font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-[#d9ff00]/90 transition-all shadow-lg active:scale-95 disabled:opacity-50"
               >
-                {isRequesting ? '正在发送详情...' : '获取模板'}
+                {MODULE_IN_DEVELOPMENT ? '开发中' : isRequesting ? '正在发送详情...' : supportsApps ? '获取模板' : '当前通道不支持'}
               </button>
               <button 
                 onClick={() => setSelectedApp(null)}
@@ -396,7 +408,7 @@ export default function AppsStudio({ apiKey }) {
         </div>
       )}
 
-      <style jsx global>{`
+      <style>{`
         @keyframes fadeIn {
           from { opacity: 0; }
           to { opacity: 1; }

@@ -1,5 +1,16 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
+function readArgValue(name) {
+    const prefix = `--${name}=`;
+    const match = process.argv.find((arg) => arg.startsWith(prefix));
+    return match ? match.slice(prefix.length) : '';
+}
+
+const desktopApiProxy = {
+    origin: readArgValue('mozen-desktop-api-origin'),
+    token: readArgValue('mozen-desktop-api-token'),
+};
+
 contextBridge.exposeInMainWorld('localAI', {
     isElectron: true,
 
@@ -39,3 +50,10 @@ contextBridge.exposeInMainWorld('localAI', {
         return () => ipcRenderer.removeListener('local-ai:download-progress', listener);
     },
 });
+
+contextBridge.exposeInMainWorld('desktopAPI', {
+    isElectron: true,
+    getProxyConfig: () => ({ ...desktopApiProxy }),
+});
+
+contextBridge.exposeInMainWorld('__MOZEN_DESKTOP_API_BASE__', desktopApiProxy.origin);

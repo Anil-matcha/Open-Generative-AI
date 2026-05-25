@@ -4,28 +4,63 @@ import { EditAgentPage } from "ai-agent";
 import "ai-agent/dist/tailwind.css";
 import { useCallback, useEffect, useRef } from "react";
 import axios from "axios";
+import {
+  API_PROVIDER_STORAGE_KEY,
+  buildProviderRequestHeaders,
+  getActiveProvider,
+  normalizeApiConfig,
+  normalizeApiKey,
+} from "studio";
 
-const STORAGE_KEY = "muapi_key";
+const LEGACY_STORAGE_KEY = "muapi_key";
 
-const normalizeApiKey = (value) => {
-  if (!value) return null;
-  const trimmed = value.trim();
-  return trimmed && trimmed !== "null" && trimmed !== "undefined" ? trimmed : null;
-};
+function getCookieValue(name) {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+  if (!match) return null;
+  try {
+    return decodeURIComponent(match[1]);
+  } catch {
+    return match[1];
+  }
+}
+
+function readProviderContext() {
+  if (typeof window === "undefined") return { apiKey: null, headers: {} };
+
+  let storedConfig = null;
+  try {
+    const raw = localStorage.getItem(API_PROVIDER_STORAGE_KEY);
+    storedConfig = raw ? JSON.parse(raw) : null;
+  } catch {
+    storedConfig = null;
+  }
+
+  const legacyKey = normalizeApiKey(localStorage.getItem(LEGACY_STORAGE_KEY));
+  const apiConfig = normalizeApiConfig(storedConfig, legacyKey || getCookieValue("provider_api_key"));
+  const activeProvider = getActiveProvider(apiConfig);
+  const apiKey =
+    normalizeApiKey(activeProvider.apiKey) ||
+    normalizeApiKey(getCookieValue("provider_api_key")) ||
+    normalizeApiKey(getCookieValue("yunwu_api_key")) ||
+    legacyKey ||
+    normalizeApiKey(getCookieValue(LEGACY_STORAGE_KEY));
+
+  return {
+    apiKey,
+    headers: {
+      ...buildProviderRequestHeaders(apiConfig),
+      ...(apiKey ? { "x-api-key": apiKey, Authorization: `Bearer ${apiKey}` } : {}),
+    },
+  };
+}
 
 export default function AgentEditClient({ userData }) {
   const interceptorRef = useRef(null);
 
   useEffect(() => {
-    const getKey = () => {
-      if (typeof window === "undefined") return null;
-      const fromStorage = normalizeApiKey(localStorage.getItem(STORAGE_KEY));
-      if (fromStorage) return fromStorage;
-      const match = document.cookie.match(/muapi_key=([^;]+)/);
-      return match ? normalizeApiKey(match[1]) : null;
-    };
-
-    const apiKey = getKey();
+    const providerContext = readProviderContext();
+    const apiKey = providerContext.apiKey;
     if (!apiKey) return;
 
     interceptorRef.current = axios.interceptors.request.use((config) => {
@@ -33,7 +68,10 @@ export default function AgentEditClient({ userData }) {
       const isInternalProxy = config.url.includes('/api/app') || config.url.includes('/api/workflow') || config.url.includes('/api/agents') || config.url.includes('/api/api') || config.url.includes('/api/v1');
       
       if (isRelative || isInternalProxy) {
-        config.headers["x-api-key"] = apiKey;
+        config.headers = {
+          ...config.headers,
+          ...providerContext.headers,
+        };
       }
       return config;
     });

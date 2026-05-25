@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-export default function ApiKeyModal({ onSave, requireApiKey = false, onToggleRequireApiKey }) {
+export default function ApiKeyModal({ onSave, requireApiKey = false, onToggleRequireApiKey, providerName = 'API 通道', providerUrl = 'https://yunwu.ai/' }) {
   const [key, setKey] = useState('');
   const [error, setError] = useState('');
 
@@ -23,10 +23,10 @@ export default function ApiKeyModal({ onSave, requireApiKey = false, onToggleReq
             </svg>
           </div>
           <h1 className="text-xl font-bold text-white tracking-tight mb-2">
-            Open Generative AI
+            MozenAIGC
           </h1>
             <p className="text-white/40 text-[13px] leading-relaxed px-4">
-            输入你的 <a href="https://muapi.ai/access-keys" target="_blank" rel="noreferrer" className="text-[#d9ff00] hover:text-[#e5ff33] transition-colors">Muapi.ai</a> API 密钥，即可开始创作
+            输入你的 <a href={providerUrl} target="_blank" rel="noreferrer" className="text-[#d9ff00] hover:text-[#e5ff33] transition-colors">{providerName}</a> 密钥，即可开始创作
           </p>
         </div>
 
@@ -39,7 +39,7 @@ export default function ApiKeyModal({ onSave, requireApiKey = false, onToggleReq
                     进入时要求输入 API 密钥
                   </label>
                   <p className="text-[12px] leading-relaxed text-white/35">
-                    默认关闭。打开后，进入工作台前会先检查是否已保存 Muapi 密钥。
+                    默认关闭。打开后，进入工作台前会先检查当前通道是否可用。
                   </p>
                 </div>
                 <button
@@ -87,8 +87,8 @@ export default function ApiKeyModal({ onSave, requireApiKey = false, onToggleReq
 
           <p className="text-center text-[12px] text-white/20 pt-2">
             还没有密钥？{' '}
-            <a href="https://muapi.ai/access-keys" target="_blank" rel="noreferrer" className="text-white/40 hover:text-[#d9ff00] transition-colors font-medium">
-              免费获取 →
+            <a href={providerUrl} target="_blank" rel="noreferrer" className="text-white/40 hover:text-[#d9ff00] transition-colors font-medium">
+              打开服务商 →
             </a>
           </p>
         </form>

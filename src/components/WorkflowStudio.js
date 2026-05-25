@@ -14,7 +14,7 @@ export function WorkflowStudio() {
     title.className = 'text-lg font-bold opacity-60';
 
     const sub = document.createElement('p');
-    sub.textContent = '可在 open-generative-ai.com 的网页版中使用';
+    sub.textContent = '可在 MozenAIGC 的网页版中使用';
     sub.className = 'text-sm opacity-40';
 
     container.appendChild(icon);

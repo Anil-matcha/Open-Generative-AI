@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 const MUAPI_BASE = 'https://api.muapi.ai';
+const PROVIDER_BASE_URL_COOKIE = 'provider_base_url';
 
 function normalizeApiKey(value) {
     if (!value) return null;
@@ -8,22 +9,66 @@ function normalizeApiKey(value) {
     return trimmed && trimmed !== 'null' && trimmed !== 'undefined' ? trimmed : null;
 }
 
+function decodeCookieValue(value) {
+    if (!value) return null;
+    try {
+        return decodeURIComponent(value);
+    } catch {
+        return value;
+    }
+}
+
+function normalizeBaseUrl(value) {
+    const raw = normalizeApiKey(decodeCookieValue(value));
+    if (!raw) return null;
+    try {
+        const parsed = new URL(raw);
+        if (!['http:', 'https:'].includes(parsed.protocol)) return null;
+        return raw.replace(/\/+$/, '');
+    } catch {
+        return null;
+    }
+}
+
+function getProviderBaseInfo(request) {
+    const headerBaseUrl = normalizeBaseUrl(request.headers.get('x-provider-base-url'));
+    const cookieBaseUrl = normalizeBaseUrl(request.cookies.get(PROVIDER_BASE_URL_COOKIE)?.value);
+    const baseUrl = headerBaseUrl || cookieBaseUrl || MUAPI_BASE;
+    return {
+        baseUrl,
+        usesProviderBase: Boolean(headerBaseUrl || cookieBaseUrl),
+    };
+}
+
 function getApiKey(request) {
     // Priority 1: Direct x-api-key header
     const headerKey = normalizeApiKey(request.headers.get('x-api-key'));
     if (headerKey) return headerKey;
 
-    // Priority 2: muapi_key cookie (used by the fixed builder library)
-    const cookieKey = normalizeApiKey(request.cookies.get('muapi_key')?.value);
-    return cookieKey;
+    // Priority 2: unified Provider cookie, then legacy muapi_key
+    return (
+        normalizeApiKey(request.cookies.get('provider_api_key')?.value) ||
+        normalizeApiKey(request.cookies.get('yunwu_api_key')?.value) ||
+        normalizeApiKey(request.cookies.get('muapi_key')?.value)
+    );
 }
 
-function cleanHeaders(request) {
+function cleanHeaders(request, apiKey, usesProviderBase) {
     const headers = new Headers(request.headers);
     headers.delete('host');
     headers.delete('connection');
-    headers.delete('cookie'); // CRITICAL: Stop forwarding browser cookies to MuAPI to avoid auth conflicts
+    headers.delete('cookie'); // Stop forwarding browser cookies to upstream APIs.
+    headers.delete('x-provider-base-url');
+    headers.delete('x-provider-id');
+    if (apiKey) {
+        headers.set('x-api-key', apiKey);
+        if (usesProviderBase) headers.set('authorization', `Bearer ${apiKey}`);
+    }
     return headers;
+}
+
+function buildTargetUrl(baseUrl, path, search) {
+    return `${baseUrl}/workflow/${path}${search}`;
 }
 
 export async function GET(request, { params }) {
@@ -32,13 +77,12 @@ export async function GET(request, { params }) {
     const path = pathSegments.join('/');
     
     const { search } = new URL(request.url);
-    const targetUrl = `${MUAPI_BASE}/workflow/${path}${search}`;
-
-    const headers = cleanHeaders(request);
+    const providerBase = getProviderBaseInfo(request);
+    const targetUrl = buildTargetUrl(providerBase.baseUrl, path, search);
 
     const apiKey = getApiKey(request);
+    const headers = cleanHeaders(request, apiKey, providerBase.usesProviderBase);
     console.log(`[proxy GET] ${targetUrl} | apiKey: ${apiKey ? apiKey.slice(0,8)+'...' : 'MISSING'}`);
-    if (apiKey) headers.set('x-api-key', apiKey);
 
     try {
         const response = await fetch(targetUrl, {
@@ -61,13 +105,12 @@ export async function POST(request, { params }) {
     const path = pathSegments.join('/');
     
     const { search } = new URL(request.url);
-    const targetUrl = `${MUAPI_BASE}/workflow/${path}${search}`;
-
-    const headers = cleanHeaders(request);
+    const providerBase = getProviderBaseInfo(request);
+    const targetUrl = buildTargetUrl(providerBase.baseUrl, path, search);
 
     const apiKey = getApiKey(request);
-    console.log(`[proxy POST] ${targetUrl} | apiKey: ${apiKey ? apiKey.slice(0,8)+'...' : 'MISSING'} | cookie: ${request.cookies.get('muapi_key')?.value?.slice(0,8) || 'NONE'} | header: ${request.headers.get('x-api-key')?.slice(0,8) || 'NONE'}`);
-    if (apiKey) headers.set('x-api-key', apiKey);
+    const headers = cleanHeaders(request, apiKey, providerBase.usesProviderBase);
+    console.log(`[proxy POST] ${targetUrl} | apiKey: ${apiKey ? apiKey.slice(0,8)+'...' : 'MISSING'} | provider: ${request.headers.get('x-provider-id') || 'legacy'} | header: ${request.headers.get('x-api-key')?.slice(0,8) || 'NONE'}`);
 
     try {
         const body = await request.arrayBuffer();
@@ -96,12 +139,11 @@ export async function DELETE(request, { params }) {
     const path = pathSegments.join('/');
     
     const { search } = new URL(request.url);
-    const targetUrl = `${MUAPI_BASE}/workflow/${path}${search}`;
-
-    const headers = cleanHeaders(request);
+    const providerBase = getProviderBaseInfo(request);
+    const targetUrl = buildTargetUrl(providerBase.baseUrl, path, search);
 
     const apiKey = getApiKey(request);
-    if (apiKey) headers.set('x-api-key', apiKey);
+    const headers = cleanHeaders(request, apiKey, providerBase.usesProviderBase);
 
     try {
         const response = await fetch(targetUrl, {
@@ -121,12 +163,11 @@ export async function PUT(request, { params }) {
     const path = pathSegments.join('/');
     
     const { search } = new URL(request.url);
-    const targetUrl = `${MUAPI_BASE}/workflow/${path}${search}`;
-
-    const headers = cleanHeaders(request);
+    const providerBase = getProviderBaseInfo(request);
+    const targetUrl = buildTargetUrl(providerBase.baseUrl, path, search);
 
     const apiKey = getApiKey(request);
-    if (apiKey) headers.set('x-api-key', apiKey);
+    const headers = cleanHeaders(request, apiKey, providerBase.usesProviderBase);
 
     try {
         const body = await request.arrayBuffer();
