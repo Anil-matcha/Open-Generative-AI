@@ -7,23 +7,27 @@ on:
       - "codex/**"
     paths:
       - ".github/workflows/desktop-packaging.yml"
+      - ".gitmodules"
       - "afterPack.js"
       - "build/**"
       - "electron/**"
       - "package-lock.json"
       - "package.json"
       - "packages/studio/**"
+      - "packages/Vibe-Workflow"
       - "src/desktop/**"
       - "vite.config.mjs"
   pull_request:
     paths:
       - ".github/workflows/desktop-packaging.yml"
+      - ".gitmodules"
       - "afterPack.js"
       - "build/**"
       - "electron/**"
       - "package-lock.json"
       - "package.json"
       - "packages/studio/**"
+      - "packages/Vibe-Workflow"
       - "src/desktop/**"
       - "vite.config.mjs"
 
@@ -34,6 +38,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -120,6 +126,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
