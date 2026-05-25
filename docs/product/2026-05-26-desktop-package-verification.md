@@ -185,6 +185,15 @@ macOS GitHub Actions evidence:
 | Artifact | `desktop-macos` |
 | Artifact archive size | 1,310,710,224 bytes |
 
+Downloaded artifact evidence on the Windows workstation:
+
+| File | Size | SHA256 |
+|---|---:|---|
+| `MozenAIGC-1.0.10.dmg` | 225,635,768 bytes | `D1DD297A13A1412D84FE94D0CA7B41205CD794F5597FF08706B210FD5948C41B` |
+| `MozenAIGC-1.0.10-arm64.dmg` | 219,612,057 bytes | `0770271438955856373723D79AE0D863661AF330DE500A6043B9FE4C97500BAB` |
+
+The artifact was downloaded outside the repository workspace to preserve a clean git worktree. The downloaded artifact also includes expanded `mac/MozenAIGC.app` and `mac-arm64/MozenAIGC.app` directories.
+
 macOS CI steps passed:
 
 - `npm run electron:build:mac:ci`

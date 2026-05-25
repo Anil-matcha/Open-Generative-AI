@@ -17,7 +17,7 @@ The old Vanilla renderer is still reachable as a fallback:
 - `src/desktop/electronStudioAdapter.js` exposes `openLegacyRenderer()`.
 - `src/desktop/DesktopApp.js` renders a `Legacy` button that navigates to that fallback.
 
-Because this fallback is still active, DSK-70 should not delete the old Vanilla implementation until DSK-63 and DSK-67 finish the macOS/CI packaging gates.
+Because this fallback is still active, DSK-70 should not delete the old Vanilla implementation until the remaining DSK-63 clean macOS account launch confirms the packaged React renderer starts reliably. DSK-67 and the DSK-63 CI DMG build gate are complete, but the user-facing macOS launch gate is still open.
 
 ## 2. Legacy Files In Scope
 
@@ -67,9 +67,12 @@ Packaging verification should then be rerun through the Desktop Packaging workfl
 
 DSK-70 is ready to execute but remains gated.
 
-Do not remove the fallback until:
+Completed gates:
 
-- DSK-67 runs the Desktop Packaging workflow against a remote branch.
-- DSK-63 has macOS DMG build evidence.
+- DSK-67 ran the Desktop Packaging workflow against a remote branch.
+- DSK-63 has macOS DMG build evidence from GitHub Actions run `26420279302`.
+
+Remaining gates before removal:
+
+- A clean macOS account launches the downloaded `desktop-macos` artifact and records Gatekeeper/quarantine behavior.
 - The team accepts that the legacy renderer is no longer needed as a rollback path.
-

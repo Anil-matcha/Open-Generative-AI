@@ -339,13 +339,13 @@ flowchart TD
 
 Latest progress is tracked in `docs/product/2026-05-26-desktop-web-sync-progress-ledger.md`.
 
-Current weighted global progress: 90%.
+Current weighted global progress: 91%.
 
 Current next three tasks:
 
 1. DSK-63: Complete clean macOS account launch and Gatekeeper/quarantine verification from the `desktop-macos` CI artifact.
-2. DSK-69: Open an upstream PR from `MookeeHugo/Open-Generative-AI:codex/internal-multimodal-lab` or obtain write access to push the passing branch to `Anil-matcha/Open-Generative-AI`.
-3. DSK-70: Remove or archive the old Vanilla JS desktop renderer after DSK-63 clean-account launch is confirmed.
+2. DSK-70: Remove or archive the old Vanilla JS desktop renderer after DSK-63 clean-account launch is confirmed.
+3. DSK-71: Update README architecture section after DSK-70 settles the active desktop renderer path.
 
 Rationale:
 
@@ -354,6 +354,7 @@ Rationale:
 - DSK-63 has passed CI DMG build, `hdiutil verify`, `codesign --verify --deep --strict`, packaged secrets audit, and artifact upload on `macos-latest`; it still needs one clean-account launch/Gatekeeper verification before release acceptance.
 - DSK-66 and DSK-67 are complete on the fork branch: `docs/product/2026-05-26-desktop-packaging-runbook.md`, CI package scripts, and `.github/workflows/desktop-packaging.yml` define and execute repeatable Linux/macOS packaging checks. Desktop Packaging run `26420279302` succeeded and uploaded `desktop-linux` and `desktop-macos`.
 - DSK-68 is complete with caveat: the branch was pushed to `MookeeHugo/Open-Generative-AI` because direct push to `Anil-matcha/Open-Generative-AI` was denied for the current GitHub user.
+- DSK-69 is complete: upstream PR `https://github.com/Anil-matcha/Open-Generative-AI/pull/202` exposes the passing fork branch to the source repository.
 - DSK-70 is ready but gated: `docs/product/2026-05-26-desktop-legacy-archive-readiness.md` identifies the legacy fallback entry points and files, but cleanup should wait until DSK-63 clean-account launch is accepted.
 
 ## 10. Milestones

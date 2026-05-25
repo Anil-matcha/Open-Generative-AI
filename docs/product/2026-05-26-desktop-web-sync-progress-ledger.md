@@ -1278,3 +1278,43 @@ New highest-priority 3 subtasks:
 1. DSK-63: Complete clean macOS account launch and Gatekeeper/quarantine verification from the `desktop-macos` CI artifact.
 2. DSK-69: Open an upstream PR from `MookeeHugo/Open-Generative-AI:codex/internal-multimodal-lab` or obtain write access to push the passing branch to `Anil-matcha/Open-Generative-AI`.
 3. DSK-70: Remove or archive the old Vanilla JS desktop renderer after DSK-63 clean-account launch is confirmed.
+
+## DSK-63, DSK-69, and DSK-70 Result
+
+Completed or advanced tasks:
+- DSK-63: Complete clean macOS account launch and Gatekeeper/quarantine verification from the `desktop-macos` CI artifact
+- DSK-69: Open an upstream PR from `MookeeHugo/Open-Generative-AI:codex/internal-multimodal-lab` or obtain write access to push the passing branch to `Anil-matcha/Open-Generative-AI`
+- DSK-70: Remove or archive the old Vanilla JS desktop renderer after DSK-63 clean-account launch is confirmed
+
+Global optimization progress:
+- Previous: 90%
+- Current: 91%
+- Delta: +1%
+
+Phase progress:
+- P0 Baseline: 75%
+- P1 Desktop React shell: 63%
+- P2 Shared shell: 82%
+- P3 Desktop API proxy: 82%
+- P4 Local inference: 90%
+- P5 Feature parity: 100%
+- P6 Packaging QA: 97%
+- P7 Cleanup: 5%
+
+Evidence:
+- Files changed: `docs/product/2026-05-26-desktop-package-verification.md`, `docs/product/2026-05-26-desktop-web-sync-master-plan.md`, `docs/product/2026-05-26-desktop-web-sync-progress-ledger.md`, `docs/product/2026-05-26-desktop-legacy-archive-readiness.md`
+- Artifact downloaded outside the repository workspace: `desktop-macos` from GitHub Actions run `26420279302`
+- macOS artifact files: `MozenAIGC-1.0.10.dmg`, 225,635,768 bytes, SHA256 `D1DD297A13A1412D84FE94D0CA7B41205CD794F5597FF08706B210FD5948C41B`; `MozenAIGC-1.0.10-arm64.dmg`, 219,612,057 bytes, SHA256 `0770271438955856373723D79AE0D863661AF330DE500A6043B9FE4C97500BAB`
+- Upstream PR created: `https://github.com/Anil-matcha/Open-Generative-AI/pull/202`
+- Commands run: `git status --short --branch`, `gh run download 26420279302 --repo MookeeHugo/Open-Generative-AI --name desktop-macos`, `Get-FileHash -Algorithm SHA256`, `gh pr list`, `gh repo view`, `gh pr create`, `rg` checks for legacy renderer references
+- Verification result: The macOS CI artifact is downloaded and hash-recorded, but this Windows workstation cannot perform the actual clean macOS account launch. DSK-69 is complete through upstream PR #202. DSK-70 was rechecked and remains intentionally gated: `?renderer=legacy`, `openLegacyRenderer()`, and the `Legacy` button still provide the rollback path until the clean macOS artifact launch passes.
+
+Risks and blockers:
+- Blocker: DSK-63 still needs a macOS host to open the downloaded DMG in a clean account and record Gatekeeper/quarantine behavior.
+- Risk: removing the legacy renderer before that macOS launch could remove the packaged desktop rollback path if the artifact opens differently outside CI.
+- Mitigation: keep DSK-70 paused until DSK-63 clean launch passes, then remove the fallback and rerun Vite, shell smoke, secrets audit, and Desktop Packaging.
+
+New highest-priority 3 subtasks:
+1. DSK-63: Complete clean macOS account launch and Gatekeeper/quarantine verification from the downloaded `desktop-macos` artifact.
+2. DSK-70: Remove or archive the old Vanilla JS desktop renderer after DSK-63 clean-account launch is confirmed.
+3. DSK-71: Update README architecture section after DSK-70 settles the active desktop renderer path.
