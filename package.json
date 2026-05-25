@@ -36,9 +36,9 @@
     "electron:build:win": "vite build && electron-builder --win",
     "electron:build:linux": "vite build && electron-builder --linux",
     "electron:build:all": "vite build && electron-builder --mac --win --linux",
-    "electron:build:win:ci": "vite build && electron-builder --win --publish never",
-    "electron:build:linux:ci": "vite build && electron-builder --linux --publish never",
-    "electron:build:mac:ci": "vite build && electron-builder --mac --publish never"
+    "electron:build:win:ci": "npm run build:workflow && vite build && electron-builder --win --publish never",
+    "electron:build:linux:ci": "npm run build:workflow && vite build && electron-builder --linux --publish never",
+    "electron:build:mac:ci": "npm run build:workflow && vite build && electron-builder --mac --publish never"
   },
   "build": {
     "appId": "ai.generative.open",
