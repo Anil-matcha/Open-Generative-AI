@@ -274,6 +274,7 @@ No subtask should be considered complete without this report.
 | DSK-66 | Add packaging host/CI runbook | P0 | 0.5d | DSK-61, DSK-62, DSK-63 attempts | Repeatable Linux and macOS packaging prerequisites, commands, and artifact checks are documented |
 | DSK-67 | Run packaging CI and attach artifacts | P0 | 0.5d | DSK-66 | GitHub Actions packaging run produces Linux and macOS artifacts with validation logs |
 | DSK-68 | Land packaging workflow branch on remote | P0 | 0.5d | DSK-66 | Current desktop migration and packaging workflow are committed and pushed to a remote `codex/**` branch so CI can run |
+| DSK-69 | Open upstream integration PR or obtain upstream write access | P0 | 0.5d | DSK-68, DSK-67 | The passing fork branch is available to `Anil-matcha/Open-Generative-AI` through a PR, maintainer-pushed branch, or granted write access |
 
 ### P7. Cleanup and Closure
 
@@ -325,6 +326,7 @@ flowchart TD
   DSK60 --> DSK66["DSK-66 Packaging host/CI runbook"]
   DSK66 --> DSK68["DSK-68 Land remote branch"]
   DSK68 --> DSK67["DSK-67 Run packaging CI"]
+  DSK67 --> DSK69["DSK-69 Upstream integration"]
   DSK66 --> DSK62
   DSK66 --> DSK63
   DSK67 --> DSK63
@@ -337,21 +339,22 @@ flowchart TD
 
 Latest progress is tracked in `docs/product/2026-05-26-desktop-web-sync-progress-ledger.md`.
 
-Current weighted global progress: 85%.
+Current weighted global progress: 90%.
 
 Current next three tasks:
 
-1. DSK-68: Commit and push the current desktop migration plus packaging workflow to a remote `codex/**` branch.
-2. DSK-67: Run the Desktop Packaging GitHub Actions workflow and attach Linux/macOS artifacts plus validation logs.
-3. DSK-63: Complete macOS DMG build and clean-account launch verification from the CI artifact or a macOS host.
+1. DSK-63: Complete clean macOS account launch and Gatekeeper/quarantine verification from the `desktop-macos` CI artifact.
+2. DSK-69: Open an upstream PR from `MookeeHugo/Open-Generative-AI:codex/internal-multimodal-lab` or obtain write access to push the passing branch to `Anil-matcha/Open-Generative-AI`.
+3. DSK-70: Remove or archive the old Vanilla JS desktop renderer after DSK-63 clean-account launch is confirmed.
 
 Rationale:
 
 - DSK-61 is accepted for the Windows workstation: NSIS installer built, silent install completed, and the installed app launched with a responding process.
 - DSK-62 is accepted for Linux Docker/CI smoke: AppImage and DEB artifacts were produced, AppImage extract-and-run stayed alive until timeout, and DEB installed to `/opt/MozenAIGC` before staying alive under `xvfb`.
-- DSK-63 remains blocked by host OS until a macOS host or GitHub Actions run builds and verifies the DMG.
-- DSK-66 is complete: `docs/product/2026-05-26-desktop-packaging-runbook.md`, CI package scripts, and `.github/workflows/desktop-packaging.yml` define repeatable Linux/macOS packaging checks. The workflow also has a `push` trigger for `codex/**` branches.
-- DSK-70 is ready but gated: `docs/product/2026-05-26-desktop-legacy-archive-readiness.md` identifies the legacy fallback entry points and files, but cleanup should wait until DSK-63 and DSK-67 are accepted.
+- DSK-63 has passed CI DMG build, `hdiutil verify`, `codesign --verify --deep --strict`, packaged secrets audit, and artifact upload on `macos-latest`; it still needs one clean-account launch/Gatekeeper verification before release acceptance.
+- DSK-66 and DSK-67 are complete on the fork branch: `docs/product/2026-05-26-desktop-packaging-runbook.md`, CI package scripts, and `.github/workflows/desktop-packaging.yml` define and execute repeatable Linux/macOS packaging checks. Desktop Packaging run `26420279302` succeeded and uploaded `desktop-linux` and `desktop-macos`.
+- DSK-68 is complete with caveat: the branch was pushed to `MookeeHugo/Open-Generative-AI` because direct push to `Anil-matcha/Open-Generative-AI` was denied for the current GitHub user.
+- DSK-70 is ready but gated: `docs/product/2026-05-26-desktop-legacy-archive-readiness.md` identifies the legacy fallback entry points and files, but cleanup should wait until DSK-63 clean-account launch is accepted.
 
 ## 10. Milestones
 

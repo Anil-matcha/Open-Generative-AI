@@ -8,10 +8,10 @@ Scope: DSK-61, DSK-62, DSK-63 packaging verification after the shared Web/Deskto
 | Task | Environment used | Status | Result |
 |---|---|---|---|
 | DSK-61 Windows build and install | Windows x64, Node v24.13.0 | Pass | NSIS installer built, installed silently, and launched successfully |
-| DSK-62 Linux AppImage and DEB | Linux Docker on Windows Docker Desktop | Pass with caveat | AppImage and DEB built; AppImage extract-and-run and DEB install launch smokes stayed alive until timeout |
-| DSK-63 macOS DMG behavior | Windows x64 attempt plus CI workflow preparation | Blocked | electron-builder requires macOS; GitHub Actions macOS workflow is prepared but not run from this uncommitted workspace |
+| DSK-62 Linux AppImage and DEB | Linux Docker on Windows Docker Desktop plus GitHub Actions `ubuntu-24.04` | Pass with caveat | AppImage and DEB built; CI metadata, AppImage, DEB install, packaged secrets audit, and artifact upload passed |
+| DSK-63 macOS DMG behavior | Windows x64 attempt plus GitHub Actions `macos-latest` | Pass with caveat | CI built the DMG, verified it with `hdiutil`, verified app signatures with `codesign`, audited packaged artifacts, and uploaded the macOS artifact; clean-account launch still pending |
 
-DSK-61 is accepted on this workstation. DSK-62 is accepted for Linux container/CI smoke and still benefits from a final visual desktop check on Ubuntu. DSK-63 still needs a macOS host or CI run before release readiness can be closed.
+DSK-61 is accepted on this workstation. DSK-62 is accepted for Linux container/CI smoke and still benefits from a final visual desktop check on Ubuntu. DSK-63 is accepted for CI DMG build and package validation, but still needs a clean macOS account launch and Gatekeeper/quarantine check before release readiness can be closed.
 
 ## 2. Windows Evidence
 
@@ -120,6 +120,27 @@ LINUX_APPIMAGE_SMOKE=ran_until_timeout
 
 Exit code `124` is expected here because the smoke uses a deliberate 25 second timeout. DBus and GPU initialization warnings were observed in the minimal container and should be rechecked in a full desktop session, but they did not prevent the app from staying alive.
 
+Linux GitHub Actions evidence:
+
+| Field | Value |
+|---|---|
+| Repository | `MookeeHugo/Open-Generative-AI` fork |
+| Branch | `codex/internal-multimodal-lab` |
+| Run | `Desktop Packaging` run `26420279302` |
+| URL | `https://github.com/MookeeHugo/Open-Generative-AI/actions/runs/26420279302` |
+| Head SHA | `fcfe13b7f8bbb607736e5593802447f616b76d5d` |
+| Artifact | `desktop-linux` |
+| Artifact archive size | 462,203,226 bytes |
+
+Linux CI steps passed:
+
+- `npm run electron:build:linux:ci`
+- Package metadata inspection for AppImage and DEB
+- AppImage `xvfb` smoke
+- DEB install plus `/opt/MozenAIGC/open-generative-ai` `xvfb` smoke
+- `npm run test:secrets-audit`
+- Upload Linux artifacts
+
 ## 4. macOS Evidence
 
 Command:
@@ -151,6 +172,32 @@ Prepared CI path:
 - `.github/workflows/desktop-packaging.yml`
 - `npm run electron:build:mac:ci`
 - CI checks: `hdiutil verify release/*.dmg`, `codesign --verify --deep --strict`, `npm run test:secrets-audit`
+
+macOS GitHub Actions evidence:
+
+| Field | Value |
+|---|---|
+| Repository | `MookeeHugo/Open-Generative-AI` fork |
+| Branch | `codex/internal-multimodal-lab` |
+| Run | `Desktop Packaging` run `26420279302` |
+| URL | `https://github.com/MookeeHugo/Open-Generative-AI/actions/runs/26420279302` |
+| Head SHA | `fcfe13b7f8bbb607736e5593802447f616b76d5d` |
+| Artifact | `desktop-macos` |
+| Artifact archive size | 1,310,710,224 bytes |
+
+macOS CI steps passed:
+
+- `npm run electron:build:mac:ci`
+- `hdiutil verify release/*.dmg`
+- `codesign --verify --deep --strict --verbose=2` on `MozenAIGC.app`
+- `npm run test:secrets-audit`
+- Upload macOS artifacts
+
+Remaining macOS follow-up:
+
+- Download the `desktop-macos` artifact on a clean macOS account.
+- Open the DMG, move or launch `MozenAIGC.app`, and document Gatekeeper/quarantine prompts.
+- Confirm the app reaches the desktop renderer shell and provider/local runtime panels without startup errors.
 
 ## 5. Secrets Audit
 
@@ -187,4 +234,4 @@ The audit now scans `.asar` archives in release artifacts while skipping unpacke
 |---|---|
 | DSK-61 | Accepted for Windows workstation smoke. Recommended remaining evidence: full UI smoke on installed app. |
 | DSK-62 | Accepted for Linux Docker/CI smoke. Recommended remaining evidence: full Ubuntu desktop screenshot or Playwright-assisted packaged UI smoke. |
-| DSK-63 | Not accepted yet. Blocked on macOS host for DMG build, launch, and Gatekeeper verification. |
+| DSK-63 | Accepted for CI DMG build, image verification, app signature verification, packaged secrets audit, and artifact upload. Remaining release evidence: clean macOS account launch and Gatekeeper/quarantine verification. |
