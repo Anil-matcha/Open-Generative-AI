@@ -8,16 +8,18 @@ This ledger records completed task results under the master plan requirement tha
 
 | Phase | Progress |
 |---|---:|
-| P0 Baseline | 75% |
-| P1 Desktop React shell | 63% |
-| P2 Shared shell | 82% |
-| P3 Desktop API proxy | 82% |
-| P4 Local inference | 90% |
+| P0 Baseline | 100% |
+| P1 Desktop React shell | 100% |
+| P2 Shared shell | 100% |
+| P3 Desktop API proxy | 95% |
+| P4 Local inference | 95% |
 | P5 Feature parity | 100% |
-| P6 Packaging QA | 87% |
-| P7 Cleanup | 5% |
+| P6 Packaging QA | 95% |
+| P7 Cleanup | 75% |
 
-Current weighted global progress: 85%.
+Current weighted global progress for the active Windows/Linux/Web scope: 97%.
+
+macOS packaging, signing, notarization, and clean-account launch verification are deferred from the current active scope until real macOS account/hardware access is available.
 
 ## DSK-00 Result
 
@@ -1361,3 +1363,42 @@ New highest-priority 3 subtasks:
 1. DSK-74: Resolve GitHub Actions Node 24 runtime deprecation warning before 2026-06-02.
 2. DSK-73: Prepare release notes and migration summary for the shared React desktop renderer.
 3. DSK-62: Capture a final full Ubuntu desktop visual smoke when an Ubuntu desktop environment is available.
+
+## DSK-74 Result
+
+Completed task:
+- DSK-74: Resolve GitHub Actions Node 24 runtime deprecation warning before 2026-06-02.
+
+Global optimization progress:
+- Previous: 96% for the active Windows/Linux/Web scope
+- Current: 97% for the active Windows/Linux/Web scope
+- Delta: +1%
+- Note: original all-platform completion still requires a future re-scoped macOS track if macOS release support is restored.
+
+Phase progress:
+- P0 Baseline: 100%
+- P1 Desktop React shell: 100%
+- P2 Shared shell: 100%
+- P3 Desktop API proxy: 95%
+- P4 Local inference: 95%
+- P5 Feature parity: 100%
+- P6 Packaging QA: 95%
+- P7 Cleanup: 75%
+
+Evidence:
+- Files changed: `.github/workflows/desktop-packaging.yml`, `docs/product/2026-05-26-desktop-package-verification.md`, `docs/product/2026-05-26-desktop-web-sync-master-plan.md`, `docs/product/2026-05-26-desktop-web-sync-progress-ledger.md`
+- Action runtime changes: `actions/checkout@v5`, `actions/setup-node@v5`, and `actions/upload-artifact@v6`.
+- Commands run: `git ls-remote --tags` for the three GitHub action repositories, `rg` workflow action references, `git diff --check`, `gh run watch 26444106357 --repo MookeeHugo/Open-Generative-AI --exit-status`, `gh run view 26444106357 --repo MookeeHugo/Open-Generative-AI --json ...`, `gh api repos/MookeeHugo/Open-Generative-AI/check-runs/77845820169/annotations`.
+- Verification result: Desktop Packaging run `26444106357` passed on branch `codex/internal-multimodal-lab`, head `64208187bf54c17c7b2788769aa04520389e11c6`, URL `https://github.com/MookeeHugo/Open-Generative-AI/actions/runs/26444106357`. The Linux job `77845820169` passed checkout, setup-node, system dependencies, `npm ci`, Linux package build, AppImage metadata, DEB metadata/install, AppImage and DEB `xvfb` smokes, packaged secrets audit, artifact upload, and post steps. The check-run annotations list was empty. Artifact `desktop-linux` ID `7213657036` uploaded successfully with final size `462159948` bytes and artifact zip SHA256 digest `2db11e75129b1302d9fc74753f9db55971e7b541065b6699995d205d385e8f6f`.
+
+Risks and blockers:
+- Deferred: macOS packaging, signing, notarization, and clean-account launch verification remain outside the current active scope because no real macOS account/hardware is available.
+- Risk: Linux package smoke has CI/container evidence but still benefits from a full Ubuntu desktop visual confirmation.
+- Risk: upstream integration still depends on PR #202 review/merge because direct push to `Anil-matcha/Open-Generative-AI` was denied for the current GitHub account.
+- Note: CI logs still include dependency-level deprecation warnings from Node/npm packages, but the GitHub Actions Node 20 action-runtime annotations are resolved.
+- Mitigation: proceed with release notes, keep macOS explicitly deferred, and keep PR #202 review/merge status visible in each subsequent progress report.
+
+New highest-priority 3 subtasks:
+1. DSK-73: Prepare release notes and migration summary for the shared React desktop renderer.
+2. DSK-62: Capture a final full Ubuntu desktop visual smoke when an Ubuntu desktop environment is available.
+3. DSK-75: Track PR #202 review and merge readiness.

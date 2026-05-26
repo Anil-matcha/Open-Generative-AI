@@ -276,7 +276,7 @@ No subtask should be considered complete without this report.
 | DSK-67 | Run packaging CI and attach artifacts | P0 | 0.5d | DSK-66 | GitHub Actions packaging run produces Linux artifacts with validation logs for the current active scope |
 | DSK-68 | Land packaging workflow branch on remote | P0 | 0.5d | DSK-66 | Current desktop migration and packaging workflow are committed and pushed to a remote `codex/**` branch so CI can run |
 | DSK-69 | Open upstream integration PR or obtain upstream write access | P0 | 0.5d | DSK-68, DSK-67 | The passing fork branch is available to `Anil-matcha/Open-Generative-AI` through a PR, maintainer-pushed branch, or granted write access |
-| DSK-74 | Resolve GitHub Actions Node 24 runtime deprecation warning | P0 | 0.25d | DSK-67 | Desktop Packaging workflow runs without Node.js 20 action-runtime deprecation annotations before the 2026-06-02 GitHub default runtime switch |
+| DSK-74 | Resolve GitHub Actions Node 24 runtime deprecation warning | Done | 0.25d | DSK-67 | Desktop Packaging workflow runs without Node.js 20 action-runtime deprecation annotations before the 2026-06-02 GitHub default runtime switch |
 
 ### P7. Cleanup and Closure
 
@@ -286,6 +286,7 @@ No subtask should be considered complete without this report.
 | DSK-71 | Update README architecture section | P1 | 0.5d | DSK-70 | README accurately describes Web/Desktop/shared architecture |
 | DSK-72 | Update project knowledge docs | P1 | 0.5d | DSK-70 | `project_knowledge.md` no longer describes stale Vanilla-only architecture |
 | DSK-73 | Prepare release notes and migration summary | P1 | 0.5d | P6 smoke pass | Release notes list desktop parity, local inference, and known limitations |
+| DSK-75 | Track PR #202 review and merge readiness | P0 | 0.25d | DSK-69 | Maintainer feedback is addressed or a merge/release decision is recorded |
 
 ## 8. Dependency Map
 
@@ -330,6 +331,7 @@ flowchart TD
   DSK68 --> DSK67["DSK-67 Run packaging CI"]
   DSK67 --> DSK69["DSK-69 Upstream integration"]
   DSK67 --> DSK74["DSK-74 Node 24 actions"]
+  DSK69 --> DSK75["DSK-75 PR review"]
   DSK66 --> DSK62
   DSK66 --> DSK63
   DSK67 -. deferred .-> DSK63
@@ -342,15 +344,15 @@ flowchart TD
 
 Latest progress is tracked in `docs/product/2026-05-26-desktop-web-sync-progress-ledger.md`.
 
-Current weighted global progress for the active Windows/Linux/Web scope: 96%.
+Current weighted global progress for the active Windows/Linux/Web scope: 97%.
 
 Original all-platform plan note: DSK-63 macOS clean-account launch remains deferred, so any future macOS release must be re-scoped before claiming 100% all-platform readiness.
 
 Current next three tasks:
 
-1. DSK-74: Resolve GitHub Actions Node 24 runtime deprecation warning before 2026-06-02.
-2. DSK-73: Prepare release notes and migration summary for the shared React desktop renderer.
-3. DSK-62: Capture a final full Ubuntu desktop visual smoke when an Ubuntu desktop environment is available.
+1. DSK-73: Prepare release notes and migration summary for the shared React desktop renderer.
+2. DSK-62: Capture a final full Ubuntu desktop visual smoke when an Ubuntu desktop environment is available.
+3. DSK-75: Track PR #202 review and merge readiness.
 
 Rationale:
 
@@ -361,7 +363,7 @@ Rationale:
 - DSK-68 is complete with caveat: the branch was pushed to `MookeeHugo/Open-Generative-AI` because direct push to `Anil-matcha/Open-Generative-AI` was denied for the current GitHub user.
 - DSK-69 is complete: upstream PR `https://github.com/Anil-matcha/Open-Generative-AI/pull/202` exposes the passing fork branch to the source repository.
 - DSK-70 is complete for the current active scope: the old Vanilla renderer fallback, button, and source files were removed after macOS was deferred.
-- DSK-74 is now the highest-priority follow-up because post-push Desktop Packaging run `26443447363` passed but GitHub emitted Node.js 20 action-runtime deprecation annotations for the checkout/setup/upload actions.
+- DSK-74 is complete: `.github/workflows/desktop-packaging.yml` now uses `actions/checkout@v5`, `actions/setup-node@v5`, and `actions/upload-artifact@v6`; Desktop Packaging run `26444106357` passed with no check-run annotations.
 
 ## 10. Milestones
 

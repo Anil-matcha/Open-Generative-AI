@@ -126,12 +126,13 @@ Linux GitHub Actions evidence:
 |---|---|
 | Repository | `MookeeHugo/Open-Generative-AI` fork |
 | Branch | `codex/internal-multimodal-lab` |
-| Run | `Desktop Packaging` run `26443447363` |
-| URL | `https://github.com/MookeeHugo/Open-Generative-AI/actions/runs/26443447363` |
-| Head SHA | `600bde16190e448eaaf899e56250870f7febbdf6` |
+| Run | `Desktop Packaging` run `26444106357` |
+| URL | `https://github.com/MookeeHugo/Open-Generative-AI/actions/runs/26444106357` |
+| Head SHA | `64208187bf54c17c7b2788769aa04520389e11c6` |
 | Artifact | `desktop-linux` |
-| Artifact archive size | 462,190,533 bytes |
-| Artifact zip SHA256 digest | `f34f3f261abced915473e299e38635386ead07612aed22c7ee4857dc24a2c6c0` |
+| Artifact ID | `7213657036` |
+| Artifact archive size | 462,159,948 bytes |
+| Artifact zip SHA256 digest | `2db11e75129b1302d9fc74753f9db55971e7b541065b6699995d205d385e8f6f` |
 
 Linux CI steps passed:
 
@@ -145,7 +146,7 @@ Linux CI steps passed:
 CI note:
 
 - The Linux package validation passed after macOS packaging was deferred and the old Vanilla renderer fallback was removed.
-- GitHub emitted Node.js 20 action-runtime deprecation annotations for the current checkout/setup/upload actions. DSK-74 tracks resolving those annotations before GitHub's 2026-06-02 default runtime switch to Node 24.
+- DSK-74 is accepted: `actions/checkout@v5`, `actions/setup-node@v5`, and `actions/upload-artifact@v6` ran successfully, and the check-run annotations list was empty.
 
 ## 4. Deferred macOS Evidence
 
