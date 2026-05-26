@@ -184,16 +184,6 @@ export function DesktopApp({ desktopAdapter }) {
           },
           'Tasks',
         ),
-        h(
-          'button',
-          {
-            type: 'button',
-            className:
-              'h-9 shrink-0 rounded-md border border-white/10 px-3 text-sm font-semibold text-zinc-200 transition hover:border-white/20 hover:bg-white/5',
-            onClick: desktopAdapter?.routing?.openLegacyRenderer,
-          },
-          'Legacy',
-        ),
       ),
       activeProvider,
       onOpenProviders: handleMissingApiKey,

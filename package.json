@@ -32,13 +32,12 @@
     "vite:dev": "vite",
     "vite:build": "vite build",
     "electron:dev": "npm run vite:build && electron .",
-    "electron:build": "vite build && electron-builder --mac",
+    "electron:build": "vite build && electron-builder",
     "electron:build:win": "vite build && electron-builder --win",
     "electron:build:linux": "vite build && electron-builder --linux",
-    "electron:build:all": "vite build && electron-builder --mac --win --linux",
+    "electron:build:all": "vite build && electron-builder --win --linux",
     "electron:build:win:ci": "npm run build:workflow && vite build && electron-builder --win --publish never",
-    "electron:build:linux:ci": "npm run build:workflow && vite build && electron-builder --linux --publish never",
-    "electron:build:mac:ci": "npm run build:workflow && vite build && electron-builder --mac --publish never"
+    "electron:build:linux:ci": "npm run build:workflow && vite build && electron-builder --linux --publish never"
   },
   "build": {
     "appId": "ai.generative.open",
@@ -52,20 +51,6 @@
       "dist/**/*",
       "electron/**/*"
     ],
-    "mac": {
-      "category": "public.app-category.graphics-design",
-      "icon": "public/banner.png",
-      "gatekeeperAssess": false,
-      "target": [
-        {
-          "target": "dmg",
-          "arch": [
-            "x64",
-            "arm64"
-          ]
-        }
-      ]
-    },
     "win": {
       "icon": "public/banner.png",
       "target": [

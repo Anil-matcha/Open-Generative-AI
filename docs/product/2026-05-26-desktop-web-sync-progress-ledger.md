@@ -1318,3 +1318,44 @@ New highest-priority 3 subtasks:
 1. DSK-63: Complete clean macOS account launch and Gatekeeper/quarantine verification from the downloaded `desktop-macos` artifact.
 2. DSK-70: Remove or archive the old Vanilla JS desktop renderer after DSK-63 clean-account launch is confirmed.
 3. DSK-71: Update README architecture section after DSK-70 settles the active desktop renderer path.
+
+## DSK-63 Scope Deferral, DSK-70, DSK-71, and DSK-72 Result
+
+Completed or re-scoped tasks:
+- DSK-63: Verify macOS DMG behavior
+- DSK-70: Remove or archive the old Vanilla JS desktop renderer
+- DSK-71: Update README architecture section
+- DSK-72: Update project knowledge docs
+
+Global optimization progress:
+- Previous: 91%
+- Current: 96% for the active Windows/Linux/Web scope
+- Delta: +5%
+- Note: original all-platform completion still requires a future re-scoped macOS track if macOS release support is restored.
+
+Phase progress:
+- P0 Baseline: 100%
+- P1 Desktop React shell: 100%
+- P2 Shared shell: 100%
+- P3 Desktop API proxy: 95%
+- P4 Local inference: 95%
+- P5 Feature parity: 100%
+- P6 Packaging QA: 90%
+- P7 Cleanup: 75%
+
+Evidence:
+- Files changed: `package.json`, `.github/workflows/desktop-packaging.yml`, `src/desktop/main.js`, `src/desktop/electronStudioAdapter.js`, `src/desktop/DesktopApp.js`, `scripts/test-studio-shell-smoke.cjs`, `README.md`, `project_knowledge.md`, `docs/product/2026-05-26-desktop-legacy-archive-readiness.md`, `docs/product/2026-05-26-desktop-package-verification.md`, `docs/product/2026-05-26-desktop-packaging-runbook.md`, `docs/product/2026-05-26-desktop-smoke-test-matrix.md`, `docs/product/2026-05-26-desktop-web-sync-baseline-matrix.md`, `docs/product/2026-05-26-desktop-web-sync-master-plan.md`, `docs/product/2026-05-26-desktop-web-sync-progress-ledger.md`
+- Files deleted: `src/main.js`, `src/components/Header.js`, `src/components/ImageStudio.js`, `src/components/VideoStudio.js`, `src/components/CinemaStudio.js`, `src/components/LipSyncStudio.js`, `src/components/WorkflowStudio.js`, `src/components/AgentStudio.js`, `src/components/McpCliStudio.js`, `src/components/SettingsModal.js`, `src/components/AuthModal.js`, `src/components/Sidebar.js`, `src/components/UploadPicker.js`, `src/components/LocalModelManager.js`, `src/components/CameraControls.js`
+- Commands run: `git status --short --branch`, `node -e "JSON.parse(...package.json...)"`, `rg` legacy/macOS/reference checks, `npm run vite:build`, `npm run test:studio-shell-smoke`, `npm run test:secrets-audit`, `npm run build:workflow`, `npm run test:api-providers`, `npm run test:desktop-api-proxy`
+- Verification result: package config is valid JSON. Vite desktop build passed. The first shell smoke run exposed a Playwright actionability timeout on the Apps Studio modal; the smoke was hardened to verify the button is visible and enabled before triggering the registration handler. The rerun passed and now verifies `desktop legacy fallback action is removed`. Secrets audit scanned 144 files and 4 `.asar` archives with zero findings. Workflow build, API provider tests, and desktop API proxy tests passed.
+
+Risks and blockers:
+- Deferred: macOS packaging, signing, notarization, and clean-account launch verification are intentionally outside the current active scope because no real macOS account/hardware is available.
+- Risk: Linux package smoke has CI/container evidence but still benefits from a full Ubuntu desktop visual confirmation.
+- Risk: upstream integration still depends on PR #202 review/merge because direct push to `Anil-matcha/Open-Generative-AI` was denied for the current GitHub account.
+- Mitigation: keep the release notes explicit that the current active desktop scope is Windows/Linux; re-scope macOS separately before promising macOS artifacts.
+
+New highest-priority 3 subtasks:
+1. DSK-73: Prepare release notes and migration summary for the shared React desktop renderer.
+2. DSK-62: Capture a final full Ubuntu desktop visual smoke when an Ubuntu desktop environment is available.
+3. DSK-69: Track upstream PR #202 review/merge and respond to maintainer feedback.

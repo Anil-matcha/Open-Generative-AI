@@ -1,7 +1,7 @@
 # Desktop Package Verification
 
 Date: 2026-05-26
-Scope: DSK-61, DSK-62, DSK-63 packaging verification after the shared Web/Desktop migration.
+Scope: DSK-61 and DSK-62 active packaging verification after the shared Web/Desktop migration. DSK-63 macOS evidence is retained as historical CI evidence only and is deferred from the current active scope.
 
 ## 1. Summary
 
@@ -9,9 +9,9 @@ Scope: DSK-61, DSK-62, DSK-63 packaging verification after the shared Web/Deskto
 |---|---|---|---|
 | DSK-61 Windows build and install | Windows x64, Node v24.13.0 | Pass | NSIS installer built, installed silently, and launched successfully |
 | DSK-62 Linux AppImage and DEB | Linux Docker on Windows Docker Desktop plus GitHub Actions `ubuntu-24.04` | Pass with caveat | AppImage and DEB built; CI metadata, AppImage, DEB install, packaged secrets audit, and artifact upload passed |
-| DSK-63 macOS DMG behavior | Windows x64 attempt plus GitHub Actions `macos-latest` | Pass with caveat | CI built the DMG, verified it with `hdiutil`, verified app signatures with `codesign`, audited packaged artifacts, and uploaded the macOS artifact; clean-account launch still pending |
+| DSK-63 macOS DMG behavior | Historical Windows x64 attempt plus GitHub Actions `macos-latest` | Deferred | CI previously built and verified DMG artifacts, but macOS packaging/configuration is no longer in the current active scope because no real macOS account or hardware is available |
 
-DSK-61 is accepted on this workstation. DSK-62 is accepted for Linux container/CI smoke and still benefits from a final visual desktop check on Ubuntu. DSK-63 is accepted for CI DMG build and package validation, but still needs a clean macOS account launch and Gatekeeper/quarantine check before release readiness can be closed.
+DSK-61 is accepted on this workstation. DSK-62 is accepted for Linux container/CI smoke and still benefits from a final visual desktop check on Ubuntu. DSK-63 is deferred and does not block the current Windows/Linux desktop cleanup or release-preparation work.
 
 ## 2. Windows Evidence
 
@@ -141,9 +141,11 @@ Linux CI steps passed:
 - `npm run test:secrets-audit`
 - Upload Linux artifacts
 
-## 4. macOS Evidence
+## 4. Deferred macOS Evidence
 
-Command:
+This section is retained only as historical evidence from the earlier all-platform packaging pass. The active source configuration no longer includes macOS build scripts or the macOS GitHub Actions job.
+
+Historical command:
 
 ```powershell
 npm run electron:build
@@ -160,18 +162,13 @@ Key blocker message:
 Build for macOS is supported only on macOS
 ```
 
-Required follow-up:
+Deferred follow-up if macOS is reapproved:
 
-- Re-run the DMG build on a macOS x64/arm64 host or the new GitHub Actions workflow.
-- Verify ad-hoc signing behavior from `afterPack.js`.
+- Restore a macOS package script and GitHub Actions job.
+- Re-run the DMG build on a real macOS x64/arm64 host or a reintroduced `macos-latest` workflow.
+- Verify signing behavior from `afterPack.js`.
 - Launch the DMG on a clean macOS account.
 - Document Gatekeeper/quarantine steps and any notarization decision.
-
-Prepared CI path:
-
-- `.github/workflows/desktop-packaging.yml`
-- `npm run electron:build:mac:ci`
-- CI checks: `hdiutil verify release/*.dmg`, `codesign --verify --deep --strict`, `npm run test:secrets-audit`
 
 macOS GitHub Actions evidence:
 
@@ -194,19 +191,19 @@ Downloaded artifact evidence on the Windows workstation:
 
 The artifact was downloaded outside the repository workspace to preserve a clean git worktree. The downloaded artifact also includes expanded `mac/MozenAIGC.app` and `mac-arm64/MozenAIGC.app` directories.
 
-macOS CI steps passed:
+Historical macOS CI steps passed:
 
-- `npm run electron:build:mac:ci`
+- `npm run electron:build:mac:ci` before that script was removed from the current active config
 - `hdiutil verify release/*.dmg`
 - `codesign --verify --deep --strict --verbose=2` on `MozenAIGC.app`
 - `npm run test:secrets-audit`
 - Upload macOS artifacts
 
-Remaining macOS follow-up:
+Current macOS status:
 
-- Download the `desktop-macos` artifact on a clean macOS account.
-- Open the DMG, move or launch `MozenAIGC.app`, and document Gatekeeper/quarantine prompts.
-- Confirm the app reaches the desktop renderer shell and provider/local runtime panels without startup errors.
+- Deferred from active release scope.
+- Not a blocker for DSK-70, DSK-71, DSK-72, or Windows/Linux release notes.
+- Must be re-scoped before any new macOS public artifact is promised.
 
 ## 5. Secrets Audit
 
@@ -243,4 +240,4 @@ The audit now scans `.asar` archives in release artifacts while skipping unpacke
 |---|---|
 | DSK-61 | Accepted for Windows workstation smoke. Recommended remaining evidence: full UI smoke on installed app. |
 | DSK-62 | Accepted for Linux Docker/CI smoke. Recommended remaining evidence: full Ubuntu desktop screenshot or Playwright-assisted packaged UI smoke. |
-| DSK-63 | Accepted for CI DMG build, image verification, app signature verification, packaged secrets audit, and artifact upload. Remaining release evidence: clean macOS account launch and Gatekeeper/quarantine verification. |
+| DSK-63 | Deferred from current active scope. Historical CI artifact hashes are recorded above, but macOS package scripts/workflow config are not maintained in this stage. |

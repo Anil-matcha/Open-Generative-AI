@@ -1,99 +1,143 @@
 # MozenAIGC: Technical Documentation & Context
 
-This document serves as a comprehensive knowledge base for the MozenAIGC project. It details the architecture, key components, API integration patterns, and state management strategies used in the application.
+This document is the working knowledge base for the MozenAIGC project. It describes the current shared Web/Desktop architecture, core runtime boundaries, API integration patterns, and known operational constraints.
 
 ## 1. Project Vision & Overview
 
-**MozenAIGC** is an ambitious open-source project dedicated to **replicating the full functionality of the Higgsfield platform**.
+**MozenAIGC** is an open-source AI image, video, workflow, agent, and app studio. The product goal is to keep the optimized Web experience and the local Electron desktop client on the same shared implementation path while preserving desktop-only local inference.
 
-- **Core Goal:** To build a feature-complete, self-hosted alternative to Higgsfield, starting with **Image Generation** (Nano) and expanding into **Video Generation** (Cinema) and other creative tools.
-- **Current State:** The Image Studio ("Nano Banana Pro" interface) is fully operational, featuring a premium dark-mode UI, history management, and multi-model support via the [Muapi.ai](https://muapi.ai) engine.
-- **Future Direction:** The architecture is designed to scale for video generation, model training interfaces, and advanced editing tools, mirroring the evolving capabilities of Higgsfield.
-
-- **Stack:** Vite, Vanilla JavaScript, Tailwind CSS v4.
+- **Core Goal:** Build a feature-complete, self-hostable creative AI studio with image generation, video generation, workflow orchestration, agent surfaces, app templates, API provider management, and local inference where available.
+- **Current State:** The Web app and Electron desktop renderer now share the React `packages/studio` workspace package. The old Vanilla desktop renderer under `src/main.js` and `src/components/*.js` has been removed from the active path.
+- **Desktop Scope:** Current active packaging and verification scope is Windows/Linux. macOS packaging, signing, notarization, and clean-account launch validation are deferred until real macOS account/hardware access is available again.
 - **Repository:** `https://github.com/Anil-matcha/Open-Generative-AI`
 - **Primary Branch:** `main`
 
 ## 2. Architecture & File Structure
 
-The project follows a component-based architecture using vanilla JS, where each component is a function that returns a DOM element.
+The repo is a Next.js + Electron monorepo with a shared React Studio package.
 
 ```tree
-src/
+app/
+├── api/                         # Next.js API routes for Web runtime
+├── codex-lab/                   # Web-only Codex Lab surface
+└── studio/[[...slug]]/page.js    # Web Studio route family
+
+components/
+├── StandaloneShell.js            # Web shell adapter around shared Studio surfaces
+└── ApiKeyModal.js                # Web API key modal
+
+packages/studio/src/
 ├── components/
-│   ├── ImageStudio.js    # Core logic: Prompts, model picking, canvas, history.
-│   ├── Header.js         # Navigation, user settings, auth status.
-│   ├── AuthModal.js      # Modal for capturing and validating the API key.
-│   ├── SettingsModal.js   # Panel for managing settings (clearing API key).
-│   └── Sidebar.js        # (Currently unused/placeholder) Navigation sidebar.
-├── lib/
-│   ├── muapi.js          # The API Client. Handles auth, submission, and polling.
-│   └── models.js         # Source of truth for model definitions and endpoints.
-├── styles/
-│   ├── global.css        # Global resets, fonts, and animation keyframes.
-│   ├── studio.css        # Specific styles for the studio interface.
-│   └── variables.css     # CSS custom properties (colors, blur amounts).
-├── main.js               # Entry point. Renders the app layout and Header/Studio.
-└── style.css             # Tailwind CSS entry file (imports other CSS).
+│   ├── StudioShell.jsx           # Shared shell layout
+│   ├── TaskCenter.jsx            # Shared generation history/task center
+│   ├── ImageStudio.jsx
+│   ├── VideoStudio.jsx
+│   ├── MarketingStudio.jsx
+│   ├── WorkflowStudio.jsx
+│   ├── AgentStudio.jsx
+│   ├── AppsStudio.jsx
+│   ├── ApiProviderStudio.jsx
+│   ├── ApiHealthStudio.jsx
+│   └── LocalModelManager.jsx
+├── apiProviders.js               # Provider defaults, normalization, redaction
+├── localRuntime.js               # Optional desktop local runtime adapter helpers
+├── models.js                     # Model metadata and endpoint source of truth
+├── muapi.js                      # Provider API client helpers
+└── useApiProviderState.js        # Shared provider persistence hook
+
+src/desktop/
+├── main.js                       # Vite React renderer entry
+├── DesktopApp.js                 # Electron shell wiring for shared Studio tabs
+└── electronStudioAdapter.js      # Electron routing, storage, cookies, API rewrite
+
+electron/
+├── main.js                       # Electron main process
+├── preload.js                    # contextBridge for localAI and desktopAPI
+└── lib/
+    ├── desktopApiProxy.js        # Local HTTP proxy for Web-style /api/** calls
+    ├── localInference.js         # sd.cpp runtime registration
+    └── wan2gpProvider.js         # Wan2GP bridge/probing
 ```
 
-## 3. Key Components & Logic
+## 3. Runtime Boundaries
 
-### `ImageStudio.js` (The Brain)
-This is the most complex component. It handles:
-- **State:** Selected model (`selectedModel`), aspect ratio (`selectedAr`), and generation status.
-- **Prompt Input:** A textarea with auto-grow logic and max-height constraints (fixed in `bf2efdb`).
-- **Dynamic Controls:**
-    - **Model Picker:** Lists models from `models.js`.
-    - **Quality/Resolution:** Only appears for models with explicit resolution support (like `nano-banana-pro`). Hidden for others (like `flux-schnell`).
-- **Generation Flow:**
-    1. Checks for API key in `localStorage`. If missing, opens `AuthModal`.
-    2. Calls `muapi.generateImage()`.
-    3. Polling loop waits for result.
-    4. On success, adds result to `generationHistory` and displays it.
-- **History:**
-    - Stored in `localStorage` key `muapi_history`.
-    - Slides in from the right sidebar.
-    - Thumbnails are clickable to re-view; hover to download.
+### Web
 
-### `muapi.js` (The Engine)
-Encapsulates all communication with `api.muapi.ai`.
-- **Authentication:** Uses `x-api-key` header (NOT `Authorization: Bearer`).
-- **Pattern:** Submit -> Poll.
-    - `POST` to endpoint (e.g., `/api/v1/nano-banana-pro`).
-    - API returns a `request_id`.
-    - `POST` / `GET` loop on `/api/v1/predictions/{id}/result` until status is `completed`, `succeeded`, or `failed`.
-- **Normalization:** The polling response structure varies. `muapi.js` normalizes the result to ensure `url` is always populated (extracting from `outputs[0]` if necessary).
+- Runs on Next.js App Router.
+- Uses `components/StandaloneShell.js` as the Web adapter.
+- Calls local Next API routes under `app/api/**`.
+- Stores provider/task state in browser storage and cookies through the shared adapter contract.
 
-### `models.js` (The Data)
-Contains the `t2iModels` array.
-- Each model has an `id`, `name`, `inputs` schema (resolution, aspect ratio support), and a crucial `endpoint` property.
-- **Crucial:** The `endpoint` property maps the internal ID to the API path (e.g., `flux-schnell` -> `flux-schnell-image`).
+### Desktop
 
-## 4. UI & Styling (Tailwind v4)
+- Runs Electron main/preload plus a Vite React renderer.
+- Loads shared Studio components through `src/desktop/DesktopApp.js`.
+- Uses `electron/lib/desktopApiProxy.js` to provide local HTTP equivalents for required Web `/api/**` route families.
+- Rewrites renderer `/api/**` calls in `src/desktop/electronStudioAdapter.js` and attaches the desktop proxy token header.
+- Exposes optional local inference through `window.localAI` and `packages/studio/src/localRuntime.js`.
 
-- **Theme:** Dark mode by default (`bg-app-bg` = `#050505`).
-- **Accent:** Neon Yellow-Green (`#d9ff00`) used for primary actions and glows.
-- **Glassmorphism:** Extensive use of `backdrop-blur` and `bg-white/5` or `bg-black/60` for panels, headers, and modals.
-- **Responsiveness:**
-    - **Mobile:** Stacked layout, simplified controls, hidden sidebar.
-    - **Desktop:** Wide canvas, floating prompt bar, side-by-side history.
-- **Animations:** Custom keyframes in `global.css` for `fade-in-up`, `pulse-glow`, etc.
+## 4. API Integration Pattern
 
-## 5. Development Setup
+Remote provider work still follows the submit/poll model:
 
-- **Vite Proxy:** Local development uses a proxy in `vite.config.js` to route `/api` requests to `https://api.muapi.ai` to avoid CORS issues.
-- **Environment:** `muapi.js` detects `import.meta.env.DEV` to decide whether to use the relative `/api` path (proxy) or the full URL (production).
+1. Submit a provider request through a Web route or desktop proxy route.
+2. Receive a `request_id` or normalized task response.
+3. Poll until the provider returns `completed`, `succeeded`, or `failed`.
+4. Normalize outputs into task records consumed by the shared task center.
 
-## 6. Known Gotchas & Fixes
+Provider secrets must remain in user-controlled storage and request headers. They must not be logged, bundled into static assets, or committed into docs/test fixtures.
 
-- **Prompt Bar Overflow:** Fixed by limiting textarea max-height and enabling scrolling.
-- **Flux Resolution Picker:** Fixed logic to only show the resolution picker if the model *explicitly* lists enum values for resolution/megapixels.
-- **Hero Visibility:** The "Nano Banana Pro" hero text is completely hidden (`display: none`) when an image is shown to prevent bleed-through.
-- **API Key Logging:** Debug logs printing the API key were removed for security.
+## 5. Local Inference
 
-## 7. Future Roadmap (Potential)
+Desktop local inference is optional and capability-driven:
 
-- **Video Generation:** Expand `models.js` and `ImageStudio.js` to support video models (already present in `schema_data` but not wired up).
-- **In-painting/Out-painting:** Add canvas editing tools.
-- **User Accounts:** Move beyond local storage for history.
+- `sd.cpp` is exposed through the local runtime adapter when installed/configured.
+- Wan2GP is treated as a user-managed Gradio server and reached through the Electron bridge.
+- Shared Studio components must degrade clearly when `localRuntime` capabilities are unavailable.
+- Current active verification priority is Windows/Linux. macOS-specific Metal packaging and launch checks are deferred.
+
+## 6. Development Setup
+
+Common commands:
+
+```powershell
+npm run setup
+npm run dev
+npm run electron:dev
+npm run vite:build
+npm run build
+```
+
+Important verification commands:
+
+```powershell
+npm run test:api-providers
+npm run test:desktop-api-proxy
+npm run test:studio-shell-smoke
+npm run test:secrets-audit
+```
+
+Packaging commands:
+
+```powershell
+npm run electron:build:win
+npm run electron:build:linux
+npm run electron:build:all
+```
+
+`electron:build:all` currently targets Windows and Linux only.
+
+## 7. Known Gotchas & Fixes
+
+- **Desktop API proxy:** The Electron renderer is static, so Web `/api/**` calls require the local proxy and token rewrite.
+- **Provider secrets:** Use the secrets audit after Web/Desktop builds and package creation.
+- **Workflow package assets:** Packaging CI must build the workflow workspace before Electron packaging so generated assets exist.
+- **Linux packaging:** AppImage/DEB verification should be run on Linux or CI. Docker `xvfb` smoke confirms launch survival but a full Ubuntu desktop visual smoke is still useful.
+- **Legacy renderer:** The old Vanilla desktop fallback has been removed. New desktop changes should target `packages/studio` plus `src/desktop`.
+
+## 8. Current Roadmap Focus
+
+- Keep Web and desktop UI changes in `packages/studio` by default.
+- Keep runtime-specific behavior behind adapters.
+- Finish release notes and migration summary for the shared renderer migration.
+- Track remaining active-scope release checks in `docs/product/2026-05-26-desktop-web-sync-progress-ledger.md`.

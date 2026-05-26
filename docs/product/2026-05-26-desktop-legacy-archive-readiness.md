@@ -1,59 +1,59 @@
-# Desktop Legacy Renderer Archive Readiness
+# Desktop Legacy Renderer Archive Result
 
 Date: 2026-05-26
-Scope: DSK-70 readiness check for removing or archiving old Vanilla JS desktop studios.
+Scope: DSK-70 execution record for removing old Vanilla JS desktop studios.
 
-## 1. Current State
+## 1. Decision
 
-The React desktop renderer is now the default active path:
+DSK-70 has been executed for the current active desktop scope.
+
+The previous blocker was the clean macOS account launch check. The user explicitly clarified that there is currently no real macOS account/hardware available and macOS configuration is not needed for this stage, so macOS packaging and launch validation are deferred instead of blocking Windows/Linux/Web desktop cleanup.
+
+## 2. Active Desktop Path
+
+The desktop renderer now has one active path:
 
 - `index.html` loads `/src/desktop/main.js`.
+- `src/desktop/main.js` always boots the React renderer.
 - `src/desktop/DesktopApp.js` imports shared React Studio components from `packages/studio/src/components`.
+- `src/desktop/electronStudioAdapter.js` provides Electron routing, storage, cookie, and API proxy rewrite adapters.
 - `vite.config.mjs` aliases `@studio` to `packages/studio/src`.
 
-The old Vanilla renderer is still reachable as a fallback:
+The old `?renderer=legacy` fallback is removed.
 
-- `src/desktop/main.js` imports `../main.js` when `?renderer=legacy` is present.
-- `src/desktop/electronStudioAdapter.js` exposes `openLegacyRenderer()`.
-- `src/desktop/DesktopApp.js` renders a `Legacy` button that navigates to that fallback.
+## 3. Removed Fallback Entry Points
 
-Because this fallback is still active, DSK-70 should not delete the old Vanilla implementation until the remaining DSK-63 clean macOS account launch confirms the packaged React renderer starts reliably. DSK-67 and the DSK-63 CI DMG build gate are complete, but the user-facing macOS launch gate is still open.
+Removed from active source:
 
-## 2. Legacy Files In Scope
+- `?renderer=legacy` handling in `src/desktop/main.js`
+- `openLegacyRenderer()` in `src/desktop/electronStudioAdapter.js`
+- `Legacy` button in `src/desktop/DesktopApp.js`
 
-These files are only referenced by the legacy renderer path in current source searches:
+## 4. Deleted Vanilla Files
 
-| File | Role | Proposed DSK-70 action |
-|---|---|---|
-| `src/main.js` | Vanilla renderer entry and router | Archive or delete after fallback removal |
-| `src/components/Header.js` | Vanilla shell header | Archive or delete |
-| `src/components/ImageStudio.js` | Duplicated Vanilla image studio | Archive or delete |
-| `src/components/VideoStudio.js` | Duplicated Vanilla video studio | Archive or delete |
-| `src/components/CinemaStudio.js` | Duplicated Vanilla cinema studio | Archive or delete |
-| `src/components/LipSyncStudio.js` | Duplicated Vanilla lip sync studio | Archive or delete |
-| `src/components/WorkflowStudio.js` | Vanilla workflow placeholder | Archive or delete |
-| `src/components/AgentStudio.js` | Vanilla agent placeholder | Archive or delete |
-| `src/components/McpCliStudio.js` | Vanilla MCP CLI studio | Archive or delete |
-| `src/components/SettingsModal.js` | Vanilla settings modal | Archive or delete if no non-legacy references remain |
-| `src/components/AuthModal.js` | Vanilla auth modal | Archive or delete if no non-legacy references remain |
-| `src/components/Sidebar.js` | Vanilla shell sidebar | Archive or delete if no non-legacy references remain |
-| `src/components/UploadPicker.js` | Vanilla upload helper | Archive or delete if no non-legacy references remain |
-| `src/components/LocalModelManager.js` | Old desktop local model UI | Archive or delete after confirming `packages/studio/src/components/LocalModelManager.jsx` covers the active path |
-| `src/components/CameraControls.js` | Old Vanilla UI helper | Archive or delete if no non-legacy references remain |
+The following old desktop-only Vanilla files were deleted because no non-legacy references remained:
 
-## 3. Required Code Changes
+| File | Previous role |
+|---|---|
+| `src/main.js` | Vanilla renderer entry and router |
+| `src/components/Header.js` | Vanilla shell header |
+| `src/components/ImageStudio.js` | Duplicated Vanilla image studio |
+| `src/components/VideoStudio.js` | Duplicated Vanilla video studio |
+| `src/components/CinemaStudio.js` | Duplicated Vanilla cinema studio |
+| `src/components/LipSyncStudio.js` | Duplicated Vanilla lip sync studio |
+| `src/components/WorkflowStudio.js` | Vanilla workflow placeholder |
+| `src/components/AgentStudio.js` | Vanilla agent placeholder |
+| `src/components/McpCliStudio.js` | Vanilla MCP CLI studio |
+| `src/components/SettingsModal.js` | Vanilla settings modal |
+| `src/components/AuthModal.js` | Vanilla auth modal |
+| `src/components/Sidebar.js` | Vanilla shell sidebar |
+| `src/components/UploadPicker.js` | Vanilla upload helper |
+| `src/components/LocalModelManager.js` | Old desktop local model UI |
+| `src/components/CameraControls.js` | Old Vanilla UI helper |
 
-When the packaging gates pass, DSK-70 should:
+## 5. Verification Requirements
 
-1. Remove `?renderer=legacy` handling from `src/desktop/main.js`.
-2. Remove `openLegacyRenderer()` from `src/desktop/electronStudioAdapter.js`.
-3. Remove the `Legacy` button from `src/desktop/DesktopApp.js`.
-4. Move old Vanilla files into an archive directory or delete them outright.
-5. Update docs that still describe `src/main.js` and `src/components/*.js` as recoverable fallback paths.
-
-## 4. Verification
-
-Required after DSK-70 edits:
+Required after this cleanup:
 
 ```powershell
 npm run vite:build
@@ -61,18 +61,12 @@ npm run test:studio-shell-smoke
 npm run test:secrets-audit
 ```
 
-Packaging verification should then be rerun through the Desktop Packaging workflow because removing the fallback changes the packaged renderer bundle.
+The shell smoke now verifies that the desktop `Legacy` action is absent.
 
-## 5. Current DSK-70 Decision
+## 6. Follow-Up
 
-DSK-70 is ready to execute but remains gated.
+The next closure tasks are:
 
-Completed gates:
-
-- DSK-67 ran the Desktop Packaging workflow against a remote branch.
-- DSK-63 has macOS DMG build evidence from GitHub Actions run `26420279302`.
-
-Remaining gates before removal:
-
-- A clean macOS account launches the downloaded `desktop-macos` artifact and records Gatekeeper/quarantine behavior.
-- The team accepts that the legacy renderer is no longer needed as a rollback path.
+1. DSK-73: Prepare release notes and migration summary.
+2. DSK-62: Capture a final full Ubuntu desktop visual smoke when environment access is available.
+3. DSK-69: Watch upstream PR #202 for review/merge or maintainer feedback.

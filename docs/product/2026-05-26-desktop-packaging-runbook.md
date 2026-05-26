@@ -1,13 +1,13 @@
 # Desktop Packaging Host and CI Runbook
 
 Date: 2026-05-26
-Scope: DSK-66, repeatable packaging and artifact validation for Windows, Linux, and macOS.
+Scope: DSK-66, repeatable packaging and artifact validation for the current active Windows/Linux desktop scope. macOS packaging is deferred until real macOS account/hardware access is available again.
 
 ## 1. Goals
 
 - Build desktop packages without publishing release assets by default.
 - Verify package metadata, installability, launch behavior, and bundled secret safety.
-- Keep OS-specific verification honest: Windows on Windows, Linux on Ubuntu or Linux Docker/CI, macOS on macOS.
+- Keep OS-specific verification honest: Windows on Windows, Linux on Ubuntu or Linux Docker/CI.
 
 ## 2. Common Gates
 
@@ -136,35 +136,9 @@ Expected artifacts:
 - `release/open-generative-ai_1.0.10_amd64.deb`
 - `release/linux-unpacked/resources/apparmor.profile`
 
-## 5. macOS Package
+## 5. Deferred macOS Package
 
-Host:
-
-- macOS x64 or arm64 host, or GitHub Actions `macos-latest`.
-- Xcode command line tools.
-- Node.js 22.
-
-Command:
-
-```bash
-npm ci
-npm run electron:build:mac:ci
-```
-
-Validation:
-
-```bash
-ls -lh release/*.dmg
-hdiutil verify release/*.dmg
-find release -maxdepth 3 -name "MozenAIGC.app" -print -exec codesign --verify --deep --strict --verbose=2 {} \;
-```
-
-Manual clean-account launch:
-
-1. Download or copy the DMG.
-2. Open the DMG and drag `MozenAIGC.app` to Applications.
-3. If Gatekeeper blocks an unsigned build, record the exact prompt and open from System Settings after confirming the build source.
-4. Launch the app and capture renderer, provider config, API health, and local model panel evidence.
+macOS packaging is intentionally out of the current active runbook. If it is reapproved later, restore a macOS build script, restore a macOS GitHub Actions job, and repeat host-specific DMG verification on real macOS hardware or a vetted macOS CI runner.
 
 ## 6. GitHub Actions
 
@@ -178,13 +152,13 @@ Run modes:
 
 - Manual: GitHub Actions > Desktop Packaging > Run workflow.
 - Pull request: runs when desktop packaging, Electron, shared Studio, or workflow files change.
+- Push to `codex/**`: runs when the same desktop packaging paths change on an implementation branch.
 
 Artifacts:
 
 - `desktop-linux`: AppImage, DEB, Linux metadata, AppArmor profile.
-- `desktop-macos`: DMG and built app bundle.
 
 Important:
 
 - Packaging commands use `--publish never`; release publishing is intentionally separate.
-- The workflow can build and verify macOS DMG metadata, but a final human launch check on a clean macOS account is still required before public release.
+- The workflow currently verifies Linux artifacts only. macOS artifacts must not be promised unless the deferred macOS scope is restored.

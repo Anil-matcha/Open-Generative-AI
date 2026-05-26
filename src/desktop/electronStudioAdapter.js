@@ -61,13 +61,6 @@ function createRoutingAdapter() {
       nextUrl.hash = '';
       window.history.replaceState({}, '', nextUrl.toString());
     },
-
-    openLegacyRenderer() {
-      const legacyUrl = new URL(window.location.href);
-      legacyUrl.searchParams.set('renderer', 'legacy');
-      legacyUrl.hash = '';
-      window.location.href = legacyUrl.toString();
-    },
   };
 }
 

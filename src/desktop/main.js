@@ -10,16 +10,7 @@ if (!appRoot) {
   throw new Error('MozenAIGC desktop renderer could not find #app.');
 }
 
-if (shouldUseLegacyRenderer()) {
-  import('../main.js');
-} else {
-  bootstrapDesktopRenderer();
-}
-
-function shouldUseLegacyRenderer() {
-  const params = new URLSearchParams(window.location.search);
-  return params.get('renderer') === 'legacy';
-}
+bootstrapDesktopRenderer();
 
 async function bootstrapDesktopRenderer() {
   const desktopAdapter = await createElectronStudioAdapter();

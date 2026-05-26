@@ -26,9 +26,9 @@ The project already has a local desktop client:
 - Preload bridge: `electron/preload.js`
 - Desktop build commands: `electron:dev`, `electron:build`, `electron:build:win`, `electron:build:linux`
 - Renderer output: `dist/index.html`
-- Renderer source: `src/main.js` and `src/components/*.js`
+- Renderer source: `src/desktop/main.js`, `src/desktop/DesktopApp.js`, and shared `packages/studio/src/**`
 
-The desktop client currently uses Vite and Vanilla JavaScript components.
+The desktop client currently uses Vite, React, and shared Studio components. The old Vanilla renderer fallback under `src/main.js` and `src/components/*.js` was removed in DSK-70.
 
 ### 2.2 Existing Web Optimization Surface
 
@@ -43,12 +43,12 @@ The Web app uses Next.js, React, and the shared `packages/studio` workspace pack
 
 ### 2.3 Key Architecture Gap
 
-The Web app and the desktop client currently render different code paths:
+The original Web/Desktop split has been removed for the active Studio surface:
 
 - Web: Next.js + React + `packages/studio`
-- Desktop: Electron + Vite + Vanilla JS in `src/components`
+- Desktop: Electron + Vite + React + `packages/studio`
 
-Because of this split, Web optimizations do not automatically reach the desktop client.
+New Web optimizations should now land in `packages/studio` first so they are available to both runtimes. Runtime-specific behavior belongs behind the Next or Electron adapters.
 
 The largest technical gap is API routing. Web optimizations depend on Next API routes such as:
 
@@ -117,6 +117,7 @@ Desktop-only local inference should be exposed through a narrow runtime adapter 
 - Adding new model providers beyond the Web parity target.
 - Changing product branding beyond current MozenAIGC naming updates.
 - Full account system redesign.
+- macOS packaging, signing, notarization, and clean-account launch verification until real macOS account/hardware access is available again.
 
 ## 5. Progress Model
 
@@ -210,7 +211,7 @@ No subtask should be considered complete without this report.
 | DSK-11 | Configure Vite aliases and workspace imports for `packages/studio` | P0 | 0.5d | DSK-10 | Desktop renderer imports shared Studio components without bundle errors |
 | DSK-12 | Render a minimal desktop shell with Image/Video/API tabs | P0 | 1d | DSK-10, DSK-11 | Desktop opens and renders shared components with no blank screen |
 | DSK-13 | Add desktop navigation adapter replacing Next router assumptions | P1 | 1d | DSK-12 | Tab changes work in Electron without Next routing |
-| DSK-14 | Keep legacy renderer available as temporary fallback | P2 | 0.5d | DSK-10 | Old `src/main.js` path remains recoverable until migration is verified |
+| DSK-14 | Keep legacy renderer available as temporary fallback | Done / retired | 0.5d | DSK-10 | Temporary fallback served the migration window and was removed in DSK-70 |
 
 ### P2. Shared Studio Shell Extraction
 
@@ -265,14 +266,14 @@ No subtask should be considered complete without this report.
 
 | ID | Task | Priority | Estimate | Dependencies | Acceptance |
 |---|---|---:|---:|---|---|
-| DSK-60 | Create desktop smoke-test matrix | P0 | 0.5d | DSK-12 | Matrix covers Windows, macOS, Linux, Web parity, and local inference |
+| DSK-60 | Create desktop smoke-test matrix | P0 | 0.5d | DSK-12 | Matrix covers Windows, Linux, Web parity, local inference, and records macOS as deferred |
 | DSK-61 | Verify Windows build and install | P1 | 1d | P1-P5 core complete | NSIS installer launches and smoke tests pass |
 | DSK-62 | Verify Linux AppImage and DEB | P1 | 1d | P1-P5 core complete | Linux app launches with AppArmor notes still valid |
-| DSK-63 | Verify macOS DMG behavior | P1 | 1d | P1-P5 core complete | DMG launches after documented Gatekeeper steps |
+| DSK-63 | Verify macOS DMG behavior | Deferred | 1d | Reapproved macOS scope and real macOS access | DMG launches after documented Gatekeeper steps |
 | DSK-64 | Verify secrets are not bundled or logged | P0 | 0.5d | DSK-36 | Build artifacts and logs contain no provider API keys |
 | DSK-65 | Verify Web app did not regress | P0 | 1d | DSK-23 | Next build and key Web flows pass |
 | DSK-66 | Add packaging host/CI runbook | P0 | 0.5d | DSK-61, DSK-62, DSK-63 attempts | Repeatable Linux and macOS packaging prerequisites, commands, and artifact checks are documented |
-| DSK-67 | Run packaging CI and attach artifacts | P0 | 0.5d | DSK-66 | GitHub Actions packaging run produces Linux and macOS artifacts with validation logs |
+| DSK-67 | Run packaging CI and attach artifacts | P0 | 0.5d | DSK-66 | GitHub Actions packaging run produces Linux artifacts with validation logs for the current active scope |
 | DSK-68 | Land packaging workflow branch on remote | P0 | 0.5d | DSK-66 | Current desktop migration and packaging workflow are committed and pushed to a remote `codex/**` branch so CI can run |
 | DSK-69 | Open upstream integration PR or obtain upstream write access | P0 | 0.5d | DSK-68, DSK-67 | The passing fork branch is available to `Anil-matcha/Open-Generative-AI` through a PR, maintainer-pushed branch, or granted write access |
 
@@ -280,7 +281,7 @@ No subtask should be considered complete without this report.
 
 | ID | Task | Priority | Estimate | Dependencies | Acceptance |
 |---|---|---:|---:|---|---|
-| DSK-70 | Remove or archive old Vanilla JS desktop studios | P2 | 1d | P6 smoke pass | No unused duplicated studio implementation remains in active path |
+| DSK-70 | Remove or archive old Vanilla JS desktop studios | P2 | 1d | Windows/Linux active smoke pass and macOS deferral decision | No unused duplicated studio implementation remains in active path |
 | DSK-71 | Update README architecture section | P1 | 0.5d | DSK-70 | README accurately describes Web/Desktop/shared architecture |
 | DSK-72 | Update project knowledge docs | P1 | 0.5d | DSK-70 | `project_knowledge.md` no longer describes stale Vanilla-only architecture |
 | DSK-73 | Prepare release notes and migration summary | P1 | 0.5d | P6 smoke pass | Release notes list desktop parity, local inference, and known limitations |
@@ -322,40 +323,42 @@ flowchart TD
   DSK53 --> DSK60
   DSK60 --> DSK61["DSK-61 Windows build"]
   DSK60 --> DSK62["DSK-62 Linux build"]
-  DSK60 --> DSK63["DSK-63 macOS build"]
+  DSK60 -. deferred .-> DSK63["DSK-63 macOS build"]
   DSK60 --> DSK66["DSK-66 Packaging host/CI runbook"]
   DSK66 --> DSK68["DSK-68 Land remote branch"]
   DSK68 --> DSK67["DSK-67 Run packaging CI"]
   DSK67 --> DSK69["DSK-69 Upstream integration"]
   DSK66 --> DSK62
   DSK66 --> DSK63
-  DSK67 --> DSK63
+  DSK67 -. deferred .-> DSK63
   DSK61 --> DSK70["DSK-70 Cleanup"]
   DSK62 --> DSK70
-  DSK63 --> DSK70
+  DSK63 -. not current gate .-> DSK70
 ```
 
 ## 9. Highest-Priority 3 Subtasks Now
 
 Latest progress is tracked in `docs/product/2026-05-26-desktop-web-sync-progress-ledger.md`.
 
-Current weighted global progress: 91%.
+Current weighted global progress for the active Windows/Linux/Web scope: 96%.
+
+Original all-platform plan note: DSK-63 macOS clean-account launch remains deferred, so any future macOS release must be re-scoped before claiming 100% all-platform readiness.
 
 Current next three tasks:
 
-1. DSK-63: Complete clean macOS account launch and Gatekeeper/quarantine verification from the `desktop-macos` CI artifact.
-2. DSK-70: Remove or archive the old Vanilla JS desktop renderer after DSK-63 clean-account launch is confirmed.
-3. DSK-71: Update README architecture section after DSK-70 settles the active desktop renderer path.
+1. DSK-73: Prepare release notes and migration summary for the shared React desktop renderer.
+2. DSK-62: Capture a final full Ubuntu desktop visual smoke when an Ubuntu desktop environment is available.
+3. DSK-69: Track upstream PR #202 review/merge and respond to maintainer feedback.
 
 Rationale:
 
 - DSK-61 is accepted for the Windows workstation: NSIS installer built, silent install completed, and the installed app launched with a responding process.
 - DSK-62 is accepted for Linux Docker/CI smoke: AppImage and DEB artifacts were produced, AppImage extract-and-run stayed alive until timeout, and DEB installed to `/opt/MozenAIGC` before staying alive under `xvfb`.
-- DSK-63 has passed CI DMG build, `hdiutil verify`, `codesign --verify --deep --strict`, packaged secrets audit, and artifact upload on `macos-latest`; it still needs one clean-account launch/Gatekeeper verification before release acceptance.
-- DSK-66 and DSK-67 are complete on the fork branch: `docs/product/2026-05-26-desktop-packaging-runbook.md`, CI package scripts, and `.github/workflows/desktop-packaging.yml` define and execute repeatable Linux/macOS packaging checks. Desktop Packaging run `26420279302` succeeded and uploaded `desktop-linux` and `desktop-macos`.
+- DSK-63 has historical CI DMG build evidence, but macOS is now deferred because there is no real macOS account/hardware available for this stage.
+- DSK-66 and DSK-67 are complete for the current active Linux CI path: `docs/product/2026-05-26-desktop-packaging-runbook.md`, CI package scripts, and `.github/workflows/desktop-packaging.yml` define and execute repeatable Linux packaging checks.
 - DSK-68 is complete with caveat: the branch was pushed to `MookeeHugo/Open-Generative-AI` because direct push to `Anil-matcha/Open-Generative-AI` was denied for the current GitHub user.
 - DSK-69 is complete: upstream PR `https://github.com/Anil-matcha/Open-Generative-AI/pull/202` exposes the passing fork branch to the source repository.
-- DSK-70 is ready but gated: `docs/product/2026-05-26-desktop-legacy-archive-readiness.md` identifies the legacy fallback entry points and files, but cleanup should wait until DSK-63 clean-account launch is accepted.
+- DSK-70 is complete for the current active scope: the old Vanilla renderer fallback, button, and source files were removed after macOS was deferred.
 
 ## 10. Milestones
 
@@ -366,7 +369,7 @@ Rationale:
 | M3 Image/video parity | DSK-52, DSK-53 | Desktop image/video match Web optimized flows |
 | M4 Local inference restored | DSK-40 to DSK-45 | sd.cpp and Wan2GP work in new React shell |
 | M5 Workflow/Agent/App parity | DSK-55 to DSK-57 | Non-core studios work or degrade clearly |
-| M6 Release-ready desktop | DSK-60 to DSK-65 | Windows/Linux/macOS smoke tests pass |
+| M6 Release-ready desktop | DSK-60 to DSK-65 | Windows/Linux/Web active-scope smoke tests pass; macOS explicitly deferred |
 | M7 Cleanup complete | DSK-70 to DSK-73 | Old duplicate implementation retired and docs updated |
 
 ## 11. Risk Register
@@ -391,7 +394,7 @@ The global task is complete when:
 4. Desktop preserves sd.cpp and Wan2GP local inference.
 5. API Provider management and health checks work in desktop.
 6. Image, video, marketing, workflow, agent, and app center have parity or documented intentional desktop limitations.
-7. Windows, Linux, and macOS desktop packages pass smoke verification.
+7. Windows and Linux desktop packages pass active-scope smoke verification; macOS is either re-scoped and verified or explicitly excluded from the release.
 8. Old duplicated Vanilla JS studio components are removed or clearly archived.
 9. README and project knowledge docs match the new architecture.
 10. Final report shows 100% global progress and no open release-blocking risks.

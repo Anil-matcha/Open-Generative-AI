@@ -11,6 +11,8 @@ This baseline freezes the observable architecture and acceptance targets for the
 
 The working tree was not fully clean at the time of this freeze. `git status --short` reported 53 entries before DSK-00 implementation. Those entries are treated as pre-existing workspace state for this task sequence. This document freezes the product and technical baseline, not a revert point.
 
+Post-migration note: after DSK-70, the active desktop renderer is `src/desktop/main.js` and the old Vanilla `src/main.js` / `src/components/*.js` fallback has been removed. The table below retains the DSK-00 starting baseline and marks the current post-cleanup state where it differs.
+
 ## 2. Current Runtime Baseline
 
 | Runtime | Current entry | Technology | Build command | Notes |
@@ -19,7 +21,7 @@ The working tree was not fully clean at the time of this freeze. `git status --s
 | Shared Studio | `packages/studio/src/**` | React components and provider helpers | `npm run build -w studio` | Contains Image, Video, Marketing, Workflow, Agent, Apps, API Provider, and API Health surfaces. |
 | Desktop main | `electron/main.js` | Electron main process | `npm run electron:dev` | Loads static `dist/index.html`, registers local inference and Wan2GP IPC handlers. |
 | Desktop preload | `electron/preload.js` | Electron context bridge | Included in Electron app | Exposes `window.localAI` for sd.cpp and Wan2GP. |
-| Desktop renderer | `src/main.js` | Vite plus Vanilla JS | `npm run vite:build` | Current active renderer before DSK-10. |
+| Desktop renderer | `src/desktop/main.js` | Vite plus React | `npm run vite:build` | Current active renderer after DSK-70; old Vanilla fallback removed. |
 
 ## 3. Web API Route Baseline
 
@@ -38,23 +40,23 @@ The working tree was not fully clean at the time of this freeze. `git status --s
 
 | Feature | Current Web source | Current desktop source | Gap | Target acceptance |
 |---|---|---|---|---|
-| Shell navigation | `components/StandaloneShell.js`, `app/studio/[[...slug]]/page.js` | `src/main.js`, `src/components/Header.js` | Separate shell and routing logic | Desktop React shell can navigate the same Studio surfaces without Next router assumptions. |
-| Image Studio | `packages/studio/src/components/ImageStudio.jsx` | `src/components/ImageStudio.js` | Duplicated implementation; desktop has local inference path | Desktop renders shared Image Studio and preserves sd.cpp local generation through a runtime adapter. |
-| Video Studio | `packages/studio/src/components/VideoStudio.jsx` | `src/components/VideoStudio.js` | Duplicated implementation; desktop has Wan2GP path | Desktop renders shared Video Studio and preserves Wan2GP generation/upload/cancel flows. |
+| Shell navigation | `components/StandaloneShell.js`, `app/studio/[[...slug]]/page.js` | `src/desktop/DesktopApp.js` | Shared shell now active on desktop | Desktop React shell can navigate the same Studio surfaces without Next router assumptions. |
+| Image Studio | `packages/studio/src/components/ImageStudio.jsx` | `packages/studio/src/components/ImageStudio.jsx` through `src/desktop/DesktopApp.js` | Shared implementation active | Desktop renders shared Image Studio and preserves sd.cpp local generation through a runtime adapter. |
+| Video Studio | `packages/studio/src/components/VideoStudio.jsx` | `packages/studio/src/components/VideoStudio.jsx` through `src/desktop/DesktopApp.js` | Shared implementation active | Desktop renders shared Video Studio and preserves Wan2GP generation/upload/cancel flows. |
 | Marketing Studio | `packages/studio/src/components/MarketingStudio.jsx` | No equivalent active Vanilla module | Web-only optimized surface | Desktop exposes Marketing Studio through shared package and provider proxy. |
-| Workflow Studio | `packages/studio/src/components/WorkflowStudio.jsx` | `src/components/WorkflowStudio.js` | Desktop placeholder only | Desktop supports workflow list/detail/execution or clear provider limitation states. |
-| Agent Studio | `packages/studio/src/components/AgentStudio.jsx` | `src/components/AgentStudio.js` | Desktop placeholder only | Desktop supports agent list/chat/create/edit or clear provider limitation states. |
+| Workflow Studio | `packages/studio/src/components/WorkflowStudio.jsx` | `packages/studio/src/components/WorkflowStudio.jsx` through `src/desktop/DesktopApp.js` | Shared implementation active | Desktop supports workflow list/detail/execution or clear provider limitation states. |
+| Agent Studio | `packages/studio/src/components/AgentStudio.jsx` | `packages/studio/src/components/AgentStudio.jsx` through `src/desktop/DesktopApp.js` | Shared implementation active | Desktop supports agent list/chat/create/edit or clear provider limitation states. |
 | Apps Studio | `packages/studio/src/components/AppsStudio.jsx` | No equivalent active Vanilla module | Web-only surface | Desktop exposes app center through shared package and desktop API proxy. |
 | API Provider Management | `packages/studio/src/components/ApiProviderStudio.jsx`, `packages/studio/src/apiProviders.js` | No equivalent active Vanilla module | Web-only provider management | Desktop can create, edit, switch, export, and persist API provider configs. |
 | API Health | `packages/studio/src/components/ApiHealthStudio.jsx` | No equivalent active Vanilla module | Web-only diagnostics | Desktop health page calls desktop status endpoint and reports provider/model readiness. |
-| Local model management | Desktop-only `src/components/LocalModelManager.js`, `electron/lib/localInference.js` | Desktop-only | Not available to shared React package | Shared components receive optional `localRuntime` capabilities only in Electron. |
+| Local model management | `packages/studio/src/components/LocalModelManager.jsx`, `electron/lib/localInference.js` | Desktop-only runtime exposed to shared UI | Shared component with Electron-only capabilities | Shared components receive optional `localRuntime` capabilities only in Electron. |
 
 ## 5. Acceptance Smoke Matrix
 
 | Area | Smoke test | Required evidence |
 |---|---|---|
 | DSK-10 React entry | `npm run vite:build` succeeds after `index.html` points at `src/desktop/main.js` | Build output includes `dist/index.html` and bundled assets. |
-| Legacy fallback | `src/desktop/main.js` can route to old `src/main.js` with a query flag | Fallback path is documented until Vanilla renderer is retired. |
+| Legacy fallback | Removed in DSK-70 | Shell smoke verifies the `Legacy` action is absent. |
 | Desktop load | Electron can load `dist/index.html` | No blank screen; renderer boot failure logs are absent. |
 | API proxy design | Decision doc compares local HTTP server, IPC-only, and fetch interception | Chosen approach has security, packaging, and migration notes. |
 | Provider secrets | Proxy design redacts credentials and avoids bundling secrets | No API key appears in logs or static assets. |

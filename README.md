@@ -28,33 +28,11 @@
 
 | Platform | Download |
 |---|---|
-| macOS Apple Silicon (M1/M2/M3/M4) | [MozenAIGC-1.0.9-arm64.dmg](https://github.com/Anil-matcha/Open-Generative-AI/releases/download/v1.0.9/Open.Generative.AI-1.0.9-arm64.dmg) |
-| macOS Intel (x64) | [MozenAIGC-1.0.9.dmg](https://github.com/Anil-matcha/Open-Generative-AI/releases/download/v1.0.9/Open.Generative.AI-1.0.9.dmg) |
 | Windows (x64) | [MozenAIGC Setup 1.0.9.exe](https://github.com/Anil-matcha/Open-Generative-AI/releases/download/v1.0.9/Open.Generative.AI.Setup.1.0.9.exe) |
 | Linux (Ubuntu x64) | [v1.0.9 release](https://github.com/Anil-matcha/Open-Generative-AI/releases/tag/v1.0.9) (`.AppImage` / `.deb`), or build locally with `npm run electron:build:linux`. |
+| macOS | 暂不在当前工作台配置和验收范围内。 |
 
 All releases: [github.com/Anil-matcha/Open-Generative-AI/releases](https://github.com/Anil-matcha/Open-Generative-AI/releases)
-
-### macOS 安装指南
-
-由于应用未经过 Apple 公证，macOS Gatekeeper 会在首次启动时拦截。按下面步骤处理：
-
-**步骤 1** - 挂载 DMG，并把应用拖到 `/Applications`
-
-**步骤 2** - 打开终端并执行：
-```bash
-xattr -cr "/Applications/MozenAIGC.app"
-```
-
-**步骤 3** - 在 `/Applications` 里右键应用 → 点 **打开** → 弹窗里再点一次 **打开**
-
-> 这一步只需要做一次，之后就能正常打开。
-
-**替代方式（不使用终端）：**
-1. 先尝试打开应用，macOS 会拦截
-2. 进入 **系统设置 → 隐私与安全性**
-3. 向下找到 _"MozenAIGC was blocked"_
-4. 点击 **仍要打开** → **打开**
 
 ### Windows 安装 - SmartScreen 提示处理
 
@@ -130,8 +108,8 @@ MozenAIGC 是一套免费、开源、无内容限制的 AI 图像、视频、电
 
 | 引擎 | 说明 | 适合场景 |
 |---|---|---|
-| **sd.cpp**（内置） | 基于 [stable-diffusion.cpp](https://github.com/leejet/stable-diffusion.cpp) 的 C++ 引擎，和应用运行在同一台机器上。Apple Silicon 使用 Metal GPU，Linux/Windows 可用 CUDA/Vulkan/ROCm。 | 纯图像模型。适合 Mac M 系列。 |
-| **Wan2GP**（自带服务器） | 连接用户自行运行的 [Wan2GP](https://github.com/deepbeepmeep/Wan2GP) 服务。服务器负责 Python + PyTorch + CUDA/ROCm，桌面应用只发送提示词并接收结果。 | 视频模型（Wan 2.2、Hunyuan、LTX）以及大型图像模型（Flux、Qwen-Image）。NVIDIA/AMD GPU 需要在服务器端，桌面应用本身可以跑在 Mac 上。 |
+| **sd.cpp**（内置） | 基于 [stable-diffusion.cpp](https://github.com/leejet/stable-diffusion.cpp) 的 C++ 引擎，和应用运行在同一台机器上。当前活跃桌面验收以 Windows/Linux 的 CPU、CUDA、Vulkan、ROCm 路径为准。 | 纯图像模型。本阶段优先覆盖 Windows/Linux 本机推理。 |
+| **Wan2GP**（自带服务器） | 连接用户自行运行的 [Wan2GP](https://github.com/deepbeepmeep/Wan2GP) 服务。服务器负责 Python + PyTorch + CUDA/ROCm，桌面应用只发送提示词并接收结果。 | 视频模型（Wan 2.2、Hunyuan、LTX）以及大型图像模型（Flux、Qwen-Image）。NVIDIA/AMD GPU 需要在服务器端。 |
 
 两套引擎共用同一个界面：打开 **设置 → Local Models** 分别配置即可。
 
@@ -141,7 +119,7 @@ MozenAIGC 是一套免费、开源、无内容限制的 AI 图像、视频、电
 |---|---|---|---|
 | **Z-Image Turbo** ⚡ | Diffusion Transformer | 2.5 GB + 2.7 GB 辅助文件 | 8 步极速生成，内存占用较高。 |
 | **Z-Image Base** ⚡ | Diffusion Transformer | 3.5 GB + 2.7 GB 辅助文件 | 50 步高质量生成，内存占用较高。 |
-| **Dreamshaper 8** | SD 1.5 | 2.1 GB | 20 步通用模型，是 Mac 上测试过的最轻量选项。 |
+| **Dreamshaper 8** | SD 1.5 | 2.1 GB | 20 步通用模型，适合作为轻量 sanity test。 |
 | **Realistic Vision v5.1** | SD 1.5 | 2.1 GB | 25 步写实模型 |
 | **Anything v5** | SD 1.5 | 2.1 GB | 20 步动漫/插画模型 |
 | **SDXL Base 1.0** | SDXL | 6.9 GB | 30 步高分辨率 |
@@ -181,49 +159,23 @@ python wgp.py --listen --server-name 0.0.0.0   # binds to all interfaces
 | **Hunyuan Video** | Video | High-quality T2V |
 | **LTX Video** | Video | Fastest video option |
 
-> **Why a separate server?** Wan2GP's runtime (Sage attention, flash-attn, AWQ/GGUF kernels) is CUDA-only — there is no MPS / Apple Silicon path. Treating it as a remote server lets a Mac-only user keep the desktop app while offloading inference to a Linux/Windows GPU box, a gaming PC on the LAN, or a rented RunPod/vast.ai instance.
+> **Why a separate server?** Wan2GP's runtime (Sage attention, flash-attn, AWQ/GGUF kernels) is CUDA-first. Treating it as a remote server lets the desktop app offload inference to a Linux/Windows GPU box, a gaming PC on the LAN, or a rented RunPod/vast.ai instance.
 
 > **Local inference is only available in the desktop app.** The hosted web version always uses cloud APIs.
 
 ### Hardware Notes
 
-- **sd.cpp** runs on CPU (all platforms) and **Metal GPU** on Apple Silicon (M1/M2/M3/M4); CUDA/Vulkan/ROCm on Linux/Windows.
-- Metal GPU acceleration is built into the macOS desktop binary — significantly faster than CPU-only.
-- Recommended for sd.cpp Z-Image: 16 GB RAM (7.4 GB weights + 2.4 GB compute buffer). On a base 8 GB M-series Mac, **Z-Image is known to hang the system** — stick to SD 1.5 there.
-- For SD 1.5 on M2: expect ~1–2 s/step with the Metal dylib active. If you see ~10 s/step instead, the binary may have fallen back to CPU — see verification below.
-
-### Verifying the SD 1.5 path (the fastest sanity test on Mac)
-
-If you want to confirm sd.cpp is installed correctly without going through the UI, you can drive `sd-cli` directly. This is the same binary the app uses.
-
-```bash
-# 1. App data layout (created on first app launch)
-APP_DATA="$HOME/Library/Application Support/open-generative-ai/local-ai"
-ls "$APP_DATA/bin"     # sd-cli, libstable-diffusion.dylib
-ls "$APP_DATA/models"  # whatever you've downloaded
-
-# 2. Grab a small SD 1.5 model directly (Dreamshaper 8, ~2 GB)
-curl -L --fail --progress-bar \
-  -o "$APP_DATA/models/DreamShaper_8_pruned.safetensors" \
-  "https://huggingface.co/Lykon/DreamShaper/resolve/main/DreamShaper_8_pruned.safetensors"
-
-# 3. Run a single 512x512 / 12-step inference
-DYLD_LIBRARY_PATH="$APP_DATA/bin" "$APP_DATA/bin/sd-cli" \
-  -m "$APP_DATA/models/DreamShaper_8_pruned.safetensors" \
-  -p "a serene mountain lake at sunrise, oil painting" \
-  -o /tmp/sd15-test.png \
-  --steps 12 -H 512 -W 512 --cfg-scale 7.5 --seed 42 \
-  --sampling-method euler_a
-```
-
-A healthy run on Apple Silicon prints `total params memory size = 1969.78MB (VRAM 1969.78MB, RAM 0.00MB)` (Metal-backed) and produces a coherent 512×512 PNG. If `VRAM` is `0.00MB` instead, the dylib is CPU-only — check `otool -L "$APP_DATA/bin/libstable-diffusion.dylib" | grep -i metal` and reinstall the engine from **Settings → Local Models** if Metal is missing.
+- **sd.cpp** runs on CPU and can use CUDA/Vulkan/ROCm where the local engine build supports it.
+- **Wan2GP** should run on the machine that owns the GPU and expose its Gradio endpoint to the desktop app.
+- Recommended for sd.cpp Z-Image: 16 GB RAM or more because the model weights and compute buffers are large.
+- macOS desktop packaging and Metal-specific verification are intentionally deferred until real macOS hardware/account access is available again.
 
 ---
 
 ## ✨ 功能一览
 
 - **图像创作** — 可直接输入提示词生成图像（50+ 文生图模型），也可以上传参考图把现有图片改成新画面（55+ 图生图模型）。只要上传了参考图，系统就会自动切换模型集合；支持分辨率和质量控制的模型也会同步显示对应选项。
-- **本地推理** — 提供两套引擎：**sd.cpp**（内置，支持 Mac / Windows / Linux，覆盖 Metal / CUDA / Vulkan / ROCm）用于 SD 1.5、SDXL 和 Z-Image；**Wan2GP**（自带 Gradio 服务器）用于 Flux、Qwen-Image 以及视频模型（Wan 2.2、Hunyuan、LTX）。两者都可以在“设置 → 本地模型”里配置。
+- **本地推理** — 提供两套引擎：**sd.cpp**（内置，当前优先支持 Windows / Linux 的 CPU、CUDA、Vulkan、ROCm 路径）用于 SD 1.5、SDXL 和 Z-Image；**Wan2GP**（自带 Gradio 服务器）用于 Flux、Qwen-Image 以及视频模型（Wan 2.2、Hunyuan、LTX）。两者都可以在“设置 → 本地模型”里配置。
 - **多图参考** — 兼容的编辑模型可一次上传最多 14 张参考图（如 Nano Banana 2 Edit、Flux Kontext Dev、GPT-4o Edit 等）。支持按顺序选择、批量上传和“使用已选”确认流程。
 - **视频创作** — 可输入提示词直接生成视频（40+ 文生视频模型），也可以上传起始帧把静帧动起来（60+ 图生视频模型）。模式切换逻辑与图像创作保持一致。
 - **口型同步工作台** — 用音频驱动人像图或现有视频生成对口型视频。内置 9 个专用模型，覆盖“人像图 + 音频 → 说话视频”和“视频 + 音频 → 口型同步视频”两种模式。
@@ -422,19 +374,19 @@ npm run start
 
 ### 桌面端打包
 
-使用 Electron 构建原生桌面应用：
+使用 Electron 构建原生桌面应用。当前活跃打包范围是 Windows 和 Linux，macOS 暂缓：
 
 ```bash
-# macOS（DMG — Intel + Apple Silicon）
+# 当前宿主平台
 npm run electron:build
 
-# Windows（NSIS 安装包 — x64 + ARM64）
+# Windows（NSIS 安装包 — x64）
 npm run electron:build:win
 
 # Linux（AppImage + DEB — x64）
 npm run electron:build:linux
 
-# 一次性打包两个平台
+# 一次性打包 Windows + Linux
 npm run electron:build:all
 ```
 
@@ -442,7 +394,7 @@ npm run electron:build:all
 
 ## 🏗️ 架构
 
-这个应用是一个 **Next.js 单体仓库**，共享 `packages/studio` 组件库。
+这个应用是一个 **Next.js + Electron 单体仓库**。Web 端和桌面端共用 `packages/studio` React 组件库；桌面端使用 `src/desktop` 的 React/Vite renderer，不再维护旧的 Vanilla renderer fallback。
 
 ```
 Open-Generative-AI/
@@ -457,21 +409,34 @@ Open-Generative-AI/
 ├── packages/
 │   └── studio/                 # 共享 React 组件库
 │       └── src/
-│           ├── index.js        # 导出：ImageStudio、VideoStudio、LipSyncStudio、CinemaStudio、WorkflowStudio
+│           ├── index.js        # 导出：ImageStudio、VideoStudio、MarketingStudio、WorkflowStudio、AgentStudio、AppsStudio
 │           ├── models.js       # 200+ 个模型定义（单一事实来源）
 │           ├── muapi.js        # API 客户端（命名导出，apiKey 作为第一个参数）
 │           └── components/
 │               ├── ImageStudio.jsx    # 文生图 / 图生图双模式工作台
 │               ├── VideoStudio.jsx    # 文生视频 / 图生视频双模式工作台
-│               ├── LipSyncStudio.jsx  # 人像/视频 + 音频 → 对口型视频
-│               ├── CinemaStudio.jsx   # 带镜头控制的专业工作台
-│               └── WorkflowStudio.jsx # 多步流水线搭建器与 playground
+│               ├── MarketingStudio.jsx
+│               ├── WorkflowStudio.jsx # 多步流水线搭建器与 playground
+│               ├── AgentStudio.jsx
+│               ├── AppsStudio.jsx
+│               ├── ApiProviderStudio.jsx
+│               ├── ApiHealthStudio.jsx
+│               └── LocalModelManager.jsx
+├── src/
+│   └── desktop/                # Electron React renderer 入口和适配器
+│       ├── main.js             # Vite renderer entry
+│       ├── DesktopApp.js       # 桌面壳与 shared Studio tabs
+│       └── electronStudioAdapter.js
+├── electron/
+│   ├── main.js                 # Electron main process
+│   ├── preload.js              # contextBridge: localAI / desktopAPI
+│   └── lib/desktopApiProxy.js  # 本地 HTTP API proxy，适配 Web `/api/**`
 ├── next.config.mjs             # transpilePackages: ['studio']
 ├── tailwind.config.js
 └── package.json                # workspaces: ["packages/studio"]
 ```
 
-`packages/studio` 这套库同样被 [muapi.ai](https://muapi.ai) 上的托管版本使用，因此你在 `packages/studio/src/models.js` 里做的模型更新，会自动同步到自托管版本和托管版本。
+`packages/studio` 是 Web 和桌面端的主要 UI 单一事实来源。模型、provider 配置、任务中心、API 健康检查和主要工作台优化应优先落在这里，再通过 Next adapter 或 Electron adapter 接入各自运行时。
 
 ## 🔌 API 接入
 
@@ -498,8 +463,9 @@ Open-Generative-AI/
 
 ## 🛠️ 技术栈
 
-- **Next.js 14** — App Router、Server Components、快速开发服务器
-- **React 18** — 工作台 UI 组件
+- **Next.js 15** — App Router、Server Components、快速开发服务器
+- **React 19** — 工作台 UI 组件
+- **Electron + Vite** — Windows/Linux 桌面客户端
 - **Tailwind CSS v3** — 原子化样式
 - **npm workspaces** — 带共享 `packages/studio` 库的单体仓库
 - **Muapi.ai** — AI 模型 API 网关

@@ -365,7 +365,14 @@ async function assertAppsStudioSurface(page, interests) {
   await page.getByText("Pet Product Studio").first().scrollIntoViewIfNeeded();
   await page.getByRole("button", { name: "GitHub" }).first().click();
   await page.getByRole("heading", { name: "\u90e8\u7f72 Pet Product Studio" }).waitFor();
-  await page.getByRole("button", { name: /\u83b7\u53d6\u6a21\u677f/ }).click();
+  const requestTemplateButton = page.getByRole("button", { name: /\u83b7\u53d6\u6a21\u677f/ });
+  await requestTemplateButton.waitFor({ state: "visible" });
+  await requestTemplateButton.evaluate((button) => {
+    if (button.disabled) {
+      throw new Error("Expected Apps template request button to be enabled.");
+    }
+    button.click();
+  });
   await page.getByText(/\u6536\u5230/).waitFor();
   await waitForCondition(
     () => interests.some((entry) => entry?.app_name === "Pet Product Studio"),
@@ -424,7 +431,10 @@ async function runDesktopSmoke(browser) {
   await assertApiHealthSurface(page);
   await page.getByRole("button", { name: /^Image\b/ }).click();
   await assertImageStudioSurface(page, { expectedModel: "GPT Image 2 All" });
-  await page.getByRole("button", { name: "Legacy" }).waitFor();
+  const legacyActions = await page.getByRole("button", { name: "Legacy" }).count();
+  if (legacyActions !== 0) {
+    throw new Error("Legacy renderer action should not be visible after DSK-70 cleanup.");
+  }
   await assertCodexLabHiddenOnDesktop(page);
 
   await assertNoPageErrors(errors);
@@ -523,7 +533,7 @@ async function main() {
             "desktop local model manager opens",
             "desktop API health tab opens with mocked model discovery",
             "desktop image studio surface renders",
-            "desktop legacy fallback action is visible",
+            "desktop legacy fallback action is removed",
             "desktop Codex Lab remains explicitly hidden",
             "web studio shell renders",
             "web task center opens",
