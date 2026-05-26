@@ -276,6 +276,7 @@ No subtask should be considered complete without this report.
 | DSK-67 | Run packaging CI and attach artifacts | P0 | 0.5d | DSK-66 | GitHub Actions packaging run produces Linux artifacts with validation logs for the current active scope |
 | DSK-68 | Land packaging workflow branch on remote | P0 | 0.5d | DSK-66 | Current desktop migration and packaging workflow are committed and pushed to a remote `codex/**` branch so CI can run |
 | DSK-69 | Open upstream integration PR or obtain upstream write access | P0 | 0.5d | DSK-68, DSK-67 | The passing fork branch is available to `Anil-matcha/Open-Generative-AI` through a PR, maintainer-pushed branch, or granted write access |
+| DSK-74 | Resolve GitHub Actions Node 24 runtime deprecation warning | P0 | 0.25d | DSK-67 | Desktop Packaging workflow runs without Node.js 20 action-runtime deprecation annotations before the 2026-06-02 GitHub default runtime switch |
 
 ### P7. Cleanup and Closure
 
@@ -328,6 +329,7 @@ flowchart TD
   DSK66 --> DSK68["DSK-68 Land remote branch"]
   DSK68 --> DSK67["DSK-67 Run packaging CI"]
   DSK67 --> DSK69["DSK-69 Upstream integration"]
+  DSK67 --> DSK74["DSK-74 Node 24 actions"]
   DSK66 --> DSK62
   DSK66 --> DSK63
   DSK67 -. deferred .-> DSK63
@@ -346,9 +348,9 @@ Original all-platform plan note: DSK-63 macOS clean-account launch remains defer
 
 Current next three tasks:
 
-1. DSK-73: Prepare release notes and migration summary for the shared React desktop renderer.
-2. DSK-62: Capture a final full Ubuntu desktop visual smoke when an Ubuntu desktop environment is available.
-3. DSK-69: Track upstream PR #202 review/merge and respond to maintainer feedback.
+1. DSK-74: Resolve GitHub Actions Node 24 runtime deprecation warning before 2026-06-02.
+2. DSK-73: Prepare release notes and migration summary for the shared React desktop renderer.
+3. DSK-62: Capture a final full Ubuntu desktop visual smoke when an Ubuntu desktop environment is available.
 
 Rationale:
 
@@ -359,6 +361,7 @@ Rationale:
 - DSK-68 is complete with caveat: the branch was pushed to `MookeeHugo/Open-Generative-AI` because direct push to `Anil-matcha/Open-Generative-AI` was denied for the current GitHub user.
 - DSK-69 is complete: upstream PR `https://github.com/Anil-matcha/Open-Generative-AI/pull/202` exposes the passing fork branch to the source repository.
 - DSK-70 is complete for the current active scope: the old Vanilla renderer fallback, button, and source files were removed after macOS was deferred.
+- DSK-74 is now the highest-priority follow-up because post-push Desktop Packaging run `26443447363` passed but GitHub emitted Node.js 20 action-runtime deprecation annotations for the checkout/setup/upload actions.
 
 ## 10. Milestones
 
