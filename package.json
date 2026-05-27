@@ -1,0 +1,138 @@
+{
+  "name": "open-generative-ai",
+  "description": "Open-source alternative to HF AI — AI image, video, cinema and lip sync studio",
+  "homepage": "https://github.com/Anil-matcha/Open-Generative-AI",
+  "private": true,
+  "version": "2.0.0",
+  "workspaces": [
+    "packages/studio",
+    "packages/Vibe-Workflow/packages/workflow-builder",
+    "packages/Open-Poe-AI/packages/agents",
+    "packages/Open-AI-Design-Agent/packages/design-agent"
+  ],
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "build:studio": "npm run build -w studio",
+    "build:workflow": "npm run build -w workflow-builder",
+    "build:agent": "npm run build -w ai-agent",
+    "build:packages": "npm run build:workflow && npm run build:agent && npm run build:studio",
+    "setup": "git submodule update --init --recursive && npm install && npm run build:packages",
+    "vite:dev": "vite",
+    "vite:build": "vite build",
+    "electron:dev": "npm run vite:build && electron .",
+    "electron:build": "vite build && electron-builder --mac",
+    "electron:build:win": "vite build && electron-builder --win",
+    "electron:build:linux": "vite build && electron-builder --linux",
+    "electron:build:linux:dir": "vite build && electron-builder --linux dir",
+    "electron:build:linux:arm64:dir": "vite build && electron-builder --linux dir --arm64",
+    "stage:local-ai": "node scripts/stage-local-ai-binary.js",
+    "package:linux:deb": "node scripts/package-linux-deb.js",
+    "package:linux:deb:arm64": "node scripts/package-linux-deb.js --arch arm64",
+    "package:linux:deb:x64": "node scripts/package-linux-deb.js --arch x64",
+    "electron:build:all": "vite build && electron-builder --mac --win --linux"
+  },
+  "build": {
+    "appId": "ai.generative.open",
+    "productName": "Open Generative AI",
+    "copyright": "Copyright © 2025",
+    "directories": {
+      "output": "release"
+    },
+    "afterPack": "./afterPack.js",
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "build/local-ai",
+        "to": "local-ai",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.graphics-design",
+      "icon": "public/banner.png",
+      "gatekeeperAssess": false,
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ]
+    },
+    "win": {
+      "icon": "public/banner.png",
+      "signAndEditExecutable": false,
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "include": "build/installer.nsh"
+    },
+    "linux": {
+      "icon": "public/banner.png",
+      "category": "Utility",
+      "maintainer": "Open Generative AI Team",
+      "extraFiles": [
+        {
+          "from": "build/linux/apparmor.profile",
+          "to": "resources/apparmor.profile"
+        }
+      ],
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    }
+  },
+  "dependencies": {
+    "axios": "^1.7.0",
+    "next": "^15.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-hot-toast": "^2.4.1",
+    "studio": "*",
+    "workflow-builder": "file:./packages/Vibe-Workflow/packages/workflow-builder",
+    "ai-agent": "file:./packages/Open-Poe-AI/packages/agents"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/vite": "^4.1.18",
+    "autoprefixer": "^10.4.24",
+    "electron": "^33.4.11",
+    "electron-builder": "^25.1.8",
+    "eslint": "^9",
+    "eslint-config-next": "^15.0.0",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.0",
+    "vite": "^5.4.0"
+  },
+  "main": "electron/main.js"
+}

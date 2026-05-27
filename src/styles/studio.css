@@ -1,0 +1,119 @@
+/* Studio Specific Styles */
+
+.style-card {
+    position: relative;
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    aspect-ratio: 16/10;
+    cursor: pointer;
+    border: 1px solid var(--border-color);
+    transition: all var(--transition-normal);
+}
+
+.style-card:hover {
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
+}
+
+.style-card.active {
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-glow);
+}
+
+.style-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.7;
+    transition: opacity var(--transition-normal);
+}
+
+.style-card:hover img,
+.style-card.active img {
+    opacity: 1;
+}
+
+.style-card .label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 0.5rem;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Prompt Bar Layout */
+.prompt-bar-container {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+}
+
+.prompt-field {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.prompt-field label {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding-left: 0.25rem;
+}
+
+.prompt-field textarea {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--border-radius-md);
+    padding: 0.75rem;
+    color: white;
+    resize: none;
+    font-size: 0.85rem;
+    transition: all var(--transition-fast);
+}
+
+.prompt-field textarea:focus {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--color-primary);
+    outline: none;
+}
+
+/* Canvas Toolbar */
+.canvas-toolbar {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    gap: 0.5rem;
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+}
+
+.result-wrapper:hover .canvas-toolbar {
+    opacity: 1;
+}
+
+.toolbar-btn {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 0.5rem;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.toolbar-btn:hover {
+    background: var(--color-primary);
+    color: black;
+    border-color: var(--color-primary);
+}

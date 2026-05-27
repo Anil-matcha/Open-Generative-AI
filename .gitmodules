@@ -1,0 +1,9 @@
+[submodule "packages/Vibe-Workflow"]
+	path = packages/Vibe-Workflow
+	url = https://github.com/SamurAIGPT/Vibe-Workflow.git
+[submodule "packages/Open-Poe-AI"]
+	path = packages/Open-Poe-AI
+	url = https://github.com/Anil-matcha/Open-Poe-AI.git
+[submodule "packages/Open-AI-Design-Agent"]
+	path = packages/Open-AI-Design-Agent
+	url = https://github.com/Anil-matcha/Open-AI-Design-Agent

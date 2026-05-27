@@ -1,0 +1,234 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    body {
+        @apply bg-app-bg text-white font-sans antialiased h-screen overflow-hidden;
+    }
+
+    /* Custom Scrollbar Refinement */
+    ::-webkit-scrollbar {
+        @apply w-1.5 h-1.5;
+    }
+
+    ::-webkit-scrollbar-track {
+        @apply bg-transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        @apply bg-white/10 rounded-full hover:bg-white/20 transition-colors;
+    }
+}
+
+@layer components {
+    .glass {
+        @apply bg-black/80 backdrop-blur-2xl border border-white/10 shadow-3xl;
+    }
+
+    .glass-panel {
+        @apply bg-black/60 backdrop-blur-xl border border-white/5;
+    }
+
+    .neon-border {
+        @apply border border-primary/20 hover:border-primary/50 transition-colors;
+    }
+
+    .interactive-glow {
+        @apply transition-all duration-300 hover:shadow-glow hover:scale-[1.02] active:scale-[0.98];
+    }
+}
+
+/* Custom Animations */
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fade-in-up 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+/* Thumbnail cards */
+.thumb-hero {
+    position: relative;
+    overflow: hidden;
+}
+
+.thumb-hero img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.thumb-hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.75), transparent);
+    pointer-events: none;
+}
+
+.thumb-hero:hover img,
+.group:hover .thumb-hero img {
+    transform: scale(1.05);
+}
+
+.thumb-skeleton {
+    background: rgba(255, 255, 255, 0.03);
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+.thumb-fallback .thumb-hero {
+    display: none;
+}
+
+.hero-banner img {
+    transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.hero-banner:hover img {
+    transform: scale(1.03);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .animate-fade-in-up {
+        animation: none;
+        opacity: 1;
+    }
+
+    .thumb-hero img {
+        transition: none;
+    }
+
+    .thumb-skeleton {
+        animation: none;
+    }
+}
+
+/* ========================
+   TOOLTIP SYSTEM
+   ======================== */
+
+/* Base tooltip container */
+[data-tooltip] {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Tooltip arrow */
+[data-tooltip]::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(8px);
+    border: 6px solid transparent;
+    border-top-color: #1a1a1a;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s ease;
+    z-index: 9999;
+}
+
+/* Tooltip body */
+[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(12px);
+    padding: 8px 14px;
+    background: #1a1a1a;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s ease;
+    z-index: 9999;
+    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+}
+
+/* Show tooltip on hover */
+[data-tooltip]:hover::before,
+[data-tooltip]:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-6px);
+}
+
+/* Tooltip positioning variants */
+[data-tooltip-bottom]::before {
+    bottom: auto;
+    top: 100%;
+    border-top-color: transparent;
+    border-bottom-color: #1a1a1a;
+    transform: translateX(-50%) translateY(-8px);
+}
+
+[data-tooltip-bottom]::after {
+    bottom: auto;
+    top: 100%;
+    transform: translateX(-50%) translateY(-12px);
+}
+
+[data-tooltip-bottom]:hover::before,
+[data-tooltip-bottom]:hover::after {
+    transform: translateX(-50%) translateY(6px);
+}
+
+/* Tooltip for left-aligned elements */
+[data-tooltip-left]::before {
+    left: 0;
+    transform: translateX(-100%) translateY(-50%);
+}
+
+[data-tooltip-left]::after {
+    left: 0;
+    transform: translateX(calc(-100% - 10px)) translateY(-50%);
+}
+
+[data-tooltip-left]:hover::before,
+[data-tooltip-left]:hover::after {
+    transform: translateX(calc(-100% - 6px)) translateY(-50%);
+}
+
+/* Tooltip for right-aligned elements */
+[data-tooltip-right]::before {
+    left: auto;
+    right: 0;
+    transform: translateX(100%) translateY(-50%);
+}
+
+[data-tooltip-right]::after {
+    left: auto;
+    right: 0;
+    transform: translateX(calc(100% + 10px)) translateY(-50%);
+}
+
+[data-tooltip-right]:hover::before,
+[data-tooltip-right]:hover::after {
+    transform: translateX(calc(100% + 6px)) translateY(-50%);
+}

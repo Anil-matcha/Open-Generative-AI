@@ -1,0 +1,49 @@
+:root {
+  /* Brand Colors */
+  --color-primary: #22d3ee;
+  /* Electric Cyan */
+  --color-primary-hover: #06b6d4;
+  --color-accent: #a855f7;
+  /* Creative Purple */
+  --color-accent-hover: #9333ea;
+  --color-danger: #ef4444;
+
+  /* Backgrounds - Strict Dark Mode */
+  --bg-app: #050505;
+  /* Deepest Black */
+  --bg-panel: #0a0a0a;
+  /* Panel Background */
+  --bg-card: #141414;
+  /* Card/Input Background */
+  --bg-glass: rgba(10, 10, 10, 0.8);
+
+  /* Text */
+  --text-primary: #ffffff;
+  --text-secondary: #a1a1aa;
+  --text-muted: #52525b;
+
+  /* UI Elements */
+  --border-color: #27272a;
+  --border-light: rgba(255, 255, 255, 0.1);
+
+  --border-radius-sm: 6px;
+  --border-radius-md: 10px;
+  --border-radius-lg: 16px;
+  --border-radius-xl: 24px;
+  --border-radius-full: 9999px;
+
+  /* Effects */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  --shadow-glow: 0 0 20px rgba(176, 251, 93, 0.4);
+  --shadow-glow-accent: 0 0 20px rgba(168, 85, 247, 0.4);
+  --backdrop-blur: blur(20px);
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Typography */
+  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
