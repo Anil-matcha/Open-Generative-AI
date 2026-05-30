@@ -2,7 +2,7 @@
 
 > **The free, open-source alternative to AI Video Platforms.** Generate AI images and videos using 200+ state-of-the-art models — no content filters, no closed ecosystem, no subscription fees.
 
-**Community:** Join [Reddit](reddit.com/r/muapi) & [Discord](https://discord.gg/QhTrNRU4r3) for discussions and support
+**Community:** Join [Reddit](https://reddit.com/r/muapi) & [Discord](https://discord.gg/QhTrNRU4r3) for discussions and support
 
 > **Latest Gemini Omni model from Google best prompts and resources:** [Gemini Omni Resources](https://github.com/Anil-matcha/Awesome-Gemini-Omni-API-Prompts)
 
@@ -14,7 +14,7 @@
 
 > **Open-source AI Clipping — turn any long-form YouTube video into viral-ready vertical shorts** -> https://github.com/SamurAIGPT/AI-Youtube-Shorts-Generator
 
-> **Open-source AI Design Agent** -> https://github.com/Anil-matcha/Open-AI-Design-Agent 
+> **Open-source AI Design Agent** -> https://github.com/Anil-matcha/Open-AI-Design-Agent
 
 ## 🌐 Try it Online — No Install Required
 
@@ -536,6 +536,31 @@ Lip sync jobs use the same two-step pattern: a dedicated `processLipSync()` meth
 | **Customizable** | No | Fully hackable |
 | **Data privacy** | Cloud-based | Your data stays local |
 | **Source code** | Closed | MIT licensed |
+
+## 🌟 Featured Open-Source Generative AI Ecosystem
+
+A curated list of cutting-edge open-source Generative AI frameworks, models, protocol servers, and educational resources to supercharge your AI workflows.
+
+### 🧩 Model Context Protocol (MCP) Servers
+*   **[Official MCP Servers](https://github.com/modelcontextprotocol/servers)** — The official collection of Model Context Protocol servers maintained by Anthropic, enabling AI assistants to securely interact with the local filesystem, databases, Git, Slack, Google Drive, and more.
+*   **[Awesome MCP Servers](https://github.com/punkpeye/awesome-mcp-servers)** — A comprehensive, community-driven directory categorizing production-ready and experimental MCP servers for browser automation, cloud integration, database access, and developer tooling.
+*   **[Generative Media Skills](https://github.com/SamurAIGPT/Generative-Media-Skills)** — A specialized MCP server and library enabling coding agents (such as Claude Code, Codex, and Gemini CLI) to execute professional image and video generations directly from the terminal.
+
+### 🖼️ Multi-Modal & Vision-Language Frameworks
+*   **[Qwen2-VL](https://github.com/QwenLM/Qwen2-VL)** — Alibaba's state-of-the-art vision-language model series, featuring Naive Dynamic Resolution and Multimodal Rotary Position Embedding (M-ROPE) for precise image and video reasoning.
+*   **[LLaVA](https://github.com/haotian-liu/LLaVA)** — An acclaimed open-source framework for visual instruction tuning, bridging text and vision encoders for powerful, accessible chat-based multi-modal interactions.
+
+### 🤖 AI Agent & Workflow Orchestration
+*   **[CrewAI](https://github.com/crewAIInc/crewAI)** — A powerful framework for orchestrating role-playing autonomous AI agents, enabling complex multi-agent collaborative workflows.
+*   **[LangGraph](https://github.com/langchain-ai/langgraph)** — A state-of-the-art orchestration framework by LangChain, designed for building stateful, multi-actor applications with LLMs using circular/graph-based agent logic.
+
+### 💻 Local & Small Language Models (SLMs)
+*   **[Qwen 2.5](https://github.com/QwenLM/Qwen2.5)** — Highly capable, multilingual small models ranging from 0.5B to 7B parameters, optimized for local inference, coding, and RAG.
+*   **[Microsoft Phi-3.5](https://github.com/microsoft/Phi-3CookBook)** — Lightweight, state-of-the-art local language models optimized for advanced reasoning, safety, and efficient on-device compute.
+
+### 📚 Books, Roadmaps & Educational Resources
+*   **[Generative AI for Beginners by Microsoft](https://github.com/microsoft/generative-ai-for-beginners)** — A comprehensive 21-lesson curriculum teaching the core fundamentals of building generative AI applications using Python, TypeScript, and modern frameworks.
+*   **[Awesome LLM Roadmap](https://github.com/Hannibal046/Awesome-LLM)** — A curated path and repository containing must-read papers, courseware, books, and frameworks for mastering Large Language Models and Generative AI.
 
 ## 📄 License
 
