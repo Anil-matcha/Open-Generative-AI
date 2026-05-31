@@ -44,6 +44,13 @@ const AUDIO_MODELS = new Set([
     'vidu-tts', 'qwen3-tts-flash',
 ]);
 
+// Models that generate images via /v1/chat/completions (not /v1/images/generations)
+const CHAT_IMAGE_MODELS = new Set([
+    'gemini-2.5-flash-image',
+    'gemini-3-pro-image-preview',
+    'gemini-3.1-flash-image-preview',
+]);
+
 // Schema key → actual Memefast model ID (for models renamed to include "edit"/"reference" in key)
 const MODEL_ID_MAP = {
     'flux-edit-kontext-pro':         'flux.1-kontext-pro',
@@ -77,6 +84,41 @@ async function generateImage(apiKey, model, params) {
     const item = data.data?.[0];
     const url = item?.url || (item?.b64_json ? `data:image/png;base64,${item.b64_json}` : '') || data.url || '';
     return [{ type: 'image_url', value: url }];
+}
+
+async function generateChatImage(apiKey, model, params) {
+    const imgInput = params.image_url || params.images_list?.[0];
+    const content = imgInput
+        ? [{ type: 'image_url', image_url: { url: imgInput } }, { type: 'text', text: params.prompt || '' }]
+        : params.prompt || '';
+    const res = await fetch(`${MEMEFAST}/v1/chat/completions`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            model,
+            messages: [{ role: 'user', content }],
+            max_tokens: 8192,
+        }),
+    });
+    if (!res.ok) {
+        const txt = await res.text().catch(() => res.statusText);
+        throw new Error(`Chat Image API ${res.status}: ${txt.slice(0, 300)}`);
+    }
+    const data = await res.json();
+    const msg = data.choices?.[0]?.message;
+    // Response may be array of parts or a string with embedded data URL
+    if (Array.isArray(msg?.content)) {
+        for (const part of msg.content) {
+            if (part.type === 'image_url') return [{ type: 'image_url', value: part.image_url?.url || '' }];
+            if (part.type === 'image') return [{ type: 'image_url', value: part.source?.url || part.url || '' }];
+        }
+    }
+    const text = typeof msg?.content === 'string' ? msg.content : '';
+    const match = text.match(/data:image\/[^;]+;base64,[A-Za-z0-9+/=]+/);
+    if (match) return [{ type: 'image_url', value: match[0] }];
+    const urlMatch = text.match(/https?:\/\/\S+\.(png|jpg|jpeg|webp|gif)/i);
+    if (urlMatch) return [{ type: 'image_url', value: urlMatch[0] }];
+    return [{ type: 'image_url', value: text }];
 }
 
 async function generateText(apiKey, model, params) {
@@ -167,6 +209,7 @@ async function runNode(runId, nodeId, model, params, apiKey) {
         else if (VIDEO_MODELS.has(model)) outputs = await generateVideo(apiKey, model, params);
         else if (TEXT_MODELS.has(model)) outputs = await generateText(apiKey, model, params);
         else if (AUDIO_MODELS.has(model)) outputs = await generateAudio(apiKey, model, params);
+        else if (CHAT_IMAGE_MODELS.has(model)) outputs = await generateChatImage(apiKey, model, params);
         else outputs = await generateImage(apiKey, model, params);
 
         runStore.set(runId, {
