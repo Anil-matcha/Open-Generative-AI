@@ -86,7 +86,7 @@ function AudioFileUploader({ label, value, onChange, apiKey }) {
     if (!file) return;
 
     if (file.size > 20 * 1024 * 1024) {
-      alert("Audio file exceeds 20MB limit.");
+      alert("Аудиофайл превышает лимит 20 МБ.");
       return;
     }
 
@@ -102,7 +102,7 @@ function AudioFileUploader({ label, value, onChange, apiKey }) {
       onChange(url);
     } catch (err) {
       setUploadState(UPLOAD_STATE.IDLE);
-      alert(`Upload failed: ${err.message}`);
+      alert(`Ошибка загрузки: ${err.message}`);
     } finally {
       setProgress(0);
     }
@@ -125,7 +125,7 @@ function AudioFileUploader({ label, value, onChange, apiKey }) {
             onClick={clearFile}
             className="text-xs font-bold text-red-400 hover:text-red-300 transition-colors uppercase tracking-wider flex items-center gap-1.5"
           >
-            <TrashIcon /> Clear
+            <TrashIcon /> Очистить
           </button>
         )}
       </div>
@@ -154,8 +154,8 @@ function AudioFileUploader({ label, value, onChange, apiKey }) {
               </svg>
             </div>
             <div className="text-left">
-              <div className="text-xs font-bold text-white">Upload audio track</div>
-              <div className="text-[11px] text-zinc-300 font-medium mt-0.5">MP3, WAV, M4A up to 20MB</div>
+              <div className="text-xs font-bold text-white">Загрузить аудиодорожку</div>
+              <div className="text-[11px] text-zinc-300 font-medium mt-0.5">MP3, WAV, M4A до 20 МБ</div>
             </div>
           </>
         )}
@@ -164,7 +164,7 @@ function AudioFileUploader({ label, value, onChange, apiKey }) {
           <div className="w-full flex items-center gap-4">
             <div className="flex-1">
               <div className="flex justify-between text-xs text-white/95 mb-1.5 font-bold">
-                <span>Uploading...</span>
+                <span>Загрузка...</span>
                 <span>{progress}%</span>
               </div>
               <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
@@ -181,7 +181,7 @@ function AudioFileUploader({ label, value, onChange, apiKey }) {
             </div>
             <div className="text-left flex-1 min-w-0">
               <div className="text-xs font-bold text-white truncate">{fileName}</div>
-              <div className="text-[11px] text-primary font-bold mt-0.5">Ready to generate</div>
+              <div className="text-[11px] text-primary font-bold mt-0.5">Готово к генерации</div>
             </div>
           </>
         )}
@@ -207,13 +207,13 @@ function AudioListUploader({ label, value = [], onChange, apiKey, maxItems = 2 }
   return (
     <div className="space-y-4">
       <label className="block text-xs font-bold text-zinc-200 uppercase tracking-wider">
-        {label} (Max {maxItems})
+        {label} (Макс. {maxItems})
       </label>
       <div className="space-y-3">
         {Array.from({ length: maxItems }).map((_, i) => (
           <AudioFileUploader
             key={i}
-            label={`Track #${i + 1}`}
+            label={`Трек №${i + 1}`}
             value={value[i] || null}
             onChange={(url) => handleItemChange(i, url)}
             apiKey={apiKey}
@@ -384,9 +384,9 @@ function PremiumAudioPlayer({ url, title }) {
         </div>
         <div className="text-center px-4 max-w-full relative z-10">
           <span className="text-xs font-black text-primary uppercase tracking-[0.2em] block mb-1">
-            Now Playing
+            Сейчас играет
           </span>
-          <p className="text-white font-bold text-base truncate max-w-xs">{title || "Generated Track"}</p>
+          <p className="text-white font-bold text-base truncate max-w-xs">{title || "Созданный трек"}</p>
         </div>
       </div>
 
@@ -425,7 +425,7 @@ function PremiumAudioPlayer({ url, title }) {
             <button
               onClick={toggleMute}
               className="p-2 bg-zinc-800/80 border border-zinc-700 hover:bg-zinc-700 rounded text-zinc-200 hover:text-white transition-all"
-              title="Mute/Unmute"
+              title="Выключить/включить звук"
               type="button"
             >
               {isMuted ? <VolumeMuteIcon /> : <VolumeIcon />}
@@ -445,7 +445,7 @@ function PremiumAudioPlayer({ url, title }) {
           <button
             onClick={togglePlay}
             className="w-12 h-12 bg-primary hover:bg-white text-black rounded-full flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-glow"
-            title={isPlaying ? "Pause" : "Play"}
+            title={isPlaying ? "Пауза" : "Воспроизвести"}
             type="button"
           >
             {isPlaying ? <PauseIcon /> : <PlayIcon />}
@@ -455,13 +455,13 @@ function PremiumAudioPlayer({ url, title }) {
           <button
             onClick={downloadAudio}
             className="px-4 py-2 bg-zinc-800/80 hover:bg-zinc-700 border border-zinc-700 rounded text-xs font-bold text-white flex items-center gap-2 hover:border-primary/45 transition-all"
-            title="Download Audio"
+            title="Скачать аудио"
             type="button"
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
             </svg>
-            <span>Save</span>
+            <span>Сохранить</span>
           </button>
         </div>
       </div>
@@ -599,7 +599,7 @@ export default function AudioStudio({
 
   const handleSelectHistory = (entry, index) => {
     setActiveResultUrl(entry.url);
-    setActiveResultTitle(entry.title || entry.prompt || "Generated Track");
+    setActiveResultTitle(entry.title || entry.prompt || "Созданный трек");
     setActiveHistoryIdx(index);
     setView("result");
   };
@@ -611,7 +611,7 @@ export default function AudioStudio({
     if (selectedModel.required) {
       for (const field of selectedModel.required) {
         if (!params[field] || (Array.isArray(params[field]) && params[field].length === 0)) {
-          alert(`Please complete the required field: ${selectedModel.inputs?.[field]?.title || field}`);
+          alert(`Пожалуйста, заполните обязательное поле: ${selectedModel.inputs?.[field]?.title || field}`);
           return;
         }
       }
@@ -630,7 +630,7 @@ export default function AudioStudio({
       const res = await generateAudio(apiKey, audioParams);
 
       if (!res?.url) {
-        throw new Error("No audio URL returned by the API.");
+        throw new Error("API не вернул ссылку на аудио.");
       }
 
       const title = params.title || params.prompt || `Generated ${selectedModel.name}`;
@@ -660,7 +660,7 @@ export default function AudioStudio({
       }
     } catch (e) {
       console.error("[AudioStudio]", e);
-      setGenerateError(e.message?.slice(0, 100) ?? "Audio generation failed");
+      setGenerateError(e.message?.slice(0, 100) ?? "Ошибка генерации аудио");
     } finally {
       setIsGenerating(false);
     }
@@ -683,7 +683,7 @@ export default function AudioStudio({
           {/* Model Selector */}
           <div className="space-y-2 relative">
             <label className="text-xs font-bold text-zinc-300 uppercase tracking-wider block">
-              Audio Model
+              Аудиомодель
             </label>
             <button
               ref={modelBtnRef}
@@ -691,7 +691,7 @@ export default function AudioStudio({
               onClick={() => setOpenDropdown(!openDropdown)}
               className="w-full bg-zinc-900 border border-zinc-700 rounded px-4 py-3.5 text-sm text-left font-bold text-white flex items-center justify-between hover:bg-zinc-850 hover:border-primary/50 transition-all"
             >
-              <span>{selectedModel?.name ?? "Select Model"}</span>
+              <span>{selectedModel?.name ?? "Выбрать модель"}</span>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={`transition-transform duration-200 ${openDropdown ? 'rotate-180' : ''}`}>
                 <polyline points="6 9 12 15 18 9" />
               </svg>
@@ -726,7 +726,7 @@ export default function AudioStudio({
           {/* Model Description */}
           {selectedModel?.description && (
             <div className="">
-              <span className="text-[10px] font-bold text-primary uppercase tracking-wider block mb-1.5">Description</span>
+              <span className="text-[10px] font-bold text-primary uppercase tracking-wider block mb-1.5">Описание</span>
               <p className="text-zinc-400 text-xs leading-relaxed font-semibold">{selectedModel.description}</p>
             </div>
           )}
@@ -854,13 +854,13 @@ export default function AudioStudio({
                 return (
                   <div key={key} className="space-y-2">
                     <label className="block text-xs font-bold text-zinc-200 uppercase tracking-wider">
-                      {schema.title || "Lyrics / Prompt"}
+                      {schema.title || "Текст / Запрос"}
                     </label>
                     <textarea
                       value={params[key] || ""}
                       onChange={(e) => setParams(prev => ({ ...prev, [key]: e.target.value }))}
                       className="w-full bg-zinc-900 border border-zinc-700 focus:border-primary/85 rounded p-3 text-xs text-white placeholder:text-zinc-400 focus:outline-none transition-all min-h-[100px] resize-none leading-relaxed shadow-inner"
-                      placeholder={schema.description || "Enter what you want generated..."}
+                      placeholder={schema.description || "Введите что хотите создать..."}
                     />
                     {schema.examples && Array.isArray(schema.examples) && (
                       <div className="flex flex-wrap gap-1.5 mt-2">
@@ -919,14 +919,14 @@ export default function AudioStudio({
             {isGenerating ? (
               <>
                 <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
-                <span>Generating Audio...</span>
+                <span>Создание аудио...</span>
               </>
             ) : (
               <>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                   <path d="M5 3l14 9-14 9V3z" />
                 </svg>
-                <span>Generate Track</span>
+                <span>Создать трек</span>
               </>
             )}
           </button>
@@ -952,7 +952,7 @@ export default function AudioStudio({
                 </div>
                 <div className="text-center">
                   <span className="text-xs font-black text-red-500 uppercase tracking-widest block mb-1">
-                    Generation Error
+                    Ошибка генерации аудио
                   </span>
                   <p className="text-white font-medium text-sm leading-relaxed">
                     {generateError}
@@ -972,10 +972,10 @@ export default function AudioStudio({
                 </div>
                 <div className="text-center space-y-2">
                   <div className="text-xs font-black text-primary uppercase tracking-[0.3em] animate-pulse">
-                    Generating Soundtrack
+                    Создание саундтрека
                   </div>
                   <div className="text-sm text-zinc-200 font-bold">
-                    Rendering audio waveforms and vocals...
+                    Рендеринг звуковых волн и вокала...
                   </div>
                 </div>
               </div>
@@ -990,9 +990,9 @@ export default function AudioStudio({
                   <MusicIcon className="text-primary w-8 h-8 filter drop-shadow-[0_0_8px_rgba(34,211,238,0.3)]" />
                 </div>
                 <div className="relative z-10">
-                  <h3 className="text-white font-black text-xl mb-3 tracking-tight">Audio Studio</h3>
+                  <h3 className="text-white font-black text-xl mb-3 tracking-tight">Студия аудио</h3>
                   <p className="text-sm text-zinc-200 font-medium leading-relaxed px-4">
-                    Choose an AI music model, voice cloner, or sound generator. Modify variables on the left and craft your next high-fidelity track.
+                    Выберите ИИ-модель музыки, клонатор голоса или генератор звука. Настройте параметры слева и создайте свой следующий трек.
                   </p>
                 </div>
               </div>
@@ -1011,10 +1011,10 @@ export default function AudioStudio({
                       <line x1="19" y1="12" x2="5" y2="12" />
                       <polyline points="12 19 5 12 12 5" />
                     </svg>
-                    <span>New Generation</span>
+                    <span>Новая генерация</span>
                   </button>
                   <span className="text-[11px] font-bold text-green-400 px-3.5 py-1.5 bg-green-500/10 border border-green-500/20 rounded-full flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" /> Success
+                    <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" /> Успешно
                   </span>
                 </div>
                 <PremiumAudioPlayer url={activeResultUrl} title={activeResultTitle} />
@@ -1027,7 +1027,7 @@ export default function AudioStudio({
           {history.length > 0 && (
             <div className="border-t border-zinc-900 pt-6 w-full animate-fade-in-up">
               <h4 className="text-xs font-bold text-zinc-300 uppercase tracking-wider mb-4 px-1">
-                Generation History ({history.length})
+                История генерации ({history.length})
               </h4>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
                 {history.map((entry, idx) => (
@@ -1053,7 +1053,7 @@ export default function AudioStudio({
                       </span>
                     </div>
                     <p className="text-[11px] font-semibold text-white line-clamp-2 leading-tight">
-                      {entry.title || entry.prompt || "Untitled Audio"}
+                      {entry.title || entry.prompt || "Аудио без названия"}
                     </p>
                   </div>
                 ))}

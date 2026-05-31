@@ -116,7 +116,7 @@ function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [] }
     const tooLarge = files.filter((f) => f.size > MAX_IMAGE_SIZE);
     if (tooLarge.length > 0) {
       alert(
-        `The following images are too large (max 10MB): ${tooLarge.map((f) => f.name).join(", ")}`,
+        `Следующие изображения слишком большие (макс. 10 МБ): ${tooLarge.map((f) => f.name).join(", ")}`,
       );
       return;
     }
@@ -172,7 +172,7 @@ function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [] }
         }),
       );
     } catch (err) {
-      alert(`Image upload failed: ${err.message}`);
+      alert(`Ошибка загрузки изображения: ${err.message}`);
     } finally {
       setUploading(false);
       setLastUploadProgress(0);
@@ -385,13 +385,13 @@ function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [] }
 
   const triggerTitle = hasSelection
     ? count > 1
-      ? `${count} of ${maxImages} images selected — click to manage`
+      ? `${count} из ${maxImages} изображений выбрано — нажмите для управления`
       : isMulti
-        ? `1 image selected — click to add more (up to ${maxImages})`
-        : "Reference image"
+        ? `1 изображение выбрано — нажмите чтобы добавить ещё (до ${maxImages})`
+        : "Референс"
     : isMulti
-      ? `Add up to ${maxImages} images`
-      : "Reference image";
+      ? `Добавьте до ${maxImages} изображений`
+      : "Референс";
 
   return (
     <div className="relative">
@@ -434,11 +434,11 @@ function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [] }
           <div className="flex items-center justify-between px-1 pb-3 mb-2 border-b border-white/5">
             <div className="flex flex-col gap-0.5">
               <span className="text-xs font-bold text-secondary">
-                Reference Images
+                Референсные изображения
               </span>
               {isMulti && (
                 <span className="text-[9px] text-muted">
-                  Select up to {maxImages} images
+                  Выберите до {maxImages} изображений
                 </span>
               )}
             </div>
@@ -449,7 +449,7 @@ function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [] }
                   onClick={handleDone}
                   className="flex items-center gap-1 px-3 py-1.5 bg-primary text-black rounded-xl text-xs font-black transition-all hover:scale-105"
                 >
-                  ✓ Done ({count})
+                  ✓ Готово ({count})
                 </button>
               )}
               <button
@@ -473,7 +473,7 @@ function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [] }
                   <polyline points="17 8 12 3 7 8" />
                   <line x1="12" y1="3" x2="12" y2="15" />
                 </svg>
-                {isMulti ? "Upload files" : "Upload new"}
+                {isMulti ? "Загрузить файлы" : "Загрузить новые"}
               </button>
             </div>
           </div>
@@ -494,7 +494,7 @@ function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [] }
                 <polyline points="17 8 12 3 7 8" />
                 <line x1="12" y1="3" x2="12" y2="15" />
               </svg>
-              <span className="text-xs text-secondary">No uploads yet</span>
+              <span className="text-xs text-secondary">Нет загрузок</span>
             </div>
           ) : (
             <div className="grid grid-cols-3 gap-2 max-h-56 overflow-y-auto custom-scrollbar pr-0.5">
@@ -537,7 +537,7 @@ function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [] }
                       <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/cell:opacity-100 transition-opacity flex items-end justify-end p-1">
                         <button
                           type="button"
-                          title="Remove from history"
+                          title="Удалить из истории"
                           onClick={(e) => handleRemoveFromHistory(e, entry)}
                           className="w-5 h-5 bg-red-500/80 hover:bg-red-500 rounded-md flex items-center justify-center transition-colors"
                         >
@@ -587,14 +587,14 @@ function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [] }
           {isMulti && hasSelection && (
             <div className="mt-3 pt-3 border-t border-white/5 flex items-center justify-between">
               <span className="text-xs text-secondary">
-                {count} of {maxImages} selected
+                {count} из {maxImages} выбрано
               </span>
               <button
                 type="button"
                 onClick={handleDone}
                 className="px-4 py-1.5 bg-primary text-black rounded-xl text-xs font-black transition-all hover:scale-105"
               >
-                Use Selected
+                Использовать выбранные
               </button>
             </div>
           )}
@@ -633,7 +633,7 @@ function ModelDropdown({ models, selectedModel, onSelect, onClose }) {
           </svg>
           <input
             type="text"
-            placeholder="Search models..."
+            placeholder="Поиск моделей..."
             value={search}
             onClick={(e) => e.stopPropagation()}
             onChange={(e) => setSearch(e.target.value)}
@@ -642,7 +642,7 @@ function ModelDropdown({ models, selectedModel, onSelect, onClose }) {
         </div>
       </div>
       <div className="text-xs font-medium text-secondary py-2 shrink-0">
-        Available models
+        Доступные модели
       </div>
       <div className="flex flex-col gap-1.5 overflow-y-auto custom-scrollbar pr-1 pb-2">
         {filtered.map((m) => (
@@ -869,7 +869,7 @@ export default function ImageStudio({
     const tooLarge = files.filter((f) => f.size > MAX_IMAGE_SIZE);
     if (tooLarge.length > 0) {
       alert(
-        `The following images are too large (max 10MB): ${tooLarge.map((f) => f.name).join(", ")}`
+        `Следующие изображения слишком большие (макс. 10 МБ): ${tooLarge.map((f) => f.name).join(", ")}`
       );
       return;
     }
@@ -895,7 +895,7 @@ export default function ImageStudio({
 
       handleUploadSelect({ urls });
     } catch (err) {
-      alert(`Image upload failed: ${err.message}`);
+      alert(`Ошибка загрузки изображения: ${err.message}`);
     } finally {
       setGenerating(false);
     }
@@ -1030,12 +1030,12 @@ export default function ImageStudio({
 
     if (imageMode) {
       if (uploadedImageUrls.length === 0) {
-        alert("Please upload a reference image first.");
+        alert("Пожалуйста, сначала загрузите референсное изображение.");
         return;
       }
     } else {
       if (!prompt.trim()) {
-        alert("Please enter a prompt to generate an image.");
+        alert("Пожалуйста, введите запрос для генерации изображения.");
         return;
       }
     }
@@ -1103,10 +1103,10 @@ export default function ImageStudio({
 
   const placeholderText =
     uploadedImageUrls.length > 1
-      ? `${uploadedImageUrls.length} images selected — describe the transformation (optional)`
+      ? `${uploadedImageUrls.length} изображений выбрано — опишите трансформацию (необязательно)`
       : imageMode
-        ? "Describe how to transform this image (optional)"
-        : "Describe the image you want to create";
+        ? "Опишите как трансформировать изображение (необязательно)"
+        : "Опишите изображение, которое хотите создать";
 
   // ── Render ───────────────────────────────────────────────────────────────
   return (
@@ -1123,7 +1123,7 @@ export default function ImageStudio({
               >
                 <img
                   src={entry.url}
-                  alt={entry.prompt?.substring(0, 30) || "Generated image"}
+                  alt={entry.prompt?.substring(0, 30) || "Созданное изображение"}
                   className="w-full aspect-square object-cover bg-black/40 cursor-pointer hover:opacity-80 transition-opacity"
                   onClick={() => setFullscreenUrl(entry.url)}
                 />
@@ -1132,7 +1132,7 @@ export default function ImageStudio({
                 <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     type="button"
-                    title="Fullscreen"
+                    title="На весь экран"
                     onClick={(e) => {
                       e.stopPropagation();
                       setFullscreenUrl(entry.url);
@@ -1148,7 +1148,7 @@ export default function ImageStudio({
                   </button>
                   <button
                     type="button"
-                    title="Download"
+                    title="Скачать"
                     onClick={(e) => {
                       e.stopPropagation();
                       downloadImage(entry.url, `muapi-${entry.id || idx}.jpg`);
@@ -1164,7 +1164,7 @@ export default function ImageStudio({
                 {/* Prompt & Details */}
                 <div className="p-3 bg-black/80 backdrop-blur-sm border-t border-white/5 flex-1 flex flex-col justify-between gap-2">
                   <p className="text-white/70 text-xs line-clamp-3 leading-relaxed" title={entry.prompt}>
-                    {entry.prompt || "No prompt provided"}
+                    {entry.prompt || "Запрос не указан"}
                   </p>
                   <div className="flex items-center justify-between mt-1">
                     <span className="text-[10px] font-bold text-primary px-2 py-0.5 bg-primary/10 rounded border border-primary/20">
@@ -1202,12 +1202,12 @@ export default function ImageStudio({
               </div>
             </div>
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight mb-4 text-center px-4">
-              <span className="text-white/40 font-medium">START CREATING WITH</span>
+              <span className="text-white/40 font-medium">НАЧНИТЕ СОЗДАВАТЬ С</span>
               <br />
-              <span className="text-white">IMAGE STUDIO</span>
+              <span className="text-white">СТУДИИ ИЗОБРАЖЕНИЙ</span>
             </h1>
             <p className="text-white/40 text-sm md:text-base font-medium tracking-wide text-center max-w-lg leading-relaxed">
-              Describe a scene, character, mood, or style — and watch it come to life
+              Опишите сцену, персонажа, настроение или стиль — и наблюдайте как это оживает
             </p>
           </div>
         )}
@@ -1314,7 +1314,7 @@ export default function ImageStudio({
                     className="absolute bottom-[calc(100%+12px)] left-0 z-50 bg-[#0a0a0a] rounded-md p-3 max-h-[40vh] overflow-y-auto custom-scrollbar shadow-2xl border border-white/10 min-w-[160px]"
                   >
                     <SimpleDropdown
-                      title="Aspect Ratio"
+                      title="Соотношение сторон"
                       options={currentAspectRatios}
                       selected={selectedAr}
                       onSelect={(val) => setSelectedAr(val)}
@@ -1349,7 +1349,7 @@ export default function ImageStudio({
                       className="absolute bottom-[calc(100%+12px)] left-0 z-50 bg-[#0a0a0a] rounded-md p-3 max-h-[40vh] overflow-y-auto custom-scrollbar shadow-2xl border border-white/[0.05] min-w-[160px]"
                     >
                       <SimpleDropdown
-                        title="Resolution"
+                        title="Разрешение"
                         options={currentResolutions}
                         selected={selectedQuality}
                         onSelect={(val) => setSelectedQuality(val)}
@@ -1375,7 +1375,7 @@ export default function ImageStudio({
                       <path d="M5 3l14 9-14 9V3z" />
                     </svg>
                     <span className="text-[11px] font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors max-w-[140px] truncate">
-                      {selectedEffect || "Effect"}
+                      {selectedEffect || "Эффект"}
                     </span>
                   </button>
 
@@ -1385,7 +1385,7 @@ export default function ImageStudio({
                       className="absolute bottom-[calc(100%+12px)] left-0 z-50 bg-[#0a0a0a] rounded-md p-3 max-h-[40vh] overflow-y-auto custom-scrollbar shadow-2xl border border-white/[0.05] min-w-[200px]"
                     >
                       <SimpleDropdown
-                        title="Effect Type"
+                        title="Тип эффекта"
                         options={currentEffects}
                         selected={selectedEffect}
                         onSelect={(val) => setSelectedEffect(val)}
@@ -1425,13 +1425,13 @@ export default function ImageStudio({
               {generating ? (
                 <>
                   <span className="animate-spin inline-block text-black">◌</span>
-                  Generating...
+                  Создание...
                 </>
               ) : generateError ? (
-                `Error: ${generateError}`
+                `Ошибка: ${generateError}`
               ) : (
                 <>
-                  <span>Generate</span>
+                  <span>Создать</span>
                 </>
               )}
             </button>
@@ -1460,7 +1460,7 @@ export default function ImageStudio({
           </button>
           <img 
             src={fullscreenUrl} 
-            alt="Fullscreen Preview" 
+            alt="На весь экран"
             className="max-w-[95vw] max-h-[95vh] rounded-2xl shadow-2xl object-contain animate-scale-up" 
             onClick={(e) => e.stopPropagation()}
           />

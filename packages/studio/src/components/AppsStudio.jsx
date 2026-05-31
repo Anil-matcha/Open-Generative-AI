@@ -149,11 +149,11 @@ export default function AppsStudio({ apiKey }) {
     try {
       await registerAppInterest(apiKey, selectedApp.name);
       setRequestedApps(prev => [...prev, selectedApp.name]);
-      toast.success("Got it! We'll send you the template details shortly.");
+      toast.success("Принято! Мы скоро отправим вам детали шаблона.");
       setTimeout(() => setSelectedApp(null), 1500);
     } catch (error) {
       console.error(error);
-      toast.error("Failed to register interest. Please try again later.");
+      toast.error("Ошибка регистрации. Попробуйте позже.");
     } finally {
       setIsRequesting(false);
     }
@@ -222,7 +222,7 @@ export default function AppsStudio({ apiKey }) {
                   className="flex-1 py-2 bg-[#22d3ee]/10 text-[#22d3ee] rounded-md text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-[#22d3ee]/20 transition-all border border-[#22d3ee]/20 active:scale-95"
                 >
                   <FaExternalLinkAlt className="text-[9px]" />
-                  Demo
+                  Демо
                 </button>
               </>
             ) : (
@@ -243,7 +243,7 @@ export default function AppsStudio({ apiKey }) {
                   className="flex-1 py-2 bg-[#22d3ee]/10 text-[#22d3ee] rounded-md text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-[#22d3ee]/20 transition-all border border-[#22d3ee]/20 active:scale-95"
                 >
                   <FaExternalLinkAlt className="text-[9px]" />
-                  Demo
+                  Демо
                 </a>
               </>
             )}
@@ -263,14 +263,14 @@ export default function AppsStudio({ apiKey }) {
         <div className="text-center space-y-6 max-w-3xl">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#22d3ee]/10 border border-[#22d3ee]/20 rounded-full">
             <FaDollarSign className="text-[#22d3ee] text-xs" />
-            <span className="text-[10px] font-black text-[#22d3ee] uppercase tracking-widest">Revenue-Ready Templates</span>
+            <span className="text-[10px] font-black text-[#22d3ee] uppercase tracking-widest">Шаблоны для монетизации</span>
           </div>
           <h1 className="text-5xl font-black text-white tracking-tighter leading-[0.9]">
-            LAUNCH AN AI APP.<br />START EARNING TODAY.
+            ЗАПУСТИТЕ ИИ-ПРИЛОЖЕНИЕ.<br />НАЧНИТЕ ЗАРАБАТЫВАТЬ СЕГОДНЯ.
           </h1>
           <p className="text-white/40 text-sm font-medium leading-relaxed max-w-xl mx-auto">
-            Each template is a fully-functional, Stripe-integrated AI SaaS you can deploy in minutes.
-            Charge your users, keep the revenue — muapi handles the AI infrastructure.
+            Каждый шаблон — полнофункциональный ИИ-SaaS со Stripe, который можно задеплоить за минуты.
+            Берите оплату с пользователей — muapi берёт на себя ИИ-инфраструктуру.
           </p>
         </div>
 
@@ -280,20 +280,20 @@ export default function AppsStudio({ apiKey }) {
             {
               icon: FaRocket,
               step: "01",
-              title: "Deploy in Minutes",
-              body: "Fork the open-source template, add your muapi key, and push to Vercel. No backend setup needed."
+              title: "Деплой за минуты",
+              body: "Форкните шаблон, добавьте ключ muapi и задеплойте на Vercel. Бэкенд не нужен."
             },
             {
               icon: FaCreditCard,
               step: "02",
-              title: "Collect Payments",
-              body: "Stripe is pre-wired. Set your own pricing — one-time credits, subscriptions, or pay-per-use."
+              title: "Собирайте платежи",
+              body: "Stripe уже подключён. Устанавливайте свои цены — разовые кредиты, подписки или оплата за использование."
             },
             {
               icon: FaDollarSign,
               step: "03",
-              title: "Keep the Revenue",
-              body: "Payments go straight to your Stripe account. You own the product, the brand, and the profits."
+              title: "Оставляйте выручку себе",
+              body: "Платежи идут прямо на ваш Stripe-счёт. Продукт, бренд и прибыль — ваши."
             }
           ].map(({ icon: Icon, step, title, body }) => (
             <div key={step} className="flex items-start gap-4 bg-[#0a0a0a] border border-white/5 rounded-2xl p-6 hover:border-white/10 transition-colors">
@@ -301,7 +301,7 @@ export default function AppsStudio({ apiKey }) {
                 <Icon className="text-lg" />
               </div>
               <div>
-                <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-1">Step {step}</p>
+                <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-1">Шаг {step}</p>
                 <h3 className="text-sm font-bold text-white mb-1.5">{title}</h3>
                 <p className="text-xs text-white/40 leading-relaxed font-medium">{body}</p>
               </div>
@@ -319,7 +319,7 @@ export default function AppsStudio({ apiKey }) {
         <div className="pt-24 pb-12 flex flex-col items-center gap-4">
           <div className="inline-flex items-center gap-3 px-4 py-2 bg-white/5 rounded-full border border-white/5">
             <span className="block w-1.5 h-1.5 rounded-full bg-[#22d3ee] animate-pulse" />
-            <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">Muapi Ecosystem — More templates coming soon</span>
+            <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">Экосистема Muapi — больше шаблонов скоро</span>
           </div>
         </div>
       </div>
@@ -334,7 +334,7 @@ export default function AppsStudio({ apiKey }) {
                 <selectedApp.icon />
               </div>
               <h2 className="text-2xl font-black text-white uppercase tracking-tight">
-                Deploy {selectedApp.name}
+                Задеплоить {selectedApp.name}
               </h2>
               <p className="text-sm font-medium text-white/40 leading-relaxed px-4">
                 Enter your details and we&apos;ll send you the <b>{selectedApp.name}</b> template along with setup instructions so you can deploy and start earning immediately.
@@ -347,13 +347,13 @@ export default function AppsStudio({ apiKey }) {
                 disabled={isRequesting}
                 className="w-full py-4 bg-[#22d3ee] text-black rounded-md text-sm font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-[#22d3ee]/90 transition-all shadow-lg active:scale-95 disabled:opacity-50"
               >
-                {isRequesting ? 'Sending Details...' : 'Get Template'}
+                {isRequesting ? 'Отправка...' : 'Получить шаблон'}
               </button>
               <button 
                 onClick={() => setSelectedApp(null)}
                 className="w-full py-4 bg-white/5 border border-white/10 text-white/60 rounded-md text-sm font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-white/10 transition-all"
               >
-                Maybe Later
+                Позже
               </button>
             </div>
           </div>

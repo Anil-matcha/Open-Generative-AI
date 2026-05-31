@@ -146,7 +146,7 @@ function ModelDropdown({ imageMode, selectedModel, onSelect, onClose }) {
           </span>
           {isV2V && (
             <span className="text-[9px] text-orange-400/70">
-              {m.imageField ? "Upload a video and image" : "Upload a video to use"}
+              {m.imageField ? "Загрузите видео и изображение" : "Загрузите видео"}
             </span>
           )}
         </div>
@@ -173,7 +173,7 @@ function ModelDropdown({ imageMode, selectedModel, onSelect, onClose }) {
           </svg>
           <input
             type="text"
-            placeholder="Search models..."
+            placeholder="Поиск моделей..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onClick={(e) => e.stopPropagation()}
@@ -182,14 +182,14 @@ function ModelDropdown({ imageMode, selectedModel, onSelect, onClose }) {
         </div>
       </div>
       <div className="text-xs font-bold text-secondary px-3 py-2 shrink-0">
-        Video models
+        Видеомодели
       </div>
       <div className="flex flex-col gap-1.5 overflow-y-auto custom-scrollbar pr-1 pb-2">
         {filteredMain.map((m) => renderItem(m, false))}
         {filteredV2V.length > 0 && (
           <>
             <div className="text-xs font-bold text-orange-400/70 px-3 py-2 mt-1 border-t border-white/5">
-              Video Tools
+              Видеоинструменты
             </div>
             {filteredV2V.map((m) => renderItem(m, true))}
           </>
@@ -536,7 +536,7 @@ export default function VideoStudio({
 
   const processDroppedImage = async (file) => {
     if (file.size > 10 * 1024 * 1024) {
-      alert("Image exceeds 10MB limit.");
+      alert("Изображение превышает лимит 10 МБ.");
       return;
     }
     setImageUploading(true);
@@ -571,7 +571,7 @@ export default function VideoStudio({
 
   const processDroppedVideo = async (file) => {
     if (file.size > 50 * 1024 * 1024) {
-      alert("Video exceeds 50MB limit.");
+      alert("Видео превышает лимит 50 МБ.");
       return;
     }
     setVideoUploading(true);
@@ -649,7 +649,7 @@ export default function VideoStudio({
     const file = e.target.files[0];
     if (!file) return;
     if (file.size > 10 * 1024 * 1024) {
-      alert("Image exceeds 10MB limit.");
+      alert("Изображение превышает лимит 10 МБ.");
       return;
     }
     setImageUploading(true);
@@ -711,7 +711,7 @@ export default function VideoStudio({
     const file = e.target.files[0];
     if (!file) return;
     if (file.size > 10 * 1024 * 1024) {
-      alert("Image exceeds 10MB limit.");
+      alert("Изображение превышает лимит 10 МБ.");
       return;
     }
     setEndImageUploading(true);
@@ -737,7 +737,7 @@ export default function VideoStudio({
     const file = e.target.files[0];
     if (!file) return;
     if (file.size > 50 * 1024 * 1024) {
-      alert("Video exceeds 50MB limit.");
+      alert("Видео превышает лимит 50 МБ.");
       return;
     }
     setVideoUploading(true);
@@ -845,21 +845,21 @@ export default function VideoStudio({
 
     if (v2vMode) {
       if (!uploadedVideoUrl) {
-        alert("Please upload a video first.");
+        alert("Пожалуйста, сначала загрузите видео.");
         return;
       }
       if (currentModel?.imageField && !uploadedImageUrl) {
-        alert("Please upload a reference image for motion control.");
+        alert("Пожалуйста, загрузите референсное изображение для управления движением.");
         return;
       }
       if (currentModel?.promptRequired && !trimmedPrompt) {
-        alert("Please describe the motion you want.");
+        alert("Пожалуйста, опишите желаемое движение.");
         return;
       }
     } else if (isExtendMode) {
       if (!lastGenerationId) {
         alert(
-          "No Seedance 2.0 generation found to extend. Generate a video first.",
+          "Генерация Seedance 2.0 не найдена. Сначала создайте видео.",
         );
         return;
       }
@@ -870,7 +870,7 @@ export default function VideoStudio({
       }
     } else {
       if (!trimmedPrompt) {
-        alert("Please enter a prompt to generate a video.");
+        alert("Пожалуйста, введите запрос для создания видео.");
         return;
       }
     }
@@ -1017,7 +1017,7 @@ export default function VideoStudio({
     } catch (e) {
       hadError = true;
       console.error("[VideoStudio]", e);
-      setGenerateError(e.message?.slice(0, 80) || "Generation failed");
+      setGenerateError(e.message?.slice(0, 80) || "Ошибка генерации");
       setTimeout(() => setGenerateError(null), 4000);
     } finally {
       setGenerating(false);
@@ -1089,14 +1089,14 @@ export default function VideoStudio({
   const promptPlaceholder = v2vMode
     ? currentModelObj?.imageField
       ? currentModelObj?.promptRequired
-        ? "Describe the motion"
-        : "Describe the motion (optional)"
-      : "Video ready — click Generate to remove watermark"
+        ? "Опишите движение"
+        : "Опишите движение (необязательно)"
+      : "Видео готово — нажмите Создать для удаления водяного знака"
     : imageMode
-      ? "Describe the motion or effect (optional)"
+      ? "Опишите движение или эффект (необязательно)"
       : isExtendMode
-        ? "Optional: describe how to continue the video..."
-        : "Describe the video you want to create";
+        ? "Необязательно: опишите как продолжить видео..."
+        : "Опишите видео, которое хотите создать";
 
   const toggleDropdown = (type) => (e) => {
     e.stopPropagation();
@@ -1139,7 +1139,7 @@ export default function VideoStudio({
                   <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                       type="button"
-                      title="Fullscreen"
+                      title="На весь экран"
                       onClick={(e) => {
                         e.stopPropagation();
                         setFullscreenUrl(entry.url);
@@ -1155,7 +1155,7 @@ export default function VideoStudio({
                     </button>
                     <button
                       type="button"
-                      title="Download"
+                      title="Скачать"
                       onClick={(e) => {
                         e.stopPropagation();
                         downloadFile(entry.url, `video-${entry.id || idx}.mp4`);
@@ -1169,7 +1169,7 @@ export default function VideoStudio({
                     {isSeedance2 && (
                       <button
                         type="button"
-                        title="Extend this video using Seedance 2.0 Extend"
+                        title="Расширить видео с помощью Seedance 2.0 Extend"
                         onClick={(e) => {
                           e.stopPropagation();
                           setLastGenerationId(entry.id);
@@ -1187,7 +1187,7 @@ export default function VideoStudio({
                   {/* Prompt & Details */}
                   <div className="p-3 bg-black/80 backdrop-blur-sm border-t border-white/5 flex-1 flex flex-col justify-between gap-2">
                     <p className="text-white/70 text-xs line-clamp-3 leading-relaxed" title={entry.prompt}>
-                      {entry.prompt || "No prompt provided"}
+                      {entry.prompt || "Запрос не указан"}
                     </p>
                     <div className="flex items-center justify-between mt-1 flex-wrap gap-1">
                       <span className="text-[10px] font-bold text-primary px-2 py-0.5 bg-primary/10 rounded border border-primary/20 whitespace-nowrap">
@@ -1222,11 +1222,11 @@ export default function VideoStudio({
               </div>
             </div>
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight mb-4 text-center px-4">
-              <span className="text-white/40 font-medium">START CREATING WITH</span><br />
-              <span className="text-white">VIDEO STUDIO</span>
+              <span className="text-white/40 font-medium">НАЧНИТЕ СОЗДАВАТЬ С</span><br />
+              <span className="text-white">ВИДЕОСТУДИИ</span>
             </h1>
             <p className="text-white/40 text-sm md:text-base font-medium tracking-wide text-center max-w-lg leading-relaxed">
-              Animate images into stunning AI videos with motion effects
+              Оживляйте изображения в потрясающие ИИ-видео с эффектами движения
             </p>
           </div>
         )}
@@ -1249,8 +1249,8 @@ export default function VideoStudio({
                 type="button"
                 title={
                   uploadedImageUrl
-                    ? "Clear image"
-                    : "Upload image for Image-to-Video"
+                    ? "Очистить изображение"
+                    : "Загрузить изображение для Image-to-Video"
                 }
                 onClick={() =>
                   uploadedImageUrl
@@ -1334,7 +1334,7 @@ export default function VideoStudio({
                 />
                 <button
                   type="button"
-                  title={uploadedEndImageUrl ? "Clear end frame" : "Upload end frame (optional)"}
+                  title={uploadedEndImageUrl ? "Очистить конечный кадр" : "Загрузить конечный кадр (необязательно)"}
                   onClick={() =>
                     uploadedEndImageUrl
                       ? clearEndImage()
@@ -1476,7 +1476,7 @@ export default function VideoStudio({
               >
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
-              <span>Extending previous Seedance 2.0 generation</span>
+              <span>Расширение предыдущей генерации Seedance 2.0</span>
             </div>
           )}
 
@@ -1563,7 +1563,7 @@ export default function VideoStudio({
                       className="absolute bottom-[calc(100%+12px)] left-0 z-50 bg-[#0a0a0a] rounded-lg p-3 shadow-2xl border border-white/[0.05] max-h-80 overflow-y-auto custom-scrollbar min-w-[160px]"
                     >
                       <div className="text-xs font-bold text-white/20 border-b border-white/[0.03] mb-2">
-                        Aspect Ratio
+                        Соотношение сторон
                       </div>
                       <div className="flex flex-col gap-1">
                         {getCurrentAspectRatios(selectedModel).map((r) => (
@@ -1618,7 +1618,7 @@ export default function VideoStudio({
                       className="absolute bottom-[calc(100%+12px)] left-0 z-50 bg-[#0a0a0a] rounded-lg p-3 shadow-2xl border border-white/[0.05] max-h-80 overflow-y-auto custom-scrollbar min-w-[200px]"
                     >
                       <div className="text-xs font-bold text-white/20 border-b border-white/[0.03] mb-2">
-                        Effect Type
+                        Тип эффекта
                       </div>
                       <div className="flex flex-col gap-1">
                         {getEffectsForI2VModel(selectedModel).map((eff) => (
@@ -1674,7 +1674,7 @@ export default function VideoStudio({
                       className="absolute bottom-[calc(100%+12px)] left-0 z-50 bg-[#0a0a0a] rounded-md p-3 shadow-2xl border border-white/10 min-w-[140px]"
                     >
                       <div className="text-xs font-bold text-white/20 border-b border-white/[0.03] mb-2">
-                        Duration
+                        Длительность
                       </div>
                       <div className="flex flex-col gap-1">
                         {getCurrentDurations(selectedModel).map((d) => (
@@ -1729,7 +1729,7 @@ export default function VideoStudio({
                       className="absolute bottom-[calc(100%+12px)] left-0 z-50 bg-[#0a0a0a] rounded-md p-3 shadow-2xl border border-white/[0.05] min-w-[140px]"
                     >
                       <div className="text-xs font-bold text-white/20 border-b border-white/[0.03] mb-2">
-                        Resolution
+                        Разрешение
                       </div>
                       <div className="flex flex-col gap-1">
                         {getCurrentResolutions(selectedModel).map((r) => (
@@ -1767,13 +1767,13 @@ export default function VideoStudio({
                   <span className="animate-spin inline-block text-black">
                     ◌
                   </span>{" "}
-                  Generating...
+                  Создание...
                 </>
               ) : generateError ? (
                 `Error: ${generateError}`
               ) : (
                 <>
-                  <span>Generate</span>
+                  <span>Создать</span>
                 </>
               )}
             </button>

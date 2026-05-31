@@ -382,7 +382,7 @@ function CameraControlsOverlay({
         <div className="flex items-center justify-between mb-8">
           <div className="flex flex-col gap-1">
             <h2 className="text-2xl font-black text-white tracking-tighter uppercase italic">
-              Camera Config
+              Настройки камеры
             </h2>
             <div className="h-[1px] w-12 bg-primary/40" />
           </div>
@@ -406,28 +406,28 @@ function CameraControlsOverlay({
         {/* Scroll columns */}
         <div className="w-full flex justify-start md:justify-center gap-3 md:gap-6 py-4 md:py-8 overflow-x-auto no-scrollbar snap-x px-4 md:px-0">
           <ScrollColumn
-            title="Camera"
+            title="Камера"
             items={CAMERAS}
             columnKey="camera"
             value={settings.camera}
             onChange={updateSetting("camera")}
           />
           <ScrollColumn
-            title="Lens"
+            title="Объектив"
             items={LENSES}
             columnKey="lens"
             value={settings.lens}
             onChange={updateSetting("lens")}
           />
           <ScrollColumn
-            title="Focal Length"
+            title="Фокусное расстояние"
             items={FOCAL_LENGTHS}
             columnKey="focal"
             value={settings.focal}
             onChange={updateSetting("focal")}
           />
           <ScrollColumn
-            title="Aperture"
+            title="Диафрагма"
             items={APERTURES}
             columnKey="aperture"
             value={settings.aperture}
@@ -495,7 +495,7 @@ export default function CinemaStudio({
       });
       if (url) setUploadedImage(url);
     } catch (err) {
-      console.error("Image upload failed:", err);
+      console.error("Ошибка загрузки изображения:", err);
     } finally {
       setIsUploadingImage(false);
       setImageUploadProgress(0);
@@ -632,7 +632,7 @@ export default function CinemaStudio({
       }
     } catch (e) {
       console.error(e);
-      alert("Generation Failed: " + e.message);
+      alert("Ошибка генерации: " + e.message);
     } finally {
       setIsGenerating(false);
     }
@@ -730,7 +730,7 @@ export default function CinemaStudio({
                 <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     type="button"
-                    title="Fullscreen"
+                    title="На весь экран"
                     onClick={(e) => {
                       e.stopPropagation();
                       setFullscreenUrl(entry.url);
@@ -746,7 +746,7 @@ export default function CinemaStudio({
                   </button>
                   <button
                     type="button"
-                    title="Download"
+                    title="Скачать"
                     onClick={async (e) => {
                       e.stopPropagation();
                       try {
@@ -779,7 +779,7 @@ export default function CinemaStudio({
                   </p>
                   <div className="flex items-center justify-between mt-1 flex-wrap gap-1">
                     <span className="text-[10px] font-bold text-[#22d3ee] px-2 py-0.5 bg-[#22d3ee]/10 rounded border border-[#22d3ee]/20">
-                      {entry.settings?.camera || "Standard"}
+                      {entry.settings?.camera || "Стандартное"}
                     </span>
                     <div className="flex gap-2">
                       <span className="text-[10px] text-white/40">{entry.settings?.lens || "35mm"}</span>
@@ -807,11 +807,11 @@ export default function CinemaStudio({
               </div>
             </div>
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight mb-4 text-center px-4">
-              <span className="text-white/40 font-medium">START CREATING WITH</span><br />
-              <span className="text-white uppercase tracking-wider">Cinema Studio</span>
+              <span className="text-white/40 font-medium">НАЧНИТЕ СОЗДАВАТЬ С</span><br />
+              <span className="text-white uppercase tracking-wider">КИНО-СТУДИИ</span>
             </h1>
             <p className="text-white/40 text-sm md:text-base font-medium tracking-wide text-center max-w-lg leading-relaxed">
-              What would you shoot with infinite budget?
+              Что бы вы сняли с безлимитным бюджетом?
             </p>
           </div>
         )}
@@ -896,7 +896,7 @@ export default function CinemaStudio({
 
               <textarea
                 ref={textareaRef}
-                placeholder="Describe your cinema scene..."
+                placeholder="Опишите вашу кинематографическую сцену..."
                 className="w-full bg-transparent border-none text-white text-sm placeholder:text-white/10 focus:outline-none resize-none pt-1 leading-relaxed min-h-[40px] max-h-[150px] md:max-h-[250px] overflow-y-auto custom-scrollbar disabled:opacity-40"
                 rows={1}
                 onInput={handleTextareaInput}
@@ -979,11 +979,11 @@ export default function CinemaStudio({
                 >
                   {isGenerating ? (
                     <>
-                      <span className="animate-spin inline-block text-black">◌</span> SHOOTING...
+                      <span className="animate-spin inline-block text-black">◌</span> СЪЁМКА...
                     </>
                   ) : (
                     <>
-                      <span>SHOOT</span>
+                      <span>СНЯТЬ</span>
                     </>
                   )}
                 </button>

@@ -324,8 +324,8 @@ export default function MarketingStudio({ apiKey, droppedFiles, onFilesHandled }
   };
 
   const handleGenerate = async () => {
-    if (!prompt.trim()) return alert("Please enter an ad script.");
-    if (!productImage) return alert("Please upload a product image.");
+    if (!prompt.trim()) return alert("Пожалуйста, введите сценарий рекламы.");
+    if (!productImage) return alert("Пожалуйста, загрузите изображение товара.");
 
     setIsGenerating(true);
     try {
@@ -350,7 +350,7 @@ export default function MarketingStudio({ apiKey, droppedFiles, onFilesHandled }
         setFullscreenUrl(result.url);
       }
     } catch (err) {
-      alert("Generation failed: " + err.message);
+      alert("Ошибка генерации: " + err.message);
     } finally {
       setIsGenerating(false);
     }
@@ -386,7 +386,7 @@ export default function MarketingStudio({ apiKey, droppedFiles, onFilesHandled }
                    <button
                     onClick={(e) => { e.stopPropagation(); downloadFile(entry.url, `marketing-ad-${entry.id}.mp4`); }}
                     className="p-2 bg-black/60 backdrop-blur-md rounded-full text-white hover:bg-primary hover:text-black transition-all border border-white/10"
-                    title="Download"
+                    title="Скачать"
                    >
                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" />
@@ -421,12 +421,12 @@ export default function MarketingStudio({ apiKey, droppedFiles, onFilesHandled }
                 </div>
               </div>
               <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight mb-4 text-center px-4">
-                <span className="text-white/40 font-medium uppercase tracking-widest">START CREATING WITH</span>
+                <span className="text-white/40 font-medium uppercase tracking-widest">НАЧНИТЕ СОЗДАВАТЬ С</span>
                 <br />
-                <span className="text-white uppercase tracking-tight">MARKETING STUDIO</span>
+                <span className="text-white uppercase tracking-tight">МАРКЕТИНГОВОЙ СТУДИИ</span>
               </h1>
               <p className="text-white/40 text-sm md:text-base font-medium tracking-wide text-center max-w-lg leading-relaxed px-6">
-                Describe your scene, upload your product, and watch high-converting AI video ads come to life.
+                Опишите сцену, загрузите товар и наблюдайте как создаются высококонверсионные ИИ-видеорекламы.
               </p>
           </div>
         )}
@@ -457,7 +457,7 @@ export default function MarketingStudio({ apiKey, droppedFiles, onFilesHandled }
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               onInput={handleTextareaInput}
-              placeholder="Describe your ad script... Use @image1 for product, @image2 for avatar."
+              placeholder="Опишите сценарий рекламы... Используйте @image1 для товара, @image2 для аватара."
               rows={1}
               className="w-full bg-transparent border-none text-white text-sm placeholder:text-white/20 focus:outline-none resize-none pt-1 leading-relaxed min-h-[44px] max-h-[300px] custom-scrollbar font-medium"
             />
@@ -470,23 +470,23 @@ export default function MarketingStudio({ apiKey, droppedFiles, onFilesHandled }
               {/* Asset Uploads Group */}
               <div className="flex items-center gap-1.5 pr-3 border-r border-white/10">
                 <UploadSlot 
-                  label="Product" 
-                  icon={<ProductIcon />} 
-                  url={productImage} 
-                  progress={uploadProgress.product} 
-                  onUpload={(e) => handleUpload(e, 'product')} 
-                  onClear={() => setProductImage(null)} 
+                  label="Товар"
+                  icon={<ProductIcon />}
+                  url={productImage}
+                  progress={uploadProgress.product}
+                  onUpload={(e) => handleUpload(e, 'product')}
+                  onClear={() => setProductImage(null)}
                 />
-                <UploadSlot 
-                  label="Avatar" 
-                  icon={<AvatarIcon />} 
-                  url={avatarImage} 
-                  progress={uploadProgress.avatar} 
-                  onUpload={(e) => handleUpload(e, 'avatar')} 
-                  onClear={() => setAvatarImage(null)} 
+                <UploadSlot
+                  label="Аватар"
+                  icon={<AvatarIcon />}
+                  url={avatarImage}
+                  progress={uploadProgress.avatar}
+                  onUpload={(e) => handleUpload(e, 'avatar')}
+                  onClear={() => setAvatarImage(null)}
                 />
-                <UploadSlot 
-                  label="References" 
+                <UploadSlot
+                  label="Референсы" 
                   icon={<RefIcon />} 
                   url={additionalImages[0]} 
                   progress={uploadProgress.additional} 
@@ -517,7 +517,7 @@ export default function MarketingStudio({ apiKey, droppedFiles, onFilesHandled }
                 </button>
                 <Dropdown 
                   isOpen={dropdown === 'format'} 
-                  title="Video Format Presets"
+                  title="Форматы видео"
                   items={ASSETS.ugc} 
                   selectedId={params.format}
                   onSelect={(item) => setParams({ ...params, format: item.name, videoUrl: item.url })}
@@ -536,7 +536,7 @@ export default function MarketingStudio({ apiKey, droppedFiles, onFilesHandled }
                     <img src={avatarImage || ASSETS.avatar[0].url} className="w-full h-full object-cover" />
                   </div>
                   <span className="text-sm font-bold text-white/70 group-hover:text-primary transition-colors">
-                    {ASSETS.avatar.find(a => a.url === avatarImage)?.name || "Select Avatar"}
+                    {ASSETS.avatar.find(a => a.url === avatarImage)?.name || "Выбрать аватар"}
                   </span>
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" className="opacity-20 group-hover:opacity-100 transition-opacity"><path d="M6 9l6 6 6-6" /></svg>
                 </button>
@@ -561,7 +561,7 @@ export default function MarketingStudio({ apiKey, droppedFiles, onFilesHandled }
                   </button>
                   <SimpleDropdown 
                     isOpen={dropdown === key} 
-                    title={key === 'res' ? 'Resolution' : key.toUpperCase()} 
+                    title={key === 'res' ? 'Разрешение' : key === 'ratio' ? 'Формат' : 'Длительность'}
                     options={OPTIONS[key]} 
                     selected={params[key]} 
                     onSelect={(val) => setParams({ ...params, [key]: val })} 
@@ -579,10 +579,10 @@ export default function MarketingStudio({ apiKey, droppedFiles, onFilesHandled }
               {isGenerating ? (
                 <>
                   <div className="w-3 h-3 border-2 border-black/20 border-t-black rounded-full animate-spin" />
-                  Generating...
+                  Создание...
                 </>
               ) : (
-                <span>Launch</span>
+                <span>Запустить</span>
               )}
             </button>
           </div>

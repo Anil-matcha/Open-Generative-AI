@@ -45,14 +45,14 @@ function AgentCard({ agent, onClick, onEdit }) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 p-4">
           <div className="text-[10px] font-bold text-[#22d3ee] uppercase tracking-wider mb-1 opacity-80">
-            {agent.category || "AI Assistant"}
+            {agent.category || "ИИ-ассистент"}
           </div>
           <h3 className="text-sm font-bold text-white truncate group-hover:text-[#22d3ee] transition-colors">
-            {agent.name || "Unnamed Agent"}
+            {agent.name || "Агент без названия"}
           </h3>
           {agent.owner_username && (
             <p className="text-[9px] text-white/40 mt-1 uppercase tracking-tighter font-black">
-              By {agent.owner_username}
+              Автор: {agent.owner_username}
             </p>
           )}
         </div>
@@ -78,7 +78,7 @@ function AgentCard({ agent, onClick, onEdit }) {
 
 // ─── Conversation Card (My Chats) ────────────────────────────────────────────
 function ConversationCard({ conv, onClick }) {
-  const displayTitle = conv.title || "New Chat";
+  const displayTitle = conv.title || "Новый чат";
   const agentSlug = conv.agent_slug || conv.agent_id;
   return (
     <div
@@ -99,7 +99,7 @@ function ConversationCard({ conv, onClick }) {
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-[10px] font-black text-[#22d3ee] uppercase tracking-wider truncate">
-            {conv.agent_name || "Unknown Agent"}
+            {conv.agent_name || "Неизвестный агент"}
           </p>
           <p className="text-sm font-bold text-white truncate" title={displayTitle}>
             {displayTitle}
@@ -108,7 +108,7 @@ function ConversationCard({ conv, onClick }) {
       </div>
       <div className="flex items-center justify-between pt-2 border-t border-white/5 mt-auto text-[10px] text-white/30 font-medium">
         <span>{timeAgo(conv.updated_at)}</span>
-        {conv.message_count != null && <span>{conv.message_count} msgs</span>}
+        {conv.message_count != null && <span>{conv.message_count} сообщ.</span>}
       </div>
     </div>
   );
@@ -176,7 +176,7 @@ export default function AgentStudio({ apiKey }) {
         }
       } catch (err) {
         console.error("AgentStudio load error:", err);
-        if (!cancelled) setError(err.message || "Failed to load.");
+        if (!cancelled) setError(err.message || "Ошибка загрузки.");
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -193,7 +193,7 @@ export default function AgentStudio({ apiKey }) {
       <div className="flex-shrink-0 h-16 border-b border-white/5 flex items-center justify-between px-8 bg-black/40">
         <div className="flex items-center gap-8 h-full">
           <h2 className="text-sm font-black uppercase tracking-[0.2em] text-[#22d3ee]">
-            Agents
+            Агенты
           </h2>
           <div className="flex gap-1 bg-white/5 p-1 rounded-xl">
             {TABS.map((tab) => (
@@ -206,7 +206,7 @@ export default function AgentStudio({ apiKey }) {
                     : "text-white/40 hover:text-white hover:bg-white/5"
                 }`}
               >
-                {tab.replace(/-/g, " ")}
+                {tab === "templates" ? "Шаблоны" : tab === "my-agents" ? "Мои агенты" : "Мои чаты"}
               </button>
             ))}
           </div>
@@ -217,7 +217,7 @@ export default function AgentStudio({ apiKey }) {
           className="px-6 py-2 bg-[#22d3ee] text-black text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-[#ebff66] transition-all active:scale-95 flex items-center gap-2"
         >
           <span className="text-sm">+</span>
-          Create
+          Создать
         </button>
       </div>
 
@@ -239,7 +239,7 @@ export default function AgentStudio({ apiKey }) {
               onClick={() => setActiveMainTab(activeMainTab)} // retrigger effect
               className="text-[10px] text-white/40 hover:text-white border border-white/10 px-4 py-2 rounded-lg transition-colors"
             >
-              Retry
+              Повторить
             </button>
           </div>
         ) : activeMainTab === "my-chats" ? (
@@ -249,12 +249,12 @@ export default function AgentStudio({ apiKey }) {
               <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.5">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
               </svg>
-              <p className="text-[10px] font-black uppercase tracking-[0.3em]">No chats yet</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em]">Чатов пока нет</p>
               <button
                 onClick={() => setActiveMainTab("templates")}
                 className="text-[10px] text-[#22d3ee] hover:text-white border border-[#22d3ee]/20 hover:border-white/20 px-4 py-2 rounded-lg transition-colors"
               >
-                Browse Templates
+                Просмотр шаблонов
               </button>
             </div>
           ) : (
@@ -275,7 +275,7 @@ export default function AgentStudio({ apiKey }) {
               <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.5">
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
               </svg>
-              <p className="text-[10px] font-black uppercase tracking-[0.3em]">No agents found</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em]">Агенты не найдены</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 max-w-[1600px] mx-auto">

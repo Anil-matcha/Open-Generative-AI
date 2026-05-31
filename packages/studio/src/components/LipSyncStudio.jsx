@@ -256,7 +256,7 @@ function HistoryThumb({ entry, isActive, onSelect, onDownload }) {
             onDownload(entry);
           }}
           className="p-1.5 bg-primary rounded-lg text-black hover:scale-110 transition-transform"
-          title="Download"
+          title="Скачать"
         >
           <svg
             width="12"
@@ -626,15 +626,15 @@ export default function LipSyncStudio({
   // ── Generation ──────────────────────────────────────────────────────────
   const handleGenerate = async () => {
     if (!audioUrl) {
-      alert("Please upload an audio file first.");
+      alert("Пожалуйста, сначала загрузите аудиофайл.");
       return;
     }
     if (inputMode === "image" && !imageUrl) {
-      alert("Please upload a portrait image first.");
+      alert("Пожалуйста, сначала загрузите портретное изображение.");
       return;
     }
     if (inputMode === "video" && !videoUrl) {
-      alert("Please upload a source video first.");
+      alert("Пожалуйста, сначала загрузите исходное видео.");
       return;
     }
 
@@ -654,7 +654,7 @@ export default function LipSyncStudio({
 
       const res = await processLipSync(apiKey, lipsyncParams);
 
-      if (!res?.url) throw new Error("No video URL returned by API");
+      if (!res?.url) throw new Error("API не вернул ссылку на видео");
 
       const genId = res.id || Date.now().toString();
       const entry = {
@@ -681,7 +681,7 @@ export default function LipSyncStudio({
       }
     } catch (e) {
       console.error("[LipSyncStudio]", e);
-      setGenerateError(e.message?.slice(0, 80) ?? "Unknown error");
+      setGenerateError(e.message?.slice(0, 80) ?? "Неизвестная ошибка");
       setTimeout(() => setGenerateError(null), 4000);
     } finally {
       setIsGenerating(false);
@@ -709,17 +709,17 @@ export default function LipSyncStudio({
     inputMode === "image"
       ? imageState === UPLOAD_STATE.READY
         ? `✓ ${imageName}`
-        : "No image"
+        : "Нет изображения"
       : videoState === UPLOAD_STATE.READY
         ? `✓ ${videoName}`
-        : "No video";
+        : "Нет видео";
   const mediaStatusClass =
     (inputMode === "image" ? imageState : videoState) === UPLOAD_STATE.READY
       ? "text-primary"
       : "text-muted";
 
   const audioStatusText =
-    audioState === UPLOAD_STATE.READY ? `✓ ${audioName}` : "No audio";
+    audioState === UPLOAD_STATE.READY ? `✓ ${audioName}` : "Нет аудио";
   const audioStatusClass =
     audioState === UPLOAD_STATE.READY ? "text-primary" : "text-muted";
 
@@ -764,7 +764,7 @@ export default function LipSyncStudio({
                 <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     type="button"
-                    title="Fullscreen"
+                    title="На весь экран"
                     onClick={(e) => {
                       e.stopPropagation();
                       setFullscreenUrl(entry.url);
@@ -780,7 +780,7 @@ export default function LipSyncStudio({
                   </button>
                   <button
                     type="button"
-                    title="Download"
+                    title="Скачать"
                     onClick={(e) => {
                       e.stopPropagation();
                       downloadFile(entry.url, `lipsync-${entry.id || idx}.mp4`);
@@ -824,11 +824,11 @@ export default function LipSyncStudio({
               </div>
             </div>
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight mb-4 text-center px-4">
-              <span className="text-white/40 font-medium">START CREATING WITH</span><br />
-              <span className="text-white">LIP SYNC</span>
+              <span className="text-white/40 font-medium">НАЧНИТЕ СОЗДАВАТЬ С</span><br />
+              <span className="text-white">СИНХРОНИЗАЦИИ ГУБ</span>
             </h1>
             <p className="text-white/40 text-sm md:text-base font-medium tracking-wide text-center max-w-lg leading-relaxed">
-              Animate portraits or sync lips to audio with AI
+              Анимируйте портреты или синхронизируйте губы с аудио с помощью ИИ
             </p>
           </div>
         )}
@@ -848,7 +848,7 @@ export default function LipSyncStudio({
                   : "border-white/[0.03] bg-white/[0.03] text-white/40 hover:border-white/20 hover:text-white"
               }`}
             >
-              🖼 Portrait Image
+              🖼 Портрет
             </button>
             <button
               type="button"
@@ -859,7 +859,7 @@ export default function LipSyncStudio({
                   : "border-white/[0.03] bg-white/[0.03] text-white/40 hover:border-white/20 hover:text-white"
               }`}
             >
-              🎬 Video
+              🎬 Видео
             </button>
           </div>
 
@@ -952,7 +952,7 @@ export default function LipSyncStudio({
                 <textarea
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="Describe speech style..."
+                  placeholder="Опишите стиль речи..."
                   className="w-full bg-transparent border-none text-white text-sm placeholder:text-white/10 focus:outline-none resize-none pt-1 leading-relaxed min-h-[40px] max-h-[150px] md:max-h-[250px] overflow-y-auto custom-scrollbar disabled:opacity-40"
                   rows={1}
                 />
@@ -1048,13 +1048,13 @@ export default function LipSyncStudio({
                   <span className="animate-spin inline-block text-black">
                     ◌
                   </span>{" "}
-                  Generating...
+                  Создание...
                 </>
               ) : generateError ? (
                 `Error: ${generateError}`
               ) : (
                 <>
-                  <span>Sync Lip</span>
+                  <span>Синхронизировать</span>
                 </>
               )}
             </button>

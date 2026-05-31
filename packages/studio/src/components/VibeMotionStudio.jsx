@@ -172,15 +172,15 @@ export default function VibeMotionStudio({ apiKey }) {
         // Known backend limitation — warn only (not error), keep console clean
         console.warn("[VibeMotionStudio] Remix unavailable:", raw.slice(0, 120));
         setGenerateError(
-          "This generation can't be remixed — the animation code wasn't saved server-side. " +
-          "Generate a new motion graphic first, then remix that result."
+          "Эту генерацию нельзя ремиксировать — код анимации не был сохранён на сервере. " +
+          "Сначала создайте новую моушн-графику, затем ремиксируйте её."
         );
         // Exit edit mode WITHOUT persisting canEdit:false — let user retry after refresh
         setEditMode(false);
         setEditSourceId(null);
       } else {
         console.error("[VibeMotionStudio]", err);
-        setGenerateError(raw.slice(0, 120) || "Generation failed");
+        setGenerateError(raw.slice(0, 120) || "Ошибка генерации");
       }
       setTimeout(() => setGenerateError(null), 10000);
     } finally {
@@ -249,9 +249,9 @@ export default function VibeMotionStudio({ apiKey }) {
               </div>
               <div className="flex flex-col items-center gap-1">
                 <span className="text-white/80 font-semibold text-sm">
-                  {editMode ? "Remixing motion graphics…" : "Generating motion graphics…"}
+                  {editMode ? "Ремикс моушн-графики…" : "Создание моушн-графики…"}
                 </span>
-                <span className="text-white/30 text-xs">React/Remotion rendering on Modal</span>
+                <span className="text-white/30 text-xs">Рендеринг React/Remotion</span>
               </div>
               <div className="flex items-center gap-2 text-white/30 text-xs bg-white/[0.03] px-4 py-1.5 rounded-full border border-white/[0.05]">
                 <svg className="animate-spin" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
@@ -290,14 +290,14 @@ export default function VibeMotionStudio({ apiKey }) {
                     ? "bg-[#22d3ee]/20 text-[#22d3ee] border-[#22d3ee]/30"
                     : "bg-violet-600/30 text-violet-300 border-violet-500/30"
                 }`}>
-                  {entry.mode === "edit" ? "✏ Edit" : "✦ Generated"}
+                  {entry.mode === "edit" ? "✏ Редактировать" : "✦ Создано"}
                 </div>
 
                 {/* ── Hover overlay actions ── */}
                 <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     type="button"
-                    title="Fullscreen"
+                    title="На весь экран"
                     onClick={(e) => { e.stopPropagation(); setFullscreenUrl(entry.url); }}
                     className="p-2 bg-black/60 backdrop-blur-md rounded-full text-white hover:bg-primary hover:text-black transition-all border border-white/10"
                   >
@@ -310,7 +310,7 @@ export default function VibeMotionStudio({ apiKey }) {
                   </button>
                   <button
                     type="button"
-                    title="Download"
+                    title="Скачать"
                     onClick={(e) => { e.stopPropagation(); downloadFile(entry.url, `motion-${entry.id || idx}.mp4`); }}
                     className="p-2 bg-black/60 backdrop-blur-md rounded-full text-white hover:bg-primary hover:text-black transition-all border border-white/10"
                   >
@@ -321,7 +321,7 @@ export default function VibeMotionStudio({ apiKey }) {
                   {entry.requestId && entry.canEdit !== false ? (
                     <button
                       type="button"
-                      title="Remix this generation"
+                      title="Ремикс этой генерации"
                       onClick={(e) => {
                         e.stopPropagation();
                         setEditMode(true);
@@ -337,9 +337,9 @@ export default function VibeMotionStudio({ apiKey }) {
                       </svg>
                     </button>
                   ) : entry.requestId && entry.canEdit === false ? (
-                    /* Legacy generation — animation code not saved by API, remix not available */
+                    /* Старая генерация — код анимации не сохранён API, ремикс недоступен */
                     <div
-                      title="Legacy generation — remix not available. Generate a new motion graphic to enable editing."
+                      title="Старая генерация — код анимации не сохранён API, ремикс недоступен."
                       className="p-2 bg-black/60 backdrop-blur-md rounded-full text-white/20 border border-white/5 cursor-not-allowed"
                     >
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-40">
@@ -388,11 +388,11 @@ export default function VibeMotionStudio({ apiKey }) {
               </div>
             </div>
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight mb-4 text-center px-4">
-              <span className="text-white/40 font-medium">START CREATING WITH</span><br />
+              <span className="text-white/40 font-medium">НАЧНИТЕ СОЗДАВАТЬ С</span><br />
               <span className="text-white">VIBE MOTION</span>
             </h1>
             <p className="text-white/40 text-sm md:text-base font-medium tracking-wide text-center max-w-lg leading-relaxed">
-              Generate animated motion graphics from a text prompt — kinetic typography, data charts, logo reveals and more
+              Создавайте анимированную моушн-графику из текста — кинетическая типографика, графики, логотип-ревилы и многое другое
             </p>
           </div>
         ) : null}
@@ -412,7 +412,7 @@ export default function VibeMotionStudio({ apiKey }) {
               <span>
                 {sourceEntry
                   ? `Editing: "${sourceEntry.prompt?.slice(0, 50)}${sourceEntry.prompt?.length > 50 ? "…" : ""}"`
-                  : "Select a source generation from the gallery"}
+                  : "Выберите исходную генерацию из галереи"}
               </span>
               <button
                 onClick={() => { setEditMode(false); setEditSourceId(null); setPrompt(""); }}
@@ -432,7 +432,7 @@ export default function VibeMotionStudio({ apiKey }) {
                   !editMode ? "bg-[#22d3ee] text-black shadow" : "text-white/40 hover:text-white/70"
                 }`}
               >
-                Generate
+                Создать
               </button>
               <button
                 type="button"
@@ -442,7 +442,7 @@ export default function VibeMotionStudio({ apiKey }) {
                   editMode ? "bg-[#22d3ee] text-black shadow" : "text-white/40 hover:text-white/70"
                 }`}
               >
-                Edit
+                Редактировать
               </button>
             </div>
 
@@ -455,8 +455,8 @@ export default function VibeMotionStudio({ apiKey }) {
                 onKeyDown={handleKeyDown}
                 placeholder={
                   editMode
-                    ? "Describe what to change — 'change background to dark navy, make bars gold, add particles…'"
-                    : "Describe the motion graphic — 'Animated sales dashboard with glowing bar charts and rising numbers'"
+                    ? "Опишите что изменить — 'сменить фон на тёмно-синий, сделать столбцы золотыми, добавить частицы…'"
+                    : "Опишите моушн-графику — 'Анимированный дашборд продаж со светящимися диаграммами'"
                 }
                 rows={1}
                 className="w-full bg-transparent border-none text-white text-sm placeholder:text-white/10 focus:outline-none resize-none pt-1 leading-relaxed min-h-[40px] max-h-[150px] md:max-h-[250px] overflow-y-auto custom-scrollbar"
@@ -495,7 +495,7 @@ export default function VibeMotionStudio({ apiKey }) {
                 </button>
                 {openDropdown === "ar" && (
                   <div className="absolute bottom-[calc(100%+12px)] left-0 z-50 bg-[#0a0a0a] rounded-lg p-3 shadow-2xl border border-white/[0.05] min-w-[140px]">
-                    <div className="text-xs font-bold text-white/20 border-b border-white/[0.03] mb-2">Aspect Ratio</div>
+                    <div className="text-xs font-bold text-white/20 border-b border-white/[0.03] mb-2">Соотношение сторон</div>
                     <div className="flex flex-col gap-1">
                       {ASPECT_RATIOS.map((ar) => (
                         <div
@@ -531,7 +531,7 @@ export default function VibeMotionStudio({ apiKey }) {
                 </button>
                 {openDropdown === "dur" && (
                   <div className="absolute bottom-[calc(100%+12px)] left-0 z-50 bg-[#0a0a0a] rounded-md p-3 shadow-2xl border border-white/10 min-w-[140px] max-h-52 overflow-y-auto custom-scrollbar">
-                    <div className="text-xs font-bold text-white/20 border-b border-white/[0.03] mb-2">Duration</div>
+                    <div className="text-xs font-bold text-white/20 border-b border-white/[0.03] mb-2">Длительность</div>
                     <div className="flex flex-col gap-1">
                       {DURATION_OPTIONS.map((d) => (
                         <div
@@ -563,7 +563,7 @@ export default function VibeMotionStudio({ apiKey }) {
                       </svg>
                     </div>
                     <span className="text-xs font-semibold text-[#22d3ee]/70 group-hover:text-[#22d3ee] transition-colors max-w-[120px] truncate">
-                      {sourceEntry ? `Source: ${sourceEntry.prompt?.slice(0, 20)}…` : "Pick source…"}
+                      {sourceEntry ? `Source: ${sourceEntry.prompt?.slice(0, 20)}…` : "Выберите источник…"}
                     </span>
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="opacity-30 flex-shrink-0">
                       <path d="M6 9l6 6 6-6"/>
@@ -571,7 +571,7 @@ export default function VibeMotionStudio({ apiKey }) {
                   </button>
                   {openDropdown === "source" && (
                     <div className="absolute bottom-[calc(100%+12px)] left-0 z-50 w-64 bg-[#0a0a0a] rounded-lg p-3 shadow-2xl border border-white/[0.05] max-h-64 overflow-y-auto custom-scrollbar">
-                      <div className="text-xs font-bold text-white/20 border-b border-white/[0.03] mb-2">Source Generation</div>
+                      <div className="text-xs font-bold text-white/20 border-b border-white/[0.03] mb-2">Исходная генерация</div>
                       <div className="flex flex-col gap-1">
                         {editSources.map((src) => (
                           <div
@@ -595,7 +595,7 @@ export default function VibeMotionStudio({ apiKey }) {
                 </div>
               )}
 
-              <span className="text-[10px] text-white/20 hidden sm:block ml-2">Ctrl+Enter to run</span>
+              <span className="text-[10px] text-white/20 hidden sm:block ml-2">Ctrl+Enter для запуска</span>
             </div>
 
             {/* ── Generate Button — matches VideoStudio exactly ── */}
@@ -608,14 +608,14 @@ export default function VibeMotionStudio({ apiKey }) {
               {generating ? (
                 <>
                   <span className="animate-spin inline-block text-black">◌</span>{" "}
-                  {editMode ? "Remixing..." : "Generating..."}
+                  {editMode ? "Ремикс..." : "Создание..."}
                 </>
               ) : generateError ? (
                 `Error: ${generateError.slice(0, 40)}…`
               ) : editMode ? (
-                <span>Remix</span>
+                <span>Ремикс</span>
               ) : (
-                <span>Generate</span>
+                <span>Создать</span>
               )}
             </button>
           </div>

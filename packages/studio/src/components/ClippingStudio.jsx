@@ -130,11 +130,11 @@ export default function ClippingStudio({
 
   const ASPECT_RATIOS = [
     { label: "9:16 (TikTok / Reels / Shorts)", value: "9:16" },
-    { label: "16:9 (YouTube / TV)", value: "16:9" },
-    { label: "1:1 (Instagram Square)", value: "1:1" },
-    { label: "4:5 (Instagram Portrait)", value: "4:5" },
-    { label: "4:3 (Classic Video)", value: "4:3" },
-    { label: "3:4 (Portrait)", value: "3:4" },
+    { label: "16:9 (YouTube / ТВ)", value: "16:9" },
+    { label: "1:1 (Instagram Квадрат)", value: "1:1" },
+    { label: "4:5 (Instagram Портрет)", value: "4:5" },
+    { label: "4:3 (Классическое видео)", value: "4:3" },
+    { label: "3:4 (Портрет)", value: "3:4" },
   ];
 
   // Close dropdown when clicking outside
@@ -261,7 +261,7 @@ export default function ClippingStudio({
   // ── Copy Link & Download Helpers ─────────────────────────────────────────
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
-    alert("URL copied to clipboard!");
+    alert("URL скопирован в буфер!");
   };
 
   const downloadVideo = async (url, title = "clipped_video") => {
@@ -321,7 +321,7 @@ export default function ClippingStudio({
   // ── Dispatch Run / Call submitAndPoll ────────────────────────────────────
   const handleGenerate = async () => {
     if (!videoUrl) {
-      alert("Please upload a video or paste a video URL first.");
+      alert("Пожалуйста, загрузите видео или вставьте URL сначала.");
       return;
     }
 
@@ -356,7 +356,7 @@ export default function ClippingStudio({
       // Mock coordinates if API succeeded but modal coordinates are empty in coordinate-only mode
       if (returnCoordinatesOnly && newResult.coordinates.length === 0) {
         newResult.coordinates = Array.from({ length: numHighlights }).map((_, idx) => ({
-          label: `Highlight #${idx + 1}`,
+          label: `Хайлайт №${idx + 1}`,
           start_time: idx * 15,
           end_time: (idx + 1) * 15,
           start: idx * 15,
@@ -380,7 +380,7 @@ export default function ClippingStudio({
       }
     } catch (err) {
       console.error("[ClippingStudio] Error generating clips:", err);
-      setGenerateError(err.message || "Failed to process AI clipping.");
+      setGenerateError(err.message || "Ошибка обработки ИИ-нарезки.");
     } finally {
       setIsGenerating(false);
     }
@@ -421,11 +421,11 @@ export default function ClippingStudio({
               </div>
             </div>
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight mb-4 text-center px-4">
-              <span className="text-white/40 font-medium">START CREATING WITH</span><br />
-              <span className="text-white">AI CLIPPING STUDIO</span>
+              <span className="text-white/40 font-medium">НАЧНИТЕ СОЗДАВАТЬ С</span><br />
+              <span className="text-white">СТУДИИ ИИ-НАРЕЗКИ</span>
             </h1>
             <p className="text-white/40 text-sm md:text-base font-medium tracking-wide text-center max-w-lg leading-relaxed">
-              Extract viral highlights and timings from your videos automatically
+              Автоматически извлекайте вирусные хайлайты из ваших видео
             </p>
           </div>
         )}
@@ -436,10 +436,10 @@ export default function ClippingStudio({
             <div className="flex items-center justify-between border-b border-white/5 pb-4">
               <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
                 <ScissorsIcon className="text-primary w-4 h-4" />
-                Clipping History Runs
+                История нарезок
               </h2>
               <span className="text-xs font-bold text-zinc-400 bg-white/5 border border-white/5 px-2.5 py-1 rounded">
-                {history.length} Saved Generations
+                {history.length} Сохранённых генераций
               </span>
             </div>
 
@@ -489,7 +489,7 @@ export default function ClippingStudio({
                         {entry.videoUrl.split('/').pop() || "source_video.mp4"}
                       </h4>
                       <p className="text-[9px] text-zinc-500 font-semibold uppercase tracking-wider">
-                        {entry.returnCoordinatesOnly ? "Timeline Seek Mode" : "Clips Gallery Mode"}
+                        {entry.returnCoordinatesOnly ? "Режим временной шкалы" : "Режим галереи клипов"}
                       </p>
                     </div>
                     <div className="flex items-center justify-between mt-1">
@@ -521,11 +521,11 @@ export default function ClippingStudio({
                   <line x1="19" y1="12" x2="5" y2="12" />
                   <polyline points="12 19 5 12 12 5" />
                 </svg>
-                Back to History
+                Назад к истории
               </button>
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-bold text-primary bg-primary/10 border border-primary/20 px-2.5 py-0.5 rounded">
-                  {result.returnCoordinatesOnly ? "Timeline Seek Mode" : "Clips Gallery Mode"}
+                  {result.returnCoordinatesOnly ? "Режим временной шкалы" : "Режим галереи клипов"}
                 </span>
                 <span className="text-[10px] text-zinc-400 bg-white/5 border border-white/5 px-2.5 py-0.5 rounded">
                   {result.aspectRatio}
@@ -539,7 +539,7 @@ export default function ClippingStudio({
                 {/* Left Side: Original Player */}
                 <div className="flex-1 bg-black border border-zinc-900 rounded-lg overflow-hidden flex flex-col shadow-2xl relative min-h-[300px] lg:min-h-0">
                   <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-md border border-white/5 z-10 text-[10px] uppercase font-bold tracking-wider text-primary">
-                    Original Video Player
+                    Оригинальный видеоплеер
                   </div>
                   <video
                     ref={mainVideoRef}
@@ -554,10 +554,10 @@ export default function ClippingStudio({
                 <div className="w-full lg:w-[350px] border border-zinc-900 bg-zinc-950/40 backdrop-blur-md rounded-lg p-5 flex flex-col min-h-[350px] lg:min-h-0">
                   <div className="pb-4 border-b border-zinc-900 flex items-center justify-between">
                     <h3 className="text-xs font-black text-white uppercase tracking-widest">
-                      Highlights Timeline
+                      Временная шкала хайлайтов
                     </h3>
                     <span className="text-[10px] font-bold text-zinc-400 bg-zinc-900 px-2 py-0.5 rounded border border-zinc-800">
-                      {result.coordinates?.length || 0} Matches
+                      {result.coordinates?.length || 0} Совпадений
                     </span>
                   </div>
 
@@ -584,11 +584,11 @@ export default function ClippingStudio({
                           >
                             <div className="flex items-center justify-between w-full">
                               <span className={`text-xs font-bold transition-colors ${isActive ? "text-primary" : "text-white"}`}>
-                                {hl.label || `Highlight #${i + 1}`}
+                                {hl.label || `Хайлайт №${i + 1}`}
                               </span>
                               {hl.score && (
                                 <span className="text-[9px] font-black text-emerald-400 bg-emerald-400/10 px-1.5 py-0.5 rounded border border-emerald-400/20">
-                                  {(hl.score * 100).toFixed(0)}% Score
+                                  {(hl.score * 100).toFixed(0)}% Оценка
                                 </span>
                               )}
                             </div>
@@ -600,14 +600,14 @@ export default function ClippingStudio({
                             </div>
                             
                             <div className="flex items-center gap-1.5 text-[10px] font-bold text-primary mt-1 opacity-0 group-hover/hl:opacity-100 transition-opacity">
-                              <PlayIcon /> Seek & Play
+                              <PlayIcon /> Перейти и воспроизвести
                             </div>
                           </button>
                         );
                       })
                     ) : (
                       <div className="text-center py-8 text-xs text-zinc-500 font-semibold">
-                        No highlights extracted.
+                        Хайлайты не извлечены.
                       </div>
                     )}
                   </div>
@@ -618,10 +618,10 @@ export default function ClippingStudio({
               <div className="space-y-5">
                 <div className="flex items-center justify-between border-b border-zinc-900 pb-3.5">
                   <h3 className="text-xs font-black text-white uppercase tracking-widest">
-                    Extracted Video Clips
+                    Извлечённые клипы
                   </h3>
                   <span className="text-[10px] font-bold text-zinc-400 bg-zinc-900 px-2.5 py-1 rounded border border-zinc-800">
-                    Aspect Ratio: {result.aspectRatio}
+                    Соотношение сторон: {result.aspectRatio}
                   </span>
                 </div>
 
@@ -691,14 +691,14 @@ export default function ClippingStudio({
                           </div>
 
                           <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-md px-2 py-1 rounded border border-white/5 text-[9px] uppercase font-black tracking-wider text-primary">
-                            Clip #{i + 1}
+                            Клип №{i + 1}
                           </div>
                         </div>
 
                         <div className="p-3 bg-black/80 backdrop-blur-sm border-t border-white/5 flex-1 flex flex-col justify-between gap-2">
                           <div className="flex items-center justify-between mt-1">
                             <span className="text-[10px] font-bold text-primary px-2 py-0.5 bg-primary/10 rounded border border-primary/20 whitespace-nowrap">
-                              Clip #{i + 1}
+                              Клип №{i + 1}
                             </span>
                             <span className="text-[10px] text-white/40">{result.aspectRatio}</span>
                           </div>
@@ -708,7 +708,7 @@ export default function ClippingStudio({
                   </div>
                 ) : (
                   <div className="py-20 text-center text-xs text-zinc-500 font-semibold border border-zinc-900 rounded bg-zinc-950/20">
-                    No video clips generated. Try re-running.
+                    Клипы не созданы. Попробуйте ещё раз.
                   </div>
                 )}
               </div>
@@ -736,7 +736,7 @@ export default function ClippingStudio({
             {/* Sleek round upload button */}
             <button
               type="button"
-              title={videoUrl ? "Clear video" : "Upload source video"}
+              title={videoUrl ? "Очистить видео" : "Загрузить исходное видео"}
               onClick={() => videoUrl ? clearVideoUpload() : videoFileInputRef.current?.click()}
               className={`w-10 h-10 shrink-0 rounded-full border transition-all flex items-center justify-center relative overflow-hidden ${
                 videoUrl 
@@ -787,7 +787,7 @@ export default function ClippingStudio({
                 ref={textareaRef}
                 value={videoUrl}
                 onChange={handleUrlInput}
-                placeholder="Upload a video file or paste a video S3 URL here..."
+                placeholder="Загрузите видеофайл или вставьте URL видео..."
                 rows={1}
                 className="w-full bg-transparent border-none text-white text-sm placeholder:text-white/20 focus:outline-none resize-none pt-1 leading-relaxed min-h-[40px] max-h-[150px] overflow-y-auto custom-scrollbar disabled:opacity-40"
               />
@@ -819,7 +819,7 @@ export default function ClippingStudio({
                   <span className="text-[9px] font-bold text-black uppercase">C</span>
                 </div>
                 <span className="text-[11px] font-semibold text-white/70">
-                  AI Clipping
+                  ИИ-нарезка
                 </span>
               </div>
 
@@ -841,7 +841,7 @@ export default function ClippingStudio({
                 {aspectDropdownOpen && (
                   <div className="absolute bottom-[calc(100%+12px)] left-0 z-50 bg-[#0a0a0a] rounded-lg p-3 shadow-2xl border border-white/[0.05] min-w-[160px]">
                     <div className="text-xs font-bold text-white/20 border-b border-white/[0.03] mb-2">
-                      Aspect Ratio
+                      Соотношение сторон
                     </div>
                     <div className="flex flex-col gap-1 max-h-60 overflow-y-auto custom-scrollbar">
                       {ASPECT_RATIOS.map((r) => (
@@ -880,11 +880,11 @@ export default function ClippingStudio({
                 {highlightsDropdownOpen && (
                   <div className="absolute bottom-[calc(100%+12px)] left-0 z-50 bg-[#0a0a0a] rounded-md p-3 shadow-2xl border border-white/10 min-w-[180px]">
                     <div className="text-xs font-bold text-white/20 border-b border-white/[0.03] mb-3">
-                      Max Highlights
+                      Макс. хайлайтов
                     </div>
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs text-white/60">Limit:</span>
+                        <span className="text-xs text-white/60">Лимит:</span>
                         <span className="text-xs font-black text-primary bg-primary/10 px-2.5 py-0.5 rounded">
                           {numHighlights}
                         </span>
@@ -914,7 +914,7 @@ export default function ClippingStudio({
                 }`}
               >
                 <ScissorsIcon className="w-3.5 h-3.5 text-current" />
-                <span>Coordinates Only</span>
+                <span>Только координаты</span>
               </button>
 
             </div>
@@ -934,7 +934,7 @@ export default function ClippingStudio({
               ) : (
                 <>
                   <ScissorsIcon className="text-black w-4 h-4" />
-                  <span>Generate</span>
+                  <span>Создать</span>
                 </>
               )}
             </button>
