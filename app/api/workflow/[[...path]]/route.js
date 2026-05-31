@@ -409,6 +409,21 @@ export async function GET(request, { params }) {
         return NextResponse.json(getNodeSchemas());
     }
 
+    // GET /api/workflow/debug-models — list models available on Memefast key
+    if (path[0] === 'debug-models') {
+        const apiKey = request.headers.get('authorization')?.replace('Bearer ', '') || '';
+        try {
+            const r = await fetch(`${MEMEFAST}/v1/models`, {
+                headers: { 'Authorization': `Bearer ${apiKey}` }
+            });
+            const data = await r.json();
+            const ids = (data.data || []).map(m => m.id).sort();
+            return NextResponse.json({ ok: r.ok, status: r.status, count: ids.length, models: ids });
+        } catch (e) {
+            return NextResponse.json({ ok: false, error: e.message });
+        }
+    }
+
     // GET /api/workflow/run/{runId}/status
     if (path[0] === 'run' && path[2] === 'status') {
         const runId = path[1];
