@@ -11,6 +11,28 @@ function emptyWorkflow(id) {
     return { workflow_id: id, id, name: 'Untitled', nodes: [], edges: [], created_at: new Date().toISOString() };
 }
 
+// Fal.ai image models — routed to /fal-ai/{model} instead of /v1/images/generations
+// Model IDs map to their Fal.ai path segments
+const FAL_IMAGE_MODEL_MAP = {
+    'nano-banana':          'nano-banana',
+    'nano-banana-edit':     'nano-banana',
+    'nano-banana-pro':      'nano-banana-pro',
+    'nano-banana-pro-edit': 'nano-banana-pro',
+    'flux-schnell':         'flux/schnell',
+    'flux-2-dev':           'flux/dev',
+    'flux-2-dev-edit':      'flux/dev',
+    'flux-2-flex':          'flux/dev/play',
+    'flux-2-flex-edit':     'flux/dev/play',
+    'flux-2-pro':           'flux-pro/v1',
+    'flux-2-pro-edit':      'flux-pro/v1',
+    'chroma-image':         'chroma',
+    'z-image-turbo':        'z-image-turbo',
+    'wan2.5-text-to-image': 'wan/v2.5/text-to-image',
+    'wan2.5-image-edit':    'wan/v2.5/image-to-image',
+    'wan2.6-text-to-image': 'wan/v2.6/text-to-image',
+    'wan2.6-image-edit':    'wan/v2.6/image-to-image',
+};
+
 // Video model IDs (need /v1/video/create endpoint)
 const VIDEO_MODELS = new Set([
     'video-passthrough','seedance-lite-i2v','seedance-lite-t2v','seedance-pro-t2v','seedance-pro-i2v',
@@ -53,6 +75,52 @@ async function generateImage(apiKey, model, params) {
     const data = await res.json();
     const url = data.data?.[0]?.url || data.url || '';
     return [{ type: 'image_url', value: url }];
+}
+
+async function generateFalImage(apiKey, model, params) {
+    const falPath = FAL_IMAGE_MODEL_MAP[model] || model;
+    const imageSize = (params.width && params.height)
+        ? { width: parseInt(params.width), height: parseInt(params.height) }
+        : params.aspect_ratio === '16:9' ? 'landscape_16_9'
+        : params.aspect_ratio === '9:16' ? 'portrait_16_9'
+        : params.aspect_ratio === '4:3' ? 'landscape_4_3'
+        : params.aspect_ratio === '3:4' ? 'portrait_4_3'
+        : 'square_hd';
+
+    const body = { prompt: params.prompt || '', num_images: 1, image_size: imageSize };
+    const imgInput = params.image_url || (params.images_list?.[0]);
+    if (imgInput) body.image_url = imgInput;
+
+    const res = await fetch(`${MEMEFAST}/fal-ai/${falPath}`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+        const txt = await res.text().catch(() => res.statusText);
+        throw new Error(`Fal API ${res.status}: ${txt.slice(0, 300)}`);
+    }
+    const data = await res.json();
+
+    // Synchronous response
+    if (data.images?.length) return [{ type: 'image_url', value: data.images[0].url }];
+
+    // Queued/async response
+    const requestId = data.request_id;
+    if (!requestId) throw new Error('Fal API: no images and no request_id in response');
+
+    for (let i = 0; i < 60; i++) {
+        await new Promise(r => setTimeout(r, 4000));
+        const poll = await fetch(`${MEMEFAST}/fal-ai/${falPath}/requests/${requestId}`, {
+            headers: { 'Authorization': `Bearer ${apiKey}` },
+        });
+        if (!poll.ok) continue;
+        const pData = await poll.json();
+        if (pData.images?.length) return [{ type: 'image_url', value: pData.images[0].url }];
+        const st = (pData.status || '').toUpperCase();
+        if (st === 'ERROR' || st === 'FAILED') throw new Error(pData.error || 'Fal image generation failed');
+    }
+    throw new Error('Fal image generation timed out');
 }
 
 async function generateText(apiKey, model, params) {
@@ -120,8 +188,9 @@ async function runNode(runId, nodeId, model, params, apiKey) {
             outputs = await generateVideo(apiKey, model, params);
         } else if (TEXT_MODELS.has(model)) {
             outputs = await generateText(apiKey, model, params);
+        } else if (model in FAL_IMAGE_MODEL_MAP) {
+            outputs = await generateFalImage(apiKey, model, params);
         } else {
-            // Default to image
             outputs = await generateImage(apiKey, model, params);
         }
         runStore.set(runId, {
