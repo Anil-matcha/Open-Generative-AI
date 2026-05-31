@@ -44,6 +44,14 @@ const AUDIO_MODELS = new Set([
     'vidu-tts', 'qwen3-tts-flash',
 ]);
 
+// Fal.ai image models — use POST /fal-ai/{path} (separate registry, not in /v1/models)
+const FAL_IMAGE_MODEL_MAP = {
+    'nano-banana':          'nano-banana',
+    'nano-banana-edit':     'nano-banana',
+    'nano-banana-pro':      'nano-banana-pro',
+    'nano-banana-pro-edit': 'nano-banana-pro',
+};
+
 // Models that generate images via /v1/chat/completions (not /v1/images/generations)
 const CHAT_IMAGE_MODELS = new Set([
     'gemini-2.5-flash-image',
@@ -107,6 +115,45 @@ async function generateImage(apiKey, model, params) {
     const item = data.data?.[0];
     const url = item?.url || (item?.b64_json ? `data:image/png;base64,${item.b64_json}` : '') || data.url || '';
     return [{ type: 'image_url', value: url }];
+}
+
+async function generateFalImage(apiKey, model, params) {
+    const falPath = FAL_IMAGE_MODEL_MAP[model] || model;
+    const imageSize = (params.width && params.height)
+        ? { width: parseInt(params.width), height: parseInt(params.height) }
+        : params.aspect_ratio === '16:9' ? 'landscape_16_9'
+        : params.aspect_ratio === '9:16' ? 'portrait_16_9'
+        : params.aspect_ratio === '4:3'  ? 'landscape_4_3'
+        : 'square_hd';
+    const body = { prompt: params.prompt || '', num_images: 1, image_size: imageSize };
+    const imgInput = params.image_url || params.images_list?.[0];
+    if (imgInput) body.image_url = imgInput;
+
+    const res = await fetch(`${MEMEFAST}/fal-ai/${falPath}`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+        const txt = await res.text().catch(() => res.statusText);
+        throw new Error(`Fal API ${res.status}: ${txt.slice(0, 300)}`);
+    }
+    const data = await res.json();
+    if (data.images?.length) return [{ type: 'image_url', value: data.images[0].url }];
+    const requestId = data.request_id;
+    if (!requestId) throw new Error('Fal API: no images and no request_id in response');
+    for (let i = 0; i < 60; i++) {
+        await new Promise(r => setTimeout(r, 4000));
+        const poll = await fetch(`${MEMEFAST}/fal-ai/${falPath}/requests/${requestId}`, {
+            headers: { 'Authorization': `Bearer ${apiKey}` },
+        });
+        if (!poll.ok) continue;
+        const pData = await poll.json();
+        if (pData.images?.length) return [{ type: 'image_url', value: pData.images[0].url }];
+        const st = (pData.status || '').toUpperCase();
+        if (st === 'ERROR' || st === 'FAILED') throw new Error(pData.error || 'Fal image generation failed');
+    }
+    throw new Error('Fal image generation timed out');
 }
 
 async function generateChatImage(apiKey, model, params) {
@@ -232,6 +279,7 @@ async function runNode(runId, nodeId, model, params, apiKey) {
         else if (VIDEO_MODELS.has(model)) outputs = await generateVideo(apiKey, model, params);
         else if (TEXT_MODELS.has(model)) outputs = await generateText(apiKey, model, params);
         else if (AUDIO_MODELS.has(model)) outputs = await generateAudio(apiKey, model, params);
+        else if (model in FAL_IMAGE_MODEL_MAP) outputs = await generateFalImage(apiKey, model, params);
         else if (CHAT_IMAGE_MODELS.has(model)) outputs = await generateChatImage(apiKey, model, params);
         else outputs = await generateImage(apiKey, model, params);
 
@@ -290,6 +338,11 @@ function getNodeSchemas() {
             image: {
                 models: {
                     "image-passthrough":              T.imgPass,
+                    // Fal.ai (separate /fal-ai/ endpoint)
+                    "nano-banana":                    T.t2i,
+                    "nano-banana-edit":               T.i2i,
+                    "nano-banana-pro":                T.t2i,
+                    "nano-banana-pro-edit":           T.i2i,
                     // OpenAI Image
                     "gpt-image-2":                    T.t2iQ,
                     "gpt-image-1.5":                  T.t2iQ,
