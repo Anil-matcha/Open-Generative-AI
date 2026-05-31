@@ -67,8 +67,31 @@ const MODEL_ID_MAP = {
 async function generateImage(apiKey, model, params) {
     const apiModel = MODEL_ID_MAP[model] || model;
     const size = (params.width && params.height) ? `${params.width}x${params.height}` : '1024x1024';
-    const body = { model: apiModel, prompt: params.prompt || '', n: 1, size, response_format: 'url' };
     const imgInput = params.image_url || params.images_list?.[0];
+
+    // Use /v1/images/edits for image editing models that have an input image
+    if (imgInput && (model.includes('edit') || model.includes('reference') || model.includes('inpaint'))) {
+        const form = new FormData();
+        form.append('model', apiModel);
+        form.append('prompt', params.prompt || '');
+        form.append('n', '1');
+        form.append('size', size);
+        form.append('image[]', imgInput);
+        const editRes = await fetch(`${MEMEFAST}/v1/images/edits`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${apiKey}` },
+            body: form,
+        });
+        if (editRes.ok) {
+            const editData = await editRes.json();
+            const editItem = editData.data?.[0];
+            const editUrl = editItem?.url || (editItem?.b64_json ? `data:image/png;base64,${editItem.b64_json}` : '') || '';
+            if (editUrl) return [{ type: 'image_url', value: editUrl }];
+        }
+        // Fall through to standard generations if edits fails
+    }
+
+    const body = { model: apiModel, prompt: params.prompt || '', n: 1, size, response_format: 'url' };
     if (imgInput) body.image_url = imgInput;
 
     const res = await fetch(`${MEMEFAST}/v1/images/generations`, {
