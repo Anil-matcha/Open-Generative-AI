@@ -527,49 +527,62 @@ function lsSet(key, val) {
 function genId() { return `${Date.now()}_${Math.random().toString(36).slice(2, 7)}`; }
 
 // ── Workflows (local storage) ─────────────────────────────────────────────────
-export async function getTemplateWorkflows() { return []; }
-export async function getUserWorkflows()     { return lsGet('mf_workflows', []); }
-export async function getPublishedWorkflows(){ return []; }
+export async function getTemplateWorkflows(_apiKey) { return []; }
+export async function getUserWorkflows(_apiKey)     { return lsGet('mf_workflows', []); }
+export async function getPublishedWorkflows(_apiKey){ return []; }
 
-export async function createWorkflow(data = {}) {
+export async function createWorkflow(apiKey, data = {}) {
     const list = lsGet('mf_workflows', []);
-    const wf = { id: genId(), name: 'Новый процесс', description: '', nodes: [], edges: [], status: 'draft', created_at: new Date().toISOString(), updated_at: new Date().toISOString(), ...data };
+    const id = genId();
+    const wf = {
+        id,
+        workflow_id: id,
+        name: data?.name || 'Untitled Workflow',
+        description: data?.description || '',
+        nodes: data?.data?.nodes || [],
+        edges: data?.edges || [],
+        status: 'draft',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+    };
     list.push(wf);
     lsSet('mf_workflows', list);
     return wf;
 }
-export async function updateWorkflowName(id, name) {
+export async function updateWorkflowName(apiKey, id, name) {
     const list = lsGet('mf_workflows', []);
-    const idx = list.findIndex(w => w.id === id);
-    if (idx !== -1) { list[idx] = { ...list[idx], name, updated_at: new Date().toISOString() }; lsSet('mf_workflows', list); return list[idx]; }
+    const idx = list.findIndex(w => w.id === id || w.workflow_id === id);
+    if (idx !== -1) {
+        list[idx] = { ...list[idx], name, updated_at: new Date().toISOString() };
+        lsSet('mf_workflows', list);
+        return list[idx];
+    }
     return {};
 }
-export async function deleteWorkflow(id) {
-    lsSet('mf_workflows', lsGet('mf_workflows', []).filter(w => w.id !== id));
+export async function deleteWorkflow(apiKey, id) {
+    lsSet('mf_workflows', lsGet('mf_workflows', []).filter(w => w.id !== id && w.workflow_id !== id));
     return { success: true };
 }
-export async function getWorkflowData(id) {
-    return lsGet('mf_workflows', []).find(w => w.id === id) || {};
+export async function getWorkflowData(apiKey, id) {
+    return lsGet('mf_workflows', []).find(w => w.id === id || w.workflow_id === id) || { nodes: [], edges: [] };
 }
-export async function getWorkflowInputs()    { return {}; }
-export async function getAllNodeSchemas()     { return {}; }
-export async function getNodeSchemas()       { return {}; }
-export async function calculateDynamicCost() { return { cost: 0 }; }
-export async function executeWorkflow(...args) {
-    const apiKey = args.find(a => typeof a === 'string' && a.length > 10);
-    const inputs = args.find(a => a && typeof a === 'object') || {};
-    const prompt = typeof inputs === 'string' ? inputs : JSON.stringify(inputs);
+export async function getWorkflowInputs(_apiKey, _id)    { return { properties: {}, required: [] }; }
+export async function getAllNodeSchemas(_apiKey, _id)     { return []; }
+export async function getNodeSchemas(_apiKey)             { return []; }
+export async function calculateDynamicCost(_apiKey)      { return { cost: 0 }; }
+export async function executeWorkflow(apiKey, id, inputs) {
+    const prompt = typeof inputs === 'string' ? inputs : JSON.stringify(inputs || {});
     const response = await fetch(`${BASE_URL}/v1/chat/completions`, {
         method: 'POST', headers: bearerHeaders(apiKey),
-        body: JSON.stringify({ model: 'gpt-4o-mini', messages: [{ role: 'user', content: prompt || 'Run workflow' }] })
+        body: JSON.stringify({ model: 'gpt-4o-mini', messages: [{ role: 'user', content: `Run workflow inputs: ${prompt}` }] })
     });
     if (!response.ok) throw new Error(`Execution failed: ${response.status}`);
     const data = await response.json();
     return { output: data.choices?.[0]?.message?.content, status: 'completed' };
 }
-export async function runSingleNode(...args) { return { status: 'completed', output: {} }; }
-export async function deleteNodeRun()        { return {}; }
-export async function getNodeStatus()        { return { status: 'completed' }; }
+export async function runSingleNode(_apiKey, _type, _inputs) { return { status: 'completed', output: {} }; }
+export async function deleteNodeRun()                        { return {}; }
+export async function getNodeStatus()                        { return { status: 'completed' }; }
 
 // ── Agents (local storage) ────────────────────────────────────────────────────
 export async function getTemplateAgents()    { return []; }

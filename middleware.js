@@ -4,7 +4,10 @@ export function middleware(request) {
     const url = request.nextUrl;
 
     // Proxy /api/mf/* → https://memefast.top/*
-    if (url.pathname.startsWith('/api/mf/')) {
+    // Exclude /api/mf/workflow/* and /api/mf/agents/* — those are handled by local Next.js routes
+    if (url.pathname.startsWith('/api/mf/') &&
+        !url.pathname.startsWith('/api/mf/workflow') &&
+        !url.pathname.startsWith('/api/mf/agents')) {
         const targetPath = url.pathname.replace('/api/mf', '');
         const targetUrl = new URL(targetPath + url.search, 'https://memefast.top');
         return NextResponse.rewrite(targetUrl);
