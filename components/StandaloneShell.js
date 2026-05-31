@@ -7,24 +7,24 @@ import { ImageStudio, VideoStudio, ClippingStudio, VibeMotionStudio, LipSyncStud
 
 const DesignAgentStudio = dynamic(() => import('studio').then(mod => mod.DesignAgentStudio), {
   ssr: false,
-  loading: () => <div className="h-full w-full bg-black flex items-center justify-center text-white/20">Loading Design Studio...</div>
+  loading: () => <div className="h-full w-full bg-black flex items-center justify-center text-white/20">Загрузка студии дизайна...</div>
 });
 import axios from 'axios';
 import ApiKeyModal from './ApiKeyModal';
 
 const TABS = [
-  { id: 'image',   label: 'Image Studio' },
-  { id: 'video',   label: 'Video Studio' },
-  { id: 'audio',   label: 'Audio Studio' },
-  { id: 'clipping', label: 'AI Clipping' },
+  { id: 'image',   label: 'Студия фото' },
+  { id: 'video',   label: 'Студия видео' },
+  { id: 'audio',   label: 'Студия аудио' },
+  { id: 'clipping', label: 'ИИ-нарезка' },
   { id: 'vibe-motion', label: 'Vibe Motion' },
-  { id: 'lipsync', label: 'Lip Sync' },
-  { id: 'cinema',  label: 'Cinema Studio' },
-  { id: 'marketing', label: 'Marketing Studio' },
-  { id: 'workflows', label: 'Workflows' },
-  { id: 'agents', label: 'Agents' },
-  { id: 'design-agent', label: 'Design Agent' },
-  { id: 'apps', label: 'Explore Apps' },
+  { id: 'lipsync', label: 'Синхронизация губ' },
+  { id: 'cinema',  label: 'Кино-студия' },
+  { id: 'marketing', label: 'Маркетинг' },
+  { id: 'workflows', label: 'Процессы' },
+  { id: 'agents', label: 'Агенты' },
+  { id: 'design-agent', label: 'Дизайн-агент' },
+  { id: 'apps', label: 'Приложения' },
 ];
 
 const STORAGE_KEY = 'muapi_key';
@@ -131,18 +131,17 @@ export default function StandaloneShell() {
     }
   }, []);
 
-  // СТАЛО:
-useEffect(() => {
-  setHasMounted(true);
-  const stored = localStorage.getItem(STORAGE_KEY);
-  const envKey = process.env.NEXT_PUBLIC_MUAPI_KEY;
-  const keyToUse = stored || envKey;
-  if (keyToUse) {
-    setApiKey(keyToUse);
-    fetchBalance(keyToUse);
-    document.cookie = `muapi_key=${keyToUse}; path=/; max-age=31536000; SameSite=Lax`;
-  }
-}, [fetchBalance]);
+  useEffect(() => {
+    setHasMounted(true);
+    const stored = localStorage.getItem(STORAGE_KEY);
+    const envKey = process.env.NEXT_PUBLIC_MUAPI_KEY;
+    const keyToUse = stored || envKey;
+    if (keyToUse) {
+      setApiKey(keyToUse);
+      fetchBalance(keyToUse);
+      document.cookie = `muapi_key=${keyToUse}; path=/; max-age=31536000; SameSite=Lax`;
+    }
+  }, [fetchBalance]);
 
   const handleKeySave = useCallback((key) => {
     localStorage.setItem(STORAGE_KEY, key);
@@ -255,8 +254,8 @@ useEffect(() => {
               </svg>
             </div>
             <div className="flex flex-col items-center">
-              <span className="text-xl font-bold text-white">Drop your media here</span>
-              <span className="text-sm text-white/40">Images, videos, or audio files</span>
+              <span className="text-xl font-bold text-white">Перетащите файлы сюда</span>
+              <span className="text-sm text-white/40">Изображения, видео или аудио</span>
             </div>
           </div>
         </div>
@@ -316,14 +315,14 @@ useEffect(() => {
 
             <button
               onClick={() => setShowSettings(true)}
-              title="Settings — API key, local models, preferences"
+              title="Настройки — API-ключ, локальные модели, параметры"
               className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-white/10 bg-white/5 text-[13px] font-bold text-white/80 hover:text-white hover:bg-white/10 hover:border-white/20 transition-colors"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="3" />
                 <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
               </svg>
-              <span>Settings</span>
+              <span>Настройки</span>
             </button>
           </div>
         </header>
@@ -349,15 +348,15 @@ useEffect(() => {
       {showSettings && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in-up">
           <div className="bg-[#0a0a0a] border border-white/10 rounded-xl p-8 w-full max-w-sm shadow-2xl">
-            <h2 className="text-white font-bold text-lg mb-2">Settings</h2>
+            <h2 className="text-white font-bold text-lg mb-2">Настройки</h2>
             <p className="text-white/40 text-[13px] mb-8">
-              Manage your AI studio preferences and authentication.
+              Управление параметрами студии и аутентификацией.
             </p>
             
             <div className="space-y-4 mb-8">
               <div className="bg-white/5 border border-white/[0.03] rounded-md p-4">
                 <label className="block text-xs font-bold text-white/30 mb-2">
-                   Active API Key
+                   Активный API-ключ
                 </label>
                 <div className="text-[13px] font-mono text-white/80">
                   {apiKey.slice(0, 8)}••••••••••••••••
@@ -370,13 +369,13 @@ useEffect(() => {
                 onClick={handleKeyChange}
                 className="flex-1 h-10 rounded-md bg-red-500/10 text-red-400 hover:bg-red-500/20 text-xs font-semibold transition-all"
               >
-                Change Key
+                Сменить ключ
               </button>
               <button
                 onClick={() => setShowSettings(false)}
                 className="flex-1 h-10 rounded-md bg-white/5 text-white/80 hover:bg-white/10 text-xs font-semibold transition-all border border-white/5"
               >
-                Close
+                Закрыть
               </button>
             </div>
           </div>

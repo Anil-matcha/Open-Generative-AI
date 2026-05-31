@@ -9,7 +9,7 @@ export default function ApiKeyModal({ onSave, onClose, overlay = false, title, s
   const handleSubmit = (e) => {
     e.preventDefault();
     const trimmed = key.trim();
-    if (!trimmed) { setError('Please enter your API key'); return; }
+    if (!trimmed) { setError('Пожалуйста, введите ваш API-ключ'); return; }
     onSave(trimmed);
   };
 
@@ -43,7 +43,7 @@ export default function ApiKeyModal({ onSave, onClose, overlay = false, title, s
           </h1>
           <p className="text-white/40 text-[13px] leading-relaxed px-4">
             {subtitle || (
-              <>Enter your <a href="https://muapi.ai/access-keys" target="_blank" rel="noreferrer" className="text-[#22d3ee] hover:text-[#e5ff33] transition-colors">Muapi.ai</a> API key to start creating</>
+              <>Введите ваш API-ключ <a href="https://muapi.ai/access-keys" target="_blank" rel="noreferrer" className="text-[#22d3ee] hover:text-[#e5ff33] transition-colors">Muapi.ai</a> чтобы начать создавать</>
             )}
           </p>
         </div>
@@ -51,13 +51,13 @@ export default function ApiKeyModal({ onSave, onClose, overlay = false, title, s
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <label className="block text-xs font-bold text-white/30 ml-1">
-              API Access Key
+              Ключ доступа API
             </label>
             <input
               type="password"
               value={key}
               onChange={(e) => { setKey(e.target.value); setError(''); }}
-              placeholder="Paste your key here..."
+              placeholder="Вставьте ваш ключ сюда..."
               className="w-full bg-white/5 border border-white/[0.03] rounded-md px-5 py-3 text-sm text-white placeholder:text-white/10 focus:outline-none focus:ring-1 focus:ring-[#22d3ee]/30 focus:bg-white/[0.07] transition-all"
               suppressHydrationWarning
             />
@@ -69,13 +69,13 @@ export default function ApiKeyModal({ onSave, onClose, overlay = false, title, s
             className="w-full bg-[#22d3ee] text-black font-medium py-2.5 rounded-md hover:bg-[#e5ff33] hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-[#22d3ee]/5"
             suppressHydrationWarning
           >
-            Get Started
+            Начать
           </button>
 
           <p className="text-center text-[12px] text-white/20 pt-2">
-            Need a key?{' '}
+            Нет ключа?{' '}
             <a href="https://muapi.ai/access-keys" target="_blank" rel="noreferrer" className="text-white/40 hover:text-[#22d3ee] transition-colors font-medium">
-              Get one free →
+              Получить бесплатно →
             </a>
           </p>
         </form>

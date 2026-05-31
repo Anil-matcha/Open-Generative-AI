@@ -78,13 +78,16 @@ export function Header(navigate) {
         document.body.appendChild(SettingsModal());
     };
 
-    // Language toggle button
+    // Language toggle button (cycles: EN → 中文 → RU → EN)
     const langBtn = document.createElement('button');
     const currentLang = getLang();
+    const langCycle = { en: 'zh', zh: 'ru', ru: 'en' };
+    const langLabel = { en: 'EN', zh: '中文', ru: 'RU' };
+    const langTitle = { en: 'Switch to Chinese', zh: 'Переключить на русский', ru: 'Switch to English' };
     langBtn.className = 'flex items-center px-3 py-1.5 rounded-md border border-white/10 bg-white/5 text-[13px] font-bold text-white/80 hover:text-white hover:bg-white/10 hover:border-white/20 transition-colors';
-    langBtn.title = currentLang === 'zh' ? 'Switch to English' : '切换为中文';
-    langBtn.textContent = currentLang === 'zh' ? 'EN' : '中文';
-    langBtn.onclick = () => setLang(currentLang === 'zh' ? 'en' : 'zh');
+    langBtn.title = langTitle[currentLang] || 'Switch language';
+    langBtn.textContent = langLabel[currentLang] || 'EN';
+    langBtn.onclick = () => setLang(langCycle[currentLang] || 'en');
 
     rightPart.appendChild(langBtn);
     rightPart.appendChild(settingsBtn);
