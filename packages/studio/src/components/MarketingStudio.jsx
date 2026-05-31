@@ -232,7 +232,7 @@ function SimpleDropdown({ isOpen, title, options, selected, onSelect, onClose })
 // ── Main Component ───────────────────────────────────────────────────────────
 
 export default function MarketingStudio({ apiKey, droppedFiles, onFilesHandled }) {
-  const PERSIST_KEY = "mf_marketing_studio_persistent";
+  const PERSIST_KEY = "hg_marketing_studio_persistent";
   
   const [prompt, setPrompt] = useState("");
   const [productImage, setProductImage] = useState(null);

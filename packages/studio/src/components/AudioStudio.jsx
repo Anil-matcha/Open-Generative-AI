@@ -479,7 +479,7 @@ export default function AudioStudio({
   droppedFiles,
   onFilesHandled,
 }) {
-  const PERSIST_KEY = "mf_audio_studio_persistent";
+  const PERSIST_KEY = "hg_audio_studio_persistent";
 
   // ── Mode & model state ──────────────────────────────────────────────────
   const [selectedModelId, setSelectedModelId] = useState(audioModels[0]?.id ?? "");

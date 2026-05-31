@@ -446,7 +446,7 @@ export default function CinemaStudio({
   onGenerationComplete,
   historyItems,
 }) {
-  const PERSIST_KEY = "mf_cinema_studio_persistent";
+  const PERSIST_KEY = "hg_cinema_studio_persistent";
 
   // ── Settings state ──
   const [settings, setSettings] = useState({

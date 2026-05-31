@@ -322,7 +322,7 @@ export default function LipSyncStudio({
   droppedFiles,
   onFilesHandled,
 }) {
-  const PERSIST_KEY = "mf_lipsync_studio_persistent";
+  const PERSIST_KEY = "hg_lipsync_studio_persistent";
 
   // ── Mode & model state ──────────────────────────────────────────────────
   const [inputMode, setInputMode] = useState("image"); // 'image' | 'video'
