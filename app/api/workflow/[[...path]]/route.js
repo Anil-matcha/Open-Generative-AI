@@ -412,8 +412,10 @@ export async function GET(request, { params }) {
     // GET /api/workflow/debug-models?key=... — list models available on Memefast key
     if (path[0] === 'debug-models') {
         const { searchParams } = new URL(request.url);
+        const cookieKey = request.headers.get('cookie')?.match(/muapi_key=([^;]+)/)?.[1] || '';
         const apiKey = searchParams.get('key')
             || request.headers.get('authorization')?.replace('Bearer ', '')
+            || cookieKey
             || '';
         try {
             const r = await fetch(`${MEMEFAST}/v1/models`, {
