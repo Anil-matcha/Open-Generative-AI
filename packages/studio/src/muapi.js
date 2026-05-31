@@ -16,6 +16,8 @@ function bearerHeaders(key) {
     return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` };
 }
 
+// ── Unified video format (/v1/video/create → /v1/video/task/{id}) ────────────
+
 async function pollVideoTask(taskId, key, maxAttempts = 300, interval = 3000) {
     const pollUrl = `${BASE_URL}/v1/video/task/${taskId}`;
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
@@ -44,7 +46,7 @@ async function pollVideoTask(taskId, key, maxAttempts = 300, interval = 3000) {
     throw new Error('Generation timed out after polling.');
 }
 
-async function submitVideo(apiKey, payload, onRequestId) {
+async function submitUnifiedVideo(apiKey, payload, onRequestId) {
     const response = await fetch(`${BASE_URL}/v1/video/create`, {
         method: 'POST',
         headers: bearerHeaders(apiKey),
@@ -65,17 +67,229 @@ async function submitVideo(apiKey, payload, onRequestId) {
     return await pollVideoTask(taskId, apiKey);
 }
 
+// ── Kling (/v1/kling/videos → /v1/kling/videos/{id}) ─────────────────────────
+
+async function pollKlingTask(taskId, key, maxAttempts = 300, interval = 3000) {
+    const pollUrl = `${BASE_URL}/v1/kling/videos/${taskId}`;
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        await new Promise(resolve => setTimeout(resolve, interval));
+        try {
+            const response = await fetch(pollUrl, { headers: bearerHeaders(key) });
+            if (!response.ok) {
+                const errText = await response.text();
+                if (response.status >= 500) continue;
+                notifyAuthRequired(response.status, errText);
+                throw new Error(`Kling Poll Failed: ${response.status} - ${errText.slice(0, 100)}`);
+            }
+            const data = await response.json();
+            const taskData = data.data || data;
+            const status = (taskData.task_status || '').toLowerCase();
+            if (status === 'succeed' || status === 'completed' || status === 'success') {
+                const videos = taskData.task_result?.videos || [];
+                const url = videos[0]?.url || taskData.url;
+                return { ...data, url };
+            }
+            if (status === 'failed' || status === 'error') {
+                throw new Error(`Kling generation failed: ${taskData.task_status_msg || 'Unknown error'}`);
+            }
+        } catch (error) {
+            if (attempt === maxAttempts) throw error;
+        }
+    }
+    throw new Error('Kling generation timed out after polling.');
+}
+
+async function submitKlingT2V(apiKey, payload, onRequestId) {
+    const response = await fetch(`${BASE_URL}/v1/kling/videos`, {
+        method: 'POST',
+        headers: bearerHeaders(apiKey),
+        body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+        const errText = await response.text();
+        notifyAuthRequired(response.status, errText);
+        throw new Error(`Kling API Failed: ${response.status} - ${errText.slice(0, 200)}`);
+    }
+    const submitData = await response.json();
+    const taskId = submitData.data?.task_id || submitData.task_id;
+    if (!taskId) throw new Error('Kling: no task_id in response');
+    if (onRequestId) onRequestId(taskId);
+    return await pollKlingTask(taskId, apiKey);
+}
+
+async function submitKlingI2V(apiKey, payload, onRequestId) {
+    const response = await fetch(`${BASE_URL}/v1/kling/videos/image2video`, {
+        method: 'POST',
+        headers: bearerHeaders(apiKey),
+        body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+        const errText = await response.text();
+        notifyAuthRequired(response.status, errText);
+        throw new Error(`Kling I2V API Failed: ${response.status} - ${errText.slice(0, 200)}`);
+    }
+    const submitData = await response.json();
+    const taskId = submitData.data?.task_id || submitData.task_id;
+    if (!taskId) throw new Error('Kling I2V: no task_id in response');
+    if (onRequestId) onRequestId(taskId);
+    return await pollKlingTask(taskId, apiKey);
+}
+
+// ── Luma (/v1/luma/generations → /v1/luma/generations/{id}) ──────────────────
+
+async function pollLumaTask(taskId, key, maxAttempts = 300, interval = 3000) {
+    const pollUrl = `${BASE_URL}/v1/luma/generations/${taskId}`;
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        await new Promise(resolve => setTimeout(resolve, interval));
+        try {
+            const response = await fetch(pollUrl, { headers: bearerHeaders(key) });
+            if (!response.ok) {
+                const errText = await response.text();
+                if (response.status >= 500) continue;
+                notifyAuthRequired(response.status, errText);
+                throw new Error(`Luma Poll Failed: ${response.status} - ${errText.slice(0, 100)}`);
+            }
+            const data = await response.json();
+            const state = (data.state || '').toLowerCase();
+            if (state === 'completed') {
+                const url = data.assets?.video || data.video_url;
+                return { ...data, url };
+            }
+            if (state === 'failed') {
+                throw new Error(`Luma generation failed: ${data.failure_reason || 'Unknown error'}`);
+            }
+        } catch (error) {
+            if (attempt === maxAttempts) throw error;
+        }
+    }
+    throw new Error('Luma generation timed out after polling.');
+}
+
+async function submitLumaVideo(apiKey, payload, onRequestId) {
+    const response = await fetch(`${BASE_URL}/v1/luma/generations`, {
+        method: 'POST',
+        headers: bearerHeaders(apiKey),
+        body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+        const errText = await response.text();
+        notifyAuthRequired(response.status, errText);
+        throw new Error(`Luma API Failed: ${response.status} - ${errText.slice(0, 200)}`);
+    }
+    const submitData = await response.json();
+    const taskId = submitData.id;
+    if (!taskId) throw new Error('Luma: no id in response');
+    if (onRequestId) onRequestId(taskId);
+    return await pollLumaTask(taskId, apiKey);
+}
+
+// ── Sora / OpenAI video format (/v1/video/generations → /v1/video/generations/{id}) ──
+
+async function pollSoraTask(taskId, key, maxAttempts = 300, interval = 4000) {
+    const pollUrl = `${BASE_URL}/v1/video/generations/${taskId}`;
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        await new Promise(resolve => setTimeout(resolve, interval));
+        try {
+            const response = await fetch(pollUrl, { headers: bearerHeaders(key) });
+            if (!response.ok) {
+                const errText = await response.text();
+                if (response.status >= 500) continue;
+                notifyAuthRequired(response.status, errText);
+                throw new Error(`Sora Poll Failed: ${response.status} - ${errText.slice(0, 100)}`);
+            }
+            const data = await response.json();
+            const status = (data.status || '').toLowerCase();
+            if (status === 'completed' || status === 'succeeded') {
+                const url = data.url || data.video_url || data.data?.[0]?.url;
+                return { ...data, url };
+            }
+            if (status === 'failed') {
+                throw new Error(`Sora generation failed: ${data.error || 'Unknown error'}`);
+            }
+        } catch (error) {
+            if (attempt === maxAttempts) throw error;
+        }
+    }
+    throw new Error('Sora generation timed out after polling.');
+}
+
+async function submitSoraVideo(apiKey, payload, onRequestId) {
+    const response = await fetch(`${BASE_URL}/v1/video/generations`, {
+        method: 'POST',
+        headers: bearerHeaders(apiKey),
+        body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+        const errText = await response.text();
+        notifyAuthRequired(response.status, errText);
+        throw new Error(`Sora API Failed: ${response.status} - ${errText.slice(0, 200)}`);
+    }
+    const submitData = await response.json();
+    const taskId = submitData.id || submitData.task_id;
+    if (taskId) {
+        if (onRequestId) onRequestId(taskId);
+        return await pollSoraTask(taskId, apiKey);
+    }
+    const url = submitData.url || submitData.video_url;
+    return { ...submitData, url };
+}
+
+// ── Runway (/v1/runway/image2video → /v1/runway/tasks/{id}) ──────────────────
+
+async function pollRunwayTask(taskId, key, maxAttempts = 300, interval = 4000) {
+    const pollUrl = `${BASE_URL}/v1/runway/tasks/${taskId}`;
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        await new Promise(resolve => setTimeout(resolve, interval));
+        try {
+            const response = await fetch(pollUrl, { headers: bearerHeaders(key) });
+            if (!response.ok) {
+                const errText = await response.text();
+                if (response.status >= 500) continue;
+                notifyAuthRequired(response.status, errText);
+                throw new Error(`Runway Poll Failed: ${response.status} - ${errText.slice(0, 100)}`);
+            }
+            const data = await response.json();
+            const status = (data.status || '').toLowerCase();
+            if (status === 'succeeded' || status === 'completed') {
+                const url = data.output?.[0] || data.url;
+                return { ...data, url };
+            }
+            if (status === 'failed') {
+                throw new Error(`Runway generation failed: ${data.failure_code || 'Unknown error'}`);
+            }
+        } catch (error) {
+            if (attempt === maxAttempts) throw error;
+        }
+    }
+    throw new Error('Runway generation timed out after polling.');
+}
+
+async function submitRunwayI2V(apiKey, payload, onRequestId) {
+    const response = await fetch(`${BASE_URL}/v1/runway/image2video`, {
+        method: 'POST',
+        headers: bearerHeaders(apiKey),
+        body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+        const errText = await response.text();
+        notifyAuthRequired(response.status, errText);
+        throw new Error(`Runway API Failed: ${response.status} - ${errText.slice(0, 200)}`);
+    }
+    const submitData = await response.json();
+    const taskId = submitData.id || submitData.task_id;
+    if (!taskId) throw new Error('Runway: no task id in response');
+    if (onRequestId) onRequestId(taskId);
+    return await pollRunwayTask(taskId, apiKey);
+}
+
+// ── Image generation ──────────────────────────────────────────────────────────
+
 export async function generateImage(apiKey, params) {
     const modelInfo = getModelById(params.model);
     const modelId = modelInfo?.apiId || params.model;
 
-    const payload = {
-        model: modelId,
-        prompt: params.prompt,
-        n: 1,
-    };
+    const payload = { model: modelId, prompt: params.prompt, n: 1 };
 
-    // Map aspect_ratio to size where needed (DALL-E 3, GPT Image)
     if (params.size) {
         payload.size = params.size;
     } else if (params.resolution && params.resolution.includes('x')) {
@@ -97,9 +311,9 @@ export async function generateImage(apiKey, params) {
         throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 200)}`);
     }
     const data = await response.json();
-    const url = data.data?.[0]?.url || data.data?.[0]?.b64_json
-        ? `data:image/png;base64,${data.data[0].b64_json}` : null;
-    return { ...data, url: data.data?.[0]?.url || url };
+    const item = data.data?.[0];
+    const url = item?.url || (item?.b64_json ? `data:image/png;base64,${item.b64_json}` : null);
+    return { ...data, url };
 }
 
 function aspectRatioToSize(ratio) {
@@ -119,10 +333,41 @@ export async function generateI2I(apiKey, params) {
     return generateImage(apiKey, params);
 }
 
+// ── Video generation (routes by platform) ─────────────────────────────────────
+
 export async function generateVideo(apiKey, params) {
     const modelInfo = getVideoModelById(params.model);
     const modelId = modelInfo?.apiId || params.model;
+    const platform = modelInfo?.platform || 'unified';
 
+    if (platform === 'kling') {
+        const payload = {
+            model_name: modelId,
+            prompt: params.prompt || '',
+        };
+        if (params.aspect_ratio) payload.aspect_ratio = params.aspect_ratio;
+        if (params.duration) payload.duration = String(params.duration);
+        if (params.mode) payload.mode = params.mode;
+        return submitKlingT2V(apiKey, payload, params.onRequestId);
+    }
+
+    if (platform === 'luma') {
+        const payload = { model: modelId };
+        if (params.prompt) payload.prompt = params.prompt;
+        if (params.aspect_ratio) payload.aspect_ratio = params.aspect_ratio;
+        if (params.loop != null) payload.loop = params.loop;
+        return submitLumaVideo(apiKey, payload, params.onRequestId);
+    }
+
+    if (platform === 'sora') {
+        const payload = { model: modelId };
+        if (params.prompt) payload.prompt = params.prompt;
+        if (params.aspect_ratio) payload.aspect_ratio = params.aspect_ratio;
+        if (params.duration) payload.duration = params.duration;
+        return submitSoraVideo(apiKey, payload, params.onRequestId);
+    }
+
+    // unified format (pixverse, veo, grok, wan, happyhorse, minimax, etc.)
     const payload = { model: modelId };
     if (params.prompt) payload.prompt = params.prompt;
     if (params.aspect_ratio) payload.aspect_ratio = params.aspect_ratio;
@@ -130,23 +375,55 @@ export async function generateVideo(apiKey, params) {
     if (params.resolution) payload.resolution = params.resolution;
     if (params.mode) payload.mode = params.mode;
     if (params.image_url) payload.image_url = params.image_url;
-
-    return submitVideo(apiKey, payload, params.onRequestId);
+    return submitUnifiedVideo(apiKey, payload, params.onRequestId);
 }
 
 export async function generateI2V(apiKey, params) {
     const modelInfo = getI2VModelById(params.model);
     const modelId = modelInfo?.apiId || params.model;
+    const platform = modelInfo?.platform || 'unified';
     const imageField = modelInfo?.imageField || 'image_url';
 
+    if (platform === 'kling') {
+        const payload = {
+            model_name: modelId,
+            prompt: params.prompt || '',
+            [imageField]: params.image_url,
+        };
+        if (params.duration) payload.duration = String(params.duration);
+        if (params.mode) payload.mode = params.mode;
+        return submitKlingI2V(apiKey, payload, params.onRequestId);
+    }
+
+    if (platform === 'luma') {
+        const payload = { model: modelId };
+        if (params.prompt) payload.prompt = params.prompt;
+        if (params.aspect_ratio) payload.aspect_ratio = params.aspect_ratio;
+        // Luma keyframes format: {frame0: {type: "image", url: "..."}}
+        if (params.image_url) {
+            payload.keyframes = { frame0: { type: 'image', url: params.image_url } };
+        }
+        return submitLumaVideo(apiKey, payload, params.onRequestId);
+    }
+
+    if (platform === 'runway') {
+        const payload = { model: modelId };
+        if (params.prompt) payload.promptText = params.prompt;
+        if (params.image_url) payload[imageField] = params.image_url;
+        if (params.duration) payload.duration = params.duration;
+        if (params.ratio) payload.ratio = params.ratio;
+        else if (params.aspect_ratio) payload.ratio = params.aspect_ratio;
+        return submitRunwayI2V(apiKey, payload, params.onRequestId);
+    }
+
+    // unified format
     const payload = { model: modelId };
     if (params.prompt) payload.prompt = params.prompt;
     if (params.image_url) payload[imageField] = params.image_url;
     if (params.aspect_ratio) payload.aspect_ratio = params.aspect_ratio;
     if (params.duration) payload.duration = params.duration;
     if (params.resolution) payload.resolution = params.resolution;
-
-    return submitVideo(apiKey, payload, params.onRequestId);
+    return submitUnifiedVideo(apiKey, payload, params.onRequestId);
 }
 
 export async function generateMarketingStudioAd(apiKey, params) {
@@ -160,6 +437,8 @@ export async function processV2V(apiKey, params) {
 export async function processLipSync(apiKey, params) {
     throw new Error('LipSync недоступен в Memefast API');
 }
+
+// ── Audio ─────────────────────────────────────────────────────────────────────
 
 export async function generateAudio(apiKey, params) {
     const modelId = params._modelId || params.model || 'tts-1';
@@ -185,6 +464,8 @@ export async function generateAudio(apiKey, params) {
     return { url };
 }
 
+// ── File upload (base64 data URL, no upload endpoint on Memefast) ─────────────
+
 export function uploadFile(apiKey, file, onProgress) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -197,6 +478,8 @@ export function uploadFile(apiKey, file, onProgress) {
         reader.readAsDataURL(file);
     });
 }
+
+// ── Balance query ─────────────────────────────────────────────────────────────
 
 export async function getUserBalance(apiKey) {
     const endpoints = [
