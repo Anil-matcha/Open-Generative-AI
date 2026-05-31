@@ -744,7 +744,7 @@ export default function ImageStudio({
   droppedFiles,
   onFilesHandled,
 }) {
-  const PERSIST_KEY = "hg_image_studio_persistent";
+  const PERSIST_KEY = "mf_image_studio_persistent";
 
   // ── Model / mode state ──────────────────────────────────────────────────
   const [imageMode, setImageMode] = useState(false); // false=t2i, true=i2i
@@ -803,8 +803,11 @@ export default function ImageStudio({
       if (stored) {
         const data = JSON.parse(stored);
         if (data.imageMode !== undefined) setImageMode(data.imageMode);
-        if (data.selectedModelId) setSelectedModelId(data.selectedModelId);
-        if (data.selectedModelName) setSelectedModelName(data.selectedModelName);
+        const allModels = [...t2iModels, ...i2iModels];
+        if (data.selectedModelId && allModels.find(m => m.id === data.selectedModelId)) {
+          setSelectedModelId(data.selectedModelId);
+          if (data.selectedModelName) setSelectedModelName(data.selectedModelName);
+        }
         if (data.selectedAr) setSelectedAr(data.selectedAr);
         if (data.selectedQuality) setSelectedQuality(data.selectedQuality);
         if (data.selectedEffect) setSelectedEffect(data.selectedEffect);

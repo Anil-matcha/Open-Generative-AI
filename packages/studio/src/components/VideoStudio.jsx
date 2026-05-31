@@ -240,7 +240,7 @@ export default function VideoStudio({
   droppedFiles,
   onFilesHandled,
 }) {
-  const PERSIST_KEY = "hg_video_studio_persistent";
+  const PERSIST_KEY = "mf_video_studio_persistent";
 
   // ── mode state ──
   const [imageMode, setImageMode] = useState(false); // i2v
@@ -446,8 +446,11 @@ export default function VideoStudio({
         const data = JSON.parse(stored);
         if (data.imageMode !== undefined) setImageMode(data.imageMode);
         if (data.v2vMode !== undefined) setV2vMode(data.v2vMode);
-        if (data.selectedModel) setSelectedModel(data.selectedModel);
-        if (data.selectedModelName) setSelectedModelName(data.selectedModelName);
+        const allVidModels = [...t2vModels, ...i2vModels, ...v2vModels];
+        if (data.selectedModel && allVidModels.find(m => m.id === data.selectedModel)) {
+          setSelectedModel(data.selectedModel);
+          if (data.selectedModelName) setSelectedModelName(data.selectedModelName);
+        }
         if (data.selectedAr) setSelectedAr(data.selectedAr);
         if (data.selectedDuration) setSelectedDuration(data.selectedDuration);
         if (data.selectedResolution) setSelectedResolution(data.selectedResolution);
