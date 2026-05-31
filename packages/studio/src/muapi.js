@@ -564,7 +564,15 @@ export async function deleteWorkflow(apiKey, id) {
     return { success: true };
 }
 export async function getWorkflowData(apiKey, id) {
-    return lsGet('mf_workflows', []).find(w => w.id === id || w.workflow_id === id) || { nodes: [], edges: [] };
+    const wf = lsGet('mf_workflows', []).find(w => w.id === id || w.workflow_id === id);
+    return {
+        workflow_id: id, id,
+        name: wf?.name || 'Untitled Workflow',
+        data: { nodes: wf?.nodes || [] },
+        edges: wf?.edges || [],
+        is_owner: true, is_published: false, is_template: false,
+        show_temp_button: false, run_id: null, category: 'General',
+    };
 }
 export async function getWorkflowInputs(_apiKey, _id)    { return { properties: {}, required: [] }; }
 export async function getAllNodeSchemas(_apiKey, _id)     { return { categories: {} }; }
