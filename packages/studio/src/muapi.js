@@ -575,7 +575,13 @@ export async function getWorkflowData(apiKey, id) {
     };
 }
 export async function getWorkflowInputs(_apiKey, _id)    { return { properties: {}, required: [] }; }
-export async function getAllNodeSchemas(_apiKey, _id)     { return { categories: {} }; }
+export async function getAllNodeSchemas(_apiKey, id) {
+    try {
+        const response = await fetch(`/api/workflow/${id}/node-schemas`);
+        if (!response.ok) return { categories: {} };
+        return await response.json();
+    } catch { return { categories: {} }; }
+}
 export async function getNodeSchemas(_apiKey)             { return { categories: {} }; }
 export async function calculateDynamicCost(_apiKey)      { return { cost: 0 }; }
 export async function executeWorkflow(apiKey, id, inputs) {
