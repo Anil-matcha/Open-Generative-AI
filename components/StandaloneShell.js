@@ -131,16 +131,18 @@ export default function StandaloneShell() {
     }
   }, []);
 
-  useEffect(() => {
-    setHasMounted(true);
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      setApiKey(stored);
-      fetchBalance(stored);
-      // Sync cookie immediately on mount to establish identity for background requests
-      document.cookie = `muapi_key=${stored}; path=/; max-age=31536000; SameSite=Lax`;
-    }
-  }, [fetchBalance]);
+  // СТАЛО:
+useEffect(() => {
+  setHasMounted(true);
+  const stored = localStorage.getItem(STORAGE_KEY);
+  const envKey = process.env.NEXT_PUBLIC_MUAPI_KEY;
+  const keyToUse = stored || envKey;
+  if (keyToUse) {
+    setApiKey(keyToUse);
+    fetchBalance(keyToUse);
+    document.cookie = `muapi_key=${keyToUse}; path=/; max-age=31536000; SameSite=Lax`;
+  }
+}, [fetchBalance]);
 
   const handleKeySave = useCallback((key) => {
     localStorage.setItem(STORAGE_KEY, key);
