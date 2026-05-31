@@ -21,6 +21,10 @@ const TABS = [
   { id: 'lipsync', label: 'Синхронизация губ' },
   { id: 'cinema',  label: 'Кино-студия' },
   { id: 'marketing', label: 'Маркетинг' },
+  { id: 'workflows', label: 'Процессы' },
+  { id: 'agents', label: 'Агенты' },
+  { id: 'design-agent', label: 'Дизайн-агент' },
+  { id: 'apps', label: 'Приложения' },
 ];
 
 const STORAGE_KEY = 'muapi_key';
