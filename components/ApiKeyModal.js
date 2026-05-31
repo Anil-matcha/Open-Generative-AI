@@ -9,7 +9,7 @@ export default function ApiKeyModal({ onSave, onClose, overlay = false, title, s
   const handleSubmit = (e) => {
     e.preventDefault();
     const trimmed = key.trim();
-    if (!trimmed) { setError('Пожалуйста, введите ваш Memefast API-ключ'); return; }
+    if (!trimmed) { setError('Пожалуйста, введите ваш API-ключ'); return; }
     onSave(trimmed);
   };
 
@@ -43,7 +43,7 @@ export default function ApiKeyModal({ onSave, onClose, overlay = false, title, s
           </h1>
           <p className="text-white/40 text-[13px] leading-relaxed px-4">
             {subtitle || (
-              <>Введите ваш API-ключ <a href="https://memefast.top" target="_blank" rel="noreferrer" className="text-[#22d3ee] hover:text-[#e5ff33] transition-colors">Memefast</a> чтобы начать создавать</>
+              <>Введите ваш API-ключ <a href="https://muapi.ai/access-keys" target="_blank" rel="noreferrer" className="text-[#22d3ee] hover:text-[#e5ff33] transition-colors">Muapi.ai</a> чтобы начать создавать</>
             )}
           </p>
         </div>
@@ -51,13 +51,13 @@ export default function ApiKeyModal({ onSave, onClose, overlay = false, title, s
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <label className="block text-xs font-bold text-white/30 ml-1">
-              Memefast API-ключ
+              Ключ доступа API
             </label>
             <input
               type="password"
               value={key}
               onChange={(e) => { setKey(e.target.value); setError(''); }}
-              placeholder="sk-..."
+              placeholder="Вставьте ваш ключ сюда..."
               className="w-full bg-white/5 border border-white/[0.03] rounded-md px-5 py-3 text-sm text-white placeholder:text-white/10 focus:outline-none focus:ring-1 focus:ring-[#22d3ee]/30 focus:bg-white/[0.07] transition-all"
               suppressHydrationWarning
             />
@@ -74,8 +74,8 @@ export default function ApiKeyModal({ onSave, onClose, overlay = false, title, s
 
           <p className="text-center text-[12px] text-white/20 pt-2">
             Нет ключа?{' '}
-            <a href="https://memefast.top" target="_blank" rel="noreferrer" className="text-white/40 hover:text-[#22d3ee] transition-colors font-medium">
-              Получить на Memefast →
+            <a href="https://muapi.ai/access-keys" target="_blank" rel="noreferrer" className="text-white/40 hover:text-[#22d3ee] transition-colors font-medium">
+              Получить бесплатно →
             </a>
           </p>
         </form>

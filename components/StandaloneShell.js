@@ -166,13 +166,14 @@ export default function StandaloneShell() {
     if (!apiKey) return;
 
     const interceptorId = axios.interceptors.request.use((config) => {
+      // Check if URL is local/proxied
       const isRelative = config.url.startsWith('/') || !config.url.startsWith('http');
-      const isInternalProxy = config.url.includes('/api/mf') || config.url.includes('/api/app') || config.url.includes('/api/workflow') || config.url.includes('/api/agents');
+      const isInternalProxy = config.url.includes('/api/app') || config.url.includes('/api/workflow') || config.url.includes('/api/agents') || config.url.includes('/api/api') || config.url.includes('/api/v1');
 
       if (isRelative || isInternalProxy) {
-        config.headers['Authorization'] = `Bearer ${apiKey}`;
+        config.headers['x-api-key'] = apiKey;
       }
-
+      
       return config;
     });
 
