@@ -23,11 +23,13 @@ const VIDEO_MODELS = new Set([
     'kling-video', 'kling-video-extend', 'kling-omni-video', 'kling-avatar-image2video',
     'happyhorse-1.0-t2v', 'happyhorse-1.0-i2v', 'happyhorse-1.0-r2v', 'happyhorse-1.0-video-edit',
     'mj_video',
-    'pixverse-video', 'pixverse-modify', 'pixverse-restyle', 'pixverse-lipsync',
-    'pixverse-multi-transition', 'pixverse-mimic',
+    'pixverse-video', 'pixverse-multi-transition', 'pixverse-mimic',
     'wan2.5-i2v-preview', 'wan2.6-i2v',
     'vidu2.0', 'viduq2', 'viduq2-pro', 'viduq2-turbo',
     'viduq3', 'viduq3-pro', 'viduq3-turbo', 'viduq3-mix',
+    // Edit video (renamed for UI categorization — mapped via MODEL_ID_MAP)
+    'pixverse-video-edit', 'pixverse-restyle-edit', 'pixverse-lipsync-edit',
+    'kling-video-edit-extend',
 ]);
 
 const TEXT_MODELS = new Set(['text-passthrough', 'any-llm', 'openrouter-vision', 'gpt-5-nano', 'gpt-5-mini']);
@@ -42,9 +44,23 @@ const AUDIO_MODELS = new Set([
     'vidu-tts', 'qwen3-tts-flash',
 ]);
 
+// Schema key → actual Memefast model ID (for models renamed to include "edit"/"reference" in key)
+const MODEL_ID_MAP = {
+    'flux-edit-kontext-pro':         'flux.1-kontext-pro',
+    'kling-omni-image-edit':         'kling-omni-image',
+    'grok-imagine-image-reference':  'grok-imagine-image-pro',
+    'mj_inpaint-edit':               'mj_inpaint',
+    'mj_variation-reference':        'mj_variation',
+    'pixverse-video-edit':           'pixverse-modify',
+    'pixverse-restyle-edit':         'pixverse-restyle',
+    'pixverse-lipsync-edit':         'pixverse-lipsync',
+    'kling-video-edit-extend':       'kling-video-extend',
+};
+
 async function generateImage(apiKey, model, params) {
+    const apiModel = MODEL_ID_MAP[model] || model;
     const size = (params.width && params.height) ? `${params.width}x${params.height}` : '1024x1024';
-    const body = { model, prompt: params.prompt || '', n: 1, size, response_format: 'url' };
+    const body = { model: apiModel, prompt: params.prompt || '', n: 1, size, response_format: 'url' };
     const imgInput = params.image_url || params.images_list?.[0];
     if (imgInput) body.image_url = imgInput;
 
@@ -84,11 +100,12 @@ async function generateText(apiKey, model, params) {
 }
 
 async function generateVideo(apiKey, model, params) {
+    const apiModel = MODEL_ID_MAP[model] || model;
     const res = await fetch(`${MEMEFAST}/v1/video/create`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            model, prompt: params.prompt || '',
+            model: apiModel, prompt: params.prompt || '',
             image_url: params.image_url,
             duration: params.duration || 5,
             aspect_ratio: params.aspect_ratio || '16:9',
@@ -216,7 +233,7 @@ function getNodeSchemas() {
                     // Flux
                     "flux-2-pro":                     T.t2i,
                     "flux-1.1-pro":                   T.t2i,
-                    "flux.1-kontext-pro":             T.i2i,
+                    "flux-edit-kontext-pro":          T.i2i,   // → flux.1-kontext-pro
                     // ByteDance Seedream
                     "doubao-seedream-5-0-260128":      T.t2i,
                     "doubao-seedream-4-5-251128":      T.t2i,
@@ -230,18 +247,18 @@ function getNodeSchemas() {
                     "z-image-turbo":                  T.t2i,
                     // Kling Image
                     "kling-image":                    T.t2i,
-                    "kling-omni-image":               T.i2i,
+                    "kling-omni-image-edit":          T.i2i,   // → kling-omni-image
                     // Grok Image
                     "grok-4.2-image":                 T.t2i,
                     "grok-4.1-image":                 T.t2i,
                     "grok-4-image":                   T.t2i,
                     "grok-imagine-image":             T.t2i,
-                    "grok-imagine-image-pro":         T.imgRef,
+                    "grok-imagine-image-reference":   T.imgRef, // → grok-imagine-image-pro
                     // Midjourney
                     "mj_imagine":                     T.t2i,
                     "mj_edits":                       T.i2i,
-                    "mj_inpaint":                     T.i2i,
-                    "mj_variation":                   T.imgRef,
+                    "mj_inpaint-edit":                T.i2i,   // → mj_inpaint
+                    "mj_variation-reference":         T.imgRef, // → mj_variation
                     // Wan Image
                     "wan2.7-image-pro":               T.t2iWH,
                     // Gemini Image
@@ -272,10 +289,10 @@ function getNodeSchemas() {
                     "grok-video-3":     T.t2v,
                     "grok-video-3-10s": T.t2v,
                     // Kling Video
-                    "kling-omni-video":         T.t2v,
-                    "kling-video":              T.t2v,
-                    "kling-video-extend":       T.i2v,
-                    "kling-avatar-image2video": T.i2v,
+                    "kling-omni-video":            T.t2v,
+                    "kling-video":                 T.t2v,
+                    "kling-avatar-image2video":    T.i2v,
+                    "kling-video-edit-extend":     T.i2v,    // → kling-video-extend
                     // Happyhorse
                     "happyhorse-1.0-t2v":        T.t2v,
                     "happyhorse-1.0-i2v":        T.i2v,
@@ -285,10 +302,10 @@ function getNodeSchemas() {
                     "mj_video": T.t2v,
                     // Pixverse
                     "pixverse-video":            T.t2v,
-                    "pixverse-modify":           T.vidEdit,
-                    "pixverse-restyle":          T.vidEdit,
-                    "pixverse-lipsync":          T.lipsync,
                     "pixverse-mimic":            T.i2v,
+                    "pixverse-video-edit":       T.vidEdit,  // → pixverse-modify
+                    "pixverse-restyle-edit":     T.vidEdit,  // → pixverse-restyle
+                    "pixverse-lipsync-edit":     T.lipsync,  // → pixverse-lipsync
                     // Wan Video
                     "wan2.6-i2v":           T.i2v,
                     "wan2.5-i2v-preview":   T.i2v,
