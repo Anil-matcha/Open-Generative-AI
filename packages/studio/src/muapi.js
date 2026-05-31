@@ -499,8 +499,13 @@ export async function getUserBalance(apiKey) {
             }
             if (response.ok) {
                 const data = await response.json();
+                // new-api/one-api format: { success:true, data:{ quota:N, used_quota:N } }
+                if (data.data?.quota !== undefined) {
+                    const remaining = (data.data.quota - (data.data.used_quota || 0)) / 500000;
+                    return { balance: remaining.toFixed(2) };
+                }
                 const balance = data.balance ?? data.credits ?? data.remaining ??
-                    data.total_granted ?? data.credit ?? null;
+                    data.total_granted ?? data.credit ?? data.data?.balance ?? null;
                 return { balance };
             }
         } catch (err) {
