@@ -293,26 +293,18 @@ export function uploadFile(apiKey, file, onProgress) {
 // ─── Account balance ──────────────────────────────────────────────────────────
 
 export async function getUserBalance(apiKey) {
-    const endpoints = [
-        '/v1/dashboard/billing/credit_grants',
-        '/v1/dashboard/billing/subscription',
-        '/v1/dashboard/billing/usage',
-    ];
-    for (const endpoint of endpoints) {
-        try {
-            const res = await fetch(`${BASE_URL}${endpoint}`, { headers: authHeaders(apiKey) });
-            if (res.status === 401 || res.status === 403) {
-                notifyAuthRequired(res.status, '');
-                return { balance: null };
-            }
-            if (!res.ok) continue;
-            const data = await res.json();
-            const balance = data.total_available ?? data.balance ?? data.credits ?? data.quota ?? null;
-            return { ...data, balance };
-        } catch (_) { /* try next endpoint */ }
+    const response = await fetch(`${BASE_URL}/v1/dashboard/billing/credit_grants`, {
+        headers: authHeaders(apiKey),
+    });
+    if (!response.ok) {
+        const errText = await response.text();
+        notifyAuthRequired(response.status, errText);
+        throw new Error(`Failed to fetch balance: ${response.status} - ${errText.slice(0, 120)}`);
     }
-    // All endpoints failed — return gracefully so the UI doesn't crash
-    return { balance: null };
+    const data = await response.json();
+    // Normalize to { balance } so the shell UI can display it
+    const balance = data.total_available ?? data.balance ?? data.credits ?? data.quota ?? 0;
+    return { ...data, balance };
 }
 
 // ─── Workflow stubs (not supported by Memefast) ───────────────────────────────
