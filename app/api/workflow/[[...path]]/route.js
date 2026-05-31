@@ -409,9 +409,12 @@ export async function GET(request, { params }) {
         return NextResponse.json(getNodeSchemas());
     }
 
-    // GET /api/workflow/debug-models — list models available on Memefast key
+    // GET /api/workflow/debug-models?key=... — list models available on Memefast key
     if (path[0] === 'debug-models') {
-        const apiKey = request.headers.get('authorization')?.replace('Bearer ', '') || '';
+        const { searchParams } = new URL(request.url);
+        const apiKey = searchParams.get('key')
+            || request.headers.get('authorization')?.replace('Bearer ', '')
+            || '';
         try {
             const r = await fetch(`${MEMEFAST}/v1/models`, {
                 headers: { 'Authorization': `Bearer ${apiKey}` }
