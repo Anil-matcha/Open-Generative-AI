@@ -1,44 +1,49 @@
 import { NextResponse } from 'next/server';
 
-// In-memory workflow store per serverless instance
-// Workflows persisted client-side via localStorage; this handles builder API calls
 const store = global._mf_workflows ?? (global._mf_workflows = new Map());
 
 function genId() { return `wf_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`; }
 
-function getApiKey(request) {
-    return request.headers.get('Authorization')?.replace('Bearer ', '') ||
-           request.headers.get('x-api-key') ||
-           request.cookies.get('muapi_key')?.value || '';
+function emptyWorkflow(id) {
+    return { workflow_id: id, id, name: 'Untitled', nodes: [], edges: [], created_at: new Date().toISOString() };
 }
 
 export async function GET(request, { params }) {
     const { path = [] } = await params;
-    const [id, action] = path;
+    const { search } = new URL(request.url);
 
+    // GET /api/workflow/get-workflow-def/{id}
+    if (path[0] === 'get-workflow-def') {
+        const id = path[1];
+        const wf = store.get(id) || emptyWorkflow(id);
+        return NextResponse.json({ nodes: [], edges: [], ...wf });
+    }
+
+    // GET /api/workflow/{id}/node-schemas
+    if (path[1] === 'node-schemas') {
+        return NextResponse.json({ categories: {} });
+    }
+
+    // GET /api/workflow/run/{runId}/status
+    if (path[0] === 'run' && path[2] === 'status') {
+        return NextResponse.json({ status: 'completed', result: {} });
+    }
+
+    // GET /api/workflow/{id}
+    const id = path[0];
     if (!id) return NextResponse.json([]);
-
-    const wf = store.get(id) || { workflow_id: id, id, name: 'Workflow', nodes: [], edges: [] };
-
-    if (action === 'get-workflow-def' || action === 'builder' || action === 'playground') {
-        return NextResponse.json({ ...wf, nodes: wf.nodes || [], edges: wf.edges || [] });
-    }
-
-    if (action === 'inputs' || action === 'input-schema') {
-        return NextResponse.json({ properties: {}, required: [] });
-    }
-
+    const wf = store.get(id) || emptyWorkflow(id);
     return NextResponse.json(wf);
 }
 
 export async function POST(request, { params }) {
     const { path = [] } = await params;
-    const [action] = path;
 
     let body = {};
     try { body = await request.json(); } catch {}
 
-    if (action === 'create' || !action) {
+    // POST /api/workflow/create
+    if (path[0] === 'create' || path.length === 0) {
         const id = body.workflow_id || genId();
         const wf = {
             workflow_id: id, id,
@@ -52,9 +57,31 @@ export async function POST(request, { params }) {
         return NextResponse.json(wf);
     }
 
-    // Save/update workflow (path[0] is the id)
-    const id = action;
-    const existing = store.get(id) || { workflow_id: id, id };
+    // POST /api/workflow/{id}/run
+    if (path[1] === 'run') {
+        const runId = genId();
+        return NextResponse.json({ run_id: runId, status: 'completed', result: {} });
+    }
+
+    // POST /api/workflow/{id}/publish or /template or /update-category etc.
+    if (['publish', 'template', 'update-category'].includes(path[1])) {
+        return NextResponse.json({ success: true });
+    }
+
+    // POST /api/workflow/architect
+    if (path[0] === 'architect') {
+        const reqId = genId();
+        return NextResponse.json({ request_id: reqId, status: 'completed', result: {} });
+    }
+
+    // POST /api/workflow/poll-architect/{id}/result
+    if (path[0] === 'poll-architect') {
+        return NextResponse.json({ status: 'completed', result: {} });
+    }
+
+    // Generic save/update
+    const id = path[0];
+    const existing = store.get(id) || emptyWorkflow(id);
     const updated = { ...existing, ...body, workflow_id: id, id, updated_at: new Date().toISOString() };
     store.set(id, updated);
     return NextResponse.json(updated);

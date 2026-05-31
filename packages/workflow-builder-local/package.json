@@ -1,11 +1,10 @@
 {
-  "name": "studio",
+  "name": "workflow-builder",
   "version": "1.0.0",
-  "description": "Open Generative AI studio components for Muapi",
-  "main": "src/index.js",
-  "module": "src/index.js",
+  "description": "Shared UI components and utilities for my Next.js apps",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
   "files": [
-    "src",
     "dist"
   ],
   "scripts": {
@@ -14,19 +13,12 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@xyflow/react": "^12.10.2",
     "axios": "^1.7.0",
-    "lucide-react": "^1.8.0",
-    "react-hot-toast": "^2.4.1",
     "react-icons": "^5.0.1",
-    "react-markdown": "^10.1.0",
-    "react-syntax-highlighter": "^16.1.1",
-    "react-toastify": "^11.1.0",
+    "react-hot-toast": "^2.4.1",
     "reactflow": "^11.11.4",
-    "remark-gfm": "^4.0.1",
-    "workflow-builder": "file:../workflow-builder-local",
-    "ai-agent": "file:../Open-Poe-AI/packages/agents",
-    "design-agent": "file:../Open-AI-Design-Agent/packages/design-agent"
+    "react-markdown": "^9.0.0",
+    "remark-gfm": "^4.0.0"
   },
   "peerDependencies": {
     "react": ">=18.0.0",

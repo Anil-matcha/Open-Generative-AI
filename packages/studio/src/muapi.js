@@ -567,8 +567,8 @@ export async function getWorkflowData(apiKey, id) {
     return lsGet('mf_workflows', []).find(w => w.id === id || w.workflow_id === id) || { nodes: [], edges: [] };
 }
 export async function getWorkflowInputs(_apiKey, _id)    { return { properties: {}, required: [] }; }
-export async function getAllNodeSchemas(_apiKey, _id)     { return []; }
-export async function getNodeSchemas(_apiKey)             { return []; }
+export async function getAllNodeSchemas(_apiKey, _id)     { return { categories: {} }; }
+export async function getNodeSchemas(_apiKey)             { return { categories: {} }; }
 export async function calculateDynamicCost(_apiKey)      { return { cost: 0 }; }
 export async function executeWorkflow(apiKey, id, inputs) {
     const prompt = typeof inputs === 'string' ? inputs : JSON.stringify(inputs || {});

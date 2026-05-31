@@ -6,7 +6,7 @@
   "version": "2.0.0",
   "workspaces": [
     "packages/studio",
-    "packages/Vibe-Workflow/packages/workflow-builder",
+    "packages/workflow-builder-local",
     "packages/Open-Poe-AI/packages/agents",
     "packages/Open-AI-Design-Agent/packages/design-agent"
   ],
