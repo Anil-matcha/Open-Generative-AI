@@ -1,12 +1,10 @@
 import { getModelById, getVideoModelById, getI2IModelById, getI2VModelById, getV2VModelById, getLipSyncModelById, getAudioModelById } from './models.js';
 
-// In an http(s) browser we route through the host app's proxy (Next.js routes
-// under /api/* re-issue the call server-side) so api.muapi.ai CORS is bypassed.
-// SSR (no window) and Electron's file:// renderer call the upstream directly.
+// Browser: route through Next.js proxy /api/mf → memefast.top (avoids CORS)
+// SSR / Electron: call upstream directly
 const BASE_URL = (typeof window !== 'undefined' && window.location?.protocol?.startsWith('http'))
-    ? '/api'
-    : 'https://api.muapi.ai';
-const PROXY_WF_BASE = '/api/workflow';
+    ? '/api/mf'
+    : 'https://memefast.top';
 
 function notifyAuthRequired(status, detail) {
     if (typeof window === 'undefined') return;
@@ -14,14 +12,16 @@ function notifyAuthRequired(status, detail) {
     window.dispatchEvent(new CustomEvent('muapi:auth-required', { detail: { status, message: detail } }));
 }
 
-async function pollForResult(requestId, key, maxAttempts = 900, interval = 2000) {
-    const pollUrl = `${BASE_URL}/api/v1/predictions/${requestId}/result`;
+function bearerHeaders(key) {
+    return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` };
+}
+
+async function pollVideoTask(taskId, key, maxAttempts = 300, interval = 3000) {
+    const pollUrl = `${BASE_URL}/v1/video/task/${taskId}`;
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
         await new Promise(resolve => setTimeout(resolve, interval));
         try {
-            const response = await fetch(pollUrl, {
-                headers: { 'Content-Type': 'application/json', 'x-api-key': key }
-            });
+            const response = await fetch(pollUrl, { headers: bearerHeaders(key) });
             if (!response.ok) {
                 const errText = await response.text();
                 if (response.status >= 500) continue;
@@ -29,9 +29,14 @@ async function pollForResult(requestId, key, maxAttempts = 900, interval = 2000)
                 throw new Error(`Poll Failed: ${response.status} - ${errText.slice(0, 100)}`);
             }
             const data = await response.json();
-            const status = data.status?.toLowerCase();
-            if (status === 'completed' || status === 'succeeded' || status === 'success') return data;
-            if (status === 'failed' || status === 'error') throw new Error(`Generation failed: ${data.error || 'Unknown error'}`);
+            const status = (data.status || '').toLowerCase();
+            if (status === 'completed' || status === 'succeeded' || status === 'success') {
+                const url = data.url || data.video_url || data.output?.url || data.data?.url;
+                return { ...data, url };
+            }
+            if (status === 'failed' || status === 'error') {
+                throw new Error(`Generation failed: ${data.error || data.message || 'Unknown error'}`);
+            }
         } catch (error) {
             if (attempt === maxAttempts) throw error;
         }
@@ -39,661 +44,242 @@ async function pollForResult(requestId, key, maxAttempts = 900, interval = 2000)
     throw new Error('Generation timed out after polling.');
 }
 
-async function submitAndPoll(endpoint, payload, key, onRequestId, maxAttempts = 60) {
-    const url = `${BASE_URL}/api/v1/${endpoint}`;
-    const response = await fetch(url, {
+async function submitVideo(apiKey, payload, onRequestId) {
+    const response = await fetch(`${BASE_URL}/v1/video/create`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-key': key },
+        headers: bearerHeaders(apiKey),
         body: JSON.stringify(payload)
     });
     if (!response.ok) {
         const errText = await response.text();
         notifyAuthRequired(response.status, errText);
-        throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+        throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 200)}`);
     }
     const submitData = await response.json();
-    const requestId = submitData.request_id || submitData.id;
-    if (!requestId) return submitData;
-    if (onRequestId) onRequestId(requestId);
-    const result = await pollForResult(requestId, key, maxAttempts);
-    const outputUrl = result.outputs?.[0] || result.url || result.output?.url;
-    return { ...result, url: outputUrl };
+    const taskId = submitData.task_id || submitData.id;
+    if (!taskId) {
+        const url = submitData.url || submitData.video_url;
+        return { ...submitData, url };
+    }
+    if (onRequestId) onRequestId(taskId);
+    return await pollVideoTask(taskId, apiKey);
 }
 
 export async function generateImage(apiKey, params) {
     const modelInfo = getModelById(params.model);
-    const endpoint = modelInfo?.endpoint || params.model;
-    const payload = { prompt: params.prompt };
-    if (params.aspect_ratio) payload.aspect_ratio = params.aspect_ratio;
-    if (params.resolution) payload.resolution = params.resolution;
-    if (params.quality) payload.quality = params.quality;
-    if (params.image_url) { 
-        payload.image_url = params.image_url; 
-        payload.strength = params.strength || 0.6; 
-    } else if (params.images_list) {
-        payload.images_list = params.images_list;
-    } else {
-        payload.image_url = null;
-    }
-    if (params.seed && params.seed !== -1) payload.seed = params.seed;
-    return submitAndPoll(endpoint, payload, apiKey, params.onRequestId, 60);
-}
+    const modelId = modelInfo?.apiId || params.model;
 
-export async function generateI2I(apiKey, params) {
-    const modelInfo = getI2IModelById(params.model);
-    const endpoint = modelInfo?.endpoint || params.model;
-    const payload = {};
-    if (params.prompt) payload.prompt = params.prompt;
-    const imageField = modelInfo?.imageField || 'image_url';
-    const imagesList = params.images_list?.length > 0 ? params.images_list : (params.image_url ? [params.image_url] : null);
-    if (imagesList) {
-        if (imageField === 'images_list') payload.images_list = imagesList;
-        else payload[imageField] = imagesList[0];
-    }
-    if (params.aspect_ratio) payload.aspect_ratio = params.aspect_ratio;
-    if (params.resolution) payload.resolution = params.resolution;
-    if (params.quality) payload.quality = params.quality;
-    if (modelInfo?.inputs?.name) {
-        payload.name = params.name || modelInfo.inputs.name.default;
-    }
-    return submitAndPoll(endpoint, payload, apiKey, params.onRequestId, 60);
-}
-
-export async function generateVideo(apiKey, params) {
-    const modelInfo = getVideoModelById(params.model);
-    const endpoint = modelInfo?.endpoint || params.model;
-    const payload = {};
-    if (params.prompt) payload.prompt = params.prompt;
-    if (params.aspect_ratio) payload.aspect_ratio = params.aspect_ratio;
-    if (params.duration) payload.duration = params.duration;
-    if (params.resolution) payload.resolution = params.resolution;
-    if (params.quality) payload.quality = params.quality;
-    if (params.mode) payload.mode = params.mode;
-    if (params.image_url) payload.image_url = params.image_url;
-    return submitAndPoll(endpoint, payload, apiKey, params.onRequestId, 900);
-}
-
-export async function generateI2V(apiKey, params) {
-    const modelInfo = getI2VModelById(params.model);
-    const endpoint = modelInfo?.endpoint || params.model;
-    const payload = {};
-    if (params.prompt) payload.prompt = params.prompt;
-    const imageField = modelInfo?.imageField || 'image_url';
-    if (params.image_url) {
-        if (imageField === 'images_list') payload.images_list = [params.image_url];
-        else payload[imageField] = params.image_url;
-    }
-    const lastImageField = modelInfo?.lastImageField;
-    if (lastImageField && params.last_image) {
-        payload[lastImageField] = params.last_image;
-    }
-    if (params.aspect_ratio) payload.aspect_ratio = params.aspect_ratio;
-    if (params.duration) payload.duration = params.duration;
-    if (params.resolution) payload.resolution = params.resolution;
-    if (params.quality) payload.quality = params.quality;
-    if (params.mode) payload.mode = params.mode;
-    if (modelInfo?.inputs?.name) {
-        payload.name = params.name || modelInfo.inputs.name.default;
-    }
-    return submitAndPoll(endpoint, payload, apiKey, params.onRequestId, 900);
-}
-
-export async function generateMarketingStudioAd(apiKey, params) {
-    const endpoint = params.resolution === '1080p' ? 'sd-2-vip-omni-reference-1080p' : 'seedance-2-vip-omni-reference';
     const payload = {
+        model: modelId,
         prompt: params.prompt,
-        aspect_ratio: params.aspect_ratio || '16:9',
-        duration: params.duration || 5,
-        images_list: params.images_list || [],
-        video_files: params.video_files || []
+        n: 1,
     };
-    return submitAndPoll(endpoint, payload, apiKey, params.onRequestId, 900);
-}
 
-export async function processV2V(apiKey, params) {
-    const modelInfo = getV2VModelById(params.model);
-    const endpoint = modelInfo?.endpoint || params.model;
-    const videoField = modelInfo?.videoField || 'video_url';
-    const payload = { [videoField]: params.video_url };
-    if (modelInfo?.imageField && params.image_url) {
-        payload[modelInfo.imageField] = params.image_url;
+    // Map aspect_ratio to size where needed (DALL-E 3, GPT Image)
+    if (params.size) {
+        payload.size = params.size;
+    } else if (params.resolution && params.resolution.includes('x')) {
+        payload.size = params.resolution;
+    } else if (params.aspect_ratio) {
+        payload.size = aspectRatioToSize(params.aspect_ratio);
     }
-    if (modelInfo?.hasPrompt && params.prompt) {
-        payload.prompt = params.prompt;
-    }
-    return submitAndPoll(endpoint, payload, apiKey, params.onRequestId, 900);
-}
 
-export async function processLipSync(apiKey, params) {
-    const modelInfo = getLipSyncModelById(params.model);
-    const endpoint = modelInfo?.endpoint || params.model;
-    const payload = {};
-    if (params.audio_url) payload.audio_url = params.audio_url;
-    if (params.image_url) payload.image_url = params.image_url;
-    if (params.video_url) payload.video_url = params.video_url;
-    if (modelInfo?.hasPrompt) payload.prompt = params.prompt || '';
-    if (params.resolution) payload.resolution = params.resolution;
-    if (params.seed !== undefined && params.seed !== -1) payload.seed = params.seed;
-    return submitAndPoll(endpoint, payload, apiKey, params.onRequestId, 900);
-}
+    if (params.quality) payload.quality = params.quality;
 
-export async function generateAudio(apiKey, params) {
-    const modelId = params._modelId || params.model;
-    const modelInfo = getAudioModelById(modelId);
-    const endpoint = modelInfo?.endpoint || modelId;
-    const payload = {};
-    const skipKeys = ['_modelId', 'onRequestId'];
-    for (const key in params) {
-        if (!skipKeys.includes(key) && params[key] !== undefined && params[key] !== null) {
-            payload[key] = params[key];
-        }
-    }
-    return submitAndPoll(endpoint, payload, apiKey, params.onRequestId, 900);
-}
-
-export function uploadFile(apiKey, file, onProgress) {
-    return new Promise((resolve, reject) => {
-        const url = `${BASE_URL}/api/v1/upload_file`;
-        const formData = new FormData();
-        formData.append('file', file);
-
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', url);
-        xhr.setRequestHeader('x-api-key', apiKey);
-
-        if (onProgress) {
-            xhr.upload.onprogress = (event) => {
-                if (event.lengthComputable) {
-                    const percentComplete = Math.round((event.loaded / event.total) * 100);
-                    onProgress(percentComplete);
-                }
-            };
-        }
-
-        xhr.onload = () => {
-            if (xhr.status >= 200 && xhr.status < 300) {
-                try {
-                    const data = JSON.parse(xhr.responseText);
-                    const fileUrl = data.url || data.file_url || data.data?.url;
-                    if (!fileUrl) {
-                        reject(new Error('No URL returned from file upload'));
-                    } else {
-                        resolve(fileUrl);
-                    }
-                } catch (e) {
-                    reject(new Error('Failed to parse upload response'));
-                }
-            } else {
-                let detail = xhr.statusText;
-                try {
-                    const errObj = JSON.parse(xhr.responseText);
-                    detail = errObj.detail || detail;
-                } catch (e) {
-                    // fallback to statusText
-                }
-                notifyAuthRequired(xhr.status, detail);
-                reject(new Error(`File upload failed: ${xhr.status} - ${detail}`));
-            }
-        };
-
-        xhr.onerror = () => reject(new Error('Network error during file upload'));
-        xhr.send(formData);
-    });
-}
-
-export async function getUserBalance(apiKey) {
-    const response = await fetch(`${BASE_URL}/api/v1/account/balance`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        }
+    const response = await fetch(`${BASE_URL}/v1/images/generations`, {
+        method: 'POST',
+        headers: bearerHeaders(apiKey),
+        body: JSON.stringify(payload)
     });
     if (!response.ok) {
         const errText = await response.text();
         notifyAuthRequired(response.status, errText);
-        throw new Error(`Failed to fetch balance: ${response.status} - ${errText.slice(0, 100)}`);
+        throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 200)}`);
     }
-    return await response.json();
+    const data = await response.json();
+    const url = data.data?.[0]?.url || data.data?.[0]?.b64_json
+        ? `data:image/png;base64,${data.data[0].b64_json}` : null;
+    return { ...data, url: data.data?.[0]?.url || url };
 }
 
-export async function getTemplateWorkflows(apiKey) {
-    const response = await fetch(`${BASE_URL}/workflow/get-template-workflows`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        }
-    });
-    if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`Failed to fetch template workflows: ${response.status} - ${errText.slice(0, 100)}`);
-    }
-    return await response.json();
-};
+function aspectRatioToSize(ratio) {
+    const map = {
+        '1:1':  '1024x1024',
+        '16:9': '1792x1024',
+        '9:16': '1024x1792',
+        '4:3':  '1024x768',
+        '3:4':  '768x1024',
+        '3:2':  '1536x1024',
+        '2:3':  '1024x1536',
+    };
+    return map[ratio] || '1024x1024';
+}
 
-export async function getUserWorkflows(apiKey) {
-    const response = await fetch(`${BASE_URL}/workflow/get-workflow-defs`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        }
-    });
-    if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`Failed to fetch user workflows: ${response.status} - ${errText.slice(0, 100)}`);
-    }
-    return await response.json();
-};
+export async function generateI2I(apiKey, params) {
+    return generateImage(apiKey, params);
+}
 
-export async function getPublishedWorkflows(apiKey) {
-    const response = await fetch(`${BASE_URL}/workflow/get-published-workflows`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        }
-    });
-    if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`Failed to fetch published workflows: ${response.status} - ${errText.slice(0, 100)}`);
-    }
-    return await response.json();
-};
+export async function generateVideo(apiKey, params) {
+    const modelInfo = getVideoModelById(params.model);
+    const modelId = modelInfo?.apiId || params.model;
 
-// Agents — uses direct URL → https://api.muapi.ai/agents/...
-export async function getTemplateAgents(apiKey) {
-    const response = await fetch(`${BASE_URL}/agents/templates/agents`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        }
-    });
-    if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`Failed to fetch template agents: ${response.status} - ${errText.slice(0, 100)}`);
-    }
-    const data = await response.json();
-    return Array.isArray(data) ? data : (data.agents || data.items || []);
-};
+    const payload = { model: modelId };
+    if (params.prompt) payload.prompt = params.prompt;
+    if (params.aspect_ratio) payload.aspect_ratio = params.aspect_ratio;
+    if (params.duration) payload.duration = params.duration;
+    if (params.resolution) payload.resolution = params.resolution;
+    if (params.mode) payload.mode = params.mode;
+    if (params.image_url) payload.image_url = params.image_url;
 
-export async function getUserAgents(apiKey) {
-    const response = await fetch(`${BASE_URL}/agents/user/agents`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        }
-    });
-    if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`Failed to fetch user agents: ${response.status} - ${errText.slice(0, 100)}`);
-    }
-    const data = await response.json();
-    return Array.isArray(data) ? data : (data.agents || data.items || []);
-};
+    return submitVideo(apiKey, payload, params.onRequestId);
+}
 
-export async function getPublishedAgents(apiKey) {
-    // MuAPI: GET /agents/featured/agents
-    const response = await fetch(`${BASE_URL}/agents/featured/agents`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        }
-    });
-    if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`Failed to fetch featured agents: ${response.status} - ${errText.slice(0, 100)}`);
-    }
-    const data = await response.json();
-    return Array.isArray(data) ? data : (data.agents || data.items || []);
-};
+export async function generateI2V(apiKey, params) {
+    const modelInfo = getI2VModelById(params.model);
+    const modelId = modelInfo?.apiId || params.model;
+    const imageField = modelInfo?.imageField || 'image_url';
 
-// GET /agents/user/conversations — returns the user's chat history across all agents
-export async function getUserConversations(apiKey) {
-    const response = await fetch(`${BASE_URL}/agents/user/conversations`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        }
-    });
-    if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`Failed to fetch conversations: ${response.status} - ${errText.slice(0, 100)}`);
-    }
-    const data = await response.json();
-    return Array.isArray(data) ? data : [];
-};
+    const payload = { model: modelId };
+    if (params.prompt) payload.prompt = params.prompt;
+    if (params.image_url) payload[imageField] = params.image_url;
+    if (params.aspect_ratio) payload.aspect_ratio = params.aspect_ratio;
+    if (params.duration) payload.duration = params.duration;
+    if (params.resolution) payload.resolution = params.resolution;
 
-export async function createWorkflow(apiKey, payload) {
-    const response = await fetch(`${BASE_URL}/workflow/create`, {
+    return submitVideo(apiKey, payload, params.onRequestId);
+}
+
+export async function generateMarketingStudioAd(apiKey, params) {
+    throw new Error('Маркетинговые видео недоступны в Memefast API');
+}
+
+export async function processV2V(apiKey, params) {
+    throw new Error('Video-to-video недоступен в Memefast API');
+}
+
+export async function processLipSync(apiKey, params) {
+    throw new Error('LipSync недоступен в Memefast API');
+}
+
+export async function generateAudio(apiKey, params) {
+    const modelId = params._modelId || params.model || 'tts-1';
+    const payload = {
+        model: modelId,
+        input: params.text || params.input || params.prompt || '',
+        voice: params.voice || 'alloy',
+    };
+    if (params.speed) payload.speed = params.speed;
+
+    const response = await fetch(`${BASE_URL}/v1/audio/speech`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        },
+        headers: bearerHeaders(apiKey),
         body: JSON.stringify(payload)
     });
     if (!response.ok) {
         const errText = await response.text();
-        throw new Error(`Failed to create workflow: ${response.status} - ${errText.slice(0, 100)}`);
+        notifyAuthRequired(response.status, errText);
+        throw new Error(`Audio generation failed: ${response.status} - ${errText.slice(0, 200)}`);
     }
-    return await response.json();
-};
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    return { url };
+}
 
-export async function updateWorkflowName(apiKey, workflowId, name) {
-    const response = await fetch(`${BASE_URL}/workflow/update-name/${workflowId}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        },
-        body: JSON.stringify({ name })
+export function uploadFile(apiKey, file, onProgress) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        if (onProgress) onProgress(30);
+        reader.onload = () => {
+            if (onProgress) onProgress(100);
+            resolve(reader.result);
+        };
+        reader.onerror = () => reject(new Error('File read failed'));
+        reader.readAsDataURL(file);
     });
-    if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`Failed to rename workflow: ${response.status} - ${errText.slice(0, 100)}`);
-    }
-    return await response.json();
-};
+}
 
-export async function deleteWorkflow(apiKey, workflowId) {
-    const response = await fetch(`${BASE_URL}/workflow/delete-workflow-def/${workflowId}`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        }
-    });
-    if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`Failed to delete workflow: ${response.status} - ${errText.slice(0, 100)}`);
-    }
-    return await response.json();
-};
-
-export async function getWorkflowInputs(apiKey, workflowId) {
-    const response = await fetch(`${BASE_URL}/workflow/${workflowId}/api-inputs`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        }
-    });
-    if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`Failed to fetch workflow inputs: ${response.status} - ${errText.slice(0, 100)}`);
-    }
-    return await response.json();
-};
-
-export async function executeWorkflow(apiKey, workflowId, inputs) {
-    const response = await fetch(`${BASE_URL}/workflow/${workflowId}/api-execute`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        },
-        body: JSON.stringify({ inputs })
-    });
-    if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`Failed to execute workflow: ${response.status} - ${errText.slice(0, 100)}`);
-    }
-    const submitData = await response.json();
-    const runId = submitData.run_id || submitData.id;
-    if (!runId) return submitData;
-    
-    // Poll for results
-    return await pollWorkflowResult(runId, apiKey);
-};
-
-async function pollWorkflowResult(runId, apiKey, maxAttempts = 900, interval = 2000) {
-    const pollUrl = `${BASE_URL}/workflow/run/${runId}/api-outputs`;
-    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-        await new Promise(resolve => setTimeout(resolve, interval));
+export async function getUserBalance(apiKey) {
+    const endpoints = [
+        '/v1/user/info',
+        '/v1/dashboard/billing/credit_grants',
+        '/v1/user/balance',
+        '/v1/dashboard/balance',
+    ];
+    for (const endpoint of endpoints) {
         try {
-            const response = await fetch(pollUrl, {
-                headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey }
+            const response = await fetch(`${BASE_URL}${endpoint}`, {
+                headers: bearerHeaders(apiKey)
             });
-            if (!response.ok) {
-                if (response.status >= 500) continue;
-                throw new Error(`Poll Failed: ${response.status}`);
+            if (response.status === 401 || response.status === 403) {
+                notifyAuthRequired(response.status, await response.text());
+                throw new Error('Unauthorized');
             }
-            const data = await response.json();
-            const status = data.status?.toLowerCase();
-            if (status === 'completed' || status === 'succeeded' || status === 'success') return data;
-            if (status === 'failed' || status === 'error') throw new Error(`Workflow failed: ${data.error || 'Unknown error'}`);
-        } catch (error) {
-            if (attempt === maxAttempts) throw error;
+            if (response.ok) {
+                const data = await response.json();
+                const balance = data.balance ?? data.credits ?? data.remaining ??
+                    data.total_granted ?? data.credit ?? null;
+                return { balance };
+            }
+        } catch (err) {
+            if (err.message === 'Unauthorized') throw err;
         }
     }
-    throw new Error('Workflow timed out after polling.');
-};
-
-export async function getAllNodeSchemas(apiKey, workflowId) {
-    const response = await fetch(`${BASE_URL}/workflow/${workflowId}/node-schemas`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        }
-    });
-    if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`Failed to fetch node schemas: ${response.status} - ${errText.slice(0, 100)}`);
-    }
-    return await response.json();
-};
-
-export async function getWorkflowData(apiKey, workflowId) {
-    const response = await fetch(`${BASE_URL}/workflow/get-workflow-def/${workflowId}`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        }
-    });
-    if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`Failed to fetch workflow data: ${response.status} - ${errText.slice(0, 100)}`);
-    }
-    return await response.json();
-};
-
-export async function getNodeSchemas(apiKey, workflowId) {
-    const response = await fetch(`${BASE_URL}/workflow/${workflowId}/api-node-schemas`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        }
-    });
-    if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`Failed to fetch node schemas: ${response.status} - ${errText.slice(0, 100)}`);
-    }
-    return await response.json();
+    return { balance: null };
 }
 
-export async function runSingleNode(apiKey, workflowId, nodeId, payload) {
-    const response = await fetch(`${BASE_URL}/workflow/${workflowId}/node/${nodeId}/run`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        },
-        body: JSON.stringify(payload)
-    });
-    if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`Failed to run single node: ${response.status} - ${errText.slice(0, 100)}`);
-    }
-    return await response.json();
-}
+// ── Workflow / Agent stubs (not available in Memefast) ───────────────────────
+export async function getTemplateWorkflows() { return []; }
+export async function getUserWorkflows()     { return []; }
+export async function getPublishedWorkflows(){ return []; }
+export async function getTemplateAgents()   { return []; }
+export async function getUserAgents()       { return []; }
+export async function getPublishedAgents()  { return []; }
+export async function getUserConversations(){ return []; }
 
-export async function deleteNodeRun(apiKey, nodeRunId) {
-    const response = await fetch(`${BASE_URL}/workflow/node-run/${nodeRunId}`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        }
-    });
-    if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`Failed to delete node run: ${response.status} - ${errText.slice(0, 100)}`);
-    }
-    return await response.json();
-}
+export async function createWorkflow()    { throw new Error('Workflows недоступны в Memefast API'); }
+export async function updateWorkflowName(){ throw new Error('Workflows недоступны в Memefast API'); }
+export async function deleteWorkflow()    { throw new Error('Workflows недоступны в Memefast API'); }
+export async function getWorkflowInputs() { return {}; }
+export async function executeWorkflow()   { throw new Error('Workflows недоступны в Memefast API'); }
+export async function getAllNodeSchemas()  { return {}; }
+export async function getWorkflowData()   { return {}; }
+export async function getNodeSchemas()    { return {}; }
+export async function runSingleNode()     { throw new Error('Workflows недоступны в Memefast API'); }
+export async function deleteNodeRun()     { return {}; }
+export async function getNodeStatus()     { return {}; }
+export async function calculateDynamicCost() { return { cost: 0 }; }
+export async function registerAppInterest()  { return {}; }
+export async function getAppInterests()      { return []; }
+export async function runClipping()          { throw new Error('AI-нарезка недоступна в Memefast API'); }
+export async function runMotionGraphics()    { throw new Error('Motion Graphics недоступны в Memefast API'); }
+export async function runMotionGraphicsEdit(){ throw new Error('Motion Graphics недоступны в Memefast API'); }
 
-export async function getNodeStatus(apiKey, runId) {
-    const response = await fetch(`${BASE_URL}/workflow/run/${runId}/status`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        }
-    });
-    if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`Failed to get node status: ${response.status} - ${errText.slice(0, 100)}`);
-    }
-    return await response.json();
-}
-
-/**
- * Handle proxy requests centralizing communication logic with MuAPI.
- * This is used by the server-side entry points.
- */
 export async function handleProxyRequest(prefix, path, method, headers, body, apiKey) {
-    const url = `${BASE_URL}/${prefix}/${path}`;
-    
+    const url = `${BASE_URL}/${path}`;
     const finalHeaders = new Headers(headers);
     finalHeaders.delete('host');
     finalHeaders.delete('connection');
-    finalHeaders.delete('content-length'); // Let fetch recalculate this for safety
-
-    if (apiKey) {
-        finalHeaders.set('x-api-key', apiKey);
-    }
-
-    try {
-        const response = await fetch(url, {
-            method,
-            headers: finalHeaders,
-            body: (method !== 'GET' && method !== 'HEAD') ? body : undefined,
-            redirect: 'follow',
-        });
-
-        const contentType = response.headers.get('Content-Type') || 'application/json';
-        const buffer = await response.arrayBuffer();
-        
-        return {
-            status: response.status,
-            contentType,
-            data: buffer
-        };
-    } catch (error) {
-        console.error(`MuAPI Proxy error for ${url}:`, error);
-        throw error;
-    }
+    finalHeaders.delete('content-length');
+    if (apiKey) finalHeaders.set('Authorization', `Bearer ${apiKey}`);
+    const response = await fetch(url, {
+        method,
+        headers: finalHeaders,
+        body: (method !== 'GET' && method !== 'HEAD') ? body : undefined,
+        redirect: 'follow',
+    });
+    const contentType = response.headers.get('Content-Type') || 'application/json';
+    const buffer = await response.arrayBuffer();
+    return { status: response.status, contentType, data: buffer };
 }
 
-/**
- * A centralized handler for Next.js API routes or middleware.
- */
 export async function handleServerSideProxy(prefix, request, params, apiKey) {
-    try {
-        const slug = await params;
-        const pathSegments = slug.path || [];
-        const path = pathSegments.join('/');
-        
-        const method = request.method;
-        let body = null;
-        if (method !== 'GET' && method !== 'HEAD') {
-            body = await request.arrayBuffer();
-        }
-
-        const { search } = new URL(request.url);
-        const pathWithSearch = search ? `${path}${search}` : path;
-
-        return await handleProxyRequest(
-            prefix, 
-            pathWithSearch, 
-            method, 
-            request.headers, 
-            body, 
-            apiKey
-        );
-    } catch (error) {
-        console.error(`Server proxy failed:`, error);
-        throw error;
-    }
-}
-
-export async function calculateDynamicCost(apiKey, taskName, payload) {
-    const response = await fetch(`${BASE_URL}/api/v1/app/calculate_dynamic_cost`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        },
-        body: JSON.stringify({ task_name: taskName, payload })
-    });
-    if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`Failed to calculate dynamic cost: ${response.status} - ${errText.slice(0, 100)}`);
-    }
-    return await response.json();
-}
-
-export async function registerAppInterest(apiKey, appName) {
-    const response = await fetch(`${BASE_URL}/app/interest`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        },
-        body: JSON.stringify({ app_name: appName })
-    });
-    if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`Failed to register interest: ${response.status} - ${errText.slice(0, 100)}`);
-    }
-    return await response.json();
-}
-
-export async function getAppInterests(apiKey) {
-    const response = await fetch(`${BASE_URL}/app/interests`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        }
-    });
-    if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`Failed to fetch interests: ${response.status} - ${errText.slice(0, 100)}`);
-    }
-    return await response.json();
-}
-
-export async function runClipping(apiKey, params) {
-    const payload = {
-        video_url: params.video_url,
-        num_highlights: params.num_highlights || 3,
-        aspect_ratio: params.aspect_ratio || "9:16",
-        return_coordinates_only: !!params.return_coordinates_only
-    };
-    return submitAndPoll("ai-clipping", payload, apiKey, params.onRequestId, 900);
-}
-
-export async function runMotionGraphics(apiKey, params) {
-    const payload = {
-        prompt: params.prompt,
-        aspect_ratio: params.aspect_ratio || "16:9",
-        duration_seconds: params.duration_seconds || 6,
-    };
-    return submitAndPoll("motion-graphics", payload, apiKey, params.onRequestId, 900);
-}
-
-export async function runMotionGraphicsEdit(apiKey, params) {
-    const payload = {
-        request_id: params.request_id,
-        edit_prompt: params.edit_prompt,
-        aspect_ratio: params.aspect_ratio || "16:9",
-        duration_seconds: params.duration_seconds || 6,
-    };
-    return submitAndPoll("motion-graphics-edit", payload, apiKey, params.onRequestId, 900);
+    const slug = await params;
+    const pathSegments = slug.path || [];
+    const path = pathSegments.join('/');
+    const method = request.method;
+    let body = null;
+    if (method !== 'GET' && method !== 'HEAD') body = await request.arrayBuffer();
+    const { search } = new URL(request.url);
+    const pathWithSearch = search ? `${path}${search}` : path;
+    return handleProxyRequest(prefix, pathWithSearch, method, request.headers, body, apiKey);
 }

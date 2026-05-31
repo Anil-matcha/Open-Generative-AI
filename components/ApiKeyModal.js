@@ -43,7 +43,7 @@ export default function ApiKeyModal({ onSave, onClose, overlay = false, title, s
           </h1>
           <p className="text-white/40 text-[13px] leading-relaxed px-4">
             {subtitle || (
-              <>Введите ваш API-ключ <a href="https://muapi.ai/access-keys" target="_blank" rel="noreferrer" className="text-[#22d3ee] hover:text-[#e5ff33] transition-colors">Muapi.ai</a> чтобы начать создавать</>
+              <>Введите ваш API-ключ <a href="https://memefast.top" target="_blank" rel="noreferrer" className="text-[#22d3ee] hover:text-[#e5ff33] transition-colors">Memefast</a> чтобы начать создавать</>
             )}
           </p>
         </div>
@@ -74,8 +74,8 @@ export default function ApiKeyModal({ onSave, onClose, overlay = false, title, s
 
           <p className="text-center text-[12px] text-white/20 pt-2">
             Нет ключа?{' '}
-            <a href="https://muapi.ai/access-keys" target="_blank" rel="noreferrer" className="text-white/40 hover:text-[#22d3ee] transition-colors font-medium">
-              Получить бесплатно →
+            <a href="https://memefast.top" target="_blank" rel="noreferrer" className="text-white/40 hover:text-[#22d3ee] transition-colors font-medium">
+              Получить на Memefast →
             </a>
           </p>
         </form>

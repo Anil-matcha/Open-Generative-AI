@@ -240,7 +240,7 @@ export default function VideoStudio({
   droppedFiles,
   onFilesHandled,
 }) {
-  const PERSIST_KEY = "hg_video_studio_persistent";
+  const PERSIST_KEY = "mf_video_studio_persistent";
 
   // ── mode state ──
   const [imageMode, setImageMode] = useState(false); // i2v

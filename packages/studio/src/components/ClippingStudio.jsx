@@ -93,7 +93,7 @@ export default function ClippingStudio({
   droppedFiles,
   onFilesHandled,
 }) {
-  const PERSIST_KEY = "hg_clipping_studio_persistent";
+  const PERSIST_KEY = "mf_clipping_studio_persistent";
 
   // ── Clipping Parameters State ───────────────────────────────────────────
   const [videoUrl, setVideoUrl] = useState("");

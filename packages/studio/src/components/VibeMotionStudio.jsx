@@ -48,7 +48,7 @@ function DropdownItem({ label, selected, onClick }) {
 
 // ── Main Component ────────────────────────────────────────────────────────────
 export default function VibeMotionStudio({ apiKey }) {
-  const PERSIST_KEY = "hg_vibe_motion_studio_persistent";
+  const PERSIST_KEY = "mf_vibe_motion_studio_persistent";
 
   // ── Params ────────────────────────────────────────────────────────────────
   const [prompt, setPrompt] = useState("");
