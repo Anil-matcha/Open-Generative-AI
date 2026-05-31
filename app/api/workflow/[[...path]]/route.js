@@ -1,11 +1,140 @@
 import { NextResponse } from 'next/server';
 
 const store = global._mf_workflows ?? (global._mf_workflows = new Map());
+const runStore = global._mf_runs ?? (global._mf_runs = new Map());
+
+const MEMEFAST = 'https://memefast.top';
 
 function genId() { return `wf_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`; }
 
 function emptyWorkflow(id) {
     return { workflow_id: id, id, name: 'Untitled', nodes: [], edges: [], created_at: new Date().toISOString() };
+}
+
+// Video model IDs (need /v1/video/create endpoint)
+const VIDEO_MODELS = new Set([
+    'video-passthrough','seedance-lite-i2v','seedance-lite-t2v','seedance-pro-t2v','seedance-pro-i2v',
+    'seedance-pro-t2v-fast','seedance-pro-i2v-fast','seedance-v1.5-pro-i2v','seedance-v1.5-pro-t2v',
+    'seedance-v1.5-pro-i2v-fast','seedance-v1.5-pro-t2v-fast','seedance-v1.5-pro-video-extend',
+    'seedance-v1.5-pro-video-extend-fast','veo3.1-image-to-video','veo3.1-text-to-video',
+    'veo3.1-fast-image-to-video','veo3.1-fast-text-to-video','wan2.2-text-to-video',
+    'wan2.2-image-to-video','wan2.2-5b-fast-t2v','wan2.2-animate','wan2.2-edit-video',
+    'wan2.2-spicy-image-to-video','wan2.2-spicy-video-extend','wan2.5-text-to-video',
+    'wan2.5-image-to-video','wan2.5-text-to-video-fast','wan2.5-image-to-video-fast',
+    'wan2.6-text-to-video','wan2.6-image-to-video','openai-sora','openai-sora-2-text-to-video',
+    'openai-sora-2-image-to-video','openai-sora-2-pro-text-to-video','openai-sora-2-pro-image-to-video',
+    'kling-v2.5-turbo-pro-t2v','kling-v2.5-turbo-pro-i2v','kling-v2.5-turbo-std-i2v',
+    'kling-v2.6-pro-t2v','kling-v2.6-pro-i2v','kling-v2.6-pro-motion-control',
+    'kling-o1-text-to-video','kling-o1-image-to-video','kling-o1-video-edit',
+    'kling-o1-video-edit-fast','kling-o1-reference-to-video','kling-o1-standard-image-to-video',
+    'kling-o1-standard-reference-to-video','kling-o1-standard-video-edit',
+    'grok-imagine-text-to-video','grok-imagine-image-to-video','hunyuan-text-to-video',
+    'hunyuan-fast-text-to-video','hunyuan-image-to-video','midjourney-v7-image-to-video',
+    'vidu-q2-turbo-start-end-video','vidu-q2-pro-start-end-video','vidu-q2-reference',
+    'luma-modify-video','luma-flash-reframe',
+]);
+
+const TEXT_MODELS = new Set(['text-passthrough','any-llm','openrouter-vision','gpt-5-nano','gpt-5-mini']);
+const AUDIO_MODELS = new Set(['audio-passthrough','suno-create-music','suno-extend-music','suno-remix-music','minimax-voice-clone','minimax-speech-2.6-hd','minimax-speech-2.6-turbo']);
+
+async function generateImage(apiKey, model, params) {
+    const size = (params.width && params.height)
+        ? `${params.width}x${params.height}`
+        : '1024x1024';
+    const res = await fetch(`${MEMEFAST}/v1/images/generations`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model, prompt: params.prompt || '', n: 1, size, response_format: 'url' })
+    });
+    if (!res.ok) {
+        const txt = await res.text().catch(() => res.statusText);
+        throw new Error(`Image API ${res.status}: ${txt.slice(0, 200)}`);
+    }
+    const data = await res.json();
+    const url = data.data?.[0]?.url || data.url || '';
+    return [{ type: 'image_url', value: url }];
+}
+
+async function generateText(apiKey, model, params) {
+    const messages = [];
+    if (params.image_url) {
+        messages.push({ role: 'user', content: [
+            { type: 'image_url', image_url: { url: params.image_url } },
+            { type: 'text', text: params.prompt || '' }
+        ]});
+    } else {
+        messages.push({ role: 'user', content: params.prompt || '' });
+    }
+    const res = await fetch(`${MEMEFAST}/v1/chat/completions`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: model === 'text-passthrough' ? 'gpt-4o-mini' : model, messages, max_tokens: 4096 })
+    });
+    if (!res.ok) {
+        const txt = await res.text().catch(() => res.statusText);
+        throw new Error(`Text API ${res.status}: ${txt.slice(0, 200)}`);
+    }
+    const data = await res.json();
+    const text = data.choices?.[0]?.message?.content || '';
+    return [{ type: 'text', value: text }];
+}
+
+async function generateVideo(apiKey, model, params) {
+    const res = await fetch(`${MEMEFAST}/v1/video/create`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model, prompt: params.prompt || '', image_url: params.image_url, duration: params.duration || 5, aspect_ratio: params.aspect_ratio || '16:9' })
+    });
+    if (!res.ok) {
+        const txt = await res.text().catch(() => res.statusText);
+        throw new Error(`Video API ${res.status}: ${txt.slice(0, 200)}`);
+    }
+    const data = await res.json();
+    const taskId = data.task_id || data.id;
+    if (!taskId) {
+        const url = data.url || data.video_url || '';
+        return [{ type: 'video_url', value: url }];
+    }
+    // Poll for result
+    for (let i = 0; i < 120; i++) {
+        await new Promise(r => setTimeout(r, 3000));
+        const poll = await fetch(`${MEMEFAST}/v1/video/task/${taskId}`, {
+            headers: { 'Authorization': `Bearer ${apiKey}` }
+        });
+        if (!poll.ok) continue;
+        const pData = await poll.json();
+        const status = (pData.status || '').toLowerCase();
+        if (status === 'completed' || status === 'succeeded' || status === 'success') {
+            const url = pData.url || pData.video_url || pData.output?.url || pData.data?.url || '';
+            return [{ type: 'video_url', value: url }];
+        }
+        if (status === 'failed' || status === 'error') throw new Error(pData.error || 'Video generation failed');
+    }
+    throw new Error('Video generation timed out');
+}
+
+async function runNode(runId, nodeId, model, params, apiKey) {
+    try {
+        let outputs;
+        if (VIDEO_MODELS.has(model)) {
+            outputs = await generateVideo(apiKey, model, params);
+        } else if (TEXT_MODELS.has(model)) {
+            outputs = await generateText(apiKey, model, params);
+        } else {
+            // Default to image
+            outputs = await generateImage(apiKey, model, params);
+        }
+        runStore.set(runId, {
+            status: 'completed',
+            nodes: { [nodeId]: [{ status: 'succeeded', result: { outputs } }] }
+        });
+    } catch (err) {
+        console.error(`Node run error [${nodeId}]:`, err.message);
+        runStore.set(runId, {
+            status: 'failed',
+            nodes: { [nodeId]: [{ status: 'failed', result: { outputs: [{ type: 'error', value: err.message }] } }] }
+        });
+    }
 }
 
 function getNodeSchemas() {
@@ -213,7 +342,10 @@ export async function GET(request, { params }) {
 
     // GET /api/workflow/run/{runId}/status
     if (path[0] === 'run' && path[2] === 'status') {
-        return NextResponse.json({ status: 'completed', result: {} });
+        const runId = path[1];
+        const run = runStore.get(runId);
+        if (!run) return NextResponse.json({ status: 'processing', nodes: {} });
+        return NextResponse.json(run);
     }
 
     // GET /api/workflow/{id}
@@ -252,8 +384,14 @@ export async function POST(request, { params }) {
 
     // POST /api/workflow/{id}/node/{nodeId}/run
     if (path[1] === 'node' && path[3] === 'run') {
-        const runId = genId();
-        return NextResponse.json({ run_id: runId, status: 'completed', result: {} });
+        const nodeId = path[2];
+        const runId = body.run_id || genId();
+        const apiKey = request.headers.get('authorization')?.replace('Bearer ', '') || '';
+        const model = body.model || '';
+        const params = body.params || {};
+        // Start async generation, don't await
+        runNode(runId, nodeId, model, params, apiKey).catch(() => {});
+        return NextResponse.json({ run_id: runId, status: 'processing' });
     }
 
     // POST /api/workflow/{id}/publish|template|update-category|thumbnail
