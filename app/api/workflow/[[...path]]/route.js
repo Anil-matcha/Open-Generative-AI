@@ -57,6 +57,23 @@ async function tosUpload(key, buffer, contentType) {
     } catch (e) { console.error('TOS upload error:', e.message); return null; }
 }
 
+// Resolve any private/TOS URL to a base64 data URL so external AI APIs can use it.
+// Server-to-server fetches are not subject to CORS; only browser→TOS is blocked.
+async function resolveImageUrl(url) {
+    if (!url || url.startsWith('data:')) return url;
+    const tosHost = TOS_ENABLED ? `${TOS_BUCKET}.${TOS_ENDPOINT}` : '';
+    if (tosHost && url.startsWith(`https://${tosHost}`)) {
+        try {
+            const r = await fetch(url);
+            if (!r.ok) return url;
+            const buf = await r.arrayBuffer();
+            const ct = r.headers.get('content-type') || 'image/png';
+            return `data:${ct};base64,${Buffer.from(buf).toString('base64')}`;
+        } catch { return url; }
+    }
+    return url;
+}
+
 // Upload base64 data URL → TOS public URL (falls back to original if TOS unavailable)
 async function maybeUploadToTOS(dataUrl) {
     if (!dataUrl || !dataUrl.startsWith('data:') || !TOS_ENABLED) return dataUrl;
@@ -432,12 +449,14 @@ async function generateText(apiKey, model, params) {
 
 async function generateVideo(apiKey, model, params) {
     const apiModel = MODEL_ID_MAP[model] || model;
+    // Resolve TOS/private URLs to base64 so Memefast can access the image
+    const imageUrl = params.image_url ? await resolveImageUrl(params.image_url) : undefined;
     const res = await fetch(`${MEMEFAST}/v1/video/create`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
             model: apiModel, prompt: params.prompt || '',
-            image_url: params.image_url,
+            image_url: imageUrl,
             duration: params.duration || 5,
             aspect_ratio: params.aspect_ratio || '16:9',
         }),
