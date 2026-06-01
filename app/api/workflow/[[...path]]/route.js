@@ -707,11 +707,14 @@ export async function POST(request, { params }) {
         const runId = genId();
         const runNodes = {}; // for pollRunIdStatus format
 
+        const PASSTHROUGH_MODELS = new Set(['text-passthrough', 'image-passthrough', 'video-passthrough', 'audio-passthrough']);
+
         for (const nodeId of order) {
             const node = nodes.find(n => n.id === nodeId);
             if (!node) continue;
 
-            const params = { ...(node.data?.formValues || {}) };
+            // Saved nodes use input_params (not data.formValues)
+            const params = { ...(node.input_params || {}) };
 
             // Apply user-provided inputs for input nodes
             const userIn = inputs[nodeId];
@@ -732,28 +735,21 @@ export async function POST(request, { params }) {
                 else if (th === 'audioInput') params.audio_url = src.value;
             }
 
-            if (node.type === 'textNode') {
-                nodeOutputs[nodeId] = [{ type: 'text', value: params.prompt || '' }];
-            } else if (node.type === 'uploadNode') {
-                const val = params.image_url || params.video_url || params.audio_url || '';
-                const type = params.video_url ? 'video_url' : params.audio_url ? 'audio_url' : 'image_url';
-                nodeOutputs[nodeId] = [{ type, value: val }];
-            } else {
-                const model = node.data?.selectedModel?.id || '';
-                if (model) {
-                    const nRunId = genId();
-                    await runNode(nRunId, nodeId, model, params, apiKey);
-                    const nr = runStore.get(nRunId);
-                    const outs = nr?.nodes?.[nodeId]?.[0]?.result?.outputs || [];
-                    nodeOutputs[nodeId] = outs;
-                    runNodes[nodeId] = nr?.nodes?.[nodeId] || [];
-                }
+            // Saved nodes use node.model (not node.data.selectedModel.id)
+            const model = node.model || '';
+            if (model) {
+                const nRunId = genId();
+                await runNode(nRunId, nodeId, model, params, apiKey);
+                const nr = runStore.get(nRunId);
+                const outs = nr?.nodes?.[nodeId]?.[0]?.result?.outputs || [];
+                nodeOutputs[nodeId] = outs;
+                runNodes[nodeId] = nr?.nodes?.[nodeId] || [];
             }
         }
 
-        // Collect outputs from nodes marked as output (make_output = true)
-        let outputNodes = nodes.filter(n => n.data?.formValues?.make_output);
-        if (!outputNodes.length) outputNodes = nodes.filter(n => !['textNode','uploadNode'].includes(n.type));
+        // Collect outputs: prefer make_output flag, fallback to non-passthrough nodes
+        let outputNodes = nodes.filter(n => n.input_params?.make_output);
+        if (!outputNodes.length) outputNodes = nodes.filter(n => n.model && !PASSTHROUGH_MODELS.has(n.model));
         const outputs = outputNodes.flatMap(n => nodeOutputs[n.id] || []);
 
         const runResult = { status: 'completed', nodes: runNodes, outputs };

@@ -588,21 +588,26 @@ export async function getWorkflowInputs(apiKey, id) {
         const nodes = wf.data?.nodes || wf.nodes || [];
         const properties = {};
         for (const node of nodes) {
-            if (node.type === 'textNode') {
+            // Nodes saved by builder use category/model, not type
+            const cat = node.category || node.type || '';
+            const model = node.model || '';
+            if (cat === 'text' || node.type === 'textNode') {
+                const prompt = node.input_params?.prompt || node.data?.formValues?.prompt || '';
                 properties[node.id] = {
                     type: 'string',
                     title: node.id,
                     description: 'Text input',
-                    default: node.data?.formValues?.prompt || '',
-                    examples: [node.data?.formValues?.prompt || ''],
+                    default: prompt,
+                    examples: [prompt],
                 };
-            } else if (node.type === 'uploadNode') {
+            } else if (model.includes('passthrough') && (cat === 'image' || node.type === 'uploadNode')) {
+                const url = node.input_params?.image_url || node.data?.formValues?.image_url || '';
                 properties[node.id] = {
                     type: 'string',
                     title: node.id + ' (image URL)',
                     description: 'Image URL',
                     field: 'image',
-                    default: node.data?.formValues?.image_url || '',
+                    default: url,
                 };
             }
         }

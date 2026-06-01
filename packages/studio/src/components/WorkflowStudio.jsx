@@ -406,10 +406,11 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
       const inputs = {};
       Object.entries(formData).forEach(([key, value]) => {
         if (!value) return;
-        if (key.startsWith("text")) inputs[key] = { prompt: value };
-        else if (key.startsWith("image")) inputs[key] = { image_url: value };
-        else if (key.startsWith("video")) inputs[key] = { video_url: value };
-        else inputs[key] = value;
+        const prop = inputSchema?.properties?.[key] || {};
+        if (prop.field === 'image') inputs[key] = { image_url: value };
+        else if (prop.field === 'video') inputs[key] = { video_url: value };
+        else if (prop.field === 'audio') inputs[key] = { audio_url: value };
+        else inputs[key] = { prompt: value };
       });
 
       const data = await executeWorkflow(apiKey, selectedWorkflow.id, inputs);
