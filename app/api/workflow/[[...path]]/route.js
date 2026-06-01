@@ -53,6 +53,10 @@ const CHAT_IMAGE_MODELS = new Set([
     'gemini-2.5-flash-image',
     'gemini-3-pro-image-preview',
     'gemini-3.1-flash-image-preview',
+    // Edit variants (same models, renamed for UI categorization)
+    'gemini-2.5-flash-image-edit',
+    'gemini-3-pro-image-edit',
+    'gemini-3.1-flash-image-edit',
 ]);
 
 // Schema key → actual Memefast model ID (for models renamed to include "edit"/"reference" in key)
@@ -62,6 +66,9 @@ const MODEL_ID_MAP = {
     'grok-imagine-image-reference':  'grok-imagine-image-pro',
     'mj_inpaint-edit':               'mj_inpaint',
     'mj_variation-reference':        'mj_variation',
+    'gemini-2.5-flash-image-edit':   'gemini-2.5-flash-image',
+    'gemini-3-pro-image-edit':       'gemini-3-pro-image-preview',
+    'gemini-3.1-flash-image-edit':   'gemini-3.1-flash-image-preview',
     'pixverse-video-edit':           'pixverse-modify',
     'pixverse-restyle-edit':         'pixverse-restyle',
     'pixverse-lipsync-edit':         'pixverse-lipsync',
@@ -371,10 +378,14 @@ function getNodeSchemas() {
                     "mj_variation-reference":         T.imgRef, // → mj_variation
                     // Wan Image
                     "wan2.7-image-pro":               T.t2iWH,
-                    // Gemini Image
-                    "gemini-3.1-flash-image-preview": T.t2i,
-                    "gemini-3-pro-image-preview":     T.t2i,
-                    "gemini-2.5-flash-image":         T.t2i,
+                    // Gemini Image (accept optional image for editing)
+                    "gemini-3.1-flash-image-preview": T.imgRef,
+                    "gemini-3-pro-image-preview":     T.imgRef,
+                    "gemini-2.5-flash-image":         T.imgRef,
+                    // Gemini Edit Image (same models, shown in Edit Image section)
+                    "gemini-2.5-flash-image-edit":    T.imgRef,  // → gemini-2.5-flash-image
+                    "gemini-3-pro-image-edit":        T.imgRef,  // → gemini-3-pro-image-preview
+                    "gemini-3.1-flash-image-edit":    T.imgRef,  // → gemini-3.1-flash-image-preview
                 }
             },
             video: {
