@@ -467,21 +467,29 @@ async function generateVideo(apiKey, model, params) {
     }
     const data = await res.json();
     const taskId = data.task_id || data.id;
+    // If the create response already contains a finished video, return it directly
+    if (data.video_url) return [{ type: 'video_url', value: data.video_url }];
     if (!taskId) return [{ type: 'video_url', value: data.url || data.video_url || '' }];
 
-    // Poll for up to 260s (stay within Vercel's 300s maxDuration with margin for overhead)
+    // Poll Memefast: GET /v1/videos/{taskId} → { status, video_url }
+    // status flow: queued → video_generating → (video_url populated when done)
+    // Poll for up to 260s (stay within Vercel's 300s maxDuration with margin).
     for (let i = 0; i < 86; i++) {
         await new Promise(r => setTimeout(r, 3000));
-        const poll = await fetch(`${MEMEFAST}/v1/video/task/${taskId}`, {
+        const poll = await fetch(`${MEMEFAST}/v1/videos/${taskId}`, {
             headers: { 'Authorization': `Bearer ${apiKey}` },
         });
         if (!poll.ok) continue;
         const pData = await poll.json();
+        // Done as soon as a video URL is available
+        if (pData.video_url || pData.url) {
+            return [{ type: 'video_url', value: pData.video_url || pData.url }];
+        }
         const st = (pData.status || '').toLowerCase();
         if (st === 'completed' || st === 'succeeded' || st === 'success' || st === 'done' || st === 'finished') {
-            return [{ type: 'video_url', value: pData.url || pData.video_url || pData.output?.url || '' }];
+            return [{ type: 'video_url', value: pData.video_url || pData.url || pData.output?.url || '' }];
         }
-        if (st === 'failed' || st === 'error') throw new Error(pData.error || 'Video generation failed');
+        if (st === 'failed' || st === 'error') throw new Error(pData.error || pData.message || 'Video generation failed');
     }
     throw new Error('Video generation timed out after 260s');
 }
@@ -539,9 +547,10 @@ async function generateAudio(apiKey, model, params) {
         if (!taskId) return [{ type: 'audio_url', value: d.url || d.audio_url || '' }];
         for (let i = 0; i < 60; i++) {
             await new Promise(r => setTimeout(r, 3000));
-            const poll = await fetch(`${MEMEFAST}/v1/video/task/${taskId}`, { headers: { 'Authorization': `Bearer ${apiKey}` } });
+            const poll = await fetch(`${MEMEFAST}/v1/videos/${taskId}`, { headers: { 'Authorization': `Bearer ${apiKey}` } });
             if (!poll.ok) continue;
             const p = await poll.json();
+            if (p.audio_url || p.url) return [{ type: 'audio_url', value: p.audio_url || p.url }];
             const st = (p.status || '').toLowerCase();
             if (st === 'completed' || st === 'succeeded') return [{ type: 'audio_url', value: p.url || p.audio_url || '' }];
             if (st === 'failed' || st === 'error') throw new Error(p.error || 'Video sound generation failed');
@@ -562,9 +571,10 @@ async function generateAudio(apiKey, model, params) {
         if (!taskId) return [{ type: 'audio_url', value: d.url || d.audio_url || '' }];
         for (let i = 0; i < 60; i++) {
             await new Promise(r => setTimeout(r, 3000));
-            const poll = await fetch(`${MEMEFAST}/v1/video/task/${taskId}`, { headers: { 'Authorization': `Bearer ${apiKey}` } });
+            const poll = await fetch(`${MEMEFAST}/v1/videos/${taskId}`, { headers: { 'Authorization': `Bearer ${apiKey}` } });
             if (!poll.ok) continue;
             const p = await poll.json();
+            if (p.audio_url || p.url) return [{ type: 'audio_url', value: p.audio_url || p.url }];
             const st = (p.status || '').toLowerCase();
             if (st === 'completed' || st === 'succeeded') return [{ type: 'audio_url', value: p.url || p.audio_url || '' }];
             if (st === 'failed' || st === 'error') throw new Error(p.error || 'Sound effect generation failed');
