@@ -120,7 +120,7 @@
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.4.1",
     "studio": "*",
-    "workflow-builder": "file:./packages/Vibe-Workflow/packages/workflow-builder",
+    "workflow-builder": "file:./packages/workflow-builder-local",
     "ai-agent": "file:./packages/Open-Poe-AI/packages/agents"
   },
   "devDependencies": {
