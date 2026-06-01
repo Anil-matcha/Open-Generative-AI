@@ -591,16 +591,27 @@ async function runNode(runId, nodeId, model, params, apiKey) {
         else if (CHAT_IMAGE_MODELS.has(model)) outputs = await generateChatImage(apiKey, model, params);
         else outputs = await generateImage(apiKey, model, params);
 
-        // Upload any base64 images to TOS → replace with public URL
-        for (const out of outputs) {
-            if (out.type === 'image_url' && out.value?.startsWith('data:')) {
-                out.value = await maybeUploadToTOS(out.value);
-            }
-        }
-
+        // Return the result immediately (browser renders data: URLs and remote
+        // URLs directly). TOS upload + run persistence happen in the background
+        // so they never block the response or depend on cross-instance reads.
         const runResult = { status: 'completed', nodes: { [nodeId]: [{ status: 'succeeded', result: { outputs } }] } };
         runStore.set(runId, runResult);
-        await tosSaveRun(runId, runResult).catch(() => {});
+
+        // Background: upload any base64 images to TOS and persist the run JSON.
+        // Fire-and-forget — failure here only affects reload persistence, not display.
+        (async () => {
+            try {
+                let changed = false;
+                for (const out of outputs) {
+                    if (out.type === 'image_url' && out.value?.startsWith('data:')) {
+                        const uploaded = await maybeUploadToTOS(out.value);
+                        if (uploaded && uploaded !== out.value) { out.value = uploaded; changed = true; }
+                    }
+                }
+                if (changed) runStore.set(runId, runResult);
+                await tosSaveRun(runId, runResult);
+            } catch { /* best-effort */ }
+        })();
     } catch (err) {
         console.error(`Node run error [${nodeId}]:`, err.message);
         const runResult = { status: 'failed', nodes: { [nodeId]: [{ status: 'failed', result: { outputs: [{ type: 'error', value: err.message }] } }] } };
