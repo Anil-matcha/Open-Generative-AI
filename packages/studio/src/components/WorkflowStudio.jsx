@@ -9,8 +9,6 @@ import {
   createWorkflow,
   updateWorkflowName,
   deleteWorkflow,
-  getWorkflowInputs,
-  executeWorkflow,
   getAllNodeSchemas,
   getWorkflowData,
 } from "../muapi.js";
@@ -152,17 +150,13 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
   const [workflows, setWorkflows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedWorkflow, setSelectedWorkflow] = useState(null);
-  const [activeSubTab, setActiveSubTab] = useState("playground"); // 'playground' | 'builder'
+  const [activeSubTab, setActiveSubTab] = useState("builder");
   const [activeMainTab, setActiveMainTab] = useState("templates"); // 'templates' | 'my-workflows' | 'published'
   const [renamingWorkflow, setRenamingWorkflow] = useState(null);
   const [newWorkflowName, setNewWorkflowName] = useState("");
   const [isDeletingId, setIsDeletingId] = useState(null);
-  const [inputSchema, setInputSchema] = useState(null);
   const [nodeSchemas, setNodeSchemas] = useState(null);
   const [workflowDef, setWorkflowDef] = useState(null);
-  const [formData, setFormData] = useState({});
-  const [isExecuting, setIsExecuting] = useState(false);
-  const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   
 
@@ -170,18 +164,16 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
   const handleSelectWorkflow = useCallback(
     async (wf, fromUrl = false) => {
       setSelectedWorkflow(wf);
-      setResult(null);
       setError(null);
       
-      const targetTab = urlTab || "playground";
+      const targetTab = "builder";
       setActiveSubTab(targetTab);
 
       if (!fromUrl) {
-        // Always route to /workflow/[id] so the builder library's useParams().id resolves correctly
-        router.push(`/workflow/${wf.id}/${targetTab}`);
+        router.push(`/workflow/${wf.id}/builder`);
       }
     },
-    [router, urlTab],
+    [router],
   );
 
   // Dedicated data fetching effect for the active workflow
@@ -192,50 +184,16 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
       try {
         setLoading(true);
         const wfId = selectedWorkflow.id;
-        
-        // Fetch everything in parallel with allSettled so one failure doesn't block the others
-        const results = await Promise.allSettled([
-          getWorkflowInputs(apiKey, wfId),
-          getAllNodeSchemas(apiKey, wfId),
-          getWorkflowData(apiKey, wfId)
+
+        const [nodes, def] = await Promise.all([
+          getAllNodeSchemas(apiKey, wfId).catch(() => []),
+          getWorkflowData(apiKey, wfId).catch(() => ({ nodes: [], edges: [] })),
         ]);
-
-        // Process Input Schema
-        if (results[0].status === 'fulfilled') {
-          const response = results[0].value;
-          const schema = response.input_data || response;
-          setInputSchema(schema);
-
-          const initial = {};
-          Object.entries(schema.properties || {}).forEach(([key, prop]) => {
-            initial[key] =
-              prop.default ||
-              (Array.isArray(prop.examples) ? prop.examples[0] : prop.examples) ||
-              "";
-          });
-          setFormData(initial);
-        } else {
-          console.warn("Input schema not available for this workflow:", results[0].reason);
-          setInputSchema(null);
-          setFormData({});
-        }
-
-        // Process Builder State
-        const nodes = results[1].status === 'fulfilled' ? results[1].value : [];
-        const def = results[2].status === 'fulfilled' ? results[2].value : { nodes: [], edges: [] };
 
         setNodeSchemas(nodes);
         setWorkflowDef(def);
-
-        if (results[1].status === 'rejected' || results[2].status === 'rejected') {
-          console.error("Builder components failed to load:", results[1].reason, results[2].reason);
-          if (!nodes.length && !def.nodes?.length) {
-             setError("Failed to load full builder data. Some features may be disabled.");
-          }
-        }
       } catch (err) {
-        console.error("Critical error loading pulse details:", err);
-        setError("Critical error loading builder: " + err.message);
+        console.error("Error loading workflow:", err);
         setNodeSchemas([]);
         setWorkflowDef({ nodes: [], edges: [] });
       } finally {
@@ -394,35 +352,6 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
     loadWorkflows();
   }, [apiKey, activeMainTab]);
 
-  const handleRun = async (e) => {
-    e.preventDefault();
-    if (isExecuting) return;
-
-    setIsExecuting(true);
-    setError(null);
-    setResult(null);
-
-    try {
-      const inputs = {};
-      Object.entries(formData).forEach(([key, value]) => {
-        if (!value) return;
-        const prop = inputSchema?.properties?.[key] || {};
-        if (prop.field === 'image') inputs[key] = { image_url: value };
-        else if (prop.field === 'video') inputs[key] = { video_url: value };
-        else if (prop.field === 'audio') inputs[key] = { audio_url: value };
-        else inputs[key] = { prompt: value };
-      });
-
-      const data = await executeWorkflow(apiKey, selectedWorkflow.id, inputs);
-      setResult(data);
-    } catch (err) {
-      console.error("Execution failed:", err);
-      setError(err.message || "Execution failed");
-    } finally {
-      setIsExecuting(false);
-    }
-  };
-
   if (loading && !selectedWorkflow) {
     return (
       <div className="h-full flex items-center justify-center">
@@ -448,41 +377,6 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
                 </svg>
                 All Workflows
               </button>
-
-              <div className="h-4 w-[1px] bg-white/10" />
-
-              <div className="flex h-full">
-                <div className="flex bg-white/5 p-1 rounded-lg my-auto">
-                  <button
-                    onClick={() => {
-                        setActiveSubTab("playground");
-                        if (selectedWorkflow?.id) router.push(`/workflow/${selectedWorkflow.id}/playground`);
-                    }}
-                    type="button"
-                    className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md transition-all ${
-                      activeSubTab === "playground"
-                        ? "bg-[#22d3ee] text-black shadow-[0_0_15px_rgba(34, 211, 238,0.2)]"
-                        : "text-white/40 hover:text-white"
-                    }`}
-                  >
-                    Playground
-                  </button>
-                  <button
-                    onClick={() => {
-                        setActiveSubTab("builder");
-                        if (selectedWorkflow?.id) router.push(`/workflow/${selectedWorkflow.id}/builder`);
-                    }}
-                    type="button"
-                    className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md transition-all ${
-                      activeSubTab === "builder"
-                        ? "bg-[#22d3ee] text-black shadow-[0_0_15px_rgba(34, 211, 238,0.2)]"
-                        : "text-white/40 hover:text-white"
-                    }`}
-                  >
-                    Full Workflow
-                  </button>
-                </div>
-              </div>
             </div>
 
             <div className="flex items-center gap-3">
@@ -512,29 +406,6 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
             >
                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
             </button>
-            
-            <div className="h-4 w-[1px] bg-white/10" />
-            
-            <div className="flex bg-white/5 p-1 rounded-lg">
-               <button
-                 onClick={() => setActiveSubTab("playground")}
-                 type="button"
-                 className={`px-3 py-1 text-[9px] font-black uppercase tracking-widest rounded-md transition-all ${
-                   activeSubTab === "playground" ? "bg-[#22d3ee] text-black" : "text-white/40"
-                 }`}
-               >
-                 Play
-               </button>
-               <button
-                 onClick={() => setActiveSubTab("builder")}
-                 type="button"
-                 className={`px-3 py-1 text-[9px] font-black uppercase tracking-widest rounded-md transition-all ${
-                   activeSubTab === "builder" ? "bg-[#22d3ee] text-black" : "text-white/40"
-                 }`}
-               >
-                 Builder
-               </button>
-            </div>
 
             <div className="h-4 w-[1px] bg-white/10" />
 
@@ -549,286 +420,28 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
           </div>
         )}
 
-        <div className="flex-1 overflow-hidden flex flex-col lg:flex-row">
-          {activeSubTab === "playground" ? (
-            <>
-              {/* Controls Panel */}
-              <div className="w-full lg:w-[400px] border-r border-white/5 flex flex-col bg-black/20">
-                <div className="p-6 overflow-y-auto flex-1 custom-scrollbar">
-                  <form onSubmit={handleRun} className="space-y-6">
-                    <div>
-                      <h3 className="text-xs font-black text-white/30 uppercase tracking-widest mb-4">
-                        Configuration
-                      </h3>
-                      <div className="space-y-4">
-                        {inputSchema &&
-                          Object.entries(inputSchema.properties || {}).map(
-                            ([key, prop]) => (
-                              <div key={key} className="space-y-2">
-                                <label className="block text-[11px] font-bold text-white/80 uppercase tracking-wider">
-                                  {prop.title || key}
-                                </label>
-                                {prop.type === "string" && !prop.enum ? (
-                                  <textarea
-                                    value={formData[key] || ""}
-                                    onChange={(e) =>
-                                      setFormData({
-                                        ...formData,
-                                        [key]: e.target.value,
-                                      })
-                                    }
-                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#22d3ee]/50 transition-colors min-h-[80px] resize-none"
-                                    placeholder={
-                                      prop.description || `Enter ${key}...`
-                                    }
-                                  />
-                                ) : prop.enum ? (
-                                  <select
-                                    value={formData[key] || ""}
-                                    onChange={(e) =>
-                                      setFormData({
-                                        ...formData,
-                                        [key]: e.target.value,
-                                      })
-                                    }
-                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#22d3ee]/50 transition-colors"
-                                  >
-                                    {prop.enum.map((opt) => (
-                                      <option
-                                        key={opt}
-                                        value={opt}
-                                        className="bg-black"
-                                      >
-                                        {opt}
-                                      </option>
-                                    ))}
-                                  </select>
-                                ) : (
-                                  <input
-                                    type="text"
-                                    value={formData[key] || ""}
-                                    onChange={(e) =>
-                                      setFormData({
-                                        ...formData,
-                                        [key]: e.target.value,
-                                      })
-                                    }
-                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#22d3ee]/50 transition-colors"
-                                    placeholder={
-                                      prop.description || `Enter ${key}...`
-                                    }
-                                  />
-                                )}
-                              </div>
-                            ),
-                          )}
-                      </div>
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={isExecuting || !selectedWorkflow.id}
-                      className="w-full py-4 bg-[#22d3ee] text-black text-xs font-black uppercase tracking-[0.2em] rounded-xl hover:bg-white transition-all transform hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:grayscale shadow-[0_0_30px_rgba(34, 211, 238,0.15)] flex items-center justify-center gap-3 mt-8"
-                    >
-                      {isExecuting ? (
-                        <>
-                          <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
-                          <span>Generating...</span>
-                        </>
-                      ) : (
-                        <>
-                          <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="3"
-                          >
-                            <path d="M5 3l14 9-14 9V3z" />
-                          </svg>
-                          <span>Run Workflow</span>
-                        </>
-                      )}
-                    </button>
-                    {!selectedWorkflow.id && (
-                      <p className="text-[10px] text-white/30 text-center mt-4">
-                        Save your workflow first to enable execution.
-                      </p>
-                    )}
-                  </form>
-                </div>
-              </div>
-
-              {/* Preview Panel */}
-              <div className="flex-1 overflow-y-auto p-8 lg:p-12 bg-[#050505] flex items-center justify-center min-h-[500px]">
-                {error && (
-                  <div className="w-full max-w-md p-6 bg-red-500/10 border border-red-500/20 rounded-2xl flex flex-col items-center gap-4 animate-shake">
-                    <div className="w-12 h-12 bg-red-500/20 rounded-full flex items-center justify-center text-red-500">
-                      <svg
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                      >
-                        <circle cx="12" cy="12" r="10" />
-                        <line x1="12" y1="8" x2="12" y2="12" />
-                        <line x1="12" y1="16" x2="12.01" y2="16" />
-                      </svg>
-                    </div>
-                    <div className="text-center">
-                      <span className="text-[10px] font-black text-red-500 uppercase tracking-widest block mb-1">
-                        Execution Error
-                      </span>
-                      <p className="text-white/60 text-sm leading-relaxed">
-                        {error}
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {!isExecuting && !result && !error && (
-                  <div className="flex flex-col items-center gap-6 opacity-40">
-                    <div className="w-20 h-20 bg-white/5 rounded-3xl flex items-center justify-center text-white/20">
-                      <svg
-                        width="40"
-                        height="40"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      >
-                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                      </svg>
-                    </div>
-                    <p className="text-xs text-white/40 max-w-[200px] mx-auto text-center font-medium">
-                      Configure parameters and run the workflow to see results.
-                    </p>
-                  </div>
-                )}
-
-                {isExecuting && (
-                  <div className="flex flex-col items-center gap-6 animate-fade-in">
-                    <div className="relative">
-                      <div className="w-24 h-24 border-[3px] border-white/5 border-t-[#22d3ee] rounded-full animate-spin shadow-[0_0_40px_rgba(34, 211, 238,0.1)]" />
-                      <div className="absolute inset-0 flex items-center justify-center text-[#22d3ee]">
-                        <svg
-                          width="32"
-                          height="32"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2.5"
-                          className="animate-pulse"
-                        >
-                          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-                        </svg>
-                      </div>
-                    </div>
-                    <div className="text-center space-y-2">
-                      <div className="text-[10px] font-black text-[#22d3ee] uppercase tracking-[0.3em] animate-pulse">
-                        Running Pipeline
-                      </div>
-                      <div className="text-[13px] text-white/40 font-medium">
-                        Processing nodes and generating assets...
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {result && (
-                  <div className="w-full max-w-4xl space-y-8 animate-fade-in-up">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-xs font-black text-white/30 uppercase tracking-widest">
-                        Workflow Results
-                      </h3>
-                      <div className="flex items-center gap-2 px-3 py-1 bg-green-500/10 text-green-500 rounded-full text-[10px] font-bold border border-green-500/20">
-                        <div className="w-1 h-1 bg-green-500 rounded-full animate-pulse" />{" "}
-                        COMPLETED
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {result.outputs?.map((out, idx) => (
-                        <div
-                          key={idx}
-                          className="group relative bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-[#22d3ee]/30 transition-all shadow-2xl"
-                        >
-                          {out.type === "image_url" ? (
-                            <img
-                              src={out.value}
-                              className="w-full aspect-square object-cover"
-                              alt="Output"
-                            />
-                          ) : out.type === "video_url" ? (
-                            <video
-                              src={out.value}
-                              controls
-                              className="w-full aspect-square object-cover"
-                            />
-                          ) : (
-                            <div className="p-6 min-h-[200px] flex items-center justify-center italic text-white/60">
-                              {out.value}
-                            </div>
-                          )}
-
-                          <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/80 to-transparent translate-y-full group-hover:translate-y-0 transition-transform">
-                            <div className="flex items-center justify-between">
-                              <span className="text-[10px] font-black text-[#22d3ee] uppercase tracking-widest">
-                                {out.id}
-                              </span>
-                              <a
-                                href={out.value}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center hover:bg-[#22d3ee] hover:text-black transition-colors"
-                              >
-                                <svg
-                                  width="14"
-                                  height="14"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="2.5"
-                                >
-                                  <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" />
-                                </svg>
-                              </a>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </>
-          ) : (
-            <div className="flex-1 relative bg-[#050505]">
-              {nodeSchemas && workflowDef ? (
-                <WorkflowUI
-                  workflowId={selectedWorkflow?.id}
-                  initialNodeSchemas={nodeSchemas}
-                  initialWorkflowData={{
-                    ...workflowDef,
-                    // Inject ID to prevent builder from assuming this is a new unsaved flow
-                    workflow_id: selectedWorkflow?.id
-                  }}
-                />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="flex flex-col items-center gap-4">
-                    <div className="w-12 h-12 border-4 border-white/5 border-t-[#22d3ee] rounded-full animate-spin" />
-                    <div className="text-[10px] font-black text-white/20 uppercase tracking-widest">
-                      Loading Builder...
-                    </div>
+        <div className="flex-1 overflow-hidden">
+          <div className="flex-1 relative h-full bg-[#050505]">
+            {nodeSchemas && workflowDef ? (
+              <WorkflowUI
+                workflowId={selectedWorkflow?.id}
+                initialNodeSchemas={nodeSchemas}
+                initialWorkflowData={{
+                  ...workflowDef,
+                  workflow_id: selectedWorkflow?.id
+                }}
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                  <div className="w-12 h-12 border-4 border-white/5 border-t-[#22d3ee] rounded-full animate-spin" />
+                  <div className="text-[10px] font-black text-white/20 uppercase tracking-widest">
+                    Loading Builder...
                   </div>
                 </div>
-              )}
-            </div>
-          )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     );
