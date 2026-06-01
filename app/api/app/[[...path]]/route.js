@@ -68,7 +68,12 @@ export async function POST(request, { params }) {
     const slug = await params;
     const pathSegments = slug.path || [];
     const path = pathSegments.join('/');
-    
+
+    // Stub endpoints not present on upstream
+    if (path === 'calculate_dynamic_cost') {
+        return NextResponse.json({ cost: 0, currency: 'USD' });
+    }
+
     const { search } = new URL(request.url);
     const targetUrl = `${MUAPI_BASE}/app/${path}${search}`;
 

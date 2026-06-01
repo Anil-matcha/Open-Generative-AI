@@ -954,7 +954,8 @@ export async function POST(request, { params }) {
 
     if (path[1] === 'run') {
         const wfId = path[0];
-        const apiKey = request.headers.get('authorization')?.replace('Bearer ', '') || '';
+        const cookieKey1 = request.headers.get('cookie')?.match(/muapi_key=([^;]+)/)?.[1] || '';
+        const apiKey = request.headers.get('authorization')?.replace('Bearer ', '') || cookieKey1 || '';
         const inputs = body.inputs || {};
 
         let wf = store.get(wfId);
@@ -1039,7 +1040,8 @@ export async function POST(request, { params }) {
     if (path[1] === 'node' && path[3] === 'run') {
         const nodeId = path[2];
         const runId = body.run_id || genId();
-        const apiKey = request.headers.get('authorization')?.replace('Bearer ', '') || '';
+        const cookieKey2 = request.headers.get('cookie')?.match(/muapi_key=([^;]+)/)?.[1] || '';
+        const apiKey = request.headers.get('authorization')?.replace('Bearer ', '') || cookieKey2 || '';
         const model = body.model || '';
         const params = body.params || {};
         await runNode(runId, nodeId, model, params, apiKey);
