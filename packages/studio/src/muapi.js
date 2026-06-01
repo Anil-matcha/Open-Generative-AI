@@ -526,41 +526,37 @@ function lsSet(key, val) {
 }
 function genId() { return `${Date.now()}_${Math.random().toString(36).slice(2, 7)}`; }
 
-// ── Workflows (local storage) ─────────────────────────────────────────────────
+// ── Workflows (TOS-backed) ────────────────────────────────────────────────────
 export async function getTemplateWorkflows(_apiKey) { return []; }
-export async function getUserWorkflows(_apiKey)     { return lsGet('mf_workflows', []); }
+export async function getUserWorkflows(apiKey) {
+    try {
+        const r = await fetch('/api/workflow/list', { headers: { 'Authorization': `Bearer ${apiKey}` } });
+        if (!r.ok) return [];
+        return await r.json();
+    } catch { return []; }
+}
 export async function getPublishedWorkflows(_apiKey){ return []; }
 
 export async function createWorkflow(apiKey, data = {}) {
-    const list = lsGet('mf_workflows', []);
-    const id = genId();
-    const wf = {
-        id,
-        workflow_id: id,
-        name: data?.name || 'Untitled Workflow',
-        description: data?.description || '',
-        nodes: data?.data?.nodes || [],
-        edges: data?.edges || [],
-        status: 'draft',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-    };
-    list.push(wf);
-    lsSet('mf_workflows', list);
-    return wf;
+    const r = await fetch('/api/workflow/create', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+    });
+    if (!r.ok) throw new Error('Failed to create workflow');
+    return await r.json();
 }
 export async function updateWorkflowName(apiKey, id, name) {
-    const list = lsGet('mf_workflows', []);
-    const idx = list.findIndex(w => w.id === id || w.workflow_id === id);
-    if (idx !== -1) {
-        list[idx] = { ...list[idx], name, updated_at: new Date().toISOString() };
-        lsSet('mf_workflows', list);
-        return list[idx];
-    }
-    return {};
+    const r = await fetch(`/api/workflow/${id}`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name }),
+    });
+    if (!r.ok) return {};
+    return await r.json();
 }
 export async function deleteWorkflow(apiKey, id) {
-    lsSet('mf_workflows', lsGet('mf_workflows', []).filter(w => w.id !== id && w.workflow_id !== id));
+    await fetch(`/api/workflow/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${apiKey}` } });
     return { success: true };
 }
 export async function getWorkflowData(apiKey, id) {

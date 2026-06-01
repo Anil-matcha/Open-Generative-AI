@@ -74,6 +74,36 @@ async function tosSaveWorkflow(id, data) {
     if (!TOS_ENABLED) return;
     const buf = Buffer.from(JSON.stringify(data));
     await tosUpload(`workflows/${id}.json`, buf, 'application/json').catch(() => {});
+    // Update workflow index
+    await tosUpdateIndex(id, { id, name: data.name || 'Untitled', updated_at: data.updated_at || new Date().toISOString(), thumbnail: data.thumbnail || null }).catch(() => {});
+}
+
+async function tosLoadIndex() {
+    if (!TOS_ENABLED) return [];
+    try {
+        const url = `https://${TOS_BUCKET}.${TOS_ENDPOINT}/workflows/index.json`;
+        const r = await fetch(url);
+        if (!r.ok) return [];
+        return await r.json();
+    } catch { return []; }
+}
+
+async function tosUpdateIndex(id, meta) {
+    if (!TOS_ENABLED) return;
+    const index = await tosLoadIndex();
+    const existing = index.findIndex(w => w.id === id);
+    if (existing >= 0) index[existing] = { ...index[existing], ...meta };
+    else index.unshift(meta);
+    const buf = Buffer.from(JSON.stringify(index));
+    await tosUpload('workflows/index.json', buf, 'application/json').catch(() => {});
+}
+
+async function tosRemoveFromIndex(id) {
+    if (!TOS_ENABLED) return;
+    const index = await tosLoadIndex();
+    const filtered = index.filter(w => w.id !== id);
+    const buf = Buffer.from(JSON.stringify(filtered));
+    await tosUpload('workflows/index.json', buf, 'application/json').catch(() => {});
 }
 
 // Load workflow from TOS (public read, no auth needed)
@@ -600,6 +630,11 @@ function getNodeSchemas() {
 export async function GET(request, { params }) {
     const { path = [] } = await params;
 
+    if (path[0] === 'list') {
+        const index = await tosLoadIndex();
+        return NextResponse.json(index);
+    }
+
     if (path[0] === 'get-workflow-def') {
         const id = path[1];
         const wf = store.get(id) || {};
@@ -796,5 +831,6 @@ export async function PUT(request, { params }) {
 export async function DELETE(request, { params }) {
     const { path = [] } = await params;
     store.delete(path[0]);
+    tosRemoveFromIndex(path[0]).catch(() => {});
     return NextResponse.json({ success: true });
 }
