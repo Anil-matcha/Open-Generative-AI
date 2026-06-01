@@ -12,6 +12,7 @@
   ],
   "scripts": {
     "dev": "next dev",
+    "prebuild": "find packages/Vibe-Workflow/packages/workflow-builder/src/components -name '*.jsx' | xargs sed -i 's/}, 3000);/}, 500);/g'",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
