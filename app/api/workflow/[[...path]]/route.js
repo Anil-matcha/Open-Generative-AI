@@ -541,9 +541,22 @@ function getNodeSchemas() {
         imgPass:    ms({ image_url: F.image_url }),
         vidPass:    ms({ video_url: F.video_url }),
         audPass:    ms({ audio_url: F.audio_url }),
-        // Video
-        t2v:        ms({ prompt: F.prompt, duration: F.duration, aspect_ratio: F.ar_video }),
+        // Video generation — model-specific schemas
+        // t2v variants (text-to-video)
+        t2v:        ms({ prompt: F.prompt, aspect_ratio: F.ar_video, duration: F.duration }),
+        t2v_seed:   ms({ prompt: F.prompt, aspect_ratio: F.ar_video, duration: { type: "int", title: "Duration (sec)", default: 5, minValue: 5, maxValue: 10, step: 5 } }),
+        t2v_veo:    ms({ prompt: F.prompt, aspect_ratio: F.ar_video, duration: { type: "int", title: "Duration (sec)", default: 8, minValue: 5, maxValue: 8, step: 1 } }),
+        t2v_veo4k:  ms({ prompt: F.prompt, aspect_ratio: F.ar_video, resolution: F.res_4k, duration: { type: "int", title: "Duration (sec)", default: 8, minValue: 5, maxValue: 8, step: 1 } }),
+        t2v_sora:   ms({ prompt: F.prompt, aspect_ratio: { enum: ["16:9","9:16","1:1"], type: "string", title: "Aspect Ratio", default: "16:9" }, duration: { type: "int", title: "Duration (sec)", default: 5, minValue: 5, maxValue: 20, step: 5 } }),
+        t2v_grok:   ms({ prompt: F.prompt, aspect_ratio: F.ar_video, duration: { type: "int", title: "Duration (sec)", default: 5, minValue: 5, maxValue: 5, step: 1 } }),
+        t2v_grok10: ms({ prompt: F.prompt, aspect_ratio: F.ar_video, duration: { type: "int", title: "Duration (sec)", default: 10, minValue: 10, maxValue: 10, step: 1 } }),
+        t2v_kling:  ms({ prompt: F.prompt, aspect_ratio: { enum: ["16:9","9:16","1:1","4:3","3:4"], type: "string", title: "Aspect Ratio", default: "16:9" }, duration: { type: "int", title: "Duration (sec)", default: 5, minValue: 5, maxValue: 10, step: 5 } }),
+        t2v_pixv:   ms({ prompt: F.prompt, aspect_ratio: { enum: ["16:9","9:16","1:1"], type: "string", title: "Aspect Ratio", default: "16:9" }, duration: { type: "int", title: "Duration (sec)", default: 5, minValue: 4, maxValue: 8, step: 1 } }),
+        // i2v variants (image-to-video)
         i2v:        ms({ prompt: F.prompt, image_url: F.image_url, duration: F.duration }),
+        i2v_seed:   ms({ prompt: F.prompt, image_url: F.image_url, duration: { type: "int", title: "Duration (sec)", default: 5, minValue: 5, maxValue: 10, step: 5 } }),
+        i2v_kling:  ms({ prompt: F.prompt, image_url: F.image_url, duration: { type: "int", title: "Duration (sec)", default: 5, minValue: 5, maxValue: 10, step: 5 } }),
+        // Edit video
         vidEdit:    ms({ prompt: F.prompt, video_url: F.video_url }),
         lipsync:    ms({ video_url: F.video_url, audio_url: F.audio_url }),
         // Text
@@ -615,29 +628,29 @@ function getNodeSchemas() {
             video: {
                 models: {
                     "video-passthrough":                    T.vidPass,
-                    // ByteDance Seedance
-                    "doubao-seedance-1-5-pro-251215":       T.t2v,
-                    "doubao-seedance-1-0-pro-fast-251015":  T.t2v,
-                    "doubao-seedance-1-0-pro-250528":       T.t2v,
-                    "doubao-seedance-1-0-lite-t2v-250428":  T.t2v,
-                    "doubao-seedance-1-0-lite-i2v-250428":  T.i2v,
-                    // Google Veo
-                    "veo3.1-pro":    T.t2v,
-                    "veo3.1-4k":     T.t2v,
-                    "veo3.1":        T.t2v,
-                    "veo3.1-fast":   T.t2v,
-                    "veo_3_1":       T.t2v,
-                    "veo_3_1-fast":  T.t2v,
-                    // OpenAI Sora
-                    "sora-2": T.t2v,
-                    // Grok Video
-                    "grok-video-3":     T.t2v,
-                    "grok-video-3-10s": T.t2v,
-                    // Kling Video
-                    "kling-omni-video":            T.t2v,
-                    "kling-video":                 T.t2v,
-                    "kling-avatar-image2video":    T.i2v,
-                    "kling-video-edit-extend":     T.i2v,    // → kling-video-extend
+                    // ByteDance Seedance — 5s or 10s, standard AR
+                    "doubao-seedance-1-5-pro-251215":       T.t2v_seed,
+                    "doubao-seedance-1-0-pro-fast-251015":  T.t2v_seed,
+                    "doubao-seedance-1-0-pro-250528":       T.t2v_seed,
+                    "doubao-seedance-1-0-lite-t2v-250428":  T.t2v_seed,
+                    "doubao-seedance-1-0-lite-i2v-250428":  T.i2v_seed,
+                    // Google Veo — up to 8s; Veo 3.1-4k supports 4k resolution
+                    "veo3.1-pro":    T.t2v_veo,
+                    "veo3.1-4k":     T.t2v_veo4k,
+                    "veo3.1":        T.t2v_veo,
+                    "veo3.1-fast":   T.t2v_veo,
+                    "veo_3_1":       T.t2v_veo,
+                    "veo_3_1-fast":  T.t2v_veo,
+                    // OpenAI Sora — up to 20s
+                    "sora-2": T.t2v_sora,
+                    // Grok Video — 5s fixed / 10s fixed
+                    "grok-video-3":     T.t2v_grok,
+                    "grok-video-3-10s": T.t2v_grok10,
+                    // Kling Video — 5s or 10s, extended AR
+                    "kling-omni-video":            T.t2v_kling,
+                    "kling-video":                 T.t2v_kling,
+                    "kling-avatar-image2video":    T.i2v_kling,
+                    "kling-video-edit-extend":     T.i2v_kling,
                     // Happyhorse
                     "happyhorse-1.0-t2v":        T.t2v,
                     "happyhorse-1.0-i2v":        T.i2v,
@@ -645,16 +658,16 @@ function getNodeSchemas() {
                     "happyhorse-1.0-video-edit": T.vidEdit,
                     // Midjourney Video
                     "mj_video": T.t2v,
-                    // Pixverse
-                    "pixverse-video":            T.t2v,
+                    // Pixverse — 4-8s, 16:9/9:16/1:1
+                    "pixverse-video":            T.t2v_pixv,
                     "pixverse-mimic":            T.i2v,
-                    "pixverse-video-edit":       T.vidEdit,  // → pixverse-modify
-                    "pixverse-restyle-edit":     T.vidEdit,  // → pixverse-restyle
-                    "pixverse-lipsync-edit":     T.lipsync,  // → pixverse-lipsync
-                    // Wan Video
+                    "pixverse-video-edit":       T.vidEdit,
+                    "pixverse-restyle-edit":     T.vidEdit,
+                    "pixverse-lipsync-edit":     T.lipsync,
+                    // Wan Video — image-to-video only
                     "wan2.6-i2v":           T.i2v,
                     "wan2.5-i2v-preview":   T.i2v,
-                    // Vidu Video
+                    // Vidu Video — standard AR, 4-8s
                     "vidu2.0":      T.t2v,
                     "viduq3-turbo": T.t2v,
                     "viduq3-pro":   T.t2v,
