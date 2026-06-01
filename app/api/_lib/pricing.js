@@ -150,7 +150,7 @@ const FREE_MODELS = new Set([
 // Sets mirroring route.js categorisation (kept local to avoid a circular import).
 const VIDEO_SET = new Set(Object.keys(MEMEFAST_VIDEO_CNY).concat([
     'veo3.1-pro', 'veo3.1-4k',
-    'doubao-seedance-2-0-260128',
+    'doubao-seedance-2-0-260128', 'doubao-seedance-2-0-fast-260128',
 ]));
 const AUDIO_SET = new Set(Object.keys(MEMEFAST_AUDIO_CNY));
 const IMAGE_SET = new Set(Object.keys(MEMEFAST_IMAGE_CNY));

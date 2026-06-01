@@ -214,7 +214,7 @@ function emptyWorkflow(id) {
 
 const VIDEO_MODELS = new Set([
     'video-passthrough',
-    'doubao-seedance-2-0-260128',
+    'doubao-seedance-2-0-260128', 'doubao-seedance-2-0-fast-260128',
     'doubao-seedance-1-0-lite-i2v-250428', 'doubao-seedance-1-0-lite-t2v-250428',
     'doubao-seedance-1-0-pro-250528', 'doubao-seedance-1-0-pro-fast-251015',
     'doubao-seedance-1-5-pro-251215',
@@ -840,6 +840,7 @@ function getNodeSchemas() {
                     "video-passthrough":                    T.vidPass,
                     // ByteDance Seedance 2.0 — image + video + audio reference inputs
                     "doubao-seedance-2-0-260128":           T.t2v_seed2,
+                    "doubao-seedance-2-0-fast-260128":      T.t2v_seed2,
                     // ByteDance Seedance 1.x — 5s or 10s, standard AR
                     "doubao-seedance-1-5-pro-251215":       T.t2v_seed,
                     "doubao-seedance-1-0-pro-fast-251015":  T.t2v_seed,

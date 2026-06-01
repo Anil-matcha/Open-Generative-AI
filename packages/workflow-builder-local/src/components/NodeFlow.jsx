@@ -136,6 +136,7 @@ const SPECIAL_MODEL_NAMES = {
   "video-passthrough": "Input Video",
   "audio-passthrough": "Input Audio",
   "doubao-seedance-2-0-260128": "Seedance 2.0",
+  "doubao-seedance-2-0-fast-260128": "Seedance 2.0 Fast",
 };
 
 const formatName = (id) => id.replace(/-/g, ' ').split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
