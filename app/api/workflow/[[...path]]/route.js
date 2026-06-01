@@ -444,7 +444,7 @@ async function generateAudio(apiKey, model, params) {
     const res = await fetch(`${MEMEFAST}/v1/audio/speech`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model, input: params.prompt || '', voice: params.voice || 'alloy' }),
+        body: JSON.stringify({ model, input: params.prompt || '', voice: params.voice || 'alloy', speed: params.speed ? parseFloat(params.speed) : undefined }),
     });
     if (!res.ok) {
         const txt = await res.text().catch(() => res.statusText);
@@ -505,6 +505,7 @@ function getNodeSchemas() {
         audio_url:     { type: "string", title: "Audio URL", field: "audio", description: "URL of the input audio", examples: [] },
         duration:      { type: "int", title: "Duration (sec)", default: 5, minValue: 3, maxValue: 30, step: 1 },
         voice:         { enum: ["alloy","echo","fable","onyx","nova","shimmer"], type: "string", title: "Voice", default: "alloy" },
+        speed:         { enum: ["0.5","0.75","1.0","1.25","1.5","2.0"], type: "string", title: "Speed", default: "1.0" },
         // Aspect ratio presets per model capability
         ar_simple:     { enum: ["1:1","16:9","9:16"], type: "string", title: "Aspect Ratio", default: "1:1" },
         ar_std:        { enum: ["1:1","16:9","9:16","4:3","3:4"], type: "string", title: "Aspect Ratio", default: "1:1" },
@@ -562,9 +563,10 @@ function getNodeSchemas() {
         // Text
         vision:     ms({ prompt: F.prompt, image_url: F.image_url }),
         txtPass:    ms({ prompt: { type: "string", title: "Text", description: "Enter your text", examples: [""] } }),
-        // Audio
-        speech:     ms({ prompt: F.prompt, voice: F.voice }),
-        tts:        ms({ prompt: F.prompt }),
+        // Audio — model-specific schemas
+        speech_full: ms({ prompt: F.prompt, voice: F.voice, speed: F.speed }),  // OpenAI tts-1/tts-1-hd
+        speech:      ms({ prompt: F.prompt, voice: F.voice }),                  // Minimax speech (same voices via Memefast)
+        tts:         ms({ prompt: F.prompt }),                                   // models without voice selector
     };
 
     return {
@@ -689,14 +691,17 @@ function getNodeSchemas() {
             audio: {
                 models: {
                     "audio-passthrough":    T.audPass,
+                    // OpenAI TTS — voice selection + speed control
+                    "tts-1-hd":             T.speech_full,
+                    "tts-1":                T.speech_full,
+                    // Minimax Speech — voice selection, no speed
                     "speech-2.8-hd":        T.speech,
                     "speech-2.8-turbo":     T.speech,
                     "speech-2.6-hd":        T.speech,
                     "speech-2.6-turbo":     T.speech,
                     "speech-02-hd":         T.speech,
                     "speech-02-turbo":      T.speech,
-                    "tts-1-hd":             T.speech,
-                    "tts-1":                T.speech,
+                    // Text-only TTS (no voice selector)
                     "MiniMax-Voice-Design": T.tts,
                     "qwen3-tts-flash":      T.tts,
                     "vidu-tts":             T.tts,
