@@ -673,19 +673,20 @@ function getNodeSchemas() {
         vidPass:    ms({ video_url: F.video_url }),
         audPass:    ms({ audio_url: F.audio_url }),
         // Video generation — model-specific schemas
-        // t2v variants (text-to-video)
-        t2v:        ms({ prompt: F.prompt, aspect_ratio: F.ar_video, duration: F.duration }),
-        t2v_seed:   ms({ prompt: F.prompt, aspect_ratio: F.ar_video, duration: { type: "int", title: "Duration (sec)", default: 5, minValue: 5, maxValue: 10, step: 5 } }),
+        // t2v variants — all accept an OPTIONAL image first-frame (image-to-video).
+        // image_url is optional: leave empty for pure text-to-video.
+        t2v:        ms({ prompt: F.prompt, image_url: F.image_url, aspect_ratio: F.ar_video, duration: F.duration }),
+        t2v_seed:   ms({ prompt: F.prompt, image_url: F.image_url, aspect_ratio: F.ar_video, duration: { type: "int", title: "Duration (sec)", default: 5, minValue: 5, maxValue: 10, step: 5 } }),
         t2v_veo:    ms({ prompt: F.prompt, aspect_ratio: F.ar_video, duration: { type: "int", title: "Duration (sec)", default: 8, minValue: 5, maxValue: 8, step: 1 } }),
         t2v_veo4k:  ms({ prompt: F.prompt, aspect_ratio: F.ar_video, resolution: F.res_4k, duration: { type: "int", title: "Duration (sec)", default: 8, minValue: 5, maxValue: 8, step: 1 } }),
         // Veo with optional image first-frame (image-to-video). image_url is optional — leave empty for pure text-to-video.
         i2v_veo:    ms({ prompt: F.prompt, image_url: F.image_url, aspect_ratio: F.ar_video, duration: { type: "int", title: "Duration (sec)", default: 8, minValue: 5, maxValue: 8, step: 1 } }),
         i2v_veo4k:  ms({ prompt: F.prompt, image_url: F.image_url, aspect_ratio: F.ar_video, resolution: F.res_4k, duration: { type: "int", title: "Duration (sec)", default: 8, minValue: 5, maxValue: 8, step: 1 } }),
-        t2v_sora:   ms({ prompt: F.prompt, aspect_ratio: { enum: ["16:9","9:16","1:1"], type: "string", title: "Aspect Ratio", default: "16:9" }, duration: { type: "int", title: "Duration (sec)", default: 5, minValue: 5, maxValue: 20, step: 5 } }),
-        t2v_grok:   ms({ prompt: F.prompt, aspect_ratio: F.ar_video, duration: { type: "int", title: "Duration (sec)", default: 5, minValue: 5, maxValue: 5, step: 1 } }),
-        t2v_grok10: ms({ prompt: F.prompt, aspect_ratio: F.ar_video, duration: { type: "int", title: "Duration (sec)", default: 10, minValue: 10, maxValue: 10, step: 1 } }),
-        t2v_kling:  ms({ prompt: F.prompt, aspect_ratio: { enum: ["16:9","9:16","1:1","4:3","3:4"], type: "string", title: "Aspect Ratio", default: "16:9" }, duration: { type: "int", title: "Duration (sec)", default: 5, minValue: 5, maxValue: 10, step: 5 } }),
-        t2v_pixv:   ms({ prompt: F.prompt, aspect_ratio: { enum: ["16:9","9:16","1:1"], type: "string", title: "Aspect Ratio", default: "16:9" }, duration: { type: "int", title: "Duration (sec)", default: 5, minValue: 4, maxValue: 8, step: 1 } }),
+        t2v_sora:   ms({ prompt: F.prompt, image_url: F.image_url, aspect_ratio: { enum: ["16:9","9:16","1:1"], type: "string", title: "Aspect Ratio", default: "16:9" }, duration: { type: "int", title: "Duration (sec)", default: 5, minValue: 5, maxValue: 20, step: 5 } }),
+        t2v_grok:   ms({ prompt: F.prompt, image_url: F.image_url, aspect_ratio: F.ar_video, duration: { type: "int", title: "Duration (sec)", default: 5, minValue: 5, maxValue: 5, step: 1 } }),
+        t2v_grok10: ms({ prompt: F.prompt, image_url: F.image_url, aspect_ratio: F.ar_video, duration: { type: "int", title: "Duration (sec)", default: 10, minValue: 10, maxValue: 10, step: 1 } }),
+        t2v_kling:  ms({ prompt: F.prompt, image_url: F.image_url, aspect_ratio: { enum: ["16:9","9:16","1:1","4:3","3:4"], type: "string", title: "Aspect Ratio", default: "16:9" }, duration: { type: "int", title: "Duration (sec)", default: 5, minValue: 5, maxValue: 10, step: 5 } }),
+        t2v_pixv:   ms({ prompt: F.prompt, image_url: F.image_url, aspect_ratio: { enum: ["16:9","9:16","1:1"], type: "string", title: "Aspect Ratio", default: "16:9" }, duration: { type: "int", title: "Duration (sec)", default: 5, minValue: 4, maxValue: 8, step: 1 } }),
         // i2v variants (image-to-video)
         i2v:        ms({ prompt: F.prompt, image_url: F.image_url, duration: F.duration }),
         i2v_seed:   ms({ prompt: F.prompt, image_url: F.image_url, duration: { type: "int", title: "Duration (sec)", default: 5, minValue: 5, maxValue: 10, step: 5 } }),
