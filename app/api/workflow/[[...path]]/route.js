@@ -35,7 +35,7 @@ async function tosUpload(key, buffer, contentType) {
         const strToSign = `TOS4-HMAC-SHA256\n${datetime}\n${scope}\n${sha256hex(canonical)}`;
 
         // TOS4 signing key: HMAC(HMAC(HMAC(HMAC("TOS4"+SK, date), region), "tos"), "tos4_request")
-        const sigKey = hmac(hmac(hmac(hmac(`TOS4${TOS_SK}`, date), TOS_REGION), 'tos'), 'request');
+        const sigKey = hmac(hmac(hmac(hmac(TOS_SK, date), TOS_REGION), 'tos'), 'request');
         const sig = createHmac('sha256', sigKey).update(strToSign).digest('hex');
         const auth = `TOS4-HMAC-SHA256 Credential=${TOS_AK}/${scope}, SignedHeaders=${signedHeaders}, Signature=${sig}`;
 
