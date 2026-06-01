@@ -243,10 +243,6 @@ const ImageGeneration = ({ id, data, selected }) => {
   };
 
   const handleRunSingleNode = async () => {
-    if (!runId) {
-      toast.error("No run_id available!. Click 'Run All' button");
-      return;
-    }
     try {
       data.onDataChange(id, { isLoading: true });
       const workflow_id = await data.handleSaveWorkFlow();
