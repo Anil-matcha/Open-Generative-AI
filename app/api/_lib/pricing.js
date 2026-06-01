@@ -36,8 +36,6 @@ const MEMEFAST_VIDEO_CNY = {
     'mj_video': 1.000,
     'pixverse-video': 0.600, 'pixverse-multi-transition': 0.600, 'pixverse-mimic': 0.600,
     'pixverse-modify': 0.600, 'pixverse-restyle': 0.600, 'pixverse-lipsync': 0.600,
-    'doubao-seedance-2-0-260128': 30.000,
-    'doubao-seedance-2-0-fast-260128': 15.000,
     'doubao-seedance-1-5-pro-251215': 24.000,
     'doubao-seedance-1-0-pro-250528': 22.500,
     'doubao-seedance-1-0-pro-fast-251015': 6.300,
@@ -95,7 +93,39 @@ const PRICE_MODEL_ALIAS = {
 
 function round2(n) { return Math.round(n * 100) / 100; }
 
-function videoPriceRub(model, durationSec) {
+// ── Seedance 2.0 token-based pricing (Volcano Engine ARK) ───────────────────
+// Source: https://www.volcengine.com/docs/82379/1099320
+// tokens = (inputSec + outputSec) × width × height × 24fps / 1024
+// generate_audio=true doubles tokens (audio = same compute as video)
+const SEEDANCE2_RATES = {
+    standard: { sd: { noVideo: 46, withVideo: 28 }, hd: { noVideo: 51, withVideo: 31 } },
+    fast:     { sd: { noVideo: 37, withVideo: 22 }, hd: { noVideo: 0,  withVideo: 0  } },
+};
+const SEEDANCE2_DIMS = { '480p': [864, 496], '720p': [1280, 720], '1080p': [1920, 1080] };
+
+function seedance2PriceRub(model, durationSec, resolution, hasVideoInput, generateAudio) {
+    const variant = model.includes('fast') ? 'fast' : 'standard';
+    const tier = resolution === '1080p' ? 'hd' : 'sd';
+    const rate = hasVideoInput ? SEEDANCE2_RATES[variant][tier].withVideo : SEEDANCE2_RATES[variant][tier].noVideo;
+    if (rate === 0) return 0;
+    const [w, h] = SEEDANCE2_DIMS[resolution] || SEEDANCE2_DIMS['720p'];
+    const inputSec = hasVideoInput ? (durationSec || 5) : 0;
+    const base = Math.round(((inputSec + (durationSec || 5)) * w * h * 24) / 1024);
+    const tokens = generateAudio !== false ? base * 2 : base;
+    return round2((tokens / 1_000_000) * rate * CNY_TO_RUB * PLATFORM_MARKUP);
+}
+
+function isSeedance2(model) {
+    return /doubao-seedance-2-0/.test(model);
+}
+
+function videoPriceRub(model, durationSec, params) {
+    // Seedance 2.0 — token-based ARK pricing (720p default, audio on, no video input)
+    if (isSeedance2(model)) {
+        const res = params?.resolution || '720p';
+        const hasVideoInput = !!(params?.image_url);  // image is not video input
+        return seedance2PriceRub(model, durationSec || 5, res, false, true);
+    }
     const baseCny = MEMEFAST_VIDEO_CNY[model] ?? 2.0;        // default ¥2
     const dur = durationSec || 5;
     const durMult = dur <= 8 ? 1.0 : dur <= 10 ? 1.5 : 2.0; // scale by duration
@@ -120,6 +150,7 @@ const FREE_MODELS = new Set([
 // Sets mirroring route.js categorisation (kept local to avoid a circular import).
 const VIDEO_SET = new Set(Object.keys(MEMEFAST_VIDEO_CNY).concat([
     'veo3.1-pro', 'veo3.1-4k',
+    'doubao-seedance-2-0-260128', 'doubao-seedance-2-0-fast-260128',
 ]));
 const AUDIO_SET = new Set(Object.keys(MEMEFAST_AUDIO_CNY));
 const IMAGE_SET = new Set(Object.keys(MEMEFAST_IMAGE_CNY));
@@ -135,7 +166,7 @@ function priceRub(category, model, params = {}) {
 
     if (category === 'video' || VIDEO_SET.has(real)) {
         const dur = parseInt(String(params.duration ?? 5), 10) || 5;
-        return videoPriceRub(real, dur);
+        return videoPriceRub(real, dur, params);
     }
     if (category === 'audio' || AUDIO_SET.has(real)) {
         return audioPriceRub(real);
