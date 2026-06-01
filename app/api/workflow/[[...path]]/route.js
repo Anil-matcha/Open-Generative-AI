@@ -69,6 +69,9 @@ const MODEL_ID_MAP = {
     'gemini-2.5-flash-image-edit':   'gemini-2.5-flash-image',
     'gemini-3-pro-image-edit':       'gemini-3-pro-image-preview',
     'gemini-3.1-flash-image-edit':   'gemini-3.1-flash-image-preview',
+    'gpt-image-2-edit':              'gpt-image-2',
+    'gpt-image-1.5-edit':            'gpt-image-1.5',
+    'gpt-image-1-edit':              'gpt-image-1',
     'pixverse-video-edit':           'pixverse-modify',
     'pixverse-restyle-edit':         'pixverse-restyle',
     'pixverse-lipsync-edit':         'pixverse-lipsync',
@@ -347,6 +350,10 @@ function getNodeSchemas() {
                     "gpt-image-1":                    T.t2iQ,
                     "gpt-image-1-mini":               T.t2i,
                     "dall-e-3":                       T.t2i,
+                    // OpenAI Image Edit (→ /v1/images/edits)
+                    "gpt-image-2-edit":               T.i2i,   // → gpt-image-2
+                    "gpt-image-1.5-edit":             T.i2i,   // → gpt-image-1.5
+                    "gpt-image-1-edit":               T.i2i,   // → gpt-image-1
                     // Flux
                     "flux-2-pro":                     T.t2i,
                     "flux-1.1-pro":                   T.t2i,
