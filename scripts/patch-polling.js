@@ -71,7 +71,21 @@ function useSyncResponse(src) {
   return src.replace(/pollNodeStatus\(response\.data\.run_id\);/g, SYNC_RESPONSE_SNIPPET);
 }
 
-// ── 1c. De-duplicate the triggerRun handler ─────────────────────────────────
+// ── 1c. Add timeout to pollNodeStatus so it never spins forever ──────────────
+// The compiled dist uses setInterval(fn, 3000) with no max attempts counter.
+// Replace it with a pattern that stops after 360 polls × 500ms ≈ 3 minutes.
+function addPollTimeout(src) {
+  // dist form: var interval = setInterval(function () { ... }, 3000);
+  return src.replace(
+    /var pollNodeStatus = function pollNodeStatus\(run_id\) \{\n    var interval = setInterval\(function \(\) \{/,
+    'var pollNodeStatus = function pollNodeStatus(run_id) {\n    var interval; var _attempts = 0; var MAX_ATTEMPTS = 360;\n    var _poll = function() {\n      if (++_attempts > MAX_ATTEMPTS) { clearInterval(interval); data.onDataChange(id, { isLoading: false, errorMsg: "Generation timed out" }); _reactHotToast.toast.error("Video generation timed out"); return; }\n      {'
+  ).replace(
+    /      \}\);\n    \}, 3000\);\n  \};\n  var handleRunSingleNode/,
+    '      }\n    };\n    _poll(); interval = setInterval(_poll, 500);\n  };\n  var handleRunSingleNode'
+  );
+}
+
+// ── 1d. De-duplicate the triggerRun handler ─────────────────────────────────
 // VideoNode has TWO useEffect hooks that both call handleRunSingleNode() when
 // data.triggerRun flips true — so a single "Generate" click fires two POST
 // /node/{id}/run requests and the model is billed twice. Remove the redundant
@@ -131,7 +145,10 @@ for (const dir of targetDirs) {
 
     src = stripGuard(src);
     src = useSyncResponse(src);
-    if (name === 'VideoNode') src = dedupeTriggerRun(src);
+    if (name === 'VideoNode') {
+      src = dedupeTriggerRun(src);
+      if (isDist) src = addPollTimeout(src);
+    }
     // Only rewrite polling timing in .jsx sources; compiled dist uses different syntax.
     if (!isDist) src = speedUpPolling(src, name === 'NodeFlow');
 

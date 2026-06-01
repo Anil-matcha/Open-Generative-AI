@@ -469,7 +469,8 @@ async function generateVideo(apiKey, model, params) {
     const taskId = data.task_id || data.id;
     if (!taskId) return [{ type: 'video_url', value: data.url || data.video_url || '' }];
 
-    for (let i = 0; i < 120; i++) {
+    // Poll for up to 260s (stay within Vercel's 300s maxDuration with margin for overhead)
+    for (let i = 0; i < 86; i++) {
         await new Promise(r => setTimeout(r, 3000));
         const poll = await fetch(`${MEMEFAST}/v1/video/task/${taskId}`, {
             headers: { 'Authorization': `Bearer ${apiKey}` },
@@ -477,12 +478,12 @@ async function generateVideo(apiKey, model, params) {
         if (!poll.ok) continue;
         const pData = await poll.json();
         const st = (pData.status || '').toLowerCase();
-        if (st === 'completed' || st === 'succeeded' || st === 'success') {
+        if (st === 'completed' || st === 'succeeded' || st === 'success' || st === 'done' || st === 'finished') {
             return [{ type: 'video_url', value: pData.url || pData.video_url || pData.output?.url || '' }];
         }
         if (st === 'failed' || st === 'error') throw new Error(pData.error || 'Video generation failed');
     }
-    throw new Error('Video generation timed out');
+    throw new Error('Video generation timed out after 260s');
 }
 
 async function generateAudio(apiKey, model, params) {

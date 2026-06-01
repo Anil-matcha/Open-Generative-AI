@@ -201,11 +201,20 @@ const VideoGeneration = ({ id, data, selected }) => {
   }, [selectedModel, formValues, loading]);
 
   const pollNodeStatus = (run_id) => {
-    let interval; const _check = () => {
+    let interval;
+    let attempts = 0;
+    const MAX_ATTEMPTS = 360; // 360 × 500ms = 3 minutes max
+    const _check = () => {
+      if (++attempts > MAX_ATTEMPTS) {
+        clearInterval(interval);
+        data.onDataChange(id, { isLoading: false, errorMsg: "Generation timed out" });
+        toast.error(`Video generation timed out`);
+        return;
+      }
       axios.get(`/api/workflow/run/${run_id}/status`)
       .then((response) => {
         const nodesInRes = response.data.nodes || {};
-        const nodeData = nodesInRes[id] || Object.entries(nodesInRes).find(([key]) => 
+        const nodeData = nodesInRes[id] || Object.entries(nodesInRes).find(([key]) =>
           key.toLowerCase().replace(/\s+/g, '') === id.toLowerCase().replace(/\s+/g, '')
         )?.[1];
 
@@ -214,11 +223,11 @@ const VideoGeneration = ({ id, data, selected }) => {
         if (latest.status === "succeeded" || latest.status === "completed") {
           const output = latest.result.outputs;
           const val = output[0]?.value || "";
-          
+
           const currentHistory = data.outputHistory || [];
           const result = latest.result;
           const isAlreadyInHistory = currentHistory.some(h => h.result?.id === result.id);
-          const newHistory = isAlreadyInHistory 
+          const newHistory = isAlreadyInHistory
             ? currentHistory.map(h => h.result?.id === result.id ? latest : h)
             : [...currentHistory, latest];
 
@@ -233,7 +242,7 @@ const VideoGeneration = ({ id, data, selected }) => {
           let errorMsg = "Generation failed";
 
           if (outputs && outputs[0]?.value?.error) {
-            errorMsg = outputs[0].value.error; 
+            errorMsg = outputs[0].value.error;
           }
           toast.error(`Node ${id} failed`);
           const currentHistory = data.outputHistory || [];

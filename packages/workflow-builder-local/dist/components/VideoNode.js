@@ -264,7 +264,14 @@ var VideoGeneration = function VideoGeneration(_ref) {
     }
   }, [selectedModel, formValues, loading]);
   var pollNodeStatus = function pollNodeStatus(run_id) {
-    var interval = setInterval(function () {
+    var interval; var _attempts = 0; var MAX_ATTEMPTS = 360;
+    var _poll = function() {
+      if (++_attempts > MAX_ATTEMPTS) {
+        clearInterval(interval);
+        data.onDataChange(id, { isLoading: false, errorMsg: "Generation timed out" });
+        _reactHotToast.toast.error("Video generation timed out");
+        return;
+      }
       _axios["default"].get("/api/workflow/run/".concat(run_id, "/status")).then(function (response) {
         var _Object$entries$find;
         var nodesInRes = response.data.nodes || {};
@@ -324,7 +331,8 @@ var VideoGeneration = function VideoGeneration(_ref) {
         });
         _reactHotToast.toast.error("Failed to get workflow status Video ".concat(id.replace(/^\D+/g, "")));
       });
-    }, 3000);
+    };
+    _poll(); interval = setInterval(_poll, 500);
   };
   var handleRunSingleNode = /*#__PURE__*/function () {
     var _ref1 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee() {
