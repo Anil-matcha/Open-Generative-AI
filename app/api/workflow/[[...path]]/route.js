@@ -7,6 +7,20 @@ const MEMEFAST = 'https://memefast.top';
 
 function genId() { return `wf_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`; }
 
+// Strip base64 data URLs from nodes before persisting — prevents 413 on save
+function stripBase64(val) {
+    if (typeof val === 'string') {
+        return val.startsWith('data:') && val.length > 500 ? '' : val;
+    }
+    if (Array.isArray(val)) return val.map(stripBase64);
+    if (val && typeof val === 'object') {
+        const out = {};
+        for (const k of Object.keys(val)) out[k] = stripBase64(val[k]);
+        return out;
+    }
+    return val;
+}
+
 function emptyWorkflow(id) {
     return { workflow_id: id, id, name: 'Untitled', nodes: [], edges: [], created_at: new Date().toISOString() };
 }
@@ -536,7 +550,7 @@ export async function POST(request, { params }) {
         const wf = {
             workflow_id: id, id,
             name: body.name || 'Untitled Workflow',
-            nodes: body.data?.nodes || [],
+            nodes: stripBase64(body.data?.nodes || []),
             edges: body.edges || [],
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
