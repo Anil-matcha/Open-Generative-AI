@@ -11,6 +11,7 @@ import {
   deleteWorkflow,
   getAllNodeSchemas,
   getWorkflowData,
+  executeWorkflow,
 } from "../muapi.js";
 
 async function publishWorkflow(apiKey, id, isPublished) {
@@ -183,6 +184,9 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
   const [nodeSchemas, setNodeSchemas] = useState(null);
   const [workflowDef, setWorkflowDef] = useState(null);
   const [error, setError] = useState(null);
+  const [isRunning, setIsRunning] = useState(false);
+  const [runResult, setRunResult] = useState(null);
+  const [showResults, setShowResults] = useState(false);
   
 
   // Handlers defined early so they can be used in effects
@@ -259,6 +263,21 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
     },
     [apiKey, router],
   );
+
+  const handleRunWorkflow = async () => {
+    if (isRunning || !selectedWorkflow?.id) return;
+    setIsRunning(true);
+    setRunResult(null);
+    setShowResults(true);
+    try {
+      const data = await executeWorkflow(apiKey, selectedWorkflow.id, {});
+      setRunResult(data);
+    } catch (err) {
+      setRunResult({ error: err.message });
+    } finally {
+      setIsRunning(false);
+    }
+  };
 
   const handlePublishWorkflow = async (wf, publish) => {
     try {
@@ -419,6 +438,18 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
                 {selectedWorkflow.name}
               </span>
               <button
+                onClick={handleRunWorkflow}
+                disabled={isRunning || !selectedWorkflow?.id}
+                type="button"
+                className="flex items-center gap-2 px-4 py-1.5 bg-[#22d3ee] text-black text-xs font-black uppercase tracking-widest rounded-full hover:bg-white transition-all disabled:opacity-50 disabled:grayscale"
+              >
+                {isRunning ? (
+                  <><div className="w-3 h-3 border-2 border-black/30 border-t-black rounded-full animate-spin" /> Running...</>
+                ) : (
+                  <><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l14 9-14 9V3z"/></svg> Run</>
+                )}
+              </button>
+              <button
                 onClick={() => onToggleHeader?.(false)}
                 className="p-1.5 bg-white/5 hover:bg-white/10 rounded-md transition-colors text-white/40 hover:text-white"
                 title="Enter Zen Mode"
@@ -478,6 +509,51 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
             )}
           </div>
         </div>
+
+        {/* Results overlay */}
+        {showResults && (
+          <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-8">
+            <div className="w-full max-w-3xl bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
+                <span className="text-xs font-black text-white/50 uppercase tracking-widest">Results</span>
+                <button onClick={() => setShowResults(false)} className="text-white/40 hover:text-white transition-colors" type="button">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+              </div>
+              <div className="p-6 overflow-y-auto max-h-[70vh]">
+                {isRunning && (
+                  <div className="flex flex-col items-center gap-4 py-12">
+                    <div className="w-16 h-16 border-4 border-white/5 border-t-[#22d3ee] rounded-full animate-spin" />
+                    <span className="text-xs text-white/40 uppercase tracking-widest animate-pulse">Generating...</span>
+                  </div>
+                )}
+                {runResult?.error && (
+                  <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm">{runResult.error}</div>
+                )}
+                {runResult?.outputs?.length > 0 && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {runResult.outputs.map((out, i) => (
+                      <div key={i} className="rounded-xl overflow-hidden border border-white/10 bg-white/5">
+                        {out.type === 'image_url' ? (
+                          <img src={out.value} alt="output" className="w-full object-cover" />
+                        ) : out.type === 'video_url' ? (
+                          <video src={out.value} controls className="w-full" />
+                        ) : out.type === 'audio_url' ? (
+                          <audio src={out.value} controls className="w-full p-4" />
+                        ) : (
+                          <div className="p-4 text-white/70 text-sm italic">{out.value}</div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {runResult && !runResult.error && (!runResult.outputs || runResult.outputs.length === 0) && (
+                  <div className="text-center py-8 text-white/30 text-sm">No outputs returned</div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
