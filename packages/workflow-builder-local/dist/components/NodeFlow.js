@@ -1189,6 +1189,16 @@ var NodeFlow = function NodeFlow(_ref) {
       return updatedEdges;
     });
   };
+  var _stripB64Deep = function _stripB64Deep(v) {
+    if (typeof v === "string") return v.indexOf("data:") === 0 && v.length > 500 ? "" : v;
+    if (Array.isArray(v)) return v.map(_stripB64Deep);
+    if (v && typeof v === "object") {
+      var o = {};
+      for (var k in v) { if (Object.prototype.hasOwnProperty.call(v, k)) o[k] = _stripB64Deep(v[k]); }
+      return o;
+    }
+    return v;
+  };
   var buildWorkflowPayload = function buildWorkflowPayload() {
     var nodeData = nodes.map(function (node) {
       var _node$data2, _node$data3, _nodeSchemas$categori4, _nodeSchemas$categori5, _nodeSchemas$categori6, _nodeSchemas$categori7, _node$data4;
@@ -1407,7 +1417,7 @@ var NodeFlow = function NodeFlow(_ref) {
       name: workflowName || "Untitled",
       edges: edges,
       data: {
-        nodes: nodeData
+        nodes: _stripB64Deep(nodeData)
       },
       is_vadoo: false,
       category: workflowCategory

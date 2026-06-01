@@ -1059,6 +1059,16 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
     });
   };
 
+  const _stripB64Deep = (v) => {
+    if (typeof v === "string") return v.indexOf("data:") === 0 && v.length > 500 ? "" : v;
+    if (Array.isArray(v)) return v.map(_stripB64Deep);
+    if (v && typeof v === "object") {
+      const o = {};
+      for (const k in v) { if (Object.prototype.hasOwnProperty.call(v, k)) o[k] = _stripB64Deep(v[k]); }
+      return o;
+    }
+    return v;
+  };
   const buildWorkflowPayload = () => {
     const nodeData = nodes.map((node) => {
 
@@ -1291,7 +1301,7 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
       name: workflowName || "Untitled",
       edges: edges,
       data: {
-        nodes: nodeData
+        nodes: _stripB64Deep(nodeData)
       },
       is_vadoo: false,
       category: workflowCategory,

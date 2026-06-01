@@ -749,22 +749,27 @@ async function runNode(runId, nodeId, model, params, apiKey) {
         else if (CHAT_IMAGE_MODELS.has(model)) outputs = await generateChatImage(apiKey, model, params);
         else outputs = await generateImage(apiKey, model, params);
 
-        // Return the result immediately (browser renders data: URLs and remote
-        // URLs directly). TOS upload + run persistence happen in the background
-        // so they never block the response or depend on cross-instance reads.
+        // Upload generated base64 images to TOS SYNCHRONOUSLY so the client
+        // receives a public URL instead of a multi-MB base64 data URL. Holding
+        // base64 in node fields blows the workflow-save payload past Vercel's
+        // request-body limit (413) when this image is wired into another node.
+        for (const out of outputs) {
+            if (out.type === 'image_url' && out.value?.startsWith('data:')) {
+                const uploaded = await maybeUploadToTOS(out.value);
+                if (uploaded && uploaded !== out.value) out.value = uploaded;
+            }
+        }
+
         const runResult = { status: 'completed', nodes: { [nodeId]: [{ status: 'succeeded', result: { outputs } }] } };
         runStore.set(runId, runResult);
 
-        // Background: upload any base64 images to TOS and persist the run JSON.
+        // Background: upload video outputs to TOS and persist the run JSON.
         // Fire-and-forget — failure here only affects reload persistence, not display.
         (async () => {
             try {
                 let changed = false;
                 for (const out of outputs) {
-                    if (out.type === 'image_url' && out.value?.startsWith('data:')) {
-                        const uploaded = await maybeUploadToTOS(out.value);
-                        if (uploaded && uploaded !== out.value) { out.value = uploaded; changed = true; }
-                    } else if (out.type === 'video_url' && out.value) {
+                    if (out.type === 'video_url' && out.value) {
                         const uploaded = await maybeUploadVideoToTOS(out.value);
                         if (uploaded && uploaded !== out.value) { out.value = uploaded; changed = true; }
                     }
