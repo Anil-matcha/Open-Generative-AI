@@ -1,7 +1,88 @@
 import { NextResponse } from 'next/server';
+import { createHmac, createHash } from 'crypto';
 
 const store = global._mf_workflows ?? (global._mf_workflows = new Map());
 const runStore = global._mf_runs ?? (global._mf_runs = new Map());
+
+// ── TOS (Volcano Engine Object Storage) ──────────────────────────────────────
+const TOS_ENDPOINT = process.env.TOS_ENDPOINT || '';
+const TOS_BUCKET   = process.env.TOS_BUCKET   || '';
+const TOS_REGION   = process.env.TOS_REGION   || 'cn-beijing';
+const TOS_AK       = process.env.TOS_ACCESS_KEY || '';
+const TOS_SK       = process.env.TOS_SECRET_KEY || '';
+const TOS_ENABLED  = !!(TOS_ENDPOINT && TOS_BUCKET && TOS_AK && TOS_SK);
+
+function sha256hex(data) { return createHash('sha256').update(data).digest('hex'); }
+function hmac(key, data)  { return createHmac('sha256', key).update(data).digest(); }
+
+async function tosUpload(key, buffer, contentType) {
+    if (!TOS_ENABLED) return null;
+    try {
+        const now = new Date();
+        const iso = now.toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
+        const date = iso.slice(0, 8);
+        const datetime = iso;
+        const host = `${TOS_BUCKET}.${TOS_ENDPOINT}`;
+        const path = `/${key}`;
+        const payloadHash = sha256hex(buffer);
+
+        const canonHeaders = `content-length:${buffer.length}\ncontent-type:${contentType}\nhost:${host}\nx-amz-content-sha256:${payloadHash}\nx-amz-date:${datetime}\n`;
+        const signedHeaders = 'content-length;content-type;host;x-amz-content-sha256;x-amz-date';
+        const canonical = `PUT\n${path}\n\n${canonHeaders}\n${signedHeaders}\n${payloadHash}`;
+
+        const scope = `${date}/${TOS_REGION}/s3/aws4_request`;
+        const strToSign = `AWS4-HMAC-SHA256\n${datetime}\n${scope}\n${sha256hex(canonical)}`;
+
+        const sigKey = hmac(hmac(hmac(hmac(`AWS4${TOS_SK}`, date), TOS_REGION), 's3'), 'aws4_request');
+        const sig = createHmac('sha256', sigKey).update(strToSign).digest('hex');
+        const auth = `AWS4-HMAC-SHA256 Credential=${TOS_AK}/${scope}, SignedHeaders=${signedHeaders}, Signature=${sig}`;
+
+        const res = await fetch(`https://${host}${path}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': auth,
+                'Content-Type': contentType,
+                'Content-Length': String(buffer.length),
+                'x-amz-content-sha256': payloadHash,
+                'x-amz-date': datetime,
+            },
+            body: buffer,
+        });
+        if (!res.ok) { console.error('TOS upload failed:', res.status, await res.text().catch(() => '')); return null; }
+        return `https://${host}${path}`;
+    } catch (e) { console.error('TOS upload error:', e.message); return null; }
+}
+
+// Upload base64 data URL → TOS public URL (falls back to original if TOS unavailable)
+async function maybeUploadToTOS(dataUrl) {
+    if (!dataUrl || !dataUrl.startsWith('data:') || !TOS_ENABLED) return dataUrl;
+    const m = dataUrl.match(/^data:([^;]+);base64,(.+)$/s);
+    if (!m) return dataUrl;
+    const contentType = m[1];
+    const ext = contentType.split('/')[1]?.split('+')[0] || 'bin';
+    const buffer = Buffer.from(m[2], 'base64');
+    const tosKey = `images/${Date.now()}_${Math.random().toString(36).slice(2, 7)}.${ext}`;
+    return (await tosUpload(tosKey, buffer, contentType)) || dataUrl;
+}
+
+// Persist workflow to TOS (so it survives Vercel cold starts)
+async function tosSaveWorkflow(id, data) {
+    if (!TOS_ENABLED) return;
+    const buf = Buffer.from(JSON.stringify(data));
+    await tosUpload(`workflows/${id}.json`, buf, 'application/json').catch(() => {});
+}
+
+// Load workflow from TOS (public read, no auth needed)
+async function tosLoadWorkflow(id) {
+    if (!TOS_ENABLED) return null;
+    try {
+        const url = `https://${TOS_BUCKET}.${TOS_ENDPOINT}/workflows/${id}.json`;
+        const r = await fetch(url);
+        if (!r.ok) return null;
+        return await r.json();
+    } catch { return null; }
+}
+// ─────────────────────────────────────────────────────────────────────────────
 
 const MEMEFAST = 'https://memefast.top';
 
@@ -303,6 +384,13 @@ async function runNode(runId, nodeId, model, params, apiKey) {
         else if (CHAT_IMAGE_MODELS.has(model)) outputs = await generateChatImage(apiKey, model, params);
         else outputs = await generateImage(apiKey, model, params);
 
+        // Upload any base64 images to TOS → replace with public URL
+        for (const out of outputs) {
+            if (out.type === 'image_url' && out.value?.startsWith('data:')) {
+                out.value = await maybeUploadToTOS(out.value);
+            }
+        }
+
         runStore.set(runId, {
             status: 'completed',
             nodes: { [nodeId]: [{ status: 'succeeded', result: { outputs } }] },
@@ -537,7 +625,12 @@ export async function GET(request, { params }) {
 
     const id = path[0];
     if (!id) return NextResponse.json([]);
-    return NextResponse.json(store.get(id) || emptyWorkflow(id));
+    let wf = store.get(id);
+    if (!wf) {
+        wf = await tosLoadWorkflow(id);
+        if (wf) store.set(id, wf);
+    }
+    return NextResponse.json(wf || emptyWorkflow(id));
 }
 
 export async function POST(request, { params }) {
@@ -556,6 +649,7 @@ export async function POST(request, { params }) {
             updated_at: new Date().toISOString(),
         };
         store.set(id, wf);
+        tosSaveWorkflow(id, wf).catch(() => {});
         return NextResponse.json(wf);
     }
 
@@ -590,6 +684,7 @@ export async function POST(request, { params }) {
     const existing = store.get(id) || emptyWorkflow(id);
     const updated = { ...existing, ...body, workflow_id: id, id, updated_at: new Date().toISOString() };
     store.set(id, updated);
+    tosSaveWorkflow(id, updated).catch(() => {});
     return NextResponse.json(updated);
 }
 
