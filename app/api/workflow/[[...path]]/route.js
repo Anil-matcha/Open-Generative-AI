@@ -88,6 +88,23 @@ async function maybeUploadToTOS(dataUrl) {
     return (await tosUpload(tosKey, buffer, contentType)) || dataUrl;
 }
 
+// Download video from CDN URL and re-upload to TOS videos/ folder.
+// Keeps a permanent copy — CDN URLs from ARK/Memefast expire.
+async function maybeUploadVideoToTOS(videoUrl) {
+    if (!videoUrl || !TOS_ENABLED) return videoUrl;
+    const tosHost = `${TOS_BUCKET}.${TOS_ENDPOINT}`;
+    if (videoUrl.startsWith(`https://${tosHost}`)) return videoUrl; // already in TOS
+    try {
+        const r = await fetch(videoUrl);
+        if (!r.ok) return videoUrl;
+        const buf = Buffer.from(await r.arrayBuffer());
+        const ct = r.headers.get('content-type') || 'video/mp4';
+        const ext = ct.includes('webm') ? 'webm' : ct.includes('mov') ? 'mov' : 'mp4';
+        const tosKey = `videos/${Date.now()}_${Math.random().toString(36).slice(2, 7)}.${ext}`;
+        return (await tosUpload(tosKey, buf, ct)) || videoUrl;
+    } catch { return videoUrl; }
+}
+
 // Persist workflow to TOS (so it survives Vercel cold starts)
 async function tosSaveWorkflow(id, data) {
     if (!TOS_ENABLED) return;
@@ -723,6 +740,9 @@ async function runNode(runId, nodeId, model, params, apiKey) {
                 for (const out of outputs) {
                     if (out.type === 'image_url' && out.value?.startsWith('data:')) {
                         const uploaded = await maybeUploadToTOS(out.value);
+                        if (uploaded && uploaded !== out.value) { out.value = uploaded; changed = true; }
+                    } else if (out.type === 'video_url' && out.value) {
+                        const uploaded = await maybeUploadVideoToTOS(out.value);
                         if (uploaded && uploaded !== out.value) { out.value = uploaded; changed = true; }
                     }
                 }
