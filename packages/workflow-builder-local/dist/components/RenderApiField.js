@@ -120,35 +120,27 @@ var RenderApiField = function RenderApiField(_ref) {
     }
     ;
     setUploading(true);
-    _axios["default"].get("/api/app/get_file_upload_url", {
+    _axios["default"].get("/api/upload-file", {
       params: {
-        filename: file.name
+        filename: file.name,
+        type: file.type
       }
     }).then(function (response) {
       var _response$data = response.data,
-        url = _response$data.url,
-        fields = _response$data.fields;
-      var formData = new FormData();
-      Object.entries(fields).forEach(function (_ref3) {
-        var _ref4 = _slicedToArray(_ref3, 2),
-          key = _ref4[0],
-          value = _ref4[1];
-        formData.append(key, value);
-      });
-      formData.append("file", file);
-      _axios["default"].post(url, formData, {
+        putUrl = _response$data.putUrl,
+        publicUrl = _response$data.publicUrl;
+      _axios["default"].put(putUrl, file, {
         headers: {
-          "Content-Type": "multipart/form-data"
+          "Content-Type": file.type
         },
         onUploadProgress: function onUploadProgress(progressEvent) {
           var percentCompleted = Math.round(progressEvent.loaded * 100 / progressEvent.total);
           setUploadProgress(percentCompleted);
         }
       }).then(function () {
-        var uploadedUrl = "https://cdn.muapi.ai/".concat(fields.key);
         setFormValues(function (prev) {
           var current = prev[field];
-          var updatedValue = fieldSchema.type === 'array' ? [].concat(_toConsumableArray(current || []), [uploadedUrl]) : uploadedUrl;
+          var updatedValue = fieldSchema.type === 'array' ? [].concat(_toConsumableArray(current || []), [publicUrl]) : publicUrl;
           return _objectSpread(_objectSpread({}, prev), {}, _defineProperty({}, field, updatedValue));
         });
         setTimeout(function () {
