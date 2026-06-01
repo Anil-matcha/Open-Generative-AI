@@ -84,6 +84,23 @@ async function tosLoadWorkflow(id) {
         return await r.json();
     } catch { return null; }
 }
+
+// Persist run result to TOS — allows any serverless instance to read it (cross-instance polling)
+async function tosSaveRun(runId, data) {
+    if (!TOS_ENABLED) return;
+    const buf = Buffer.from(JSON.stringify(data));
+    await tosUpload(`runs/${runId}.json`, buf, 'application/json').catch(() => {});
+}
+
+async function tosLoadRun(runId) {
+    if (!TOS_ENABLED) return null;
+    try {
+        const url = `https://${TOS_BUCKET}.${TOS_ENDPOINT}/runs/${runId}.json`;
+        const r = await fetch(url);
+        if (!r.ok) return null;
+        return await r.json();
+    } catch { return null; }
+}
 // ─────────────────────────────────────────────────────────────────────────────
 
 const MEMEFAST = 'https://memefast.top';
@@ -393,16 +410,14 @@ async function runNode(runId, nodeId, model, params, apiKey) {
             }
         }
 
-        runStore.set(runId, {
-            status: 'completed',
-            nodes: { [nodeId]: [{ status: 'succeeded', result: { outputs } }] },
-        });
+        const runResult = { status: 'completed', nodes: { [nodeId]: [{ status: 'succeeded', result: { outputs } }] } };
+        runStore.set(runId, runResult);
+        tosSaveRun(runId, runResult).catch(() => {});
     } catch (err) {
         console.error(`Node run error [${nodeId}]:`, err.message);
-        runStore.set(runId, {
-            status: 'failed',
-            nodes: { [nodeId]: [{ status: 'failed', result: { outputs: [{ type: 'error', value: err.message }] } }] },
-        });
+        const runResult = { status: 'failed', nodes: { [nodeId]: [{ status: 'failed', result: { outputs: [{ type: 'error', value: err.message }] } }] } };
+        runStore.set(runId, runResult);
+        tosSaveRun(runId, runResult).catch(() => {});
     }
 }
 
@@ -600,7 +615,9 @@ export async function GET(request, { params }) {
     }
 
     if (path[0] === 'run' && path[2] === 'status') {
-        const run = runStore.get(path[1]);
+        const runId = path[1];
+        let run = runStore.get(runId);
+        if (!run) run = await tosLoadRun(runId);
         if (!run) return NextResponse.json({ status: 'processing', nodes: {} });
         return NextResponse.json(run);
     }
