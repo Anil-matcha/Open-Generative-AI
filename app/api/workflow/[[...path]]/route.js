@@ -27,8 +27,8 @@ async function tosUpload(key, buffer, contentType) {
         const payloadHash = sha256hex(buffer);
 
         // Volcano Engine TOS4 signing (TOS4-HMAC-SHA256)
-        const canonHeaders = `content-length:${buffer.length}\ncontent-type:${contentType}\nhost:${host}\nx-content-sha256:${payloadHash}\nx-date:${datetime}\n`;
-        const signedHeaders = 'content-length;content-type;host;x-content-sha256;x-date';
+        const canonHeaders = `content-length:${buffer.length}\ncontent-type:${contentType}\nhost:${host}\nx-tos-content-sha256:${payloadHash}\nx-tos-date:${datetime}\n`;
+        const signedHeaders = 'content-length;content-type;host;x-tos-content-sha256;x-tos-date';
         const canonical = `PUT\n${path}\n\n${canonHeaders}\n${signedHeaders}\n${payloadHash}`;
 
         const scope = `${date}/${TOS_REGION}/tos/request`;
@@ -45,8 +45,8 @@ async function tosUpload(key, buffer, contentType) {
                 'Authorization': auth,
                 'Content-Type': contentType,
                 'Content-Length': String(buffer.length),
-                'X-Content-Sha256': payloadHash,
-                'X-Date': datetime,
+                'X-Tos-Content-Sha256': payloadHash,
+                'X-Tos-Date': datetime,
             },
             body: buffer,
         });
