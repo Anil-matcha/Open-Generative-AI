@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createHmac, createHash } from 'crypto';
+import { priceRub } from '../../_lib/pricing';
+import { BILLING_ENABLED, getUser, deduct, refund } from '../../_lib/balance';
 
 export const maxDuration = 300; // Vercel Pro: allow up to 5min for long generations
 
@@ -605,6 +607,19 @@ async function generateAudio(apiKey, model, params) {
     return [{ type: 'audio_url', value: data.url || data.audio_url || '' }];
 }
 
+// Map a model id to its billing category (matches the node-schema categories).
+function modelCategory(model) {
+    if (VIDEO_MODELS.has(model)) return 'video';
+    if (AUDIO_MODELS.has(model)) return 'audio';
+    if (TEXT_MODELS.has(model)) return 'text';
+    return 'image';
+}
+
+// Cost of a node run in rubles (0 for passthroughs / unknown free models).
+function costForNode(model, params) {
+    return priceRub(modelCategory(model), model, params);
+}
+
 async function runNode(runId, nodeId, model, params, apiKey) {
     try {
         let outputs;
@@ -1046,6 +1061,8 @@ export async function POST(request, { params }) {
         const cookieKey1 = request.headers.get('cookie')?.match(/muapi_key=([^;]+)/)?.[1] || '';
         const apiKey = request.headers.get('authorization')?.replace('Bearer ', '') || cookieKey1 || '';
         const inputs = body.inputs || {};
+        // Resolve the billing user once for the whole workflow run.
+        const billingUser = BILLING_ENABLED ? await getUser(request) : null;
 
         let wf = store.get(wfId);
         if (!wf) { wf = await tosLoadWorkflow(wfId); if (wf) store.set(wfId, wf); }
@@ -1106,9 +1123,27 @@ export async function POST(request, { params }) {
             // Saved nodes use node.model (not node.data.selectedModel.id)
             const model = node.model || '';
             if (model) {
+                // Billing: charge this node before running it.
+                const cost = costForNode(model, params);
+                let billed = false;
+                if (billingUser && cost > 0) {
+                    const charged = await deduct(billingUser.id, cost);
+                    if (!charged.ok && charged.reason === 'insufficient') {
+                        return NextResponse.json(
+                            { error: 'insufficient_funds', node: nodeId, required: cost, balance: charged.balance },
+                            { status: 402 }
+                        );
+                    }
+                    billed = charged.ok;
+                }
+
                 const nRunId = genId();
                 await runNode(nRunId, nodeId, model, params, apiKey);
                 const nr = runStore.get(nRunId);
+                // Refund if this node failed.
+                if (billed && nr?.status === 'failed') {
+                    await refund(billingUser.id, cost).catch(() => {});
+                }
                 const outs = nr?.nodes?.[nodeId]?.[0]?.result?.outputs || [];
                 nodeOutputs[nodeId] = outs;
                 runNodes[nodeId] = nr?.nodes?.[nodeId] || [];
@@ -1133,9 +1168,33 @@ export async function POST(request, { params }) {
         const apiKey = request.headers.get('authorization')?.replace('Bearer ', '') || cookieKey2 || '';
         const model = body.model || '';
         const params = body.params || {};
+
+        // Billing: charge the logged-in user's balance before generating.
+        // No-op when billing is disabled or the user isn't authenticated.
+        const cost = costForNode(model, params);
+        let billedUser = null;
+        if (BILLING_ENABLED && cost > 0) {
+            const user = await getUser(request);
+            if (user) {
+                const charged = await deduct(user.id, cost);
+                if (!charged.ok && charged.reason === 'insufficient') {
+                    return NextResponse.json(
+                        { error: 'insufficient_funds', required: cost, balance: charged.balance },
+                        { status: 402 }
+                    );
+                }
+                if (charged.ok) billedUser = user;
+            }
+        }
+
         await runNode(runId, nodeId, model, params, apiKey);
         const result = runStore.get(runId) || { status: 'processing', nodes: {} };
-        return NextResponse.json({ run_id: runId, ...result });
+
+        // Refund if the generation ended up failing.
+        if (billedUser && result.status === 'failed') {
+            await refund(billedUser.id, cost).catch(() => {});
+        }
+        return NextResponse.json({ run_id: runId, cost, ...result });
     }
 
     // Publish: handles both /api/workflow/{id}/publish and /api/workflow/workflow/{id}/publish

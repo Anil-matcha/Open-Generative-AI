@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { priceRub } from '../../_lib/pricing';
 
 const MUAPI_BASE = 'https://api.muapi.ai';
 
@@ -69,9 +70,13 @@ export async function POST(request, { params }) {
     const pathSegments = slug.path || [];
     const path = pathSegments.join('/');
 
-    // Stub endpoints not present on upstream
+    // Real generation cost in rubles (model price × CNY→RUB × markup).
     if (path === 'calculate_dynamic_cost') {
-        return NextResponse.json({ cost: 0, currency: 'USD' });
+        let cb = {};
+        try { cb = await request.json(); } catch {}
+        // priceRub auto-detects video/audio/image from the model id.
+        const cost = priceRub(undefined, cb?.task_name || '', cb?.payload || {});
+        return NextResponse.json({ cost, currency: 'RUB' });
     }
 
     const { search } = new URL(request.url);
