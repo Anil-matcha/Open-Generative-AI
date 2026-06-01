@@ -214,24 +214,44 @@ const ARK_API_KEY = process.env.ARK_API_KEY || '';
 const ARK_BASE    = 'https://ark.cn-beijing.volces.com';
 
 async function generateVideoARK(model, params) {
-    // ARK needs a public HTTP URL — it cannot accept base64 data URLs
-    let imageUrl = params.image_url || undefined;
-    if (imageUrl?.startsWith('data:')) {
-        const uploaded = await maybeUploadToTOS(imageUrl);
-        imageUrl = (uploaded && !uploaded.startsWith('data:')) ? uploaded : undefined;
-    }
-    const promptParts = [params.prompt || ''];
-    if (params.resolution)   promptParts.push(`--rs ${String(params.resolution).toLowerCase()}`);
-    if (params.aspect_ratio) promptParts.push(`--rt ${params.aspect_ratio}`);
-    if (params.duration)     promptParts.push(`--dur ${params.duration}`);
+    // ARK needs public HTTP URLs — it cannot accept base64 data URLs.
+    const resolvePublic = async (u) => {
+        if (!u || typeof u !== 'string') return undefined;
+        if (!u.startsWith('data:')) return u;
+        const uploaded = await maybeUploadToTOS(u);
+        return (uploaded && !uploaded.startsWith('data:')) ? uploaded : undefined;
+    };
+    const imageUrl = await resolvePublic(params.image_url);
+    const videoUrl = await resolvePublic(params.video_url);
+    const audioUrl = await resolvePublic(params.audio_url);
 
-    const content = [{ type: 'text', text: promptParts.join(' ') }];
+    // Build the multimodal content array (text + optional reference media).
+    const content = [{ type: 'text', text: params.prompt || '' }];
     if (imageUrl) content.push({ type: 'image_url', image_url: { url: imageUrl }, role: 'first_frame' });
+    if (videoUrl) content.push({ type: 'video_url', video_url: { url: videoUrl }, role: 'reference_video' });
+    if (audioUrl) content.push({ type: 'audio_url', audio_url: { url: audioUrl }, role: 'reference_audio' });
+
+    // Output parameters go directly in the request body (abbreviations like
+    // --rs/--rt/--dur are NOT supported by Seedance 2.0).
+    const body = { model, content, watermark: false };
+    if (params.resolution) {
+        let res = String(params.resolution).toLowerCase();
+        // Seedance 2.0 Fast caps at 720p — downgrade 1080p to avoid a 400.
+        if (/fast/i.test(model) && res === '1080p') res = '720p';
+        body.resolution = res;
+    }
+    if (params.aspect_ratio) body.ratio = params.aspect_ratio;
+    if (params.duration) {
+        const d = Math.max(4, Math.min(15, Number(params.duration) || 5));
+        body.duration = d;
+    }
+    // Generate native audio when an audio reference is supplied.
+    if (audioUrl) body.generate_audio = true;
 
     const submitRes = await fetch(`${ARK_BASE}/api/v3/contents/generations/tasks`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${ARK_API_KEY}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model, content }),
+        body: JSON.stringify(body),
     });
     if (!submitRes.ok) {
         const txt = await submitRes.text().catch(() => submitRes.statusText);
@@ -779,10 +799,13 @@ function getNodeSchemas() {
         ar_ext:        { enum: ["1:1","16:9","9:16","4:3","3:4","3:2","2:3"], type: "string", title: "Aspect Ratio", default: "1:1" },
         ar_wide:       { enum: ["1:1","16:9","9:16","4:3","3:4","3:2","2:3","21:9"], type: "string", title: "Aspect Ratio", default: "1:1" },
         ar_video:      { enum: ["16:9","9:16","1:1","4:3"], type: "string", title: "Aspect Ratio", default: "16:9" },
+        ar_seed2:      { enum: ["21:9","16:9","4:3","1:1","3:4","9:16"], type: "string", title: "Aspect Ratio", default: "16:9" },
         // Resolution presets per model capability
         res_2k:        { enum: ["1k","2k"], type: "string", title: "Resolution", default: "1k" },
         res_4k:        { enum: ["1k","2k","4k"], type: "string", title: "Resolution", default: "1k" },
         res_video:     { enum: ["480p","720p","1080p"], type: "string", title: "Resolution", default: "1080p" },
+        res_video_fast:{ enum: ["480p","720p"], type: "string", title: "Resolution", default: "720p" },
+        dur_seed2:     { type: "int", title: "Duration (sec)", default: 5, minValue: 4, maxValue: 15, step: 1 },
         // Quality presets
         quality_hq:    { enum: ["low","medium","high"], type: "string", title: "Quality", default: "low" },
         quality_std:   { enum: ["standard","hd"], type: "string", title: "Quality", default: "standard" },
@@ -819,8 +842,11 @@ function getNodeSchemas() {
         // image_url is optional: leave empty for pure text-to-video.
         t2v:        ms({ prompt: F.prompt, image_url: F.image_url, aspect_ratio: F.ar_video, duration: F.duration }),
         t2v_seed:   ms({ prompt: F.prompt, image_url: F.image_url, aspect_ratio: F.ar_video, duration: { type: "int", title: "Duration (sec)", default: 5, minValue: 5, maxValue: 10, step: 5 } }),
-        // Seedance 2.0 — adds optional reference video and audio inputs + resolution
-        t2v_seed2:  ms({ prompt: F.prompt, image_url: F.image_url, video_url: F.video_url, audio_url: F.audio_url, resolution: F.res_video, aspect_ratio: F.ar_video, duration: { type: "int", title: "Duration (sec)", default: 5, minValue: 5, maxValue: 10, step: 5 } }),
+        // Seedance 2.0 — adds optional reference video and audio inputs + resolution.
+        // Resolution 480p/720p/1080p, ratio incl. 21:9/3:4, duration 4–15s.
+        t2v_seed2:      ms({ prompt: F.prompt, image_url: F.image_url, video_url: F.video_url, audio_url: F.audio_url, resolution: F.res_video,      aspect_ratio: F.ar_seed2, duration: F.dur_seed2 }),
+        // Seedance 2.0 Fast — same, but max resolution is 720p.
+        t2v_seed2_fast: ms({ prompt: F.prompt, image_url: F.image_url, video_url: F.video_url, audio_url: F.audio_url, resolution: F.res_video_fast, aspect_ratio: F.ar_seed2, duration: F.dur_seed2 }),
         t2v_veo:    ms({ prompt: F.prompt, aspect_ratio: F.ar_video, duration: { type: "int", title: "Duration (sec)", default: 8, minValue: 5, maxValue: 8, step: 1 } }),
         t2v_veo4k:  ms({ prompt: F.prompt, aspect_ratio: F.ar_video, resolution: F.res_4k, duration: { type: "int", title: "Duration (sec)", default: 8, minValue: 5, maxValue: 8, step: 1 } }),
         // Veo with optional image first-frame (image-to-video). image_url is optional — leave empty for pure text-to-video.
@@ -923,7 +949,7 @@ function getNodeSchemas() {
                     "video-passthrough":                    T.vidPass,
                     // ByteDance Seedance 2.0 — image + video + audio reference inputs
                     "doubao-seedance-2-0-260128":           T.t2v_seed2,
-                    "doubao-seedance-2-0-fast-260128":      T.t2v_seed2,
+                    "doubao-seedance-2-0-fast-260128":      T.t2v_seed2_fast,
                     // ByteDance Seedance 1.x — 5s or 10s, standard AR
                     "doubao-seedance-1-5-pro-251215":       T.t2v_seed,
                     "doubao-seedance-1-0-pro-fast-251015":  T.t2v_seed,
