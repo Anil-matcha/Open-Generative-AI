@@ -251,9 +251,12 @@ async function generateVideoARK(model, params) {
         const p = await pollRes.json();
         const st = String(p.status || '').toLowerCase();
         if (st === 'succeeded' || st === 'completed' || st === 'success') {
-            const videoUrl = p.content?.video_url || p.video_url;
-            if (videoUrl) return [{ type: 'video_url', value: videoUrl }];
-            throw new Error('ARK succeeded but no video URL');
+            const arkUrl = p.content?.video_url || p.video_url;
+            if (!arkUrl) throw new Error('ARK succeeded but no video URL');
+            // ARK CDN (volces.com) has CORS restrictions — re-upload to TOS immediately
+            // so the browser can play it. Falls back to ARK URL if TOS is unavailable.
+            const finalUrl = await maybeUploadVideoToTOS(arkUrl);
+            return [{ type: 'video_url', value: finalUrl }];
         }
         if (st === 'failed' || st === 'error' || st === 'expired' || st === 'cancelled') {
             throw new Error(p.error?.message || p.error || p.message || 'ARK video generation failed');
