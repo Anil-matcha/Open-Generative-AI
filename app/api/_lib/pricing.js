@@ -36,6 +36,8 @@ const MEMEFAST_VIDEO_CNY = {
     'mj_video': 1.000,
     'pixverse-video': 0.600, 'pixverse-multi-transition': 0.600, 'pixverse-mimic': 0.600,
     'pixverse-modify': 0.600, 'pixverse-restyle': 0.600, 'pixverse-lipsync': 0.600,
+    'doubao-seedance-2-0-260128': 30.000,
+    'doubao-seedance-2-0-fast-260128': 15.000,
     'doubao-seedance-1-5-pro-251215': 24.000,
     'doubao-seedance-1-0-pro-250528': 22.500,
     'doubao-seedance-1-0-pro-fast-251015': 6.300,
