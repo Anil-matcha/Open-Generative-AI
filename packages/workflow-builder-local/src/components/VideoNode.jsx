@@ -200,14 +200,6 @@ const VideoGeneration = ({ id, data, selected }) => {
     }
   }, [selectedModel, formValues, loading]);
 
-  useEffect(() => {
-    if (data.triggerRun) {
-      handleRunSingleNode();
-
-      data.onDataChange(id, { triggerRun: false });
-    }
-  }, [data.triggerRun]);
-  
   const pollNodeStatus = (run_id) => {
     let interval; const _check = () => {
       axios.get(`/api/workflow/run/${run_id}/status`)

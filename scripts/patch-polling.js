@@ -71,6 +71,27 @@ function useSyncResponse(src) {
   return src.replace(/pollNodeStatus\(response\.data\.run_id\);/g, SYNC_RESPONSE_SNIPPET);
 }
 
+// ── 1c. De-duplicate the triggerRun handler ─────────────────────────────────
+// VideoNode has TWO useEffect hooks that both call handleRunSingleNode() when
+// data.triggerRun flips true — so a single "Generate" click fires two POST
+// /node/{id}/run requests and the model is billed twice. Remove the redundant
+// standalone `useEffect(() => { if (data.triggerRun) {...} }, [data.triggerRun])`
+// block (the broader selectedModel/triggerRun/outputHistory effect still runs it).
+function dedupeTriggerRun(src) {
+  let out = src;
+  // JSX source form
+  out = out.replace(
+    /\n[ \t]*useEffect\(\(\) => \{\s*\n[ \t]*if \(data\.triggerRun\) \{\s*\n[ \t]*handleRunSingleNode\(\);\s*\n\s*\n?[ \t]*data\.onDataChange\(id, \{ triggerRun: false \}\);\s*\n[ \t]*\}\s*\n[ \t]*\}, \[data\.triggerRun\]\);/g,
+    ''
+  );
+  // Babel-compiled form
+  out = out.replace(
+    /\n[ \t]*\(0, _react\.useEffect\)\(function \(\) \{\s*\n[ \t]*if \(data\.triggerRun\) \{\s*\n[ \t]*handleRunSingleNode\(\);\s*\n[ \t]*data\.onDataChange\(id, \{\s*\n[ \t]*triggerRun: false\s*\n[ \t]*\}\);\s*\n[ \t]*\}\s*\n[ \t]*\}, \[data\.triggerRun\]\);/g,
+    ''
+  );
+  return out;
+}
+
 // ── 2. Speed up polling (src .jsx only — compiled dist already runs) ─────────
 function speedUpPolling(src, isNodeFlow) {
   let out = src;
@@ -110,6 +131,7 @@ for (const dir of targetDirs) {
 
     src = stripGuard(src);
     src = useSyncResponse(src);
+    if (name === 'VideoNode') src = dedupeTriggerRun(src);
     // Only rewrite polling timing in .jsx sources; compiled dist uses different syntax.
     if (!isDist) src = speedUpPolling(src, name === 'NodeFlow');
 

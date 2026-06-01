@@ -263,14 +263,6 @@ var VideoGeneration = function VideoGeneration(_ref) {
       });
     }
   }, [selectedModel, formValues, loading]);
-  (0, _react.useEffect)(function () {
-    if (data.triggerRun) {
-      handleRunSingleNode();
-      data.onDataChange(id, {
-        triggerRun: false
-      });
-    }
-  }, [data.triggerRun]);
   var pollNodeStatus = function pollNodeStatus(run_id) {
     var interval = setInterval(function () {
       _axios["default"].get("/api/workflow/run/".concat(run_id, "/status")).then(function (response) {
