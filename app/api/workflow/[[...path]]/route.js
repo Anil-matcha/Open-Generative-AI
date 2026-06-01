@@ -214,8 +214,9 @@ const AUDIO_MODELS = new Set([
     'speech-02-hd', 'speech-02-turbo',
     'speech-2.6-hd', 'speech-2.6-turbo',
     'speech-2.8-hd', 'speech-2.8-turbo',
-    'tts-1', 'tts-1-hd',
+    'tts-1', 'tts-1-hd', 'gpt-4o-mini-tts',
     'vidu-tts', 'qwen3-tts-flash',
+    'kling-sound-effect',
 ]);
 
 // Fal.ai image models — use POST /fal-ai/{path} (separate registry, not in /v1/models)
@@ -441,10 +442,37 @@ async function generateVideo(apiKey, model, params) {
 }
 
 async function generateAudio(apiKey, model, params) {
+    // Kling sound effect — uses video/create endpoint
+    if (model === 'kling-sound-effect') {
+        const res = await fetch(`${MEMEFAST}/v1/video/create`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ model: 'kling-sound', prompt: params.prompt || '', duration: params.duration || 5 }),
+        });
+        if (!res.ok) { const t = await res.text().catch(() => res.statusText); throw new Error(`Kling Sound API ${res.status}: ${t.slice(0, 200)}`); }
+        const d = await res.json();
+        const taskId = d.task_id || d.id;
+        if (!taskId) return [{ type: 'audio_url', value: d.url || d.audio_url || '' }];
+        for (let i = 0; i < 60; i++) {
+            await new Promise(r => setTimeout(r, 3000));
+            const poll = await fetch(`${MEMEFAST}/v1/video/task/${taskId}`, { headers: { 'Authorization': `Bearer ${apiKey}` } });
+            if (!poll.ok) continue;
+            const p = await poll.json();
+            const st = (p.status || '').toLowerCase();
+            if (st === 'completed' || st === 'succeeded') return [{ type: 'audio_url', value: p.url || p.audio_url || '' }];
+            if (st === 'failed' || st === 'error') throw new Error(p.error || 'Sound effect generation failed');
+        }
+        throw new Error('Sound effect generation timed out');
+    }
+
+    // MiniMax Voice Clone — send audio sample as reference
+    const body = { model, input: params.prompt || '', voice: params.voice || 'alloy', speed: params.speed ? parseFloat(params.speed) : undefined };
+    if (model === 'MiniMax-Voice-Clone' && params.audio_url) body.voice_id = params.audio_url;
+
     const res = await fetch(`${MEMEFAST}/v1/audio/speech`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model, input: params.prompt || '', voice: params.voice || 'alloy', speed: params.speed ? parseFloat(params.speed) : undefined }),
+        body: JSON.stringify(body),
     });
     if (!res.ok) {
         const txt = await res.text().catch(() => res.statusText);
@@ -564,9 +592,11 @@ function getNodeSchemas() {
         vision:     ms({ prompt: F.prompt, image_url: F.image_url }),
         txtPass:    ms({ prompt: { type: "string", title: "Text", description: "Enter your text", examples: [""] } }),
         // Audio — model-specific schemas
-        speech_full: ms({ prompt: F.prompt, voice: F.voice, speed: F.speed }),  // OpenAI tts-1/tts-1-hd
-        speech:      ms({ prompt: F.prompt, voice: F.voice }),                  // Minimax speech (same voices via Memefast)
-        tts:         ms({ prompt: F.prompt }),                                   // models without voice selector
+        speech_full:  ms({ prompt: F.prompt, voice: F.voice, speed: F.speed }),  // OpenAI tts-1/tts-1-hd/gpt-4o-mini-tts
+        speech:       ms({ prompt: F.prompt, voice: F.voice }),                  // Minimax speech
+        tts:          ms({ prompt: F.prompt }),                                   // models without voice selector
+        voice_clone:  ms({ prompt: F.prompt, audio_url: F.audio_url }),          // MiniMax-Voice-Clone: voice sample + text
+        sound_effect: ms({ prompt: F.prompt, duration: { type: "int", title: "Duration (sec)", default: 5, minValue: 1, maxValue: 30, step: 1 } }), // Kling sound effect
     };
 
     return {
@@ -691,20 +721,25 @@ function getNodeSchemas() {
             audio: {
                 models: {
                     "audio-passthrough":    T.audPass,
-                    // OpenAI TTS — voice selection + speed control
+                    // OpenAI TTS — voice + speed
                     "tts-1-hd":             T.speech_full,
                     "tts-1":                T.speech_full,
-                    // Minimax Speech — voice selection, no speed
+                    "gpt-4o-mini-tts":      T.speech_full,
+                    // Minimax Speech — voice, no speed
                     "speech-2.8-hd":        T.speech,
                     "speech-2.8-turbo":     T.speech,
                     "speech-2.6-hd":        T.speech,
                     "speech-2.6-turbo":     T.speech,
                     "speech-02-hd":         T.speech,
                     "speech-02-turbo":      T.speech,
-                    // Text-only TTS (no voice selector)
+                    // MiniMax Voice Clone — voice sample (audio) + text
+                    "MiniMax-Voice-Clone":  T.voice_clone,
+                    // Text-only TTS
                     "MiniMax-Voice-Design": T.tts,
                     "qwen3-tts-flash":      T.tts,
                     "vidu-tts":             T.tts,
+                    // Kling Sound Effect — prompt + duration
+                    "kling-sound-effect":   T.sound_effect,
                 }
             },
         }
