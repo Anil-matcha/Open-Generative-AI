@@ -203,7 +203,11 @@ const VIDEO_MODELS = new Set([
     'viduq3', 'viduq3-pro', 'viduq3-turbo', 'viduq3-mix',
     // Edit video (renamed for UI categorization — mapped via MODEL_ID_MAP)
     'pixverse-video-edit', 'pixverse-restyle-edit', 'pixverse-lipsync-edit',
-    'kling-video-edit-extend',
+    'pixverse-multi-transition-edit',
+    'kling-video-edit-extend', 'kling-effects-edit',
+    'wan2.6-v2v-edit',
+    'vidu-video-edit',
+    'seedance-video-edit',
 ]);
 
 const TEXT_MODELS = new Set(['text-passthrough', 'any-llm', 'openrouter-vision', 'gpt-5-nano', 'gpt-5-mini', 'whisper-1', 'gpt-4o-transcribe']);
@@ -248,10 +252,15 @@ const MODEL_ID_MAP = {
     'gpt-image-2-edit':              'gpt-image-2',
     'gpt-image-1.5-edit':            'gpt-image-1.5',
     'gpt-image-1-edit':              'gpt-image-1',
-    'pixverse-video-edit':           'pixverse-modify',
-    'pixverse-restyle-edit':         'pixverse-restyle',
-    'pixverse-lipsync-edit':         'pixverse-lipsync',
-    'kling-video-edit-extend':       'kling-video-extend',
+    'pixverse-video-edit':               'pixverse-modify',
+    'pixverse-restyle-edit':             'pixverse-restyle',
+    'pixverse-lipsync-edit':             'pixverse-lipsync',
+    'pixverse-multi-transition-edit':    'pixverse-multi-transition',
+    'kling-video-edit-extend':           'kling-video-extend',
+    'kling-effects-edit':                'kling-effects',
+    'wan2.6-v2v-edit':                   'wan2.6-v2v',
+    'vidu-video-edit':                   'vidu-video-edit',
+    'seedance-video-edit':               'doubao-seedance-video-edit',
 };
 
 function computeImageSize(aspectRatio, resolution, width, height) {
@@ -775,7 +784,13 @@ function getNodeSchemas() {
                     "kling-omni-video":            T.t2v_kling,
                     "kling-video":                 T.t2v_kling,
                     "kling-avatar-image2video":    T.i2v_kling,
+                    // Edit video
                     "kling-video-edit-extend":     T.vidExtend,
+                    "kling-effects-edit":          T.vidEdit,
+                    "pixverse-multi-transition-edit": T.vidEdit,
+                    "wan2.6-v2v-edit":             T.vidEdit,
+                    "vidu-video-edit":             T.vidEdit,
+                    "seedance-video-edit":         T.vidEdit,
                     // Happyhorse
                     "happyhorse-1.0-t2v":        T.t2v,
                     "happyhorse-1.0-i2v":        T.i2v,
