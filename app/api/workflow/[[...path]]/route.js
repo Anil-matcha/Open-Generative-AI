@@ -600,12 +600,12 @@ async function runNode(runId, nodeId, model, params, apiKey) {
 
         const runResult = { status: 'completed', nodes: { [nodeId]: [{ status: 'succeeded', result: { outputs } }] } };
         runStore.set(runId, runResult);
-        tosSaveRun(runId, runResult).catch(() => {});
+        await tosSaveRun(runId, runResult).catch(() => {});
     } catch (err) {
         console.error(`Node run error [${nodeId}]:`, err.message);
         const runResult = { status: 'failed', nodes: { [nodeId]: [{ status: 'failed', result: { outputs: [{ type: 'error', value: err.message }] } }] } };
         runStore.set(runId, runResult);
-        tosSaveRun(runId, runResult).catch(() => {});
+        await tosSaveRun(runId, runResult).catch(() => {});
     }
 }
 
