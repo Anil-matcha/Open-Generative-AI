@@ -669,6 +669,7 @@ function getNodeSchemas() {
         i2v_kling:  ms({ prompt: F.prompt, image_url: F.image_url, duration: { type: "int", title: "Duration (sec)", default: 5, minValue: 5, maxValue: 10, step: 5 } }),
         // Edit video
         vidEdit:    ms({ prompt: F.prompt, video_url: F.video_url }),
+        vidExtend:  ms({ prompt: F.prompt, video_url: F.video_url, duration: { type: "int", title: "Duration (sec)", default: 5, minValue: 5, maxValue: 10, step: 5 } }),
         lipsync:    ms({ video_url: F.video_url, audio_url: F.audio_url }),
         // Text
         vision:     ms({ prompt: F.prompt, image_url: F.image_url }),
@@ -774,7 +775,7 @@ function getNodeSchemas() {
                     "kling-omni-video":            T.t2v_kling,
                     "kling-video":                 T.t2v_kling,
                     "kling-avatar-image2video":    T.i2v_kling,
-                    "kling-video-edit-extend":     T.i2v_kling,
+                    "kling-video-edit-extend":     T.vidExtend,
                     // Happyhorse
                     "happyhorse-1.0-t2v":        T.t2v,
                     "happyhorse-1.0-i2v":        T.i2v,
