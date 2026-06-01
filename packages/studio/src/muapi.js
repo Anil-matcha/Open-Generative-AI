@@ -564,17 +564,53 @@ export async function deleteWorkflow(apiKey, id) {
     return { success: true };
 }
 export async function getWorkflowData(apiKey, id) {
-    const wf = lsGet('mf_workflows', []).find(w => w.id === id || w.workflow_id === id);
-    return {
-        workflow_id: id, id,
-        name: wf?.name || 'Untitled Workflow',
-        data: { nodes: wf?.nodes || [] },
-        edges: wf?.edges || [],
-        is_owner: true, is_published: false, is_template: false,
-        show_temp_button: false, run_id: null, category: 'General',
-    };
+    try {
+        const response = await fetch(`/api/workflow/${id}`, {
+            headers: { 'Authorization': `Bearer ${apiKey}` }
+        });
+        if (!response.ok) throw new Error('Not found');
+        const wf = await response.json();
+        return {
+            workflow_id: id, id,
+            name: wf.name || 'Untitled Workflow',
+            data: { nodes: wf.nodes || [] },
+            edges: wf.edges || [],
+            is_owner: true, is_published: false, is_template: false,
+            show_temp_button: false, run_id: null, category: 'General',
+        };
+    } catch {
+        return { workflow_id: id, id, name: 'Untitled Workflow', data: { nodes: [] }, edges: [], is_owner: true, is_published: false, is_template: false, show_temp_button: false, run_id: null, category: 'General' };
+    }
 }
-export async function getWorkflowInputs(_apiKey, _id)    { return { properties: {}, required: [] }; }
+export async function getWorkflowInputs(apiKey, id) {
+    try {
+        const wf = await getWorkflowData(apiKey, id);
+        const nodes = wf.data?.nodes || wf.nodes || [];
+        const properties = {};
+        for (const node of nodes) {
+            if (node.type === 'textNode') {
+                properties[node.id] = {
+                    type: 'string',
+                    title: node.id,
+                    description: 'Text input',
+                    default: node.data?.formValues?.prompt || '',
+                    examples: [node.data?.formValues?.prompt || ''],
+                };
+            } else if (node.type === 'uploadNode') {
+                properties[node.id] = {
+                    type: 'string',
+                    title: node.id + ' (image URL)',
+                    description: 'Image URL',
+                    field: 'image',
+                    default: node.data?.formValues?.image_url || '',
+                };
+            }
+        }
+        return { properties, required: [] };
+    } catch {
+        return { properties: {}, required: [] };
+    }
+}
 export async function getAllNodeSchemas(_apiKey, id) {
     try {
         const response = await fetch(`/api/workflow/${id}/node-schemas`);
@@ -585,14 +621,13 @@ export async function getAllNodeSchemas(_apiKey, id) {
 export async function getNodeSchemas(_apiKey)             { return { categories: {} }; }
 export async function calculateDynamicCost(_apiKey)      { return { cost: 0 }; }
 export async function executeWorkflow(apiKey, id, inputs) {
-    const prompt = typeof inputs === 'string' ? inputs : JSON.stringify(inputs || {});
-    const response = await fetch(`${BASE_URL}/v1/chat/completions`, {
-        method: 'POST', headers: bearerHeaders(apiKey),
-        body: JSON.stringify({ model: 'gpt-4o-mini', messages: [{ role: 'user', content: `Run workflow inputs: ${prompt}` }] })
+    const response = await fetch(`/api/workflow/${id}/run`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ inputs: inputs || {} }),
     });
     if (!response.ok) throw new Error(`Execution failed: ${response.status}`);
-    const data = await response.json();
-    return { output: data.choices?.[0]?.message?.content, status: 'completed' };
+    return await response.json();
 }
 export async function runSingleNode(_apiKey, _type, _inputs) { return { status: 'completed', output: {} }; }
 export async function deleteNodeRun()                        { return {}; }

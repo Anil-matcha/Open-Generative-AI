@@ -6,7 +6,7 @@ const fs = require('fs');
 const path = require('path');
 
 const dir = path.join(__dirname, '..', 'packages/Vibe-Workflow/packages/workflow-builder/src/components');
-const targets = ['ImageNode', 'VideoNode', 'TextNode', 'AudioNode', 'ApiNode', 'VideoCombiner'];
+const targets = ['ImageNode', 'VideoNode', 'TextNode', 'AudioNode', 'ApiNode', 'VideoCombiner', 'NodeFlow'];
 
 let patched = 0;
 for (const name of targets) {

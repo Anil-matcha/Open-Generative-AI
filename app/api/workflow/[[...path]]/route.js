@@ -675,8 +675,91 @@ export async function POST(request, { params }) {
     }
 
     if (path[1] === 'run') {
+        const wfId = path[0];
+        const apiKey = request.headers.get('authorization')?.replace('Bearer ', '') || '';
+        const inputs = body.inputs || {};
+
+        let wf = store.get(wfId);
+        if (!wf) { wf = await tosLoadWorkflow(wfId); if (wf) store.set(wfId, wf); }
+        if (!wf) return NextResponse.json({ error: 'Workflow not found' }, { status: 404 });
+
+        const nodes = wf.nodes || [];
+        const edges = wf.edges || [];
+
+        // Build incoming edges map: nodeId → [{source, sourceHandle, targetHandle}]
+        const inEdges = {};
+        for (const e of edges) {
+            (inEdges[e.target] ??= []).push({ source: e.source, sourceHandle: e.sourceHandle, targetHandle: e.targetHandle });
+        }
+
+        // Topological sort
+        const visited = new Set(), order = [];
+        const visit = (id) => {
+            if (visited.has(id)) return;
+            visited.add(id);
+            for (const dep of (inEdges[id] || [])) visit(dep.source);
+            order.push(id);
+        };
+        for (const n of nodes) visit(n.id);
+
+        // Execute each node in order
+        const nodeOutputs = {}; // nodeId → [{type,value}]
         const runId = genId();
-        return NextResponse.json({ run_id: runId, status: 'completed', result: {} });
+        const runNodes = {}; // for pollRunIdStatus format
+
+        for (const nodeId of order) {
+            const node = nodes.find(n => n.id === nodeId);
+            if (!node) continue;
+
+            const params = { ...(node.data?.formValues || {}) };
+
+            // Apply user-provided inputs for input nodes
+            const userIn = inputs[nodeId];
+            if (userIn) {
+                if (userIn.prompt !== undefined) params.prompt = userIn.prompt;
+                if (userIn.image_url !== undefined) params.image_url = userIn.image_url;
+            }
+
+            // Inject outputs from connected nodes
+            for (const dep of (inEdges[nodeId] || [])) {
+                const src = (nodeOutputs[dep.source] || [])[0];
+                if (!src) continue;
+                const th = dep.targetHandle || '';
+                if (th === 'imageInput' || th.includes('text')) params.prompt = src.value;
+                else if (th === 'imageInput2') { params.images_list = [...(params.images_list || []), src.value]; }
+                else if (th === 'imageInput3') params.image_url = src.value;
+                else if (th === 'videoInput') params.video_url = src.value;
+                else if (th === 'audioInput') params.audio_url = src.value;
+            }
+
+            if (node.type === 'textNode') {
+                nodeOutputs[nodeId] = [{ type: 'text', value: params.prompt || '' }];
+            } else if (node.type === 'uploadNode') {
+                const val = params.image_url || params.video_url || params.audio_url || '';
+                const type = params.video_url ? 'video_url' : params.audio_url ? 'audio_url' : 'image_url';
+                nodeOutputs[nodeId] = [{ type, value: val }];
+            } else {
+                const model = node.data?.selectedModel?.id || '';
+                if (model) {
+                    const nRunId = genId();
+                    await runNode(nRunId, nodeId, model, params, apiKey);
+                    const nr = runStore.get(nRunId);
+                    const outs = nr?.nodes?.[nodeId]?.[0]?.result?.outputs || [];
+                    nodeOutputs[nodeId] = outs;
+                    runNodes[nodeId] = nr?.nodes?.[nodeId] || [];
+                }
+            }
+        }
+
+        // Collect outputs from nodes marked as output (make_output = true)
+        let outputNodes = nodes.filter(n => n.data?.formValues?.make_output);
+        if (!outputNodes.length) outputNodes = nodes.filter(n => !['textNode','uploadNode'].includes(n.type));
+        const outputs = outputNodes.flatMap(n => nodeOutputs[n.id] || []);
+
+        const runResult = { status: 'completed', nodes: runNodes, outputs };
+        runStore.set(runId, runResult);
+        tosSaveRun(runId, runResult).catch(() => {});
+        return NextResponse.json({ run_id: runId, ...runResult });
     }
 
     if (path[1] === 'node' && path[3] === 'run') {
