@@ -82,41 +82,23 @@ var UploadNode = function UploadNode(_ref) {
     }
     ;
     setUploading(true);
-    _axios["default"].get("/api/app/get_file_upload_url", {
-      params: {
-        filename: file.name
+    var uploadFormData = new FormData();
+    uploadFormData.append("file", file);
+    _axios["default"].post("/api/upload-file", uploadFormData, {
+      headers: { "Content-Type": "multipart/form-data" },
+      onUploadProgress: function onUploadProgress(progressEvent) {
+        var percentCompleted = Math.round(progressEvent.loaded * 100 / progressEvent.total);
+        setUploadProgress(percentCompleted);
       }
     }).then(function (response) {
-      var _response$data = response.data,
-        url = _response$data.url,
-        fields = _response$data.fields;
-      var formData = new FormData();
-      Object.entries(fields).forEach(function (_ref2) {
-        var _ref3 = _slicedToArray(_ref2, 2),
-          key = _ref3[0],
-          value = _ref3[1];
-        formData.append(key, value);
+      var uploadedUrl = response.data.url;
+      setFormValues(function (prev) {
+        return _objectSpread(_objectSpread({}, prev), {}, _defineProperty({}, type, uploadedUrl));
       });
-      formData.append("file", file);
-      _axios["default"].post(url, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data"
-        },
-        onUploadProgress: function onUploadProgress(progressEvent) {
-          var percentCompleted = Math.round(progressEvent.loaded * 100 / progressEvent.total);
-          setUploadProgress(percentCompleted);
-        }
-      }).then(function () {
-        var prefix = "https://cdn.muapi.ai/";
-        var uploadedUrl = prefix + fields.key;
-        setFormValues(function (prev) {
-          return _objectSpread(_objectSpread({}, prev), {}, _defineProperty({}, type, uploadedUrl));
-        });
-        setTimeout(function () {
-          setUploading(false);
-          setUploadProgress(0);
-        }, 500);
-      });
+      setTimeout(function () {
+        setUploading(false);
+        setUploadProgress(0);
+      }, 500);
     })["catch"](function (error) {
       var _error$response;
       console.error("Upload failed", error);
