@@ -678,6 +678,9 @@ function getNodeSchemas() {
         t2v_seed:   ms({ prompt: F.prompt, aspect_ratio: F.ar_video, duration: { type: "int", title: "Duration (sec)", default: 5, minValue: 5, maxValue: 10, step: 5 } }),
         t2v_veo:    ms({ prompt: F.prompt, aspect_ratio: F.ar_video, duration: { type: "int", title: "Duration (sec)", default: 8, minValue: 5, maxValue: 8, step: 1 } }),
         t2v_veo4k:  ms({ prompt: F.prompt, aspect_ratio: F.ar_video, resolution: F.res_4k, duration: { type: "int", title: "Duration (sec)", default: 8, minValue: 5, maxValue: 8, step: 1 } }),
+        // Veo with optional image first-frame (image-to-video). image_url is optional — leave empty for pure text-to-video.
+        i2v_veo:    ms({ prompt: F.prompt, image_url: F.image_url, aspect_ratio: F.ar_video, duration: { type: "int", title: "Duration (sec)", default: 8, minValue: 5, maxValue: 8, step: 1 } }),
+        i2v_veo4k:  ms({ prompt: F.prompt, image_url: F.image_url, aspect_ratio: F.ar_video, resolution: F.res_4k, duration: { type: "int", title: "Duration (sec)", default: 8, minValue: 5, maxValue: 8, step: 1 } }),
         t2v_sora:   ms({ prompt: F.prompt, aspect_ratio: { enum: ["16:9","9:16","1:1"], type: "string", title: "Aspect Ratio", default: "16:9" }, duration: { type: "int", title: "Duration (sec)", default: 5, minValue: 5, maxValue: 20, step: 5 } }),
         t2v_grok:   ms({ prompt: F.prompt, aspect_ratio: F.ar_video, duration: { type: "int", title: "Duration (sec)", default: 5, minValue: 5, maxValue: 5, step: 1 } }),
         t2v_grok10: ms({ prompt: F.prompt, aspect_ratio: F.ar_video, duration: { type: "int", title: "Duration (sec)", default: 10, minValue: 10, maxValue: 10, step: 1 } }),
@@ -779,13 +782,13 @@ function getNodeSchemas() {
                     "doubao-seedance-1-0-pro-250528":       T.t2v_seed,
                     "doubao-seedance-1-0-lite-t2v-250428":  T.t2v_seed,
                     "doubao-seedance-1-0-lite-i2v-250428":  T.i2v_seed,
-                    // Google Veo — up to 8s; Veo 3.1-4k supports 4k resolution
-                    "veo3.1-pro":    T.t2v_veo,
-                    "veo3.1-4k":     T.t2v_veo4k,
-                    "veo3.1":        T.t2v_veo,
-                    "veo3.1-fast":   T.t2v_veo,
-                    "veo_3_1":       T.t2v_veo,
-                    "veo_3_1-fast":  T.t2v_veo,
+                    // Google Veo — up to 8s; optional image first-frame (image-to-video). Veo 3.1-4k supports 4k.
+                    "veo3.1-pro":    T.i2v_veo,
+                    "veo3.1-4k":     T.i2v_veo4k,
+                    "veo3.1":        T.i2v_veo,
+                    "veo3.1-fast":   T.i2v_veo,
+                    "veo_3_1":       T.i2v_veo,
+                    "veo_3_1-fast":  T.i2v_veo,
                     // OpenAI Sora — up to 20s
                     "sora-2": T.t2v_sora,
                     // Grok Video — 5s fixed / 10s fixed
