@@ -206,7 +206,7 @@ const VIDEO_MODELS = new Set([
     'kling-video-edit-extend',
 ]);
 
-const TEXT_MODELS = new Set(['text-passthrough', 'any-llm', 'openrouter-vision', 'gpt-5-nano', 'gpt-5-mini']);
+const TEXT_MODELS = new Set(['text-passthrough', 'any-llm', 'openrouter-vision', 'gpt-5-nano', 'gpt-5-mini', 'whisper-1', 'gpt-4o-transcribe']);
 
 const AUDIO_MODELS = new Set([
     'audio-passthrough',
@@ -216,7 +216,8 @@ const AUDIO_MODELS = new Set([
     'speech-2.8-hd', 'speech-2.8-turbo',
     'tts-1', 'tts-1-hd', 'gpt-4o-mini-tts',
     'vidu-tts', 'qwen3-tts-flash',
-    'kling-sound-effect',
+    'kling-sound-effect', 'kling-tts', 'kling-video-sound',
+    'suno-inspire', 'suno-custom', 'suno-continue',
 ]);
 
 // Fal.ai image models — use POST /fal-ai/{path} (separate registry, not in /v1/models)
@@ -386,6 +387,21 @@ async function generateChatImage(apiKey, model, params) {
 }
 
 async function generateText(apiKey, model, params) {
+    // Transcription models — audio URL → text
+    if (model === 'whisper-1' || model === 'gpt-4o-transcribe') {
+        const res = await fetch(`${MEMEFAST}/v1/audio/transcriptions`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ model, url: params.audio_url || '', response_format: 'json' }),
+        });
+        if (!res.ok) {
+            const txt = await res.text().catch(() => res.statusText);
+            throw new Error(`Transcription API ${res.status}: ${txt.slice(0, 200)}`);
+        }
+        const data = await res.json();
+        return [{ type: 'text', value: data.text || '' }];
+    }
+
     const messages = params.image_url
         ? [{ role: 'user', content: [
               { type: 'image_url', image_url: { url: params.image_url } },
@@ -442,6 +458,68 @@ async function generateVideo(apiKey, model, params) {
 }
 
 async function generateAudio(apiKey, model, params) {
+    // Suno music generation — async with task polling
+    if (model.startsWith('suno-')) {
+        const mode = model.replace('suno-', ''); // 'inspire' | 'custom' | 'continue'
+        const body = { model: 'suno-v4', mode, prompt: params.prompt || '' };
+        if (mode === 'custom') {
+            body.lyrics = params.lyrics || params.prompt || '';
+            body.style  = params.style  || '';
+            body.title  = params.title  || '';
+            delete body.prompt;
+        }
+        if (mode === 'continue' && params.audio_url) {
+            body.audio_url   = params.audio_url;
+            body.continue_at = params.continue_at ? parseFloat(params.continue_at) : 0;
+        }
+        const sRes = await fetch(`${MEMEFAST}/v1/audio/music`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        });
+        if (!sRes.ok) { const t = await sRes.text().catch(() => sRes.statusText); throw new Error(`Suno API ${sRes.status}: ${t.slice(0, 300)}`); }
+        const sData = await sRes.json();
+        const taskId = sData.task_id || sData.id;
+        if (!taskId) return [{ type: 'audio_url', value: sData.url || sData.audio_url || '' }];
+        for (let i = 0; i < 120; i++) {
+            await new Promise(r => setTimeout(r, 5000));
+            const poll = await fetch(`${MEMEFAST}/v1/audio/music/${taskId}`, { headers: { 'Authorization': `Bearer ${apiKey}` } });
+            if (!poll.ok) continue;
+            const p = await poll.json();
+            const st = (p.status || '').toLowerCase();
+            if (st === 'completed' || st === 'succeeded' || st === 'success') {
+                const clips = Array.isArray(p.clips) ? p.clips : Array.isArray(p.data) ? p.data : [];
+                if (clips.length) return clips.map(c => ({ type: 'audio_url', value: c.audio_url || c.url || '' })).filter(c => c.value);
+                return [{ type: 'audio_url', value: p.url || p.audio_url || '' }];
+            }
+            if (st === 'failed' || st === 'error') throw new Error(p.error || 'Suno generation failed');
+        }
+        throw new Error('Suno music generation timed out');
+    }
+
+    // Kling video→sound — generates audio from a video clip
+    if (model === 'kling-video-sound') {
+        const res = await fetch(`${MEMEFAST}/v1/video/create`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ model: 'kling-video-sound', video_url: params.video_url || '' }),
+        });
+        if (!res.ok) { const t = await res.text().catch(() => res.statusText); throw new Error(`Kling Video Sound API ${res.status}: ${t.slice(0, 200)}`); }
+        const d = await res.json();
+        const taskId = d.task_id || d.id;
+        if (!taskId) return [{ type: 'audio_url', value: d.url || d.audio_url || '' }];
+        for (let i = 0; i < 60; i++) {
+            await new Promise(r => setTimeout(r, 3000));
+            const poll = await fetch(`${MEMEFAST}/v1/video/task/${taskId}`, { headers: { 'Authorization': `Bearer ${apiKey}` } });
+            if (!poll.ok) continue;
+            const p = await poll.json();
+            const st = (p.status || '').toLowerCase();
+            if (st === 'completed' || st === 'succeeded') return [{ type: 'audio_url', value: p.url || p.audio_url || '' }];
+            if (st === 'failed' || st === 'error') throw new Error(p.error || 'Video sound generation failed');
+        }
+        throw new Error('Video sound generation timed out');
+    }
+
     // Kling sound effect — uses video/create endpoint
     if (model === 'kling-sound-effect') {
         const res = await fetch(`${MEMEFAST}/v1/video/create`, {
@@ -546,6 +624,10 @@ function getNodeSchemas() {
         // Quality presets
         quality_hq:    { enum: ["low","medium","high"], type: "string", title: "Quality", default: "low" },
         quality_std:   { enum: ["standard","hd"], type: "string", title: "Quality", default: "standard" },
+        // Suno music fields
+        lyrics:        { type: "string", title: "Lyrics", description: "Song lyrics", examples: [""] },
+        style:         { type: "string", title: "Music Style", description: "Describe the musical style", examples: ["pop", "rock", "jazz"] },
+        title:         { type: "string", title: "Song Title", description: "Title for the generated song", examples: [""] },
     };
 
     const ms = (props) => ({ input_schema: { schemas: { input_data: { properties: props } } } });
@@ -597,6 +679,16 @@ function getNodeSchemas() {
         tts:          ms({ prompt: F.prompt }),                                   // models without voice selector
         voice_clone:  ms({ prompt: F.prompt, audio_url: F.audio_url }),          // MiniMax-Voice-Clone: voice sample + text
         sound_effect: ms({ prompt: F.prompt, duration: { type: "int", title: "Duration (sec)", default: 5, minValue: 1, maxValue: 30, step: 1 } }), // Kling sound effect
+        // Kling TTS — voice selector, no speed
+        kling_tts:    ms({ prompt: F.prompt, voice: F.voice }),
+        // Kling video→sound — input video, generates matching audio
+        vid2sound:    ms({ video_url: F.video_url }),
+        // Transcription — audio → text
+        transcription: ms({ audio_url: F.audio_url }),
+        // Suno music generation modes
+        suno_inspire: ms({ prompt: F.prompt }),                                                          // inspiration mode: describe the song
+        suno_custom:  ms({ title: F.title, lyrics: F.lyrics, style: F.style }),                        // custom mode: lyrics + style + title
+        suno_continue:ms({ prompt: F.prompt, audio_url: F.audio_url }),                                 // continuation mode: extend an existing track
     };
 
     return {
@@ -716,6 +808,9 @@ function getNodeSchemas() {
                     "openrouter-vision": T.vision,
                     "gpt-5-nano":        T.vision,
                     "gpt-5-mini":        T.vision,
+                    // Transcription — audio input → text output
+                    "whisper-1":         T.transcription,
+                    "gpt-4o-transcribe": T.transcription,
                 }
             },
             audio: {
@@ -740,6 +835,14 @@ function getNodeSchemas() {
                     "vidu-tts":             T.tts,
                     // Kling Sound Effect — prompt + duration
                     "kling-sound-effect":   T.sound_effect,
+                    // Kling TTS — prompt + voice
+                    "kling-tts":            T.kling_tts,
+                    // Kling video→sound — video input → matching audio
+                    "kling-video-sound":    T.vid2sound,
+                    // Suno music — three modes
+                    "suno-inspire":         T.suno_inspire,
+                    "suno-custom":          T.suno_custom,
+                    "suno-continue":        T.suno_continue,
                 }
             },
         }
