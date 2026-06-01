@@ -48,28 +48,21 @@ const UploadNode = ({ id, data, formValues, setFormValues, selectedModel, loadin
     };
 
     setUploading(true);
-    axios.get("/api/app/get_file_upload_url", {
-      params: { filename: file.name }
+    axios.get("/api/upload-file", {
+      params: { filename: file.name, type: file.type }
     })
     .then((response) => {
-      const { url, fields } = response.data;
+      const { putUrl, publicUrl } = response.data;
 
-      const formData = new FormData();
-      Object.entries(fields).forEach(([key, value]) => {
-        formData.append(key, value);
-      });
-      formData.append("file", file);
-      axios.post(url, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+      axios.put(putUrl, file, {
+        headers: { "Content-Type": file.type },
         onUploadProgress: (progressEvent) => {
           const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
           setUploadProgress(percentCompleted);
         }
       })
       .then(() => {
-        const prefix = "https://cdn.muapi.ai/";
-        const uploadedUrl = prefix + fields.key;
-        setFormValues(prev => ({ ...prev, [type]: uploadedUrl }));
+        setFormValues(prev => ({ ...prev, [type]: publicUrl }));
 
         setTimeout(() => {
           setUploading(false);
@@ -82,7 +75,7 @@ const UploadNode = ({ id, data, formValues, setFormValues, selectedModel, loadin
       toast.error("Upload failed.", error?.response?.data);
       setUploading(false);
       setUploadProgress(0);
-    })  
+    })
   };
 
   const handleDragOver = (e) => {
