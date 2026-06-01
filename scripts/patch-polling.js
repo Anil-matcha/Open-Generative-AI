@@ -85,6 +85,27 @@ function addPollTimeout(src) {
   );
 }
 
+// ── 1c-bis. Guard against duplicate concurrent generation (double billing) ───
+// Every node's handleRunSingleNode POSTs to /node/{id}/run which bills the model.
+// If it's invoked again while the first request is still in flight (double click,
+// effect re-fire, etc.) the model is billed twice. Wrap the compiled exported
+// function with an in-flight ref so a second call is a no-op until the first
+// settles. Idempotent: only adds the ref once and only wraps the un-guarded form.
+function guardConcurrentRun(src) {
+  let out = src;
+  if (!/var inFlightRef = /.test(out)) {
+    out = out.replace(
+      /\n(  var handleRunSingleNode = \/\*#__PURE__\*\/function \(\) \{)/,
+      '\n  var inFlightRef = (0, _react.useRef)(false);\n$1'
+    );
+  }
+  out = out.replace(
+    /return function handleRunSingleNode\(\) \{\n      return (_ref\d+)\.apply\(this, arguments\);\n    \};/,
+    'return function handleRunSingleNode() {\n      if (inFlightRef.current) return Promise.resolve();\n      inFlightRef.current = true;\n      return $1.apply(this, arguments)["finally"](function () { inFlightRef.current = false; });\n    };'
+  );
+  return out;
+}
+
 // ── 1d. De-duplicate the triggerRun handler ─────────────────────────────────
 // VideoNode has TWO useEffect hooks that both call handleRunSingleNode() when
 // data.triggerRun flips true — so a single "Generate" click fires two POST
@@ -145,6 +166,9 @@ for (const dir of targetDirs) {
 
     src = stripGuard(src);
     src = useSyncResponse(src);
+    // Guard every node's run against duplicate concurrent billing (dist only —
+    // the bundled form). VideoNode local copies are already guarded by hand.
+    if (isDist && nodeTargets.includes(name)) src = guardConcurrentRun(src);
     if (name === 'VideoNode') {
       src = dedupeTriggerRun(src);
       if (isDist) src = addPollTimeout(src);

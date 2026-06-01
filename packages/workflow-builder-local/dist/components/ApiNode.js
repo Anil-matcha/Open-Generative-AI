@@ -477,6 +477,7 @@ var ApiNode = function ApiNode(_ref) {
       });
     }, 3000);
   };
+  var inFlightRef = (0, _react.useRef)(false);
   var handleRunSingleNode = /*#__PURE__*/function () {
     var _ref15 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee() {
       var workflow_id, params, inputSchema, localSources, _i, _Object$entries, _Object$entries$_i, key, meta, _meta$default2, filteredInputParams, response, _error$response2, _t;
@@ -560,7 +561,9 @@ var ApiNode = function ApiNode(_ref) {
       }, _callee, null, [[1, 6]]);
     }));
     return function handleRunSingleNode() {
-      return _ref15.apply(this, arguments);
+      if (inFlightRef.current) return Promise.resolve();
+      inFlightRef.current = true;
+      return _ref15.apply(this, arguments)["finally"](function () { inFlightRef.current = false; });
     };
   }();
   var handleDeleteNode = function handleDeleteNode() {

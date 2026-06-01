@@ -48,6 +48,7 @@ const VideoGeneration = ({ id, data, selected }) => {
   const videoRef = useRef(null);
   const outputHistory = data.outputHistory || [];
   const prevHistoryLengthRef = useRef(outputHistory.length);
+  const inFlightRef = useRef(false); // guards against duplicate concurrent generation requests
   const workflowId = getWorkflowId();
   const runId = data.runId ?? getRunId();
   const nodeSchemas = data.nodeSchemas || {};
@@ -260,6 +261,9 @@ const VideoGeneration = ({ id, data, selected }) => {
   };
 
   const handleRunSingleNode = async () => {
+    // Prevent duplicate billing: ignore re-entry while a generation is in flight
+    if (inFlightRef.current) return;
+    inFlightRef.current = true;
     try {
       data.onDataChange(id, { isLoading: true });
       const workflow_id = await data.handleSaveWorkFlow();
@@ -299,6 +303,8 @@ const VideoGeneration = ({ id, data, selected }) => {
       data.onDataChange(id, { isLoading: false });
       toast.error(error.response?.data?.detail || "Error running node");
       console.error(error);
+    } finally {
+      inFlightRef.current = false;
     };
   };
 

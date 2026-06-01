@@ -310,6 +310,7 @@ var AudioGeneration = function AudioGeneration(_ref) {
       });
     }, 3000);
   };
+  var inFlightRef = (0, _react.useRef)(false);
   var handleRunSingleNode = /*#__PURE__*/function () {
     var _ref1 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee() {
       var _nodeSchemas$categori2, workflow_id, modelSchema, params, inputSchema, localSources, _i, _Object$entries, _Object$entries$_i, key, meta, _meta$default2, response, _error$response, _t;
@@ -389,7 +390,9 @@ var AudioGeneration = function AudioGeneration(_ref) {
       }, _callee, null, [[2, 7]]);
     }));
     return function handleRunSingleNode() {
-      return _ref1.apply(this, arguments);
+      if (inFlightRef.current) return Promise.resolve();
+      inFlightRef.current = true;
+      return _ref1.apply(this, arguments)["finally"](function () { inFlightRef.current = false; });
     };
   }();
   var handleDeleteNode = function handleDeleteNode() {

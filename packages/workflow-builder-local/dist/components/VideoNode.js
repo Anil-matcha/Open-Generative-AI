@@ -103,6 +103,7 @@ var VideoGeneration = function VideoGeneration(_ref) {
   var videoRef = (0, _react.useRef)(null);
   var outputHistory = data.outputHistory || [];
   var prevHistoryLengthRef = (0, _react.useRef)(outputHistory.length);
+  var inFlightRef = (0, _react.useRef)(false);
   var workflowId = (0, _WorkflowStore.getWorkflowId)();
   var runId = (_data$runId = data.runId) !== null && _data$runId !== void 0 ? _data$runId : (0, _WorkflowStore.getRunId)();
   var nodeSchemas = data.nodeSchemas || {};
@@ -412,7 +413,9 @@ var VideoGeneration = function VideoGeneration(_ref) {
       }, _callee, null, [[1, 6]]);
     }));
     return function handleRunSingleNode() {
-      return _ref1.apply(this, arguments);
+      if (inFlightRef.current) return Promise.resolve();
+      inFlightRef.current = true;
+      return _ref1.apply(this, arguments)["finally"](function () { inFlightRef.current = false; });
     };
   }();
   var handleDeleteNode = function handleDeleteNode() {
