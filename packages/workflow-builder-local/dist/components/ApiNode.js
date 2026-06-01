@@ -483,12 +483,8 @@ var ApiNode = function ApiNode(_ref) {
       return _regenerator().w(function (_context) {
         while (1) switch (_context.p = _context.n) {
           case 0:
-            if (runId) {
-              _context.n = 1;
+            _context.n = 1;
               break;
-            }
-            _reactHotToast.toast.error("No run_id available!. Click 'Run All' button");
-            return _context.a(2);
           case 1:
             _context.p = 1;
             data.onDataChange(id, {
