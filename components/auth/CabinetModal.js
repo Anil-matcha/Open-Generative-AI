@@ -5,6 +5,7 @@ import { useAuth } from './AuthProvider';
 import { supabase } from '@/lib/supabaseClient';
 
 const PRESETS = [500, 1000, 2000, 5000];
+const ADMIN_EMAILS = ['kaban.vershinin@gmail.com', 'didig.vershinin@yandex.ru'];
 
 export default function CabinetModal() {
     const { cabinetOpen, setCabinetOpen, profile, balance, logout, refreshBalance, user } = useAuth();
@@ -109,6 +110,13 @@ export default function CabinetModal() {
                     </button>
                     <div className="text-xs text-white/30 text-center">Карта или СБП · от 100 ₽</div>
                 </div>
+
+                {ADMIN_EMAILS.some(e => e.toLowerCase() === (user?.email || '').toLowerCase()) && (
+                    <a href="/admin"
+                       className="w-full py-2 text-sm text-purple-400 hover:text-purple-300 transition-colors text-center block">
+                        ⚙ Админ-панель
+                    </a>
+                )}
 
                 <button onClick={logout}
                         className="w-full py-2 text-sm text-white/50 hover:text-red-400 transition-colors">
