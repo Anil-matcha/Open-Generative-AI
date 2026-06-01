@@ -197,7 +197,12 @@ const ARK_API_KEY = process.env.ARK_API_KEY || '';
 const ARK_BASE    = 'https://ark.cn-beijing.volces.com';
 
 async function generateVideoARK(model, params) {
-    const imageUrl = params.image_url ? await resolveImageUrl(params.image_url) : undefined;
+    // ARK needs a public HTTP URL — it cannot accept base64 data URLs
+    let imageUrl = params.image_url || undefined;
+    if (imageUrl?.startsWith('data:')) {
+        const uploaded = await maybeUploadToTOS(imageUrl);
+        imageUrl = (uploaded && !uploaded.startsWith('data:')) ? uploaded : undefined;
+    }
     const promptParts = [params.prompt || ''];
     if (params.resolution)   promptParts.push(`--rs ${String(params.resolution).toLowerCase()}`);
     if (params.aspect_ratio) promptParts.push(`--rt ${params.aspect_ratio}`);
@@ -1186,11 +1191,20 @@ export async function POST(request, { params }) {
                 const src = (nodeOutputs[dep.source] || [])[0];
                 if (!src) continue;
                 const th = dep.targetHandle || '';
-                if (th === 'imageInput' || th.includes('text')) params.prompt = src.value;
-                else if (th === 'imageInput2') { params.images_list = [...(params.images_list || []), src.value]; }
-                else if (th === 'imageInput3') params.image_url = src.value;
-                else if (th === 'videoInput') params.video_url = src.value;
-                else if (th === 'audioInput') params.audio_url = src.value;
+                // Handle mapping mirrors NodeFlow.jsx client-side edge injection
+                if (['imageInput', 'videoInput', 'audioInput2'].includes(th) || th.includes('text')) {
+                    params.prompt = src.value;
+                } else if (['imageInput2', 'textInput3', 'videoInput6'].includes(th)) {
+                    params.images_list = [...(params.images_list || []), src.value];
+                } else if (['imageInput3', 'videoInput2', 'audioInput3'].includes(th)) {
+                    params.image_url = src.value;
+                } else if (['videoInput4', 'audioInput4'].includes(th)) {
+                    params.video_url = src.value;
+                } else if (['videoInput5', 'audioInput'].includes(th)) {
+                    params.audio_url = src.value;
+                } else if (th === 'videoInput3') {
+                    params.last_image = src.value;
+                }
             }
 
             // Saved nodes use node.model (not node.data.selectedModel.id)
