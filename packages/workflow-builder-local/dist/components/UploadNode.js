@@ -82,26 +82,39 @@ var UploadNode = function UploadNode(_ref) {
     }
     ;
     setUploading(true);
-    var uploadFormData = new FormData();
-    uploadFormData.append("file", file);
-    _axios["default"].post("/api/upload-file", uploadFormData, {
-      onUploadProgress: function onUploadProgress(progressEvent) {
-        var percentCompleted = Math.round(progressEvent.loaded * 100 / progressEvent.total);
-        setUploadProgress(percentCompleted);
-      }
+    // Step 1: get a presigned PUT URL from our server
+    _axios["default"].get("/api/upload-file", {
+      params: { filename: file.name, type: file.type }
     }).then(function (response) {
-      var uploadedUrl = response.data.url;
-      setFormValues(function (prev) {
-        return _objectSpread(_objectSpread({}, prev), {}, _defineProperty({}, type, uploadedUrl));
-      });
-      setTimeout(function () {
+      var _response$data = response.data,
+        putUrl = _response$data.putUrl,
+        publicUrl = _response$data.publicUrl;
+      // Step 2: PUT the file directly to TOS (bypasses Vercel body size limit)
+      _axios["default"].put(putUrl, file, {
+        headers: { "Content-Type": file.type },
+        onUploadProgress: function onUploadProgress(progressEvent) {
+          var percentCompleted = Math.round(progressEvent.loaded * 100 / progressEvent.total);
+          setUploadProgress(percentCompleted);
+        }
+      }).then(function () {
+        setFormValues(function (prev) {
+          return _objectSpread(_objectSpread({}, prev), {}, _defineProperty({}, type, publicUrl));
+        });
+        setTimeout(function () {
+          setUploading(false);
+          setUploadProgress(0);
+        }, 500);
+      })["catch"](function (error) {
+        var _error$response;
+        console.error("TOS upload failed", error);
+        _reactHotToast.toast.error("Upload failed.", error === null || error === void 0 || (_error$response = error.response) === null || _error$response === void 0 ? void 0 : _error$response.data);
         setUploading(false);
         setUploadProgress(0);
-      }, 500);
+      });
     })["catch"](function (error) {
-      var _error$response;
+      var _error$response2;
       console.error("Upload failed", error);
-      _reactHotToast.toast.error("Upload failed.", error === null || error === void 0 || (_error$response = error.response) === null || _error$response === void 0 ? void 0 : _error$response.data);
+      _reactHotToast.toast.error("Upload failed.", error === null || error === void 0 || (_error$response2 = error.response) === null || _error$response2 === void 0 ? void 0 : _error$response2.data);
       setUploading(false);
       setUploadProgress(0);
     });
