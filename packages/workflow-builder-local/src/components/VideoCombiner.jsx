@@ -184,7 +184,7 @@ const VideoCombiner = ({ id, data, selected }) => {
   }, [selectedModel, formValues, loading]);
 
   const pollNodeStatus = (run_id) => {
-    const interval = setInterval(() => {
+    let interval; const _check = () => {
       axios.get(`/api/workflow/run/${run_id}/status`)
       .then((response) => {
         const nodesInRes = response.data.nodes || {};
@@ -229,7 +229,7 @@ const VideoCombiner = ({ id, data, selected }) => {
         data.onDataChange(id, { isLoading: false });
         toast.error(`Failed to get workflow status Video Combiner ${id.replace(/^\D+/g, "")}`);
       });
-    }, 3000);
+    }; _check(); interval = setInterval(_check, 500);
   };
 
   const handleRunSingleNode = async () => {
@@ -267,7 +267,7 @@ const VideoCombiner = ({ id, data, selected }) => {
         cost: generationCost,
         node_id: "Video Combiner"
       });
-      pollNodeStatus(response.data.run_id);
+      { var _r = response.data; var _nd = _r && _r.nodes && (_r.nodes[id] || Object.values(_r.nodes)[0]); var _lt = _nd && _nd[_nd.length - 1]; if (_lt && (_lt.status === "succeeded" || _lt.status === "completed") && _lt.result && _lt.result.outputs) { var _o = _lt.result.outputs; data && data.onDataChange && data.onDataChange(id, { outputs: _o, resultUrl: (_o[0] && _o[0].value) || "", isLoading: false, errorMsg: null, outputHistory: (data.outputHistory || []).concat([_lt]) }); } else if (_lt && _lt.status === "failed") { data && data.onDataChange && data.onDataChange(id, { isLoading: false, errorMsg: "Generation failed" }); } else { pollNodeStatus(_r.run_id); } }
     } catch(error) {
       data.onDataChange(id, { isLoading: false });
       toast.error(error.response?.data?.detail || "Error running node");

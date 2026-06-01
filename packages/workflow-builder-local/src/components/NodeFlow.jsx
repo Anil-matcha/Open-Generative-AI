@@ -1349,7 +1349,7 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
   }, [handleSaveWorkFlow]);
 
   const pollRunIdStatus = (runId) => {
-    const interval = setInterval(() => {
+    let interval; const _check = () => {
       axios.get(`/api/workflow/run/${runId}/status`)
         .then((response) => {
           const runData = response.data;
@@ -1463,7 +1463,7 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
           setIsRunning(0);
           toast.error("Failed to get workflow status");
         });
-    }, 3000);
+    }; _check(); interval = setInterval(_check, 500);
   };
 
   const handleRunWorkflow = async () => {

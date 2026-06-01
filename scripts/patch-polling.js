@@ -51,6 +51,26 @@ function stripGuard(src) {
   return out;
 }
 
+// ── 1b. Use the synchronous node-run response directly ──────────────────────
+// POST /node/{id}/run is synchronous and already returns the finished result.
+// Relying on pollNodeStatus afterwards fails across serverless instances (the
+// poll may hit a different instance whose in-memory store is empty). So apply
+// the result from the POST response immediately and only fall back to polling
+// if the response is still processing. ES5-safe so it works in src AND dist.
+const SYNC_RESPONSE_SNIPPET =
+  '{ var _r = response.data; var _nd = _r && _r.nodes && (_r.nodes[id] || Object.values(_r.nodes)[0]); ' +
+  'var _lt = _nd && _nd[_nd.length - 1]; ' +
+  'if (_lt && (_lt.status === "succeeded" || _lt.status === "completed") && _lt.result && _lt.result.outputs) { ' +
+  'var _o = _lt.result.outputs; ' +
+  'data && data.onDataChange && data.onDataChange(id, { outputs: _o, resultUrl: (_o[0] && _o[0].value) || "", isLoading: false, errorMsg: null, outputHistory: (data.outputHistory || []).concat([_lt]) }); ' +
+  '} else if (_lt && _lt.status === "failed") { ' +
+  'data && data.onDataChange && data.onDataChange(id, { isLoading: false, errorMsg: "Generation failed" }); ' +
+  '} else { pollNodeStatus(_r.run_id); } }';
+
+function useSyncResponse(src) {
+  return src.replace(/pollNodeStatus\(response\.data\.run_id\);/g, SYNC_RESPONSE_SNIPPET);
+}
+
 // ── 2. Speed up polling (src .jsx only — compiled dist already runs) ─────────
 function speedUpPolling(src, isNodeFlow) {
   let out = src;
@@ -89,6 +109,7 @@ for (const dir of targetDirs) {
     const orig = src;
 
     src = stripGuard(src);
+    src = useSyncResponse(src);
     // Only rewrite polling timing in .jsx sources; compiled dist uses different syntax.
     if (!isDist) src = speedUpPolling(src, name === 'NodeFlow');
 
