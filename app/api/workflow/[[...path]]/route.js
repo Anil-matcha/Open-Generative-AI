@@ -837,12 +837,15 @@ export async function POST(request, { params }) {
         return NextResponse.json({ run_id: runId, ...result });
     }
 
-    if (path[1] === 'publish') {
-        const wfId = path[0];
+    // Publish: handles both /api/workflow/{id}/publish and /api/workflow/workflow/{id}/publish
+    const publishIdx = path.indexOf('publish');
+    if (publishIdx > 0) {
+        const wfId = path[publishIdx - 1];
         let wf = store.get(wfId);
         if (!wf) { wf = await tosLoadWorkflow(wfId); if (wf) store.set(wfId, wf); }
         if (!wf) return NextResponse.json({ error: 'Workflow not found' }, { status: 404 });
-        const published = body.is_published !== false; // default true, false = unpublish
+        // Builder sends { publish: true }, our UI sends { is_published: true }
+        const published = body.publish !== undefined ? !!body.publish : (body.is_published !== false);
         if (published) {
             await tosUpdateCommunity(wfId, {
                 id: wfId,
@@ -854,11 +857,10 @@ export async function POST(request, { params }) {
         } else {
             await tosRemoveFromCommunity(wfId);
         }
-        // Update workflow's own record
         const updated = { ...wf, is_published: published, updated_at: new Date().toISOString() };
         store.set(wfId, updated);
         tosSaveWorkflow(wfId, updated).catch(() => {});
-        return NextResponse.json({ success: true, is_published: published });
+        return NextResponse.json({ success: true, publish: published, is_published: published });
     }
 
     if (['template', 'update-category', 'thumbnail'].includes(path[1])) {
