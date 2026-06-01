@@ -252,9 +252,22 @@ const MODEL_ID_MAP = {
     'kling-video-edit-extend':       'kling-video-extend',
 };
 
+function computeImageSize(aspectRatio, resolution, width, height) {
+    if (width && height) return `${width}x${height}`;
+    const base = resolution === '4k' ? 4096 : resolution === '2k' ? 2048 : 1024;
+    const scale = base / 1024;
+    const AR1K = {
+        '1:1': [1024, 1024], '16:9': [1792, 1024], '9:16': [1024, 1792],
+        '4:3': [1024, 768],  '3:4': [768, 1024],   '3:2': [1536, 1024],
+        '2:3': [1024, 1536], '21:9': [2048, 878],
+    };
+    const [w, h] = AR1K[aspectRatio] || AR1K['1:1'];
+    return `${Math.round(w * scale)}x${Math.round(h * scale)}`;
+}
+
 async function generateImage(apiKey, model, params) {
     const apiModel = MODEL_ID_MAP[model] || model;
-    const size = (params.width && params.height) ? `${params.width}x${params.height}` : '1024x1024';
+    const size = computeImageSize(params.aspect_ratio, params.resolution, params.width, params.height);
     const imgInput = params.image_url || params.images_list?.[0];
 
     // Use /v1/images/edits for image editing models that have an input image
@@ -483,39 +496,62 @@ async function runNode(runId, nodeId, model, params, apiKey) {
 
 function getNodeSchemas() {
     const F = {
-        prompt:      { type: "string", title: "Prompt", description: "Describe what you want to generate", examples: [""] },
-        width:       { type: "int", title: "Width", default: 1024, minValue: 256, maxValue: 4096, step: 64 },
-        height:      { type: "int", title: "Height", default: 1024, minValue: 256, maxValue: 4096, step: 64 },
-        aspect_ratio:{ enum: ["1:1","16:9","9:16","4:3","3:4","21:9"], type: "string", title: "Aspect Ratio", default: "1:1" },
-        quality:     { enum: ["standard","hd"], type: "string", title: "Quality", default: "standard" },
-        images_list: { type: "array", title: "Input Images", field: "images_list", maxItems: 5, description: "Images to edit or use as reference", examples: [] },
-        image_url:   { type: "string", title: "Image URL", field: "image", description: "URL of the input image", examples: [] },
-        video_url:   { type: "string", title: "Video URL", field: "video", description: "URL of the input video", examples: [] },
-        audio_url:   { type: "string", title: "Audio URL", field: "audio", description: "URL of the input audio", examples: [] },
-        duration:    { type: "int", title: "Duration (sec)", default: 5, minValue: 3, maxValue: 30, step: 1 },
-        ar_video:    { enum: ["16:9","9:16","1:1","4:3"], type: "string", title: "Aspect Ratio", default: "16:9" },
-        voice:       { enum: ["alloy","echo","fable","onyx","nova","shimmer"], type: "string", title: "Voice", default: "alloy" },
+        prompt:        { type: "string", title: "Prompt", description: "Describe what you want to generate", examples: [""] },
+        width:         { type: "int", title: "Width", default: 1024, minValue: 256, maxValue: 4096, step: 64 },
+        height:        { type: "int", title: "Height", default: 1024, minValue: 256, maxValue: 4096, step: 64 },
+        images_list:   { type: "array", title: "Input Images", field: "images_list", maxItems: 5, description: "Images to edit or use as reference", examples: [] },
+        image_url:     { type: "string", title: "Image URL", field: "image", description: "URL of the input image", examples: [] },
+        video_url:     { type: "string", title: "Video URL", field: "video", description: "URL of the input video", examples: [] },
+        audio_url:     { type: "string", title: "Audio URL", field: "audio", description: "URL of the input audio", examples: [] },
+        duration:      { type: "int", title: "Duration (sec)", default: 5, minValue: 3, maxValue: 30, step: 1 },
+        voice:         { enum: ["alloy","echo","fable","onyx","nova","shimmer"], type: "string", title: "Voice", default: "alloy" },
+        // Aspect ratio presets per model capability
+        ar_simple:     { enum: ["1:1","16:9","9:16"], type: "string", title: "Aspect Ratio", default: "1:1" },
+        ar_std:        { enum: ["1:1","16:9","9:16","4:3","3:4"], type: "string", title: "Aspect Ratio", default: "1:1" },
+        ar_ext:        { enum: ["1:1","16:9","9:16","4:3","3:4","3:2","2:3"], type: "string", title: "Aspect Ratio", default: "1:1" },
+        ar_wide:       { enum: ["1:1","16:9","9:16","4:3","3:4","3:2","2:3","21:9"], type: "string", title: "Aspect Ratio", default: "1:1" },
+        ar_video:      { enum: ["16:9","9:16","1:1","4:3"], type: "string", title: "Aspect Ratio", default: "16:9" },
+        // Resolution presets per model capability
+        res_2k:        { enum: ["1k","2k"], type: "string", title: "Resolution", default: "1k" },
+        res_4k:        { enum: ["1k","2k","4k"], type: "string", title: "Resolution", default: "1k" },
+        // Quality presets
+        quality_hq:    { enum: ["low","medium","high"], type: "string", title: "Quality", default: "low" },
+        quality_std:   { enum: ["standard","hd"], type: "string", title: "Quality", default: "standard" },
     };
 
     const ms = (props) => ({ input_schema: { schemas: { input_data: { properties: props } } } });
 
     const T = {
-        t2i:    ms({ prompt: F.prompt, aspect_ratio: F.aspect_ratio }),
-        t2iQ:   ms({ prompt: F.prompt, aspect_ratio: F.aspect_ratio, quality: F.quality }),
-        t2iWH:  ms({ prompt: F.prompt, width: F.width, height: F.height }),
-        i2i:    ms({ prompt: F.prompt, images_list: F.images_list }),
-        imgRef: ms({ prompt: F.prompt, image_url: F.image_url }),
-        imgPass:ms({ image_url: F.image_url }),
-        vidPass:ms({ video_url: F.video_url }),
-        audPass:ms({ audio_url: F.audio_url }),
-        t2v:    ms({ prompt: F.prompt, duration: F.duration, aspect_ratio: { ...F.ar_video } }),
-        i2v:    ms({ prompt: F.prompt, image_url: F.image_url, duration: F.duration }),
-        vidEdit:ms({ prompt: F.prompt, video_url: F.video_url }),
-        lipsync:ms({ video_url: F.video_url, audio_url: F.audio_url }),
-        vision: ms({ prompt: F.prompt, image_url: F.image_url }),
-        txtPass:ms({ prompt: { type: "string", title: "Text", description: "Enter your text", examples: [""] } }),
-        speech: ms({ prompt: F.prompt, voice: F.voice }),
-        tts:    ms({ prompt: F.prompt }),
+        // Image generation — model-specific schemas
+        t2i_gpt2:   ms({ prompt: F.prompt, aspect_ratio: F.ar_ext,    resolution: F.res_4k, quality: F.quality_hq }),
+        t2i_gpt1:   ms({ prompt: F.prompt, aspect_ratio: F.ar_ext,    resolution: F.res_2k, quality: F.quality_hq }),
+        t2i_dalle:  ms({ prompt: F.prompt, aspect_ratio: F.ar_simple }),
+        t2i_flux:   ms({ prompt: F.prompt, aspect_ratio: F.ar_std,    resolution: F.res_2k }),
+        t2i_kling:  ms({ prompt: F.prompt, aspect_ratio: F.ar_wide,   resolution: F.res_2k }),
+        t2i_seed:   ms({ prompt: F.prompt, aspect_ratio: F.ar_std }),
+        t2i_std:    ms({ prompt: F.prompt, aspect_ratio: F.ar_std }),
+        t2i_simple: ms({ prompt: F.prompt, aspect_ratio: F.ar_simple }),
+        t2iWH:      ms({ prompt: F.prompt, width: F.width, height: F.height }),
+        // Image editing — model-specific schemas
+        i2i_gpt2:   ms({ prompt: F.prompt, images_list: F.images_list, resolution: F.res_4k, quality: F.quality_hq }),
+        i2i_gpt1:   ms({ prompt: F.prompt, images_list: F.images_list, resolution: F.res_2k, quality: F.quality_hq }),
+        i2i:        ms({ prompt: F.prompt, images_list: F.images_list }),
+        imgRef:     ms({ prompt: F.prompt, image_url: F.image_url }),
+        // Passthrough
+        imgPass:    ms({ image_url: F.image_url }),
+        vidPass:    ms({ video_url: F.video_url }),
+        audPass:    ms({ audio_url: F.audio_url }),
+        // Video
+        t2v:        ms({ prompt: F.prompt, duration: F.duration, aspect_ratio: F.ar_video }),
+        i2v:        ms({ prompt: F.prompt, image_url: F.image_url, duration: F.duration }),
+        vidEdit:    ms({ prompt: F.prompt, video_url: F.video_url }),
+        lipsync:    ms({ video_url: F.video_url, audio_url: F.audio_url }),
+        // Text
+        vision:     ms({ prompt: F.prompt, image_url: F.image_url }),
+        txtPass:    ms({ prompt: { type: "string", title: "Text", description: "Enter your text", examples: [""] } }),
+        // Audio
+        speech:     ms({ prompt: F.prompt, voice: F.voice }),
+        tts:        ms({ prompt: F.prompt }),
     };
 
     return {
@@ -523,55 +559,57 @@ function getNodeSchemas() {
             image: {
                 models: {
                     "image-passthrough":              T.imgPass,
-                    // OpenAI Image
-                    "gpt-image-2":                    T.t2iQ,
-                    "gpt-image-1.5":                  T.t2iQ,
-                    "gpt-image-1":                    T.t2iQ,
-                    "gpt-image-1-mini":               T.t2i,
-                    "dall-e-3":                       T.t2i,
-                    // OpenAI Image Edit (→ /v1/images/edits)
-                    "gpt-image-2-edit":               T.i2i,   // → gpt-image-2
-                    "gpt-image-1.5-edit":             T.i2i,   // → gpt-image-1.5
-                    "gpt-image-1-edit":               T.i2i,   // → gpt-image-1
-                    // Flux
-                    "flux-2-pro":                     T.t2i,
-                    "flux-1.1-pro":                   T.t2i,
-                    "flux-edit-kontext-pro":          T.i2i,   // → flux.1-kontext-pro
-                    // ByteDance Seedream
-                    "doubao-seedream-5-0-260128":      T.t2i,
-                    "doubao-seedream-4-5-251128":      T.t2i,
-                    "doubao-seedream-4-0-250828":      T.t2i,
-                    "doubao-seedream-3-0-t2i-250415":  T.t2i,
-                    // Qwen Image
-                    "qwen-image-max":                 T.t2i,
-                    "qwen-image-2.0-2026-03-03":      T.t2i,
+                    // OpenAI GPT Image 2 — 4k, extended AR, quality: low/medium/high
+                    "gpt-image-2":                    T.t2i_gpt2,
+                    "gpt-image-2-edit":               T.i2i_gpt2,
+                    // OpenAI GPT Image 1.5 — 2k, extended AR
+                    "gpt-image-1.5":                  T.t2i_gpt1,
+                    "gpt-image-1.5-edit":             T.i2i_gpt1,
+                    // OpenAI GPT Image 1 — 2k, extended AR
+                    "gpt-image-1":                    T.t2i_gpt1,
+                    "gpt-image-1-edit":               T.i2i_gpt1,
+                    // GPT Image Mini / DALL-E 3 — simple AR only
+                    "gpt-image-1-mini":               T.t2i_dalle,
+                    "dall-e-3":                       T.t2i_dalle,
+                    // Flux — 2k, standard AR
+                    "flux-2-pro":                     T.t2i_flux,
+                    "flux-1.1-pro":                   T.t2i_flux,
+                    "flux-edit-kontext-pro":          T.i2i,
+                    // ByteDance Seedream — standard AR
+                    "doubao-seedream-5-0-260128":      T.t2i_seed,
+                    "doubao-seedream-4-5-251128":      T.t2i_seed,
+                    "doubao-seedream-4-0-250828":      T.t2i_seed,
+                    "doubao-seedream-3-0-t2i-250415":  T.t2i_seed,
+                    // Qwen Image — simple AR
+                    "qwen-image-max":                 T.t2i_simple,
+                    "qwen-image-2.0-2026-03-03":      T.t2i_simple,
                     "qwen-image-edit-2509":           T.i2i,
-                    // z-image
-                    "z-image-turbo":                  T.t2i,
-                    // Kling Image
-                    "kling-image":                    T.t2i,
-                    "kling-omni-image-edit":          T.i2i,   // → kling-omni-image
-                    // Grok Image
-                    "grok-4.2-image":                 T.t2i,
-                    "grok-4.1-image":                 T.t2i,
-                    "grok-4-image":                   T.t2i,
-                    "grok-imagine-image":             T.t2i,
-                    "grok-imagine-image-reference":   T.imgRef, // → grok-imagine-image-pro
-                    // Midjourney
-                    "mj_imagine":                     T.t2i,
+                    // z-image — simple AR
+                    "z-image-turbo":                  T.t2i_simple,
+                    // Kling Image — 2k, wide AR (21:9 included)
+                    "kling-image":                    T.t2i_kling,
+                    "kling-omni-image-edit":          T.imgRef,
+                    // Grok Image — standard AR
+                    "grok-4.2-image":                 T.t2i_std,
+                    "grok-4.1-image":                 T.t2i_std,
+                    "grok-4-image":                   T.t2i_std,
+                    "grok-imagine-image":             T.t2i_std,
+                    "grok-imagine-image-reference":   T.imgRef,
+                    // Midjourney — standard AR
+                    "mj_imagine":                     T.t2i_std,
                     "mj_edits":                       T.i2i,
-                    "mj_inpaint-edit":                T.i2i,   // → mj_inpaint
-                    "mj_variation-reference":         T.imgRef, // → mj_variation
-                    // Wan Image
+                    "mj_inpaint-edit":                T.i2i,
+                    "mj_variation-reference":         T.imgRef,
+                    // Wan Image — width/height sliders
                     "wan2.7-image-pro":               T.t2iWH,
-                    // Gemini Image (accept optional image for editing)
-                    "gemini-3.1-flash-image-preview": T.imgRef,
-                    "gemini-3-pro-image-preview":     T.imgRef,
-                    "gemini-2.5-flash-image":         T.imgRef,
-                    // Gemini Edit Image (same models, shown in Edit Image section)
-                    "gemini-2.5-flash-image-edit":    T.imgRef,  // → gemini-2.5-flash-image
-                    "gemini-3-pro-image-edit":        T.imgRef,  // → gemini-3-pro-image-preview
-                    "gemini-3.1-flash-image-edit":    T.imgRef,  // → gemini-3.1-flash-image-preview
+                    // Gemini Image — standard AR (generate)
+                    "gemini-3.1-flash-image-preview": T.t2i_std,
+                    "gemini-3-pro-image-preview":     T.t2i_std,
+                    "gemini-2.5-flash-image":         T.t2i_std,
+                    // Gemini Edit Image — prompt + image ref
+                    "gemini-2.5-flash-image-edit":    T.imgRef,
+                    "gemini-3-pro-image-edit":        T.imgRef,
+                    "gemini-3.1-flash-image-edit":    T.imgRef,
                 }
             },
             video: {
