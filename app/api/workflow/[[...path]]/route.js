@@ -169,6 +169,14 @@ async function tosSaveRun(runId, data) {
     if (!TOS_ENABLED) return;
     const buf = Buffer.from(JSON.stringify(data));
     await tosUpload(`runs/${runId}.json`, buf, 'application/json').catch(() => {});
+    // Also save to videos/ if any output is a video_url
+    const nodes = data?.nodes || {};
+    const hasVideo = Object.values(nodes).some(runs =>
+        Array.isArray(runs) && runs.some(r => r?.result?.outputs?.some(o => o?.type === 'video_url' && o?.value))
+    );
+    if (hasVideo) {
+        await tosUpload(`videos/${runId}.json`, buf, 'application/json').catch(() => {});
+    }
 }
 
 async function tosLoadRun(runId) {
