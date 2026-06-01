@@ -20,22 +20,24 @@ async function tosUpload(key, buffer, contentType) {
     try {
         const now = new Date();
         const iso = now.toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
-        const date = iso.slice(0, 8);
-        const datetime = iso;
+        const date = iso.slice(0, 8);   // YYYYMMDD
+        const datetime = iso;            // YYYYMMDDTHHmmssZ
         const host = `${TOS_BUCKET}.${TOS_ENDPOINT}`;
         const path = `/${key}`;
         const payloadHash = sha256hex(buffer);
 
-        const canonHeaders = `content-length:${buffer.length}\ncontent-type:${contentType}\nhost:${host}\nx-amz-content-sha256:${payloadHash}\nx-amz-date:${datetime}\n`;
-        const signedHeaders = 'content-length;content-type;host;x-amz-content-sha256;x-amz-date';
+        // Volcano Engine TOS native signing uses X-Date / X-Content-Sha256 (not x-amz-*)
+        const canonHeaders = `content-length:${buffer.length}\ncontent-type:${contentType}\nhost:${host}\nx-content-sha256:${payloadHash}\nx-date:${datetime}\n`;
+        const signedHeaders = 'content-length;content-type;host;x-content-sha256;x-date';
         const canonical = `PUT\n${path}\n\n${canonHeaders}\n${signedHeaders}\n${payloadHash}`;
 
-        const scope = `${date}/${TOS_REGION}/s3/aws4_request`;
-        const strToSign = `AWS4-HMAC-SHA256\n${datetime}\n${scope}\n${sha256hex(canonical)}`;
+        // TOS signing: no "AWS4" prefix, service = "tos", terminal = "request"
+        const scope = `${date}/${TOS_REGION}/tos/request`;
+        const strToSign = `HMAC-SHA256\n${datetime}\n${scope}\n${sha256hex(canonical)}`;
 
-        const sigKey = hmac(hmac(hmac(hmac(`AWS4${TOS_SK}`, date), TOS_REGION), 's3'), 'aws4_request');
+        const sigKey = hmac(hmac(hmac(hmac(TOS_SK, date), TOS_REGION), 'tos'), 'request');
         const sig = createHmac('sha256', sigKey).update(strToSign).digest('hex');
-        const auth = `AWS4-HMAC-SHA256 Credential=${TOS_AK}/${scope}, SignedHeaders=${signedHeaders}, Signature=${sig}`;
+        const auth = `HMAC-SHA256 Credential=${TOS_AK}/${scope},Date=${datetime},SignedHeaders=${signedHeaders},Signature=${sig}`;
 
         const res = await fetch(`https://${host}${path}`, {
             method: 'PUT',
@@ -43,8 +45,8 @@ async function tosUpload(key, buffer, contentType) {
                 'Authorization': auth,
                 'Content-Type': contentType,
                 'Content-Length': String(buffer.length),
-                'x-amz-content-sha256': payloadHash,
-                'x-amz-date': datetime,
+                'X-Content-Sha256': payloadHash,
+                'X-Date': datetime,
             },
             body: buffer,
         });
