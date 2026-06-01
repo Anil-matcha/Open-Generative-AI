@@ -1033,7 +1033,7 @@ export async function POST(request, { params }) {
 
         const runResult = { status: 'completed', nodes: runNodes, outputs };
         runStore.set(runId, runResult);
-        tosSaveRun(runId, runResult).catch(() => {});
+        await tosSaveRun(runId, runResult).catch(() => {});
         return NextResponse.json({ run_id: runId, ...runResult });
     }
 
