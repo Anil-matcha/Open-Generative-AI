@@ -85,7 +85,6 @@ var UploadNode = function UploadNode(_ref) {
     var uploadFormData = new FormData();
     uploadFormData.append("file", file);
     _axios["default"].post("/api/upload-file", uploadFormData, {
-      headers: { "Content-Type": "multipart/form-data" },
       onUploadProgress: function onUploadProgress(progressEvent) {
         var percentCompleted = Math.round(progressEvent.loaded * 100 / progressEvent.total);
         setUploadProgress(percentCompleted);
