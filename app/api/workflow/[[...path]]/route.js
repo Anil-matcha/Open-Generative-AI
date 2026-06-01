@@ -106,6 +106,34 @@ async function tosRemoveFromIndex(id) {
     await tosUpload('workflows/index.json', buf, 'application/json').catch(() => {});
 }
 
+async function tosLoadCommunity() {
+    if (!TOS_ENABLED) return [];
+    try {
+        const url = `https://${TOS_BUCKET}.${TOS_ENDPOINT}/workflows/community.json`;
+        const r = await fetch(url);
+        if (!r.ok) return [];
+        return await r.json();
+    } catch { return []; }
+}
+
+async function tosUpdateCommunity(id, meta) {
+    if (!TOS_ENABLED) return;
+    const list = await tosLoadCommunity();
+    const existing = list.findIndex(w => w.id === id);
+    if (existing >= 0) list[existing] = { ...list[existing], ...meta };
+    else list.unshift(meta);
+    const buf = Buffer.from(JSON.stringify(list));
+    await tosUpload('workflows/community.json', buf, 'application/json').catch(() => {});
+}
+
+async function tosRemoveFromCommunity(id) {
+    if (!TOS_ENABLED) return;
+    const list = await tosLoadCommunity();
+    const filtered = list.filter(w => w.id !== id);
+    const buf = Buffer.from(JSON.stringify(filtered));
+    await tosUpload('workflows/community.json', buf, 'application/json').catch(() => {});
+}
+
 // Load workflow from TOS (public read, no auth needed)
 async function tosLoadWorkflow(id) {
     if (!TOS_ENABLED) return null;
@@ -635,6 +663,11 @@ export async function GET(request, { params }) {
         return NextResponse.json(index);
     }
 
+    if (path[0] === 'community') {
+        const list = await tosLoadCommunity();
+        return NextResponse.json(list);
+    }
+
     if (path[0] === 'get-workflow-def') {
         const id = path[1];
         const wf = store.get(id) || {};
@@ -804,7 +837,31 @@ export async function POST(request, { params }) {
         return NextResponse.json({ run_id: runId, ...result });
     }
 
-    if (['publish', 'template', 'update-category', 'thumbnail'].includes(path[1])) {
+    if (path[1] === 'publish') {
+        const wfId = path[0];
+        let wf = store.get(wfId);
+        if (!wf) { wf = await tosLoadWorkflow(wfId); if (wf) store.set(wfId, wf); }
+        if (!wf) return NextResponse.json({ error: 'Workflow not found' }, { status: 404 });
+        const published = body.is_published !== false; // default true, false = unpublish
+        if (published) {
+            await tosUpdateCommunity(wfId, {
+                id: wfId,
+                name: wf.name || 'Untitled',
+                thumbnail: body.thumbnail || wf.thumbnail || null,
+                published_at: new Date().toISOString(),
+                nodes_count: (wf.nodes || []).length,
+            });
+        } else {
+            await tosRemoveFromCommunity(wfId);
+        }
+        // Update workflow's own record
+        const updated = { ...wf, is_published: published, updated_at: new Date().toISOString() };
+        store.set(wfId, updated);
+        tosSaveWorkflow(wfId, updated).catch(() => {});
+        return NextResponse.json({ success: true, is_published: published });
+    }
+
+    if (['template', 'update-category', 'thumbnail'].includes(path[1])) {
         return NextResponse.json({ success: true });
     }
 

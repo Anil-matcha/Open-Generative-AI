@@ -535,7 +535,13 @@ export async function getUserWorkflows(apiKey) {
         return await r.json();
     } catch { return []; }
 }
-export async function getPublishedWorkflows(_apiKey){ return []; }
+export async function getPublishedWorkflows(apiKey) {
+    try {
+        const r = await fetch('/api/workflow/community', { headers: { 'Authorization': `Bearer ${apiKey}` } });
+        if (!r.ok) return [];
+        return await r.json();
+    } catch { return []; }
+}
 
 export async function createWorkflow(apiKey, data = {}) {
     const r = await fetch('/api/workflow/create', {

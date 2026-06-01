@@ -12,6 +12,16 @@ import {
   getAllNodeSchemas,
   getWorkflowData,
 } from "../muapi.js";
+
+async function publishWorkflow(apiKey, id, isPublished) {
+  const r = await fetch(`/api/workflow/${id}/publish`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ is_published: isPublished }),
+  });
+  if (!r.ok) throw new Error('Publish failed');
+  return await r.json();
+}
 import dynamic from "next/dynamic";
 
 const WorkflowUI = dynamic(() => import("./WorkflowUI"), {
@@ -28,7 +38,7 @@ const WorkflowUI = dynamic(() => import("./WorkflowUI"), {
   ),
 });
 
-function WorkflowCard({ workflow, onClick, activeTab, onRename, onDelete }) {
+function WorkflowCard({ workflow, onClick, activeTab, onRename, onDelete, onPublish }) {
   const [showOptions, setShowOptions] = useState(false);
 
   return (
@@ -90,6 +100,15 @@ function WorkflowCard({ workflow, onClick, activeTab, onRename, onDelete }) {
                 Rename
               </button>
               <button
+                onClick={() => onPublish(workflow, !workflow.is_published)}
+                className="w-full px-4 py-2 text-left text-[11px] font-bold text-white/70 hover:text-[#22d3ee] hover:bg-white/5 transition-colors flex items-center gap-2"
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13" />
+                </svg>
+                {workflow.is_published ? 'Unpublish' : 'Publish'}
+              </button>
+              <button
                 onClick={() => onDelete(workflow.id)}
                 className="w-full px-4 py-2 text-left text-[11px] font-bold text-red-500 hover:bg-red-500/10 transition-colors flex items-center gap-2"
               >
@@ -103,11 +122,17 @@ function WorkflowCard({ workflow, onClick, activeTab, onRename, onDelete }) {
         </div>
       )}
 
-      {/* Community Profile Info */}
-      {activeTab === 'published' && workflow.user_name && (
-        <div className="absolute top-2 left-2 z-20 flex items-center gap-2 bg-black/40 backdrop-blur-md px-2 py-1 rounded-full border border-white/10">
-          <img src={workflow.user_profile || "/user_profile.png"} alt="profile" className="w-4 h-4 rounded-full" />
-          <span className="text-[9px] font-black text-white/80 uppercase tracking-widest">{workflow.user_name}</span>
+      {/* Published badge on my-workflows */}
+      {activeTab === 'my-workflows' && workflow.is_published && (
+        <div className="absolute top-2 left-2 z-20 px-2 py-1 bg-[#22d3ee]/20 border border-[#22d3ee]/40 rounded-full">
+          <span className="text-[9px] font-black text-[#22d3ee] uppercase tracking-widest">Published</span>
+        </div>
+      )}
+
+      {/* Community nodes count */}
+      {activeTab === 'published' && workflow.nodes_count > 0 && (
+        <div className="absolute top-2 left-2 z-20 px-2 py-1 bg-black/40 backdrop-blur-md border border-white/10 rounded-full">
+          <span className="text-[9px] font-black text-white/60 uppercase tracking-widest">{workflow.nodes_count} nodes</span>
         </div>
       )}
 
@@ -234,6 +259,16 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
     },
     [apiKey, router],
   );
+
+  const handlePublishWorkflow = async (wf, publish) => {
+    try {
+      await publishWorkflow(apiKey, wf.id, publish);
+      setWorkflows((prev) => prev.map((w) => w.id === wf.id ? { ...w, is_published: publish } : w));
+    } catch (err) {
+      console.error("Publish failed:", err);
+      alert("Failed to publish workflow");
+    }
+  };
 
   const handleDeleteWorkflow = async (wfId) => {
     if (!confirm("Are you sure you want to delete this workflow?")) return;
@@ -533,6 +568,7 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
                    setNewWorkflowName(wf.name);
                 }}
                 onDelete={handleDeleteWorkflow}
+                onPublish={handlePublishWorkflow}
               />
             ))}
             {!loading && workflows.length === 0 && (
