@@ -192,6 +192,54 @@ async function tosLoadRun(runId) {
 
 const MEMEFAST = 'https://memefast.top';
 
+// ── ARK (Volcano Engine) — direct API for Seedance 2.0 ───────────────────────
+const ARK_API_KEY = process.env.ARK_API_KEY || '';
+const ARK_BASE    = 'https://ark.cn-beijing.volces.com';
+
+async function generateVideoARK(model, params) {
+    const imageUrl = params.image_url ? await resolveImageUrl(params.image_url) : undefined;
+    const promptParts = [params.prompt || ''];
+    if (params.resolution)   promptParts.push(`--rs ${String(params.resolution).toLowerCase()}`);
+    if (params.aspect_ratio) promptParts.push(`--rt ${params.aspect_ratio}`);
+    if (params.duration)     promptParts.push(`--dur ${params.duration}`);
+
+    const content = [{ type: 'text', text: promptParts.join(' ') }];
+    if (imageUrl) content.push({ type: 'image_url', image_url: { url: imageUrl }, role: 'first_frame' });
+
+    const submitRes = await fetch(`${ARK_BASE}/api/v3/contents/generations/tasks`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${ARK_API_KEY}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model, content }),
+    });
+    if (!submitRes.ok) {
+        const txt = await submitRes.text().catch(() => submitRes.statusText);
+        throw new Error(`ARK submit ${submitRes.status}: ${txt.slice(0, 300)}`);
+    }
+    const submitData = await submitRes.json();
+    const taskId = submitData.id || submitData.task_id;
+    if (!taskId) throw new Error('ARK: no task id in response: ' + JSON.stringify(submitData).slice(0, 200));
+
+    // Poll for up to 290s (60 attempts × 5s each, within Vercel 300s limit)
+    for (let i = 0; i < 58; i++) {
+        await new Promise(r => setTimeout(r, 5000));
+        const pollRes = await fetch(`${ARK_BASE}/api/v3/contents/generations/tasks/${taskId}`, {
+            headers: { 'Authorization': `Bearer ${ARK_API_KEY}` },
+        });
+        if (!pollRes.ok) continue;
+        const p = await pollRes.json();
+        const st = String(p.status || '').toLowerCase();
+        if (st === 'succeeded' || st === 'completed' || st === 'success') {
+            const videoUrl = p.content?.video_url || p.video_url;
+            if (videoUrl) return [{ type: 'video_url', value: videoUrl }];
+            throw new Error('ARK succeeded but no video URL');
+        }
+        if (st === 'failed' || st === 'error' || st === 'expired' || st === 'cancelled') {
+            throw new Error(p.error?.message || p.error || p.message || 'ARK video generation failed');
+        }
+    }
+    throw new Error('ARK video generation timed out after 290s');
+}
+
 function genId() { return `wf_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`; }
 
 // Strip base64 data URLs from nodes before persisting — prevents 413 on save
@@ -460,6 +508,12 @@ async function generateText(apiKey, model, params) {
 
 async function generateVideo(apiKey, model, params) {
     const apiModel = MODEL_ID_MAP[model] || model;
+
+    // Seedance 2.0 models go through ARK (Volcano Engine) directly, not Memefast
+    if (/doubao-seedance-2-0/i.test(apiModel)) {
+        return generateVideoARK(apiModel, params);
+    }
+
     // Resolve TOS/private URLs to base64 so Memefast can access the image
     const imageUrl = params.image_url ? await resolveImageUrl(params.image_url) : undefined;
     const videoUrl = params.video_url ? await resolveImageUrl(params.video_url) : undefined;
