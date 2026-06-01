@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { createHmac, createHash } from 'crypto';
 
+export const maxDuration = 300; // Vercel Pro: allow up to 5min for long generations
+
 const store = global._mf_workflows ?? (global._mf_workflows = new Map());
 const runStore = global._mf_runs ?? (global._mf_runs = new Map());
 
@@ -683,8 +685,9 @@ export async function POST(request, { params }) {
         const apiKey = request.headers.get('authorization')?.replace('Bearer ', '') || '';
         const model = body.model || '';
         const params = body.params || {};
-        runNode(runId, nodeId, model, params, apiKey).catch(() => {});
-        return NextResponse.json({ run_id: runId, status: 'processing' });
+        await runNode(runId, nodeId, model, params, apiKey);
+        const result = runStore.get(runId) || { status: 'processing', nodes: {} };
+        return NextResponse.json({ run_id: runId, ...result });
     }
 
     if (['publish', 'template', 'update-category', 'thumbnail'].includes(path[1])) {
