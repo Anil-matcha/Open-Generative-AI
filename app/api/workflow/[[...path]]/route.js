@@ -45,12 +45,8 @@ const AUDIO_MODELS = new Set([
 ]);
 
 // Fal.ai image models — use POST /fal-ai/{path} (separate registry, not in /v1/models)
-const FAL_IMAGE_MODEL_MAP = {
-    'nano-banana':          'nano-banana',
-    'nano-banana-edit':     'nano-banana',
-    'nano-banana-pro':      'nano-banana-pro',
-    'nano-banana-pro-edit': 'nano-banana-pro',
-};
+// nano-banana removed: "No available channel" error with current Memefast key
+const FAL_IMAGE_MODEL_MAP = {};
 
 // Models that generate images via /v1/chat/completions (not /v1/images/generations)
 const CHAT_IMAGE_MODELS = new Set([
@@ -338,11 +334,6 @@ function getNodeSchemas() {
             image: {
                 models: {
                     "image-passthrough":              T.imgPass,
-                    // Fal.ai (separate /fal-ai/ endpoint)
-                    "nano-banana":                    T.t2i,
-                    "nano-banana-edit":               T.i2i,
-                    "nano-banana-pro":                T.t2i,
-                    "nano-banana-pro-edit":           T.i2i,
                     // OpenAI Image
                     "gpt-image-2":                    T.t2iQ,
                     "gpt-image-1.5":                  T.t2iQ,
