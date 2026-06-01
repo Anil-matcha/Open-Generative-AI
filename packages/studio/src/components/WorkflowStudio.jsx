@@ -176,7 +176,7 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
   const [loading, setLoading] = useState(true);
   const [selectedWorkflow, setSelectedWorkflow] = useState(null);
   const [activeSubTab, setActiveSubTab] = useState("builder");
-  const [activeMainTab, setActiveMainTab] = useState("templates"); // 'templates' | 'my-workflows' | 'published'
+  const [activeMainTab, setActiveMainTab] = useState("my-workflows");
   const [renamingWorkflow, setRenamingWorkflow] = useState(null);
   const [newWorkflowName, setNewWorkflowName] = useState("");
   const [isDeletingId, setIsDeletingId] = useState(null);
@@ -518,16 +518,6 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
           </div>
 
           <div className="flex items-center gap-2 border-b border-white/5">
-            <button
-              onClick={() => setActiveMainTab("templates")}
-              className={`px-6 py-4 text-xs font-black uppercase tracking-[0.2em] transition-all border-b-2 ${
-                activeMainTab === "templates"
-                  ? "text-[#22d3ee] border-[#22d3ee]"
-                  : "text-white/30 border-transparent hover:text-white"
-              }`}
-            >
-              Templates
-            </button>
             <button
               onClick={() => setActiveMainTab("my-workflows")}
               className={`px-6 py-4 text-xs font-black uppercase tracking-[0.2em] transition-all border-b-2 ${
