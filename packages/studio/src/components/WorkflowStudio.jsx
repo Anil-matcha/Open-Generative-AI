@@ -476,6 +476,21 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
             <div className="h-4 w-[1px] bg-white/10" />
 
             <button
+              onClick={handleRunWorkflow}
+              disabled={isRunning || !selectedWorkflow?.id}
+              type="button"
+              className="flex items-center gap-1.5 px-3 py-1 bg-[#22d3ee] text-black text-[9px] font-black uppercase tracking-widest rounded-lg transition-all hover:bg-white disabled:opacity-50"
+            >
+              {isRunning ? (
+                <><div className="w-2.5 h-2.5 border-2 border-black/30 border-t-black rounded-full animate-spin" /> Running</>
+              ) : (
+                <><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l14 9-14 9V3z"/></svg> Run</>
+              )}
+            </button>
+
+            <div className="h-4 w-[1px] bg-white/10" />
+
+            <button
               onClick={() => onToggleHeader?.(true)}
               className="px-3 py-1 bg-white/10 hover:bg-white/20 text-[9px] font-black text-white uppercase tracking-widest rounded-lg transition-colors flex items-center gap-2"
               type="button"
