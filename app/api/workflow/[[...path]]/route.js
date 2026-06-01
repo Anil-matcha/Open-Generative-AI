@@ -937,6 +937,50 @@ export async function GET(request, { params }) {
         return NextResponse.json(run);
     }
 
+    // GET /api/workflow/debug-video?model=veo3.1&prompt=cat — dumps raw create response + task fields
+    // GET /api/workflow/debug-video?task=TASK_ID — polls a specific task and dumps raw response
+    if (path[0] === 'debug-video') {
+        const { searchParams } = new URL(request.url);
+        const cookieKey = request.headers.get('cookie')?.match(/muapi_key=([^;]+)/)?.[1] || '';
+        const apiKey = searchParams.get('key')
+            || request.headers.get('authorization')?.replace('Bearer ', '')
+            || cookieKey || '';
+        const task = searchParams.get('task');
+        try {
+            if (task) {
+                // Try several common poll-endpoint shapes and report which works
+                const candidates = [
+                    `${MEMEFAST}/v1/video/task/${task}`,
+                    `${MEMEFAST}/v1/video/tasks/${task}`,
+                    `${MEMEFAST}/v1/video/generations/${task}`,
+                    `${MEMEFAST}/v1/video/${task}`,
+                    `${MEMEFAST}/v1/videos/${task}`,
+                ];
+                const results = [];
+                for (const url of candidates) {
+                    try {
+                        const r = await fetch(url, { headers: { 'Authorization': `Bearer ${apiKey}` } });
+                        const txt = await r.text();
+                        results.push({ url, status: r.status, body: txt.slice(0, 800) });
+                    } catch (e) { results.push({ url, error: e.message }); }
+                }
+                return NextResponse.json({ task, results });
+            }
+            const model = searchParams.get('model') || 'veo3.1';
+            const prompt = searchParams.get('prompt') || 'a cat walking';
+            const r = await fetch(`${MEMEFAST}/v1/video/create`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ model, prompt, duration: 5, aspect_ratio: '16:9' }),
+            });
+            const txt = await r.text();
+            let parsed = null; try { parsed = JSON.parse(txt); } catch {}
+            return NextResponse.json({ ok: r.ok, status: r.status, raw: txt.slice(0, 1500), keys: parsed ? Object.keys(parsed) : null, parsed });
+        } catch (e) {
+            return NextResponse.json({ ok: false, error: e.message });
+        }
+    }
+
     // GET /api/workflow/debug-models?key=...
     if (path[0] === 'debug-models') {
         const { searchParams } = new URL(request.url);
