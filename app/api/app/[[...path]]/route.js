@@ -1,7 +1,59 @@
 import { NextResponse } from 'next/server';
+import { createHmac, createHash } from 'crypto';
 import { priceRub } from '../../_lib/pricing';
 
 const MUAPI_BASE = 'https://api.muapi.ai';
+
+const TOS_ENDPOINT = process.env.TOS_ENDPOINT || '';
+const TOS_BUCKET   = process.env.TOS_BUCKET   || '';
+const TOS_REGION   = process.env.TOS_REGION   || 'cn-beijing';
+const TOS_AK       = process.env.TOS_ACCESS_KEY || '';
+const TOS_SK       = process.env.TOS_SECRET_KEY || '';
+const TOS_ENABLED  = !!(TOS_ENDPOINT && TOS_BUCKET && TOS_AK && TOS_SK);
+
+function hmac(key, data) { return createHmac('sha256', key).update(data).digest(); }
+
+// Build a TOS POST-policy form upload (S3-style). The existing frontend does a
+// multipart POST of { ...fields, file } to `url`, then builds the public URL.
+// All uploads go into the ref/ folder.
+function tosPostPolicy(filename) {
+    const now = new Date();
+    const iso = now.toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
+    const date = iso.slice(0, 8);
+    const datetime = iso;
+    const host = `${TOS_BUCKET}.${TOS_ENDPOINT}`;
+    const ext = (filename.split('.').pop() || 'bin').toLowerCase();
+    const key = `ref/${Date.now()}_${Math.random().toString(36).slice(2, 7)}.${ext}`;
+
+    const credential = `${TOS_AK}/${date}/${TOS_REGION}/tos/request`;
+    const expiration = new Date(now.getTime() + 3600 * 1000).toISOString();
+
+    const policy = {
+        expiration,
+        conditions: [
+            { bucket: TOS_BUCKET },
+            { key },
+            { 'x-tos-algorithm': 'TOS4-HMAC-SHA256' },
+            { 'x-tos-credential': credential },
+            { 'x-tos-date': datetime },
+        ],
+    };
+    const policyB64 = Buffer.from(JSON.stringify(policy)).toString('base64');
+    const sigKey = hmac(hmac(hmac(hmac(TOS_SK, date), TOS_REGION), 'tos'), 'request');
+    const signature = createHmac('sha256', sigKey).update(policyB64).digest('hex');
+
+    return {
+        url: `https://${host}`,
+        fields: {
+            key,
+            'x-tos-algorithm': 'TOS4-HMAC-SHA256',
+            'x-tos-credential': credential,
+            'x-tos-date': datetime,
+            policy: policyB64,
+            'x-tos-signature': signature,
+        },
+    };
+}
 
 function getApiKey(request) {
     // Priority 1: Direct x-api-key header
@@ -28,7 +80,14 @@ export async function GET(request, { params }) {
     
     // Handle alias: get_upload_file -> get_file_upload_url
     const effectivePath = path === 'get_upload_file' ? 'get_file_upload_url' : path;
-    
+
+    // Serve uploads directly from TOS (ref/ folder) instead of proxying muapi.
+    if (effectivePath === 'get_file_upload_url' && TOS_ENABLED) {
+        const { searchParams } = new URL(request.url);
+        const filename = searchParams.get('filename') || 'upload.bin';
+        return NextResponse.json(tosPostPolicy(filename));
+    }
+
     const { search } = new URL(request.url);
     const targetUrl = `${MUAPI_BASE}/app/${effectivePath}${search}`;
 

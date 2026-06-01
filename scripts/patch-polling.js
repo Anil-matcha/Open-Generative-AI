@@ -184,4 +184,39 @@ for (const dir of targetDirs) {
   }
 }
 
+// ── 3. Point uploaded-file URLs at TOS instead of the hardcoded muapi CDN ────
+// Upload nodes build the final URL as `https://cdn.muapi.ai/{key}`. Since
+// /api/app/get_file_upload_url now returns a TOS POST-policy targeting the
+// `ref/` folder, rewrite that hardcoded prefix to the TOS bucket host so the
+// resulting URL actually resolves. Runs on every copy (src + dist), so whichever
+// one gets bundled is correct. Reads TOS env vars present during the Vercel build.
+const TOS_ENDPOINT = process.env.TOS_ENDPOINT || '';
+const TOS_BUCKET = process.env.TOS_BUCKET || '';
+if (TOS_ENDPOINT && TOS_BUCKET) {
+  const tosHost = `https://${TOS_BUCKET}.${TOS_ENDPOINT}/`;
+  const uploadComponents = ['UploadNode', 'RenderField', 'RenderApiField'];
+  for (const dir of targetDirs) {
+    if (!fs.existsSync(dir)) continue;
+    const isDist = dir.includes('/dist/');
+    const ext = isDist ? '.js' : '.jsx';
+    for (const name of uploadComponents) {
+      const file = path.join(dir, `${name}${ext}`);
+      if (!fs.existsSync(file)) continue;
+      let src = fs.readFileSync(file, 'utf8');
+      const orig = src;
+      src = src.split('https://cdn.muapi.ai/').join(tosHost);
+      // Drop the manual multipart Content-Type so the browser adds the boundary
+      // (required for the TOS POST-policy upload to parse).
+      src = src.split('"Content-Type": "multipart/form-data"').join('"Accept": "*/*"');
+      if (src !== orig) {
+        fs.writeFileSync(file, src, 'utf8');
+        patched++;
+        console.log(`Patched (upload prefix): ${path.relative(root, file)}`);
+      }
+    }
+  }
+} else {
+  console.log('Skip upload prefix patch: TOS env vars not set');
+}
+
 console.log(`patch-polling: ${patched} file(s) patched`);
