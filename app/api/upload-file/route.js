@@ -60,10 +60,8 @@ export async function GET(request) {
     const contentType = searchParams.get('type') || 'application/octet-stream';
 
     const ext = filename.split('.').pop()?.toLowerCase() || 'bin';
-    const folder = contentType.startsWith('video') ? 'videos'
-                 : contentType.startsWith('audio') ? 'audios'
-                 : 'images';
-    const key = `${folder}/${Date.now()}_${Math.random().toString(36).slice(2, 7)}.${ext}`;
+    // All user-uploaded reference files (from PC) go into the ref/ folder.
+    const key = `ref/${Date.now()}_${Math.random().toString(36).slice(2, 7)}.${ext}`;
 
     const putUrl = presignedPutUrl(key, contentType);
     const publicUrl = `https://${TOS_BUCKET}.${TOS_ENDPOINT}/${key}`;
