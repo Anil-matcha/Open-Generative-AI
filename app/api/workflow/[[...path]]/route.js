@@ -782,6 +782,7 @@ function getNodeSchemas() {
         // Resolution presets per model capability
         res_2k:        { enum: ["1k","2k"], type: "string", title: "Resolution", default: "1k" },
         res_4k:        { enum: ["1k","2k","4k"], type: "string", title: "Resolution", default: "1k" },
+        res_video:     { enum: ["480p","720p","1080p"], type: "string", title: "Resolution", default: "1080p" },
         // Quality presets
         quality_hq:    { enum: ["low","medium","high"], type: "string", title: "Quality", default: "low" },
         quality_std:   { enum: ["standard","hd"], type: "string", title: "Quality", default: "standard" },
@@ -818,8 +819,8 @@ function getNodeSchemas() {
         // image_url is optional: leave empty for pure text-to-video.
         t2v:        ms({ prompt: F.prompt, image_url: F.image_url, aspect_ratio: F.ar_video, duration: F.duration }),
         t2v_seed:   ms({ prompt: F.prompt, image_url: F.image_url, aspect_ratio: F.ar_video, duration: { type: "int", title: "Duration (sec)", default: 5, minValue: 5, maxValue: 10, step: 5 } }),
-        // Seedance 2.0 — adds optional reference video and audio inputs
-        t2v_seed2:  ms({ prompt: F.prompt, image_url: F.image_url, video_url: F.video_url, audio_url: F.audio_url, aspect_ratio: F.ar_video, duration: { type: "int", title: "Duration (sec)", default: 5, minValue: 5, maxValue: 10, step: 5 } }),
+        // Seedance 2.0 — adds optional reference video and audio inputs + resolution
+        t2v_seed2:  ms({ prompt: F.prompt, image_url: F.image_url, video_url: F.video_url, audio_url: F.audio_url, resolution: F.res_video, aspect_ratio: F.ar_video, duration: { type: "int", title: "Duration (sec)", default: 5, minValue: 5, maxValue: 10, step: 5 } }),
         t2v_veo:    ms({ prompt: F.prompt, aspect_ratio: F.ar_video, duration: { type: "int", title: "Duration (sec)", default: 8, minValue: 5, maxValue: 8, step: 1 } }),
         t2v_veo4k:  ms({ prompt: F.prompt, aspect_ratio: F.ar_video, resolution: F.res_4k, duration: { type: "int", title: "Duration (sec)", default: 8, minValue: 5, maxValue: 8, step: 1 } }),
         // Veo with optional image first-frame (image-to-video). image_url is optional — leave empty for pure text-to-video.
