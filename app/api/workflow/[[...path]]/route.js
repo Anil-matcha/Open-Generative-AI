@@ -454,15 +454,20 @@ async function generateVideo(apiKey, model, params) {
     const apiModel = MODEL_ID_MAP[model] || model;
     // Resolve TOS/private URLs to base64 so Memefast can access the image
     const imageUrl = params.image_url ? await resolveImageUrl(params.image_url) : undefined;
+    const videoUrl = params.video_url ? await resolveImageUrl(params.video_url) : undefined;
+    const audioUrl = params.audio_url || undefined;
+    const body = {
+        model: apiModel, prompt: params.prompt || '',
+        image_url: imageUrl,
+        duration: params.duration || 5,
+        aspect_ratio: params.aspect_ratio || '16:9',
+    };
+    if (videoUrl) body.video_url = videoUrl;
+    if (audioUrl) body.audio_url = audioUrl;
     const res = await fetch(`${MEMEFAST}/v1/video/create`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            model: apiModel, prompt: params.prompt || '',
-            image_url: imageUrl,
-            duration: params.duration || 5,
-            aspect_ratio: params.aspect_ratio || '16:9',
-        }),
+        body: JSON.stringify(body),
     });
     if (!res.ok) {
         const txt = await res.text().catch(() => res.statusText);
@@ -723,6 +728,8 @@ function getNodeSchemas() {
         // image_url is optional: leave empty for pure text-to-video.
         t2v:        ms({ prompt: F.prompt, image_url: F.image_url, aspect_ratio: F.ar_video, duration: F.duration }),
         t2v_seed:   ms({ prompt: F.prompt, image_url: F.image_url, aspect_ratio: F.ar_video, duration: { type: "int", title: "Duration (sec)", default: 5, minValue: 5, maxValue: 10, step: 5 } }),
+        // Seedance 2.0 — adds optional reference video and audio inputs
+        t2v_seed2:  ms({ prompt: F.prompt, image_url: F.image_url, video_url: F.video_url, audio_url: F.audio_url, aspect_ratio: F.ar_video, duration: { type: "int", title: "Duration (sec)", default: 5, minValue: 5, maxValue: 10, step: 5 } }),
         t2v_veo:    ms({ prompt: F.prompt, aspect_ratio: F.ar_video, duration: { type: "int", title: "Duration (sec)", default: 8, minValue: 5, maxValue: 8, step: 1 } }),
         t2v_veo4k:  ms({ prompt: F.prompt, aspect_ratio: F.ar_video, resolution: F.res_4k, duration: { type: "int", title: "Duration (sec)", default: 8, minValue: 5, maxValue: 8, step: 1 } }),
         // Veo with optional image first-frame (image-to-video). image_url is optional — leave empty for pure text-to-video.
@@ -823,9 +830,9 @@ function getNodeSchemas() {
             video: {
                 models: {
                     "video-passthrough":                    T.vidPass,
-                    // ByteDance Seedance 2.0 — 5s or 10s, optional first-frame image
-                    "doubao-seedance-2-0-260128":           T.t2v_seed,
-                    "doubao-seedance-2-0-fast-260128":      T.t2v_seed,
+                    // ByteDance Seedance 2.0 — image + video + audio reference inputs
+                    "doubao-seedance-2-0-260128":           T.t2v_seed2,
+                    "doubao-seedance-2-0-fast-260128":      T.t2v_seed2,
                     // ByteDance Seedance 1.x — 5s or 10s, standard AR
                     "doubao-seedance-1-5-pro-251215":       T.t2v_seed,
                     "doubao-seedance-1-0-pro-fast-251015":  T.t2v_seed,
