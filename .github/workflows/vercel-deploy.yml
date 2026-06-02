@@ -1,0 +1,23 @@
+name: Trigger Vercel Deploy
+
+# Vercel's own GitHub webhook drops deliveries on this repo, so production
+# stops auto-deploying. GitHub Actions are dispatched by GitHub itself (they do
+# not depend on that webhook), so this job reliably fires the Vercel Deploy Hook
+# on every push to main. Store the hook URL as the VERCEL_DEPLOY_HOOK repo secret.
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fire Vercel Deploy Hook
+        run: |
+          if [ -z "${{ secrets.VERCEL_DEPLOY_HOOK }}" ]; then
+            echo "VERCEL_DEPLOY_HOOK secret is not set — skipping."
+            exit 0
+          fi
+          echo "Triggering Vercel deploy for ${GITHUB_SHA}…"
+          curl -sS -X POST "${{ secrets.VERCEL_DEPLOY_HOOK }}"
+          echo
