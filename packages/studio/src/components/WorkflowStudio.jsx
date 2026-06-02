@@ -438,18 +438,6 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
                 {selectedWorkflow.name}
               </span>
               <button
-                onClick={handleRunWorkflow}
-                disabled={isRunning || !selectedWorkflow?.id}
-                type="button"
-                className="flex items-center gap-2 px-4 py-1.5 bg-[#22d3ee] text-black text-xs font-black uppercase tracking-widest rounded-full hover:bg-white transition-all disabled:opacity-50 disabled:grayscale"
-              >
-                {isRunning ? (
-                  <><div className="w-3 h-3 border-2 border-black/30 border-t-black rounded-full animate-spin" /> Running...</>
-                ) : (
-                  <><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l14 9-14 9V3z"/></svg> Run</>
-                )}
-              </button>
-              <button
                 onClick={() => onToggleHeader?.(false)}
                 className="p-1.5 bg-white/5 hover:bg-white/10 rounded-md transition-colors text-white/40 hover:text-white"
                 title="Enter Zen Mode"
@@ -471,21 +459,6 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
                type="button"
             >
                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-            </button>
-
-            <div className="h-4 w-[1px] bg-white/10" />
-
-            <button
-              onClick={handleRunWorkflow}
-              disabled={isRunning || !selectedWorkflow?.id}
-              type="button"
-              className="flex items-center gap-1.5 px-3 py-1 bg-[#22d3ee] text-black text-[9px] font-black uppercase tracking-widest rounded-lg transition-all hover:bg-white disabled:opacity-50"
-            >
-              {isRunning ? (
-                <><div className="w-2.5 h-2.5 border-2 border-black/30 border-t-black rounded-full animate-spin" /> Running</>
-              ) : (
-                <><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l14 9-14 9V3z"/></svg> Run</>
-              )}
             </button>
 
             <div className="h-4 w-[1px] bg-white/10" />

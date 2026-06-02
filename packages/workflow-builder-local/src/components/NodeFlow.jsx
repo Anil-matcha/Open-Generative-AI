@@ -2204,23 +2204,6 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
                     </>
                   )}
                 </button>
-                <button
-                  type="button"
-                  suppressHydrationWarning={true}
-                  disabled={isRunning === 1 || !interactionMode}
-                  onClick={handleRunWorkflow}
-                  className="flex items-center gap-2 px-4 py-1.5 border border-gray-600/70 bg-blue-500 text-white text-sm rounded-full font-semibold group cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:bg-black hover:text-white whitespace-nowrap"
-                >
-                  {isRunning === 1 ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-t-transparent border-black group-hover:border-white group-hover:border-t-transparent rounded-full animate-spin"></div> Running...
-                    </>
-                  ) : (
-                    <>
-                      <FaPlay size={16} /> Run All {parseFloat(totalWorkflowCost) > 0 && `($${totalWorkflowCost})`}
-                    </>
-                  )}
-                </button>
               </>
             ) : (
               <button
