@@ -147,6 +147,15 @@ export async function POST(request) {
   }
   try {
     const body = await request.json();
+
+    // Best-effort mirror of a finished Ark CDN video into TOS. Called by the
+    // client after the task succeeds, so it never blocks the poll loop. Returns
+    // the (permanent) TOS URL, or the original Ark URL if mirroring fails.
+    if (body.action === 'mirror') {
+      const url = await mirrorVideoToTOS(body.url);
+      return NextResponse.json({ url });
+    }
+
     const {
       fast = false,
       prompt = '',
@@ -196,7 +205,9 @@ export async function POST(request) {
 }
 
 // GET /api/ark/seedance?taskId=... — poll a task, returns { status, url }
-// On success, mirrors the Ark CDN video to TOS for permanent storage.
+// Returns the raw Ark CDN URL immediately. Mirroring to TOS happens in a
+// separate, non-blocking request (see POST ?action=mirror) so we never hit the
+// serverless timeout while downloading/uploading a large video inside the poll.
 export async function GET(request) {
   if (!ARK_API_KEY) {
     return NextResponse.json({ error: 'ARK_API_KEY not configured' }, { status: 503 });
@@ -217,13 +228,7 @@ export async function GET(request) {
       );
     }
     const status = data.status || 'running';
-    const arkUrl = data.content?.video_url || data.video_url || null;
-
-    // Mirror to TOS on success so the video survives CDN expiry and is accessible.
-    const url = (status === 'succeeded' && arkUrl)
-      ? await mirrorVideoToTOS(arkUrl)
-      : arkUrl;
-
+    const url = data.content?.video_url || data.video_url || null;
     return NextResponse.json({ status, url, error: data.error?.message || null });
   } catch (e) {
     return NextResponse.json({ error: e.message }, { status: 500 });

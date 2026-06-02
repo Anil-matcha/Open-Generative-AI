@@ -521,7 +521,19 @@ async function generateSeedanceArk(modelInfo, params) {
         const status = (data.status || '').toLowerCase();
         if (status === 'succeeded' || status === 'success') {
             if (!data.url) throw new Error('Ark: видео готово, но URL не получен.');
-            return { url: data.url, id: taskId };
+            // Mirror the Ark CDN video into TOS for permanence (best-effort —
+            // fall back to the raw Ark URL if it fails or times out).
+            let finalUrl = data.url;
+            try {
+                const mirror = await fetch('/api/ark/seedance', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'mirror', url: data.url }),
+                });
+                const mirrorData = await mirror.json().catch(() => ({}));
+                if (mirror.ok && mirrorData.url) finalUrl = mirrorData.url;
+            } catch { /* keep raw Ark URL */ }
+            return { url: finalUrl, id: taskId };
         }
         if (status === 'failed' || status === 'error' || status === 'expired') {
             throw new Error(`Ark: генерация не удалась (${data.error || status}).`);
