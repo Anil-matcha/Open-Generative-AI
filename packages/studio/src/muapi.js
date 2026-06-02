@@ -319,13 +319,13 @@ export async function generateImage(apiKey, params) {
         throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 200)}`);
     }
     const data = await response.json();
-    let url = extractImageUrl(data);
+    const url = extractImageUrl(data);
     if (!url) {
         console.error('[generateImage] No image URL in response:', JSON.stringify(data).slice(0, 500));
         throw new Error('Сервер не вернул изображение (нет URL в ответе).');
     }
-    // Mirror base64 responses to TOS so we store a real URL instead of a huge data URI.
-    url = await persistImageToTOS(url);
+    // Return the raw url/base64 immediately so the UI can show it without waiting.
+    // The caller mirrors it to TOS in the background (see runGeneration).
     return { ...data, url };
 }
 
@@ -524,9 +524,9 @@ async function generateImageEdit(apiKey, params) {
         throw new Error(`API Request Failed: ${response.status} - ${errText.slice(0, 200)}`);
     }
     const data = await response.json();
-    let url = extractImageUrl(data);
+    const url = extractImageUrl(data);
     if (!url) throw new Error('Сервер не вернул изображение (нет URL в ответе).');
-    url = await persistImageToTOS(url);
+    // Raw url/base64 returned immediately; TOS mirroring happens in the background.
     return { ...data, url };
 }
 

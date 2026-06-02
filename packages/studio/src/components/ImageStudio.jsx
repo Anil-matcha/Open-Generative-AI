@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { generateImage, generateI2I, uploadFile } from "../muapi.js";
+import { generateImage, generateI2I, uploadFile, persistImageToTOS } from "../muapi.js";
 import FaceRegistrationDialog from "./FaceRegistrationDialog.jsx";
 import {
   t2iModels,
@@ -1152,24 +1152,43 @@ export default function ImageStudio({
         results.forEach((res) => {
           if (res && res.url) {
             added++;
+            const id = res.id || Math.random().toString(36).substring(7);
+            const rawUrl = res.url;
             const entry = {
-              id: res.id || Math.random().toString(36).substring(7),
-              url: res.url,
+              id,
+              url: rawUrl,
               prompt: promptTrim,
               model: snap.selectedModelId,
               aspect_ratio: snap.selectedAr,
               timestamp: new Date().toISOString(),
             };
-            // Persist to localStorage FIRST so the result survives even if this
-            // component was unmounted (e.g. user navigated to the workflow builder).
-            persistEntryToStorage(entry);
+            // Show the result IMMEDIATELY (raw url / base64) — don't make the user
+            // wait for the TOS upload. Display is in-memory only at this point.
             addToHistory(entry);
-            onGenerationComplete?.({
-              url: res.url,
-              model: snap.selectedModelId,
-              prompt: promptTrim,
-              type: "image",
-            });
+
+            // Mirror to TOS in the background, then swap the raw url for the
+            // permanent one, persist to localStorage and notify the parent.
+            // base64 is never written to localStorage (it would blow the quota).
+            (async () => {
+              let permUrl = rawUrl;
+              try {
+                permUrl = await persistImageToTOS(rawUrl);
+              } catch {}
+              const finalEntry = { ...entry, url: permUrl };
+              if (permUrl !== rawUrl) {
+                setCurrentImageUrl((cur) => (cur === rawUrl ? permUrl : cur));
+                setLocalHistory((prev) =>
+                  prev.map((e) => (e.id === id ? finalEntry : e)),
+                );
+              }
+              persistEntryToStorage(finalEntry);
+              onGenerationComplete?.({
+                url: permUrl,
+                model: snap.selectedModelId,
+                prompt: promptTrim,
+                type: "image",
+              });
+            })();
           }
         });
 
