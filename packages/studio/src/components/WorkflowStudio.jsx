@@ -27,14 +27,18 @@ const ALLOWED_WORKFLOW_IMAGE_MODELS = new Set([
 // Correct input parameters for each model's Properties panel (label = title,
 // options = enum). These keys are honoured by the workflow proxy at run time.
 const GEMINI_WORKFLOW_AR = ["1:1", "16:9", "9:16", "4:3", "3:4", "2:3", "3:2", "4:5", "5:4", "1:4", "4:1", "1:8", "8:1", "21:9"];
+// image_url is optional — wiring an image into this input switches the model
+// into editing/reference mode (handled by the workflow proxy).
 const GEMINI_WORKFLOW_PROPS = {
   prompt: { type: "string", title: "Prompt" },
+  image_url: { type: "string", title: "Reference Image" },
   aspect_ratio: { type: "string", title: "Aspect Ratio", enum: GEMINI_WORKFLOW_AR, default: "1:1" },
   imageSize: { type: "string", title: "Resolution", enum: ["1K", "2K", "4K", "512"], default: "1K" },
 };
 const WORKFLOW_IMAGE_SCHEMA_PROPS = {
   "gpt-image-2": {
     prompt: { type: "string", title: "Prompt" },
+    image_url: { type: "string", title: "Reference Image" },
     size: { type: "string", title: "Size", enum: ["1024x1024", "1536x1024", "1024x1536", "2048x2048", "2048x1152", "3840x2160", "2160x3840"], default: "1024x1024" },
     quality: { type: "string", title: "Quality", enum: ["auto", "high", "medium", "low"], default: "auto" },
     format: { type: "string", title: "Format", enum: ["jpeg", "png", "webp"], default: "jpeg" },

@@ -433,8 +433,8 @@ async function generateImage(apiKey, model, params) {
     const size = params.size || computeImageSize(params.aspect_ratio, params.resolution, params.width, params.height);
     const imgInput = params.image_url || params.images_list?.[0];
 
-    // Use /v1/images/edits for image editing models that have an input image
-    if (imgInput && (model.includes('edit') || model.includes('reference') || model.includes('inpaint'))) {
+    // Use /v1/images/edits whenever a reference image is wired in (editing mode).
+    if (imgInput && (model.includes('edit') || model.includes('reference') || model.includes('inpaint') || model.startsWith('gpt-image'))) {
         const form = new FormData();
         form.append('model', apiModel);
         form.append('prompt', params.prompt || '');
