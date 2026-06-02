@@ -72,31 +72,76 @@ export const i2iModels = [];
 
 // ── Text-to-video ────────────────────────────────────────────────────────────
 export const t2vModels = [
+  // ── Seedance (Doubao) ──
+  {
+    id: "seedance-2.0-t2v",
+    name: "Seedance 2.0",
+    apiId: "seedance-pro-t2v",
+    platform: "unified",
+    inputs: {
+      prompt: { type: "string", title: "Prompt" },
+      aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }
+    }
+  },
+  {
+    id: "seedance-2.0-fast-t2v",
+    name: "Seedance 2.0 Fast",
+    apiId: "seedance-pro-t2v-fast",
+    platform: "unified",
+    inputs: {
+      prompt: { type: "string", title: "Prompt" },
+      aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }
+    }
+  },
+  {
+    id: "seedance-v1.5-pro-t2v",
+    name: "Seedance 1.5 Pro",
+    apiId: "seedance-v1.5-pro-t2v",
+    platform: "unified",
+    inputs: {
+      prompt: { type: "string", title: "Prompt" },
+      aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }
+    }
+  },
+  {
+    id: "seedance-v1.5-pro-t2v-fast",
+    name: "Seedance 1.5 Pro Fast",
+    apiId: "seedance-v1.5-pro-t2v-fast",
+    platform: "unified",
+    inputs: {
+      prompt: { type: "string", title: "Prompt" },
+      aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }
+    }
+  },
+  {
+    id: "seedance-lite-t2v",
+    name: "Seedance Lite",
+    apiId: "seedance-lite-t2v",
+    platform: "unified",
+    inputs: {
+      prompt: { type: "string", title: "Prompt" },
+      aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }
+    }
+  },
   // ── Google Veo (unified format) ──
   {
     id: "veo-3.1",
     name: "Google Veo 3.1",
-    apiId: "veo-3.1",
+    apiId: "veo3.1-text-to-video",
     platform: "unified",
     inputs: {
       prompt: { type: "string", title: "Prompt" },
-      aspect_ratio: {
-        enum: ["16:9", "9:16", "1:1"],
-        default: "16:9", title: "Aspect Ratio", type: "string"
-      }
+      aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }
     }
   },
   {
     id: "veo-3.1-fast",
     name: "Google Veo 3.1 Fast",
-    apiId: "veo-3.1-fast",
+    apiId: "veo3.1-fast-text-to-video",
     platform: "unified",
     inputs: {
       prompt: { type: "string", title: "Prompt" },
-      aspect_ratio: {
-        enum: ["16:9", "9:16", "1:1"],
-        default: "16:9", title: "Aspect Ratio", type: "string"
-      }
+      aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }
     }
   },
   {
@@ -106,56 +151,40 @@ export const t2vModels = [
     platform: "unified",
     inputs: {
       prompt: { type: "string", title: "Prompt" },
-      aspect_ratio: {
-        enum: ["16:9", "9:16", "1:1"],
-        default: "16:9", title: "Aspect Ratio", type: "string"
-      }
+      aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }
     }
   },
-  // ── Kling (platform-specific) ──
+  // ── Kling (unified format — new IDs) ──
   {
-    id: "kling-v3-master",
-    name: "Kling V3 Master",
-    apiId: "kling-v3-master",
-    platform: "kling",
+    id: "kling-v2.6-pro-t2v",
+    name: "Kling v2.6 Pro",
+    apiId: "kling-v2.6-pro-t2v",
+    platform: "unified",
     inputs: {
       prompt: { type: "string", title: "Prompt" },
-      aspect_ratio: {
-        enum: ["16:9", "9:16", "1:1"],
-        default: "16:9", title: "Aspect Ratio", type: "string"
-      },
-      duration: { enum: [5, 10], default: 5, title: "Duration (s)", type: "int" },
-      mode: { enum: ["pro", "std"], default: "pro", title: "Mode", type: "string" }
+      aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" },
+      duration: { enum: [5, 10], default: 5, title: "Duration (s)", type: "int" }
     }
   },
   {
-    id: "kling-v2.5-master",
-    name: "Kling V2.5 Master",
-    apiId: "kling-v2.5-master",
-    platform: "kling",
+    id: "kling-v2.5-turbo-pro-t2v",
+    name: "Kling v2.5 Turbo Pro",
+    apiId: "kling-v2.5-turbo-pro-t2v",
+    platform: "unified",
     inputs: {
       prompt: { type: "string", title: "Prompt" },
-      aspect_ratio: {
-        enum: ["16:9", "9:16", "1:1"],
-        default: "16:9", title: "Aspect Ratio", type: "string"
-      },
-      duration: { enum: [5, 10], default: 5, title: "Duration (s)", type: "int" },
-      mode: { enum: ["pro", "std"], default: "pro", title: "Mode", type: "string" }
+      aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" },
+      duration: { enum: [5, 10], default: 5, title: "Duration (s)", type: "int" }
     }
   },
   {
-    id: "kling-v2-master",
-    name: "Kling V2 Master",
-    apiId: "kling-v2-master",
-    platform: "kling",
+    id: "kling-o1-text-to-video",
+    name: "Kling O1",
+    apiId: "kling-o1-text-to-video",
+    platform: "unified",
     inputs: {
       prompt: { type: "string", title: "Prompt" },
-      aspect_ratio: {
-        enum: ["16:9", "9:16", "1:1"],
-        default: "16:9", title: "Aspect Ratio", type: "string"
-      },
-      duration: { enum: [5, 10], default: 5, title: "Duration (s)", type: "int" },
-      mode: { enum: ["pro", "std"], default: "pro", title: "Mode", type: "string" }
+      aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }
     }
   },
   // ── Luma Dream Machine (platform-specific) ──
@@ -166,10 +195,7 @@ export const t2vModels = [
     platform: "luma",
     inputs: {
       prompt: { type: "string", title: "Prompt" },
-      aspect_ratio: {
-        enum: ["16:9", "9:16", "4:3", "3:4", "21:9", "1:1"],
-        default: "16:9", title: "Aspect Ratio", type: "string"
-      },
+      aspect_ratio: { enum: ["16:9", "9:16", "4:3", "3:4", "21:9", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" },
       loop: { type: "boolean", default: false, title: "Loop" }
     }
   },
@@ -180,10 +206,7 @@ export const t2vModels = [
     platform: "luma",
     inputs: {
       prompt: { type: "string", title: "Prompt" },
-      aspect_ratio: {
-        enum: ["16:9", "9:16", "4:3", "3:4", "1:1"],
-        default: "16:9", title: "Aspect Ratio", type: "string"
-      }
+      aspect_ratio: { enum: ["16:9", "9:16", "4:3", "3:4", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }
     }
   },
   // ── Minimax Hailuo (unified format) ──
@@ -194,67 +217,62 @@ export const t2vModels = [
     platform: "unified",
     inputs: {
       prompt: { type: "string", title: "Prompt" },
-      aspect_ratio: {
-        enum: ["16:9", "9:16", "1:1"],
-        default: "16:9", title: "Aspect Ratio", type: "string"
-      }
+      aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }
     }
   },
   // ── Sora (OpenAI video format) ──
   {
     id: "sora-2",
     name: "Sora 2",
-    apiId: "sora-2",
+    apiId: "openai-sora-2-text-to-video",
     platform: "sora",
     inputs: {
       prompt: { type: "string", title: "Prompt" },
-      aspect_ratio: {
-        enum: ["16:9", "9:16", "1:1"],
-        default: "16:9", title: "Aspect Ratio", type: "string"
-      },
+      aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" },
       duration: { enum: [5, 10, 20], default: 10, title: "Duration (s)", type: "int" }
     }
   },
   {
     id: "sora",
     name: "Sora",
-    apiId: "sora",
+    apiId: "openai-sora",
     platform: "sora",
     inputs: {
       prompt: { type: "string", title: "Prompt" },
-      aspect_ratio: {
-        enum: ["16:9", "9:16", "1:1"],
-        default: "16:9", title: "Aspect Ratio", type: "string"
-      },
+      aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" },
       duration: { enum: [5, 10], default: 5, title: "Duration (s)", type: "int" }
     }
   },
-  // ── Wan / 通义万象 (unified format) ──
+  // ── Wan (unified format) ──
   {
-    id: "wan2.1-t2v-14b",
-    name: "WAN 2.1 T2V",
-    apiId: "wan2.1-t2v-14b",
+    id: "wan2.5-text-to-video",
+    name: "Wan 2.5 T2V",
+    apiId: "wan2.5-text-to-video",
     platform: "unified",
     inputs: {
       prompt: { type: "string", title: "Prompt" },
-      aspect_ratio: {
-        enum: ["16:9", "9:16", "1:1"],
-        default: "16:9", title: "Aspect Ratio", type: "string"
-      }
+      aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }
     }
   },
-  // ── HappyHorse / 通义万象 (unified format) ──
   {
-    id: "happyhorse",
-    name: "HappyHorse",
-    apiId: "happyhorse",
+    id: "wan2.6-text-to-video",
+    name: "Wan 2.6 T2V",
+    apiId: "wan2.6-text-to-video",
     platform: "unified",
     inputs: {
       prompt: { type: "string", title: "Prompt" },
-      aspect_ratio: {
-        enum: ["16:9", "9:16", "1:1"],
-        default: "16:9", title: "Aspect Ratio", type: "string"
-      }
+      aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }
+    }
+  },
+  // ── Grok video (unified format) ──
+  {
+    id: "grok-imagine-text-to-video",
+    name: "Grok Imagine",
+    apiId: "grok-imagine-text-to-video",
+    platform: "unified",
+    inputs: {
+      prompt: { type: "string", title: "Prompt" },
+      aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }
     }
   },
   // ── Pixverse (unified format) ──
@@ -265,66 +283,145 @@ export const t2vModels = [
     platform: "unified",
     inputs: {
       prompt: { type: "string", title: "Prompt" },
-      aspect_ratio: {
-        enum: ["16:9", "9:16", "1:1", "4:3", "3:4"],
-        default: "16:9", title: "Aspect Ratio", type: "string"
-      },
+      aspect_ratio: { enum: ["16:9", "9:16", "1:1", "4:3", "3:4"], default: "16:9", title: "Aspect Ratio", type: "string" },
       duration: { enum: [4, 8], default: 4, title: "Duration (s)", type: "int" }
     }
   },
-  // ── Grok video (unified format) ──
+  // ── Hunyuan (unified format) ──
   {
-    id: "grok-2-aurora",
-    name: "Grok 2 Aurora",
-    apiId: "grok-2-aurora",
+    id: "hunyuan-text-to-video",
+    name: "Hunyuan T2V",
+    apiId: "hunyuan-text-to-video",
     platform: "unified",
     inputs: {
       prompt: { type: "string", title: "Prompt" },
-      aspect_ratio: {
-        enum: ["16:9", "9:16", "1:1"],
-        default: "16:9", title: "Aspect Ratio", type: "string"
-      }
+      aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }
     }
-  }
+  },
+  {
+    id: "hunyuan-fast-text-to-video",
+    name: "Hunyuan Fast T2V",
+    apiId: "hunyuan-fast-text-to-video",
+    platform: "unified",
+    inputs: {
+      prompt: { type: "string", title: "Prompt" },
+      aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }
+    }
+  },
+  // ── WAN 2.1 (legacy, keep for backwards compat) ──
+  {
+    id: "wan2.1-t2v-14b",
+    name: "WAN 2.1 T2V",
+    apiId: "wan2.1-t2v-14b",
+    platform: "unified",
+    inputs: {
+      prompt: { type: "string", title: "Prompt" },
+      aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }
+    }
+  },
 ];
 
 // ── Image-to-video ────────────────────────────────────────────────────────────
 export const i2vModels = [
-  // ── Kling i2v (platform-specific) ──
+  // ── Seedance i2v ──
   {
-    id: "kling-v3-master-i2v",
-    name: "Kling V3 Master (фото→видео)",
-    apiId: "kling-v3-master",
-    platform: "kling",
-    imageField: "image",
+    id: "seedance-2.0-i2v",
+    name: "Seedance 2.0 (фото→видео)",
+    apiId: "seedance-pro-i2v",
+    platform: "unified",
+    imageField: "image_url",
     inputs: {
       prompt: { type: "string", title: "Prompt" },
-      duration: { enum: [5, 10], default: 5, title: "Duration (s)", type: "int" },
-      mode: { enum: ["pro", "std"], default: "pro", title: "Mode", type: "string" }
+      aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }
     }
   },
   {
-    id: "kling-v2.5-master-i2v",
-    name: "Kling V2.5 Master (фото→видео)",
-    apiId: "kling-v2.5-master",
-    platform: "kling",
-    imageField: "image",
+    id: "seedance-2.0-fast-i2v",
+    name: "Seedance 2.0 Fast (фото→видео)",
+    apiId: "seedance-pro-i2v-fast",
+    platform: "unified",
+    imageField: "image_url",
     inputs: {
       prompt: { type: "string", title: "Prompt" },
-      duration: { enum: [5, 10], default: 5, title: "Duration (s)", type: "int" },
-      mode: { enum: ["pro", "std"], default: "pro", title: "Mode", type: "string" }
+      aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }
     }
   },
   {
-    id: "kling-v2-master-i2v",
-    name: "Kling V2 Master (фото→видео)",
-    apiId: "kling-v2-master",
-    platform: "kling",
-    imageField: "image",
+    id: "seedance-v1.5-pro-i2v",
+    name: "Seedance 1.5 Pro (фото→видео)",
+    apiId: "seedance-v1.5-pro-i2v",
+    platform: "unified",
+    imageField: "image_url",
     inputs: {
       prompt: { type: "string", title: "Prompt" },
-      duration: { enum: [5, 10], default: 5, title: "Duration (s)", type: "int" },
-      mode: { enum: ["pro", "std"], default: "pro", title: "Mode", type: "string" }
+      aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }
+    }
+  },
+  {
+    id: "seedance-lite-i2v",
+    name: "Seedance Lite (фото→видео)",
+    apiId: "seedance-lite-i2v",
+    platform: "unified",
+    imageField: "image_url",
+    inputs: {
+      prompt: { type: "string", title: "Prompt" },
+      aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }
+    }
+  },
+  // ── Veo i2v ──
+  {
+    id: "veo-3.1-i2v",
+    name: "Google Veo 3.1 (фото→видео)",
+    apiId: "veo3.1-image-to-video",
+    platform: "unified",
+    imageField: "image_url",
+    inputs: {
+      prompt: { type: "string", title: "Prompt" },
+      aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }
+    }
+  },
+  {
+    id: "veo-3.1-fast-i2v",
+    name: "Google Veo 3.1 Fast (фото→видео)",
+    apiId: "veo3.1-fast-image-to-video",
+    platform: "unified",
+    imageField: "image_url",
+    inputs: {
+      prompt: { type: "string", title: "Prompt" },
+      aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }
+    }
+  },
+  // ── Kling i2v (unified new IDs) ──
+  {
+    id: "kling-v2.6-pro-i2v",
+    name: "Kling v2.6 Pro (фото→видео)",
+    apiId: "kling-v2.6-pro-i2v",
+    platform: "unified",
+    imageField: "image_url",
+    inputs: {
+      prompt: { type: "string", title: "Prompt" },
+      duration: { enum: [5, 10], default: 5, title: "Duration (s)", type: "int" }
+    }
+  },
+  {
+    id: "kling-v2.5-turbo-pro-i2v",
+    name: "Kling v2.5 Turbo Pro (фото→видео)",
+    apiId: "kling-v2.5-turbo-pro-i2v",
+    platform: "unified",
+    imageField: "image_url",
+    inputs: {
+      prompt: { type: "string", title: "Prompt" },
+      duration: { enum: [5, 10], default: 5, title: "Duration (s)", type: "int" }
+    }
+  },
+  {
+    id: "kling-o1-image-to-video",
+    name: "Kling O1 (фото→видео)",
+    apiId: "kling-o1-image-to-video",
+    platform: "unified",
+    imageField: "image_url",
+    inputs: {
+      prompt: { type: "string", title: "Prompt" }
     }
   },
   // ── Luma i2v (platform-specific) ──
@@ -336,10 +433,7 @@ export const i2vModels = [
     imageField: "keyframes",
     inputs: {
       prompt: { type: "string", title: "Prompt" },
-      aspect_ratio: {
-        enum: ["16:9", "9:16", "4:3", "3:4", "1:1"],
-        default: "16:9", title: "Aspect Ratio", type: "string"
-      }
+      aspect_ratio: { enum: ["16:9", "9:16", "4:3", "3:4", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }
     }
   },
   // ── Runway (image-to-video only) ──
@@ -353,6 +447,42 @@ export const i2vModels = [
       prompt: { type: "string", title: "Prompt" },
       duration: { enum: [5, 10], default: 5, title: "Duration (s)", type: "int" },
       ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Ratio", type: "string" }
+    }
+  },
+  // ── Hunyuan i2v ──
+  {
+    id: "hunyuan-image-to-video",
+    name: "Hunyuan (фото→видео)",
+    apiId: "hunyuan-image-to-video",
+    platform: "unified",
+    imageField: "image_url",
+    inputs: {
+      prompt: { type: "string", title: "Prompt" },
+      aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }
+    }
+  },
+  // ── Wan i2v ──
+  {
+    id: "wan2.5-image-to-video",
+    name: "Wan 2.5 (фото→видео)",
+    apiId: "wan2.5-image-to-video",
+    platform: "unified",
+    imageField: "image_url",
+    inputs: {
+      prompt: { type: "string", title: "Prompt" },
+      aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }
+    }
+  },
+  // ── Grok i2v ──
+  {
+    id: "grok-imagine-image-to-video",
+    name: "Grok Imagine (фото→видео)",
+    apiId: "grok-imagine-image-to-video",
+    platform: "unified",
+    imageField: "image_url",
+    inputs: {
+      prompt: { type: "string", title: "Prompt" },
+      aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }
     }
   },
   // ── Pixverse i2v (unified) ──
