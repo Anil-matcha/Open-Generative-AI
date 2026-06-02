@@ -2240,7 +2240,10 @@ export default function VideoStudio({
       <FaceAssetDialog
         open={facePickOpen}
         onClose={() => setFacePickOpen(false)}
-        onSelect={(assetUri, name) => setFaceAsset({ uri: assetUri, name })}
+        onSelect={(assetUri, name) => {
+          setFaceAsset({ uri: assetUri, name });
+          insertRefToken("@лицо");
+        }}
         onRegisterNew={() => setFaceRegOpen(true)}
       />
 
@@ -2250,6 +2253,7 @@ export default function VideoStudio({
         onClose={() => setFaceRegOpen(false)}
         onRegistered={(assetUri, displayName) => {
           setFaceAsset({ uri: assetUri, name: displayName });
+          insertRefToken("@лицо");
         }}
       />
     </div>
