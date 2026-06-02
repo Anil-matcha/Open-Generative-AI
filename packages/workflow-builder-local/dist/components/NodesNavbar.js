@@ -230,23 +230,9 @@ var NodesNavbar = function NodesNavbar(_ref) {
       hasSubmenu: true,
       id: "edit-video"
     }]
-  }, {
-    label: "Audio",
-    items: [{
-      label: "Generate Audio",
-      icon: /*#__PURE__*/_react["default"].createElement(_ai.AiOutlineAudio, null),
-      hasSubmenu: true,
-      id: "generate-audio"
-    }]
-  }, {
-    label: "API Models",
-    items: [{
-      label: "Api Node",
-      icon: /*#__PURE__*/_react["default"].createElement(_ri.RiInputMethodLine, null),
-      hasSubmenu: true,
-      id: "api-models"
-    }]
-  }];
+  }
+  // Audio (Generate Audio) and API Models (Api Node) sections removed.
+  ];
   var getSubmenuItems = function getSubmenuItems(id) {
     switch (id) {
       case "inputs":

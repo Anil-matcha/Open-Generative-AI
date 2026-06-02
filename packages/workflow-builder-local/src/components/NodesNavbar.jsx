@@ -165,18 +165,7 @@ const NodesNavbar = ({ addNode, apiNodeModels, filterNodeTypes = null, nodeSchem
         { label: "Edit Video", icon: <RiVideoOnAiLine />, hasSubmenu: true, id: "edit-video" },
       ]
     },
-    {
-      label: "Audio",
-      items: [
-        { label: "Generate Audio", icon: <AiOutlineAudio />, hasSubmenu: true, id: "generate-audio" },
-      ]
-    },
-    {
-      label: "API Models",
-      items: [
-        { label: "Api Node", icon: <RiInputMethodLine />, hasSubmenu: true, id: "api-models" },
-      ]
-    }
+    // Audio (Generate Audio) and API Models (Api Node) sections removed.
   ];
 
   const getSubmenuItems = (id) => {
