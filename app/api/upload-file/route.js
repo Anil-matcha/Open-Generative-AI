@@ -118,7 +118,9 @@ export async function POST(request) {
         const key = `images/${Date.now()}_${Math.random().toString(36).slice(2, 7)}.${ext}`;
         const publicUrl = await tosUpload(key, buffer, contentType);
         if (!publicUrl) return NextResponse.json({ error: 'Upload failed' }, { status: 502 });
-        return NextResponse.json({ url: publicUrl });
+        // The bucket is private, so return a same-origin proxy URL that streams the
+        // object through our signed-GET route — this is what <img> will load.
+        return NextResponse.json({ url: `/api/file?key=${encodeURIComponent(key)}` });
     } catch (e) {
         return NextResponse.json({ error: e.message }, { status: 500 });
     }
