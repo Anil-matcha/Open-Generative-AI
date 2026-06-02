@@ -55,7 +55,7 @@ function pickEndpoint(fast) {
   return ep;
 }
 
-function buildContent({ prompt, image_url, image_urls, video_url, audio_url }) {
+function buildContent({ prompt, image_url, image_urls, video_url, video_urls, audio_url, audio_urls }) {
   const content = [];
   if (prompt) content.push({ type: 'text', text: prompt });
 
@@ -63,17 +63,25 @@ function buildContent({ prompt, image_url, image_urls, video_url, audio_url }) {
   if (image_url) images.push(image_url);
   if (Array.isArray(image_urls)) images.push(...image_urls.filter(Boolean));
 
+  const videos = [];
+  if (video_url) videos.push(video_url);
+  if (Array.isArray(video_urls)) videos.push(...video_urls.filter(Boolean));
+
+  const audios = [];
+  if (audio_url) audios.push(audio_url);
+  if (Array.isArray(audio_urls)) audios.push(...audio_urls.filter(Boolean));
+
   // Single image with no other media → first-frame I2V (no role, per Ark docs).
   // Multiple images or image + video/audio → multimodal reference (role: reference_image).
-  const hasRefMedia = !!(video_url || audio_url);
+  const hasRefMedia = videos.length > 0 || audios.length > 0;
   const multiImage  = images.length > 1;
   images.forEach((u) => {
     const item = { type: 'image_url', image_url: { url: u } };
     if (hasRefMedia || multiImage) item.role = 'reference_image';
     content.push(item);
   });
-  if (video_url) content.push({ type: 'video_url', video_url: { url: video_url }, role: 'reference_video' });
-  if (audio_url) content.push({ type: 'audio_url', audio_url: { url: audio_url }, role: 'reference_audio' });
+  videos.forEach((u) => content.push({ type: 'video_url', video_url: { url: u }, role: 'reference_video' }));
+  audios.forEach((u) => content.push({ type: 'audio_url', audio_url: { url: u }, role: 'reference_audio' }));
   return content;
 }
 
@@ -90,14 +98,16 @@ export async function POST(request) {
       image_url,
       image_urls,
       video_url,
+      video_urls,
       audio_url,
+      audio_urls,
       resolution,
       ratio,
       duration,
       generate_audio = true,
     } = body;
 
-    const content = buildContent({ prompt, image_url, image_urls, video_url, audio_url });
+    const content = buildContent({ prompt, image_url, image_urls, video_url, video_urls, audio_url, audio_urls });
     if (content.length === 0) {
       return NextResponse.json({ error: 'Empty content' }, { status: 400 });
     }

@@ -291,6 +291,10 @@ export default function VideoStudio({
   const [audioProgress, setAudioProgress] = useState(0);
   const [uploadedAudioName, setUploadedAudioName] = useState(null);
 
+  // ── Seedance 2.0 multimodal reference files (image 1-9 / video 1-3 / audio 1-3) ──
+  // Each: { id, url, kind: 'image'|'video'|'audio', name, uploading, progress }
+  const [refFiles, setRefFiles] = useState([]);
+
   // ── generation / canvas ──
   const [generating, setGenerating] = useState(false);
   const [generateError, setGenerateError] = useState(null);
@@ -320,6 +324,7 @@ export default function VideoStudio({
   const endImageFileInputRef = useRef(null);
   const videoFileInputRef = useRef(null);
   const audioFileInputRef = useRef(null);
+  const refFileInputRef = useRef(null);
   const resultVideoRef = useRef(null);
   const hasRestored = useRef(false);
 
@@ -747,6 +752,73 @@ export default function VideoStudio({
 
   const clearEndImage = () => setUploadedEndImageUrl(null);
 
+  // ── Seedance 2.0 multimodal reference uploads (multiple image/video/audio) ──
+  const refKindOf = (file) =>
+    file.type.startsWith("image/")
+      ? "image"
+      : file.type.startsWith("video/")
+        ? "video"
+        : file.type.startsWith("audio/")
+          ? "audio"
+          : null;
+
+  // Per-kind label + ordinal for the @reference chip, e.g. @фото1, @видео2, @аудио1.
+  const refLabel = (kind, index) => {
+    const word = kind === "image" ? "фото" : kind === "video" ? "видео" : "аудио";
+    return `@${word}${index}`;
+  };
+
+  const handleRefFilesChange = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (refFileInputRef.current) refFileInputRef.current.value = "";
+    for (const file of files) {
+      const kind = refKindOf(file);
+      if (!kind) {
+        alert(`Файл ${file.name}: поддерживаются только изображения, видео и аудио.`);
+        continue;
+      }
+      const limitMb = kind === "image" ? 10 : 100;
+      if (file.size > limitMb * 1024 * 1024) {
+        alert(`Файл ${file.name} превышает лимит ${limitMb} МБ.`);
+        continue;
+      }
+      const id = `${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+      setRefFiles((prev) => [
+        ...prev,
+        { id, url: null, kind, name: file.name, uploading: true, progress: 0 },
+      ]);
+      try {
+        const url = await uploadFile(apiKey, file, (pct) => {
+          setRefFiles((prev) => prev.map((f) => (f.id === id ? { ...f, progress: pct } : f)));
+        });
+        setRefFiles((prev) => prev.map((f) => (f.id === id ? { ...f, url, uploading: false } : f)));
+      } catch (err) {
+        console.error("[VideoStudio] Reference upload failed:", err);
+        setRefFiles((prev) => prev.filter((f) => f.id !== id));
+        alert(`Не удалось загрузить ${file.name}: ${err.message}`);
+      }
+    }
+  };
+
+  const removeRefFile = (id) => setRefFiles((prev) => prev.filter((f) => f.id !== id));
+
+  // Insert the @reference token into the prompt at the caret (or append).
+  const insertRefToken = (token) => {
+    const el = textareaRef.current;
+    setPrompt((prev) => {
+      if (!el) return (prev ? prev + " " : "") + token + " ";
+      const start = el.selectionStart ?? prev.length;
+      const end = el.selectionEnd ?? prev.length;
+      const next = prev.slice(0, start) + token + " " + prev.slice(end);
+      requestAnimationFrame(() => {
+        el.focus();
+        const pos = start + token.length + 1;
+        el.setSelectionRange(pos, pos);
+      });
+      return next;
+    });
+  };
+
   // ── video upload ─────────────────────────────────────────────────────────
   const handleVideoFileChange = async (e) => {
     const file = e.target.files[0];
@@ -896,6 +968,65 @@ export default function VideoStudio({
     const currentModel = getCurrentModel();
     const isExtendMode = currentModel?.requiresRequestId;
     const trimmedPrompt = prompt.trim();
+
+    // ── Seedance 2.0 (Ark) multimodal path — isolated from the t2v/i2v/v2v flow ──
+    if (currentModel?.provider === "ark") {
+      if (refFiles.some((f) => f.uploading)) {
+        alert("Подождите, файлы ещё загружаются.");
+        return;
+      }
+      const readyRefs = refFiles.filter((f) => f.url);
+      if (!trimmedPrompt && readyRefs.length === 0) {
+        alert("Введите запрос или загрузите хотя бы один файл.");
+        return;
+      }
+      setGenerating(true);
+      setGenerateError(null);
+      try {
+        const params = {
+          model: selectedModel,
+          prompt: trimmedPrompt,
+          aspect_ratio: selectedAr,
+          image_urls: readyRefs.filter((f) => f.kind === "image").map((f) => f.url),
+          video_urls: readyRefs.filter((f) => f.kind === "video").map((f) => f.url),
+          audio_urls: readyRefs.filter((f) => f.kind === "audio").map((f) => f.url),
+        };
+        const durations = getCurrentDurations(selectedModel);
+        if (durations.length > 0) params.duration = selectedDuration;
+        const resolutions = getCurrentResolutions(selectedModel);
+        if (resolutions.length > 0) params.resolution = selectedResolution;
+
+        const isI2V = i2vModels.some((m) => m.id === selectedModel);
+        const res = isI2V
+          ? await generateI2V(apiKey, params)
+          : await generateVideo(apiKey, params);
+        if (!res?.url) throw new Error("No video URL returned by API");
+
+        const genId = res.id || Date.now().toString();
+        setLastGenerationId(genId);
+        setLastGenerationModel(selectedModel);
+        const entry = {
+          id: genId,
+          url: res.url,
+          prompt: trimmedPrompt,
+          model: selectedModel,
+          aspect_ratio: selectedAr,
+          duration: selectedDuration,
+          timestamp: new Date().toISOString(),
+        };
+        addToLocalHistory(entry);
+        showVideoInCanvas(res.url, selectedModel);
+        if (onGenerationComplete)
+          onGenerationComplete({ url: res.url, model: selectedModel, prompt: trimmedPrompt, type: "video" });
+      } catch (e) {
+        console.error("[VideoStudio]", e);
+        setGenerateError(e.message?.slice(0, 80) || "Ошибка генерации");
+        setTimeout(() => setGenerateError(null), 4000);
+      } finally {
+        setGenerating(false);
+      }
+      return;
+    }
 
     if (v2vMode) {
       if (!uploadedVideoUrl) {
@@ -1098,8 +1229,12 @@ export default function VideoStudio({
     showEffect,
     uploadedImageUrl,
     uploadedVideoUrl,
+    uploadedAudioUrl,
+    refFiles,
     lastGenerationId,
     getCurrentModel,
+    getCurrentDurations,
+    getCurrentResolutions,
     addToLocalHistory,
     showVideoInCanvas,
     onGenerationComplete,
@@ -1146,8 +1281,12 @@ export default function VideoStudio({
     canvasModel === "seedance-v2.0-t2v" || canvasModel === "seedance-v2.0-i2v";
   const currentModelObj = getCurrentModel();
   const isExtendMode = currentModelObj?.requiresRequestId;
+  // Seedance 2.0 (Ark) supports multimodal references — show the dedicated uploader.
+  const isSeedanceArk = currentModelObj?.provider === "ark";
 
-  const promptPlaceholder = v2vMode
+  const promptPlaceholder = isSeedanceArk
+    ? "Используйте @, чтобы ссылаться на загруженные файлы. Напр.: возьми движение из @видео1, создай видео с персонажами из @фото2 и @фото3."
+    : v2vMode
     ? currentModelObj?.imageField
       ? currentModelObj?.promptRequired
         ? "Опишите движение"
@@ -1320,7 +1459,78 @@ export default function VideoStudio({
       {/* ── BOTTOM PROMPT BAR ── */}
       <div className="absolute bottom-4 w-full max-w-[95%] lg:max-w-4xl z-40 animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
         <div className="w-full bg-[#0a0a0a]/80 backdrop-blur-3xl rounded-md border border-white/10 p-4 flex flex-col gap-2 shadow-2xl">
+          {/* Seedance 2.0 reference chips — click to insert @reference into prompt */}
+          {isSeedanceArk && refFiles.length > 0 && (
+            <div className="flex flex-wrap gap-2 px-1 pb-1">
+              {(() => {
+                const counters = { image: 0, video: 0, audio: 0 };
+                return refFiles.map((f) => {
+                  counters[f.kind] += 1;
+                  const label = refLabel(f.kind, counters[f.kind]);
+                  return (
+                    <div
+                      key={f.id}
+                      className={`group relative flex items-center gap-1.5 h-8 pl-1.5 pr-2 rounded-lg border text-[11px] font-medium transition-all ${f.uploading ? "border-white/10 bg-white/5 text-white/40" : "border-primary/30 bg-primary/5 text-white/80 hover:border-primary/60 cursor-pointer"}`}
+                      title={f.uploading ? `${f.name} — загрузка ${f.progress}%` : `${f.name} — вставить ${label} в запрос`}
+                      onClick={() => !f.uploading && insertRefToken(label)}
+                    >
+                      {f.kind === "image" && f.url ? (
+                        <img src={f.url} alt="" className="w-5 h-5 rounded object-cover" />
+                      ) : (
+                        <span className="w-5 h-5 rounded bg-white/10 flex items-center justify-center text-[9px]">
+                          {f.kind === "video" ? "🎬" : f.kind === "audio" ? "🎵" : "🖼"}
+                        </span>
+                      )}
+                      <span className="whitespace-nowrap">{f.uploading ? `${f.progress}%` : label}</span>
+                      {!f.uploading && (
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); removeRefFile(f.id); }}
+                          className="ml-0.5 text-white/40 hover:text-red-400 transition-colors"
+                          title="Удалить"
+                        >
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+                  );
+                });
+              })()}
+            </div>
+          )}
           <div className="flex items-center gap-2 px-1">
+            {/* Seedance 2.0 multimodal reference uploader — image/video/audio, multiple */}
+            {isSeedanceArk && (
+              <div className="relative">
+                <input
+                  ref={refFileInputRef}
+                  type="file"
+                  accept="image/*,video/*,audio/*"
+                  multiple
+                  className="hidden"
+                  onChange={handleRefFilesChange}
+                />
+                <button
+                  type="button"
+                  title="Загрузить изображения / видео / аудио (можно несколько)"
+                  onClick={() => refFileInputRef.current?.click()}
+                  className="h-10 px-3 shrink-0 rounded-full border bg-white/[0.03] border-white/[0.06] hover:bg-white/10 hover:border-primary/40 transition-all flex items-center gap-2 group"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-white/50 group-hover:text-primary transition-colors">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                  <span className="text-[11px] font-medium text-white/50 group-hover:text-primary transition-colors whitespace-nowrap">
+                    Изображения/видео/аудио
+                  </span>
+                </button>
+              </div>
+            )}
+
+            {!isSeedanceArk && (<>
             {/* Image upload button */}
             <div className="relative">
               <input
@@ -1585,6 +1795,7 @@ export default function VideoStudio({
               </button>
             </div>
             )}
+            </>)}
 
             {/* Prompt textarea */}
             <div className="flex-1 flex flex-col gap-1">
