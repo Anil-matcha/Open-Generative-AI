@@ -483,12 +483,62 @@ export async function generateI2I(apiKey, params) {
     return generateImage(apiKey, params);
 }
 
+// ── Seedance 2.0 direct via Volcano Ark (round-robin endpoints) ───────────────
+
+// Submit + poll a Seedance 2.0 task through our /api/ark/seedance route.
+async function generateSeedanceArk(modelInfo, params) {
+    const fast = /fast/.test(modelInfo?.apiId || '');
+    const body = {
+        fast,
+        prompt: params.prompt || '',
+        image_url: params.image_url || undefined,
+        video_url: params.video_url || undefined,
+        audio_url: params.audio_url || undefined,
+        resolution: params.resolution || undefined,
+        ratio: params.aspect_ratio || undefined,
+        duration: params.duration || undefined,
+    };
+
+    const submit = await fetch('/api/ark/seedance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+    });
+    const submitData = await submit.json().catch(() => ({}));
+    if (!submit.ok) {
+        throw new Error(`Ark: ${submitData.error || submit.status}`);
+    }
+    const taskId = submitData.taskId;
+    if (!taskId) throw new Error('Ark: задача не создана (нет taskId).');
+
+    // Poll from the browser so we never hit the serverless timeout.
+    for (let attempt = 0; attempt < 300; attempt++) {
+        await new Promise((r) => setTimeout(r, 3000));
+        const poll = await fetch(`/api/ark/seedance?taskId=${encodeURIComponent(taskId)}`);
+        const data = await poll.json().catch(() => ({}));
+        if (!poll.ok) continue;
+        const status = (data.status || '').toLowerCase();
+        if (status === 'succeeded' || status === 'success') {
+            if (!data.url) throw new Error('Ark: видео готово, но URL не получен.');
+            return { url: data.url, id: taskId };
+        }
+        if (status === 'failed' || status === 'error' || status === 'expired') {
+            throw new Error(`Ark: генерация не удалась (${data.error || status}).`);
+        }
+    }
+    throw new Error('Ark: превышено время ожидания генерации.');
+}
+
 // ── Video generation (routes by platform) ─────────────────────────────────────
 
 export async function generateVideo(apiKey, params) {
     const modelInfo = getVideoModelById(params.model);
     const modelId = modelInfo?.apiId || params.model;
     const platform = modelInfo?.platform || 'unified';
+
+    if (modelInfo?.provider === 'ark') {
+        return generateSeedanceArk(modelInfo, params);
+    }
 
     if (platform === 'kling') {
         const payload = {
@@ -535,6 +585,10 @@ export async function generateI2V(apiKey, params) {
     const modelId = modelInfo?.apiId || params.model;
     const platform = modelInfo?.platform || 'unified';
     const imageField = modelInfo?.imageField || 'image_url';
+
+    if (modelInfo?.provider === 'ark') {
+        return generateSeedanceArk(modelInfo, params);
+    }
 
     if (platform === 'kling') {
         const payload = {
