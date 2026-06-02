@@ -748,6 +748,7 @@ export default function ImageStudio({
   onFilesHandled,
 }) {
   const PERSIST_KEY = "mf_image_studio_persistent";
+  const PENDING_KEY = "mf_image_studio_pending";
 
   // ── Model / mode state ──────────────────────────────────────────────────
   const [imageMode, setImageMode] = useState(false); // false=t2i, true=i2i
@@ -1043,7 +1044,88 @@ export default function ImageStudio({
   };
 
   // ── Generation ───────────────────────────────────────────────────────────
-  const handleGenerate = async () => {
+  // Core generation runner. Takes an explicit params snapshot so it can run
+  // both from a user click and from an auto-resume on page reload.
+  const runGeneration = useCallback(
+    async (snap) => {
+      setGenerating(true);
+      setGenerateError(null);
+
+      const promptTrim = (snap.prompt || "").trim();
+      const batch = snap.batchSize || 1;
+
+      try {
+        const results = await Promise.all(
+          Array.from({ length: batch }).map(async () => {
+            if (snap.imageMode) {
+              const genParams = {
+                model: snap.selectedModelId,
+                images_list: snap.uploadedImageUrls,
+                image_url: snap.uploadedImageUrls?.[0],
+                aspect_ratio: snap.selectedAr,
+              };
+              if (promptTrim) genParams.prompt = promptTrim;
+              if (snap.qualityField && snap.selectedQuality) {
+                genParams[snap.qualityField] = snap.selectedQuality;
+              }
+              if (snap.effect) genParams.name = snap.effect;
+              return await generateI2I(apiKey, genParams);
+            } else {
+              const genParams = {
+                model: snap.selectedModelId,
+                prompt: promptTrim,
+                aspect_ratio: snap.selectedAr,
+              };
+              if (snap.qualityField && snap.selectedQuality) {
+                genParams[snap.qualityField] = snap.selectedQuality;
+              }
+              return await generateImage(apiKey, genParams);
+            }
+          })
+        );
+
+        let added = 0;
+        results.forEach((res) => {
+          if (res && res.url) {
+            added++;
+            const entry = {
+              id: res.id || Math.random().toString(36).substring(7),
+              url: res.url,
+              prompt: promptTrim,
+              model: snap.selectedModelId,
+              aspect_ratio: snap.selectedAr,
+              timestamp: new Date().toISOString(),
+            };
+            addToHistory(entry);
+            onGenerationComplete?.({
+              url: res.url,
+              model: snap.selectedModelId,
+              prompt: promptTrim,
+              type: "image",
+            });
+          }
+        });
+
+        // If the request "succeeded" but produced no usable image, surface it
+        // instead of silently showing nothing.
+        if (added === 0) {
+          throw new Error("Изображение не получено. Попробуйте другую модель.");
+        }
+      } catch (e) {
+        console.error("[ImageStudio] Generation failed:", e);
+        setGenerateError(e.message.slice(0, 120));
+        setTimeout(() => setGenerateError(null), 6000);
+      } finally {
+        setGenerating(false);
+        // Clear the pending marker only once the run actually finishes, so a
+        // tab closed mid-generation will resume on next load.
+        try { localStorage.removeItem(PENDING_KEY); } catch {}
+      }
+    },
+    [apiKey, addToHistory, onGenerationComplete],
+  );
+
+  const handleGenerate = () => {
     if (generating) return;
 
     if (imageMode) {
@@ -1058,74 +1140,47 @@ export default function ImageStudio({
       }
     }
 
-    setGenerating(true);
-    setGenerateError(null);
+    const snap = {
+      imageMode,
+      selectedModelId,
+      uploadedImageUrls,
+      prompt,
+      qualityField: currentQualityField,
+      selectedQuality,
+      effect: showEffectBtn ? selectedEffect : "",
+      selectedAr,
+      batchSize,
+      ts: Date.now(),
+    };
 
-    try {
-      const results = await Promise.all(
-        Array.from({ length: batchSize }).map(async () => {
-          if (imageMode) {
-            const genParams = {
-              model: selectedModelId,
-              images_list: uploadedImageUrls,
-              image_url: uploadedImageUrls[0],
-              aspect_ratio: selectedAr,
-            };
-            if (prompt.trim()) genParams.prompt = prompt.trim();
-            if (currentQualityField && selectedQuality) {
-              genParams[currentQualityField] = selectedQuality;
-            }
-            if (showEffectBtn && selectedEffect) genParams.name = selectedEffect;
-            return await generateI2I(apiKey, genParams);
-          } else {
-            const genParams = {
-              model: selectedModelId,
-              prompt: prompt.trim(),
-              aspect_ratio: selectedAr,
-            };
-            if (currentQualityField && selectedQuality) {
-              genParams[currentQualityField] = selectedQuality;
-            }
-            return await generateImage(apiKey, genParams);
-          }
-        })
-      );
+    // Persist the in-flight request so it survives a tab close / reload.
+    try { localStorage.setItem(PENDING_KEY, JSON.stringify(snap)); } catch {}
 
-      let added = 0;
-      results.forEach((res) => {
-        if (res && res.url) {
-          added++;
-          const entry = {
-            id: res.id || Math.random().toString(36).substring(7),
-            url: res.url,
-            prompt: prompt.trim(),
-            model: selectedModelId,
-            aspect_ratio: selectedAr,
-            timestamp: new Date().toISOString(),
-          };
-          addToHistory(entry);
-          onGenerationComplete?.({
-            url: res.url,
-            model: selectedModelId,
-            prompt: prompt.trim(),
-            type: "image",
-          });
-        }
-      });
-
-      // If the request "succeeded" but produced no usable image, surface it
-      // instead of silently showing nothing.
-      if (added === 0) {
-        throw new Error("Изображение не получено. Попробуйте другую модель.");
-      }
-    } catch (e) {
-      console.error("[ImageStudio] Generation failed:", e);
-      setGenerateError(e.message.slice(0, 120));
-      setTimeout(() => setGenerateError(null), 6000);
-    } finally {
-      setGenerating(false);
-    }
+    runGeneration(snap);
   };
+
+  // ── Resume a generation that was interrupted by a tab close / reload ───────
+  useEffect(() => {
+    if (!apiKey) return;
+    let snap;
+    try {
+      const raw = localStorage.getItem(PENDING_KEY);
+      if (!raw) return;
+      snap = JSON.parse(raw);
+    } catch {
+      try { localStorage.removeItem(PENDING_KEY); } catch {}
+      return;
+    }
+    // Only resume fresh requests (< 10 min) to avoid re-running stale ones.
+    if (!snap?.ts || Date.now() - snap.ts > 10 * 60 * 1000) {
+      try { localStorage.removeItem(PENDING_KEY); } catch {}
+      return;
+    }
+    // Restore the prompt in the UI and re-run the generation.
+    if (snap.prompt) setPrompt(snap.prompt);
+    runGeneration(snap);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [apiKey]);
 
   const placeholderText =
     uploadedImageUrls.length > 1
