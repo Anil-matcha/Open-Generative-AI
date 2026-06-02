@@ -785,6 +785,10 @@ export default function ImageStudio({
   const [selectedModeration, setSelectedModeration] = useState(null);
   // Routing strategy suffix (default/nitro/floor/stable) — applies to all models.
   const [selectedRouting, setSelectedRouting] = useState("default");
+  // Gemini output resolution (imageConfig.imageSize: 1K/2K/4K/512).
+  const [selectedImageSize, setSelectedImageSize] = useState(
+    () => getImageInputDefault(t2iModels[0].id, "imageSize"),
+  );
 
   // ── Prompt / upload state ───────────────────────────────────────────────
   const [prompt, setPrompt] = useState("");
@@ -965,6 +969,7 @@ export default function ImageStudio({
   const currentFormatOptions = getImageInputOptions(selectedModelId, "format");
   const currentBackgroundOptions = getImageInputOptions(selectedModelId, "background");
   const currentModerationOptions = getImageInputOptions(selectedModelId, "moderation");
+  const currentImageSizeOptions = getImageInputOptions(selectedModelId, "imageSize");
 
   // ── Textarea auto-resize ─────────────────────────────────────────────────
   const handleTextareaInput = () => {
@@ -995,6 +1000,7 @@ export default function ImageStudio({
         setSelectedFormat(getImageInputDefault(firstI2I.id, "format"));
         setSelectedBackground(getImageInputDefault(firstI2I.id, "background"));
         setSelectedModeration(getImageInputDefault(firstI2I.id, "moderation"));
+        setSelectedImageSize(getImageInputDefault(firstI2I.id, "imageSize"));
         setSelectedEffect(effects.length > 0 ? (getDefaultEffectForI2IModel(firstI2I.id) || effects[0]) : "");
         setMaxImages(getMaxImagesForI2IModel(firstI2I.id));
       }
@@ -1016,6 +1022,7 @@ export default function ImageStudio({
     setSelectedFormat(getImageInputDefault(firstT2I.id, "format"));
     setSelectedBackground(getImageInputDefault(firstT2I.id, "background"));
     setSelectedModeration(getImageInputDefault(firstT2I.id, "moderation"));
+    setSelectedImageSize(getImageInputDefault(firstT2I.id, "imageSize"));
     setSelectedEffect("");
     setMaxImages(1);
   }, []);
@@ -1036,6 +1043,7 @@ export default function ImageStudio({
     setSelectedFormat(getImageInputDefault(m.id, "format"));
     setSelectedBackground(getImageInputDefault(m.id, "background"));
     setSelectedModeration(getImageInputDefault(m.id, "moderation"));
+    setSelectedImageSize(getImageInputDefault(m.id, "imageSize"));
     if (imageMode) {
       setMaxImages(getMaxImagesForI2IModel(m.id));
       const effects = getEffectsForI2IModel(m.id);
@@ -1101,6 +1109,7 @@ export default function ImageStudio({
     setSelectedFormat(getImageInputDefault(firstT2I.id, "format"));
     setSelectedBackground(getImageInputDefault(firstT2I.id, "background"));
     setSelectedModeration(getImageInputDefault(firstT2I.id, "moderation"));
+    setSelectedImageSize(getImageInputDefault(firstT2I.id, "imageSize"));
     setSelectedEffect("");
     setMaxImages(1);
   };
@@ -1134,6 +1143,7 @@ export default function ImageStudio({
               if (snap.selectedFormat) genParams.format = snap.selectedFormat;
               if (snap.selectedBackground) genParams.background = snap.selectedBackground;
               if (snap.selectedModeration) genParams.moderation = snap.selectedModeration;
+              if (snap.selectedImageSize) genParams.imageSize = snap.selectedImageSize;
               if (snap.selectedRouting) genParams.routing = snap.selectedRouting;
               if (snap.effect) genParams.name = snap.effect;
               return await generateI2I(apiKey, genParams);
@@ -1148,6 +1158,7 @@ export default function ImageStudio({
               }
               if (snap.selectedQualityOpt) genParams.quality = snap.selectedQualityOpt;
               if (snap.selectedFormat) genParams.format = snap.selectedFormat;
+              if (snap.selectedImageSize) genParams.imageSize = snap.selectedImageSize;
               if (snap.selectedRouting) genParams.routing = snap.selectedRouting;
               return await generateImage(apiKey, genParams);
             }
@@ -1243,6 +1254,7 @@ export default function ImageStudio({
       selectedFormat: currentFormatOptions.length > 0 ? selectedFormat : null,
       selectedBackground: currentBackgroundOptions.length > 0 ? selectedBackground : null,
       selectedModeration: currentModerationOptions.length > 0 ? selectedModeration : null,
+      selectedImageSize: currentImageSizeOptions.length > 0 ? selectedImageSize : null,
       selectedRouting,
       effect: showEffectBtn ? selectedEffect : "",
       selectedAr,
@@ -1586,6 +1598,42 @@ export default function ImageStudio({
                         selected={selectedQualityOpt}
                         labels={QUALITY_LABELS}
                         onSelect={(val) => setSelectedQualityOpt(val)}
+                        onClose={() => setDropdownOpen(null)}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Output resolution button (Gemini imageSize: 1K/2K/4K/512) */}
+              {currentImageSizeOptions.length > 0 && (
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDropdownOpen((o) => (o === "imageSize" ? null : "imageSize"));
+                    }}
+                    className="flex items-center gap-2 px-3 py-2 bg-white/[0.03] hover:bg-white/[0.06] rounded-md transition-all border border-white/[0.03] group whitespace-nowrap"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="opacity-40 text-white">
+                      <path d="M6 2L3 6v15a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z" />
+                    </svg>
+                    <span className="text-[11px] font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors">
+                      {selectedImageSize || currentImageSizeOptions[0]}
+                    </span>
+                  </button>
+
+                  {dropdownOpen === "imageSize" && (
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      className="absolute bottom-[calc(100%+12px)] left-0 z-50 bg-[#0a0a0a] rounded-md p-3 max-h-[40vh] overflow-y-auto custom-scrollbar shadow-2xl border border-white/[0.05] min-w-[160px]"
+                    >
+                      <SimpleDropdown
+                        title="Разрешение"
+                        options={currentImageSizeOptions}
+                        selected={selectedImageSize}
+                        onSelect={(val) => setSelectedImageSize(val)}
                         onClose={() => setDropdownOpen(null)}
                       />
                     </div>

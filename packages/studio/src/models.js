@@ -17,6 +17,9 @@ export const routingLabels = {
   stable: "Стабильнее",
 };
 
+// Aspect-ratio options shared by the Gemini image model (Nano Banana 2).
+const GEMINI_AR = ["1:1", "16:9", "9:16", "4:3", "3:4", "2:3", "3:2", "4:5", "5:4", "1:4", "4:1", "1:8", "8:1", "21:9"];
+
 // ── Image generation (text → image) via POST /v1/images/generations ──────────
 export const t2iModels = [
   {
@@ -28,6 +31,18 @@ export const t2iModels = [
       size: { enum: ["1024x1024", "1536x1024", "1024x1536", "2048x2048", "2048x1152", "3840x2160", "2160x3840"], default: "1024x1024" },
       quality: { enum: ["auto", "high", "medium", "low"], default: "auto" },
       format: { enum: ["jpeg", "png", "webp"], default: "jpeg" },
+    },
+  },
+  {
+    // Gemini Native API: POST /v1beta/models/gemini-3.1-flash-image-preview:generateContent
+    // Routed in muapi via the /gemini.*image/ test → generateGeminiImage().
+    id: "gemini-3.1-flash-image-preview",
+    name: "Nano Banana 2",
+    apiId: "gemini-3.1-flash-image-preview",
+    inputs: {
+      prompt: { type: "string" },
+      aspect_ratio: { enum: GEMINI_AR, default: "1:1" },
+      imageSize: { enum: ["1K", "2K", "4K", "512"], default: "1K" },
     },
   },
 ];
@@ -47,6 +62,18 @@ export const i2iModels = [
       format: { enum: ["jpeg", "png", "webp"], default: "jpeg" },
       background: { enum: ["auto", "transparent", "opaque"], default: "auto" },
       moderation: { enum: ["auto", "low"], default: "auto" },
+    },
+  },
+  {
+    // Gemini editing uses the same generateContent endpoint with inline reference
+    // images (no editEndpoint flag → routed through generateImage → generateGeminiImage).
+    id: "gemini-3.1-flash-image-preview-edit",
+    name: "Nano Banana 2",
+    apiId: "gemini-3.1-flash-image-preview",
+    inputs: {
+      prompt: { type: "string" },
+      aspect_ratio: { enum: GEMINI_AR, default: "1:1" },
+      imageSize: { enum: ["1K", "2K", "4K", "512"], default: "1K" },
     },
   },
 ];
@@ -558,7 +585,7 @@ export const audioModels = [
 ];
 
 // ── Getter helpers ────────────────────────────────────────────────────────────
-export const getModelById        = (id) => t2iModels.find(m => m.id === id);
+export const getModelById        = (id) => t2iModels.find(m => m.id === id) || i2iModels.find(m => m.id === id);
 export const getI2IModelById     = (id) => i2iModels.find(m => m.id === id);
 export const getVideoModelById   = (id) => [...t2vModels, ...i2vModels].find(m => m.id === id);
 export const getI2VModelById     = (id) => i2vModels.find(m => m.id === id);
