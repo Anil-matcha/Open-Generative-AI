@@ -1091,8 +1091,10 @@ export default function ImageStudio({
         })
       );
 
+      let added = 0;
       results.forEach((res) => {
         if (res && res.url) {
+          added++;
           const entry = {
             id: res.id || Math.random().toString(36).substring(7),
             url: res.url,
@@ -1110,10 +1112,16 @@ export default function ImageStudio({
           });
         }
       });
+
+      // If the request "succeeded" but produced no usable image, surface it
+      // instead of silently showing nothing.
+      if (added === 0) {
+        throw new Error("Изображение не получено. Попробуйте другую модель.");
+      }
     } catch (e) {
       console.error("[ImageStudio] Generation failed:", e);
-      setGenerateError(e.message.slice(0, 80));
-      setTimeout(() => setGenerateError(null), 4000);
+      setGenerateError(e.message.slice(0, 120));
+      setTimeout(() => setGenerateError(null), 6000);
     } finally {
       setGenerating(false);
     }

@@ -311,9 +311,49 @@ export async function generateImage(apiKey, params) {
         throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 200)}`);
     }
     const data = await response.json();
-    const item = data.data?.[0];
-    const url = item?.url || (item?.b64_json ? `data:image/png;base64,${item.b64_json}` : null);
+    const url = extractImageUrl(data);
+    if (!url) {
+        console.error('[generateImage] No image URL in response:', JSON.stringify(data).slice(0, 500));
+        throw new Error('Сервер не вернул изображение (нет URL в ответе).');
+    }
     return { ...data, url };
+}
+
+// Robustly pull an image URL (or base64 data URI) out of various provider response shapes.
+function extractImageUrl(data) {
+    if (!data || typeof data !== 'object') return null;
+
+    // Common containers that may hold the image item(s).
+    const item =
+        data.data?.[0] ||
+        data.images?.[0] ||
+        data.output?.[0] ||
+        data.output ||
+        data.result?.[0] ||
+        data.result ||
+        data;
+
+    const fromItem = (it) => {
+        if (!it) return null;
+        if (typeof it === 'string') return it; // some APIs return a bare URL string
+        return (
+            it.url ||
+            it.image_url ||
+            it.image ||
+            it.imageUrl ||
+            (it.b64_json ? `data:image/png;base64,${it.b64_json}` : null) ||
+            (it.base64 ? `data:image/png;base64,${it.base64}` : null) ||
+            null
+        );
+    };
+
+    return (
+        fromItem(item) ||
+        data.url ||
+        data.image_url ||
+        (Array.isArray(data.urls) ? data.urls[0] : null) ||
+        null
+    );
 }
 
 function aspectRatioToSize(ratio) {
