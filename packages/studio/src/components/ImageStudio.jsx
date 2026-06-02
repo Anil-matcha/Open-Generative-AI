@@ -768,13 +768,25 @@ export default function ImageStudio({
 
   // ── UI state ────────────────────────────────────────────────────────────
   const [dropdownOpen, setDropdownOpen] = useState(null); // 'model' | 'ar' | 'quality' | null
-  const [generating, setGenerating] = useState(false);
+  const [generating, setGenerating] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return sessionStorage.getItem('imageStudioGenerating') === 'true';
+    }
+    return false;
+  });
   const [generateError, setGenerateError] = useState(null);
   const [fullscreenUrl, setFullscreenUrl] = useState(null);
 
   // Notify parent when generation state changes (so it persists across tabs)
   useEffect(() => {
     onGeneratingChange?.(generating);
+    if (typeof window !== 'undefined') {
+      if (generating) {
+        sessionStorage.setItem('imageStudioGenerating', 'true');
+      } else {
+        sessionStorage.removeItem('imageStudioGenerating');
+      }
+    }
   }, [generating, onGeneratingChange]);
 
   // ── Canvas / history state ──────────────────────────────────────────────

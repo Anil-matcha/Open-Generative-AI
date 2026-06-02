@@ -71,8 +71,23 @@ export default function StandaloneShell() {
   const [isDragging, setIsDragging] = useState(false);
   const [droppedFiles, setDroppedFiles] = useState(null);
 
-  // Generation State (persists across tab switches)
-  const [isGenerating, setIsGenerating] = useState(false);
+  // Generation State (persists across tab switches via sessionStorage)
+  const [isGenerating, setIsGenerating] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return sessionStorage.getItem('imageStudioGenerating') === 'true';
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (isGenerating) {
+        sessionStorage.setItem('imageStudioGenerating', 'true');
+      } else {
+        sessionStorage.removeItem('imageStudioGenerating');
+      }
+    }
+  }, [isGenerating]);
 
   // Sync tab with URL if user navigates manually or via browser back/forward
   useEffect(() => {
