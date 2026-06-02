@@ -589,7 +589,7 @@ export default function CinemaStudio({
 
     try {
       const res = await generateImage(apiKey, {
-        model: uploadedImage ? "nano-banana-pro-edit" : "nano-banana-pro",
+        model: "nano-banana-pro",
         prompt: finalPrompt,
         aspect_ratio: settings.aspect_ratio,
         resolution: resolution.toLowerCase(),

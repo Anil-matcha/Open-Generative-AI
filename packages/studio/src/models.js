@@ -32,8 +32,8 @@ export const t2iModels = [
   { id: "flux-kontext-max", name: "FLUX Kontext Max", apiId: "flux-kontext-max", inputs: { prompt: { type: "string" }, aspect_ratio: { enum: ["1:1", "16:9", "9:16", "4:3", "3:4", "3:2", "2:3"], default: "1:1" }, size: { enum: ["1K", "2K", "4K"], default: "1K" } } },
 
   // Other models (use aspect_ratio + resolution)
-  { id: "nano-banana", name: "Nano Banana", apiId: "nano-banana", inputs: { prompt: { type: "string" }, aspect_ratio: { enum: ["1:1", "16:9", "9:16", "4:3", "3:4"], default: "1:1" }, size: { enum: ["1K", "2K"], default: "1K" } } },
-  { id: "nano-banana-pro", name: "Nano Banana Pro", apiId: "nano-banana-pro", inputs: { prompt: { type: "string" }, aspect_ratio: { enum: ["1:1", "16:9", "9:16", "4:3", "3:4"], default: "1:1" }, size: { enum: ["1K", "2K", "4K"], default: "1K" } } },
+  { id: "nano-banana", name: "Nano Banana 2", apiId: "gemini-3.1-flash-image-preview", inputs: { prompt: { type: "string" }, aspect_ratio: { enum: ["1:1", "16:9", "9:16", "4:3", "3:4"], default: "1:1" }, size: { enum: ["1K", "2K"], default: "1K" } } },
+  { id: "nano-banana-pro", name: "Nano Banana Pro", apiId: "gemini-3-pro-image-preview", inputs: { prompt: { type: "string" }, aspect_ratio: { enum: ["1:1", "16:9", "9:16", "4:3", "3:4"], default: "1:1" }, size: { enum: ["1K", "2K", "4K"], default: "1K" } } },
   { id: "bytedance-seedream-v4", name: "Bytedance Seedream v4", apiId: "bytedance-seedream-v4", inputs: { prompt: { type: "string" }, aspect_ratio: { enum: ["1:1", "16:9", "9:16", "4:3", "3:4"], default: "1:1" }, size: { enum: ["1K", "2K"], default: "1K" } } },
   { id: "bytedance-seedream-v4.5", name: "Seedream v4.5", apiId: "bytedance-seedream-v4.5", inputs: { prompt: { type: "string" }, aspect_ratio: { enum: ["1:1", "16:9", "9:16", "4:3", "3:4"], default: "1:1" }, size: { enum: ["1K", "2K", "4K"], default: "1K" } } },
   { id: "wan2.5-text-to-image", name: "Wan 2.5 Text to Image", apiId: "wan2.5-text-to-image", inputs: { prompt: { type: "string" }, aspect_ratio: { enum: ["1:1", "16:9", "9:16", "4:3", "3:4"], default: "1:1" }, size: { enum: ["1K", "2K"], default: "1K" } } },
