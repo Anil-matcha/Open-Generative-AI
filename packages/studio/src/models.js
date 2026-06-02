@@ -590,29 +590,48 @@ export const getEffectsForI2IModel      = (id) => [];
 export const getDefaultEffectForI2IModel = (id) => null;
 
 // ── VideoStudio helpers ───────────────────────────────────────────────────────
+// Generic capabilities for video models. The unified /v1/video/create endpoint
+// forwards `resolution` and `duration`; the sora endpoint forwards `duration`.
+// Veo (fixed length / resolution baked into the model id), Luma and Runway are
+// excluded from the generic controls.
+const VIDEO_RESOLUTIONS = ["1080p", "720p", "480p"];
+const VIDEO_DURATIONS = [5, 10];
+
+const isVeoModel = (m) => (m?.apiId || "").startsWith("veo");
+
+const genericResolutions = (m) => {
+  if (!m) return [];
+  if (m.inputs?.resolution?.enum) return m.inputs.resolution.enum;
+  if (m.platform === "unified" && !isVeoModel(m)) return VIDEO_RESOLUTIONS;
+  return [];
+};
+const genericDurations = (m) => {
+  if (!m) return [];
+  if (m.inputs?.duration?.enum) return m.inputs.duration.enum;
+  if ((m.platform === "unified" && !isVeoModel(m)) || m.platform === "sora") return VIDEO_DURATIONS;
+  return [];
+};
+
 export const getAspectRatiosForVideoModel = (id) => {
   const m = t2vModels.find(x => x.id === id);
   return m?.inputs?.aspect_ratio?.enum || ["16:9", "9:16", "1:1"];
 };
 export const getDurationsForModel = (id) => {
   const m = [...t2vModels, ...i2vModels].find(x => x.id === id);
-  return m?.inputs?.duration?.enum || [];
+  return genericDurations(m);
 };
 export const getResolutionsForVideoModel = (id) => {
-  const m = t2vModels.find(x => x.id === id);
-  return m?.inputs?.resolution?.enum || [];
+  return genericResolutions(t2vModels.find(x => x.id === id));
 };
 export const getAspectRatiosForI2VModel = (id) => {
   const m = i2vModels.find(x => x.id === id);
   return m?.inputs?.aspect_ratio?.enum || ["16:9", "9:16", "1:1"];
 };
 export const getDurationsForI2VModel = (id) => {
-  const m = i2vModels.find(x => x.id === id);
-  return m?.inputs?.duration?.enum || [];
+  return genericDurations(i2vModels.find(x => x.id === id));
 };
 export const getResolutionsForI2VModel = (id) => {
-  const m = i2vModels.find(x => x.id === id);
-  return m?.inputs?.resolution?.enum || [];
+  return genericResolutions(i2vModels.find(x => x.id === id));
 };
 export const getEffectsForI2VModel       = (id) => [];
 export const getDefaultEffectForI2VModel = (id) => null;
