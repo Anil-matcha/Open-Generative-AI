@@ -52,6 +52,11 @@ function filterWorkflowImageModels(schemas) {
   if (!models || typeof models !== "object") return schemas;
   const kept = {};
   for (const [id, model] of Object.entries(models)) {
+    // Keep passthrough/input models (e.g. image-passthrough = "Input Image").
+    if (id.includes("passthrough")) {
+      kept[id] = model;
+      continue;
+    }
     if (!ALLOWED_WORKFLOW_IMAGE_MODELS.has(id)) continue;
     const props = WORKFLOW_IMAGE_SCHEMA_PROPS[id];
     kept[id] = props
