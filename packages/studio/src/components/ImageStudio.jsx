@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useLayoutEffect, useRef, useCallback } from "react";
 import { generateImage, generateI2I, uploadFile } from "../muapi.js";
 import {
   t2iModels,
@@ -780,7 +780,8 @@ export default function ImageStudio({
   const [fullscreenUrl, setFullscreenUrl] = useState(null);
 
   // Notify parent when generation state changes (so it persists across tabs)
-  useEffect(() => {
+  // Use useLayoutEffect to ensure sessionStorage is updated before unmount
+  useLayoutEffect(() => {
     console.log('[ImageStudio] generation state changed:', generating);
     onGeneratingChange?.(generating);
     if (typeof window !== 'undefined') {

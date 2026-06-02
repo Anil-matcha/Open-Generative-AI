@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useLayoutEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { ImageStudio, VideoStudio, ClippingStudio, VibeMotionStudio, LipSyncStudio, CinemaStudio, AudioStudio, MarketingStudio, WorkflowStudio, AgentStudio, AppsStudio, getUserBalance } from 'studio';
@@ -81,7 +81,7 @@ export default function StandaloneShell() {
     return false;
   });
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     console.log('[StandaloneShell] isGenerating changed:', isGenerating);
     if (typeof window !== 'undefined') {
       if (isGenerating) {
