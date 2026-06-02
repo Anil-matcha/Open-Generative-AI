@@ -1172,7 +1172,31 @@ export default function VideoStudio({
     >
       {/* ── CENTRAL GALLERY AREA ── */}
       <div className="flex-1 w-full max-w-7xl mx-auto overflow-y-auto custom-scrollbar pb-40 lg:pb-32 px-2">
-        {history.length > 0 ? (
+        {generating ? (
+          <div className="flex flex-col items-center justify-center h-full animate-fade-in-up min-h-[50vh]">
+            <div className="mb-10 relative">
+              <div className="absolute inset-0 bg-primary/20 blur-[100px] rounded-full opacity-50 animate-pulse" />
+              <div className="relative w-24 h-24 md:w-28 md:h-28 bg-white/[0.02] rounded-[2rem] flex items-center justify-center border border-primary/20 overflow-hidden backdrop-blur-sm">
+                <svg
+                  className="animate-spin text-primary"
+                  width="40"
+                  height="40"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2.5" className="opacity-20" />
+                  <path d="M22 12a10 10 0 0 1-10 10" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+                </svg>
+              </div>
+            </div>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight mb-3 text-center px-4">
+              Генерация видео…
+            </h1>
+            <p className="text-white/40 text-sm md:text-base font-medium tracking-wide text-center max-w-lg leading-relaxed">
+              Модель создаёт ваше видео. Это может занять до нескольких минут — не закрывайте вкладку.
+            </p>
+          </div>
+        ) : history.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full pt-4 animate-fade-in-up">
             {history.map((entry, idx) => {
               const isSeedance2 = entry.model === "seedance-v2.0-t2v" || entry.model === "seedance-v2.0-i2v";
