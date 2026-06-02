@@ -479,7 +479,58 @@ function aspectRatioToSize(ratio) {
     return map[ratio] || '1024x1024';
 }
 
+// Image editing via POST /v1/images/edits (multipart/form-data).
+// Fetches each image URL as a blob and appends it to the form.
+// Used by gpt-image-2 and any model with editEndpoint: true in models.js.
+async function generateImageEdit(apiKey, params) {
+    const form = new FormData();
+    const modelInfo = getModelById(params.model);
+    form.append('model', modelInfo?.apiId || params.model);
+    form.append('prompt', params.prompt || '');
+    form.append('n', '1');
+
+    const size = params.size
+        || (params.resolution?.includes('x') ? params.resolution : null)
+        || (params.aspect_ratio ? aspectRatioToSize(params.aspect_ratio) : '1024x1024');
+    form.append('size', size);
+
+    if (params.quality) form.append('quality', params.quality);
+    form.append('format', 'jpeg');
+    form.append('background', 'auto');
+    form.append('moderation', 'auto');
+
+    const urls = Array.isArray(params.images_list) && params.images_list.length > 0
+        ? params.images_list
+        : params.image_url ? [params.image_url] : [];
+    for (const url of urls) {
+        const r = await fetch(url);
+        if (!r.ok) throw new Error(`Не удалось загрузить изображение: ${url}`);
+        const blob = await r.blob();
+        const ext = blob.type.includes('png') ? 'png' : 'jpeg';
+        form.append('image', blob, `image.${ext}`);
+    }
+
+    const response = await fetch(`${BASE_URL}/v1/images/edits`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${apiKey}` },
+        body: form,
+    });
+    if (!response.ok) {
+        const errText = await response.text();
+        notifyAuthRequired(response.status, errText);
+        throw new Error(`API Request Failed: ${response.status} - ${errText.slice(0, 200)}`);
+    }
+    const data = await response.json();
+    const url = extractImageUrl(data);
+    if (!url) throw new Error('Сервер не вернул изображение (нет URL в ответе).');
+    return { ...data, url };
+}
+
 export async function generateI2I(apiKey, params) {
+    const modelInfo = getModelById(params.model);
+    if (modelInfo?.editEndpoint) {
+        return generateImageEdit(apiKey, params);
+    }
     return generateImage(apiKey, params);
 }
 

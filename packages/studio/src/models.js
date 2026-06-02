@@ -12,7 +12,10 @@ export const t2iModels = [
 ];
 
 // ── Image-to-image ────────────────────────────────────────────────────────────
-export const i2iModels = [];
+export const i2iModels = [
+  // editEndpoint: true → uses POST /v1/images/edits (multipart/form-data) instead of /generations
+  { id: "gpt-image-2-edit", name: "GPT Image 2", apiId: "gpt-image-2", editEndpoint: true, inputs: { prompt: { type: "string" }, quality: { enum: ["auto", "low", "medium", "high"], default: "auto" }, size: { enum: ["1024x1024", "1024x1536", "1536x1024"], default: "1024x1024" } } },
+];
 
 // ── Text-to-video ────────────────────────────────────────────────────────────
 export const t2vModels = [
