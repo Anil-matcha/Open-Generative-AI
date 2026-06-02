@@ -8,6 +8,7 @@
 
 // ── Image generation (text → image) via POST /v1/images/generations ──────────
 export const t2iModels = [
+  { id: "gpt-image-2", name: "GPT Image 2", apiId: "gpt-image-2", inputs: { prompt: { type: "string" }, quality: { enum: ["standard", "hd"], default: "standard" }, size: { enum: ["1024x1024", "1024x1536", "1536x1024"], default: "1024x1024" } } },
 ];
 
 // ── Image-to-image ────────────────────────────────────────────────────────────
