@@ -2,9 +2,10 @@
   "name": "workflow-builder",
   "version": "1.0.0",
   "description": "Shared UI components and utilities for my Next.js apps",
-  "main": "dist/index.js",
-  "module": "dist/index.js",
+  "main": "src/index.js",
+  "module": "src/index.js",
   "files": [
+    "src",
     "dist"
   ],
   "scripts": {

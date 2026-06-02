@@ -186,8 +186,15 @@ const ImageGeneration = ({ id, data, selected }) => {
     return () => clearTimeout(timer);
   }, [data.formValues]);
 
+  const lastSentRef = useRef(null);
   useEffect(() => {
     if (data?.onDataChange && data?.selectedModel?.id !== "image-passthrough") {
+      // Only propagate when the content actually changes. Without this guard an
+      // array field (e.g. images_list) produces a fresh reference on every render,
+      // causing an onDataChange ⇄ formValues feedback loop (React error #185).
+      const snapshot = JSON.stringify({ model: selectedModel?.id, formValues, loading });
+      if (snapshot === lastSentRef.current) return;
+      lastSentRef.current = snapshot;
       data.onDataChange(id, { selectedModel, formValues, loading });
     }
   }, [selectedModel, formValues, loading]);

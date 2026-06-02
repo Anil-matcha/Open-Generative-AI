@@ -530,11 +530,14 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
         }
 
         else if (["textInput3", "imageInput2", "videoInput6"].includes(targetHandle)) {
-          const list = Array.isArray(updatedFormValues.images_list)
-            ? [...updatedFormValues.images_list]
-            : [];
-          if (!list.includes(resultValue) && resultValue && resultValue.trim() !== "") list.push(resultValue);
-          updatedFormValues.images_list = list;
+          const existing = Array.isArray(updatedFormValues.images_list) ? updatedFormValues.images_list : [];
+          // Only assign a new array when the value is actually added — otherwise we
+          // churn the reference every pass and feed an infinite update loop.
+          if (resultValue && resultValue.trim?.() !== "" && !existing.includes(resultValue)) {
+            updatedFormValues.images_list = [...existing, resultValue];
+          } else {
+            updatedFormValues.images_list = existing;
+          }
         }
 
         else if (targetHandle === "apiInput2") {
