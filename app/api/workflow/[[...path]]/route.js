@@ -112,9 +112,6 @@ async function saveToGallery(userId, outputs, model, prompt) {
                 created_at: new Date().toISOString()
             });
         }
-
-        // Keep last 500 entries
-        entries = entries.slice(0, 500);
         const buf = Buffer.from(JSON.stringify(entries));
         await tosUpload(key, buf, 'application/json').catch(() => {});
     } catch { /* best-effort */ }
