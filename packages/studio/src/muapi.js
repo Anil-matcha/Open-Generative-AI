@@ -288,6 +288,13 @@ export async function generateImage(apiKey, params) {
     const modelInfo = getModelById(params.model);
     const modelId = modelInfo?.apiId || params.model;
 
+    // Gemini image models (gemini-*-image-*) are not served by /v1/images/generations.
+    // They are exposed only through the OpenAI-compatible /v1/chat/completions endpoint,
+    // returning the image embedded in the assistant message.
+    if (/gemini.*image/i.test(modelId)) {
+        return generateImageViaChat(apiKey, modelId, params);
+    }
+
     const payload = { model: modelId, prompt: params.prompt, n: 1 };
 
     if (params.size) {
@@ -317,6 +324,82 @@ export async function generateImage(apiKey, params) {
         throw new Error('Сервер не вернул изображение (нет URL в ответе).');
     }
     return { ...data, url };
+}
+
+// Generate an image through the OpenAI-compatible chat endpoint (Gemini image models).
+async function generateImageViaChat(apiKey, modelId, params) {
+    // Build the user content. Include reference images (for editing) when provided.
+    const refs = Array.isArray(params.images_list) ? params.images_list.filter(Boolean) : [];
+    let content;
+    if (refs.length > 0) {
+        content = [
+            { type: 'text', text: params.prompt },
+            ...refs.map((u) => ({ type: 'image_url', image_url: { url: u } })),
+        ];
+    } else {
+        content = params.prompt;
+    }
+
+    const payload = {
+        model: modelId,
+        messages: [{ role: 'user', content }],
+        modalities: ['text', 'image'],
+        stream: false,
+    };
+
+    const response = await fetch(`${BASE_URL}/v1/chat/completions`, {
+        method: 'POST',
+        headers: bearerHeaders(apiKey),
+        body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+        const errText = await response.text();
+        notifyAuthRequired(response.status, errText);
+        throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 200)}`);
+    }
+    const data = await response.json();
+    const url = extractImageFromChat(data);
+    if (!url) {
+        console.error('[generateImageViaChat] No image in chat response:', JSON.stringify(data).slice(0, 800));
+        throw new Error('Сервер не вернул изображение (нет URL в ответе).');
+    }
+    return { ...data, url };
+}
+
+// Pull an image URL / data URI out of an OpenAI-compatible chat completion response.
+function extractImageFromChat(data) {
+    const msg = data?.choices?.[0]?.message;
+    if (!msg) return null;
+
+    // 1) OpenRouter / new-api style: message.images[].image_url.url
+    const imgs = msg.images;
+    if (Array.isArray(imgs) && imgs.length > 0) {
+        const first = imgs[0];
+        const u = typeof first === 'string' ? first : (first?.image_url?.url || first?.url || first?.image_url);
+        if (u) return u;
+    }
+
+    // 2) content as an array of parts, with image_url parts
+    if (Array.isArray(msg.content)) {
+        for (const part of msg.content) {
+            const u = part?.image_url?.url || (part?.type === 'image_url' ? part?.image_url : null);
+            if (typeof u === 'string') return u;
+            if (part?.type === 'output_image' && part?.image) return part.image;
+        }
+    }
+
+    // 3) content as a string: markdown image, data URI, or bare URL
+    if (typeof msg.content === 'string') {
+        const c = msg.content;
+        const md = c.match(/!\[[^\]]*\]\((data:image\/[^)]+|https?:\/\/[^)]+)\)/i);
+        if (md) return md[1];
+        const data64 = c.match(/data:image\/[a-zA-Z0-9.+-]+;base64,[A-Za-z0-9+/=]+/);
+        if (data64) return data64[0];
+        const httpUrl = c.match(/https?:\/\/\S+\.(?:png|jpe?g|webp|gif)(?:\?\S*)?/i);
+        if (httpUrl) return httpUrl[0];
+    }
+
+    return null;
 }
 
 // Robustly pull an image URL (or base64 data URI) out of various provider response shapes.
