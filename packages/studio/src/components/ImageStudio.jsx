@@ -1025,6 +1025,24 @@ export default function ImageStudio({
     [historyItems],
   );
 
+  // Write a completed result straight into the persisted history in localStorage.
+  // This runs even if the React component has been unmounted (e.g. the user
+  // navigated to the workflow builder), so the image is never lost — it shows
+  // up the next time ImageStudio loads its history.
+  const persistEntryToStorage = useCallback((entry) => {
+    try {
+      const raw = localStorage.getItem(PERSIST_KEY);
+      const data = raw ? JSON.parse(raw) : {};
+      const prevHistory = Array.isArray(data.localHistory) ? data.localHistory : [];
+      // Avoid duplicates by id.
+      if (prevHistory.some((e) => e.id === entry.id)) return;
+      data.localHistory = [entry, ...prevHistory].slice(0, 50);
+      localStorage.setItem(PERSIST_KEY, JSON.stringify(data));
+    } catch (err) {
+      console.warn("persistEntryToStorage failed:", err?.message);
+    }
+  }, []);
+
   // ── View state ─────────────────────────────────────
 
   const resetToPrompt = () => {
@@ -1096,6 +1114,9 @@ export default function ImageStudio({
               aspect_ratio: snap.selectedAr,
               timestamp: new Date().toISOString(),
             };
+            // Persist to localStorage FIRST so the result survives even if this
+            // component was unmounted (e.g. user navigated to the workflow builder).
+            persistEntryToStorage(entry);
             addToHistory(entry);
             onGenerationComplete?.({
               url: res.url,
@@ -1122,7 +1143,7 @@ export default function ImageStudio({
         try { localStorage.removeItem(PENDING_KEY); } catch {}
       }
     },
-    [apiKey, addToHistory, onGenerationComplete],
+    [apiKey, addToHistory, onGenerationComplete, persistEntryToStorage],
   );
 
   const handleGenerate = () => {
