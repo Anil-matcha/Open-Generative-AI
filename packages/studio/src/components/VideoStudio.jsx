@@ -286,6 +286,10 @@ export default function VideoStudio({
   const [uploadedVideoUrl, setUploadedVideoUrl] = useState(null);
   const [videoUploading, setVideoUploading] = useState(false);
   const [uploadedVideoName, setUploadedVideoName] = useState(null);
+  const [uploadedAudioUrl, setUploadedAudioUrl] = useState(null);
+  const [audioUploading, setAudioUploading] = useState(false);
+  const [audioProgress, setAudioProgress] = useState(0);
+  const [uploadedAudioName, setUploadedAudioName] = useState(null);
 
   // ── generation / canvas ──
   const [generating, setGenerating] = useState(false);
@@ -315,6 +319,7 @@ export default function VideoStudio({
   const imageFileInputRef = useRef(null);
   const endImageFileInputRef = useRef(null);
   const videoFileInputRef = useRef(null);
+  const audioFileInputRef = useRef(null);
   const resultVideoRef = useRef(null);
   const hasRestored = useRef(false);
 
@@ -570,7 +575,8 @@ export default function VideoStudio({
   };
 
   const processDroppedVideo = async (file) => {
-    if (v2vModels.length === 0) {
+    const multimodal = getCurrentModel()?.acceptsVideo;
+    if (v2vModels.length === 0 && !multimodal) {
       alert("Обработка видео на входе пока не поддерживается.");
       return;
     }
@@ -586,6 +592,11 @@ export default function VideoStudio({
       });
       setUploadedVideoUrl(url);
       setUploadedVideoName(file.name);
+      // Multimodal models keep the current model — video is just an extra input.
+      if (multimodal) {
+        setPromptDisabled(false);
+        return;
+      }
       if (imageMode) {
         setUploadedImageUrl(null);
         setImageMode(false);
@@ -753,7 +764,11 @@ export default function VideoStudio({
       setUploadedVideoUrl(url);
       setUploadedVideoName(file.name);
 
-      if (isMotionControlSelection(selectedModel, v2vMode)) {
+      // Multimodal models (e.g. Seedance 2.0) take video as an extra conditioning
+      // input alongside text/image — keep the current model, don't switch to v2v.
+      if (getCurrentModel()?.acceptsVideo) {
+        setPromptDisabled(false);
+      } else if (isMotionControlSelection(selectedModel, v2vMode)) {
         // Already in motion-control mode — keep model and image, allow prompt
         setPromptDisabled(false);
       } else {
@@ -783,12 +798,47 @@ export default function VideoStudio({
   const clearVideoUpload = () => {
     setUploadedVideoUrl(null);
     setUploadedVideoName(null);
+    // For multimodal models the video is just an optional input — keep the model.
+    if (getCurrentModel()?.acceptsVideo) {
+      setPromptDisabled(false);
+      if (videoFileInputRef.current) videoFileInputRef.current.value = "";
+      return;
+    }
     setV2vMode(false);
     const first = t2vModels[0];
     setSelectedModel(first.id);
     setSelectedModelName(first.name);
     applyControlsForModel(first.id, false, false);
     setPromptDisabled(false);
+  };
+
+  const handleAudioFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 50 * 1024 * 1024) {
+      alert("Аудио превышает лимит 50 МБ.");
+      return;
+    }
+    setAudioUploading(true);
+    setAudioProgress(0);
+    try {
+      const url = await uploadFile(apiKey, file, (pct) => setAudioProgress(pct));
+      setUploadedAudioUrl(url);
+      setUploadedAudioName(file.name);
+    } catch (err) {
+      console.error("[VideoStudio] Audio upload failed:", err);
+      alert(`Audio upload failed: ${err.message}`);
+    } finally {
+      setAudioUploading(false);
+      setAudioProgress(0);
+      if (audioFileInputRef.current) audioFileInputRef.current.value = "";
+    }
+  };
+
+  const clearAudioUpload = () => {
+    setUploadedAudioUrl(null);
+    setUploadedAudioName(null);
+    if (audioFileInputRef.current) audioFileInputRef.current.value = "";
   };
 
   // ── model selection from dropdown ─────────────────────────────────────────
@@ -937,6 +987,9 @@ export default function VideoStudio({
         if (selectedQuality) i2vParams.quality = selectedQuality;
         if (selectedMode) i2vParams.mode = selectedMode;
         if (showEffect && selectedEffect) i2vParams.name = selectedEffect;
+        const i2vModelObj = i2vModels.find((m) => m.id === selectedModel);
+        if (i2vModelObj?.acceptsVideo && uploadedVideoUrl) i2vParams.video_url = uploadedVideoUrl;
+        if (i2vModelObj?.acceptsAudio && uploadedAudioUrl) i2vParams.audio_url = uploadedAudioUrl;
 
         res = await generateI2V(apiKey, i2vParams);
         if (!res?.url) throw new Error("No video URL returned by API");
@@ -984,6 +1037,10 @@ export default function VideoStudio({
         if (resolutions.length > 0) params.resolution = selectedResolution;
         if (selectedQuality) params.quality = selectedQuality;
         if (selectedMode) params.mode = selectedMode;
+        const t2vModelObj = t2vModels.find((m) => m.id === selectedModel);
+        if (t2vModelObj?.acceptsImage && uploadedImageUrl) params.image_url = uploadedImageUrl;
+        if (t2vModelObj?.acceptsVideo && uploadedVideoUrl) params.video_url = uploadedVideoUrl;
+        if (t2vModelObj?.acceptsAudio && uploadedAudioUrl) params.audio_url = uploadedAudioUrl;
 
         res = await generateVideo(apiKey, params);
         if (!res?.url) throw new Error("No video URL returned by API");
@@ -1390,10 +1447,9 @@ export default function VideoStudio({
               </div>
             )}
 
-            {/* Video upload button — only when video-to-video models exist.
-                Without any v2v model, uploading a video crashes on v2vModels[0]
-                and Veo/etc. don't accept video input anyway. */}
-            {v2vModels.length > 0 && (
+            {/* Video upload button — shown for v2v models or multimodal models
+                (e.g. Seedance 2.0) that accept a video as an extra input. */}
+            {(v2vModels.length > 0 || currentModelObj?.acceptsVideo) && (
             <div className="relative">
               <input
                 ref={videoFileInputRef}
@@ -1452,6 +1508,55 @@ export default function VideoStudio({
                   />
                 ) : (
                   <VideoIconSvg className="text-white/40 group-hover:text-primary transition-colors" />
+                )}
+              </button>
+            </div>
+            )}
+
+            {/* Audio upload button — for multimodal models (e.g. Seedance 2.0). */}
+            {currentModelObj?.acceptsAudio && (
+            <div className="relative">
+              <input
+                ref={audioFileInputRef}
+                type="file"
+                accept="audio/*"
+                className="hidden"
+                onChange={handleAudioFileChange}
+              />
+              <button
+                type="button"
+                title={
+                  uploadedAudioUrl
+                    ? `${uploadedAudioName} — нажмите, чтобы очистить`
+                    : "Загрузить аудио (необязательно)"
+                }
+                onClick={() =>
+                  uploadedAudioUrl
+                    ? clearAudioUpload()
+                    : audioFileInputRef.current?.click()
+                }
+                className={`w-10 h-10 shrink-0 rounded-full border transition-all flex items-center justify-center relative overflow-hidden ${uploadedAudioUrl ? "border-primary/60 bg-white/5" : "bg-white/[0.03] border-white/[0.03] hover:bg-white/10 hover:border-primary/40"} group`}
+              >
+                {audioUploading ? (
+                  <div className="flex flex-col items-center justify-center w-full h-full absolute inset-0 bg-black/80 z-20 backdrop-blur-[2px]">
+                    <span className="text-[9px] font-black text-primary leading-none">
+                      {audioProgress}%
+                    </span>
+                  </div>
+                ) : (
+                  <svg
+                    className={`w-5 h-5 ${uploadedAudioUrl ? "text-primary" : "text-white/40 group-hover:text-primary"} transition-colors`}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M9 18V5l12-2v13" />
+                    <circle cx="6" cy="18" r="3" />
+                    <circle cx="18" cy="16" r="3" />
+                  </svg>
                 )}
               </button>
             </div>

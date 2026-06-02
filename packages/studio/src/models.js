@@ -78,6 +78,9 @@ export const t2vModels = [
     name: "Seedance 2.0",
     apiId: "seedance-pro-t2v",
     platform: "unified",
+    acceptsImage: true,
+    acceptsVideo: true,
+    acceptsAudio: true,
     inputs: {
       prompt: { type: "string", title: "Prompt" },
       aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }
@@ -88,6 +91,9 @@ export const t2vModels = [
     name: "Seedance 2.0 Fast",
     apiId: "seedance-pro-t2v-fast",
     platform: "unified",
+    acceptsImage: true,
+    acceptsVideo: true,
+    acceptsAudio: true,
     inputs: {
       prompt: { type: "string", title: "Prompt" },
       aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }
@@ -330,6 +336,8 @@ export const i2vModels = [
     apiId: "seedance-pro-i2v",
     platform: "unified",
     imageField: "image_url",
+    acceptsVideo: true,
+    acceptsAudio: true,
     inputs: {
       prompt: { type: "string", title: "Prompt" },
       aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }
@@ -341,6 +349,8 @@ export const i2vModels = [
     apiId: "seedance-pro-i2v-fast",
     platform: "unified",
     imageField: "image_url",
+    acceptsVideo: true,
+    acceptsAudio: true,
     inputs: {
       prompt: { type: "string", title: "Prompt" },
       aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }

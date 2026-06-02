@@ -517,7 +517,7 @@ export async function generateVideo(apiKey, params) {
         return submitSoraVideo(apiKey, payload, params.onRequestId);
     }
 
-    // unified format (pixverse, veo, grok, wan, happyhorse, minimax, etc.)
+    // unified format (pixverse, veo, grok, wan, happyhorse, minimax, seedance, etc.)
     const payload = { model: modelId };
     if (params.prompt) payload.prompt = params.prompt;
     if (params.aspect_ratio) payload.aspect_ratio = params.aspect_ratio;
@@ -525,6 +525,8 @@ export async function generateVideo(apiKey, params) {
     if (params.resolution) payload.resolution = params.resolution;
     if (params.mode) payload.mode = params.mode;
     if (params.image_url) payload.image_url = params.image_url;
+    if (params.video_url) payload.video_url = params.video_url;
+    if (params.audio_url) payload.audio_url = params.audio_url;
     return submitUnifiedVideo(apiKey, payload, params.onRequestId);
 }
 
@@ -573,6 +575,8 @@ export async function generateI2V(apiKey, params) {
     if (params.aspect_ratio) payload.aspect_ratio = params.aspect_ratio;
     if (params.duration) payload.duration = params.duration;
     if (params.resolution) payload.resolution = params.resolution;
+    if (params.video_url) payload.video_url = params.video_url;
+    if (params.audio_url) payload.audio_url = params.audio_url;
     return submitUnifiedVideo(apiKey, payload, params.onRequestId);
 }
 
