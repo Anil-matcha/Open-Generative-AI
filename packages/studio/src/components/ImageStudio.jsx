@@ -740,6 +740,7 @@ function SimpleDropdown({ title, options, selected, onSelect, onClose }) {
 export default function ImageStudio({
   apiKey,
   onGenerationComplete,
+  onHistoryChange,
   historyItems,
   droppedFiles,
   onFilesHandled,
@@ -995,6 +996,14 @@ export default function ImageStudio({
   };
 
   // ── History helpers ──────────────────────────────────────────────────────
+  const removeFromHistory = useCallback((entryId, entryIdx) => {
+    if (historyItems !== undefined) {
+      onHistoryChange?.(historyItems.filter(e => e.id !== entryId && historyItems.indexOf(e) !== entryIdx));
+    } else {
+      setLocalHistory(prev => prev.filter((_, idx) => idx !== entryIdx));
+    }
+  }, [historyItems, onHistoryChange]);
+
   const addToHistory = useCallback(
     (entry) => {
       if (!historyItems) {
@@ -1157,6 +1166,22 @@ export default function ImageStudio({
                   >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                       <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" />
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    title="Удалить"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeFromHistory(entry.id, idx);
+                    }}
+                    className="p-2 bg-black/60 backdrop-blur-md rounded-full text-white hover:bg-red-500 hover:text-white transition-all border border-white/10"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <polyline points="3 6 5 6 21 6" />
+                      <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                      <line x1="10" y1="11" x2="10" y2="17" />
+                      <line x1="14" y1="11" x2="14" y2="17" />
                     </svg>
                   </button>
                 </div>
