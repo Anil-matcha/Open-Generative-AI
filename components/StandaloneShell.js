@@ -15,7 +15,6 @@ import ApiKeyModal from './ApiKeyModal';
 const TABS = [
   { id: 'image',   label: 'Студия фото' },
   { id: 'video',   label: 'Студия видео' },
-  { id: 'cinema',  label: 'Кино-студия' },
   { id: 'marketing', label: 'Маркетинг' },
   { id: 'workflows', label: 'Процессы' },
   { id: 'agents', label: 'Агенты' },
@@ -307,7 +306,6 @@ export default function StandaloneShell() {
       <div className="flex-1 min-h-0 relative overflow-hidden">
         {activeTab === 'image'   && <ImageStudio   apiKey={apiKey} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} />}
         {activeTab === 'video'   && <VideoStudio   apiKey={apiKey} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} />}
-        {activeTab === 'cinema'  && <CinemaStudio  apiKey={apiKey} />}
         {activeTab === 'marketing' && <MarketingStudio apiKey={apiKey} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} />}
         {activeTab === 'workflows' && <WorkflowStudio apiKey={apiKey} isHeaderVisible={isHeaderVisible} onToggleHeader={setIsHeaderVisible} />}
         {activeTab === 'agents' && <AgentStudio apiKey={apiKey} isHeaderVisible={isHeaderVisible} onToggleHeader={setIsHeaderVisible} />}
