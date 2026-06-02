@@ -6,6 +6,17 @@
 // platform: 'minimax' → POST /v1/video_generation + GET /v1/query/video_generation?task_id=
 // platform: 'runway'  → POST /v1/runway/image2video + GET /v1/runway/tasks/{id}
 
+// ── Routing strategy (memefast model-name suffix) ────────────────────────────
+// Appended to the model name as `model:suffix`. Lets the client pick a routing
+// strategy. Applies to all memefast APIs (image generation, video tasks).
+export const routingOptions = ["default", "nitro", "floor", "stable"];
+export const routingLabels = {
+  default: "Авто",
+  nitro: "Быстрее",
+  floor: "Дешевле",
+  stable: "Стабильнее",
+};
+
 // ── Image generation (text → image) via POST /v1/images/generations ──────────
 export const t2iModels = [
   {

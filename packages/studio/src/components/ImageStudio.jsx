@@ -17,6 +17,8 @@ import {
   getDefaultEffectForI2IModel,
   getImageInputOptions,
   getImageInputDefault,
+  routingOptions,
+  routingLabels,
 } from "../models.js";
 
 // ─── helpers ────────────────────────────────────────────────────────────────
@@ -781,6 +783,8 @@ export default function ImageStudio({
   );
   const [selectedBackground, setSelectedBackground] = useState(null);
   const [selectedModeration, setSelectedModeration] = useState(null);
+  // Routing strategy suffix (default/nitro/floor/stable) — applies to all models.
+  const [selectedRouting, setSelectedRouting] = useState("default");
 
   // ── Prompt / upload state ───────────────────────────────────────────────
   const [prompt, setPrompt] = useState("");
@@ -1130,6 +1134,7 @@ export default function ImageStudio({
               if (snap.selectedFormat) genParams.format = snap.selectedFormat;
               if (snap.selectedBackground) genParams.background = snap.selectedBackground;
               if (snap.selectedModeration) genParams.moderation = snap.selectedModeration;
+              if (snap.selectedRouting) genParams.routing = snap.selectedRouting;
               if (snap.effect) genParams.name = snap.effect;
               return await generateI2I(apiKey, genParams);
             } else {
@@ -1143,6 +1148,7 @@ export default function ImageStudio({
               }
               if (snap.selectedQualityOpt) genParams.quality = snap.selectedQualityOpt;
               if (snap.selectedFormat) genParams.format = snap.selectedFormat;
+              if (snap.selectedRouting) genParams.routing = snap.selectedRouting;
               return await generateImage(apiKey, genParams);
             }
           })
@@ -1237,6 +1243,7 @@ export default function ImageStudio({
       selectedFormat: currentFormatOptions.length > 0 ? selectedFormat : null,
       selectedBackground: currentBackgroundOptions.length > 0 ? selectedBackground : null,
       selectedModeration: currentModerationOptions.length > 0 ? selectedModeration : null,
+      selectedRouting,
       effect: showEffectBtn ? selectedEffect : "",
       selectedAr,
       batchSize,
@@ -1697,6 +1704,41 @@ export default function ImageStudio({
                   )}
                 </div>
               )}
+
+              {/* Routing strategy button (default/nitro/floor/stable) */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDropdownOpen((o) => (o === "routing" ? null : "routing"));
+                  }}
+                  className="flex items-center gap-2 px-3 py-2 bg-white/[0.03] hover:bg-white/[0.06] rounded-md transition-all border border-white/[0.03] group whitespace-nowrap"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="opacity-40 text-white">
+                    <polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                  </svg>
+                  <span className="text-[11px] font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors">
+                    {routingLabels[selectedRouting] || selectedRouting}
+                  </span>
+                </button>
+
+                {dropdownOpen === "routing" && (
+                  <div
+                    onClick={(e) => e.stopPropagation()}
+                    className="absolute bottom-[calc(100%+12px)] left-0 z-50 bg-[#0a0a0a] rounded-md p-3 max-h-[40vh] overflow-y-auto custom-scrollbar shadow-2xl border border-white/[0.05] min-w-[160px]"
+                  >
+                    <SimpleDropdown
+                      title="Приоритет"
+                      options={routingOptions}
+                      selected={selectedRouting}
+                      labels={routingLabels}
+                      onSelect={(val) => setSelectedRouting(val)}
+                      onClose={() => setDropdownOpen(null)}
+                    />
+                  </div>
+                )}
+              </div>
 
               {/* Effect type button */}
               {showEffectBtn && (

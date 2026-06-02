@@ -284,17 +284,26 @@ async function submitRunwayI2V(apiKey, payload, onRequestId) {
 
 // ── Image generation ──────────────────────────────────────────────────────────
 
+// Append a memefast routing suffix to the model name so the client can pick a
+// strategy: :floor (cheapest), :nitro (fastest), :stable (most reliable).
+// 'default' / empty leaves the model name untouched.
+function applyRouting(modelId, routing) {
+    if (routing && routing !== 'default') return `${modelId}:${routing}`;
+    return modelId;
+}
+
 export async function generateImage(apiKey, params) {
     const modelInfo = getModelById(params.model);
-    const modelId = modelInfo?.apiId || params.model;
+    const baseModelId = modelInfo?.apiId || params.model;
 
     // Gemini image models (gemini-*-image-*) are not served by /v1/images/generations.
     // They are exposed only through the OpenAI-compatible /v1/chat/completions endpoint,
     // returning the image embedded in the assistant message.
-    if (/gemini.*image/i.test(modelId)) {
-        return generateImageViaChat(apiKey, modelId, params);
+    if (/gemini.*image/i.test(baseModelId)) {
+        return generateImageViaChat(apiKey, baseModelId, params);
     }
 
+    const modelId = applyRouting(baseModelId, params.routing);
     const payload = { model: modelId, prompt: params.prompt, n: 1 };
 
     if (params.size) {
@@ -488,7 +497,7 @@ function aspectRatioToSize(ratio) {
 async function generateImageEdit(apiKey, params) {
     const form = new FormData();
     const modelInfo = getModelById(params.model);
-    form.append('model', modelInfo?.apiId || params.model);
+    form.append('model', applyRouting(modelInfo?.apiId || params.model, params.routing));
     form.append('prompt', params.prompt || '');
     form.append('n', '1');
 
