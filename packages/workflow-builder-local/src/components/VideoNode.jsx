@@ -24,6 +24,7 @@ const inputHandles = [
   "videoInput6",  // images_list
   "videoInput7",  // videos_list, video_files
   "videoInput8",  // audios_list, audio_files
+  "videoInput9",  // face_asset (Character node)
 ];
 
 const outputHandles = [
@@ -302,6 +303,8 @@ const VideoGeneration = ({ id, data, selected }) => {
           params[key] = meta.default ?? null;
         }
       }
+      // face_asset isn't in the schema — carry it through when present.
+      if (localSources.face_asset) params.face_asset = localSources.face_asset;
 
       const response = await axios.post(`/api/workflow/${workflow_id}/node/${id}/run`, {
         run_id: runId,
@@ -336,6 +339,9 @@ const VideoGeneration = ({ id, data, selected }) => {
   const hasVideoUrl = properties && "video_url" in properties && !data.selectedModel?.id.includes("passthrough");
   const hasAudioUrl = properties && "audio_url" in properties && !data.selectedModel?.id.includes("passthrough");
   const hasAudiosList = properties && ("audios_list" in properties || "audio_files" in properties) && !data.selectedModel?.id.includes("passthrough");
+  // face_asset isn't in the model schema; show its handle for Seedance models so
+  // a Character node can be wired in.
+  const hasFaceAsset = /seedance/i.test(data.selectedModel?.id || "") && !data.selectedModel?.id.includes("passthrough");
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -348,6 +354,7 @@ const VideoGeneration = ({ id, data, selected }) => {
         hasImagesList && "videoInput6",
         hasVideosList && "videoInput7",
         hasAudiosList && "videoInput8",
+        hasFaceAsset && "videoInput9",
       ].filter(Boolean);
 
       setEdges((prevEdges) =>
@@ -858,20 +865,51 @@ const VideoGeneration = ({ id, data, selected }) => {
         data-type="yellow"
       />
       {hasAudioUrl && (
-        <p 
+        <p
           className={`absolute -left-10 top-[190px] text-xs text-yellow-500 transition-opacity duration-200 ${
             data.activeHandleColor === "yellow"
-              ? "opacity-100" 
+              ? "opacity-100"
               : "opacity-0 group-hover:opacity-100"
           }`}
-        > 
+        >
           Audio
         </p>
       )}
-      <Handle 
-        type="source" 
-        position={Position.Right} 
-        id="videoOutput" 
+      <Handle
+        type="target"
+        position={Position.Left}
+        id="videoInput9"
+        style={{
+          top: 220,
+          opacity: hasFaceAsset ? 1 : 0,
+          pointerEvents: hasFaceAsset ? 'auto' : 'none',
+          width: 12,
+          height: 12,
+          transition: 'all 0.2s ease-in-out',
+        }}
+        className={`!rounded-full !border-[3px] !left-[-8px] transition-all
+          ${connectedInputs.videoInput9
+            ? '!bg-purple-600 !border-zinc-900 shadow-[0_0_15px_rgba(168,85,247,0.8)]'
+            : '!bg-zinc-900 !border-purple-600/50 hover:!border-purple-600 shadow-sm'
+          }
+        `}
+        data-type="purple"
+      />
+      {hasFaceAsset && (
+        <p
+          className={`absolute -left-9 top-[220px] text-xs text-purple-400 transition-opacity duration-200 ${
+            data.activeHandleColor === "purple"
+              ? "opacity-100"
+              : "opacity-0 group-hover:opacity-100"
+          }`}
+        >
+          Лицо
+        </p>
+      )}
+      <Handle
+        type="source"
+        position={Position.Right}
+        id="videoOutput"
         style={{ 
           top: 100,
           width: 12,

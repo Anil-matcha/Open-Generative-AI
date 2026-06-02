@@ -220,13 +220,20 @@ var NodesNavbar = function NodesNavbar(_ref) {
   var getSubmenuItems = function getSubmenuItems(id) {
     switch (id) {
       case "inputs":
-        return categorizedModels.inputs.map(function (m) {
+        return [].concat(_toConsumableArray(categorizedModels.inputs.map(function (m) {
           return {
             label: m.name,
             model: m,
             type: m.type
           };
-        });
+        })), [{
+          label: "Персонаж",
+          model: {
+            id: "character",
+            name: "Персонаж"
+          },
+          type: "characterNode"
+        }]);
       case "text-utils":
       case "utilities":
         return categorizedModels.utilities.map(function (m) {

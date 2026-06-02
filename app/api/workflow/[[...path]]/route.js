@@ -253,12 +253,17 @@ async function generateVideoARK(model, params) {
     const imageUrl = await resolvePublic(params.image_url);
     const videoUrl = await resolvePublic(params.video_url);
     const audioUrl = await resolvePublic(params.audio_url);
+    // Character node → face reference (asset://… URI or a public image URL).
+    const faceAsset = params.face_asset && String(params.face_asset).startsWith('asset://')
+      ? params.face_asset
+      : await resolvePublic(params.face_asset);
 
     // Build the multimodal content array (text + optional reference media).
     const content = [{ type: 'text', text: params.prompt || '' }];
     if (imageUrl) content.push({ type: 'image_url', image_url: { url: imageUrl }, role: 'first_frame' });
     if (videoUrl) content.push({ type: 'video_url', video_url: { url: videoUrl }, role: 'reference_video' });
     if (audioUrl) content.push({ type: 'audio_url', audio_url: { url: audioUrl }, role: 'reference_audio' });
+    if (faceAsset) content.push({ type: 'image_url', image_url: { url: faceAsset }, role: 'reference_image' });
 
     // Output parameters go directly in the request body (abbreviations like
     // --rs/--rt/--dur are NOT supported by Seedance 2.0).

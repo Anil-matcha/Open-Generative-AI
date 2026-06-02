@@ -35,6 +35,7 @@ var _NodesNavbar = _interopRequireDefault(require("./NodesNavbar"));
 var _ChatWidget = _interopRequireDefault(require("./ChatWidget"));
 var _ai = require("react-icons/ai");
 var _VideoCombiner = _interopRequireDefault(require("./VideoCombiner"));
+var _CharacterNode = _interopRequireDefault(require("./CharacterNode"));
 var _useGenerationCost2 = require("./useGenerationCost");
 function _interopRequireDefault(e) { return e && e.__esModule ? e : { "default": e }; }
 function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function _interopRequireWildcard(e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, "default": e }; if (null === e || "object" != _typeof(e) && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (var _t9 in e) "default" !== _t9 && {}.hasOwnProperty.call(e, _t9) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, _t9)) && (i.get || i.set) ? o(f, _t9, i) : f[_t9] = e[_t9]); return f; })(e, t); }
@@ -65,7 +66,8 @@ var nodeTypes = {
   audioNode: _AudioNode["default"],
   concatNode: _PromptConcate["default"],
   vidConcatNode: _VideoCombiner["default"],
-  apiNode: _ApiNode["default"]
+  apiNode: _ApiNode["default"],
+  characterNode: _CharacterNode["default"]
 };
 var initialNodes = [{
   id: "text1",
@@ -117,6 +119,11 @@ var edgeStyles = {
   white: {
     stroke: '#ffffff',
     strokeWidth: 2
+  },
+  purple: {
+    stroke: '#a855f7',
+    // purple-500 — character / face reference
+    strokeWidth: 2
   }
 };
 var getEdgeColor = function getEdgeColor(sourceHandle, targetHandle) {
@@ -135,6 +142,8 @@ var getEdgeColor = function getEdgeColor(sourceHandle, targetHandle) {
   if (["imageOutput"].includes(sourceHandle)) return "green";
   if (["videoOutput"].includes(sourceHandle)) return "orange";
   if (["audioOutput"].includes(sourceHandle)) return "yellow";
+  if (["characterOutput"].includes(sourceHandle)) return "purple";
+  if (["videoInput9"].includes(targetHandle)) return "purple";
   if (["textInput", "textInput4", "imageInput", "videoInput", "audioInput2", "concatInput", "apiInput"].includes(targetHandle)) return "blue";
   if (["textInput2", "textInput3", "imageInput2", "imageInput3", "videoInput2", "videoInput3", "videoInput6", "audioInput3", "apiInput2", "apiInput3"].includes(targetHandle)) return "green";
   if (["videoInput4", "audioInput4", "videoInput7"].includes(targetHandle)) return "orange";
@@ -712,6 +721,8 @@ var NodeFlow = function NodeFlow(_ref) {
           updatedFormValues[_key] = _list2;
         } else if (["videoInput5", "audioInput"].includes(targetHandle)) {
           updatedFormValues.audio_url = resultValue;
+        } else if (targetHandle === "videoInput9") {
+          updatedFormValues.face_asset = resultValue;
         } else if (node.type === "apiNode") {
           var _node$data$taskData;
           var listFields = ["images", "image_urls", "images_list"];
@@ -1216,7 +1227,7 @@ var NodeFlow = function NodeFlow(_ref) {
       var inputNodes = connectedEdges.map(function (e) {
         return e.source;
       });
-      var category = node.type === "textNode" ? "text" : node.type === "imageNode" ? "image" : node.type === "videoNode" ? "video" : node.type === "apiNode" ? "api" : node.type === "audioNode" ? "audio" : "utility";
+      var category = node.type === "textNode" ? "text" : node.type === "imageNode" ? "image" : node.type === "videoNode" ? "video" : node.type === "apiNode" ? "api" : node.type === "audioNode" ? "audio" : node.type === "characterNode" ? "image" : "utility";
       var isVideoCombiner = node.type === "vidConcatNode";
       var model = (_node$data2 = node.data) !== null && _node$data2 !== void 0 && (_node$data2 = _node$data2.selectedModel) !== null && _node$data2 !== void 0 && _node$data2.id ? (_node$data3 = node.data) === null || _node$data3 === void 0 || (_node$data3 = _node$data3.selectedModel) === null || _node$data3 === void 0 ? void 0 : _node$data3.id : category === "utility" ? isVideoCombiner ? "video-combiner" : "prompt-concatenator" : "".concat(category, "-passthrough");
       var modelSchema = nodeSchemas === null || nodeSchemas === void 0 || (_nodeSchemas$categori4 = nodeSchemas.categories) === null || _nodeSchemas$categori4 === void 0 || (_nodeSchemas$categori4 = _nodeSchemas$categori4[category]) === null || _nodeSchemas$categori4 === void 0 || (_nodeSchemas$categori4 = _nodeSchemas$categori4.models) === null || _nodeSchemas$categori4 === void 0 || (_nodeSchemas$categori4 = _nodeSchemas$categori4[model]) === null || _nodeSchemas$categori4 === void 0 || (_nodeSchemas$categori4 = _nodeSchemas$categori4.input_schema) === null || _nodeSchemas$categori4 === void 0 || (_nodeSchemas$categori4 = _nodeSchemas$categori4.schemas) === null || _nodeSchemas$categori4 === void 0 ? void 0 : _nodeSchemas$categori4.input_data;
@@ -1279,8 +1290,13 @@ var NodeFlow = function NodeFlow(_ref) {
       });
       var dynamicVideoUrl = videoUrlConnections.length > 0 ? "{{ ".concat(videoUrlConnections[0].source, ".outputs[0].value }}") : (formValues === null || formValues === void 0 ? void 0 : formValues.video_url) || null;
       var dynamicAudioUrl = audioUrlConnections.length > 0 ? "{{ ".concat(audioUrlConnections[0].source, ".outputs[0].value }}") : (formValues === null || formValues === void 0 ? void 0 : formValues.audio_url) || null;
-      var dynamicLastImage = lastImageConnections.length > 0 ? "{{ ".concat(lastImageConnections[0].source, ".outputs[0].value }}") : (formValues === null || formValues === void 0 ? void 0 : formValues.last_image) || null; // || node.data?.outputs?.[0]?.value 
+      var dynamicLastImage = lastImageConnections.length > 0 ? "{{ ".concat(lastImageConnections[0].source, ".outputs[0].value }}") : (formValues === null || formValues === void 0 ? void 0 : formValues.last_image) || null; // || node.data?.outputs?.[0]?.value
 
+      // Character node → face_asset (Seedance reference image).
+      var faceAssetConnections = connectedEdges.filter(function (e) {
+        return e.targetHandle === "videoInput9";
+      });
+      var dynamicFaceAsset = faceAssetConnections.length > 0 ? "{{ ".concat(faceAssetConnections[0].source, ".outputs[0].value }}") : (formValues === null || formValues === void 0 ? void 0 : formValues.face_asset) || null;
       var localSources = _objectSpread(_objectSpread({}, formValues), {}, {
         prompt: dynamicPrompt ? dynamicPrompt : formValues === null || formValues === void 0 ? void 0 : formValues.prompt,
         system_prompt: dynamicSystemPrompt,
@@ -1296,7 +1312,9 @@ var NodeFlow = function NodeFlow(_ref) {
         video_files: dynamicVideosList,
         audios_list: dynamicAudiosList,
         audio_files: dynamicAudiosList
-      });
+      }, dynamicFaceAsset ? {
+        face_asset: dynamicFaceAsset
+      } : {});
       if (node.type === "apiNode") {
         var listFields = ["images", "image_urls", "images_list"];
         connectedEdges.forEach(function (edge) {
@@ -1393,6 +1411,11 @@ var NodeFlow = function NodeFlow(_ref) {
             params[_key7] = (_meta4$default = _meta4["default"]) !== null && _meta4$default !== void 0 ? _meta4$default : null;
           }
         }
+        // face_asset isn't in the model schema, so carry it through explicitly
+        // when a Character node feeds the video node.
+        if (node.type === "videoNode" && localSources.face_asset) {
+          params.face_asset = localSources.face_asset;
+        }
       }
       if (node.type === "textNode") {
         var _node$data5, _node$data6;
@@ -1400,7 +1423,7 @@ var NodeFlow = function NodeFlow(_ref) {
           resultUrl: ((_node$data5 = node.data) === null || _node$data5 === void 0 ? void 0 : _node$data5.resultUrl) || "",
           outputs: ((_node$data6 = node.data) === null || _node$data6 === void 0 ? void 0 : _node$data6.outputs) || []
         };
-      } else if (["imageNode", "videoNode", "audioNode", "apiNode", "concatNode", "vidConcatNode"].includes(node.type)) {
+      } else if (["imageNode", "videoNode", "audioNode", "apiNode", "concatNode", "vidConcatNode", "characterNode"].includes(node.type)) {
         var _node$data7, _node$data8;
         output_params = {
           resultUrl: ((_node$data7 = node.data) === null || _node$data7 === void 0 ? void 0 : _node$data7.resultUrl) || null,

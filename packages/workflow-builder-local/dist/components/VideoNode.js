@@ -56,11 +56,13 @@ var inputHandles = ["videoInput",
 // images_list
 "videoInput7",
 // videos_list, video_files
-"videoInput8" // audios_list, audio_files
+"videoInput8",
+// audios_list, audio_files
+"videoInput9" // face_asset (Character node)
 ];
 var outputHandles = ["videoOutput"];
 var VideoGeneration = function VideoGeneration(_ref) {
-  var _data$runId, _nodeSchemas$categori, _data$selectedModel3, _data$selectedModel4, _data$selectedModel5, _data$selectedModel6, _data$selectedModel7, _data$selectedModel8, _data$selectedModel9, _data$selectedModel0, _outputHistory$curren, _currentOutputList$cu, _currentOutputList$, _data$selectedModel1;
+  var _data$runId, _nodeSchemas$categori, _data$selectedModel3, _data$selectedModel4, _data$selectedModel5, _data$selectedModel6, _data$selectedModel7, _data$selectedModel8, _data$selectedModel9, _data$selectedModel0, _data$selectedModel1, _data$selectedModel10, _outputHistory$curren, _currentOutputList$cu, _currentOutputList$, _data$selectedModel11;
   var id = _ref.id,
     data = _ref.data,
     selected = _ref.selected;
@@ -407,6 +409,8 @@ var VideoGeneration = function VideoGeneration(_ref) {
                 params[key] = (_meta$default2 = meta["default"]) !== null && _meta$default2 !== void 0 ? _meta$default2 : null;
               }
             }
+            // face_asset isn't in the schema — carry it through when present.
+            if (localSources.face_asset) params.face_asset = localSources.face_asset;
             _context.n = 6;
             return _axios["default"].post("/api/workflow/".concat(workflow_id, "/node/").concat(id, "/run"), {
               run_id: runId,
@@ -486,9 +490,12 @@ var VideoGeneration = function VideoGeneration(_ref) {
   var hasVideoUrl = properties && "video_url" in properties && !((_data$selectedModel8 = data.selectedModel) !== null && _data$selectedModel8 !== void 0 && _data$selectedModel8.id.includes("passthrough"));
   var hasAudioUrl = properties && "audio_url" in properties && !((_data$selectedModel9 = data.selectedModel) !== null && _data$selectedModel9 !== void 0 && _data$selectedModel9.id.includes("passthrough"));
   var hasAudiosList = properties && ("audios_list" in properties || "audio_files" in properties) && !((_data$selectedModel0 = data.selectedModel) !== null && _data$selectedModel0 !== void 0 && _data$selectedModel0.id.includes("passthrough"));
+  // face_asset isn't in the model schema; show its handle for Seedance models so
+  // a Character node can be wired in.
+  var hasFaceAsset = /seedance/i.test(((_data$selectedModel1 = data.selectedModel) === null || _data$selectedModel1 === void 0 ? void 0 : _data$selectedModel1.id) || "") && !((_data$selectedModel10 = data.selectedModel) !== null && _data$selectedModel10 !== void 0 && _data$selectedModel10.id.includes("passthrough"));
   (0, _react.useEffect)(function () {
     var timeout = setTimeout(function () {
-      var validHandles = [hasPrompt && "videoInput", hasImageUrl && "videoInput2", hasLastImage && "videoInput3", hasVideoUrl && "videoInput4", hasAudioUrl && "videoInput5", hasImagesList && "videoInput6", hasVideosList && "videoInput7", hasAudiosList && "videoInput8"].filter(Boolean);
+      var validHandles = [hasPrompt && "videoInput", hasImageUrl && "videoInput2", hasLastImage && "videoInput3", hasVideoUrl && "videoInput4", hasAudioUrl && "videoInput5", hasImagesList && "videoInput6", hasVideosList && "videoInput7", hasAudiosList && "videoInput8", hasFaceAsset && "videoInput9"].filter(Boolean);
       setEdges(function (prevEdges) {
         return prevEdges.filter(function (edge) {
           if (edge.target !== id) return true;
@@ -692,7 +699,7 @@ var VideoGeneration = function VideoGeneration(_ref) {
     onDuplicate: data.duplicateNode,
     onDelete: handleDeleteNode,
     downloadUrl: currentOutput
-  }))), ((_data$selectedModel1 = data.selectedModel) === null || _data$selectedModel1 === void 0 ? void 0 : _data$selectedModel1.id) === "video-passthrough" ? /*#__PURE__*/_react["default"].createElement("div", {
+  }))), ((_data$selectedModel11 = data.selectedModel) === null || _data$selectedModel11 === void 0 ? void 0 : _data$selectedModel11.id) === "video-passthrough" ? /*#__PURE__*/_react["default"].createElement("div", {
     className: "w-full h-full flex-1"
   }, /*#__PURE__*/_react["default"].createElement(_UploadNode["default"], {
     id: id,
@@ -887,6 +894,22 @@ var VideoGeneration = function VideoGeneration(_ref) {
   }), hasAudioUrl && /*#__PURE__*/_react["default"].createElement("p", {
     className: "absolute -left-10 top-[190px] text-xs text-yellow-500 transition-opacity duration-200 ".concat(data.activeHandleColor === "yellow" ? "opacity-100" : "opacity-0 group-hover:opacity-100")
   }, "Audio"), /*#__PURE__*/_react["default"].createElement(_reactflow.Handle, {
+    type: "target",
+    position: _reactflow.Position.Left,
+    id: "videoInput9",
+    style: {
+      top: 220,
+      opacity: hasFaceAsset ? 1 : 0,
+      pointerEvents: hasFaceAsset ? 'auto' : 'none',
+      width: 12,
+      height: 12,
+      transition: 'all 0.2s ease-in-out'
+    },
+    className: "!rounded-full !border-[3px] !left-[-8px] transition-all\n          ".concat(connectedInputs.videoInput9 ? '!bg-purple-600 !border-zinc-900 shadow-[0_0_15px_rgba(168,85,247,0.8)]' : '!bg-zinc-900 !border-purple-600/50 hover:!border-purple-600 shadow-sm', "\n        "),
+    "data-type": "purple"
+  }), hasFaceAsset && /*#__PURE__*/_react["default"].createElement("p", {
+    className: "absolute -left-9 top-[220px] text-xs text-purple-400 transition-opacity duration-200 ".concat(data.activeHandleColor === "purple" ? "opacity-100" : "opacity-0 group-hover:opacity-100")
+  }, "\u041B\u0438\u0446\u043E"), /*#__PURE__*/_react["default"].createElement(_reactflow.Handle, {
     type: "source",
     position: _reactflow.Position.Right,
     id: "videoOutput",

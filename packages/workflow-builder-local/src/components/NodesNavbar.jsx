@@ -164,7 +164,10 @@ const NodesNavbar = ({ addNode, apiNodeModels, filterNodeTypes = null, nodeSchem
 
   const getSubmenuItems = (id) => {
     switch (id) {
-      case "inputs": return categorizedModels.inputs.map(m => ({ label: m.name, model: m, type: m.type }));
+      case "inputs": return [
+        ...categorizedModels.inputs.map(m => ({ label: m.name, model: m, type: m.type })),
+        { label: "Персонаж", model: { id: "character", name: "Персонаж" }, type: "characterNode" },
+      ];
       case "text-utils": 
       case "utilities": 
         return categorizedModels.utilities.map(m => ({ 

@@ -41,6 +41,7 @@ import NodesNavbar from "./NodesNavbar"
 import ChatWidget from "./ChatWidget";
 import { AiOutlineAudio } from "react-icons/ai";
 import VideoCombiner from "./VideoCombiner";
+import CharacterNode from "./CharacterNode";
 import { useGenerationCost } from "./useGenerationCost";
 
 const nodeTypes = {
@@ -50,7 +51,8 @@ const nodeTypes = {
   audioNode: AudioGeneration,
   concatNode: PromptConcate,
   vidConcatNode: VideoCombiner,
-  apiNode: ApiNode
+  apiNode: ApiNode,
+  characterNode: CharacterNode
 }
 
 const initialNodes = [
@@ -87,6 +89,10 @@ const edgeStyles = {
   white: {
     stroke: '#ffffff',
     strokeWidth: 2,
+  },
+  purple: {
+    stroke: '#a855f7', // purple-500 — character / face reference
+    strokeWidth: 2,
   }
 };
 
@@ -105,6 +111,8 @@ const getEdgeColor = (sourceHandle, targetHandle, sourceNode = null, targetNode 
   if (["imageOutput"].includes(sourceHandle)) return "green";
   if (["videoOutput"].includes(sourceHandle)) return "orange";
   if (["audioOutput"].includes(sourceHandle)) return "yellow";
+  if (["characterOutput"].includes(sourceHandle)) return "purple";
+  if (["videoInput9"].includes(targetHandle)) return "purple";
 
   if (["textInput", "textInput4", "imageInput", "videoInput", "audioInput2", "concatInput", "apiInput"].includes(targetHandle)) return "blue";
   if (["textInput2", "textInput3", "imageInput2", "imageInput3", "videoInput2", "videoInput3", "videoInput6", "audioInput3", "apiInput2", "apiInput3"].includes(targetHandle)) return "green";
@@ -584,6 +592,10 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
 
         else if (["videoInput5", "audioInput"].includes(targetHandle)) {
           updatedFormValues.audio_url = resultValue;
+        }
+
+        else if (targetHandle === "videoInput9") {
+          updatedFormValues.face_asset = resultValue;
         }
 
         else if (node.type === "apiNode") {
@@ -1077,7 +1089,7 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
 
       const connectedEdges = edges.filter((e) => e.target === node.id);
       const inputNodes = connectedEdges.map((e) => e.source);
-      const category = node.type === "textNode" ? "text" : node.type === "imageNode" ? "image" : node.type === "videoNode" ? "video" : node.type === "apiNode" ? "api" : node.type === "audioNode" ? "audio" : "utility";
+      const category = node.type === "textNode" ? "text" : node.type === "imageNode" ? "image" : node.type === "videoNode" ? "video" : node.type === "apiNode" ? "api" : node.type === "audioNode" ? "audio" : node.type === "characterNode" ? "image" : "utility";
       const isVideoCombiner = node.type === "vidConcatNode";
       const model = node.data?.selectedModel?.id ? node.data?.selectedModel?.id : category === "utility" ? (isVideoCombiner ? "video-combiner" : "prompt-concatenator") : `${category}-passthrough`;
       const modelSchema = nodeSchemas?.categories?.[category]?.models?.[model]?.input_schema?.schemas?.input_data;
@@ -1178,7 +1190,16 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
       const dynamicLastImage =
         lastImageConnections.length > 0
           ? `{{ ${lastImageConnections[0].source}.outputs[0].value }}`
-          : formValues?.last_image || null; // || node.data?.outputs?.[0]?.value 
+          : formValues?.last_image || null; // || node.data?.outputs?.[0]?.value
+
+      // Character node → face_asset (Seedance reference image).
+      const faceAssetConnections = connectedEdges.filter(
+        (e) => e.targetHandle === "videoInput9"
+      );
+      const dynamicFaceAsset =
+        faceAssetConnections.length > 0
+          ? `{{ ${faceAssetConnections[0].source}.outputs[0].value }}`
+          : formValues?.face_asset || null;
 
       const localSources = {
         ...formValues,
@@ -1196,6 +1217,7 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
         video_files: dynamicVideosList,
         audios_list: dynamicAudiosList,
         audio_files: dynamicAudiosList,
+        ...(dynamicFaceAsset ? { face_asset: dynamicFaceAsset } : {}),
       };
 
       if (node.type === "apiNode") {
@@ -1272,6 +1294,11 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
             params[key] = meta.default ?? null;
           }
         }
+        // face_asset isn't in the model schema, so carry it through explicitly
+        // when a Character node feeds the video node.
+        if (node.type === "videoNode" && localSources.face_asset) {
+          params.face_asset = localSources.face_asset;
+        }
       }
 
       if (node.type === "textNode") {
@@ -1279,7 +1306,7 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
           resultUrl: node.data?.resultUrl || "",
           outputs: node.data?.outputs || [],
         }
-      } else if (["imageNode", "videoNode", "audioNode", "apiNode", "concatNode", "vidConcatNode"].includes(node.type)) {
+      } else if (["imageNode", "videoNode", "audioNode", "apiNode", "concatNode", "vidConcatNode", "characterNode"].includes(node.type)) {
         output_params = {
           resultUrl: node.data?.resultUrl || null,
           outputs: node.data?.outputs || [],
