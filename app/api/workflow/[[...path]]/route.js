@@ -88,6 +88,38 @@ async function maybeUploadToTOS(dataUrl) {
     return (await tosUpload(tosKey, buffer, contentType)) || dataUrl;
 }
 
+// Save generation to user's gallery index
+async function saveToGallery(userId, outputs, model, prompt) {
+    if (!userId || !TOS_ENABLED || !outputs?.length) return;
+    try {
+        const key = `gallery/${userId}/entries.json`;
+        const url = `https://${TOS_BUCKET}.${TOS_ENDPOINT}/${key}`;
+        let entries = [];
+        try {
+            const r = await fetch(url);
+            if (r.ok) entries = await r.json();
+        } catch {}
+
+        // Add new entries for each output
+        for (const out of outputs) {
+            if (out.type === 'error') continue; // skip errors
+            entries.unshift({
+                id: `${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+                type: out.type.replace('_url', ''), // image_url → image, etc.
+                url: out.value,
+                model,
+                prompt: prompt || '',
+                created_at: new Date().toISOString()
+            });
+        }
+
+        // Keep last 500 entries
+        entries = entries.slice(0, 500);
+        const buf = Buffer.from(JSON.stringify(entries));
+        await tosUpload(key, buf, 'application/json').catch(() => {});
+    } catch { /* best-effort */ }
+}
+
 // Download video from CDN URL and re-upload to TOS videos/ folder.
 // Keeps a permanent copy — CDN URLs from ARK/Memefast expire.
 async function maybeUploadVideoToTOS(videoUrl) {
@@ -733,7 +765,7 @@ function costForNode(model, params) {
     return priceRub(modelCategory(model), model, params);
 }
 
-async function runNode(runId, nodeId, model, params, apiKey) {
+async function runNode(runId, nodeId, model, params, apiKey, userId = null) {
     try {
         let outputs;
         // Passthroughs
@@ -762,6 +794,9 @@ async function runNode(runId, nodeId, model, params, apiKey) {
 
         const runResult = { status: 'completed', nodes: { [nodeId]: [{ status: 'succeeded', result: { outputs } }] } };
         runStore.set(runId, runResult);
+
+        // Save to user's gallery
+        await saveToGallery(userId, outputs, model, params.prompt);
 
         // Background: upload video outputs to TOS and persist the run JSON.
         // Fire-and-forget — failure here only affects reload persistence, not display.
@@ -1280,7 +1315,7 @@ export async function POST(request, { params }) {
                 }
 
                 const nRunId = genId();
-                await runNode(nRunId, nodeId, model, params, apiKey);
+                await runNode(nRunId, nodeId, model, params, apiKey, billingUser?.id);
                 const nr = runStore.get(nRunId);
                 // Refund if this node failed.
                 if (billed && nr?.status === 'failed') {
@@ -1329,7 +1364,7 @@ export async function POST(request, { params }) {
             }
         }
 
-        await runNode(runId, nodeId, model, params, apiKey);
+        await runNode(runId, nodeId, model, params, apiKey, billedUser?.id);
         const result = runStore.get(runId) || { status: 'processing', nodes: {} };
 
         // Refund if the generation ended up failing.

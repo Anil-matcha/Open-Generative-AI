@@ -9,6 +9,11 @@ const DesignAgentStudio = dynamic(() => import('studio').then(mod => mod.DesignA
   ssr: false,
   loading: () => <div className="h-full w-full bg-black flex items-center justify-center text-white/20">Загрузка студии дизайна...</div>
 });
+
+const GalleryStudio = dynamic(() => import('studio').then(mod => mod.GalleryStudio), {
+  ssr: false,
+  loading: () => <div className="h-full w-full bg-black flex items-center justify-center text-white/20">Загрузка галереи...</div>
+});
 import axios from 'axios';
 import ApiKeyModal from './ApiKeyModal';
 
@@ -16,6 +21,7 @@ const TABS = [
   { id: 'image',   label: 'Студия фото' },
   { id: 'video',   label: 'Студия видео' },
   { id: 'workflows', label: 'Процессы' },
+  { id: 'gallery', label: 'Галерея' },
 ];
 
 const STORAGE_KEY = 'muapi_key';
@@ -303,6 +309,7 @@ export default function StandaloneShell() {
         {activeTab === 'image'   && <ImageStudio   apiKey={apiKey} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} />}
         {activeTab === 'video'   && <VideoStudio   apiKey={apiKey} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} />}
         {activeTab === 'workflows' && <WorkflowStudio apiKey={apiKey} isHeaderVisible={isHeaderVisible} onToggleHeader={setIsHeaderVisible} />}
+        {activeTab === 'gallery' && <GalleryStudio apiKey={apiKey} />}
       </div>
 
       {/* Settings Modal */}
