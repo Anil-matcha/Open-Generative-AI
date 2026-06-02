@@ -16,6 +16,10 @@
 
 > **Open-source AI Design Agent** -> https://github.com/Anil-matcha/Open-AI-Design-Agent 
 
+> **Open-source Speech AI — industrial-grade speech recognition with 50+ languages** -> https://github.com/modelscope/FunASR
+
+> **Open-source Multi-task Speech Model — ASR + emotion + audio events in one model** -> https://github.com/FunAudioLLM/SenseVoice
+
 ## 🌐 Try it Online — No Install Required
 
 **Hosted version:** [https://muapi.ai/open-generative-ai](https://muapi.ai/open-generative-ai)
