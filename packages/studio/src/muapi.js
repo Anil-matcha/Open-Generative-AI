@@ -485,9 +485,11 @@ export async function generateI2I(apiKey, params) {
 
 // ── Seedance 2.0 direct via Volcano Ark (round-robin endpoints) ───────────────
 
-// Generate a Seedance 2.0 video through our /api/ark/seedance route. The server
-// submits, polls to completion, and mirrors the result to TOS in one request
-// (same proven flow as the workflow builder), returning the final video URL.
+// Generate a Seedance 2.0 video via Ark.
+// Submits the task with a short POST, then polls from the browser every 5s
+// so we never have a single long-running HTTP connection that can hang.
+// After the video is ready, calls /api/upload-file to mirror the Ark CDN URL
+// to TOS for permanent storage (fire-and-forget — falls back to Ark URL).
 async function generateSeedanceArk(modelInfo, params) {
     const fast = /fast/.test(modelInfo?.apiId || '');
     const body = {
@@ -502,15 +504,44 @@ async function generateSeedanceArk(modelInfo, params) {
         duration: params.duration || undefined,
     };
 
-    const res = await fetch('/api/ark/seedance', {
+    // Step 1: submit task (fast — just creates the Ark task and returns taskId)
+    const submit = await fetch('/api/ark/seedance', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
     });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(`Ark: ${data.error || res.status}`);
-    if (!data.url) throw new Error('Ark: видео готово, но URL не получен.');
-    return { url: data.url, id: data.id };
+    const submitData = await submit.json().catch(() => ({}));
+    if (!submit.ok) throw new Error(`Ark: ${submitData.error || submit.status}`);
+    const taskId = submitData.taskId;
+    if (!taskId) throw new Error('Ark: задача не создана (нет taskId).');
+
+    // Step 2: poll from the browser — each request is < 1s, no connection hangs
+    for (let attempt = 0; attempt < 300; attempt++) {
+        await new Promise((r) => setTimeout(r, 5000));
+        const poll = await fetch(`/api/ark/seedance?taskId=${encodeURIComponent(taskId)}`);
+        const data = await poll.json().catch(() => ({}));
+        if (!poll.ok) continue;
+        const status = (data.status || '').toLowerCase();
+        if (status === 'succeeded' || status === 'success') {
+            if (!data.url) throw new Error('Ark: видео готово, но URL не получен.');
+            // Step 3: mirror to TOS for permanent storage (non-blocking fallback to Ark URL)
+            let finalUrl = data.url;
+            fetch('/api/upload-file', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: data.url }),
+            }).then((r) => r.json()).then((d) => {
+                if (d?.url) finalUrl = d.url;
+            }).catch(() => {});
+            // Small delay to let the mirror fire before we return (best-effort)
+            await new Promise((r) => setTimeout(r, 800));
+            return { url: finalUrl, id: taskId };
+        }
+        if (status === 'failed' || status === 'error' || status === 'expired' || status === 'cancelled') {
+            throw new Error(`Ark: генерация не удалась (${data.error || status}).`);
+        }
+    }
+    throw new Error('Ark: превышено время ожидания генерации.');
 }
 
 // ── Video generation (routes by platform) ─────────────────────────────────────
