@@ -17,6 +17,7 @@ import {
   getModesForModel,
 } from "../models.js";
 import FaceRegistrationDialog from "./FaceRegistrationDialog.jsx";
+import FaceAssetDialog from "./FaceAssetDialog.jsx";
 
 // ── tiny helpers ──────────────────────────────────────────────────────────────
 
@@ -297,7 +298,8 @@ export default function VideoStudio({
   const [refFiles, setRefFiles] = useState([]);
 
   // ── Registered face/character for Seedance (asset://… + display name) ──
-  const [faceRegOpen, setFaceRegOpen] = useState(false);
+  const [faceRegOpen, setFaceRegOpen] = useState(false);   // register a new face
+  const [facePickOpen, setFacePickOpen] = useState(false); // pick an existing asset
   const [faceAsset, setFaceAsset] = useState(null); // { uri, name } | null
 
   // ── generation / canvas ──
@@ -2166,8 +2168,8 @@ export default function VideoStudio({
             {isSeedanceArk && (
               <button
                 type="button"
-                onClick={() => setFaceRegOpen(true)}
-                title="Зарегистрировать лицо для Seedance"
+                onClick={() => setFacePickOpen(true)}
+                title="Выбрать или добавить лицо для Seedance"
                 className={`h-9 px-3 rounded-md font-medium text-sm transition-all border flex items-center gap-2 ${faceAsset ? "bg-purple-600/30 border-purple-500/50 text-purple-100" : "bg-gradient-to-r from-purple-600/20 to-pink-600/20 hover:from-purple-600/40 hover:to-pink-600/40 text-purple-300 border-purple-500/30"}`}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -2233,6 +2235,14 @@ export default function VideoStudio({
           />
         </div>
       )}
+
+      {/* ── FACE ASSET PICKER (select an existing asset or add one by id) ── */}
+      <FaceAssetDialog
+        open={facePickOpen}
+        onClose={() => setFacePickOpen(false)}
+        onSelect={(assetUri, name) => setFaceAsset({ uri: assetUri, name })}
+        onRegisterNew={() => setFaceRegOpen(true)}
+      />
 
       {/* ── FACE REGISTRATION DIALOG (binds a face to Seedance) ── */}
       <FaceRegistrationDialog
