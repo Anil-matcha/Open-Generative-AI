@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useLayoutEffect, useRef, useCallback } from "react";
 import { generateImage, generateI2I, uploadFile } from "../muapi.js";
+import FaceRegistrationDialog from "./FaceRegistrationDialog.jsx";
 import {
   t2iModels,
   i2iModels,
@@ -776,6 +777,7 @@ export default function ImageStudio({
   });
   const [generateError, setGenerateError] = useState(null);
   const [fullscreenUrl, setFullscreenUrl] = useState(null);
+  const [faceRegOpen, setFaceRegOpen] = useState(false);
 
   // Notify parent when generation state changes (so it persists across tabs)
   // Use useLayoutEffect to ensure sessionStorage is updated before unmount
@@ -1479,13 +1481,27 @@ export default function ImageStudio({
                 </>
               )}
             </button>
+
+            {/* Face Registration Button */}
+            <button
+              type="button"
+              onClick={() => setFaceRegOpen(true)}
+              title="Зарегистрировать лицо для видео"
+              className="h-12 px-4 rounded-xl bg-gradient-to-r from-purple-600/20 to-pink-600/20 hover:from-purple-600/40 hover:to-pink-600/40 text-purple-300 font-medium transition-all border border-purple-500/30 flex items-center gap-2"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+              Лицо
+            </button>
           </div>
         </div>
       </div>
 
       {/* ── FULLSCREEN IMAGE MODAL ── */}
       {fullscreenUrl && (
-        <div 
+        <div
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-sm animate-fade-in"
           onClick={() => setFullscreenUrl(null)}
         >
@@ -1502,14 +1518,24 @@ export default function ImageStudio({
               <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
           </button>
-          <img 
-            src={fullscreenUrl} 
+          <img
+            src={fullscreenUrl}
             alt="На весь экран"
-            className="max-w-[95vw] max-h-[95vh] rounded-2xl shadow-2xl object-contain animate-scale-up" 
+            className="max-w-[95vw] max-h-[95vh] rounded-2xl shadow-2xl object-contain animate-scale-up"
             onClick={(e) => e.stopPropagation()}
           />
         </div>
       )}
+
+      {/* ── FACE REGISTRATION DIALOG ── */}
+      <FaceRegistrationDialog
+        open={faceRegOpen}
+        onClose={() => setFaceRegOpen(false)}
+        onRegistered={(assetUri, displayName) => {
+          // Asset registered - can be used in video models
+          console.log('[ImageStudio] Face registered:', { assetUri, displayName });
+        }}
+      />
     </div>
   );
 }
