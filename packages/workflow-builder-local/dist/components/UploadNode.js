@@ -1,4 +1,3 @@
-/* UploadNode v2 - TOS presigned PUT upload */
 "use strict";
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -13,6 +12,7 @@ var _axios = _interopRequireDefault(require("axios"));
 var _AudioPlayer = _interopRequireDefault(require("./AudioPlayer"));
 var _VideoPlayer = _interopRequireDefault(require("./VideoPlayer"));
 var _io = require("react-icons/io5");
+var _utility = require("./utility");
 function _interopRequireDefault(e) { return e && e.__esModule ? e : { "default": e }; }
 function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function _interopRequireWildcard(e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, "default": e }; if (null === e || "object" != _typeof(e) && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (var _t in e) "default" !== _t && {}.hasOwnProperty.call(e, _t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, _t)) && (i.get || i.set) ? o(f, _t, i) : f[_t] = e[_t]); return f; })(e, t); }
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
@@ -83,16 +83,19 @@ var UploadNode = function UploadNode(_ref) {
     }
     ;
     setUploading(true);
-    // Step 1: get a presigned PUT URL from our server
     _axios["default"].get("/api/upload-file", {
-      params: { filename: file.name, type: file.type }
+      params: {
+        filename: file.name,
+        type: file.type
+      }
     }).then(function (response) {
       var _response$data = response.data,
         putUrl = _response$data.putUrl,
         publicUrl = _response$data.publicUrl;
-      // Step 2: PUT the file directly to TOS (bypasses Vercel body size limit)
       _axios["default"].put(putUrl, file, {
-        headers: { "Content-Type": file.type },
+        headers: {
+          "Content-Type": file.type
+        },
         onUploadProgress: function onUploadProgress(progressEvent) {
           var percentCompleted = Math.round(progressEvent.loaded * 100 / progressEvent.total);
           setUploadProgress(percentCompleted);
@@ -105,17 +108,11 @@ var UploadNode = function UploadNode(_ref) {
           setUploading(false);
           setUploadProgress(0);
         }, 500);
-      })["catch"](function (error) {
-        var _error$response;
-        console.error("TOS upload failed", error);
-        _reactHotToast.toast.error("Upload failed.", error === null || error === void 0 || (_error$response = error.response) === null || _error$response === void 0 ? void 0 : _error$response.data);
-        setUploading(false);
-        setUploadProgress(0);
       });
     })["catch"](function (error) {
-      var _error$response2;
+      var _error$response;
       console.error("Upload failed", error);
-      _reactHotToast.toast.error("Upload failed.", error === null || error === void 0 || (_error$response2 = error.response) === null || _error$response2 === void 0 ? void 0 : _error$response2.data);
+      _reactHotToast.toast.error("Upload failed.", error === null || error === void 0 || (_error$response = error.response) === null || _error$response === void 0 ? void 0 : _error$response.data);
       setUploading(false);
       setUploadProgress(0);
     });
@@ -146,97 +143,99 @@ var UploadNode = function UploadNode(_ref) {
       return _objectSpread(_objectSpread({}, prev), {}, _defineProperty({}, key, null));
     });
   };
+  var imageUrl = acceptType === "image" ? formValues.image_url || null : null;
+
+  // Probe image dimensions / size only when the URL actually changes. Keeping
+  // this in its own effect (keyed on the URL, not `data`) is what stops the
+  // HEAD-request flood that exhausted the browser (ERR_INSUFFICIENT_RESOURCES).
   (0, _react.useEffect)(function () {
-    var outputs = [{
-      type: "",
-      value: null
-    }];
-    var resultUrl;
-    if (acceptType === "image") {
-      outputs = [{
-        type: "image_url",
-        value: formValues.image_url ? formValues.image_url : null
-      }];
-      resultUrl = formValues.image_url ? formValues.image_url : null;
-    } else if (acceptType === "video") {
-      outputs = [{
-        type: "video_url",
-        value: formValues.video_url ? formValues.video_url : null
-      }];
-      resultUrl = formValues.video_url ? formValues.video_url : null;
-    } else if (acceptType === "audio") {
-      outputs = [{
-        type: "audio_url",
-        value: formValues.audio_url ? formValues.audio_url : null
-      }];
-      resultUrl = formValues.audio_url ? formValues.audio_url : null;
-    } else {
-      outputs = [{
-        type: "text",
-        value: formValues.prompt ? formValues.prompt : ""
-      }];
-      resultUrl = formValues.prompt ? formValues.prompt : "";
-    }
-    ;
-    if (acceptType === "image" && resultUrl) {
-      var img = new Image();
-      img.onload = function () {
-        setImageMetadata(function (prev) {
-          return _objectSpread(_objectSpread({}, prev), {}, {
-            width: img.naturalWidth,
-            height: img.naturalHeight
-          });
-        });
-      };
-      img.src = resultUrl;
-      fetch(resultUrl, {
-        method: 'HEAD'
-      }).then(function (res) {
-        var size = res.headers.get('content-length');
-        if (size) {
-          var sizeInMB = (parseInt(size) / (1024 * 1024)).toFixed(2);
-          setImageMetadata(function (prev) {
-            return _objectSpread(_objectSpread({}, prev), {}, {
-              size: sizeInMB + ' MB'
-            });
-          });
-        } else {
-          setImageMetadata(function (prev) {
-            return _objectSpread(_objectSpread({}, prev), {}, {
-              size: null
-            });
-          });
-        }
-      })["catch"](function () {
-        setImageMetadata(function (prev) {
-          return _objectSpread(_objectSpread({}, prev), {}, {
-            size: null
-          });
-        });
-      });
-    } else if (acceptType === "image") {
+    if (acceptType !== "image") return;
+    if (!imageUrl) {
       setImageMetadata({
         width: 0,
         height: 0,
         size: null
       });
+      return;
     }
-
-    // if (!data.formValues) return;
-    var incoming = JSON.stringify(prevFormValues.current);
-    var current = JSON.stringify(formValues);
-    if (incoming === current) return;
-    prevFormValues.current = formValues;
-    if (data !== null && data !== void 0 && data.onDataChange) {
-      data === null || data === void 0 || data.onDataChange(id, {
-        selectedModel: selectedModel,
-        formValues: formValues,
-        loading: loading,
-        outputs: outputs,
-        resultUrl: resultUrl
+    var cancelled = false;
+    var img = new Image();
+    img.onload = function () {
+      if (cancelled) return;
+      setImageMetadata(function (prev) {
+        return _objectSpread(_objectSpread({}, prev), {}, {
+          width: img.naturalWidth,
+          height: img.naturalHeight
+        });
       });
+    };
+    img.src = imageUrl;
+    fetch(imageUrl, {
+      method: 'HEAD'
+    }).then(function (res) {
+      if (cancelled) return;
+      var size = res.headers.get('content-length');
+      setImageMetadata(function (prev) {
+        return _objectSpread(_objectSpread({}, prev), {}, {
+          size: size ? (parseInt(size) / (1024 * 1024)).toFixed(2) + ' MB' : null
+        });
+      });
+    })["catch"](function () {
+      if (!cancelled) setImageMetadata(function (prev) {
+        return _objectSpread(_objectSpread({}, prev), {}, {
+          size: null
+        });
+      });
+    });
+    return function () {
+      cancelled = true;
+    };
+  }, [imageUrl, acceptType]);
+
+  // Propagate this node's value to the parent. `data` is intentionally NOT a
+  // dependency: the parent recreates the node's `data` object on every
+  // onDataChange, so depending on it re-ran this effect forever (the source of
+  // the white-screen React #185 loop). A stable, key-order-independent compare
+  // ensures we only emit when the content really changed.
+  (0, _react.useEffect)(function () {
+    var _data$onDataChange;
+    var outputs, resultUrl;
+    if (acceptType === "image") {
+      resultUrl = formValues.image_url || null;
+      outputs = [{
+        type: "image_url",
+        value: resultUrl
+      }];
+    } else if (acceptType === "video") {
+      resultUrl = formValues.video_url || null;
+      outputs = [{
+        type: "video_url",
+        value: resultUrl
+      }];
+    } else if (acceptType === "audio") {
+      resultUrl = formValues.audio_url || null;
+      outputs = [{
+        type: "audio_url",
+        value: resultUrl
+      }];
+    } else {
+      resultUrl = formValues.prompt || "";
+      outputs = [{
+        type: "text",
+        value: resultUrl
+      }];
     }
-  }, [formValues, selectedModel, loading, id, data, acceptType]);
+    if ((0, _utility.stableStringify)(prevFormValues.current) === (0, _utility.stableStringify)(formValues)) return;
+    prevFormValues.current = formValues;
+    data === null || data === void 0 || (_data$onDataChange = data.onDataChange) === null || _data$onDataChange === void 0 || _data$onDataChange.call(data, id, {
+      selectedModel: selectedModel,
+      formValues: formValues,
+      loading: loading,
+      outputs: outputs,
+      resultUrl: resultUrl
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formValues, selectedModel, loading, id, acceptType]);
   var hasFileUrl = (formValues === null || formValues === void 0 ? void 0 : formValues.image_url) || (formValues === null || formValues === void 0 ? void 0 : formValues.video_url) || (formValues === null || formValues === void 0 ? void 0 : formValues.audio_url);
   var textareaRef = (0, _react.useRef)(null);
   (0, _react.useEffect)(function () {

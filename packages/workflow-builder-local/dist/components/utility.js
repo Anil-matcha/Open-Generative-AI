@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.videoModels = exports.videoCombinerModels = exports.textModels = exports.presets = exports.imageModels = exports.downloadFile = exports.concatModels = exports.audioModels = exports.apiNodeModels = void 0;
+exports.videoModels = exports.videoCombinerModels = exports.textModels = exports.stableStringify = exports.presets = exports.imageModels = exports.downloadFile = exports.concatModels = exports.audioModels = exports.apiNodeModels = void 0;
 var _axios = _interopRequireDefault(require("axios"));
 var _reactHotToast = require("react-hot-toast");
 function _interopRequireDefault(e) { return e && e.__esModule ? e : { "default": e }; }
@@ -11,6 +11,29 @@ function _regenerator() { /*! regenerator-runtime -- Copyright (c) 2014-present,
 function _regeneratorDefine2(e, r, n, t) { var i = Object.defineProperty; try { i({}, "", {}); } catch (e) { i = 0; } _regeneratorDefine2 = function _regeneratorDefine(e, r, n, t) { function o(r, n) { _regeneratorDefine2(e, r, function (e) { return this._invoke(r, n, e); }); } r ? i ? i(e, r, { value: n, enumerable: !t, configurable: !t, writable: !t }) : e[r] = n : (o("next", 0), o("throw", 1), o("return", 2)); }, _regeneratorDefine2(e, r, n, t); }
 function asyncGeneratorStep(n, t, e, r, o, a, c) { try { var i = n[a](c), u = i.value; } catch (n) { return void e(n); } i.done ? t(u) : Promise.resolve(u).then(r, o); }
 function _asyncToGenerator(n) { return function () { var t = this, e = arguments; return new Promise(function (r, o) { var a = n.apply(t, e); function _next(n) { asyncGeneratorStep(a, r, o, _next, _throw, "next", n); } function _throw(n) { asyncGeneratorStep(a, r, o, _next, _throw, "throw", n); } _next(void 0); }); }; }
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+// Key-order-independent JSON serialization. Two objects with the same content
+// but differently-ordered keys serialize to the same string. This is what keeps
+// the node <-> parent formValues sync from ping-ponging into React error #185
+// (the white-screen "Maximum update depth exceeded" crash) when an array field
+// such as images_list / videos_list churns its reference on every render.
+var stableStringify = exports.stableStringify = function stableStringify(obj) {
+  var _norm = function norm(v) {
+    if (Array.isArray(v)) return v.map(_norm);
+    if (v && _typeof(v) === "object") {
+      return Object.keys(v).sort().reduce(function (acc, k) {
+        acc[k] = _norm(v[k]);
+        return acc;
+      }, {});
+    }
+    return v;
+  };
+  try {
+    return JSON.stringify(_norm(obj));
+  } catch (_unused) {
+    return "";
+  }
+};
 var imageModels = exports.imageModels = [{
   id: "image-passthrough",
   name: "Input Image",

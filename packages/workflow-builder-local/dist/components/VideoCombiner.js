@@ -242,7 +242,8 @@ var VideoCombiner = function VideoCombiner(_ref) {
     }
   }, [selectedModel, formValues, loading]);
   var pollNodeStatus = function pollNodeStatus(run_id) {
-    var interval = setInterval(function () {
+    var interval;
+    var _check = function _check() {
       _axios["default"].get("/api/workflow/run/".concat(run_id, "/status")).then(function (response) {
         var _Object$entries$find;
         var nodesInRes = response.data.nodes || {};
@@ -302,28 +303,26 @@ var VideoCombiner = function VideoCombiner(_ref) {
         });
         _reactHotToast.toast.error("Failed to get workflow status Video Combiner ".concat(id.replace(/^\D+/g, "")));
       });
-    }, 3000);
+    };
+    _check();
+    interval = setInterval(_check, 500);
   };
-  var inFlightRef = (0, _react.useRef)(false);
   var handleRunSingleNode = /*#__PURE__*/function () {
     var _ref1 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee() {
-      var _nodeSchemas$categori2, workflow_id, modelSchema, params, inputSchema, localSources, _i, _Object$entries, _Object$entries$_i, key, meta, _meta$default2, response, _error$response, _t;
+      var _nodeSchemas$categori2, workflow_id, modelSchema, params, inputSchema, localSources, _i, _Object$entries, _Object$entries$_i, key, meta, _meta$default2, response, _r, _nd, _lt, _o, _error$response, _t;
       return _regenerator().w(function (_context) {
         while (1) switch (_context.p = _context.n) {
           case 0:
-            _context.n = 1;
-              break;
-          case 1:
-            _context.p = 1;
+            _context.p = 0;
             data.onDataChange(id, {
               isLoading: true
             });
-            _context.n = 2;
+            _context.n = 1;
             return data.handleSaveWorkFlow();
-          case 2:
+          case 1:
             workflow_id = _context.v;
             if (workflow_id) {
-              _context.n = 3;
+              _context.n = 2;
               break;
             }
             _reactHotToast.toast.error("Failed to save workflow before running node");
@@ -331,10 +330,10 @@ var VideoCombiner = function VideoCombiner(_ref) {
               isLoading: false
             });
             return _context.a(2);
-          case 3:
+          case 2:
             modelSchema = nodeSchemas === null || nodeSchemas === void 0 || (_nodeSchemas$categori2 = nodeSchemas.categories) === null || _nodeSchemas$categori2 === void 0 || (_nodeSchemas$categori2 = _nodeSchemas$categori2.utility) === null || _nodeSchemas$categori2 === void 0 || (_nodeSchemas$categori2 = _nodeSchemas$categori2.models[selectedModel.id]) === null || _nodeSchemas$categori2 === void 0 || (_nodeSchemas$categori2 = _nodeSchemas$categori2.input_schema) === null || _nodeSchemas$categori2 === void 0 || (_nodeSchemas$categori2 = _nodeSchemas$categori2.schemas) === null || _nodeSchemas$categori2 === void 0 ? void 0 : _nodeSchemas$categori2.input_data;
             if (!(!modelSchema || !modelSchema.properties)) {
-              _context.n = 4;
+              _context.n = 3;
               break;
             }
             _reactHotToast.toast.error("No input schema found for this model");
@@ -342,7 +341,7 @@ var VideoCombiner = function VideoCombiner(_ref) {
               isLoading: false
             });
             return _context.a(2);
-          case 4:
+          case 3:
             params = {};
             inputSchema = modelSchema.properties;
             localSources = formValues || {};
@@ -354,7 +353,7 @@ var VideoCombiner = function VideoCombiner(_ref) {
                 params[key] = (_meta$default2 = meta["default"]) !== null && _meta$default2 !== void 0 ? _meta$default2 : null;
               }
             }
-            _context.n = 5;
+            _context.n = 4;
             return _axios["default"].post("/api/workflow/".concat(workflow_id, "/node/").concat(id, "/run"), {
               run_id: runId,
               model: selectedModel.id,
@@ -362,30 +361,47 @@ var VideoCombiner = function VideoCombiner(_ref) {
               cost: generationCost,
               node_id: "Video Combiner"
             });
-          case 5:
+          case 4:
             response = _context.v;
-            { var _r = response.data; var _nd = _r && _r.nodes && (_r.nodes[id] || Object.values(_r.nodes)[0]); var _lt = _nd && _nd[_nd.length - 1]; if (_lt && (_lt.status === "succeeded" || _lt.status === "completed") && _lt.result && _lt.result.outputs) { var _o = _lt.result.outputs; data && data.onDataChange && data.onDataChange(id, { outputs: _o, resultUrl: (_o[0] && _o[0].value) || "", isLoading: false, errorMsg: null, outputHistory: (data.outputHistory || []).concat([_lt]) }); } else if (_lt && _lt.status === "failed") { data && data.onDataChange && data.onDataChange(id, { isLoading: false, errorMsg: "Generation failed" }); } else { pollNodeStatus(_r.run_id); } }
-            _context.n = 7;
+            _r = response.data;
+            _nd = _r && _r.nodes && (_r.nodes[id] || Object.values(_r.nodes)[0]);
+            _lt = _nd && _nd[_nd.length - 1];
+            if (_lt && (_lt.status === "succeeded" || _lt.status === "completed") && _lt.result && _lt.result.outputs) {
+              _o = _lt.result.outputs;
+              data && data.onDataChange && data.onDataChange(id, {
+                outputs: _o,
+                resultUrl: _o[0] && _o[0].value || "",
+                isLoading: false,
+                errorMsg: null,
+                outputHistory: (data.outputHistory || []).concat([_lt])
+              });
+            } else if (_lt && _lt.status === "failed") {
+              data && data.onDataChange && data.onDataChange(id, {
+                isLoading: false,
+                errorMsg: "Generation failed"
+              });
+            } else {
+              pollNodeStatus(_r.run_id);
+            }
+            _context.n = 6;
             break;
-          case 6:
-            _context.p = 6;
+          case 5:
+            _context.p = 5;
             _t = _context.v;
             data.onDataChange(id, {
               isLoading: false
             });
             _reactHotToast.toast.error(((_error$response = _t.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.detail) || "Error running node");
             console.error(_t);
-          case 7:
+          case 6:
             ;
-          case 8:
+          case 7:
             return _context.a(2);
         }
-      }, _callee, null, [[1, 6]]);
+      }, _callee, null, [[0, 5]]);
     }));
     return function handleRunSingleNode() {
-      if (inFlightRef.current) return Promise.resolve();
-      inFlightRef.current = true;
-      return _ref1.apply(this, arguments)["finally"](function () { inFlightRef.current = false; });
+      return _ref1.apply(this, arguments);
     };
   }();
   var handleDeleteNode = function handleDeleteNode() {

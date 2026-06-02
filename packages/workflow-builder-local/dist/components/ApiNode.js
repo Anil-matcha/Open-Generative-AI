@@ -387,9 +387,9 @@ var ApiNode = function ApiNode(_ref) {
     });
   };
   (0, _react.useEffect)(function () {
-    var incoming = JSON.stringify(data.formValues);
-    var current = JSON.stringify(formValues);
-    if (incoming === current) return;
+    // Key-order-independent compare so a parent rebuild with the same content
+    // doesn't look "different" and pull us into a sync loop (React #185).
+    if ((0, _utility.stableStringify)(data.formValues) === (0, _utility.stableStringify)(formValues)) return;
     var timer = setTimeout(function () {
       if (Object.entries(data.formValues || {}).length > 0) {
         setFormValues(data.formValues);
@@ -399,18 +399,38 @@ var ApiNode = function ApiNode(_ref) {
       return clearTimeout(timer);
     };
   }, [data.formValues]);
+  var lastSentRef = (0, _react.useRef)(null);
   (0, _react.useEffect)(function () {
-    if (data !== null && data !== void 0 && data.onDataChange) {
-      data.onDataChange(id, {
-        selectedModel: selectedModel,
-        formValues: formValues,
-        taskData: taskData,
-        loading: loading
-      });
+    var _data$selectedModel;
+    if (!(data !== null && data !== void 0 && data.onDataChange)) return;
+    var localSig = (0, _utility.stableStringify)({
+      fv: formValues,
+      td: taskData
+    });
+    var parentSig = (0, _utility.stableStringify)({
+      fv: data.formValues || {},
+      td: data.taskData
+    });
+    var sameModel = (selectedModel === null || selectedModel === void 0 ? void 0 : selectedModel.id) === ((_data$selectedModel = data.selectedModel) === null || _data$selectedModel === void 0 ? void 0 : _data$selectedModel.id);
+
+    // Echo suppression: skip propagation when the parent already holds exactly
+    // our state, otherwise array fields churn references and loop (React #185).
+    if (sameModel && localSig === parentSig) {
+      lastSentRef.current = localSig;
+      return;
     }
-  }, [selectedModel, formValues, taskData, loading]);
+    if (sameModel && localSig === lastSentRef.current) return;
+    lastSentRef.current = localSig;
+    data.onDataChange(id, {
+      selectedModel: selectedModel,
+      formValues: formValues,
+      taskData: taskData,
+      loading: loading
+    });
+  }, [selectedModel, formValues, taskData, loading, data.formValues, data.taskData, data.selectedModel]);
   var pollNodeStatus = function pollNodeStatus(run_id) {
-    var interval = setInterval(function () {
+    var interval;
+    var _check = function _check() {
       _axios["default"].get("/api/workflow/run/".concat(run_id, "/status")).then(function (response) {
         var _Object$entries$find;
         var nodesInRes = response.data.nodes || {};
@@ -475,28 +495,26 @@ var ApiNode = function ApiNode(_ref) {
         });
         _reactHotToast.toast.error("Failed to get workflow status Api ".concat(id.replace(/^\D+/g, "")));
       });
-    }, 3000);
+    };
+    _check();
+    interval = setInterval(_check, 500);
   };
-  var inFlightRef = (0, _react.useRef)(false);
   var handleRunSingleNode = /*#__PURE__*/function () {
     var _ref15 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee() {
-      var workflow_id, params, inputSchema, localSources, _i, _Object$entries, _Object$entries$_i, key, meta, _meta$default2, filteredInputParams, response, _error$response2, _t;
+      var workflow_id, params, inputSchema, localSources, _i, _Object$entries, _Object$entries$_i, key, meta, _meta$default2, filteredInputParams, response, _r, _nd, _lt, _o, _error$response2, _t;
       return _regenerator().w(function (_context) {
         while (1) switch (_context.p = _context.n) {
           case 0:
-            _context.n = 1;
-              break;
-          case 1:
-            _context.p = 1;
+            _context.p = 0;
             data.onDataChange(id, {
               isLoading: true
             });
-            _context.n = 2;
+            _context.n = 1;
             return data.handleSaveWorkFlow();
-          case 2:
+          case 1:
             workflow_id = _context.v;
             if (workflow_id) {
-              _context.n = 3;
+              _context.n = 2;
               break;
             }
             _reactHotToast.toast.error("Failed to save workflow before running node");
@@ -504,9 +522,9 @@ var ApiNode = function ApiNode(_ref) {
               isLoading: false
             });
             return _context.a(2);
-          case 3:
+          case 2:
             if (!(!modelSchema || !modelSchema.input_schema)) {
-              _context.n = 4;
+              _context.n = 3;
               break;
             }
             _reactHotToast.toast.error("No input schema found for this model");
@@ -514,7 +532,7 @@ var ApiNode = function ApiNode(_ref) {
               isLoading: false
             });
             return _context.a(2);
-          case 4:
+          case 3:
             params = {};
             inputSchema = (modelSchema === null || modelSchema === void 0 ? void 0 : modelSchema.input_schema) || {};
             localSources = formValues || {};
@@ -532,7 +550,7 @@ var ApiNode = function ApiNode(_ref) {
               return key !== "model_url" && key !== "api_key" && key !== "model_type" && key !== "model_name";
             }));
             params["params"] = filteredInputParams;
-            _context.n = 5;
+            _context.n = 4;
             return _axios["default"].post("/api/workflow/".concat(workflow_id, "/node/").concat(id, "/run"), {
               run_id: runId,
               model: selectedModel.id,
@@ -540,30 +558,47 @@ var ApiNode = function ApiNode(_ref) {
               cost: 0.025,
               node_id: "API Node"
             });
-          case 5:
+          case 4:
             response = _context.v;
-            { var _r = response.data; var _nd = _r && _r.nodes && (_r.nodes[id] || Object.values(_r.nodes)[0]); var _lt = _nd && _nd[_nd.length - 1]; if (_lt && (_lt.status === "succeeded" || _lt.status === "completed") && _lt.result && _lt.result.outputs) { var _o = _lt.result.outputs; data && data.onDataChange && data.onDataChange(id, { outputs: _o, resultUrl: (_o[0] && _o[0].value) || "", isLoading: false, errorMsg: null, outputHistory: (data.outputHistory || []).concat([_lt]) }); } else if (_lt && _lt.status === "failed") { data && data.onDataChange && data.onDataChange(id, { isLoading: false, errorMsg: "Generation failed" }); } else { pollNodeStatus(_r.run_id); } }
-            _context.n = 7;
+            _r = response.data;
+            _nd = _r && _r.nodes && (_r.nodes[id] || Object.values(_r.nodes)[0]);
+            _lt = _nd && _nd[_nd.length - 1];
+            if (_lt && (_lt.status === "succeeded" || _lt.status === "completed") && _lt.result && _lt.result.outputs) {
+              _o = _lt.result.outputs;
+              data && data.onDataChange && data.onDataChange(id, {
+                outputs: _o,
+                resultUrl: _o[0] && _o[0].value || "",
+                isLoading: false,
+                errorMsg: null,
+                outputHistory: (data.outputHistory || []).concat([_lt])
+              });
+            } else if (_lt && _lt.status === "failed") {
+              data && data.onDataChange && data.onDataChange(id, {
+                isLoading: false,
+                errorMsg: "Generation failed"
+              });
+            } else {
+              pollNodeStatus(_r.run_id);
+            }
+            _context.n = 6;
             break;
-          case 6:
-            _context.p = 6;
+          case 5:
+            _context.p = 5;
             _t = _context.v;
             data.onDataChange(id, {
               isLoading: false
             });
             _reactHotToast.toast.error(((_error$response2 = _t.response) === null || _error$response2 === void 0 || (_error$response2 = _error$response2.data) === null || _error$response2 === void 0 ? void 0 : _error$response2.detail) || "Error running node");
             console.error(_t);
-          case 7:
+          case 6:
             ;
-          case 8:
+          case 7:
             return _context.a(2);
         }
-      }, _callee, null, [[1, 6]]);
+      }, _callee, null, [[0, 5]]);
     }));
     return function handleRunSingleNode() {
-      if (inFlightRef.current) return Promise.resolve();
-      inFlightRef.current = true;
-      return _ref15.apply(this, arguments)["finally"](function () { inFlightRef.current = false; });
+      return _ref15.apply(this, arguments);
     };
   }();
   var handleDeleteNode = function handleDeleteNode() {

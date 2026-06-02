@@ -279,7 +279,7 @@ var RenderField = function RenderField(_ref) {
   }
   ;
   if (meta.minValue !== undefined && meta.maxValue !== undefined) {
-    var _ref5, _formValues$fieldName2, _ref6, _formValues$fieldName3;
+    var _ref3, _formValues$fieldName2, _ref4, _formValues$fieldName3;
     return /*#__PURE__*/_react["default"].createElement("div", {
       key: fieldName,
       className: "flex flex-col w-full"
@@ -291,7 +291,7 @@ var RenderField = function RenderField(_ref) {
       min: meta.minValue,
       max: meta.maxValue,
       step: meta.step,
-      value: (_ref5 = (_formValues$fieldName2 = formValues[fieldName]) !== null && _formValues$fieldName2 !== void 0 ? _formValues$fieldName2 : meta["default"]) !== null && _ref5 !== void 0 ? _ref5 : 0,
+      value: (_ref3 = (_formValues$fieldName2 = formValues[fieldName]) !== null && _formValues$fieldName2 !== void 0 ? _formValues$fieldName2 : meta["default"]) !== null && _ref3 !== void 0 ? _ref3 : 0,
       onChange: function onChange(e) {
         return handleChange(fieldName, parseFloat(e.target.value));
       },
@@ -302,7 +302,7 @@ var RenderField = function RenderField(_ref) {
       min: meta.minValue,
       max: meta.maxValue,
       step: meta.step,
-      value: (_ref6 = (_formValues$fieldName3 = formValues[fieldName]) !== null && _formValues$fieldName3 !== void 0 ? _formValues$fieldName3 : meta["default"]) !== null && _ref6 !== void 0 ? _ref6 : 0,
+      value: (_ref4 = (_formValues$fieldName3 = formValues[fieldName]) !== null && _formValues$fieldName3 !== void 0 ? _formValues$fieldName3 : meta["default"]) !== null && _ref4 !== void 0 ? _ref4 : 0,
       readOnly: true
       // onChange={(e) => {
       //   const val = parseFloat(e.target.value) || meta.minValue;

@@ -42,7 +42,7 @@ function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
 var inputHandles = ["textInput", "textInput2", "textInput3", "textInput4"];
 var outputHandles = ["textOutput"];
 var TextGeneration = function TextGeneration(_ref) {
-  var _data$runId, _nodeSchemas$categori, _data$selectedModel2, _data$selectedModel3, _data$selectedModel4, _data$selectedModel5, _outputHistory$curren, _currentOutputList$cu, _currentOutputList$, _data$selectedModel6;
+  var _data$runId, _nodeSchemas$categori, _data$selectedModel3, _data$selectedModel4, _data$selectedModel5, _data$selectedModel6, _outputHistory$curren, _currentOutputList$cu, _currentOutputList$, _data$selectedModel7;
   var id = _ref.id,
     data = _ref.data,
     selected = _ref.selected;
@@ -216,9 +216,9 @@ var TextGeneration = function TextGeneration(_ref) {
   }, [formValues, id]);
   (0, _react.useEffect)(function () {
     if (!data.formValues) return;
-    var incoming = JSON.stringify(data.formValues);
-    var current = JSON.stringify(formValues);
-    if (incoming === current) return;
+    // Key-order-independent compare so a parent rebuild with the same content
+    // doesn't look "different" and pull us into a sync loop (React #185).
+    if ((0, _utility.stableStringify)(data.formValues) === (0, _utility.stableStringify)(formValues)) return;
     var timer = setTimeout(function () {
       if (Object.entries(data.formValues || {}).length > 0) {
         setFormValues(data.formValues);
@@ -228,16 +228,28 @@ var TextGeneration = function TextGeneration(_ref) {
       return clearTimeout(timer);
     };
   }, [data.formValues]);
+  var lastSentRef = (0, _react.useRef)(null);
   (0, _react.useEffect)(function () {
-    var _data$selectedModel;
-    if (data !== null && data !== void 0 && data.onDataChange && (data === null || data === void 0 || (_data$selectedModel = data.selectedModel) === null || _data$selectedModel === void 0 ? void 0 : _data$selectedModel.id) !== "text-passthrough") {
-      data.onDataChange(id, {
-        selectedModel: selectedModel,
-        formValues: formValues,
-        loading: loading
-      });
+    var _data$selectedModel, _data$selectedModel2;
+    if (!(data !== null && data !== void 0 && data.onDataChange) || (data === null || data === void 0 || (_data$selectedModel = data.selectedModel) === null || _data$selectedModel === void 0 ? void 0 : _data$selectedModel.id) === "text-passthrough") return;
+    var localSig = (0, _utility.stableStringify)(formValues);
+    var parentSig = (0, _utility.stableStringify)(data.formValues || {});
+    var sameModel = (selectedModel === null || selectedModel === void 0 ? void 0 : selectedModel.id) === ((_data$selectedModel2 = data.selectedModel) === null || _data$selectedModel2 === void 0 ? void 0 : _data$selectedModel2.id);
+
+    // Echo suppression: skip propagation when the parent already holds exactly
+    // our state, otherwise the formValues sync loops (React #185).
+    if (sameModel && localSig === parentSig) {
+      lastSentRef.current = localSig;
+      return;
     }
-  }, [selectedModel, formValues, loading]);
+    if (sameModel && localSig === lastSentRef.current) return;
+    lastSentRef.current = localSig;
+    data.onDataChange(id, {
+      selectedModel: selectedModel,
+      formValues: formValues,
+      loading: loading
+    });
+  }, [selectedModel, formValues, loading, data.formValues, data.selectedModel]);
   var handleChange = function handleChange(key, value) {
     setFormValues(function (prev) {
       return _objectSpread(_objectSpread({}, prev), {}, _defineProperty({}, key, value));
@@ -245,7 +257,8 @@ var TextGeneration = function TextGeneration(_ref) {
     setDropDown(-1);
   };
   var pollNodeStatus = function pollNodeStatus(run_id) {
-    var interval = setInterval(function () {
+    var interval;
+    var _check = function _check() {
       _axios["default"].get("/api/workflow/run/".concat(run_id, "/status")).then(function (response) {
         var _Object$entries$find;
         var nodesInRes = response.data.nodes || {};
@@ -305,28 +318,26 @@ var TextGeneration = function TextGeneration(_ref) {
         });
         _reactHotToast.toast.error("Failed to get workflow status Text ".concat(id.replace(/^\D+/g, "")));
       });
-    }, 3000);
+    };
+    _check();
+    interval = setInterval(_check, 500);
   };
-  var inFlightRef = (0, _react.useRef)(false);
   var handleRunSingleNode = /*#__PURE__*/function () {
     var _ref1 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee() {
-      var _nodeSchemas$categori2, workflow_id, modelSchema, params, inputSchema, localSources, _i, _Object$entries, _Object$entries$_i, key, meta, _meta$default2, response, _error$response, _t;
+      var _nodeSchemas$categori2, workflow_id, modelSchema, params, inputSchema, localSources, _i, _Object$entries, _Object$entries$_i, key, meta, _meta$default2, response, _r, _nd, _lt, _o, _error$response, _t;
       return _regenerator().w(function (_context) {
         while (1) switch (_context.p = _context.n) {
           case 0:
-            _context.n = 1;
-            break;
-          case 1:
-            _context.p = 1;
+            _context.p = 0;
             data.onDataChange(id, {
               isLoading: true
             });
-            _context.n = 2;
+            _context.n = 1;
             return data.handleSaveWorkFlow();
-          case 2:
+          case 1:
             workflow_id = _context.v;
             if (workflow_id) {
-              _context.n = 3;
+              _context.n = 2;
               break;
             }
             _reactHotToast.toast.error("Failed to save workflow before running node");
@@ -334,10 +345,10 @@ var TextGeneration = function TextGeneration(_ref) {
               isLoading: false
             });
             return _context.a(2);
-          case 3:
+          case 2:
             modelSchema = nodeSchemas === null || nodeSchemas === void 0 || (_nodeSchemas$categori2 = nodeSchemas.categories) === null || _nodeSchemas$categori2 === void 0 || (_nodeSchemas$categori2 = _nodeSchemas$categori2.text) === null || _nodeSchemas$categori2 === void 0 || (_nodeSchemas$categori2 = _nodeSchemas$categori2.models[selectedModel.id]) === null || _nodeSchemas$categori2 === void 0 || (_nodeSchemas$categori2 = _nodeSchemas$categori2.input_schema) === null || _nodeSchemas$categori2 === void 0 || (_nodeSchemas$categori2 = _nodeSchemas$categori2.schemas) === null || _nodeSchemas$categori2 === void 0 ? void 0 : _nodeSchemas$categori2.input_data;
             if (!(!modelSchema || !modelSchema.properties)) {
-              _context.n = 4;
+              _context.n = 3;
               break;
             }
             _reactHotToast.toast.error("No input schema found for this model");
@@ -345,7 +356,7 @@ var TextGeneration = function TextGeneration(_ref) {
               isLoading: false
             });
             return _context.a(2);
-          case 4:
+          case 3:
             params = {};
             inputSchema = modelSchema.properties;
             localSources = formValues || {};
@@ -357,7 +368,7 @@ var TextGeneration = function TextGeneration(_ref) {
                 params[key] = (_meta$default2 = meta["default"]) !== null && _meta$default2 !== void 0 ? _meta$default2 : null;
               }
             }
-            _context.n = 5;
+            _context.n = 4;
             return _axios["default"].post("/api/workflow/".concat(workflow_id, "/node/").concat(id, "/run"), {
               run_id: runId,
               model: selectedModel.id,
@@ -365,30 +376,47 @@ var TextGeneration = function TextGeneration(_ref) {
               cost: generationCost,
               node_id: "AI Text"
             });
-          case 5:
+          case 4:
             response = _context.v;
-            { var _r = response.data; var _nd = _r && _r.nodes && (_r.nodes[id] || Object.values(_r.nodes)[0]); var _lt = _nd && _nd[_nd.length - 1]; if (_lt && (_lt.status === "succeeded" || _lt.status === "completed") && _lt.result && _lt.result.outputs) { var _o = _lt.result.outputs; data && data.onDataChange && data.onDataChange(id, { outputs: _o, resultUrl: (_o[0] && _o[0].value) || "", isLoading: false, errorMsg: null, outputHistory: (data.outputHistory || []).concat([_lt]) }); } else if (_lt && _lt.status === "failed") { data && data.onDataChange && data.onDataChange(id, { isLoading: false, errorMsg: "Generation failed" }); } else { pollNodeStatus(_r.run_id); } }
-            _context.n = 7;
+            _r = response.data;
+            _nd = _r && _r.nodes && (_r.nodes[id] || Object.values(_r.nodes)[0]);
+            _lt = _nd && _nd[_nd.length - 1];
+            if (_lt && (_lt.status === "succeeded" || _lt.status === "completed") && _lt.result && _lt.result.outputs) {
+              _o = _lt.result.outputs;
+              data && data.onDataChange && data.onDataChange(id, {
+                outputs: _o,
+                resultUrl: _o[0] && _o[0].value || "",
+                isLoading: false,
+                errorMsg: null,
+                outputHistory: (data.outputHistory || []).concat([_lt])
+              });
+            } else if (_lt && _lt.status === "failed") {
+              data && data.onDataChange && data.onDataChange(id, {
+                isLoading: false,
+                errorMsg: "Generation failed"
+              });
+            } else {
+              pollNodeStatus(_r.run_id);
+            }
+            _context.n = 6;
             break;
-          case 6:
-            _context.p = 6;
+          case 5:
+            _context.p = 5;
             _t = _context.v;
             data.onDataChange(id, {
               isLoading: false
             });
             _reactHotToast.toast.error(((_error$response = _t.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.detail) || "Error running node");
             console.error(_t);
-          case 7:
+          case 6:
             ;
-          case 8:
+          case 7:
             return _context.a(2);
         }
-      }, _callee, null, [[1, 6]]);
+      }, _callee, null, [[0, 5]]);
     }));
     return function handleRunSingleNode() {
-      if (inFlightRef.current) return Promise.resolve();
-      inFlightRef.current = true;
-      return _ref1.apply(this, arguments)["finally"](function () { inFlightRef.current = false; });
+      return _ref1.apply(this, arguments);
     };
   }();
   var handleDeleteNode = function handleDeleteNode() {
@@ -407,10 +435,10 @@ var TextGeneration = function TextGeneration(_ref) {
     }
     ;
   };
-  var hasPrompt = properties && "prompt" in properties && !((_data$selectedModel2 = data.selectedModel) !== null && _data$selectedModel2 !== void 0 && (_data$selectedModel2 = _data$selectedModel2.id) !== null && _data$selectedModel2 !== void 0 && _data$selectedModel2.includes("passthrough"));
-  var hasImagesList = properties && "images_list" in properties && !((_data$selectedModel3 = data.selectedModel) !== null && _data$selectedModel3 !== void 0 && (_data$selectedModel3 = _data$selectedModel3.id) !== null && _data$selectedModel3 !== void 0 && _data$selectedModel3.includes("passthrough"));
-  var hasImageUrl = properties && "image_url" in properties && !((_data$selectedModel4 = data.selectedModel) !== null && _data$selectedModel4 !== void 0 && (_data$selectedModel4 = _data$selectedModel4.id) !== null && _data$selectedModel4 !== void 0 && _data$selectedModel4.includes("passthrough"));
-  var hasSystemPrompt = properties && "system_prompt" in properties && !((_data$selectedModel5 = data.selectedModel) !== null && _data$selectedModel5 !== void 0 && (_data$selectedModel5 = _data$selectedModel5.id) !== null && _data$selectedModel5 !== void 0 && _data$selectedModel5.includes("passthrough"));
+  var hasPrompt = properties && "prompt" in properties && !((_data$selectedModel3 = data.selectedModel) !== null && _data$selectedModel3 !== void 0 && (_data$selectedModel3 = _data$selectedModel3.id) !== null && _data$selectedModel3 !== void 0 && _data$selectedModel3.includes("passthrough"));
+  var hasImagesList = properties && "images_list" in properties && !((_data$selectedModel4 = data.selectedModel) !== null && _data$selectedModel4 !== void 0 && (_data$selectedModel4 = _data$selectedModel4.id) !== null && _data$selectedModel4 !== void 0 && _data$selectedModel4.includes("passthrough"));
+  var hasImageUrl = properties && "image_url" in properties && !((_data$selectedModel5 = data.selectedModel) !== null && _data$selectedModel5 !== void 0 && (_data$selectedModel5 = _data$selectedModel5.id) !== null && _data$selectedModel5 !== void 0 && _data$selectedModel5.includes("passthrough"));
+  var hasSystemPrompt = properties && "system_prompt" in properties && !((_data$selectedModel6 = data.selectedModel) !== null && _data$selectedModel6 !== void 0 && (_data$selectedModel6 = _data$selectedModel6.id) !== null && _data$selectedModel6 !== void 0 && _data$selectedModel6.includes("passthrough"));
   (0, _react.useEffect)(function () {
     var timeout = setTimeout(function () {
       var validHandles = [hasPrompt && "textInput", hasImageUrl && "textInput2", hasImagesList && "textInput3", hasSystemPrompt && "textInput4"].filter(Boolean);
@@ -624,7 +652,7 @@ var TextGeneration = function TextGeneration(_ref) {
     nodeId: id,
     onDuplicate: data.duplicateNode,
     onDelete: handleDeleteNode
-  }))), ((_data$selectedModel6 = data.selectedModel) === null || _data$selectedModel6 === void 0 ? void 0 : _data$selectedModel6.id) === "text-passthrough" ? /*#__PURE__*/_react["default"].createElement("div", {
+  }))), ((_data$selectedModel7 = data.selectedModel) === null || _data$selectedModel7 === void 0 ? void 0 : _data$selectedModel7.id) === "text-passthrough" ? /*#__PURE__*/_react["default"].createElement("div", {
     className: "w-full h-full flex-1 flex flex-col"
   }, /*#__PURE__*/_react["default"].createElement(_UploadNode["default"], {
     id: id,

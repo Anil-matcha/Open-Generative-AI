@@ -60,7 +60,7 @@ var inputHandles = ["videoInput",
 ];
 var outputHandles = ["videoOutput"];
 var VideoGeneration = function VideoGeneration(_ref) {
-  var _data$runId, _nodeSchemas$categori, _data$selectedModel2, _data$selectedModel3, _data$selectedModel4, _data$selectedModel5, _data$selectedModel6, _data$selectedModel7, _data$selectedModel8, _data$selectedModel9, _outputHistory$curren, _currentOutputList$cu, _currentOutputList$, _data$selectedModel0;
+  var _data$runId, _nodeSchemas$categori, _data$selectedModel3, _data$selectedModel4, _data$selectedModel5, _data$selectedModel6, _data$selectedModel7, _data$selectedModel8, _data$selectedModel9, _data$selectedModel0, _outputHistory$curren, _currentOutputList$cu, _currentOutputList$, _data$selectedModel1;
   var id = _ref.id,
     data = _ref.data,
     selected = _ref.selected;
@@ -103,7 +103,7 @@ var VideoGeneration = function VideoGeneration(_ref) {
   var videoRef = (0, _react.useRef)(null);
   var outputHistory = data.outputHistory || [];
   var prevHistoryLengthRef = (0, _react.useRef)(outputHistory.length);
-  var inFlightRef = (0, _react.useRef)(false);
+  var inFlightRef = (0, _react.useRef)(false); // guards against duplicate concurrent generation requests
   var workflowId = (0, _WorkflowStore.getWorkflowId)();
   var runId = (_data$runId = data.runId) !== null && _data$runId !== void 0 ? _data$runId : (0, _WorkflowStore.getRunId)();
   var nodeSchemas = data.nodeSchemas || {};
@@ -242,9 +242,9 @@ var VideoGeneration = function VideoGeneration(_ref) {
   };
   (0, _react.useEffect)(function () {
     if (!data.formValues) return;
-    var incoming = JSON.stringify(data.formValues);
-    var current = JSON.stringify(formValues);
-    if (incoming === current) return;
+    // Key-order-independent compare so a parent rebuild with the same content
+    // doesn't look "different" and pull us into a sync loop (React #185).
+    if ((0, _utility.stableStringify)(data.formValues) === (0, _utility.stableStringify)(formValues)) return;
     var timer = setTimeout(function () {
       if (Object.entries(data.formValues || {}).length > 0) {
         setFormValues(data.formValues);
@@ -254,22 +254,40 @@ var VideoGeneration = function VideoGeneration(_ref) {
       return clearTimeout(timer);
     };
   }, [data.formValues]);
+  var lastSentRef = (0, _react.useRef)(null);
   (0, _react.useEffect)(function () {
-    var _data$selectedModel;
-    if (data !== null && data !== void 0 && data.onDataChange && (data === null || data === void 0 || (_data$selectedModel = data.selectedModel) === null || _data$selectedModel === void 0 ? void 0 : _data$selectedModel.id) !== "video-passthrough") {
-      data.onDataChange(id, {
-        selectedModel: selectedModel,
-        formValues: formValues,
-        loading: loading
-      });
+    var _data$selectedModel, _data$selectedModel2;
+    if (!(data !== null && data !== void 0 && data.onDataChange) || (data === null || data === void 0 || (_data$selectedModel = data.selectedModel) === null || _data$selectedModel === void 0 ? void 0 : _data$selectedModel.id) === "video-passthrough") return;
+    var localSig = (0, _utility.stableStringify)(formValues);
+    var parentSig = (0, _utility.stableStringify)(data.formValues || {});
+    var sameModel = (selectedModel === null || selectedModel === void 0 ? void 0 : selectedModel.id) === ((_data$selectedModel2 = data.selectedModel) === null || _data$selectedModel2 === void 0 ? void 0 : _data$selectedModel2.id);
+
+    // Echo suppression: if the parent already holds exactly this state, sending
+    // it back would just bounce through onDataChange <-> formValues forever
+    // (React #185 — an array field like videos_list churns its reference).
+    if (sameModel && localSig === parentSig) {
+      lastSentRef.current = localSig;
+      return;
     }
-  }, [selectedModel, formValues, loading]);
+    if (sameModel && localSig === lastSentRef.current) return;
+    lastSentRef.current = localSig;
+    data.onDataChange(id, {
+      selectedModel: selectedModel,
+      formValues: formValues,
+      loading: loading
+    });
+  }, [selectedModel, formValues, loading, data.formValues, data.selectedModel]);
   var pollNodeStatus = function pollNodeStatus(run_id) {
-    var interval; var _attempts = 0; var MAX_ATTEMPTS = 360;
-    var _poll = function() {
-      if (++_attempts > MAX_ATTEMPTS) {
+    var interval;
+    var attempts = 0;
+    var MAX_ATTEMPTS = 360; // 360 × 500ms = 3 minutes max
+    var _check = function _check() {
+      if (++attempts > MAX_ATTEMPTS) {
         clearInterval(interval);
-        data.onDataChange(id, { isLoading: false, errorMsg: "Generation timed out" });
+        data.onDataChange(id, {
+          isLoading: false,
+          errorMsg: "Generation timed out"
+        });
         _reactHotToast.toast.error("Video generation timed out");
         return;
       }
@@ -333,27 +351,32 @@ var VideoGeneration = function VideoGeneration(_ref) {
         _reactHotToast.toast.error("Failed to get workflow status Video ".concat(id.replace(/^\D+/g, "")));
       });
     };
-    _poll(); interval = setInterval(_poll, 500);
+    _check();
+    interval = setInterval(_check, 500);
   };
   var handleRunSingleNode = /*#__PURE__*/function () {
     var _ref1 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee() {
-      var _nodeSchemas$categori2, workflow_id, modelSchema, params, inputSchema, localSources, _i, _Object$entries, _Object$entries$_i, key, meta, _meta$default2, response, _error$response, _t;
+      var _nodeSchemas$categori2, workflow_id, modelSchema, params, inputSchema, localSources, _i, _Object$entries, _Object$entries$_i, key, meta, _meta$default2, response, _r, _nd, _lt, _o, _error$response, _t;
       return _regenerator().w(function (_context) {
         while (1) switch (_context.p = _context.n) {
           case 0:
-            _context.n = 1;
-            break;
+            if (!inFlightRef.current) {
+              _context.n = 1;
+              break;
+            }
+            return _context.a(2);
           case 1:
-            _context.p = 1;
+            inFlightRef.current = true;
+            _context.p = 2;
             data.onDataChange(id, {
               isLoading: true
             });
-            _context.n = 2;
+            _context.n = 3;
             return data.handleSaveWorkFlow();
-          case 2:
+          case 3:
             workflow_id = _context.v;
             if (workflow_id) {
-              _context.n = 3;
+              _context.n = 4;
               break;
             }
             _reactHotToast.toast.error("Failed to save workflow before running node");
@@ -361,10 +384,10 @@ var VideoGeneration = function VideoGeneration(_ref) {
               isLoading: false
             });
             return _context.a(2);
-          case 3:
+          case 4:
             modelSchema = nodeSchemas === null || nodeSchemas === void 0 || (_nodeSchemas$categori2 = nodeSchemas.categories) === null || _nodeSchemas$categori2 === void 0 || (_nodeSchemas$categori2 = _nodeSchemas$categori2.video) === null || _nodeSchemas$categori2 === void 0 || (_nodeSchemas$categori2 = _nodeSchemas$categori2.models[selectedModel.id]) === null || _nodeSchemas$categori2 === void 0 || (_nodeSchemas$categori2 = _nodeSchemas$categori2.input_schema) === null || _nodeSchemas$categori2 === void 0 || (_nodeSchemas$categori2 = _nodeSchemas$categori2.schemas) === null || _nodeSchemas$categori2 === void 0 ? void 0 : _nodeSchemas$categori2.input_data;
             if (!(!modelSchema || !modelSchema.properties)) {
-              _context.n = 4;
+              _context.n = 5;
               break;
             }
             _reactHotToast.toast.error("No input schema found for this model");
@@ -372,7 +395,7 @@ var VideoGeneration = function VideoGeneration(_ref) {
               isLoading: false
             });
             return _context.a(2);
-          case 4:
+          case 5:
             params = {};
             inputSchema = modelSchema.properties;
             localSources = formValues || {};
@@ -384,7 +407,7 @@ var VideoGeneration = function VideoGeneration(_ref) {
                 params[key] = (_meta$default2 = meta["default"]) !== null && _meta$default2 !== void 0 ? _meta$default2 : null;
               }
             }
-            _context.n = 5;
+            _context.n = 6;
             return _axios["default"].post("/api/workflow/".concat(workflow_id, "/node/").concat(id, "/run"), {
               run_id: runId,
               model: selectedModel.id,
@@ -392,30 +415,51 @@ var VideoGeneration = function VideoGeneration(_ref) {
               cost: generationCost,
               node_id: "AI Video"
             });
-          case 5:
-            response = _context.v;
-            { var _r = response.data; var _nd = _r && _r.nodes && (_r.nodes[id] || Object.values(_r.nodes)[0]); var _lt = _nd && _nd[_nd.length - 1]; if (_lt && (_lt.status === "succeeded" || _lt.status === "completed") && _lt.result && _lt.result.outputs) { var _o = _lt.result.outputs; data && data.onDataChange && data.onDataChange(id, { outputs: _o, resultUrl: (_o[0] && _o[0].value) || "", isLoading: false, errorMsg: null, outputHistory: (data.outputHistory || []).concat([_lt]) }); } else if (_lt && _lt.status === "failed") { data && data.onDataChange && data.onDataChange(id, { isLoading: false, errorMsg: "Generation failed" }); } else { pollNodeStatus(_r.run_id); } }
-            _context.n = 7;
-            break;
           case 6:
-            _context.p = 6;
+            response = _context.v;
+            _r = response.data;
+            _nd = _r && _r.nodes && (_r.nodes[id] || Object.values(_r.nodes)[0]);
+            _lt = _nd && _nd[_nd.length - 1];
+            if (_lt && (_lt.status === "succeeded" || _lt.status === "completed") && _lt.result && _lt.result.outputs) {
+              _o = _lt.result.outputs;
+              data && data.onDataChange && data.onDataChange(id, {
+                outputs: _o,
+                resultUrl: _o[0] && _o[0].value || "",
+                isLoading: false,
+                errorMsg: null,
+                outputHistory: (data.outputHistory || []).concat([_lt])
+              });
+            } else if (_lt && _lt.status === "failed") {
+              data && data.onDataChange && data.onDataChange(id, {
+                isLoading: false,
+                errorMsg: "Generation failed"
+              });
+            } else {
+              pollNodeStatus(_r.run_id);
+            }
+            _context.n = 8;
+            break;
+          case 7:
+            _context.p = 7;
             _t = _context.v;
             data.onDataChange(id, {
               isLoading: false
             });
             _reactHotToast.toast.error(((_error$response = _t.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.detail) || "Error running node");
             console.error(_t);
-          case 7:
-            ;
           case 8:
+            _context.p = 8;
+            inFlightRef.current = false;
+            return _context.f(8);
+          case 9:
+            ;
+          case 10:
             return _context.a(2);
         }
-      }, _callee, null, [[1, 6]]);
+      }, _callee, null, [[2, 7, 8, 9]]);
     }));
     return function handleRunSingleNode() {
-      if (inFlightRef.current) return Promise.resolve();
-      inFlightRef.current = true;
-      return _ref1.apply(this, arguments)["finally"](function () { inFlightRef.current = false; });
+      return _ref1.apply(this, arguments);
     };
   }();
   var handleDeleteNode = function handleDeleteNode() {
@@ -434,14 +478,14 @@ var VideoGeneration = function VideoGeneration(_ref) {
     }
     ;
   };
-  var hasPrompt = properties && "prompt" in properties && !((_data$selectedModel2 = data.selectedModel) !== null && _data$selectedModel2 !== void 0 && _data$selectedModel2.id.includes("passthrough"));
-  var hasImagesList = properties && "images_list" in properties && !((_data$selectedModel3 = data.selectedModel) !== null && _data$selectedModel3 !== void 0 && _data$selectedModel3.id.includes("passthrough"));
-  var hasVideosList = properties && ("videos_list" in properties || "video_files" in properties) && !((_data$selectedModel4 = data.selectedModel) !== null && _data$selectedModel4 !== void 0 && _data$selectedModel4.id.includes("passthrough"));
-  var hasLastImage = properties && "last_image" in properties && !((_data$selectedModel5 = data.selectedModel) !== null && _data$selectedModel5 !== void 0 && _data$selectedModel5.id.includes("passthrough"));
-  var hasImageUrl = properties && "image_url" in properties && !((_data$selectedModel6 = data.selectedModel) !== null && _data$selectedModel6 !== void 0 && _data$selectedModel6.id.includes("passthrough"));
-  var hasVideoUrl = properties && "video_url" in properties && !((_data$selectedModel7 = data.selectedModel) !== null && _data$selectedModel7 !== void 0 && _data$selectedModel7.id.includes("passthrough"));
-  var hasAudioUrl = properties && "audio_url" in properties && !((_data$selectedModel8 = data.selectedModel) !== null && _data$selectedModel8 !== void 0 && _data$selectedModel8.id.includes("passthrough"));
-  var hasAudiosList = properties && ("audios_list" in properties || "audio_files" in properties) && !((_data$selectedModel9 = data.selectedModel) !== null && _data$selectedModel9 !== void 0 && _data$selectedModel9.id.includes("passthrough"));
+  var hasPrompt = properties && "prompt" in properties && !((_data$selectedModel3 = data.selectedModel) !== null && _data$selectedModel3 !== void 0 && _data$selectedModel3.id.includes("passthrough"));
+  var hasImagesList = properties && "images_list" in properties && !((_data$selectedModel4 = data.selectedModel) !== null && _data$selectedModel4 !== void 0 && _data$selectedModel4.id.includes("passthrough"));
+  var hasVideosList = properties && ("videos_list" in properties || "video_files" in properties) && !((_data$selectedModel5 = data.selectedModel) !== null && _data$selectedModel5 !== void 0 && _data$selectedModel5.id.includes("passthrough"));
+  var hasLastImage = properties && "last_image" in properties && !((_data$selectedModel6 = data.selectedModel) !== null && _data$selectedModel6 !== void 0 && _data$selectedModel6.id.includes("passthrough"));
+  var hasImageUrl = properties && "image_url" in properties && !((_data$selectedModel7 = data.selectedModel) !== null && _data$selectedModel7 !== void 0 && _data$selectedModel7.id.includes("passthrough"));
+  var hasVideoUrl = properties && "video_url" in properties && !((_data$selectedModel8 = data.selectedModel) !== null && _data$selectedModel8 !== void 0 && _data$selectedModel8.id.includes("passthrough"));
+  var hasAudioUrl = properties && "audio_url" in properties && !((_data$selectedModel9 = data.selectedModel) !== null && _data$selectedModel9 !== void 0 && _data$selectedModel9.id.includes("passthrough"));
+  var hasAudiosList = properties && ("audios_list" in properties || "audio_files" in properties) && !((_data$selectedModel0 = data.selectedModel) !== null && _data$selectedModel0 !== void 0 && _data$selectedModel0.id.includes("passthrough"));
   (0, _react.useEffect)(function () {
     var timeout = setTimeout(function () {
       var validHandles = [hasPrompt && "videoInput", hasImageUrl && "videoInput2", hasLastImage && "videoInput3", hasVideoUrl && "videoInput4", hasAudioUrl && "videoInput5", hasImagesList && "videoInput6", hasVideosList && "videoInput7", hasAudiosList && "videoInput8"].filter(Boolean);
@@ -648,7 +692,7 @@ var VideoGeneration = function VideoGeneration(_ref) {
     onDuplicate: data.duplicateNode,
     onDelete: handleDeleteNode,
     downloadUrl: currentOutput
-  }))), ((_data$selectedModel0 = data.selectedModel) === null || _data$selectedModel0 === void 0 ? void 0 : _data$selectedModel0.id) === "video-passthrough" ? /*#__PURE__*/_react["default"].createElement("div", {
+  }))), ((_data$selectedModel1 = data.selectedModel) === null || _data$selectedModel1 === void 0 ? void 0 : _data$selectedModel1.id) === "video-passthrough" ? /*#__PURE__*/_react["default"].createElement("div", {
     className: "w-full h-full flex-1"
   }, /*#__PURE__*/_react["default"].createElement(_UploadNode["default"], {
     id: id,

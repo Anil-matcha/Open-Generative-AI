@@ -45,6 +45,9 @@ var SPECIAL_MODEL_NAMES = {
   "gemini-3.1-flash-image-preview": "Nano Banana 2",
   "gemini-3-pro-image-preview": "Nano Banana Pro"
 };
+
+// Only these three image models are exposed in the "Generate Image" menu.
+// Editing is disabled in the builder, so the "Edit Image" category is hidden.
 var ALLOWED_GENERATE_IMAGE = new Set(["gpt-image-2", "gemini-3.1-flash-image-preview", "gemini-3-pro-image-preview"]);
 var NodesNavbar = function NodesNavbar(_ref) {
   var addNode = _ref.addNode,
@@ -134,9 +137,12 @@ var NodesNavbar = function NodesNavbar(_ref) {
         type: 'audioNode'
       });
     })));
+
+    // Restrict the Generate Image menu to the three allowed models only.
     var generateImageModels = imageModels.filter(function (m) {
       return ALLOWED_GENERATE_IMAGE.has(m === null || m === void 0 ? void 0 : m.id);
     });
+    // Editing is disabled in the builder — keep the list empty.
     var editImageModels = [];
     var upscaleImageModels = imageModels.filter(function (m) {
       return (m === null || m === void 0 ? void 0 : m.id) && !isPassthrough(m) && m.id.includes("upscale");
@@ -207,6 +213,7 @@ var NodesNavbar = function NodesNavbar(_ref) {
       id: "generate-image"
     }
     // Edit Image disabled — generation only.
+    // { label: "Edit Image", icon: <RiImageAiLine />, hasSubmenu: true, id: "edit-image" },
     // { label: "Upscale Image", icon: <MdOutlineImage />, hasSubmenu: true, id: "upscale-image" },
     // { label: "Image Utilities", icon: <MdCrop />, hasSubmenu: true, id: "image-utils" },
     ]
