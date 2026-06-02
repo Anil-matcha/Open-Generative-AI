@@ -15,6 +15,8 @@ import {
   getMaxImagesForI2IModel,
   getEffectsForI2IModel,
   getDefaultEffectForI2IModel,
+  getImageInputOptions,
+  getImageInputDefault,
 } from "../models.js";
 
 // ─── helpers ────────────────────────────────────────────────────────────────
@@ -763,6 +765,16 @@ export default function ImageStudio({
   });
   const [selectedEffect, setSelectedEffect] = useState("");
   const [maxImages, setMaxImages] = useState(1);
+  // Extra image parameters (quality / format / background / moderation), mirroring
+  // the memefast playground. Each defaults to the model's declared default.
+  const [selectedQualityOpt, setSelectedQualityOpt] = useState(
+    () => getImageInputDefault(t2iModels[0].id, "quality"),
+  );
+  const [selectedFormat, setSelectedFormat] = useState(
+    () => getImageInputDefault(t2iModels[0].id, "format"),
+  );
+  const [selectedBackground, setSelectedBackground] = useState(null);
+  const [selectedModeration, setSelectedModeration] = useState(null);
 
   // ── Prompt / upload state ───────────────────────────────────────────────
   const [prompt, setPrompt] = useState("");
@@ -938,6 +950,12 @@ export default function ImageStudio({
   const currentEffects = imageMode ? getEffectsForI2IModel(selectedModelId) : [];
   const showEffectBtn = currentEffects.length > 0;
 
+  // Extra parameter option lists for the current model.
+  const currentQualityOptions = getImageInputOptions(selectedModelId, "quality");
+  const currentFormatOptions = getImageInputOptions(selectedModelId, "format");
+  const currentBackgroundOptions = getImageInputOptions(selectedModelId, "background");
+  const currentModerationOptions = getImageInputOptions(selectedModelId, "moderation");
+
   // ── Textarea auto-resize ─────────────────────────────────────────────────
   const handleTextareaInput = () => {
     const el = textareaRef.current;
@@ -963,6 +981,10 @@ export default function ImageStudio({
         setSelectedModelName(firstI2I.name);
         setSelectedAr(ars[0] || "1:1");
         setSelectedQuality(resolutions[0] || null);
+        setSelectedQualityOpt(getImageInputDefault(firstI2I.id, "quality"));
+        setSelectedFormat(getImageInputDefault(firstI2I.id, "format"));
+        setSelectedBackground(getImageInputDefault(firstI2I.id, "background"));
+        setSelectedModeration(getImageInputDefault(firstI2I.id, "moderation"));
         setSelectedEffect(effects.length > 0 ? (getDefaultEffectForI2IModel(firstI2I.id) || effects[0]) : "");
         setMaxImages(getMaxImagesForI2IModel(firstI2I.id));
       }
@@ -980,6 +1002,10 @@ export default function ImageStudio({
     setSelectedModelName(firstT2I.name);
     setSelectedAr(ars[0] || "1:1");
     setSelectedQuality(resolutions[0] || null);
+    setSelectedQualityOpt(getImageInputDefault(firstT2I.id, "quality"));
+    setSelectedFormat(getImageInputDefault(firstT2I.id, "format"));
+    setSelectedBackground(getImageInputDefault(firstT2I.id, "background"));
+    setSelectedModeration(getImageInputDefault(firstT2I.id, "moderation"));
     setSelectedEffect("");
     setMaxImages(1);
   }, []);
@@ -996,6 +1022,10 @@ export default function ImageStudio({
     setSelectedModelName(m.name);
     setSelectedAr(ars[0] || "1:1");
     setSelectedQuality(resolutions[0] || null);
+    setSelectedQualityOpt(getImageInputDefault(m.id, "quality"));
+    setSelectedFormat(getImageInputDefault(m.id, "format"));
+    setSelectedBackground(getImageInputDefault(m.id, "background"));
+    setSelectedModeration(getImageInputDefault(m.id, "moderation"));
     if (imageMode) {
       setMaxImages(getMaxImagesForI2IModel(m.id));
       const effects = getEffectsForI2IModel(m.id);
@@ -1057,6 +1087,10 @@ export default function ImageStudio({
     setSelectedModelName(firstT2I.name);
     setSelectedAr(ars[0] || "1:1");
     setSelectedQuality(resolutions[0] || null);
+    setSelectedQualityOpt(getImageInputDefault(firstT2I.id, "quality"));
+    setSelectedFormat(getImageInputDefault(firstT2I.id, "format"));
+    setSelectedBackground(getImageInputDefault(firstT2I.id, "background"));
+    setSelectedModeration(getImageInputDefault(firstT2I.id, "moderation"));
     setSelectedEffect("");
     setMaxImages(1);
   };
@@ -1086,6 +1120,10 @@ export default function ImageStudio({
               if (snap.qualityField && snap.selectedQuality) {
                 genParams[snap.qualityField] = snap.selectedQuality;
               }
+              if (snap.selectedQualityOpt) genParams.quality = snap.selectedQualityOpt;
+              if (snap.selectedFormat) genParams.format = snap.selectedFormat;
+              if (snap.selectedBackground) genParams.background = snap.selectedBackground;
+              if (snap.selectedModeration) genParams.moderation = snap.selectedModeration;
               if (snap.effect) genParams.name = snap.effect;
               return await generateI2I(apiKey, genParams);
             } else {
@@ -1097,6 +1135,8 @@ export default function ImageStudio({
               if (snap.qualityField && snap.selectedQuality) {
                 genParams[snap.qualityField] = snap.selectedQuality;
               }
+              if (snap.selectedQualityOpt) genParams.quality = snap.selectedQualityOpt;
+              if (snap.selectedFormat) genParams.format = snap.selectedFormat;
               return await generateImage(apiKey, genParams);
             }
           })
@@ -1168,6 +1208,10 @@ export default function ImageStudio({
       prompt,
       qualityField: currentQualityField,
       selectedQuality,
+      selectedQualityOpt: currentQualityOptions.length > 0 ? selectedQualityOpt : null,
+      selectedFormat: currentFormatOptions.length > 0 ? selectedFormat : null,
+      selectedBackground: currentBackgroundOptions.length > 0 ? selectedBackground : null,
+      selectedModeration: currentModerationOptions.length > 0 ? selectedModeration : null,
       effect: showEffectBtn ? selectedEffect : "",
       selectedAr,
       batchSize,
@@ -1409,6 +1453,7 @@ export default function ImageStudio({
               </div>
 
               {/* Aspect ratio button */}
+              {currentAspectRatios.length > 0 && (
               <div className="relative">
                 <button
                   type="button"
@@ -1441,6 +1486,7 @@ export default function ImageStudio({
                   </div>
                 )}
               </div>
+              )}
 
               {/* Quality/resolution button */}
               {showQualityBtn && (
@@ -1471,6 +1517,152 @@ export default function ImageStudio({
                         options={currentResolutions}
                         selected={selectedQuality}
                         onSelect={(val) => setSelectedQuality(val)}
+                        onClose={() => setDropdownOpen(null)}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Quality button (auto/high/medium/low) */}
+              {currentQualityOptions.length > 0 && (
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDropdownOpen((o) => (o === "qualopt" ? null : "qualopt"));
+                    }}
+                    className="flex items-center gap-2 px-3 py-2 bg-white/[0.03] hover:bg-white/[0.06] rounded-md transition-all border border-white/[0.03] group whitespace-nowrap"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="opacity-40 text-white">
+                      <polygon points="12 2 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9" />
+                    </svg>
+                    <span className="text-[11px] font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors capitalize">
+                      {selectedQualityOpt || currentQualityOptions[0]}
+                    </span>
+                  </button>
+
+                  {dropdownOpen === "qualopt" && (
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      className="absolute bottom-[calc(100%+12px)] left-0 z-50 bg-[#0a0a0a] rounded-md p-3 max-h-[40vh] overflow-y-auto custom-scrollbar shadow-2xl border border-white/[0.05] min-w-[160px]"
+                    >
+                      <SimpleDropdown
+                        title="Качество"
+                        options={currentQualityOptions}
+                        selected={selectedQualityOpt}
+                        onSelect={(val) => setSelectedQualityOpt(val)}
+                        onClose={() => setDropdownOpen(null)}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Output format button (jpeg/png/webp) */}
+              {currentFormatOptions.length > 0 && (
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDropdownOpen((o) => (o === "format" ? null : "format"));
+                    }}
+                    className="flex items-center gap-2 px-3 py-2 bg-white/[0.03] hover:bg-white/[0.06] rounded-md transition-all border border-white/[0.03] group whitespace-nowrap"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="opacity-40 text-white">
+                      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                      <polyline points="14 2 14 8 20 8" />
+                    </svg>
+                    <span className="text-[11px] font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors uppercase">
+                      {selectedFormat || currentFormatOptions[0]}
+                    </span>
+                  </button>
+
+                  {dropdownOpen === "format" && (
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      className="absolute bottom-[calc(100%+12px)] left-0 z-50 bg-[#0a0a0a] rounded-md p-3 max-h-[40vh] overflow-y-auto custom-scrollbar shadow-2xl border border-white/[0.05] min-w-[160px]"
+                    >
+                      <SimpleDropdown
+                        title="Формат"
+                        options={currentFormatOptions}
+                        selected={selectedFormat}
+                        onSelect={(val) => setSelectedFormat(val)}
+                        onClose={() => setDropdownOpen(null)}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Background mode button (auto/transparent/opaque) — editing only */}
+              {currentBackgroundOptions.length > 0 && (
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDropdownOpen((o) => (o === "background" ? null : "background"));
+                    }}
+                    className="flex items-center gap-2 px-3 py-2 bg-white/[0.03] hover:bg-white/[0.06] rounded-md transition-all border border-white/[0.03] group whitespace-nowrap"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="opacity-40 text-white">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                      <path d="M3 9h18M9 21V9" />
+                    </svg>
+                    <span className="text-[11px] font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors capitalize">
+                      {selectedBackground || currentBackgroundOptions[0]}
+                    </span>
+                  </button>
+
+                  {dropdownOpen === "background" && (
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      className="absolute bottom-[calc(100%+12px)] left-0 z-50 bg-[#0a0a0a] rounded-md p-3 max-h-[40vh] overflow-y-auto custom-scrollbar shadow-2xl border border-white/[0.05] min-w-[160px]"
+                    >
+                      <SimpleDropdown
+                        title="Фон"
+                        options={currentBackgroundOptions}
+                        selected={selectedBackground}
+                        onSelect={(val) => setSelectedBackground(val)}
+                        onClose={() => setDropdownOpen(null)}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Moderation button (auto/low) — editing only */}
+              {currentModerationOptions.length > 0 && (
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDropdownOpen((o) => (o === "moderation" ? null : "moderation"));
+                    }}
+                    className="flex items-center gap-2 px-3 py-2 bg-white/[0.03] hover:bg-white/[0.06] rounded-md transition-all border border-white/[0.03] group whitespace-nowrap"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="opacity-40 text-white">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                    <span className="text-[11px] font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors capitalize">
+                      {selectedModeration || currentModerationOptions[0]}
+                    </span>
+                  </button>
+
+                  {dropdownOpen === "moderation" && (
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      className="absolute bottom-[calc(100%+12px)] left-0 z-50 bg-[#0a0a0a] rounded-md p-3 max-h-[40vh] overflow-y-auto custom-scrollbar shadow-2xl border border-white/[0.05] min-w-[160px]"
+                    >
+                      <SimpleDropdown
+                        title="Модерация"
+                        options={currentModerationOptions}
+                        selected={selectedModeration}
+                        onSelect={(val) => setSelectedModeration(val)}
                         onClose={() => setDropdownOpen(null)}
                       />
                     </div>

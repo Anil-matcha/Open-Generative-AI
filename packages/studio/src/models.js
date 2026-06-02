@@ -582,6 +582,19 @@ export const getQualityFieldForI2IModel = (id) => {
   if (m?.inputs?.size?.enum) return 'size';
   return m?.inputs?.quality?.enum ? 'quality' : null;
 };
+
+// Generic input-option helpers — work for both t2i and i2i models. Used by
+// ImageStudio to render the extra parameter dropdowns (quality, format,
+// background, moderation) exactly like the memefast playground.
+export const getImageInputOptions = (id, field) => {
+  const m = t2iModels.find(x => x.id === id) || i2iModels.find(x => x.id === id);
+  return m?.inputs?.[field]?.enum || [];
+};
+export const getImageInputDefault = (id, field) => {
+  const m = t2iModels.find(x => x.id === id) || i2iModels.find(x => x.id === id);
+  return m?.inputs?.[field]?.default ?? null;
+};
+
 export const getMaxImagesForI2IModel    = (id) => 1;
 export const getEffectsForI2IModel      = (id) => [];
 export const getDefaultEffectForI2IModel = (id) => null;
