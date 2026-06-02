@@ -770,13 +770,32 @@ export function uploadFile(apiKey, file, onProgress) {
 
 // ── Balance query ─────────────────────────────────────────────────────────────
 
+const BALANCE_ENDPOINTS = [
+    '/v1/user/info',
+    '/v1/dashboard/billing/credit_grants',
+    '/v1/user/balance',
+    '/v1/dashboard/balance',
+];
+// Remember which endpoint actually works so polling doesn't spam 404s every
+// 30s. `null` = not probed yet, `''` = probed and none work (give up).
+let _balanceEndpoint = null;
+
+function parseBalance(data) {
+    // new-api/one-api format: { success:true, data:{ quota:N, used_quota:N } }
+    if (data.data?.quota !== undefined) {
+        const remaining = (data.data.quota - (data.data.used_quota || 0)) / 500000;
+        return { balance: remaining.toFixed(2) };
+    }
+    const balance = data.balance ?? data.credits ?? data.remaining ??
+        data.total_granted ?? data.credit ?? data.data?.balance ?? null;
+    return { balance };
+}
+
 export async function getUserBalance(apiKey) {
-    const endpoints = [
-        '/v1/user/info',
-        '/v1/dashboard/billing/credit_grants',
-        '/v1/user/balance',
-        '/v1/dashboard/balance',
-    ];
+    // Once a working endpoint is known, hit only that one. If none worked on the
+    // first probe, stop trying entirely to avoid flooding the console with 404s.
+    if (_balanceEndpoint === '') return { balance: null };
+    const endpoints = _balanceEndpoint ? [_balanceEndpoint] : BALANCE_ENDPOINTS;
     for (const endpoint of endpoints) {
         try {
             const response = await fetch(`${BASE_URL}${endpoint}`, {
@@ -787,20 +806,15 @@ export async function getUserBalance(apiKey) {
                 throw new Error('Unauthorized');
             }
             if (response.ok) {
-                const data = await response.json();
-                // new-api/one-api format: { success:true, data:{ quota:N, used_quota:N } }
-                if (data.data?.quota !== undefined) {
-                    const remaining = (data.data.quota - (data.data.used_quota || 0)) / 500000;
-                    return { balance: remaining.toFixed(2) };
-                }
-                const balance = data.balance ?? data.credits ?? data.remaining ??
-                    data.total_granted ?? data.credit ?? data.data?.balance ?? null;
-                return { balance };
+                _balanceEndpoint = endpoint;
+                return parseBalance(await response.json());
             }
         } catch (err) {
             if (err.message === 'Unauthorized') throw err;
         }
     }
+    // First full probe found nothing usable — don't retry on later polls.
+    if (!_balanceEndpoint) _balanceEndpoint = '';
     return { balance: null };
 }
 
