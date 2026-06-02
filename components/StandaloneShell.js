@@ -74,39 +74,27 @@ export default function StandaloneShell() {
   // Generation State — driven purely by ImageStudio (which stays mounted across tabs).
   const [isGenerating, setIsGenerating] = useState(false);
 
-  // Sync tab with URL if user navigates manually or via browser back/forward
+  // Sync tab from the *actual* URL (window.location) when Next.js navigation occurs.
+  // Reading pathname instead of slug avoids stale-params bugs from replaceState.
   useEffect(() => {
-    const info = getWorkflowInfo();
-    if (info.id) {
-        setActiveTab('workflows');
-    } else if (slug.includes('agents')) {
-        setActiveTab('agents');
-    } else if (slug.includes('design-agent')) {
-        setActiveTab('design-agent');
-    } else if (slug.includes('apps')) {
-        setActiveTab('apps');
-    } else {
-        const firstSegment = slug[0];
-        if (firstSegment && TABS.find(t => t.id === firstSegment)) {
-          setActiveTab(firstSegment);
-        }
-    }
-  }, [slug, getWorkflowInfo]);
+    const path = window.location.pathname;
+    const after = path.startsWith('/studio') ? path.slice('/studio'.length) : path;
+    const segments = after.split('/').filter(Boolean);
+    const first = segments[0];
+
+    if (!first) { setActiveTab('image'); return; }
+    if (first === 'workflows' || first === 'workflow') { setActiveTab('workflows'); return; }
+    if (first === 'agents')       { setActiveTab('agents');       return; }
+    if (first === 'design-agent') { setActiveTab('design-agent'); return; }
+    if (first === 'apps')         { setActiveTab('apps');         return; }
+    if (TABS.find(t => t.id === first)) { setActiveTab(first); }
+  }, [slug]);
 
   const handleTabChange = (tabId) => {
-    // If we're deep inside a workflow route, navigate properly to reset it.
-    if (urlWorkflowId) {
-      router.push(`/studio/${tabId}`);
-      setActiveTab(tabId);
-      return;
-    }
-    // Otherwise switch tabs WITHOUT a Next navigation. A router.push remounts
-    // StandaloneShell (and ImageStudio), which kills any in-flight generation.
-    // Pure state switch keeps ImageStudio mounted so generation survives.
     setActiveTab(tabId);
-    try {
-      window.history.replaceState(null, '', `/studio/${tabId}`);
-    } catch {}
+    // router.replace keeps Next.js params in sync without adding a history entry.
+    // Within [[...slug]] the same page component handles all tab URLs, so no remount.
+    router.replace(`/studio/${tabId}`, { scroll: false });
   };
 
   // Auto-hide header when inside a specific workflow view or design agent
