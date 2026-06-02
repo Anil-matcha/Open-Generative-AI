@@ -17,7 +17,6 @@ const TABS = [
   { id: 'video',   label: 'Студия видео' },
   { id: 'workflows', label: 'Процессы' },
   { id: 'agents', label: 'Агенты' },
-  { id: 'apps', label: 'Приложения' },
 ];
 
 const STORAGE_KEY = 'muapi_key';
@@ -306,7 +305,6 @@ export default function StandaloneShell() {
         {activeTab === 'video'   && <VideoStudio   apiKey={apiKey} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} />}
         {activeTab === 'workflows' && <WorkflowStudio apiKey={apiKey} isHeaderVisible={isHeaderVisible} onToggleHeader={setIsHeaderVisible} />}
         {activeTab === 'agents' && <AgentStudio apiKey={apiKey} isHeaderVisible={isHeaderVisible} onToggleHeader={setIsHeaderVisible} />}
-        {activeTab === 'apps' && <AppsStudio apiKey={apiKey} />}
       </div>
 
       {/* Settings Modal */}
