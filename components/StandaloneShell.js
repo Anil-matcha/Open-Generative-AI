@@ -17,7 +17,6 @@ const TABS = [
   { id: 'video',   label: 'Студия видео' },
   { id: 'workflows', label: 'Процессы' },
   { id: 'agents', label: 'Агенты' },
-  { id: 'design-agent', label: 'Дизайн-агент' },
   { id: 'apps', label: 'Приложения' },
 ];
 
@@ -307,7 +306,6 @@ export default function StandaloneShell() {
         {activeTab === 'video'   && <VideoStudio   apiKey={apiKey} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} />}
         {activeTab === 'workflows' && <WorkflowStudio apiKey={apiKey} isHeaderVisible={isHeaderVisible} onToggleHeader={setIsHeaderVisible} />}
         {activeTab === 'agents' && <AgentStudio apiKey={apiKey} isHeaderVisible={isHeaderVisible} onToggleHeader={setIsHeaderVisible} />}
-        {activeTab === 'design-agent' && <DesignAgentStudio apiKey={apiKey} isHeaderVisible={isHeaderVisible} onToggleHeader={setIsHeaderVisible} />}
         {activeTab === 'apps' && <AppsStudio apiKey={apiKey} />}
       </div>
 
