@@ -741,6 +741,7 @@ export default function ImageStudio({
   apiKey,
   onGenerationComplete,
   onHistoryChange,
+  onGeneratingChange,
   historyItems,
   droppedFiles,
   onFilesHandled,
@@ -770,6 +771,11 @@ export default function ImageStudio({
   const [generating, setGenerating] = useState(false);
   const [generateError, setGenerateError] = useState(null);
   const [fullscreenUrl, setFullscreenUrl] = useState(null);
+
+  // Notify parent when generation state changes (so it persists across tabs)
+  useEffect(() => {
+    onGeneratingChange?.(generating);
+  }, [generating, onGeneratingChange]);
 
   // ── Canvas / history state ──────────────────────────────────────────────
   const [currentImageUrl, setCurrentImageUrl] = useState(null);
@@ -1463,35 +1469,6 @@ export default function ImageStudio({
           </div>
         </div>
       </div>
-
-      {/* ── GENERATION PROGRESS INDICATOR ── */}
-      {generating && (
-        <div className="fixed bottom-6 right-6 z-[110] animate-fade-in">
-          <div className="bg-[#0a0a0a]/95 border border-[#22d3ee]/30 rounded-xl p-4 shadow-2xl flex flex-col items-center gap-3 min-w-[240px] backdrop-blur-sm">
-            <div className="flex flex-col items-center gap-2">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#22d3ee] to-[#a855f7] p-1 animate-spin">
-                <div className="w-full h-full rounded-full bg-[#0a0a0a] flex items-center justify-center">
-                  <span className="text-xl text-[#22d3ee]">◌</span>
-                </div>
-              </div>
-              <div className="text-center">
-                <h4 className="text-sm font-bold text-white">Генерирую...</h4>
-                <p className="text-xs text-white/40">Подождите</p>
-              </div>
-            </div>
-
-            <div className="w-full space-y-1">
-              <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-[#22d3ee] to-[#a855f7] animate-pulse" style={{ width: "100%" }} />
-              </div>
-            </div>
-
-            <p className="text-[10px] text-white/30 text-center leading-tight">
-              может занять до минуты
-            </p>
-          </div>
-        </div>
-      )}
 
       {/* ── FULLSCREEN IMAGE MODAL ── */}
       {fullscreenUrl && (
