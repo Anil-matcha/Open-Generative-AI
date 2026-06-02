@@ -2242,7 +2242,7 @@ export default function VideoStudio({
         onClose={() => setFacePickOpen(false)}
         onSelect={(assetUri, name) => {
           setFaceAsset({ uri: assetUri, name });
-          insertRefToken("@лицо");
+          insertRefToken("@" + String(name || "лицо").trim().replace(/\s+/g, "_"));
         }}
         onRegisterNew={() => setFaceRegOpen(true)}
       />
@@ -2253,7 +2253,7 @@ export default function VideoStudio({
         onClose={() => setFaceRegOpen(false)}
         onRegistered={(assetUri, displayName) => {
           setFaceAsset({ uri: assetUri, name: displayName });
-          insertRefToken("@лицо");
+          insertRefToken("@" + String(displayName || "лицо").trim().replace(/\s+/g, "_"));
         }}
       />
     </div>
