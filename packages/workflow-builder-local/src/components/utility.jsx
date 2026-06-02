@@ -1,6 +1,22 @@
 import axios from "axios";
 import { toast } from "react-hot-toast";
 
+// Key-order-independent JSON serialization. Two objects with the same content
+// but differently-ordered keys serialize to the same string. This is what keeps
+// the node <-> parent formValues sync from ping-ponging into React error #185
+// (the white-screen "Maximum update depth exceeded" crash) when an array field
+// such as images_list / videos_list churns its reference on every render.
+export const stableStringify = (obj) => {
+  const norm = (v) => {
+    if (Array.isArray(v)) return v.map(norm);
+    if (v && typeof v === "object") {
+      return Object.keys(v).sort().reduce((acc, k) => { acc[k] = norm(v[k]); return acc; }, {});
+    }
+    return v;
+  };
+  try { return JSON.stringify(norm(obj)); } catch { return ""; }
+};
+
 export const imageModels = [
   {
     id: "image-passthrough",

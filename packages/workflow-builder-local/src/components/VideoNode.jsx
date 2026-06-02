@@ -1,4 +1,4 @@
-import { downloadFile, videoModels } from "./utility";
+import { downloadFile, videoModels, stableStringify } from "./utility";
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { BsArrowUpCircleFill } from "react-icons/bs";
 import { IoTimeOutline, IoVideocamOutline, IoTrashOutline, IoPlay, IoPause, IoVolumeHigh, IoVolumeMute } from "react-icons/io5";
@@ -183,10 +183,10 @@ const VideoGeneration = ({ id, data, selected }) => {
 
   useEffect(() => {
     if (!data.formValues) return;
-    const incoming = JSON.stringify(data.formValues);
-    const current = JSON.stringify(formValues);
-    if (incoming === current) return;
-    
+    // Key-order-independent compare so a parent rebuild with the same content
+    // doesn't look "different" and pull us into a sync loop (React #185).
+    if (stableStringify(data.formValues) === stableStringify(formValues)) return;
+
     const timer = setTimeout(() => {
       if (Object.entries(data.formValues || {}).length > 0) {
         setFormValues(data.formValues);
@@ -195,11 +195,23 @@ const VideoGeneration = ({ id, data, selected }) => {
     return () => clearTimeout(timer);
   }, [data.formValues]);
 
+  const lastSentRef = useRef(null);
   useEffect(() => {
-    if (data?.onDataChange && data?.selectedModel?.id !== "video-passthrough") {
-      data.onDataChange(id, { selectedModel, formValues, loading });
-    }
-  }, [selectedModel, formValues, loading]);
+    if (!data?.onDataChange || data?.selectedModel?.id === "video-passthrough") return;
+
+    const localSig = stableStringify(formValues);
+    const parentSig = stableStringify(data.formValues || {});
+    const sameModel = (selectedModel?.id) === (data.selectedModel?.id);
+
+    // Echo suppression: if the parent already holds exactly this state, sending
+    // it back would just bounce through onDataChange <-> formValues forever
+    // (React #185 — an array field like videos_list churns its reference).
+    if (sameModel && localSig === parentSig) { lastSentRef.current = localSig; return; }
+    if (sameModel && localSig === lastSentRef.current) return;
+
+    lastSentRef.current = localSig;
+    data.onDataChange(id, { selectedModel, formValues, loading });
+  }, [selectedModel, formValues, loading, data.formValues, data.selectedModel]);
 
   const pollNodeStatus = (run_id) => {
     let interval;

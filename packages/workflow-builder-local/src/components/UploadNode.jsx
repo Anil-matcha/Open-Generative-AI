@@ -5,6 +5,7 @@ import axios from "axios";
 import AudioPlayer from "./AudioPlayer";
 import VideoPlayer from "./VideoPlayer";
 import { IoImageOutline, IoTrashOutline } from "react-icons/io5";
+import { stableStringify } from "./utility";
 
 const UploadNode = ({ id, data, formValues, setFormValues, selectedModel, loading, uploadType, acceptType }) => {
   const [uploading, setUploading] = useState(false);
@@ -98,83 +99,64 @@ const UploadNode = ({ id, data, formValues, setFormValues, selectedModel, loadin
     setFormValues(prev => ({ ...prev, [key]: null }))
   };
 
+  const imageUrl = acceptType === "image" ? (formValues.image_url || null) : null;
+
+  // Probe image dimensions / size only when the URL actually changes. Keeping
+  // this in its own effect (keyed on the URL, not `data`) is what stops the
+  // HEAD-request flood that exhausted the browser (ERR_INSUFFICIENT_RESOURCES).
   useEffect(() => {
-    let outputs = [{
-      type: "",
-      value: null
-    }];
-    let resultUrl;
+    if (acceptType !== "image") return;
+    if (!imageUrl) { setImageMetadata({ width: 0, height: 0, size: null }); return; }
 
-    if (acceptType === "image") {
-      outputs = [{ 
-        type: "image_url", 
-        value: formValues.image_url ? formValues.image_url: null,
-      }];
-      resultUrl = formValues.image_url ? formValues.image_url: null;
-    } else if (acceptType === "video") {
-      outputs = [{ 
-        type: "video_url", 
-        value: formValues.video_url ? formValues.video_url: null,
-      }];
-      resultUrl = formValues.video_url ? formValues.video_url: null;
-    } else if (acceptType === "audio") {
-      outputs = [{ 
-        type: "audio_url", 
-        value: formValues.audio_url ? formValues.audio_url: null,
-      }];
-      resultUrl = formValues.audio_url ? formValues.audio_url: null;
-    } else {
-      outputs = [{ 
-        type: "text", 
-        value: formValues.prompt ? formValues.prompt: "",
-      }];
-      resultUrl = formValues.prompt ? formValues.prompt: "";
+    let cancelled = false;
+    const img = new Image();
+    img.onload = () => {
+      if (cancelled) return;
+      setImageMetadata(prev => ({ ...prev, width: img.naturalWidth, height: img.naturalHeight }));
     };
+    img.src = imageUrl;
 
-    if (acceptType === "image" && resultUrl) {
-      const img = new Image();
-      img.onload = () => {
-        setImageMetadata(prev => ({ 
-          ...prev, 
-          width: img.naturalWidth, 
-          height: img.naturalHeight 
+    fetch(imageUrl, { method: 'HEAD' })
+      .then(res => {
+        if (cancelled) return;
+        const size = res.headers.get('content-length');
+        setImageMetadata(prev => ({
+          ...prev,
+          size: size ? (parseInt(size) / (1024 * 1024)).toFixed(2) + ' MB' : null,
         }));
-      };
-      img.src = resultUrl;
-      
-      fetch(resultUrl, { method: 'HEAD' })
-        .then(res => {
-          const size = res.headers.get('content-length');
-          if (size) {
-            const sizeInMB = (parseInt(size) / (1024 * 1024)).toFixed(2);
-            setImageMetadata(prev => ({ ...prev, size: sizeInMB + ' MB' }));
-          } else {
-            setImageMetadata(prev => ({ ...prev, size: null }));
-          }
-        })
-        .catch(() => {
-          setImageMetadata(prev => ({ ...prev, size: null }));
-        });
-    } else if (acceptType === "image") {
-      setImageMetadata({ width: 0, height: 0, size: null });
+      })
+      .catch(() => { if (!cancelled) setImageMetadata(prev => ({ ...prev, size: null })); });
+
+    return () => { cancelled = true; };
+  }, [imageUrl, acceptType]);
+
+  // Propagate this node's value to the parent. `data` is intentionally NOT a
+  // dependency: the parent recreates the node's `data` object on every
+  // onDataChange, so depending on it re-ran this effect forever (the source of
+  // the white-screen React #185 loop). A stable, key-order-independent compare
+  // ensures we only emit when the content really changed.
+  useEffect(() => {
+    let outputs, resultUrl;
+    if (acceptType === "image") {
+      resultUrl = formValues.image_url || null;
+      outputs = [{ type: "image_url", value: resultUrl }];
+    } else if (acceptType === "video") {
+      resultUrl = formValues.video_url || null;
+      outputs = [{ type: "video_url", value: resultUrl }];
+    } else if (acceptType === "audio") {
+      resultUrl = formValues.audio_url || null;
+      outputs = [{ type: "audio_url", value: resultUrl }];
+    } else {
+      resultUrl = formValues.prompt || "";
+      outputs = [{ type: "text", value: resultUrl }];
     }
-    
-    // if (!data.formValues) return;
-    const incoming = JSON.stringify(prevFormValues.current);
-    const current = JSON.stringify(formValues);
-    if (incoming === current) return;
+
+    if (stableStringify(prevFormValues.current) === stableStringify(formValues)) return;
     prevFormValues.current = formValues;
 
-    if (data?.onDataChange) {
-      data?.onDataChange(id, {
-        selectedModel,
-        formValues,
-        loading,
-        outputs: outputs,
-        resultUrl: resultUrl,
-      });
-    }
-  }, [formValues, selectedModel, loading, id, data, acceptType]);
+    data?.onDataChange?.(id, { selectedModel, formValues, loading, outputs, resultUrl });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formValues, selectedModel, loading, id, acceptType]);
 
   const hasFileUrl = formValues?.image_url || formValues?.video_url || formValues?.audio_url;
   const textareaRef = useRef(null);

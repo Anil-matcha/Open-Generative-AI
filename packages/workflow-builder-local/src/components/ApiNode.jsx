@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Handle, Position, useReactFlow, useStore, useUpdateNodeInternals } from "reactflow";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
-import { apiNodeModels } from "./utility";
+import { apiNodeModels, stableStringify } from "./utility";
 import { getRunId, getWorkflowId } from "./WorkflowStore";
 import axios from "axios";
 import { toast } from "react-hot-toast";
@@ -314,9 +314,9 @@ const ApiNode = ({ id, data, selected }) => {
   };
 
   useEffect(() => {
-    const incoming = JSON.stringify(data.formValues);
-    const current = JSON.stringify(formValues);
-    if (incoming === current) return;
+    // Key-order-independent compare so a parent rebuild with the same content
+    // doesn't look "different" and pull us into a sync loop (React #185).
+    if (stableStringify(data.formValues) === stableStringify(formValues)) return;
 
     const timer = setTimeout(() => {
       if (Object.entries(data.formValues || {}).length > 0) {
@@ -326,11 +326,22 @@ const ApiNode = ({ id, data, selected }) => {
     return () => clearTimeout(timer);
   }, [data.formValues]);
 
+  const lastSentRef = useRef(null);
   useEffect(() => {
-    if (data?.onDataChange) {
-      data.onDataChange(id, { selectedModel, formValues, taskData, loading });
-    }
-  }, [selectedModel, formValues, taskData, loading]);
+    if (!data?.onDataChange) return;
+
+    const localSig = stableStringify({ fv: formValues, td: taskData });
+    const parentSig = stableStringify({ fv: data.formValues || {}, td: data.taskData });
+    const sameModel = (selectedModel?.id) === (data.selectedModel?.id);
+
+    // Echo suppression: skip propagation when the parent already holds exactly
+    // our state, otherwise array fields churn references and loop (React #185).
+    if (sameModel && localSig === parentSig) { lastSentRef.current = localSig; return; }
+    if (sameModel && localSig === lastSentRef.current) return;
+
+    lastSentRef.current = localSig;
+    data.onDataChange(id, { selectedModel, formValues, taskData, loading });
+  }, [selectedModel, formValues, taskData, loading, data.formValues, data.taskData, data.selectedModel]);
 
   const pollNodeStatus = (run_id) => {
     let interval; const _check = () => {

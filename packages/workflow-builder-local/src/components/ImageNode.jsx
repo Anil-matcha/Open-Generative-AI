@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Handle, Position, useReactFlow, useStore, useUpdateNodeInternals } from "reactflow";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
-import { downloadFile, imageModels } from "./utility";
+import { downloadFile, imageModels, stableStringify } from "./utility";
 import { getRunId, getWorkflowId } from "./WorkflowStore";
 import axios from "axios";
 import { toast } from "react-hot-toast";
@@ -19,20 +19,6 @@ const inputHandles = [
   "imageInput2",
   "imageInput3"
 ];
-
-// Serialize independent of key order so two objects with the same content but
-// differently-ordered keys compare equal. This is what makes the formValues
-// sync converge instead of ping-ponging into React error #185.
-const stableStringify = (obj) => {
-  const norm = (v) => {
-    if (Array.isArray(v)) return v.map(norm);
-    if (v && typeof v === "object") {
-      return Object.keys(v).sort().reduce((acc, k) => { acc[k] = norm(v[k]); return acc; }, {});
-    }
-    return v;
-  };
-  try { return JSON.stringify(norm(obj)); } catch { return ""; }
-};
 
 const outputHandles = [
   "imageOutput",

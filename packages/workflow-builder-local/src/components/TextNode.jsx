@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { Handle, Position, useReactFlow, useStore, useUpdateNodeInternals } from "reactflow";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
-import { textModels } from "./utility";
+import { textModels, stableStringify } from "./utility";
 import axios from "axios";
 import { getRunId, getWorkflowId } from "./WorkflowStore";
 import { toast } from "react-hot-toast";
@@ -168,10 +168,10 @@ const TextGeneration = ({ id, data, selected }) => {
 
   useEffect(() => {
     if (!data.formValues) return;
-    const incoming = JSON.stringify(data.formValues);
-    const current = JSON.stringify(formValues);
-    if (incoming === current) return;
-    
+    // Key-order-independent compare so a parent rebuild with the same content
+    // doesn't look "different" and pull us into a sync loop (React #185).
+    if (stableStringify(data.formValues) === stableStringify(formValues)) return;
+
     const timer = setTimeout(() => {
       if (Object.entries(data.formValues || {}).length > 0) {
         setFormValues(data.formValues);
@@ -180,11 +180,22 @@ const TextGeneration = ({ id, data, selected }) => {
     return () => clearTimeout(timer);
   }, [data.formValues]);
 
+  const lastSentRef = useRef(null);
   useEffect(() => {
-    if (data?.onDataChange && data?.selectedModel?.id !== "text-passthrough") {
-      data.onDataChange(id, { selectedModel, formValues, loading });
-    }
-  }, [selectedModel, formValues, loading]);
+    if (!data?.onDataChange || data?.selectedModel?.id === "text-passthrough") return;
+
+    const localSig = stableStringify(formValues);
+    const parentSig = stableStringify(data.formValues || {});
+    const sameModel = (selectedModel?.id) === (data.selectedModel?.id);
+
+    // Echo suppression: skip propagation when the parent already holds exactly
+    // our state, otherwise the formValues sync loops (React #185).
+    if (sameModel && localSig === parentSig) { lastSentRef.current = localSig; return; }
+    if (sameModel && localSig === lastSentRef.current) return;
+
+    lastSentRef.current = localSig;
+    data.onDataChange(id, { selectedModel, formValues, loading });
+  }, [selectedModel, formValues, loading, data.formValues, data.selectedModel]);
 
   const handleChange = (key, value) => {
     setFormValues(prev => ({ ...prev, [key]: value }));
