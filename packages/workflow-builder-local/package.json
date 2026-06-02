@@ -1,6 +1,6 @@
 {
-  "name": "workflow-builder",
-  "version": "1.0.2",
+  "name": "workflow-builder-local",
+  "version": "1.0.3",
   "description": "Shared UI components and utilities for my Next.js apps",
   "main": "dist/index.js",
   "module": "dist/index.js",

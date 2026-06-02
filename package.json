@@ -17,7 +17,7 @@
     "start": "next start",
     "lint": "next lint",
     "build:studio": "npm run build -w studio",
-    "build:workflow": "npm run build -w workflow-builder",
+    "build:workflow": "npm run build -w workflow-builder-local",
     "build:agent": "npm run build -w ai-agent",
     "build:packages": "npm run build:workflow && npm run build:agent && npm run build:studio",
     "setup": "git submodule update --init --recursive && npm install && npm run build:packages",
@@ -122,7 +122,7 @@
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.4.1",
     "studio": "*",
-    "workflow-builder": "file:./packages/workflow-builder-local"
+    "workflow-builder-local": "file:./packages/workflow-builder-local"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

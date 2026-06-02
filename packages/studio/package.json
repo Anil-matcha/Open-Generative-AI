@@ -24,7 +24,7 @@
     "react-toastify": "^11.1.0",
     "reactflow": "^11.11.4",
     "remark-gfm": "^4.0.1",
-    "workflow-builder": "file:../workflow-builder-local",
+    "workflow-builder-local": "file:../workflow-builder-local",
     "ai-agent": "file:../Open-Poe-AI/packages/agents",
     "design-agent": "file:../Open-AI-Design-Agent/packages/design-agent"
   },
