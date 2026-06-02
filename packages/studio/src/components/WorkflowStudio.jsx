@@ -24,12 +24,44 @@ const ALLOWED_WORKFLOW_IMAGE_MODELS = new Set([
   "gemini-3-pro-image-preview",
 ]);
 
+// Correct input parameters for each model's Properties panel (label = title,
+// options = enum). These keys are honoured by the workflow proxy at run time.
+const GEMINI_WORKFLOW_AR = ["1:1", "16:9", "9:16", "4:3", "3:4", "2:3", "3:2", "4:5", "5:4", "1:4", "4:1", "1:8", "8:1", "21:9"];
+const GEMINI_WORKFLOW_PROPS = {
+  prompt: { type: "string", title: "Prompt" },
+  aspect_ratio: { type: "string", title: "Aspect Ratio", enum: GEMINI_WORKFLOW_AR, default: "1:1" },
+  imageSize: { type: "string", title: "Resolution", enum: ["1K", "2K", "4K", "512"], default: "1K" },
+};
+const WORKFLOW_IMAGE_SCHEMA_PROPS = {
+  "gpt-image-2": {
+    prompt: { type: "string", title: "Prompt" },
+    size: { type: "string", title: "Size", enum: ["1024x1024", "1536x1024", "1024x1536", "2048x2048", "2048x1152", "3840x2160", "2160x3840"], default: "1024x1024" },
+    quality: { type: "string", title: "Quality", enum: ["auto", "high", "medium", "low"], default: "auto" },
+    format: { type: "string", title: "Format", enum: ["jpeg", "png", "webp"], default: "jpeg" },
+  },
+  "gemini-3.1-flash-image-preview": GEMINI_WORKFLOW_PROPS,
+  "gemini-3-pro-image-preview": GEMINI_WORKFLOW_PROPS,
+};
+
 function filterWorkflowImageModels(schemas) {
   const models = schemas?.categories?.image?.models;
   if (!models || typeof models !== "object") return schemas;
   const kept = {};
   for (const [id, model] of Object.entries(models)) {
-    if (ALLOWED_WORKFLOW_IMAGE_MODELS.has(id)) kept[id] = model;
+    if (!ALLOWED_WORKFLOW_IMAGE_MODELS.has(id)) continue;
+    const props = WORKFLOW_IMAGE_SCHEMA_PROPS[id];
+    kept[id] = props
+      ? {
+          ...model,
+          input_schema: {
+            ...(model.input_schema || {}),
+            schemas: {
+              ...(model.input_schema?.schemas || {}),
+              input_data: { type: "object", properties: props, required: ["prompt"] },
+            },
+          },
+        }
+      : model;
   }
   return {
     ...schemas,

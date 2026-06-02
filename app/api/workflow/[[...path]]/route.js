@@ -428,7 +428,9 @@ function computeImageSize(aspectRatio, resolution, width, height) {
 
 async function generateImage(apiKey, model, params) {
     const apiModel = MODEL_ID_MAP[model] || model;
-    const size = computeImageSize(params.aspect_ratio, params.resolution, params.width, params.height);
+    // Prefer an explicit pixel size (e.g. gpt-image-2 "Size" field); otherwise
+    // derive it from aspect_ratio + resolution for models that use those.
+    const size = params.size || computeImageSize(params.aspect_ratio, params.resolution, params.width, params.height);
     const imgInput = params.image_url || params.images_list?.[0];
 
     // Use /v1/images/edits for image editing models that have an input image
@@ -438,6 +440,8 @@ async function generateImage(apiKey, model, params) {
         form.append('prompt', params.prompt || '');
         form.append('n', '1');
         form.append('size', size);
+        if (params.quality) form.append('quality', params.quality);
+        if (params.format) form.append('format', params.format);
         form.append('image[]', imgInput);
         const editRes = await fetch(`${MEMEFAST}/v1/images/edits`, {
             method: 'POST',
@@ -454,6 +458,8 @@ async function generateImage(apiKey, model, params) {
     }
 
     const body = { model: apiModel, prompt: params.prompt || '', n: 1, size, response_format: 'url' };
+    if (params.quality) body.quality = params.quality;
+    if (params.format) body.format = params.format;
     if (imgInput) body.image_url = imgInput;
 
     const res = await fetch(`${MEMEFAST}/v1/images/generations`, {
@@ -510,39 +516,73 @@ async function generateFalImage(apiKey, model, params) {
     throw new Error('Fal image generation timed out');
 }
 
+// Fetch a remote image (or pass through a data URI) → Gemini inline_data.
+async function urlToInlineData(url) {
+    try {
+        if (!url) return null;
+        if (url.startsWith('data:')) {
+            const m = url.match(/^data:([^;]+);base64,(.+)$/s);
+            return m ? { mime_type: m[1], data: m[2] } : null;
+        }
+        const r = await fetch(url);
+        if (!r.ok) return null;
+        const ct = r.headers.get('content-type') || 'image/png';
+        const buf = Buffer.from(await r.arrayBuffer());
+        return { mime_type: ct, data: buf.toString('base64') };
+    } catch {
+        return null;
+    }
+}
+
+// Gemini image models (Nano Banana 2 / Pro) via the native generateContent API.
+// Honours generationConfig.imageConfig (aspectRatio + imageSize) and embeds an
+// optional reference image inline as base64.
 async function generateChatImage(apiKey, model, params) {
+    const apiModel = MODEL_ID_MAP[model] || model;
+    const parts = [{ text: params.prompt || '' }];
     const imgInput = params.image_url || params.images_list?.[0];
-    const content = imgInput
-        ? [{ type: 'image_url', image_url: { url: imgInput } }, { type: 'text', text: params.prompt || '' }]
-        : params.prompt || '';
-    const res = await fetch(`${MEMEFAST}/v1/chat/completions`, {
+    if (imgInput) {
+        const inline = await urlToInlineData(imgInput);
+        if (inline) parts.push({ inline_data: inline });
+    }
+
+    const imageConfig = {};
+    if (params.aspect_ratio) imageConfig.aspectRatio = params.aspect_ratio;
+    if (params.imageSize) imageConfig.imageSize = params.imageSize;
+
+    const body = {
+        contents: [{ parts }],
+        generationConfig: {
+            responseModalities: ['IMAGE', 'TEXT'],
+            ...(Object.keys(imageConfig).length ? { imageConfig } : {}),
+        },
+    };
+
+    const res = await fetch(`${MEMEFAST}/v1beta/models/${apiModel}:generateContent`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            model,
-            messages: [{ role: 'user', content }],
-            max_tokens: 8192,
-        }),
+        body: JSON.stringify(body),
     });
     if (!res.ok) {
         const txt = await res.text().catch(() => res.statusText);
-        throw new Error(`Chat Image API ${res.status}: ${txt.slice(0, 300)}`);
+        throw new Error(`Gemini Image API ${res.status}: ${txt.slice(0, 300)}`);
     }
     const data = await res.json();
-    const msg = data.choices?.[0]?.message;
-    // Response may be array of parts or a string with embedded data URL
-    if (Array.isArray(msg?.content)) {
-        for (const part of msg.content) {
-            if (part.type === 'image_url') return [{ type: 'image_url', value: part.image_url?.url || '' }];
-            if (part.type === 'image') return [{ type: 'image_url', value: part.source?.url || part.url || '' }];
+    const respParts = data?.candidates?.[0]?.content?.parts || [];
+    for (const p of respParts) {
+        const inline = p?.inlineData || p?.inline_data;
+        if (inline?.data) {
+            const mime = inline.mimeType || inline.mime_type || 'image/png';
+            return [{ type: 'image_url', value: `data:${mime};base64,${inline.data}` }];
         }
     }
-    const text = typeof msg?.content === 'string' ? msg.content : '';
-    const match = text.match(/data:image\/[^;]+;base64,[A-Za-z0-9+/=]+/);
+    // Fallback: some channels still return a text part with an embedded URL.
+    const textPart = respParts.find((p) => typeof p?.text === 'string')?.text || '';
+    const match = textPart.match(/data:image\/[^;]+;base64,[A-Za-z0-9+/=]+/);
     if (match) return [{ type: 'image_url', value: match[0] }];
-    const urlMatch = text.match(/https?:\/\/\S+\.(png|jpg|jpeg|webp|gif)/i);
+    const urlMatch = textPart.match(/https?:\/\/\S+\.(png|jpg|jpeg|webp|gif)/i);
     if (urlMatch) return [{ type: 'image_url', value: urlMatch[0] }];
-    return [{ type: 'image_url', value: text }];
+    return [{ type: 'image_url', value: '' }];
 }
 
 async function generateText(apiKey, model, params) {
