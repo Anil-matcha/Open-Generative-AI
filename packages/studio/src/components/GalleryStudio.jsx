@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { toast } from 'react-hot-toast';
 
 export default function GalleryStudio({ apiKey }) {
   const [entries, setEntries] = useState([]);
@@ -33,12 +34,14 @@ export default function GalleryStudio({ apiKey }) {
 
   const handleDelete = async (entryId) => {
     try {
-      await axios.delete(`/api/gallery/${entryId}`, {
+      const response = await axios.delete(`/api/gallery/${entryId}`, {
         headers: { Authorization: `Bearer ${apiKey}` }
       });
       setEntries(entries.filter(e => e.id !== entryId));
+      toast.success('Удалено');
     } catch (err) {
       console.error('Failed to delete entry:', err);
+      toast.error(`Ошибка удаления: ${err.response?.data?.error || err.message}`);
     }
   };
 

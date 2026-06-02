@@ -21,27 +21,34 @@ async function tosUpload(key, buffer, contentType) {
 export async function DELETE(request, { params }) {
     try {
         const user = await getUser(request);
+        console.log('[gallery delete] user:', user?.id);
         if (!user?.id) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         if (!TOS_ENABLED) {
+            console.log('[gallery delete] TOS not enabled');
             return NextResponse.json({ error: 'TOS not enabled' }, { status: 503 });
         }
 
         const { entryId } = await params;
+        console.log('[gallery delete] entryId:', entryId);
         const url = `https://${TOS_BUCKET}.${TOS_ENDPOINT}/gallery/${user.id}/entries.json`;
 
         const r = await fetch(url);
         if (!r.ok) {
+            console.log('[gallery delete] entries fetch failed:', r.status);
             return NextResponse.json({ error: 'Entries not found' }, { status: 404 });
         }
 
         let entries = await r.json();
+        console.log('[gallery delete] entries before filter:', entries.length);
         entries = entries.filter(e => e.id !== entryId);
+        console.log('[gallery delete] entries after filter:', entries.length);
 
         const buf = Buffer.from(JSON.stringify(entries));
         await tosUpload(`gallery/${user.id}/entries.json`, buf, 'application/json');
+        console.log('[gallery delete] upload success');
 
         return NextResponse.json({ success: true });
     } catch (error) {
