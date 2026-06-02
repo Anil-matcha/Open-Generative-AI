@@ -74,13 +74,35 @@ function filterWorkflowImageModels(schemas) {
         }
       : model;
   }
-  return {
+  const result = {
     ...schemas,
     categories: {
       ...schemas.categories,
       image: { ...schemas.categories.image, models: kept },
     },
   };
+
+  // Video menu: keep only Seedance 2.0 and 2.0 Fast, plus the input/passthrough
+  // node. Older Seedance (1.5, 1.0, Lite) and everything else (Veo, Sora, Grok,
+  // Kling, Happyhorse…) is removed.
+  const videoModels = schemas?.categories?.video?.models;
+  if (videoModels && typeof videoModels === "object") {
+    const keptVideo = {};
+    for (const [id, model] of Object.entries(videoModels)) {
+      // Match on id and display name/title so it works regardless of how the
+      // backend keys the model. Keep only Seedance 2.0 / 2.0 Fast.
+      const hay = `${id} ${model?.name || ""} ${model?.title || ""}`;
+      // Version "2.0" / "2-0" / "2_0" / "2 0" bounded by non-digits so it never
+      // matches the 6-digit date suffix (e.g. 260128).
+      const isSeedance2 = /seedance/i.test(hay) && /(^|[^0-9])2[._\- ]?0([^0-9]|$)/.test(hay);
+      if (id.includes("passthrough") || isSeedance2) {
+        keptVideo[id] = model;
+      }
+    }
+    result.categories.video = { ...schemas.categories.video, models: keptVideo };
+  }
+
+  return result;
 }
 
 async function publishWorkflow(apiKey, id, isPublished) {
