@@ -94,8 +94,19 @@ export default function StandaloneShell() {
   }, [slug, getWorkflowInfo]);
 
   const handleTabChange = (tabId) => {
-    router.push(`/studio/${tabId}`);
-    // setActiveTab(tabId);
+    // If we're deep inside a workflow route, navigate properly to reset it.
+    if (urlWorkflowId) {
+      router.push(`/studio/${tabId}`);
+      setActiveTab(tabId);
+      return;
+    }
+    // Otherwise switch tabs WITHOUT a Next navigation. A router.push remounts
+    // StandaloneShell (and ImageStudio), which kills any in-flight generation.
+    // Pure state switch keeps ImageStudio mounted so generation survives.
+    setActiveTab(tabId);
+    try {
+      window.history.replaceState(null, '', `/studio/${tabId}`);
+    } catch {}
   };
 
   // Auto-hide header when inside a specific workflow view or design agent
