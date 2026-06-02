@@ -792,8 +792,25 @@ function parseBalance(data) {
 }
 
 export async function getUserBalance(apiKey) {
-    // Once a working endpoint is known, hit only that one. If none worked on the
-    // first probe, stop trying entirely to avoid flooding the console with 404s.
+    // Primary source of truth: the user's RUB balance lives in Supabase
+    // (profiles.balance), exposed by our own /api/payments/balance route. The
+    // sb_access_token cookie rides along automatically on same-origin fetches.
+    if (BASE_URL === '/api/mf') {
+        try {
+            const r = await fetch('/api/payments/balance');
+            if (r.ok) {
+                // A successful response is authoritative (the balance may be
+                // null when billing is off / the user isn't logged in). Either
+                // way memefast has nothing to add, so don't probe it.
+                const data = await r.json();
+                return { balance: data.balance ?? null };
+            }
+        } catch { /* route unavailable (Electron/SSR) — fall through to probe */ }
+    }
+
+    // Legacy fallback (Electron / SSR, or when not logged into Supabase): probe
+    // memefast. Once a working endpoint is known, hit only that one; if none
+    // work on the first probe, stop trying to avoid flooding the console.
     if (_balanceEndpoint === '') return { balance: null };
     const endpoints = _balanceEndpoint ? [_balanceEndpoint] : BALANCE_ENDPOINTS;
     for (const endpoint of endpoints) {

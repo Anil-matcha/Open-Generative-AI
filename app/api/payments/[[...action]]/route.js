@@ -8,6 +8,7 @@
 //   TOCHKA_TOKEN, TOCHKA_CUSTOMER_CODE, PUBLIC_BASE_URL, CRON_SECRET
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { getBalance } from '../../_lib/balance';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://hsyuvhvjrjxdpvuzivvv.supabase.co';
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || 'sb_publishable_9bCiI4pZI45ObKbC2W1xvw_bscZtpFJ';
@@ -198,5 +199,11 @@ export async function POST(request, { params }) {
 export async function GET(request, { params }) {
     const { action = [] } = await params;
     if (action[0] === 'poll-pending') return pollPending(request);
+    if (action[0] === 'balance') {
+        // Identified via the sb_access_token cookie (sent same-origin), so it
+        // never collides with the memefast key in the Authorization header.
+        const balance = await getBalance(request);
+        return NextResponse.json({ balance });
+    }
     return NextResponse.json({ error: 'Unknown action' }, { status: 404 });
 }

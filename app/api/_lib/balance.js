@@ -102,4 +102,17 @@ async function refund(userId, amount) {
 
 function round2(n) { return Math.round(n * 100) / 100; }
 
-export { BILLING_ENABLED, getUser, deduct, refund };
+// Read the authenticated user's current balance (in RUB). Returns null when
+// billing is disabled or the user is not logged in.
+async function getBalance(request) {
+    const user = await getUser(request);
+    if (!user) return null;
+    try {
+        const { data: profile, error } = await admin()
+            .from('profiles').select('balance').eq('id', user.id).single();
+        if (error || !profile) return null;
+        return round2(Number(profile.balance || 0));
+    } catch { return null; }
+}
+
+export { BILLING_ENABLED, getUser, getBalance, deduct, refund };
