@@ -358,12 +358,46 @@ async function generateImageViaChat(apiKey, modelId, params) {
         throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 200)}`);
     }
     const data = await response.json();
-    const url = extractImageFromChat(data);
-    if (!url) {
+    const raw = extractImageFromChat(data);
+    if (!raw) {
         console.error('[generateImageViaChat] No image in chat response:', JSON.stringify(data).slice(0, 800));
         throw new Error('Сервер не вернул изображение (нет URL в ответе).');
     }
+    // Gemini returns the image as a base64 data URI. Mirror it to TOS so we get
+    // a permanent, lightweight URL (base64 is huge and would blow the
+    // localStorage quota, losing history on the next page load).
+    const url = await persistImageToTOS(raw);
     return { ...data, url };
+}
+
+// Upload an image (data URI or remote URL) to TOS and return its permanent
+// public URL. Falls back to the original on any failure so generation still works.
+export async function persistImageToTOS(image) {
+    try {
+        if (typeof window === 'undefined' || !image) return image;
+        // Already a TOS/public http URL that isn't a data URI? keep it.
+        if (typeof image === 'string' && image.startsWith('http')) return image;
+
+        const blobResp = await fetch(image);
+        const blob = await blobResp.blob();
+        const type = blob.type || 'image/png';
+        const ext = (type.split('/')[1] || 'png').split('+')[0];
+
+        const metaResp = await fetch(`/api/upload-file?filename=gen.${ext}&type=${encodeURIComponent(type)}`);
+        if (!metaResp.ok) return image; // storage not configured → keep original
+        const { putUrl, publicUrl } = await metaResp.json();
+
+        const putResp = await fetch(putUrl, {
+            method: 'PUT',
+            headers: { 'Content-Type': type },
+            body: blob,
+        });
+        if (!putResp.ok) return image;
+        return publicUrl;
+    } catch (err) {
+        console.warn('persistImageToTOS failed:', err?.message);
+        return image;
+    }
 }
 
 // Pull an image URL / data URI out of an OpenAI-compatible chat completion response.
