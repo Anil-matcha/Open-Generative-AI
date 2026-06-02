@@ -492,6 +492,7 @@ async function generateSeedanceArk(modelInfo, params) {
         fast,
         prompt: params.prompt || '',
         image_url: params.image_url || undefined,
+        image_urls: Array.isArray(params.image_urls) ? params.image_urls : undefined,
         video_url: params.video_url || undefined,
         audio_url: params.audio_url || undefined,
         resolution: params.resolution || undefined,

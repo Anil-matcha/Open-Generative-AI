@@ -15,6 +15,7 @@ const DEFAULT_ENDPOINTS = [
   'ep-20260529025745-7qpzf',
   'ep-20260529025647-5xbjq',
   'ep-20260529022549-pwx2w',
+  'ep-20260602190908-7nzjw',
 ];
 const ENDPOINTS = (process.env.ARK_SEEDANCE_ENDPOINTS || '')
   .split(',')
@@ -34,20 +35,26 @@ function pickEndpoint() {
   return ep;
 }
 
-function buildContent({ prompt, image_url, video_url, audio_url }) {
+function buildContent({ prompt, image_url, image_urls, video_url, audio_url }) {
   const content = [];
   if (prompt) content.push({ type: 'text', text: prompt });
 
-  // image + (video or audio) → multimodal reference scenario (mutually exclusive
-  // with first-frame). image-only → first frame i2v.
+  // Collect images: single image_url and/or an array of image_urls (1-9 refs).
+  const images = [];
+  if (image_url) images.push(image_url);
+  if (Array.isArray(image_urls)) images.push(...image_urls.filter(Boolean));
+
+  // image(s) + (video or audio) → multimodal reference scenario (mutually
+  // exclusive with first-frame). A single image with no other media → first frame.
   const hasRefMedia = !!(video_url || audio_url);
-  if (image_url) {
+  const multiImage = images.length > 1;
+  images.forEach((u) => {
     content.push({
       type: 'image_url',
-      image_url: { url: image_url },
-      role: hasRefMedia ? 'reference_image' : 'first_frame',
+      image_url: { url: u },
+      role: hasRefMedia || multiImage ? 'reference_image' : 'first_frame',
     });
-  }
+  });
   if (video_url) {
     content.push({ type: 'video_url', video_url: { url: video_url }, role: 'reference_video' });
   }
@@ -68,6 +75,7 @@ export async function POST(request) {
       fast = false,
       prompt = '',
       image_url,
+      image_urls,
       video_url,
       audio_url,
       resolution,
@@ -76,7 +84,7 @@ export async function POST(request) {
       generate_audio = true,
     } = body;
 
-    const content = buildContent({ prompt, image_url, video_url, audio_url });
+    const content = buildContent({ prompt, image_url, image_urls, video_url, audio_url });
     if (content.length === 0) {
       return NextResponse.json({ error: 'Empty content' }, { status: 400 });
     }
