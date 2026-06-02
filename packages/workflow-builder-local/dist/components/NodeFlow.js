@@ -2518,62 +2518,7 @@ var NodeFlow = function NodeFlow(_ref) {
     addNode: _addNode,
     apiNodeModels: filteredApiNodeModels,
     nodeSchemas: nodeSchemas
-  }))), /*#__PURE__*/_react["default"].createElement("div", {
-    className: "relative ".concat(!interactionMode && "hidden"),
-    onBlur: function onBlur(e) {
-      var currentTarget = e.currentTarget;
-      setTimeout(function () {
-        if (currentTarget && !currentTarget.contains(document.activeElement)) {
-          setDropDown(0);
-        }
-      }, 100);
-    },
-    tabIndex: 0
-  }, /*#__PURE__*/_react["default"].createElement("button", {
-    type: "button",
-    suppressHydrationWarning: true,
-    disabled: !interactionMode,
-    onClick: function onClick() {
-      return setDropDown(function (prev) {
-        return prev === 4 ? 0 : 4;
-      });
-    },
-    className: "p-3 rounded-full cursor-pointer outline-none transition disabled:opacity-50 disabled:cursor-not-allowed ".concat(dropDown === 4 ? "bg-white text-black" : "text-gray-300 active:bg-gray-600 hover:text-white hover:bg-[#1b1e23]")
-  }, /*#__PURE__*/_react["default"].createElement(_fa.FaToolbox, {
-    size: 18
-  })), dropDown === 4 && /*#__PURE__*/_react["default"].createElement("div", {
-    className: "absolute left-14 top-0 bg-[#1b1e23] border border-gray-700 p-3 rounded-lg flex flex-col gap-2 w-52"
-  }, /*#__PURE__*/_react["default"].createElement("h3", {
-    className: "w-full text-center text-sm text-gray-300"
-  }, "Utility Node"), /*#__PURE__*/_react["default"].createElement("div", {
-    className: "flex flex-col gap-2 w-full"
-  }, /*#__PURE__*/_react["default"].createElement("button", {
-    type: "button",
-    suppressHydrationWarning: true,
-    onClick: function onClick() {
-      return _addNode("concatNode", null, {
-        selectedModel: _utility.concatModels[0]
-      });
-    },
-    className: "flex gap-2 justify-center items-center py-3 px-4 text-white cursor-pointer bg-[#2c3037] rounded hover:bg-[#212326]"
-  }, /*#__PURE__*/_react["default"].createElement(_tb.TbArrowMerge, {
-    className: "rotate-90"
-  }), " ", /*#__PURE__*/_react["default"].createElement("span", {
-    className: "text-xs font-medium"
-  }, "Prompt Concatenator")), /*#__PURE__*/_react["default"].createElement("button", {
-    type: "button",
-    suppressHydrationWarning: true,
-    onClick: function onClick() {
-      return _addNode("vidConcatNode", null, {
-        selectedModel: _utility.videoCombinerModels[0]
-      });
-    },
-    className: "flex gap-2 justify-center items-center py-3 px-4 text-white cursor-pointer bg-[#2c3037] rounded hover:bg-[#212326]"
-  }, /*#__PURE__*/_react["default"].createElement(_tb.TbArrowMerge, {
-    className: "rotate-90"
-  }), " ", /*#__PURE__*/_react["default"].createElement("span", {
-    className: "text-xs font-medium"
-  }, "Video Combiner"))))), /*#__PURE__*/_react["default"].createElement("button", {
+  }))), /*#__PURE__*/_react["default"].createElement("button", {
     type: "button",
     suppressHydrationWarning: true,
     onClick: zoomIn,

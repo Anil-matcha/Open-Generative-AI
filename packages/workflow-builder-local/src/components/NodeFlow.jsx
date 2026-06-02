@@ -2266,51 +2266,7 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
             </div>
           )}
         </div>
-        <div
-          className={`relative ${!interactionMode && "hidden"}`}
-          onBlur={(e) => {
-            const currentTarget = e.currentTarget;
-            setTimeout(() => {
-              if (currentTarget && !currentTarget.contains(document.activeElement)) {
-                setDropDown(0);
-              }
-            }, 100);
-          }}
-          tabIndex={0}
-        >
-          <button
-            type="button"
-            suppressHydrationWarning={true}
-            disabled={!interactionMode}
-            onClick={() => setDropDown((prev) => prev === 4 ? 0 : 4)}
-            className={`p-3 rounded-full cursor-pointer outline-none transition disabled:opacity-50 disabled:cursor-not-allowed ${dropDown === 4 ? "bg-white text-black" : "text-gray-300 active:bg-gray-600 hover:text-white hover:bg-[#1b1e23]"}`}
-          >
-            <FaToolbox size={18} />
-          </button>
-          {dropDown === 4 && (
-            <div className="absolute left-14 top-0 bg-[#1b1e23] border border-gray-700 p-3 rounded-lg flex flex-col gap-2 w-52">
-              <h3 className="w-full text-center text-sm text-gray-300">Utility Node</h3>
-              <div className="flex flex-col gap-2 w-full">
-                <button
-                  type="button"
-                  suppressHydrationWarning={true}
-                  onClick={() => addNode("concatNode", null, { selectedModel: concatModels[0] })}
-                  className="flex gap-2 justify-center items-center py-3 px-4 text-white cursor-pointer bg-[#2c3037] rounded hover:bg-[#212326]"
-                >
-                  <TbArrowMerge className="rotate-90" /> <span className="text-xs font-medium">Prompt Concatenator</span>
-                </button>
-                <button
-                  type="button"
-                  suppressHydrationWarning={true}
-                  onClick={() => addNode("vidConcatNode", null, { selectedModel: videoCombinerModels[0] })}
-                  className="flex gap-2 justify-center items-center py-3 px-4 text-white cursor-pointer bg-[#2c3037] rounded hover:bg-[#212326]"
-                >
-                  <TbArrowMerge className="rotate-90" /> <span className="text-xs font-medium">Video Combiner</span>
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
+        {/* Utility Node (toolbox) button removed. */}
         <button
           type="button"
           suppressHydrationWarning={true}
