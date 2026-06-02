@@ -9,7 +9,7 @@ import {
   FaUpload,
   FaCheck,
   FaCopy,
-  FaFace
+  FaRegSmile
 } from 'react-icons/fa';
 
 export default function FaceRegistrationDialog({ open, onClose, onRegistered }) {
@@ -195,7 +195,7 @@ export default function FaceRegistrationDialog({ open, onClose, onRegistered }) 
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <FaFace className="h-5 w-5 text-[#22d3ee]" />
+            <FaRegSmile className="h-5 w-5 text-[#22d3ee]" />
             <h3 className="text-lg font-semibold text-white">Регистрация лица</h3>
           </div>
           <button
@@ -209,7 +209,7 @@ export default function FaceRegistrationDialog({ open, onClose, onRegistered }) 
 
         {/* Progress bar */}
         <div className="flex items-center gap-1.5">
-          {(['name', 'verify', 'photo', 'done'] as const).map((s) => {
+          {['name', 'verify', 'photo', 'done'].map((s) => {
             const order = ['name', 'verify', 'photo', 'processing', 'done'];
             const active = order.indexOf(step) >= order.indexOf(s);
             return (
