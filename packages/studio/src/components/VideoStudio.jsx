@@ -1016,6 +1016,12 @@ export default function VideoStudio({
         };
         addToLocalHistory(entry);
         showVideoInCanvas(res.url, selectedModel);
+        // Save to persistent gallery
+        fetch('/api/gallery', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+          body: JSON.stringify({ url: res.url, type: 'video', model: selectedModel, prompt: trimmedPrompt }),
+        }).catch(() => {});
         if (onGenerationComplete)
           onGenerationComplete({ url: res.url, model: selectedModel, prompt: trimmedPrompt, type: "video" });
       } catch (e) {
