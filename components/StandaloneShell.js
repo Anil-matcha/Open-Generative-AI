@@ -91,6 +91,18 @@ export default function StandaloneShell() {
   }, [slug]);
 
   const handleTabChange = (tabId) => {
+    // If we're leaving a workflow builder or design agent, do a single hard
+    // navigation to the target tab. The builder mutates global CSS, so a full
+    // load is needed to clear it — and it also gets us out of the builder route.
+    const fromBuilder = sessionStorage.getItem("fromWorkflowBuilder");
+    const fromDesignAgent = sessionStorage.getItem("fromDesignAgent");
+    if ((fromBuilder && tabId !== 'workflows') || (fromDesignAgent && tabId !== 'design-agent')) {
+      sessionStorage.removeItem("fromWorkflowBuilder");
+      sessionStorage.removeItem("fromDesignAgent");
+      window.location.href = `/studio/${tabId}`;
+      return;
+    }
+
     setActiveTab(tabId);
     // router.replace keeps Next.js params in sync without adding a history entry.
     // Within [[...slug]] the same page component handles all tab URLs, so no remount.
@@ -108,18 +120,6 @@ export default function StandaloneShell() {
       setIsHeaderVisible(true);
     }
   }, [activeTab, urlWorkflowId, idFromParams]);
-
-  // Global builder CSS cleanup when switching away from Workflows or Design Agent tabs
-  useEffect(() => {
-    const fromBuilder = sessionStorage.getItem("fromWorkflowBuilder");
-    const fromDesignAgent = sessionStorage.getItem("fromDesignAgent");
-    
-    if ((fromBuilder && activeTab !== 'workflows') || (fromDesignAgent && activeTab !== 'design-agent')) {
-      sessionStorage.removeItem("fromWorkflowBuilder");
-      sessionStorage.removeItem("fromDesignAgent");
-      window.location.reload();
-    }
-  }, [activeTab]);
 
   const fetchBalance = useCallback(async (key) => {
     try {
