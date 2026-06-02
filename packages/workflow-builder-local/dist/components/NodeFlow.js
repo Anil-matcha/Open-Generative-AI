@@ -2381,7 +2381,7 @@ var NodeFlow = function NodeFlow(_ref) {
   }, /*#__PURE__*/_react["default"].createElement("div", {
     className: "flex items-center gap-2 w-[35%]"
   }, /*#__PURE__*/_react["default"].createElement(_link["default"], {
-    href: "/workflow",
+    href: "/studio/workflows",
     className: "text-white"
   }, /*#__PURE__*/_react["default"].createElement(_fa.FaAngleLeft, null)), /*#__PURE__*/_react["default"].createElement("button", {
     type: "button",

@@ -2112,7 +2112,7 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
         <div className="flex items-center justify-between w-full max-w-[95%] sm:max-w-[90%] lg:max-w-[80%] overflow-x-auto">
           <div className="flex items-center gap-2 w-[35%]">
             <Link
-              href="/workflow"
+              href="/studio/workflows"
               className="text-white"
             >
               <FaAngleLeft />

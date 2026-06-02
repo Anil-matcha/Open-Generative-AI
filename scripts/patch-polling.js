@@ -143,6 +143,9 @@ function removeRunAllButton(src) {
     /,\s*\/\*#__PURE__\*\/_react\["default"\]\.createElement\("button",[\s\S]{0,300}?onClick:\s*handleRunWorkflow,[\s\S]{0,1500}?" Run All "[\s\S]{0,300}?\)\)/g,
     ''
   );
+  // Fix back-arrow link: /workflow → /studio/workflows
+  src = src.split('href="/workflow"').join('href="/studio/workflows"');
+  src = src.split("href: \"/workflow\"").join("href: \"/studio/workflows\"");
   return src;
 }
 
