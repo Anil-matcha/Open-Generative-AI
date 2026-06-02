@@ -8,7 +8,7 @@ const nextConfig = {
   experimental: {
     serverBodySizeLimit: '50mb',
   },
-  generateBuildId: async () => 'build-face-name-token-v20',
+  generateBuildId: async () => 'build-seedance-only-v21',
 };
 
 export default nextConfig;

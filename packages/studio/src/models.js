@@ -100,7 +100,7 @@ export const i2iModels = [
 ];
 
 // ── Text-to-video ────────────────────────────────────────────────────────────
-export const t2vModels = [
+const _t2vModelsAll = [
   // ── Seedance (Doubao) ──
   {
     id: "seedance-2.0-t2v",
@@ -362,8 +362,11 @@ export const t2vModels = [
   },
 ];
 
+// Video Studio is limited to Seedance 2.0 / 2.0 Fast only — keep just those.
+export const t2vModels = _t2vModelsAll.filter((m) => m.id.startsWith("seedance-2.0-"));
+
 // ── Image-to-video ────────────────────────────────────────────────────────────
-export const i2vModels = [
+const _i2vModelsAll = [
   // ── Seedance i2v ──
   {
     id: "seedance-2.0-i2v",
@@ -568,6 +571,8 @@ export const i2vModels = [
     }
   }
 ];
+
+export const i2vModels = _i2vModelsAll.filter((m) => m.id.startsWith("seedance-2.0-"));
 
 // ── Video-to-video ────────────────────────────────────────────────────────────
 export const v2vModels = [];
