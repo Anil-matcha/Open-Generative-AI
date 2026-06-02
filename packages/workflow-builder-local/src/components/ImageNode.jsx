@@ -20,6 +20,20 @@ const inputHandles = [
   "imageInput3"
 ];
 
+// Serialize independent of key order so two objects with the same content but
+// differently-ordered keys compare equal. This is what makes the formValues
+// sync converge instead of ping-ponging into React error #185.
+const stableStringify = (obj) => {
+  const norm = (v) => {
+    if (Array.isArray(v)) return v.map(norm);
+    if (v && typeof v === "object") {
+      return Object.keys(v).sort().reduce((acc, k) => { acc[k] = norm(v[k]); return acc; }, {});
+    }
+    return v;
+  };
+  try { return JSON.stringify(norm(obj)); } catch { return ""; }
+};
+
 const outputHandles = [
   "imageOutput",
 ];
@@ -174,10 +188,10 @@ const ImageGeneration = ({ id, data, selected }) => {
 
   useEffect(() => {
     if (!data.formValues) return;
-    const incoming = JSON.stringify(data.formValues);
-    const current = JSON.stringify(formValues);
-    if (incoming === current) return;
-    
+    // Key-order-independent compare so a parent rebuild with the same content
+    // doesn't look "different" and pull us into a sync loop.
+    if (stableStringify(data.formValues) === stableStringify(formValues)) return;
+
     const timer = setTimeout(() => {
       if (Object.entries(data.formValues || {}).length > 0) {
         setFormValues(data.formValues);
@@ -188,16 +202,25 @@ const ImageGeneration = ({ id, data, selected }) => {
 
   const lastSentRef = useRef(null);
   useEffect(() => {
-    if (data?.onDataChange && data?.selectedModel?.id !== "image-passthrough") {
-      // Only propagate when the content actually changes. Without this guard an
-      // array field (e.g. images_list) produces a fresh reference on every render,
-      // causing an onDataChange ⇄ formValues feedback loop (React error #185).
-      const snapshot = JSON.stringify({ model: selectedModel?.id, formValues, loading });
-      if (snapshot === lastSentRef.current) return;
-      lastSentRef.current = snapshot;
-      data.onDataChange(id, { selectedModel, formValues, loading });
+    if (!data?.onDataChange || data?.selectedModel?.id === "image-passthrough") return;
+
+    const localSig = stableStringify(formValues);
+    const parentSig = stableStringify(data.formValues || {});
+    const sameModel = (selectedModel?.id) === (data.selectedModel?.id);
+
+    // Echo suppression: if the parent already holds exactly this state, sending
+    // it back would just bounce through onDataChange ⇄ formValues forever
+    // (React error #185 — the array field images_list churns its reference).
+    if (sameModel && localSig === parentSig) {
+      lastSentRef.current = localSig;
+      return;
     }
-  }, [selectedModel, formValues, loading]);
+    // Don't re-send the same payload we just sent.
+    if (sameModel && localSig === lastSentRef.current) return;
+
+    lastSentRef.current = localSig;
+    data.onDataChange(id, { selectedModel, formValues, loading });
+  }, [selectedModel, formValues, loading, data.formValues, data.selectedModel]);
   
   const pollNodeStatus = (run_id) => {
     let interval; const _check = () => {
