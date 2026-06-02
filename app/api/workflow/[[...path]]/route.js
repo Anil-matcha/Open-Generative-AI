@@ -1191,6 +1191,27 @@ export async function GET(request, { params }) {
         }
     }
 
+    if (path[0] === 'proxy-download') {
+        const { searchParams } = new URL(request.url);
+        const fileUrl = searchParams.get('url');
+        if (!fileUrl) return NextResponse.json({ error: 'No URL' }, { status: 400 });
+        try {
+            const r = await fetch(fileUrl);
+            if (!r.ok) return NextResponse.json({ error: 'Fetch failed' }, { status: 502 });
+            const contentType = r.headers.get('content-type') || 'application/octet-stream';
+            const arrayBuffer = await r.arrayBuffer();
+            return new Response(arrayBuffer, {
+                headers: {
+                    'Content-Type': contentType,
+                    'Content-Disposition': 'attachment',
+                    'Cache-Control': 'no-store',
+                },
+            });
+        } catch (e) {
+            return NextResponse.json({ error: e.message }, { status: 502 });
+        }
+    }
+
     const id = path[0];
     if (!id) return NextResponse.json([]);
     let wf = store.get(id);
@@ -1205,6 +1226,13 @@ export async function POST(request, { params }) {
     const { path = [] } = await params;
     let body = {};
     try { body = await request.json(); } catch {}
+
+    if (path[0] === 'cloudfront-signed-url') {
+        const fileUrl = body.url;
+        if (!fileUrl) return NextResponse.json({ error: 'No URL' }, { status: 400 });
+        const proxyUrl = `/api/workflow/proxy-download?url=${encodeURIComponent(fileUrl)}`;
+        return NextResponse.json({ signed_url: proxyUrl });
+    }
 
     if (path[0] === 'create' || path.length === 0) {
         const id = body.workflow_id || genId();
