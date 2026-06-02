@@ -83,7 +83,9 @@ export const t2vModels = [
     acceptsAudio: true,
     inputs: {
       prompt: { type: "string", title: "Prompt" },
-      aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }
+      aspect_ratio: { enum: ["adaptive", "16:9", "9:16", "1:1", "4:3", "3:4", "21:9"], default: "adaptive", title: "Aspect Ratio", type: "string" },
+      resolution: { enum: ["720p", "1080p", "480p"], default: "720p", title: "Resolution", type: "string" },
+      duration: { enum: [4, 5, 6, 8, 10, 12, 15], default: 5, title: "Duration (s)", type: "int" }
     }
   },
   {
@@ -96,7 +98,9 @@ export const t2vModels = [
     acceptsAudio: true,
     inputs: {
       prompt: { type: "string", title: "Prompt" },
-      aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }
+      aspect_ratio: { enum: ["adaptive", "16:9", "9:16", "1:1", "4:3", "3:4", "21:9"], default: "adaptive", title: "Aspect Ratio", type: "string" },
+      resolution: { enum: ["720p", "480p"], default: "720p", title: "Resolution", type: "string" },
+      duration: { enum: [4, 5, 6, 8, 10, 12, 15], default: 5, title: "Duration (s)", type: "int" }
     }
   },
   {
@@ -340,7 +344,9 @@ export const i2vModels = [
     acceptsAudio: true,
     inputs: {
       prompt: { type: "string", title: "Prompt" },
-      aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }
+      aspect_ratio: { enum: ["adaptive", "16:9", "9:16", "1:1", "4:3", "3:4", "21:9"], default: "adaptive", title: "Aspect Ratio", type: "string" },
+      resolution: { enum: ["720p", "1080p", "480p"], default: "720p", title: "Resolution", type: "string" },
+      duration: { enum: [4, 5, 6, 8, 10, 12, 15], default: 5, title: "Duration (s)", type: "int" }
     }
   },
   {
@@ -353,7 +359,9 @@ export const i2vModels = [
     acceptsAudio: true,
     inputs: {
       prompt: { type: "string", title: "Prompt" },
-      aspect_ratio: { enum: ["16:9", "9:16", "1:1"], default: "16:9", title: "Aspect Ratio", type: "string" }
+      aspect_ratio: { enum: ["adaptive", "16:9", "9:16", "1:1", "4:3", "3:4", "21:9"], default: "adaptive", title: "Aspect Ratio", type: "string" },
+      resolution: { enum: ["720p", "480p"], default: "720p", title: "Resolution", type: "string" },
+      duration: { enum: [4, 5, 6, 8, 10, 12, 15], default: 5, title: "Duration (s)", type: "int" }
     }
   },
   {
@@ -604,7 +612,7 @@ export const getDefaultEffectForI2IModel = (id) => null;
 // forwards `resolution` and `duration`; the sora endpoint forwards `duration`.
 // Veo (fixed length / resolution baked into the model id), Luma and Runway are
 // excluded from the generic controls.
-const VIDEO_RESOLUTIONS = ["1080p", "720p", "480p"];
+const VIDEO_RESOLUTIONS = ["720p", "1080p", "480p"];
 const VIDEO_DURATIONS = [5, 10];
 
 const isVeoModel = (m) => (m?.apiId || "").startsWith("veo");
