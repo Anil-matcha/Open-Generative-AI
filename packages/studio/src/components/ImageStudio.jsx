@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { generateImage, generateI2I, uploadFile, persistImageToTOS } from "../muapi.js";
-import FaceRegistrationDialog from "./FaceRegistrationDialog.jsx";
 import {
   t2iModels,
   i2iModels,
@@ -799,7 +798,6 @@ export default function ImageStudio({
   const [generating, setGenerating] = useState(false);
   const [generateError, setGenerateError] = useState(null);
   const [fullscreenUrl, setFullscreenUrl] = useState(null);
-  const [faceRegOpen, setFaceRegOpen] = useState(false);
 
   // Notify parent when generation state changes (drives the corner indicator).
   // ImageStudio stays mounted across tabs, so this state is always accurate.
@@ -1864,19 +1862,7 @@ export default function ImageStudio({
               )}
             </button>
 
-            {/* Face Registration Button */}
-            <button
-              type="button"
-              onClick={() => setFaceRegOpen(true)}
-              title="Зарегистрировать лицо для видео"
-              className="h-12 px-4 rounded-xl bg-gradient-to-r from-purple-600/20 to-pink-600/20 hover:from-purple-600/40 hover:to-pink-600/40 text-purple-300 font-medium transition-all border border-purple-500/30 flex items-center gap-2"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                <circle cx="12" cy="7" r="4" />
-              </svg>
-              Лицо
-            </button>
+            {/* Face Registration moved to Video Studio (bound to Seedance). */}
           </div>
         </div>
       </div>
@@ -1909,15 +1895,6 @@ export default function ImageStudio({
         </div>
       )}
 
-      {/* ── FACE REGISTRATION DIALOG ── */}
-      <FaceRegistrationDialog
-        open={faceRegOpen}
-        onClose={() => setFaceRegOpen(false)}
-        onRegistered={(assetUri, displayName) => {
-          // Asset registered - can be used in video models
-          console.log('[ImageStudio] Face registered:', { assetUri, displayName });
-        }}
-      />
     </div>
   );
 }

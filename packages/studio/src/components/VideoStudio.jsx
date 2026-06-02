@@ -16,6 +16,7 @@ import {
   getDefaultEffectForI2VModel,
   getModesForModel,
 } from "../models.js";
+import FaceRegistrationDialog from "./FaceRegistrationDialog.jsx";
 
 // ── tiny helpers ──────────────────────────────────────────────────────────────
 
@@ -294,6 +295,10 @@ export default function VideoStudio({
   // ── Seedance 2.0 multimodal reference files (image 1-9 / video 1-3 / audio 1-3) ──
   // Each: { id, url, kind: 'image'|'video'|'audio', name, uploading, progress }
   const [refFiles, setRefFiles] = useState([]);
+
+  // ── Registered face/character for Seedance (asset://… + display name) ──
+  const [faceRegOpen, setFaceRegOpen] = useState(false);
+  const [faceAsset, setFaceAsset] = useState(null); // { uri, name } | null
 
   // ── generation / canvas ──
   const [generating, setGenerating] = useState(false);
@@ -1010,6 +1015,7 @@ export default function VideoStudio({
           image_urls: readyRefs.filter((f) => f.kind === "image").map((f) => f.url),
           video_urls: readyRefs.filter((f) => f.kind === "video").map((f) => f.url),
           audio_urls: readyRefs.filter((f) => f.kind === "audio").map((f) => f.url),
+          face_asset: faceAsset?.uri || undefined,
         };
         const durations = getCurrentDurations(selectedModel);
         if (durations.length > 0) params.duration = selectedDuration;
@@ -1257,6 +1263,7 @@ export default function VideoStudio({
     uploadedVideoUrl,
     uploadedAudioUrl,
     refFiles,
+    faceAsset,
     lastGenerationId,
     getCurrentModel,
     getCurrentDurations,
@@ -1485,6 +1492,32 @@ export default function VideoStudio({
       {/* ── BOTTOM PROMPT BAR ── */}
       <div className="absolute bottom-4 w-full max-w-[95%] lg:max-w-4xl z-40 animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
         <div className="w-full bg-[#0a0a0a]/80 backdrop-blur-3xl rounded-md border border-white/10 p-4 flex flex-col gap-2 shadow-2xl">
+          {/* Registered face chip — the generated video keeps this face */}
+          {isSeedanceArk && faceAsset && (
+            <div className="flex flex-wrap gap-2 px-1 pb-1">
+              <div
+                className="group relative flex items-center gap-1.5 h-8 pl-2 pr-2 rounded-lg border text-[11px] font-medium border-purple-500/40 bg-purple-500/10 text-purple-200"
+                title={`Лицо «${faceAsset.name}» привязано к Seedance`}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+                <span className="whitespace-nowrap max-w-[140px] truncate">{faceAsset.name}</span>
+                <button
+                  type="button"
+                  onClick={() => setFaceAsset(null)}
+                  className="ml-0.5 text-white/40 hover:text-red-400 transition-colors"
+                  title="Убрать лицо"
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          )}
           {/* Seedance 2.0 reference chips — click to insert @reference into prompt */}
           {isSeedanceArk && refFiles.length > 0 && (
             <div className="flex flex-wrap gap-2 px-1 pb-1">
@@ -2129,6 +2162,22 @@ export default function VideoStudio({
               )}
             </div>
 
+            {/* Face registration — only for Seedance (binds a face to the video) */}
+            {isSeedanceArk && (
+              <button
+                type="button"
+                onClick={() => setFaceRegOpen(true)}
+                title="Зарегистрировать лицо для Seedance"
+                className={`h-9 px-3 rounded-md font-medium text-sm transition-all border flex items-center gap-2 ${faceAsset ? "bg-purple-600/30 border-purple-500/50 text-purple-100" : "bg-gradient-to-r from-purple-600/20 to-pink-600/20 hover:from-purple-600/40 hover:to-pink-600/40 text-purple-300 border-purple-500/30"}`}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+                {faceAsset ? faceAsset.name : "Лицо"}
+              </button>
+            )}
+
             {/* Generate button */}
             <button
               type="button"
@@ -2184,6 +2233,15 @@ export default function VideoStudio({
           />
         </div>
       )}
+
+      {/* ── FACE REGISTRATION DIALOG (binds a face to Seedance) ── */}
+      <FaceRegistrationDialog
+        open={faceRegOpen}
+        onClose={() => setFaceRegOpen(false)}
+        onRegistered={(assetUri, displayName) => {
+          setFaceAsset({ uri: assetUri, name: displayName });
+        }}
+      />
     </div>
   );
 }

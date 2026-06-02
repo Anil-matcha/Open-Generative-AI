@@ -8,7 +8,7 @@ const nextConfig = {
   experimental: {
     serverBodySizeLimit: '50mb',
   },
-  generateBuildId: async () => 'build-remove-runall-v16',
+  generateBuildId: async () => 'build-remove-runall-v17',
 };
 
 export default nextConfig;

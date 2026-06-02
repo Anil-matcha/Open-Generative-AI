@@ -55,7 +55,7 @@ function pickEndpoint(fast) {
   return ep;
 }
 
-function buildContent({ prompt, image_url, image_urls, video_url, video_urls, audio_url, audio_urls }) {
+function buildContent({ prompt, image_url, image_urls, video_url, video_urls, audio_url, audio_urls, face_asset }) {
   const content = [];
   if (prompt) content.push({ type: 'text', text: prompt });
 
@@ -82,6 +82,9 @@ function buildContent({ prompt, image_url, image_urls, video_url, video_urls, au
   });
   videos.forEach((u) => content.push({ type: 'video_url', video_url: { url: u }, role: 'reference_video' }));
   audios.forEach((u) => content.push({ type: 'audio_url', audio_url: { url: u }, role: 'reference_audio' }));
+  // Registered face/character asset (asset://…) — always a reference image so the
+  // generated video keeps the same face.
+  if (face_asset) content.push({ type: 'image_url', image_url: { url: face_asset }, role: 'reference_image' });
   return content;
 }
 
@@ -105,9 +108,10 @@ export async function POST(request) {
       ratio,
       duration,
       generate_audio = true,
+      face_asset,
     } = body;
 
-    const content = buildContent({ prompt, image_url, image_urls, video_url, video_urls, audio_url, audio_urls });
+    const content = buildContent({ prompt, image_url, image_urls, video_url, video_urls, audio_url, audio_urls, face_asset });
     if (content.length === 0) {
       return NextResponse.json({ error: 'Empty content' }, { status: 400 });
     }
