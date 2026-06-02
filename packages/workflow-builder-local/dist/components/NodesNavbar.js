@@ -40,8 +40,12 @@ var SPECIAL_MODEL_NAMES = {
   "text-passthrough": "Input Text",
   "image-passthrough": "Input Image",
   "video-passthrough": "Input Video",
-  "audio-passthrough": "Input Audio"
+  "audio-passthrough": "Input Audio",
+  "gpt-image-2": "GPT Image 2",
+  "gemini-3.1-flash-image-preview": "Nano Banana 2",
+  "gemini-3-pro-image-preview": "Nano Banana Pro"
 };
+var ALLOWED_GENERATE_IMAGE = new Set(["gpt-image-2", "gemini-3.1-flash-image-preview", "gemini-3-pro-image-preview"]);
 var NodesNavbar = function NodesNavbar(_ref) {
   var addNode = _ref.addNode,
     apiNodeModels = _ref.apiNodeModels,
@@ -131,11 +135,9 @@ var NodesNavbar = function NodesNavbar(_ref) {
       });
     })));
     var generateImageModels = imageModels.filter(function (m) {
-      return (m === null || m === void 0 ? void 0 : m.id) && !isPassthrough(m) && !m.id.includes("edit") && !m.id.includes("reference") && !m.id.includes("image-to-image");
+      return ALLOWED_GENERATE_IMAGE.has(m === null || m === void 0 ? void 0 : m.id);
     });
-    var editImageModels = imageModels.filter(function (m) {
-      return (m === null || m === void 0 ? void 0 : m.id) && !isPassthrough(m) && (m.id.includes("edit") || m.id.includes("reference") || m.id.includes("image-to-image"));
-    });
+    var editImageModels = [];
     var upscaleImageModels = imageModels.filter(function (m) {
       return (m === null || m === void 0 ? void 0 : m.id) && !isPassthrough(m) && m.id.includes("upscale");
     });
@@ -203,12 +205,8 @@ var NodesNavbar = function NodesNavbar(_ref) {
       icon: /*#__PURE__*/_react["default"].createElement(_io.IoImageOutline, null),
       hasSubmenu: true,
       id: "generate-image"
-    }, {
-      label: "Edit Image",
-      icon: /*#__PURE__*/_react["default"].createElement(_ri.RiImageAiLine, null),
-      hasSubmenu: true,
-      id: "edit-image"
     }
+    // Edit Image disabled — generation only.
     // { label: "Upscale Image", icon: <MdOutlineImage />, hasSubmenu: true, id: "upscale-image" },
     // { label: "Image Utilities", icon: <MdCrop />, hasSubmenu: true, id: "image-utils" },
     ]

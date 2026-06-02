@@ -23,7 +23,18 @@ const SPECIAL_MODEL_NAMES = {
   "image-passthrough": "Input Image",
   "video-passthrough": "Input Video",
   "audio-passthrough": "Input Audio",
+  "gpt-image-2": "GPT Image 2",
+  "gemini-3.1-flash-image-preview": "Nano Banana 2",
+  "gemini-3-pro-image-preview": "Nano Banana Pro",
 };
+
+// Only these three image models are exposed in the "Generate Image" menu.
+// Editing is disabled in the builder, so the "Edit Image" category is hidden.
+const ALLOWED_GENERATE_IMAGE = new Set([
+  "gpt-image-2",
+  "gemini-3.1-flash-image-preview",
+  "gemini-3-pro-image-preview",
+]);
 
 const NodesNavbar = ({ addNode, apiNodeModels, filterNodeTypes = null, nodeSchemas = {} }) => {
   const [activeSubMenu, setActiveSubMenu] = useState(null);
@@ -90,8 +101,10 @@ const NodesNavbar = ({ addNode, apiNodeModels, filterNodeTypes = null, nodeSchem
       ...audioModels.filter(isPassthrough).map(m => ({ ...m, type: 'audioNode' })),
     ];
 
-    const generateImageModels = imageModels.filter(m => m?.id && !isPassthrough(m) && !m.id.includes("edit") && !m.id.includes("reference") && !m.id.includes("image-to-image"));
-    const editImageModels = imageModels.filter(m => m?.id && !isPassthrough(m) && (m.id.includes("edit") || m.id.includes("reference") || m.id.includes("image-to-image")));
+    // Restrict the Generate Image menu to the three allowed models only.
+    const generateImageModels = imageModels.filter(m => ALLOWED_GENERATE_IMAGE.has(m?.id));
+    // Editing is disabled in the builder — keep the list empty.
+    const editImageModels = [];
     const upscaleImageModels = imageModels.filter(m => m?.id && !isPassthrough(m) && m.id.includes("upscale"));
     const generateVideoModels = videoModels.filter(m => m?.id && !isPassthrough(m) && !m.id.includes("edit"));
     const editVideoModels = videoModels.filter(m => m?.id && !isPassthrough(m) && m.id.includes("edit"));
@@ -139,7 +152,8 @@ const NodesNavbar = ({ addNode, apiNodeModels, filterNodeTypes = null, nodeSchem
       label: "Image",
       items: [
         { label: "Generate Image", icon: <IoImageOutline />, hasSubmenu: true, id: "generate-image" },
-        { label: "Edit Image", icon: <RiImageAiLine />, hasSubmenu: true, id: "edit-image" },
+        // Edit Image disabled — generation only.
+        // { label: "Edit Image", icon: <RiImageAiLine />, hasSubmenu: true, id: "edit-image" },
         // { label: "Upscale Image", icon: <MdOutlineImage />, hasSubmenu: true, id: "upscale-image" },
         // { label: "Image Utilities", icon: <MdCrop />, hasSubmenu: true, id: "image-utils" },
       ]
