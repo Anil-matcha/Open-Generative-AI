@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { createHmac, createHash } from 'crypto';
 
 // Volcano Ark video generation (Seedance 2.0) — called directly, bypassing Memefast.
 // Auth: long-lived Ark API Key (Bearer). Set ARK_API_KEY in env.
@@ -7,6 +8,65 @@ import { NextResponse } from 'next/server';
 
 const ARK_BASE = 'https://ark.cn-beijing.volces.com/api/v3';
 const ARK_API_KEY = process.env.ARK_API_KEY || '';
+
+// TOS — used to mirror generated videos so they survive CDN expiry.
+const TOS_ENDPOINT = process.env.TOS_ENDPOINT || '';
+const TOS_BUCKET   = process.env.TOS_BUCKET   || '';
+const TOS_REGION   = process.env.TOS_REGION   || 'cn-beijing';
+const TOS_AK       = process.env.TOS_ACCESS_KEY || '';
+const TOS_SK       = process.env.TOS_SECRET_KEY || '';
+const TOS_ENABLED  = !!(TOS_ENDPOINT && TOS_BUCKET && TOS_AK && TOS_SK);
+
+function sha256hex(data) { return createHash('sha256').update(data).digest('hex'); }
+function hmac(key, data)  { return createHmac('sha256', key).update(data).digest(); }
+
+async function tosUpload(key, buffer, contentType) {
+  if (!TOS_ENABLED) return null;
+  try {
+    const now = new Date();
+    const iso = now.toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
+    const date = iso.slice(0, 8);
+    const host = `${TOS_BUCKET}.${TOS_ENDPOINT}`;
+    const payloadHash = sha256hex(buffer);
+    const canonHeaders = `content-length:${buffer.length}\ncontent-type:${contentType}\nhost:${host}\nx-tos-content-sha256:${payloadHash}\nx-tos-date:${iso}\n`;
+    const signedHeaders = 'content-length;content-type;host;x-tos-content-sha256;x-tos-date';
+    const canonical = `PUT\n/${key}\n\n${canonHeaders}\n${signedHeaders}\n${payloadHash}`;
+    const scope = `${date}/${TOS_REGION}/tos/request`;
+    const strToSign = `TOS4-HMAC-SHA256\n${iso}\n${scope}\n${sha256hex(canonical)}`;
+    const sigKey = hmac(hmac(hmac(hmac(TOS_SK, date), TOS_REGION), 'tos'), 'request');
+    const sig = createHmac('sha256', sigKey).update(strToSign).digest('hex');
+    const auth = `TOS4-HMAC-SHA256 Credential=${TOS_AK}/${scope}, SignedHeaders=${signedHeaders}, Signature=${sig}`;
+    const res = await fetch(`https://${host}/${key}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: auth,
+        'Content-Type': contentType,
+        'Content-Length': String(buffer.length),
+        'X-Tos-Content-Sha256': payloadHash,
+        'X-Tos-Date': iso,
+      },
+      body: buffer,
+    });
+    if (!res.ok) { console.error('TOS upload failed:', res.status, await res.text().catch(() => '')); return null; }
+    return `https://${host}/${key}`;
+  } catch (e) { console.error('TOS upload error:', e.message); return null; }
+}
+
+// Download an Ark CDN video and mirror it to TOS. Falls back to the original URL on any error.
+async function mirrorVideoToTOS(arkUrl) {
+  if (!arkUrl || !TOS_ENABLED) return arkUrl;
+  const tosHost = `${TOS_BUCKET}.${TOS_ENDPOINT}`;
+  if (arkUrl.startsWith(`https://${tosHost}`)) return arkUrl;
+  try {
+    const r = await fetch(arkUrl);
+    if (!r.ok) return arkUrl;
+    const buf = Buffer.from(await r.arrayBuffer());
+    const ct = r.headers.get('content-type') || 'video/mp4';
+    const ext = ct.includes('webm') ? 'webm' : ct.includes('mov') ? 'mov' : 'mp4';
+    const key = `videos/${Date.now()}_${Math.random().toString(36).slice(2, 7)}.${ext}`;
+    return (await tosUpload(key, buf, ct)) || arkUrl;
+  } catch { return arkUrl; }
+}
 
 function parseEndpoints(envVal, fallback) {
   const list = (envVal || '')
@@ -62,16 +122,14 @@ function buildContent({ prompt, image_url, image_urls, video_url, audio_url }) {
   if (image_url) images.push(image_url);
   if (Array.isArray(image_urls)) images.push(...image_urls.filter(Boolean));
 
-  // image(s) + (video or audio) → multimodal reference scenario (mutually
-  // exclusive with first-frame). A single image with no other media → first frame.
+  // image(s) + (video or audio) → multimodal reference scenario → role: reference_image.
+  // A single image with no other media → first-frame I2V (no role field, per Ark docs).
   const hasRefMedia = !!(video_url || audio_url);
   const multiImage = images.length > 1;
   images.forEach((u) => {
-    content.push({
-      type: 'image_url',
-      image_url: { url: u },
-      role: hasRefMedia || multiImage ? 'reference_image' : 'first_frame',
-    });
+    const item = { type: 'image_url', image_url: { url: u } };
+    if (hasRefMedia || multiImage) item.role = 'reference_image';
+    content.push(item);
   });
   if (video_url) {
     content.push({ type: 'video_url', video_url: { url: video_url }, role: 'reference_video' });
@@ -138,6 +196,7 @@ export async function POST(request) {
 }
 
 // GET /api/ark/seedance?taskId=... — poll a task, returns { status, url }
+// On success, mirrors the Ark CDN video to TOS for permanent storage.
 export async function GET(request) {
   if (!ARK_API_KEY) {
     return NextResponse.json({ error: 'ARK_API_KEY not configured' }, { status: 503 });
@@ -158,7 +217,13 @@ export async function GET(request) {
       );
     }
     const status = data.status || 'running';
-    const url = data.content?.video_url || data.video_url || null;
+    const arkUrl = data.content?.video_url || data.video_url || null;
+
+    // Mirror to TOS on success so the video survives CDN expiry and is accessible.
+    const url = (status === 'succeeded' && arkUrl)
+      ? await mirrorVideoToTOS(arkUrl)
+      : arkUrl;
+
     return NextResponse.json({ status, url, error: data.error?.message || null });
   } catch (e) {
     return NextResponse.json({ error: e.message }, { status: 500 });
