@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { createHmac, createHash } from 'crypto';
 import { getUser } from '../_lib/balance';
 
+// Allow time to download the generated video from the CDN and re-upload to TOS.
+export const maxDuration = 60;
+
 const TOS_ENDPOINT = process.env.TOS_ENDPOINT || '';
 const TOS_BUCKET = process.env.TOS_BUCKET || '';
 const TOS_REGION = process.env.TOS_REGION || 'cn-beijing';
@@ -54,6 +57,36 @@ async function tosUpload(key, buffer, contentType) {
     } catch (e) {
         console.error('TOS upload error:', e.message);
         return null;
+    }
+}
+
+// Download a media file from a (possibly expiring) CDN URL and re-upload it to
+// TOS for permanent storage. Returns the permanent TOS URL, or the original URL
+// on failure. Mirrors the workflow builder's behaviour so generated videos land
+// in the bucket's videos/ folder.
+async function maybeUploadMediaToTOS(srcUrl, kind) {
+    if (!srcUrl || !TOS_ENABLED) return srcUrl;
+    const tosHost = `${TOS_BUCKET}.${TOS_ENDPOINT}`;
+    if (srcUrl.startsWith(`https://${tosHost}`)) return srcUrl; // already in TOS
+    try {
+        const r = await fetch(srcUrl);
+        if (!r.ok) return srcUrl;
+        const buf = Buffer.from(await r.arrayBuffer());
+        const ct = r.headers.get('content-type') || (kind === 'video' ? 'video/mp4' : kind === 'audio' ? 'audio/mpeg' : 'image/png');
+        let folder = 'images', ext = 'png';
+        if (kind === 'video') {
+            folder = 'videos';
+            ext = ct.includes('webm') ? 'webm' : ct.includes('mov') ? 'mov' : 'mp4';
+        } else if (kind === 'audio') {
+            folder = 'audio';
+            ext = ct.includes('wav') ? 'wav' : ct.includes('ogg') ? 'ogg' : 'mp3';
+        } else {
+            ext = (ct.split('/')[1] || 'png').split('+')[0];
+        }
+        const tosKey = `${folder}/${Date.now()}_${Math.random().toString(36).slice(2, 7)}.${ext}`;
+        return (await tosUpload(tosKey, buf, ct)) || srcUrl;
+    } catch {
+        return srcUrl;
     }
 }
 
@@ -110,6 +143,10 @@ export async function POST(request) {
             return NextResponse.json({ error: 'url required' }, { status: 400 });
         }
 
+        // Mirror the media into TOS (videos/ for video, audio/ for audio, images/ for image)
+        // so it survives the source CDN URL expiring. Falls back to the original URL.
+        const permanentUrl = await maybeUploadMediaToTOS(url, type);
+
         const key = `gallery/${user.id}/entries.json`;
         const tosUrl = `https://${TOS_BUCKET}.${TOS_ENDPOINT}/${key}`;
         let entries = [];
@@ -121,7 +158,7 @@ export async function POST(request) {
         const entry = {
             id: `${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
             type,
-            url,
+            url: permanentUrl,
             model,
             prompt,
             created_at: new Date().toISOString(),

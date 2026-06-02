@@ -526,18 +526,9 @@ async function generateSeedanceArk(modelInfo, params) {
         const status = (data.status || '').toLowerCase();
         if (status === 'succeeded' || status === 'success') {
             if (!data.url) throw new Error('Ark: видео готово, но URL не получен.');
-            // Step 3: mirror to TOS for permanent storage (non-blocking fallback to Ark URL)
-            let finalUrl = data.url;
-            fetch('/api/upload-file', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url: data.url }),
-            }).then((r) => r.json()).then((d) => {
-                if (d?.url) finalUrl = d.url;
-            }).catch(() => {});
-            // Small delay to let the mirror fire before we return (best-effort)
-            await new Promise((r) => setTimeout(r, 800));
-            return { url: finalUrl, id: taskId };
+            // Return the Ark CDN URL. Permanent TOS mirroring (into videos/) happens
+            // server-side when VideoStudio saves the result to the gallery.
+            return { url: data.url, id: taskId };
         }
         if (status === 'failed' || status === 'error' || status === 'expired' || status === 'cancelled') {
             throw new Error(`Ark: генерация не удалась (${data.error || status}).`);
