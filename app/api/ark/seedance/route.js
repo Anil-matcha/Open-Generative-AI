@@ -28,6 +28,7 @@ const FULL_ENDPOINTS = parseEndpoints(process.env.ARK_SEEDANCE_ENDPOINTS, [
   'ep-20260529022549-pwx2w',
 ]);
 const FAST_ENDPOINTS = parseEndpoints(process.env.ARK_SEEDANCE_FAST_ENDPOINTS, [
+  'ep-20260602191805-lkvlm',
   'ep-20260602191309-2d24d',
   'ep-20260602191215-9dpxn',
   'ep-20260602191152-xctn2',
