@@ -570,6 +570,10 @@ export default function VideoStudio({
   };
 
   const processDroppedVideo = async (file) => {
+    if (v2vModels.length === 0) {
+      alert("Обработка видео на входе пока не поддерживается.");
+      return;
+    }
     if (file.size > 50 * 1024 * 1024) {
       alert("Видео превышает лимит 50 МБ.");
       return;
@@ -1386,7 +1390,10 @@ export default function VideoStudio({
               </div>
             )}
 
-            {/* Video upload button */}
+            {/* Video upload button — only when video-to-video models exist.
+                Without any v2v model, uploading a video crashes on v2vModels[0]
+                and Veo/etc. don't accept video input anyway. */}
+            {v2vModels.length > 0 && (
             <div className="relative">
               <input
                 ref={videoFileInputRef}
@@ -1448,6 +1455,7 @@ export default function VideoStudio({
                 )}
               </button>
             </div>
+            )}
 
             {/* Prompt textarea */}
             <div className="flex-1 flex flex-col gap-1">
