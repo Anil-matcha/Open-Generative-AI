@@ -770,7 +770,9 @@ export default function ImageStudio({
   const [dropdownOpen, setDropdownOpen] = useState(null); // 'model' | 'ar' | 'quality' | null
   const [generating, setGenerating] = useState(() => {
     if (typeof window !== 'undefined') {
-      return sessionStorage.getItem('imageStudioGenerating') === 'true';
+      const val = sessionStorage.getItem('imageStudioGenerating') === 'true';
+      console.log('[ImageStudio] Initialize generating from sessionStorage:', val);
+      return val;
     }
     return false;
   });
@@ -779,6 +781,7 @@ export default function ImageStudio({
 
   // Notify parent when generation state changes (so it persists across tabs)
   useEffect(() => {
+    console.log('[ImageStudio] generation state changed:', generating);
     onGeneratingChange?.(generating);
     if (typeof window !== 'undefined') {
       if (generating) {
