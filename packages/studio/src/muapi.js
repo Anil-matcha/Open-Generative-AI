@@ -306,6 +306,7 @@ export async function generateImage(apiKey, params) {
     }
 
     if (params.quality) payload.quality = params.quality;
+    payload.format = params.format || 'jpeg';
 
     const response = await fetch(`${BASE_URL}/v1/images/generations`, {
         method: 'POST',
@@ -318,11 +319,13 @@ export async function generateImage(apiKey, params) {
         throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 200)}`);
     }
     const data = await response.json();
-    const url = extractImageUrl(data);
+    let url = extractImageUrl(data);
     if (!url) {
         console.error('[generateImage] No image URL in response:', JSON.stringify(data).slice(0, 500));
         throw new Error('Сервер не вернул изображение (нет URL в ответе).');
     }
+    // Mirror base64 responses to TOS so we store a real URL instead of a huge data URI.
+    url = await persistImageToTOS(url);
     return { ...data, url };
 }
 
@@ -495,9 +498,9 @@ async function generateImageEdit(apiKey, params) {
     form.append('size', size);
 
     if (params.quality) form.append('quality', params.quality);
-    form.append('format', 'jpeg');
-    form.append('background', 'auto');
-    form.append('moderation', 'auto');
+    form.append('format', params.format || 'jpeg');
+    form.append('background', params.background || 'auto');
+    form.append('moderation', params.moderation || 'auto');
 
     const urls = Array.isArray(params.images_list) && params.images_list.length > 0
         ? params.images_list
@@ -521,8 +524,9 @@ async function generateImageEdit(apiKey, params) {
         throw new Error(`API Request Failed: ${response.status} - ${errText.slice(0, 200)}`);
     }
     const data = await response.json();
-    const url = extractImageUrl(data);
+    let url = extractImageUrl(data);
     if (!url) throw new Error('Сервер не вернул изображение (нет URL в ответе).');
+    url = await persistImageToTOS(url);
     return { ...data, url };
 }
 

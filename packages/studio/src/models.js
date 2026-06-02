@@ -8,13 +8,36 @@
 
 // ── Image generation (text → image) via POST /v1/images/generations ──────────
 export const t2iModels = [
-  { id: "gpt-image-2", name: "GPT Image 2", apiId: "gpt-image-2", inputs: { prompt: { type: "string" }, quality: { enum: ["auto", "low", "medium", "high"], default: "auto" }, size: { enum: ["auto", "1024x1024", "1536x1024", "1024x1536", "2048x2048", "2048x1152", "3840x2160", "2160x3840"], default: "1024x1024" } } },
+  {
+    id: "gpt-image-2",
+    name: "GPT Image 2",
+    apiId: "gpt-image-2",
+    inputs: {
+      prompt: { type: "string" },
+      size: { enum: ["1024x1024", "1536x1024", "1024x1536", "2048x2048", "2048x1152", "3840x2160", "2160x3840"], default: "1024x1024" },
+      quality: { enum: ["auto", "high", "medium", "low"], default: "auto" },
+      format: { enum: ["jpeg", "png", "webp"], default: "jpeg" },
+    },
+  },
 ];
 
 // ── Image-to-image ────────────────────────────────────────────────────────────
 export const i2iModels = [
   // editEndpoint: true → uses POST /v1/images/edits (multipart/form-data) instead of /generations
-  { id: "gpt-image-2-edit", name: "GPT Image 2", apiId: "gpt-image-2", editEndpoint: true, inputs: { prompt: { type: "string" }, quality: { enum: ["auto", "low", "medium", "high"], default: "auto" }, size: { enum: ["auto", "1024x1024", "1536x1024", "1024x1536", "2048x2048", "2048x1152", "3840x2160", "2160x3840"], default: "1024x1024" } } },
+  {
+    id: "gpt-image-2-edit",
+    name: "GPT Image 2",
+    apiId: "gpt-image-2",
+    editEndpoint: true,
+    inputs: {
+      prompt: { type: "string" },
+      size: { enum: ["1024x1024", "1536x1024", "1024x1536", "2048x2048", "2048x1152", "3840x2160", "2160x3840"], default: "1024x1024" },
+      quality: { enum: ["auto", "high", "medium", "low"], default: "auto" },
+      format: { enum: ["jpeg", "png", "webp"], default: "jpeg" },
+      background: { enum: ["auto", "transparent", "opaque"], default: "auto" },
+      moderation: { enum: ["auto", "low"], default: "auto" },
+    },
+  },
 ];
 
 // ── Text-to-video ────────────────────────────────────────────────────────────
@@ -543,6 +566,7 @@ export const getResolutionsForModel = (id) => {
 };
 export const getQualityFieldForModel = (id) => {
   const m = t2iModels.find(x => x.id === id);
+  if (m?.inputs?.size?.enum) return 'size';
   return m?.inputs?.quality?.enum ? 'quality' : null;
 };
 export const getAspectRatiosForI2IModel = (id) => {
@@ -553,7 +577,11 @@ export const getResolutionsForI2IModel = (id) => {
   const m = i2iModels.find(x => x.id === id);
   return m?.inputs?.size?.enum || [];
 };
-export const getQualityFieldForI2IModel = (id) => null;
+export const getQualityFieldForI2IModel = (id) => {
+  const m = i2iModels.find(x => x.id === id);
+  if (m?.inputs?.size?.enum) return 'size';
+  return m?.inputs?.quality?.enum ? 'quality' : null;
+};
 export const getMaxImagesForI2IModel    = (id) => 1;
 export const getEffectsForI2IModel      = (id) => [];
 export const getDefaultEffectForI2IModel = (id) => null;
