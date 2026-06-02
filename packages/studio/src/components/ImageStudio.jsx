@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useLayoutEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { generateImage, generateI2I, uploadFile } from "../muapi.js";
 import FaceRegistrationDialog from "./FaceRegistrationDialog.jsx";
 import {
@@ -769,27 +769,15 @@ export default function ImageStudio({
 
   // ── UI state ────────────────────────────────────────────────────────────
   const [dropdownOpen, setDropdownOpen] = useState(null); // 'model' | 'ar' | 'quality' | null
-  const [generating, setGenerating] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return sessionStorage.getItem('imageStudioGenerating') === 'true';
-    }
-    return false;
-  });
+  const [generating, setGenerating] = useState(false);
   const [generateError, setGenerateError] = useState(null);
   const [fullscreenUrl, setFullscreenUrl] = useState(null);
   const [faceRegOpen, setFaceRegOpen] = useState(false);
 
-  // Notify parent when generation state changes (so it persists across tabs)
-  // Use useLayoutEffect to ensure sessionStorage is updated before unmount
-  useLayoutEffect(() => {
+  // Notify parent when generation state changes (drives the corner indicator).
+  // ImageStudio stays mounted across tabs, so this state is always accurate.
+  useEffect(() => {
     onGeneratingChange?.(generating);
-    if (typeof window !== 'undefined') {
-      if (generating) {
-        sessionStorage.setItem('imageStudioGenerating', 'true');
-      } else {
-        sessionStorage.removeItem('imageStudioGenerating');
-      }
-    }
   }, [generating, onGeneratingChange]);
 
   // ── Canvas / history state ──────────────────────────────────────────────

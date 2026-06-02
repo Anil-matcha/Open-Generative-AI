@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useLayoutEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { ImageStudio, VideoStudio, ClippingStudio, VibeMotionStudio, LipSyncStudio, CinemaStudio, AudioStudio, MarketingStudio, WorkflowStudio, AgentStudio, AppsStudio, getUserBalance } from 'studio';
@@ -71,23 +71,8 @@ export default function StandaloneShell() {
   const [isDragging, setIsDragging] = useState(false);
   const [droppedFiles, setDroppedFiles] = useState(null);
 
-  // Generation State (persists across tab switches via sessionStorage)
-  const [isGenerating, setIsGenerating] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return sessionStorage.getItem('imageStudioGenerating') === 'true';
-    }
-    return false;
-  });
-
-  useLayoutEffect(() => {
-    if (typeof window !== 'undefined') {
-      if (isGenerating) {
-        sessionStorage.setItem('imageStudioGenerating', 'true');
-      } else {
-        sessionStorage.removeItem('imageStudioGenerating');
-      }
-    }
-  }, [isGenerating]);
+  // Generation State — driven purely by ImageStudio (which stays mounted across tabs).
+  const [isGenerating, setIsGenerating] = useState(false);
 
   // Sync tab with URL if user navigates manually or via browser back/forward
   useEffect(() => {
@@ -324,7 +309,11 @@ export default function StandaloneShell() {
 
       {/* Studio Content */}
       <div className="flex-1 min-h-0 relative overflow-hidden">
-        {activeTab === 'image'   && <ImageStudio   apiKey={apiKey} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGeneratingChange={setIsGenerating} />}
+        {/* ImageStudio stays mounted always (hidden when inactive) so an in-progress
+            generation keeps running when the user switches tabs. */}
+        <div className={`absolute inset-0 ${activeTab === 'image' ? '' : 'hidden'}`}>
+          <ImageStudio apiKey={apiKey} droppedFiles={activeTab === 'image' ? droppedFiles : null} onFilesHandled={handleFilesHandled} onGeneratingChange={setIsGenerating} />
+        </div>
         {activeTab === 'video'   && <VideoStudio   apiKey={apiKey} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} />}
         {activeTab === 'workflows' && <WorkflowStudio apiKey={apiKey} isHeaderVisible={isHeaderVisible} onToggleHeader={setIsHeaderVisible} />}
         {activeTab === 'gallery' && <GalleryStudio apiKey={apiKey} />}
