@@ -431,7 +431,13 @@ async function generateImage(apiKey, model, params) {
     // Prefer an explicit pixel size (e.g. gpt-image-2 "Size" field); otherwise
     // derive it from aspect_ratio + resolution for models that use those.
     const size = params.size || computeImageSize(params.aspect_ratio, params.resolution, params.width, params.height);
-    const imgInput = params.image_url || params.images_list?.[0];
+    // Collect every wired reference image (images_list = up to 16, plus a single
+    // image_url for backward compatibility).
+    const imgs = [
+        ...(Array.isArray(params.images_list) ? params.images_list : []),
+        params.image_url,
+    ].filter(Boolean);
+    const imgInput = imgs[0];
 
     // Use /v1/images/edits whenever a reference image is wired in (editing mode).
     if (imgInput && (model.includes('edit') || model.includes('reference') || model.includes('inpaint') || model.startsWith('gpt-image'))) {
@@ -442,7 +448,7 @@ async function generateImage(apiKey, model, params) {
         form.append('size', size);
         if (params.quality) form.append('quality', params.quality);
         if (params.format) form.append('format', params.format);
-        form.append('image[]', imgInput);
+        for (const u of imgs) form.append('image[]', u);
         const editRes = await fetch(`${MEMEFAST}/v1/images/edits`, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${apiKey}` },
@@ -540,9 +546,13 @@ async function urlToInlineData(url) {
 async function generateChatImage(apiKey, model, params) {
     const apiModel = MODEL_ID_MAP[model] || model;
     const parts = [{ text: params.prompt || '' }];
-    const imgInput = params.image_url || params.images_list?.[0];
-    if (imgInput) {
-        const inline = await urlToInlineData(imgInput);
+    // Embed every wired reference image (images_list, plus a single image_url).
+    const imgs = [
+        ...(Array.isArray(params.images_list) ? params.images_list : []),
+        params.image_url,
+    ].filter(Boolean);
+    for (const u of imgs) {
+        const inline = await urlToInlineData(u);
         if (inline) parts.push({ inline_data: inline });
     }
 
