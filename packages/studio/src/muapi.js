@@ -370,30 +370,23 @@ async function generateImageViaChat(apiKey, modelId, params) {
     return { ...data, url };
 }
 
-// Upload an image (data URI or remote URL) to TOS and return its permanent
-// public URL. Falls back to the original on any failure so generation still works.
+// Mirror an image (base64 data URI) to TOS via the server, returning a permanent
+// public URL. The upload runs server-side because browser→TOS PUTs are CORS-blocked.
+// Falls back to the original image on any failure so generation still works.
 export async function persistImageToTOS(image) {
     try {
         if (typeof window === 'undefined' || !image) return image;
-        // Already a TOS/public http URL that isn't a data URI? keep it.
-        if (typeof image === 'string' && image.startsWith('http')) return image;
+        // Only base64 data URIs need mirroring; remote http URLs already persist.
+        if (typeof image === 'string' && !image.startsWith('data:')) return image;
 
-        const blobResp = await fetch(image);
-        const blob = await blobResp.blob();
-        const type = blob.type || 'image/png';
-        const ext = (type.split('/')[1] || 'png').split('+')[0];
-
-        const metaResp = await fetch(`/api/upload-file?filename=gen.${ext}&type=${encodeURIComponent(type)}`);
-        if (!metaResp.ok) return image; // storage not configured → keep original
-        const { putUrl, publicUrl } = await metaResp.json();
-
-        const putResp = await fetch(putUrl, {
-            method: 'PUT',
-            headers: { 'Content-Type': type },
-            body: blob,
+        const resp = await fetch('/api/upload-file', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image }),
         });
-        if (!putResp.ok) return image;
-        return publicUrl;
+        if (!resp.ok) return image; // storage not configured / upload failed → keep original
+        const { url } = await resp.json();
+        return url || image;
     } catch (err) {
         console.warn('persistImageToTOS failed:', err?.message);
         return image;
