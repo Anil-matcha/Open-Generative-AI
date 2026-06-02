@@ -788,10 +788,24 @@ export default function VideoStudio({
         { id, url: null, kind, name: file.name, uploading: true, progress: 0 },
       ]);
       try {
-        const url = await uploadFile(apiKey, file, (pct) => {
-          setRefFiles((prev) => prev.map((f) => (f.id === id ? { ...f, progress: pct } : f)));
+        // Step 1: read file as base64 data URL (browser-local, fast)
+        const base64 = await uploadFile(apiKey, file, (pct) => {
+          setRefFiles((prev) => prev.map((f) => (f.id === id ? { ...f, progress: Math.round(pct * 0.4) } : f)));
         });
-        setRefFiles((prev) => prev.map((f) => (f.id === id ? { ...f, url, uploading: false } : f)));
+        // Step 2: mirror to TOS so Ark API receives a real public URL (not huge base64)
+        let url = base64;
+        try {
+          const r = await fetch('/api/upload-file', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: base64 }),
+          });
+          if (r.ok) {
+            const d = await r.json();
+            if (d?.url) url = d.url;
+          }
+        } catch { /* use base64 as fallback */ }
+        setRefFiles((prev) => prev.map((f) => (f.id === id ? { ...f, url, uploading: false, progress: 100 } : f)));
       } catch (err) {
         console.error("[VideoStudio] Reference upload failed:", err);
         setRefFiles((prev) => prev.filter((f) => f.id !== id));

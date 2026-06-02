@@ -115,7 +115,10 @@ export async function POST(request) {
         }
 
         const ext = (contentType.split('/')[1] || 'png').split('+')[0];
-        const key = `images/${Date.now()}_${Math.random().toString(36).slice(2, 7)}.${ext}`;
+        const folder = contentType.startsWith('video/') ? 'videos'
+                     : contentType.startsWith('audio/') ? 'audio'
+                     : 'images';
+        const key = `${folder}/${Date.now()}_${Math.random().toString(36).slice(2, 7)}.${ext}`;
         const publicUrl = await tosUpload(key, buffer, contentType);
         if (!publicUrl) return NextResponse.json({ error: 'Upload failed' }, { status: 502 });
         return NextResponse.json({ url: publicUrl });
