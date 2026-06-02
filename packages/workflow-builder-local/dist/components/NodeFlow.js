@@ -143,7 +143,6 @@ var getEdgeColor = function getEdgeColor(sourceHandle, targetHandle) {
   if (["videoOutput"].includes(sourceHandle)) return "orange";
   if (["audioOutput"].includes(sourceHandle)) return "yellow";
   if (["characterOutput"].includes(sourceHandle)) return "purple";
-  if (["videoInput9"].includes(targetHandle)) return "purple";
   if (["textInput", "textInput4", "imageInput", "videoInput", "audioInput2", "concatInput", "apiInput"].includes(targetHandle)) return "blue";
   if (["textInput2", "textInput3", "imageInput2", "imageInput3", "videoInput2", "videoInput3", "videoInput6", "audioInput3", "apiInput2", "apiInput3"].includes(targetHandle)) return "green";
   if (["videoInput4", "audioInput4", "videoInput7"].includes(targetHandle)) return "orange";
@@ -683,7 +682,13 @@ var NodeFlow = function NodeFlow(_ref) {
           return n.id === edge.source;
         });
         var sourceValue = (sourceNode === null || sourceNode === void 0 ? void 0 : sourceNode.type) === "concatNode" ? sourceNode === null || sourceNode === void 0 || (_sourceNode$data = sourceNode.data) === null || _sourceNode$data === void 0 || (_sourceNode$data = _sourceNode$data.formValues) === null || _sourceNode$data === void 0 ? void 0 : _sourceNode$data.prompt : resultValue;
-        if (["textInput", "imageInput", "videoInput", "audioInput2", "apiInput"].includes(targetHandle)) {
+
+        // A Character node plugged into a video node is a face reference — route
+        // it to face_asset (reference_image) regardless of which image handle it
+        // lands on, instead of treating it as a first-frame image.
+        if ((sourceNode === null || sourceNode === void 0 ? void 0 : sourceNode.type) === "characterNode" && node.type === "videoNode") {
+          updatedFormValues.face_asset = resultValue;
+        } else if (["textInput", "imageInput", "videoInput", "audioInput2", "apiInput"].includes(targetHandle)) {
           updatedFormValues.prompt = sourceValue;
         } else if (targetHandle === "textInput4") {
           updatedFormValues.system_prompt = sourceValue;
@@ -721,8 +726,6 @@ var NodeFlow = function NodeFlow(_ref) {
           updatedFormValues[_key] = _list2;
         } else if (["videoInput5", "audioInput"].includes(targetHandle)) {
           updatedFormValues.audio_url = resultValue;
-        } else if (targetHandle === "videoInput9") {
-          updatedFormValues.face_asset = resultValue;
         } else if (node.type === "apiNode") {
           var _node$data$taskData;
           var listFields = ["images", "image_urls", "images_list"];
@@ -1254,15 +1257,23 @@ var NodeFlow = function NodeFlow(_ref) {
         return e.targetHandle === "textInput4";
       });
       var dynamicSystemPrompt = systemPromptConnections.length > 0 ? "{{ ".concat(systemPromptConnections[0].source, ".outputs[0].value }}") : (formValues === null || formValues === void 0 ? void 0 : formValues.system_prompt) || null;
+
+      // Character nodes feed face_asset (reference image), not image_url/list.
+      var isCharSource = function isCharSource(srcId) {
+        var _nodes$find;
+        return ((_nodes$find = nodes.find(function (n) {
+          return n.id === srcId;
+        })) === null || _nodes$find === void 0 ? void 0 : _nodes$find.type) === "characterNode";
+      };
       var imageListConnections = connectedEdges.filter(function (e) {
-        return ["textInput3", "imageInput2", "videoInput6", "apiInput2"].includes(e.targetHandle);
+        return ["textInput3", "imageInput2", "videoInput6", "apiInput2"].includes(e.targetHandle) && !isCharSource(e.source);
       });
       var dynamicImagesList = imageListConnections.length > 0 ? imageListConnections.map(function (conn) {
         return "{{ ".concat(conn.source, ".outputs[0].value }}");
-      }) : (formValues === null || formValues === void 0 ? void 0 : formValues.images_list) || []; // || [node.data?.outputs?.[0]?.value] 
+      }) : (formValues === null || formValues === void 0 ? void 0 : formValues.images_list) || []; // || [node.data?.outputs?.[0]?.value]
 
       var imageUrlConnections = connectedEdges.filter(function (e) {
-        return ["textInput2", "videoInput2", "imageInput3", "audioInput3", "apiInput3"].includes(e.targetHandle);
+        return ["textInput2", "videoInput2", "imageInput3", "audioInput3", "apiInput3"].includes(e.targetHandle) && !isCharSource(e.source);
       });
       var videoUrlConnections = connectedEdges.filter(function (e) {
         return ["videoInput4", "audioInput4"].includes(e.targetHandle);
@@ -1292,9 +1303,9 @@ var NodeFlow = function NodeFlow(_ref) {
       var dynamicAudioUrl = audioUrlConnections.length > 0 ? "{{ ".concat(audioUrlConnections[0].source, ".outputs[0].value }}") : (formValues === null || formValues === void 0 ? void 0 : formValues.audio_url) || null;
       var dynamicLastImage = lastImageConnections.length > 0 ? "{{ ".concat(lastImageConnections[0].source, ".outputs[0].value }}") : (formValues === null || formValues === void 0 ? void 0 : formValues.last_image) || null; // || node.data?.outputs?.[0]?.value
 
-      // Character node → face_asset (Seedance reference image).
+      // Character node connected to any image handle → face_asset (reference image).
       var faceAssetConnections = connectedEdges.filter(function (e) {
-        return e.targetHandle === "videoInput9";
+        return isCharSource(e.source);
       });
       var dynamicFaceAsset = faceAssetConnections.length > 0 ? "{{ ".concat(faceAssetConnections[0].source, ".outputs[0].value }}") : (formValues === null || formValues === void 0 ? void 0 : formValues.face_asset) || null;
       var localSources = _objectSpread(_objectSpread({}, formValues), {}, {

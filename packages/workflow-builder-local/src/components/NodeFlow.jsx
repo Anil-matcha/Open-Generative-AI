@@ -112,7 +112,6 @@ const getEdgeColor = (sourceHandle, targetHandle, sourceNode = null, targetNode 
   if (["videoOutput"].includes(sourceHandle)) return "orange";
   if (["audioOutput"].includes(sourceHandle)) return "yellow";
   if (["characterOutput"].includes(sourceHandle)) return "purple";
-  if (["videoInput9"].includes(targetHandle)) return "purple";
 
   if (["textInput", "textInput4", "imageInput", "videoInput", "audioInput2", "concatInput", "apiInput"].includes(targetHandle)) return "blue";
   if (["textInput2", "textInput3", "imageInput2", "imageInput3", "videoInput2", "videoInput3", "videoInput6", "audioInput3", "apiInput2", "apiInput3"].includes(targetHandle)) return "green";
@@ -529,7 +528,14 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
           ? sourceNode?.data?.formValues?.prompt
           : resultValue;
 
-        if (["textInput", "imageInput", "videoInput", "audioInput2", "apiInput"].includes(targetHandle)) {
+        // A Character node plugged into a video node is a face reference — route
+        // it to face_asset (reference_image) regardless of which image handle it
+        // lands on, instead of treating it as a first-frame image.
+        if (sourceNode?.type === "characterNode" && node.type === "videoNode") {
+          updatedFormValues.face_asset = resultValue;
+        }
+
+        else if (["textInput", "imageInput", "videoInput", "audioInput2", "apiInput"].includes(targetHandle)) {
           updatedFormValues.prompt = sourceValue;
         }
 
@@ -592,10 +598,6 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
 
         else if (["videoInput5", "audioInput"].includes(targetHandle)) {
           updatedFormValues.audio_url = resultValue;
-        }
-
-        else if (targetHandle === "videoInput9") {
-          updatedFormValues.face_asset = resultValue;
         }
 
         else if (node.type === "apiNode") {
@@ -1125,8 +1127,11 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
           ? `{{ ${systemPromptConnections[0].source}.outputs[0].value }}`
           : formValues?.system_prompt || null;
 
+      // Character nodes feed face_asset (reference image), not image_url/list.
+      const isCharSource = (srcId) => nodes.find((n) => n.id === srcId)?.type === "characterNode";
+
       const imageListConnections = connectedEdges.filter((e) =>
-        ["textInput3", "imageInput2", "videoInput6", "apiInput2"].includes(e.targetHandle)
+        ["textInput3", "imageInput2", "videoInput6", "apiInput2"].includes(e.targetHandle) && !isCharSource(e.source)
       );
 
       const dynamicImagesList =
@@ -1134,10 +1139,10 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
           ? imageListConnections.map(
             (conn) => `{{ ${conn.source}.outputs[0].value }}`
           )
-          : formValues?.images_list || []; // || [node.data?.outputs?.[0]?.value] 
+          : formValues?.images_list || []; // || [node.data?.outputs?.[0]?.value]
 
       const imageUrlConnections = connectedEdges.filter((e) =>
-        ["textInput2", "videoInput2", "imageInput3", "audioInput3", "apiInput3"].includes(e.targetHandle)
+        ["textInput2", "videoInput2", "imageInput3", "audioInput3", "apiInput3"].includes(e.targetHandle) && !isCharSource(e.source)
       );
 
       const videoUrlConnections = connectedEdges.filter((e) =>
@@ -1192,10 +1197,8 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
           ? `{{ ${lastImageConnections[0].source}.outputs[0].value }}`
           : formValues?.last_image || null; // || node.data?.outputs?.[0]?.value
 
-      // Character node → face_asset (Seedance reference image).
-      const faceAssetConnections = connectedEdges.filter(
-        (e) => e.targetHandle === "videoInput9"
-      );
+      // Character node connected to any image handle → face_asset (reference image).
+      const faceAssetConnections = connectedEdges.filter((e) => isCharSource(e.source));
       const dynamicFaceAsset =
         faceAssetConnections.length > 0
           ? `{{ ${faceAssetConnections[0].source}.outputs[0].value }}`
