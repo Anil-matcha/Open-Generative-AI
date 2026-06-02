@@ -1464,34 +1464,30 @@ export default function ImageStudio({
         </div>
       </div>
 
-      {/* ── GENERATION PROGRESS MODAL ── */}
+      {/* ── GENERATION PROGRESS INDICATOR ── */}
       {generating && (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fade-in">
-          <div className="bg-[#0a0a0a] border border-white/10 rounded-2xl p-8 w-full max-w-sm shadow-2xl flex flex-col items-center gap-6">
-            <div className="flex flex-col items-center gap-3">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#22d3ee] to-[#a855f7] p-1 animate-spin">
+        <div className="fixed bottom-6 right-6 z-[110] animate-fade-in">
+          <div className="bg-[#0a0a0a]/95 border border-[#22d3ee]/30 rounded-xl p-4 shadow-2xl flex flex-col items-center gap-3 min-w-[240px] backdrop-blur-sm">
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#22d3ee] to-[#a855f7] p-1 animate-spin">
                 <div className="w-full h-full rounded-full bg-[#0a0a0a] flex items-center justify-center">
-                  <span className="text-2xl text-[#22d3ee]">◌</span>
+                  <span className="text-xl text-[#22d3ee]">◌</span>
                 </div>
               </div>
               <div className="text-center">
-                <h3 className="text-lg font-bold text-white mb-1">Генерирую изображение...</h3>
-                <p className="text-sm text-white/40">Пожалуйста, подождите</p>
+                <h4 className="text-sm font-bold text-white">Генерирую...</h4>
+                <p className="text-xs text-white/40">Подождите</p>
               </div>
             </div>
 
-            <div className="w-full space-y-2">
-              <div className="flex justify-between text-xs text-white/60 mb-2">
-                <span>Ход выполнения</span>
-                <span>Обработка</span>
-              </div>
-              <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+            <div className="w-full space-y-1">
+              <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
                 <div className="h-full bg-gradient-to-r from-[#22d3ee] to-[#a855f7] animate-pulse" style={{ width: "100%" }} />
               </div>
             </div>
 
-            <p className="text-xs text-white/40 text-center">
-              Это может занять от нескольких секунд до минуты в зависимости от модели
+            <p className="text-[10px] text-white/30 text-center leading-tight">
+              может занять до минуты
             </p>
           </div>
         </div>
