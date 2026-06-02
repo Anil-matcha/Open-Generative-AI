@@ -127,6 +127,25 @@ function dedupeTriggerRun(src) {
   return out;
 }
 
+// ── 1e. Remove "Run All" button from NodeFlow ────────────────────────────────
+// Users run nodes individually via the Generate button in the Properties panel.
+// The "Run All" top-bar button is redundant and confusing.
+function removeRunAllButton(src) {
+  // JSX source form: <button onClick={handleRunWorkflow}>...Run All...</button>
+  src = src.replace(
+    /\n[ \t]*<button\b[\s\S]{0,500}?onClick=\{handleRunWorkflow\}[\s\S]{0,1000}?Run All[\s\S]{0,300}?<\/button>/g,
+    ''
+  );
+  // Compiled dist form: the Run All button is the 2nd child of the interactionMode Fragment.
+  // It starts with a leading "," and ends with "))" (inner Fragment close + button close).
+  // The outer Fragment ")" sits right after and is preserved automatically.
+  src = src.replace(
+    /,\s*\/\*#__PURE__\*\/_react\["default"\]\.createElement\("button",[\s\S]{0,300}?onClick:\s*handleRunWorkflow,[\s\S]{0,1500}?" Run All "[\s\S]{0,300}?\)\)/g,
+    ''
+  );
+  return src;
+}
+
 // ── 2. Speed up polling (src .jsx only — compiled dist already runs) ─────────
 function speedUpPolling(src, isNodeFlow) {
   let out = src;
@@ -175,6 +194,8 @@ for (const dir of targetDirs) {
     }
     // Only rewrite polling timing in .jsx sources; compiled dist uses different syntax.
     if (!isDist) src = speedUpPolling(src, name === 'NodeFlow');
+    // Remove "Run All" button from NodeFlow (both src and dist).
+    if (name === 'NodeFlow') src = removeRunAllButton(src);
 
     if (src !== orig) {
       fs.writeFileSync(file, src, 'utf8');
