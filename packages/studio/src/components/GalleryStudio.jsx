@@ -31,6 +31,17 @@ export default function GalleryStudio({ apiKey }) {
     fetchGallery(type);
   };
 
+  const handleDelete = async (entryId) => {
+    try {
+      await axios.delete(`/api/gallery/${entryId}`, {
+        headers: { Authorization: `Bearer ${apiKey}` }
+      });
+      setEntries(entries.filter(e => e.id !== entryId));
+    } catch (err) {
+      console.error('Failed to delete entry:', err);
+    }
+  };
+
   const getIcon = (type) => {
     const icons = {
       image: '🖼️',
@@ -111,14 +122,22 @@ export default function GalleryStudio({ apiKey }) {
                       {entry.prompt}
                     </div>
                   )}
-                  <a
-                    href={entry.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-3 py-1 bg-[#22d3ee] text-black text-[10px] font-bold rounded hover:bg-white transition-colors"
-                  >
-                    Открыть
-                  </a>
+                  <div className="flex gap-2">
+                    <a
+                      href={entry.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-1 bg-[#22d3ee] text-black text-[10px] font-bold rounded hover:bg-white transition-colors"
+                    >
+                      Открыть
+                    </a>
+                    <button
+                      onClick={() => handleDelete(entry.id)}
+                      className="px-3 py-1 bg-red-500/20 text-red-400 text-[10px] font-bold rounded hover:bg-red-500/40 transition-colors"
+                    >
+                      Удалить
+                    </button>
+                  </div>
                 </div>
 
                 {/* Type Badge */}
