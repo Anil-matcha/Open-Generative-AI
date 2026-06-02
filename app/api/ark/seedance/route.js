@@ -8,30 +8,47 @@ import { NextResponse } from 'next/server';
 const ARK_BASE = 'https://ark.cn-beijing.volces.com/api/v3';
 const ARK_API_KEY = process.env.ARK_API_KEY || '';
 
-// Endpoint pool for the standard Seedance 2.0 (260128). Overridable via env.
-const DEFAULT_ENDPOINTS = [
+function parseEndpoints(envVal, fallback) {
+  const list = (envVal || '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+  return list.length > 0 ? list : fallback;
+}
+
+// Two separate endpoint pools — Seedance 2.0 (full) and Seedance 2.0 Fast.
+// Each is round-robin load-balanced. Override via env (comma-separated ep- ids):
+//   ARK_SEEDANCE_ENDPOINTS       — full (Doubao-Seedance-2.0)
+//   ARK_SEEDANCE_FAST_ENDPOINTS  — fast (Doubao-Seedance-2.0-fast)
+const FULL_ENDPOINTS = parseEndpoints(process.env.ARK_SEEDANCE_ENDPOINTS, [
   'ep-20260529025832-p9qqk',
   'ep-20260529025809-nv5bv',
   'ep-20260529025745-7qpzf',
   'ep-20260529025647-5xbjq',
   'ep-20260529022549-pwx2w',
-  'ep-20260602190908-7nzjw',
-];
-const ENDPOINTS = (process.env.ARK_SEEDANCE_ENDPOINTS || '')
-  .split(',')
-  .map((s) => s.trim())
-  .filter(Boolean);
-const SEEDANCE_ENDPOINTS = ENDPOINTS.length > 0 ? ENDPOINTS : DEFAULT_ENDPOINTS;
+]);
+const FAST_ENDPOINTS = parseEndpoints(process.env.ARK_SEEDANCE_FAST_ENDPOINTS, [
+  'ep-20260602191309-2d24d',
+  'ep-20260602191215-9dpxn',
+  'ep-20260602191152-xctn2',
+  'ep-20260602190812-pqwdx',
+]);
 
 const FAST_MODEL_ID = 'doubao-seedance-2-0-fast-260128';
 const STD_MODEL_ID = 'doubao-seedance-2-0-260128';
 
-// Round-robin index. Per serverless instance; seeded randomly so concurrent
-// cold instances don't all start on the same endpoint.
-let rrIndex = Math.floor(Math.random() * SEEDANCE_ENDPOINTS.length);
-function pickEndpoint() {
-  const ep = SEEDANCE_ENDPOINTS[rrIndex % SEEDANCE_ENDPOINTS.length];
-  rrIndex = (rrIndex + 1) % SEEDANCE_ENDPOINTS.length;
+// Per-pool round-robin index, seeded randomly so concurrent cold serverless
+// instances don't all start on the same endpoint.
+const rrIndex = {
+  full: Math.floor(Math.random() * Math.max(1, FULL_ENDPOINTS.length)),
+  fast: Math.floor(Math.random() * Math.max(1, FAST_ENDPOINTS.length)),
+};
+function pickEndpoint(fast) {
+  const pool = fast ? FAST_ENDPOINTS : FULL_ENDPOINTS;
+  const key = fast ? 'fast' : 'full';
+  if (pool.length === 0) return null;
+  const ep = pool[rrIndex[key] % pool.length];
+  rrIndex[key] = (rrIndex[key] + 1) % pool.length;
   return ep;
 }
 
@@ -89,8 +106,9 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Empty content' }, { status: 400 });
     }
 
-    // fast variant uses its own model id (the endpoint pool is for the std 260128).
-    const model = fast ? FAST_MODEL_ID : (SEEDANCE_ENDPOINTS.length > 0 ? pickEndpoint() : STD_MODEL_ID);
+    // Round-robin within the matching pool; fall back to the bare model id if a
+    // pool is empty.
+    const model = pickEndpoint(fast) || (fast ? FAST_MODEL_ID : STD_MODEL_ID);
 
     const payload = { model, content, generate_audio, watermark: false };
     if (resolution) payload.resolution = resolution;
