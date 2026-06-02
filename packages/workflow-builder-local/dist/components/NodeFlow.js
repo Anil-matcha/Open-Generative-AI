@@ -2457,7 +2457,7 @@ var NodeFlow = function NodeFlow(_ref) {
     className: "w-4 h-4 border-2 border-t-transparent border-black group-hover:border-white group-hover:border-t-transparent rounded-full animate-spin"
   }), " Publishing...") : /*#__PURE__*/_react["default"].createElement(_react["default"].Fragment, null, /*#__PURE__*/_react["default"].createElement(_fa2.FaTelegramPlane, {
     size: 16
-  }), " ", publishWorkflow ? "Unpublish" : "Publish")) : /*#__PURE__*/_react["default"].createElement("button", {
+  }), " ", publishWorkflow ? "Unpublish" : "Publish"))) : /*#__PURE__*/_react["default"].createElement("button", {
     type: "button",
     suppressHydrationWarning: true,
     disabled: interactionMode,

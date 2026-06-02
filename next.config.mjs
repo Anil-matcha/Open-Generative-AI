@@ -9,7 +9,7 @@ const nextConfig = {
   experimental: {
     serverBodySizeLimit: '50mb',
   },
-  generateBuildId: async () => 'build-remove-runall-v3',
+  generateBuildId: async () => 'build-remove-runall-v4',
   webpack(config) {
     // Use the local (patched) workflow-builder to avoid submodule issues
     config.resolve.alias['workflow-builder'] = path.resolve(__dirname, 'packages/workflow-builder-local/dist/index.js');
