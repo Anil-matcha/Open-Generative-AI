@@ -8,13 +8,13 @@
 
 // ── Image generation (text → image) via POST /v1/images/generations ──────────
 export const t2iModels = [
-  { id: "gpt-image-2", name: "GPT Image 2", apiId: "gpt-image-2", inputs: { prompt: { type: "string" }, quality: { enum: ["standard", "hd"], default: "standard" }, size: { enum: ["1024x1024", "1024x1536", "1536x1024"], default: "1024x1024" } } },
+  { id: "gpt-image-2", name: "GPT Image 2", apiId: "gpt-image-2", inputs: { prompt: { type: "string" }, quality: { enum: ["auto", "low", "medium", "high"], default: "auto" }, size: { enum: ["auto", "1024x1024", "1536x1024", "1024x1536", "2048x2048", "2048x1152", "3840x2160", "2160x3840"], default: "1024x1024" } } },
 ];
 
 // ── Image-to-image ────────────────────────────────────────────────────────────
 export const i2iModels = [
   // editEndpoint: true → uses POST /v1/images/edits (multipart/form-data) instead of /generations
-  { id: "gpt-image-2-edit", name: "GPT Image 2", apiId: "gpt-image-2", editEndpoint: true, inputs: { prompt: { type: "string" }, quality: { enum: ["auto", "low", "medium", "high"], default: "auto" }, size: { enum: ["1024x1024", "1024x1536", "1536x1024"], default: "1024x1024" } } },
+  { id: "gpt-image-2-edit", name: "GPT Image 2", apiId: "gpt-image-2", editEndpoint: true, inputs: { prompt: { type: "string" }, quality: { enum: ["auto", "low", "medium", "high"], default: "auto" }, size: { enum: ["auto", "1024x1024", "1536x1024", "1024x1536", "2048x2048", "2048x1152", "3840x2160", "2160x3840"], default: "1024x1024" } } },
 ];
 
 // ── Text-to-video ────────────────────────────────────────────────────────────
