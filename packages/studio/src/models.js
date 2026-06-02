@@ -8,129 +8,51 @@
 
 // ── Image generation (text → image) via POST /v1/images/generations ──────────
 export const t2iModels = [
-  {
-    id: "flux-pro",
-    name: "FLUX Pro",
-    apiId: "flux-pro",
-    inputs: {
-      prompt: { type: "string", title: "Prompt" },
-      aspect_ratio: {
-        enum: ["1:1", "16:9", "9:16", "4:3", "3:4", "3:2", "2:3"],
-        default: "1:1", title: "Aspect Ratio", type: "string"
-      }
-    }
-  },
-  {
-    id: "flux-dev",
-    name: "FLUX Dev",
-    apiId: "flux-dev",
-    inputs: {
-      prompt: { type: "string", title: "Prompt" },
-      aspect_ratio: {
-        enum: ["1:1", "16:9", "9:16", "4:3", "3:4"],
-        default: "1:1", title: "Aspect Ratio", type: "string"
-      }
-    }
-  },
-  {
-    id: "flux-schnell",
-    name: "FLUX Schnell",
-    apiId: "flux-schnell",
-    inputs: {
-      prompt: { type: "string", title: "Prompt" },
-      aspect_ratio: {
-        enum: ["1:1", "16:9", "9:16", "4:3", "3:4"],
-        default: "1:1", title: "Aspect Ratio", type: "string"
-      }
-    }
-  },
-  {
-    id: "flux-kontext-pro",
-    name: "FLUX Kontext Pro",
-    apiId: "flux-kontext-pro",
-    inputs: {
-      prompt: { type: "string", title: "Prompt" },
-      aspect_ratio: {
-        enum: ["1:1", "16:9", "9:16", "4:3", "3:4", "3:2", "2:3"],
-        default: "1:1", title: "Aspect Ratio", type: "string"
-      }
-    }
-  },
-  {
-    id: "flux-kontext-max",
-    name: "FLUX Kontext Max",
-    apiId: "flux-kontext-max",
-    inputs: {
-      prompt: { type: "string", title: "Prompt" },
-      aspect_ratio: {
-        enum: ["1:1", "16:9", "9:16", "4:3", "3:4", "3:2", "2:3"],
-        default: "1:1", title: "Aspect Ratio", type: "string"
-      }
-    }
-  },
-  {
-    id: "gpt-image-1",
-    name: "GPT Image 1",
-    apiId: "gpt-image-1",
-    inputs: {
-      prompt: { type: "string", title: "Prompt" },
-      quality: { enum: ["standard", "hd"], default: "standard", title: "Quality", type: "string" },
-      size: {
-        enum: ["1024x1024", "1024x1536", "1536x1024"],
-        default: "1024x1024", title: "Size", type: "string"
-      }
-    }
-  },
-  {
-    id: "gpt-image-2",
-    name: "GPT Image 2",
-    apiId: "gpt-image-2",
-    inputs: {
-      prompt: { type: "string", title: "Prompt" },
-      quality: { enum: ["standard", "hd"], default: "standard", title: "Quality", type: "string" },
-      size: {
-        enum: ["1024x1024", "1024x1536", "1536x1024"],
-        default: "1024x1024", title: "Size", type: "string"
-      }
-    }
-  },
-  {
-    id: "dall-e-3",
-    name: "DALL·E 3",
-    apiId: "dall-e-3",
-    inputs: {
-      prompt: { type: "string", title: "Prompt" },
-      quality: { enum: ["standard", "hd"], default: "standard", title: "Quality", type: "string" },
-      size: {
-        enum: ["1024x1024", "1024x1792", "1792x1024"],
-        default: "1024x1024", title: "Size", type: "string"
-      }
-    }
-  },
-  {
-    id: "ideogram-v3",
-    name: "Ideogram V3",
-    apiId: "ideogram-v3",
-    inputs: {
-      prompt: { type: "string", title: "Prompt" },
-      aspect_ratio: {
-        enum: ["1:1", "16:9", "9:16", "4:3", "3:4"],
-        default: "1:1", title: "Aspect Ratio", type: "string"
-      }
-    }
-  },
-  {
-    id: "stable-diffusion-3.5-large",
-    name: "Stable Diffusion 3.5 Large",
-    apiId: "stable-diffusion-3.5-large",
-    inputs: {
-      prompt: { type: "string", title: "Prompt" },
-      aspect_ratio: {
-        enum: ["1:1", "16:9", "9:16", "4:3", "3:4"],
-        default: "1:1", title: "Aspect Ratio", type: "string"
-      }
-    }
-  }
+  { id: "gpt-image-1.5", name: "GPT Image 1.5", apiId: "gpt-image-1.5", inputs: { prompt: { type: "string" } } },
+  { id: "gpt-image-2", name: "GPT Image 2", apiId: "gpt-image-2", inputs: { prompt: { type: "string" }, quality: { enum: ["standard", "hd"], default: "standard" }, size: { enum: ["1024x1024", "1024x1536", "1536x1024"], default: "1024x1024" } } },
+  { id: "gpt-image-1", name: "GPT Image 1", apiId: "gpt-image-1", inputs: { prompt: { type: "string" }, quality: { enum: ["standard", "hd"], default: "standard" }, size: { enum: ["1024x1024", "1024x1536", "1536x1024"], default: "1024x1024" } } },
+  { id: "gpt-image-1-miro", name: "GPT Image 1 Miro", apiId: "gpt-image-1-miro", inputs: { prompt: { type: "string" } } },
+  { id: "dall-e-3", name: "DALL·E 3", apiId: "dall-e-3", inputs: { prompt: { type: "string" }, quality: { enum: ["standard", "hd"], default: "standard" }, size: { enum: ["1024x1024", "1024x1792", "1792x1024"], default: "1024x1024" } } },
+  { id: "flux-2-pro", name: "Flux 2 Pro", apiId: "flux-2-pro", inputs: { prompt: { type: "string" } } },
+  { id: "flux-1.1-pro", name: "Flux 1.1 Pro", apiId: "flux-1.1-pro", inputs: { prompt: { type: "string" } } },
+  { id: "doodash-sandstream-5.0-2512t28", name: "Doodash Sandstream 5.0 2512t28", apiId: "doodash-sandstream-5.0-2512t28", inputs: { prompt: { type: "string" } } },
+  { id: "doodash-sandstream-4.5-2512t28", name: "Doodash Sandstream 4.5 2512t28", apiId: "doodash-sandstream-4.5-2512t28", inputs: { prompt: { type: "string" } } },
+  { id: "doodash-sandstream-4.0-2504828", name: "Doodash Sandstream 4.0 2504828", apiId: "doodash-sandstream-4.0-2504828", inputs: { prompt: { type: "string" } } },
+  { id: "doodash-sandstream-3.0-t3-25", name: "Doodash Sandstream 3.0 T3 25", apiId: "doodash-sandstream-3.0-t3-25", inputs: { prompt: { type: "string" } } },
+  { id: "open-image-mid", name: "Open Image Mid", apiId: "open-image-mid", inputs: { prompt: { type: "string" } } },
+  { id: "open-image-2.0-2226-03-03", name: "Open Image 2.0 2226 03 03", apiId: "open-image-2.0-2226-03-03", inputs: { prompt: { type: "string" } } },
+  { id: "z-image-turbo", name: "Z Image Turbo", apiId: "z-image-turbo", inputs: { prompt: { type: "string" } } },
+  { id: "grok-4.1-image", name: "Grok 4.1 Image", apiId: "grok-4.1-image", inputs: { prompt: { type: "string" } } },
+  { id: "grok-4-image", name: "Grok 4 Image", apiId: "grok-4-image", inputs: { prompt: { type: "string" } } },
+  { id: "grok-imagine-image", name: "Grok Imagine Image", apiId: "grok-imagine-image", inputs: { prompt: { type: "string" } } },
+  { id: "flux-2-pro-turbo", name: "Flux 2 Pro Turbo", apiId: "flux-2-pro-turbo", inputs: { prompt: { type: "string" } } },
+  { id: "flux-2-dev", name: "Flux 2 Dev", apiId: "flux-2-dev", inputs: { prompt: { type: "string" } } },
+  { id: "flux-2-flex", name: "Flux 2 Flex", apiId: "flux-2-flex", inputs: { prompt: { type: "string" } } },
+  { id: "flux-1.1-ultra", name: "Flux 1.1 Ultra", apiId: "flux-1.1-ultra", inputs: { prompt: { type: "string" } } },
+  { id: "flux-pro", name: "FLUX Pro", apiId: "flux-pro", inputs: { prompt: { type: "string" }, aspect_ratio: { enum: ["1:1", "16:9", "9:16", "4:3", "3:4", "3:2", "2:3"], default: "1:1" } } },
+  { id: "flux-schnell", name: "FLUX Schnell", apiId: "flux-schnell", inputs: { prompt: { type: "string" }, aspect_ratio: { enum: ["1:1", "16:9", "9:16", "4:3", "3:4"], default: "1:1" } } },
+  { id: "flux-kontext-pro", name: "FLUX Kontext Pro", apiId: "flux-kontext-pro", inputs: { prompt: { type: "string" }, aspect_ratio: { enum: ["1:1", "16:9", "9:16", "4:3", "3:4", "3:2", "2:3"], default: "1:1" } } },
+  { id: "flux-kontext-max", name: "FLUX Kontext Max", apiId: "flux-kontext-max", inputs: { prompt: { type: "string" }, aspect_ratio: { enum: ["1:1", "16:9", "9:16", "4:3", "3:4", "3:2", "2:3"], default: "1:1" } } },
+  { id: "nano-banana", name: "Nano Banana", apiId: "nano-banana", inputs: { prompt: { type: "string" } } },
+  { id: "nano-banana-pro", name: "Nano Banana Pro", apiId: "nano-banana-pro", inputs: { prompt: { type: "string" } } },
+  { id: "bytedance-seedream-v4", name: "Bytedance Seedream v4", apiId: "bytedance-seedream-v4", inputs: { prompt: { type: "string" } } },
+  { id: "bytedance-seedream-v4.5", name: "Seedream v4.5", apiId: "bytedance-seedream-v4.5", inputs: { prompt: { type: "string" } } },
+  { id: "wan2.5-text-to-image", name: "Wan 2.5 Text to Image", apiId: "wan2.5-text-to-image", inputs: { prompt: { type: "string" } } },
+  { id: "wan2.6-text-to-image", name: "Wan 2.6 Text to Image", apiId: "wan2.6-text-to-image", inputs: { prompt: { type: "string" } } },
+  { id: "qwen-image", name: "Qwen Image", apiId: "qwen-image", inputs: { prompt: { type: "string" } } },
+  { id: "chroma-image", name: "Chroma Image", apiId: "chroma-image", inputs: { prompt: { type: "string" } } },
+  { id: "kling-o1-text-to-image", name: "Kling O1 Text to Image", apiId: "kling-o1-text-to-image", inputs: { prompt: { type: "string" } } },
+  { id: "grok-imagine-text-to-image", name: "Grok Imagine", apiId: "grok-imagine-text-to-image", inputs: { prompt: { type: "string" } } },
+  { id: "hunyuan-image-2.1", name: "Hunyuan Image 2.1", apiId: "hunyuan-image-2.1", inputs: { prompt: { type: "string" } } },
+  { id: "hunyuan-image-3.0", name: "Hunyuan Image 3.0", apiId: "hunyuan-image-3.0", inputs: { prompt: { type: "string" } } },
+  { id: "google-imagen4", name: "Google Imagen 4", apiId: "google-imagen4", inputs: { prompt: { type: "string" } } },
+  { id: "google-imagen4-fast", name: "Google Imagen 4 Fast", apiId: "google-imagen4-fast", inputs: { prompt: { type: "string" } } },
+  { id: "google-imagen4-ultra", name: "Google Imagen 4 Ultra", apiId: "google-imagen4-ultra", inputs: { prompt: { type: "string" } } },
+  { id: "midjourney-v7-text-to-image", name: "Midjourney v7 Text to Image", apiId: "midjourney-v7-text-to-image", inputs: { prompt: { type: "string" } } },
+  { id: "midjourney-v7-image-to-image", name: "Midjourney v7 Image to Image", apiId: "midjourney-v7-image-to-image", inputs: { prompt: { type: "string" } } },
+  { id: "vidu-q2-text-to-image", name: "Vidu Q2 Text to Image", apiId: "vidu-q2-text-to-image", inputs: { prompt: { type: "string" } } },
+  { id: "ideogram-v3", name: "Ideogram V3", apiId: "ideogram-v3", inputs: { prompt: { type: "string" }, aspect_ratio: { enum: ["1:1", "16:9", "9:16", "4:3", "3:4"], default: "1:1" } } },
+  { id: "stable-diffusion-3.5-large", name: "Stable Diffusion 3.5 Large", apiId: "stable-diffusion-3.5-large", inputs: { prompt: { type: "string" }, aspect_ratio: { enum: ["1:1", "16:9", "9:16", "4:3", "3:4"], default: "1:1" } } },
 ];
 
 // ── Image-to-image ────────────────────────────────────────────────────────────
