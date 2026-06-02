@@ -14,6 +14,32 @@ import {
   executeWorkflow,
 } from "../muapi.js";
 
+// Only these image models are exposed in the workflow builder's Generate Image
+// menu. Editing models are dropped entirely (Edit Image is disabled). Applied to
+// the node schema here (studio rebuilds reliably) so it works regardless of the
+// prebuilt workflow-builder package.
+const ALLOWED_WORKFLOW_IMAGE_MODELS = new Set([
+  "gpt-image-2",
+  "gemini-3.1-flash-image-preview",
+  "gemini-3-pro-image-preview",
+]);
+
+function filterWorkflowImageModels(schemas) {
+  const models = schemas?.categories?.image?.models;
+  if (!models || typeof models !== "object") return schemas;
+  const kept = {};
+  for (const [id, model] of Object.entries(models)) {
+    if (ALLOWED_WORKFLOW_IMAGE_MODELS.has(id)) kept[id] = model;
+  }
+  return {
+    ...schemas,
+    categories: {
+      ...schemas.categories,
+      image: { ...schemas.categories.image, models: kept },
+    },
+  };
+}
+
 async function publishWorkflow(apiKey, id, isPublished) {
   const r = await fetch(`/api/workflow/${id}/publish`, {
     method: 'POST',
@@ -219,7 +245,7 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
           getWorkflowData(apiKey, wfId).catch(() => ({ nodes: [], edges: [] })),
         ]);
 
-        setNodeSchemas(nodes);
+        setNodeSchemas(filterWorkflowImageModels(nodes));
         setWorkflowDef(def);
       } catch (err) {
         console.error("Error loading workflow:", err);

@@ -5,15 +5,16 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ['studio', 'ai-agent', 'design-agent', 'workflow-builder'],
+  transpilePackages: ['studio', 'ai-agent', 'design-agent'],
   experimental: {
     serverBodySizeLimit: '50mb',
   },
-  generateBuildId: async () => 'build-remove-runall-v5',
+  generateBuildId: async () => 'build-remove-runall-v6',
   webpack(config) {
-    // Use the local (patched) workflow-builder, transpiled straight from source
-    // so edits in src land in the deploy (the prebuilt dist was being cached).
-    config.resolve.alias['workflow-builder'] = path.resolve(__dirname, 'packages/workflow-builder-local/src/index.js');
+    // Use the local (patched) workflow-builder (prebuilt dist). The Generate Image
+    // model list is additionally trimmed in studio's WorkflowStudio so it applies
+    // regardless of whether this prebuilt bundle is rebuilt.
+    config.resolve.alias['workflow-builder'] = path.resolve(__dirname, 'packages/workflow-builder-local/dist/index.js');
     return config;
   },
 };
