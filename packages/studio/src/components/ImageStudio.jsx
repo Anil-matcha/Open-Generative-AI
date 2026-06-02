@@ -697,9 +697,15 @@ function ModelDropdown({ models, selectedModel, onSelect, onClose }) {
   );
 }
 
+// ─── Russian labels for image parameter values (API keeps the raw value) ──────
+// Photo formats (jpeg/png/webp) are intentionally NOT translated.
+const QUALITY_LABELS = { auto: "Авто", high: "Высокое", medium: "Среднее", low: "Низкое" };
+const BACKGROUND_LABELS = { auto: "Авто", transparent: "Прозрачный", opaque: "Непрозрачный" };
+const MODERATION_LABELS = { auto: "Авто", low: "Низкая" };
+
 // ─── SimpleDropdown ───────────────────────────────────────────────────────────
 
-function SimpleDropdown({ title, options, selected, onSelect, onClose }) {
+function SimpleDropdown({ title, options, selected, onSelect, onClose, labels }) {
   return (
     <>
       <div className="text-xs font-medium text-muted pb-2 border-b border-white/5 mb-2">
@@ -717,7 +723,7 @@ function SimpleDropdown({ title, options, selected, onSelect, onClose }) {
             className="flex items-center justify-between p-2 hover:bg-white/5 rounded-md cursor-pointer transition-all group"
           >
             <span className="text-xs font-bold text-white opacity-80 group-hover:opacity-100">
-              {opt}
+              {labels?.[opt] || opt}
             </span>
             {selected === opt && (
               <svg
@@ -1538,8 +1544,8 @@ export default function ImageStudio({
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="opacity-40 text-white">
                       <polygon points="12 2 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9" />
                     </svg>
-                    <span className="text-[11px] font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors capitalize">
-                      {selectedQualityOpt || currentQualityOptions[0]}
+                    <span className="text-[11px] font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors">
+                      {QUALITY_LABELS[selectedQualityOpt || currentQualityOptions[0]] || selectedQualityOpt || currentQualityOptions[0]}
                     </span>
                   </button>
 
@@ -1552,6 +1558,7 @@ export default function ImageStudio({
                         title="Качество"
                         options={currentQualityOptions}
                         selected={selectedQualityOpt}
+                        labels={QUALITY_LABELS}
                         onSelect={(val) => setSelectedQualityOpt(val)}
                         onClose={() => setDropdownOpen(null)}
                       />
@@ -1612,8 +1619,8 @@ export default function ImageStudio({
                       <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
                       <path d="M3 9h18M9 21V9" />
                     </svg>
-                    <span className="text-[11px] font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors capitalize">
-                      {selectedBackground || currentBackgroundOptions[0]}
+                    <span className="text-[11px] font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors">
+                      {BACKGROUND_LABELS[selectedBackground || currentBackgroundOptions[0]] || selectedBackground || currentBackgroundOptions[0]}
                     </span>
                   </button>
 
@@ -1626,6 +1633,7 @@ export default function ImageStudio({
                         title="Фон"
                         options={currentBackgroundOptions}
                         selected={selectedBackground}
+                        labels={BACKGROUND_LABELS}
                         onSelect={(val) => setSelectedBackground(val)}
                         onClose={() => setDropdownOpen(null)}
                       />
@@ -1648,8 +1656,8 @@ export default function ImageStudio({
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="opacity-40 text-white">
                       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                     </svg>
-                    <span className="text-[11px] font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors capitalize">
-                      {selectedModeration || currentModerationOptions[0]}
+                    <span className="text-[11px] font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors">
+                      {MODERATION_LABELS[selectedModeration || currentModerationOptions[0]] || selectedModeration || currentModerationOptions[0]}
                     </span>
                   </button>
 
@@ -1662,6 +1670,7 @@ export default function ImageStudio({
                         title="Модерация"
                         options={currentModerationOptions}
                         selected={selectedModeration}
+                        labels={MODERATION_LABELS}
                         onSelect={(val) => setSelectedModeration(val)}
                         onClose={() => setDropdownOpen(null)}
                       />
