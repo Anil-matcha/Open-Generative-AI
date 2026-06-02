@@ -74,15 +74,12 @@ export default function StandaloneShell() {
   // Generation State (persists across tab switches via sessionStorage)
   const [isGenerating, setIsGenerating] = useState(() => {
     if (typeof window !== 'undefined') {
-      const val = sessionStorage.getItem('imageStudioGenerating') === 'true';
-      console.log('[StandaloneShell] Initialize isGenerating from sessionStorage:', val);
-      return val;
+      return sessionStorage.getItem('imageStudioGenerating') === 'true';
     }
     return false;
   });
 
   useLayoutEffect(() => {
-    console.log('[StandaloneShell] isGenerating changed:', isGenerating);
     if (typeof window !== 'undefined') {
       if (isGenerating) {
         sessionStorage.setItem('imageStudioGenerating', 'true');
