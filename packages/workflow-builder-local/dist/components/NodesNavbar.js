@@ -189,22 +189,9 @@ var NodesNavbar = function NodesNavbar(_ref) {
       hasSubmenu: true,
       id: "inputs"
     }]
-  }, {
-    label: "Text",
-    items: [{
-      label: "Text (LLMs)",
-      icon: /*#__PURE__*/_react["default"].createElement(_tfi.TfiText, null),
-      hasSubmenu: true,
-      id: "text-llms"
-    }, {
-      label: "Utilities",
-      icon: /*#__PURE__*/_react["default"].createElement(_tb.TbArrowMerge, {
-        className: "rotate-90"
-      }),
-      hasSubmenu: true,
-      id: "utilities"
-    }]
-  }, {
+  },
+  // Text section (Text LLMs + Utilities) removed.
+  {
     label: "Image",
     items: [{
       label: "Generate Image",
@@ -224,12 +211,9 @@ var NodesNavbar = function NodesNavbar(_ref) {
       icon: /*#__PURE__*/_react["default"].createElement(_io.IoVideocamOutline, null),
       hasSubmenu: true,
       id: "generate-video"
-    }, {
-      label: "Edit Video",
-      icon: /*#__PURE__*/_react["default"].createElement(_ri.RiVideoOnAiLine, null),
-      hasSubmenu: true,
-      id: "edit-video"
-    }]
+    }
+    // Edit Video removed.
+    ]
   }
   // Audio (Generate Audio) and API Models (Api Node) sections removed.
   ];

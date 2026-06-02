@@ -141,13 +141,7 @@ const NodesNavbar = ({ addNode, apiNodeModels, filterNodeTypes = null, nodeSchem
         { label: "Input Models", icon: <LuUpload />, hasSubmenu: true, id: "inputs" },
       ]
     },
-    {
-      label: "Text",
-      items: [
-        { label: "Text (LLMs)", icon: <TfiText />, hasSubmenu: true, id: "text-llms" },
-        { label: "Utilities", icon: <TbArrowMerge className="rotate-90" />, hasSubmenu: true, id: "utilities" },
-      ]
-    },
+    // Text section (Text LLMs + Utilities) removed.
     {
       label: "Image",
       items: [
@@ -162,7 +156,7 @@ const NodesNavbar = ({ addNode, apiNodeModels, filterNodeTypes = null, nodeSchem
       label: "Video",
       items: [
         { label: "Generate Video", icon: <IoVideocamOutline />, hasSubmenu: true, id: "generate-video" },
-        { label: "Edit Video", icon: <RiVideoOnAiLine />, hasSubmenu: true, id: "edit-video" },
+        // Edit Video removed.
       ]
     },
     // Audio (Generate Audio) and API Models (Api Node) sections removed.
