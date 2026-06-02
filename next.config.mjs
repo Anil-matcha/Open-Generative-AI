@@ -1,12 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // workflow-builder is transpiled from source (package main = src/index.js) so
-  // fixes inside its components actually reach the deploy.
-  transpilePackages: ['studio', 'ai-agent', 'design-agent', 'workflow-builder'],
+  // workflow-builder is consumed as its prebuilt dist (main = dist/index.js).
+  // Transpiling it from source via transpilePackages did NOT reach the deploy
+  // (Vercel kept serving a stale compiled copy), so the render-loop fixes are
+  // shipped in the committed dist instead.
+  transpilePackages: ['studio', 'ai-agent', 'design-agent'],
   experimental: {
     serverBodySizeLimit: '50mb',
   },
-  generateBuildId: async () => 'build-remove-runall-v9',
+  generateBuildId: async () => 'build-remove-runall-v10',
 };
 
 export default nextConfig;
