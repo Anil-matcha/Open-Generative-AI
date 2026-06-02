@@ -45,6 +45,17 @@ export const t2iModels = [
       imageSize: { enum: ["1K", "2K", "4K", "512"], default: "1K" },
     },
   },
+  {
+    // Nano Banana Pro — same native Gemini generateContent path as above.
+    id: "gemini-3-pro-image-preview",
+    name: "Nano Banana Pro",
+    apiId: "gemini-3-pro-image-preview",
+    inputs: {
+      prompt: { type: "string" },
+      aspect_ratio: { enum: GEMINI_AR, default: "1:1" },
+      imageSize: { enum: ["1K", "2K", "4K", "512"], default: "1K" },
+    },
+  },
 ];
 
 // ── Image-to-image ────────────────────────────────────────────────────────────
@@ -70,6 +81,16 @@ export const i2iModels = [
     id: "gemini-3.1-flash-image-preview-edit",
     name: "Nano Banana 2",
     apiId: "gemini-3.1-flash-image-preview",
+    inputs: {
+      prompt: { type: "string" },
+      aspect_ratio: { enum: GEMINI_AR, default: "1:1" },
+      imageSize: { enum: ["1K", "2K", "4K", "512"], default: "1K" },
+    },
+  },
+  {
+    id: "gemini-3-pro-image-preview-edit",
+    name: "Nano Banana Pro",
+    apiId: "gemini-3-pro-image-preview",
     inputs: {
       prompt: { type: "string" },
       aspect_ratio: { enum: GEMINI_AR, default: "1:1" },
