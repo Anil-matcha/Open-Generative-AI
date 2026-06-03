@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { toast } from "react-hot-toast";
 import { FiUpload } from "react-icons/fi";
+import { useStore } from "reactflow";
 import axios from "axios";
 import AudioPlayer from "./AudioPlayer";
 import VideoPlayer from "./VideoPlayer";
@@ -161,6 +162,60 @@ const UploadNode = ({ id, data, formValues, setFormValues, selectedModel, loadin
   const hasFileUrl = formValues?.image_url || formValues?.video_url || formValues?.audio_url;
   const textareaRef = useRef(null);
 
+  // Референс-теги: если этот текст-нод кормит видео/изображение-ноду, к которой
+  // подключён Персонаж, показываем кликабельный чип @Имя с миниатюрой лица.
+  // Клик вставляет @Имя в промпт (как в Студии Креаторов).
+  const rfEdges = useStore((s) => s.edges);
+  const rfNodes = useStore((s) => s.nodeInternals);
+  const characterTags = useMemo(() => {
+    if (uploadType !== "text") return [];
+    const nodesArr = rfNodes ? Array.from(rfNodes.values()) : [];
+    // Ноды, которые кормит этот текст-нод (его промпт).
+    const fedTargets = rfEdges.filter((e) => e.source === id).map((e) => e.target);
+    const targetSet = new Set(
+      fedTargets.filter((tid) => {
+        const n = nodesArr.find((nn) => nn.id === tid);
+        return n?.type === "videoNode" || n?.type === "imageNode";
+      })
+    );
+    if (!targetSet.size) return [];
+    // Персонаж-ноды, подключённые к тем же целям.
+    const charIds = new Set(
+      rfEdges
+        .filter((e) => targetSet.has(e.target))
+        .map((e) => e.source)
+        .filter((sid) => nodesArr.find((nn) => nn.id === sid)?.type === "characterNode")
+    );
+    const tags = [];
+    for (const cid of charIds) {
+      const cnode = nodesArr.find((nn) => nn.id === cid);
+      const fv = cnode?.data?.formValues || {};
+      const name = (fv.character_name || "лицо").trim();
+      const thumb = fv.character_photo || fv.face_thumbnail || null;
+      tags.push({ id: cid, name, thumb });
+    }
+    return tags;
+  }, [rfEdges, rfNodes, id, uploadType]);
+
+  const insertCharTag = (name) => {
+    const token = "@" + String(name || "лицо").trim().replace(/\s+/g, "_") + " ";
+    const ta = textareaRef.current;
+    const cur = formValues?.prompt || "";
+    if (!ta) {
+      setFormValues((prev) => ({ ...prev, prompt: cur + token }));
+      return;
+    }
+    const start = ta.selectionStart ?? cur.length;
+    const end = ta.selectionEnd ?? cur.length;
+    const next = cur.slice(0, start) + token + cur.slice(end);
+    setFormValues((prev) => ({ ...prev, prompt: next }));
+    requestAnimationFrame(() => {
+      ta.focus();
+      const pos = start + token.length;
+      ta.setSelectionRange(pos, pos);
+    });
+  };
+
   useEffect(() => {
     const textarea = textareaRef.current;
     if (textarea) {
@@ -174,13 +229,35 @@ const UploadNode = ({ id, data, formValues, setFormValues, selectedModel, loadin
     <div className="flex flex-col w-full flex-1 overflow-hidden rounded-b-2xl h-full">
       <div className="flex flex-col items-center justify-center w-full h-full flex-1">
         {uploadType === "text" ? (
-          <textarea
-            ref={textareaRef}
-            className="bg-transparent border border-gray-800 w-full h-full max-h-96 p-2 text-xs text-white resize-none overflow-y-auto custom-scrollbar"
-            placeholder="Enter your text prompt here..."
-            value={formValues?.prompt || ""}
-            onChange={handleTextChange}
-          />
+          <div className="flex flex-col w-full h-full gap-1.5">
+            {characterTags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {characterTags.map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => insertCharTag(t.name)}
+                    title={`Вставить @${t.name} в промпт`}
+                    className="flex items-center gap-1.5 pl-1 pr-2 py-1 rounded-lg bg-purple-500/15 hover:bg-purple-500/30 border border-purple-500/30 text-purple-200 transition-colors"
+                  >
+                    {t.thumb ? (
+                      <img src={t.thumb} alt={t.name} className="w-7 h-7 rounded-md object-cover flex-shrink-0" />
+                    ) : (
+                      <span className="w-7 h-7 rounded-md bg-purple-500/20 flex items-center justify-center text-[12px] flex-shrink-0">🙂</span>
+                    )}
+                    <span className="text-[10px]">@{t.name}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+            <textarea
+              ref={textareaRef}
+              className="bg-transparent border border-gray-800 w-full h-full max-h-96 p-2 text-xs text-white resize-none overflow-y-auto custom-scrollbar"
+              placeholder="Enter your text prompt here..."
+              value={formValues?.prompt || ""}
+              onChange={handleTextChange}
+            />
+          </div>
         ) : uploadType === "upload" && (
           <div 
             className="flex flex-col items-center justify-center w-full h-full relative" 

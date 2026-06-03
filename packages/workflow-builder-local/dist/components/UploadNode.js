@@ -8,6 +8,7 @@ exports["default"] = void 0;
 var _react = _interopRequireWildcard(require("react"));
 var _reactHotToast = require("react-hot-toast");
 var _fi = require("react-icons/fi");
+var _reactflow = require("reactflow");
 var _axios = _interopRequireDefault(require("axios"));
 var _AudioPlayer = _interopRequireDefault(require("./AudioPlayer"));
 var _VideoPlayer = _interopRequireDefault(require("./VideoPlayer"));
@@ -15,6 +16,7 @@ var _io = require("react-icons/io5");
 var _utility = require("./utility");
 function _interopRequireDefault(e) { return e && e.__esModule ? e : { "default": e }; }
 function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function _interopRequireWildcard(e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, "default": e }; if (null === e || "object" != _typeof(e) && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (var _t in e) "default" !== _t && {}.hasOwnProperty.call(e, _t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, _t)) && (i.get || i.set) ? o(f, _t, i) : f[_t] = e[_t]); return f; })(e, t); }
+function _createForOfIteratorHelper(r, e) { var t = "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (!t) { if (Array.isArray(r) || (t = _unsupportedIterableToArray(r)) || e && r && "number" == typeof r.length) { t && (r = t); var _n = 0, F = function F() {}; return { s: F, n: function n() { return _n >= r.length ? { done: !0 } : { done: !1, value: r[_n++] }; }, e: function e(r) { throw r; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var o, a = !0, u = !1; return { s: function s() { t = t.call(r); }, n: function n() { var r = t.next(); return a = r.done, r; }, e: function e(r) { u = !0, o = r; }, f: function f() { try { a || null == t["return"] || t["return"](); } finally { if (u) throw o; } } }; }
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
 function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
 function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
@@ -238,6 +240,99 @@ var UploadNode = function UploadNode(_ref) {
   }, [formValues, selectedModel, loading, id, acceptType]);
   var hasFileUrl = (formValues === null || formValues === void 0 ? void 0 : formValues.image_url) || (formValues === null || formValues === void 0 ? void 0 : formValues.video_url) || (formValues === null || formValues === void 0 ? void 0 : formValues.audio_url);
   var textareaRef = (0, _react.useRef)(null);
+
+  // Референс-теги: если этот текст-нод кормит видео/изображение-ноду, к которой
+  // подключён Персонаж, показываем кликабельный чип @Имя с миниатюрой лица.
+  // Клик вставляет @Имя в промпт (как в Студии Креаторов).
+  var rfEdges = (0, _reactflow.useStore)(function (s) {
+    return s.edges;
+  });
+  var rfNodes = (0, _reactflow.useStore)(function (s) {
+    return s.nodeInternals;
+  });
+  var characterTags = (0, _react.useMemo)(function () {
+    if (uploadType !== "text") return [];
+    var nodesArr = rfNodes ? Array.from(rfNodes.values()) : [];
+    // Ноды, которые кормит этот текст-нод (его промпт).
+    var fedTargets = rfEdges.filter(function (e) {
+      return e.source === id;
+    }).map(function (e) {
+      return e.target;
+    });
+    var targetSet = new Set(fedTargets.filter(function (tid) {
+      var n = nodesArr.find(function (nn) {
+        return nn.id === tid;
+      });
+      return (n === null || n === void 0 ? void 0 : n.type) === "videoNode" || (n === null || n === void 0 ? void 0 : n.type) === "imageNode";
+    }));
+    if (!targetSet.size) return [];
+    // Персонаж-ноды, подключённые к тем же целям.
+    var charIds = new Set(rfEdges.filter(function (e) {
+      return targetSet.has(e.target);
+    }).map(function (e) {
+      return e.source;
+    }).filter(function (sid) {
+      var _nodesArr$find;
+      return ((_nodesArr$find = nodesArr.find(function (nn) {
+        return nn.id === sid;
+      })) === null || _nodesArr$find === void 0 ? void 0 : _nodesArr$find.type) === "characterNode";
+    }));
+    var tags = [];
+    var _iterator = _createForOfIteratorHelper(charIds),
+      _step;
+    try {
+      var _loop = function _loop() {
+        var _cnode$data;
+        var cid = _step.value;
+        var cnode = nodesArr.find(function (nn) {
+          return nn.id === cid;
+        });
+        var fv = (cnode === null || cnode === void 0 || (_cnode$data = cnode.data) === null || _cnode$data === void 0 ? void 0 : _cnode$data.formValues) || {};
+        var name = (fv.character_name || "лицо").trim();
+        var thumb = fv.character_photo || fv.face_thumbnail || null;
+        tags.push({
+          id: cid,
+          name: name,
+          thumb: thumb
+        });
+      };
+      for (_iterator.s(); !(_step = _iterator.n()).done;) {
+        _loop();
+      }
+    } catch (err) {
+      _iterator.e(err);
+    } finally {
+      _iterator.f();
+    }
+    return tags;
+  }, [rfEdges, rfNodes, id, uploadType]);
+  var insertCharTag = function insertCharTag(name) {
+    var _ta$selectionStart, _ta$selectionEnd;
+    var token = "@" + String(name || "лицо").trim().replace(/\s+/g, "_") + " ";
+    var ta = textareaRef.current;
+    var cur = (formValues === null || formValues === void 0 ? void 0 : formValues.prompt) || "";
+    if (!ta) {
+      setFormValues(function (prev) {
+        return _objectSpread(_objectSpread({}, prev), {}, {
+          prompt: cur + token
+        });
+      });
+      return;
+    }
+    var start = (_ta$selectionStart = ta.selectionStart) !== null && _ta$selectionStart !== void 0 ? _ta$selectionStart : cur.length;
+    var end = (_ta$selectionEnd = ta.selectionEnd) !== null && _ta$selectionEnd !== void 0 ? _ta$selectionEnd : cur.length;
+    var next = cur.slice(0, start) + token + cur.slice(end);
+    setFormValues(function (prev) {
+      return _objectSpread(_objectSpread({}, prev), {}, {
+        prompt: next
+      });
+    });
+    requestAnimationFrame(function () {
+      ta.focus();
+      var pos = start + token.length;
+      ta.setSelectionRange(pos, pos);
+    });
+  };
   (0, _react.useEffect)(function () {
     var textarea = textareaRef.current;
     if (textarea) {
@@ -250,13 +345,35 @@ var UploadNode = function UploadNode(_ref) {
     className: "flex flex-col w-full flex-1 overflow-hidden rounded-b-2xl h-full"
   }, /*#__PURE__*/_react["default"].createElement("div", {
     className: "flex flex-col items-center justify-center w-full h-full flex-1"
-  }, uploadType === "text" ? /*#__PURE__*/_react["default"].createElement("textarea", {
+  }, uploadType === "text" ? /*#__PURE__*/_react["default"].createElement("div", {
+    className: "flex flex-col w-full h-full gap-1.5"
+  }, characterTags.length > 0 && /*#__PURE__*/_react["default"].createElement("div", {
+    className: "flex flex-wrap gap-1.5"
+  }, characterTags.map(function (t) {
+    return /*#__PURE__*/_react["default"].createElement("button", {
+      key: t.id,
+      type: "button",
+      onClick: function onClick() {
+        return insertCharTag(t.name);
+      },
+      title: "\u0412\u0441\u0442\u0430\u0432\u0438\u0442\u044C @".concat(t.name, " \u0432 \u043F\u0440\u043E\u043C\u043F\u0442"),
+      className: "flex items-center gap-1.5 pl-1 pr-2 py-1 rounded-lg bg-purple-500/15 hover:bg-purple-500/30 border border-purple-500/30 text-purple-200 transition-colors"
+    }, t.thumb ? /*#__PURE__*/_react["default"].createElement("img", {
+      src: t.thumb,
+      alt: t.name,
+      className: "w-7 h-7 rounded-md object-cover flex-shrink-0"
+    }) : /*#__PURE__*/_react["default"].createElement("span", {
+      className: "w-7 h-7 rounded-md bg-purple-500/20 flex items-center justify-center text-[12px] flex-shrink-0"
+    }, "\uD83D\uDE42"), /*#__PURE__*/_react["default"].createElement("span", {
+      className: "text-[10px]"
+    }, "@", t.name));
+  })), /*#__PURE__*/_react["default"].createElement("textarea", {
     ref: textareaRef,
     className: "bg-transparent border border-gray-800 w-full h-full max-h-96 p-2 text-xs text-white resize-none overflow-y-auto custom-scrollbar",
     placeholder: "Enter your text prompt here...",
     value: (formValues === null || formValues === void 0 ? void 0 : formValues.prompt) || "",
     onChange: handleTextChange
-  }) : uploadType === "upload" && /*#__PURE__*/_react["default"].createElement("div", {
+  })) : uploadType === "upload" && /*#__PURE__*/_react["default"].createElement("div", {
     className: "flex flex-col items-center justify-center w-full h-full relative",
     onDragOver: handleDragOver,
     onDrop: handleDrop

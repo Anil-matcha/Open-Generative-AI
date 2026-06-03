@@ -8,7 +8,7 @@ const nextConfig = {
   experimental: {
     serverBodySizeLimit: '50mb',
   },
-  generateBuildId: async () => 'build-face-thumb-prompt-tag-v26',
+  generateBuildId: async () => 'build-textnode-char-tag-v27',
 };
 
 export default nextConfig;
