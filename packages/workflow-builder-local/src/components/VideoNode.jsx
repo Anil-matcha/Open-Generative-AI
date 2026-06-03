@@ -409,6 +409,8 @@ const VideoGeneration = ({ id, data, selected }) => {
       // ("doubao-seedance-2-0-fast-260128", "Seedance 2.0 Fast", …).
       const modelHay = `${selectedModel?.id || ""} ${selectedModel?.name || ""} ${data.selectedModel?.id || ""} ${data.selectedModel?.name || ""}`.toLowerCase();
       const isArkSeedance = /seedance[\s-]*2/.test(modelHay);
+      // DIAGNOSTIC: surface exactly what model id we got and which path runs.
+      toast(`model: ${selectedModel?.id || "?"} → ${isArkSeedance ? "ARK" : "server"}`, { icon: "🔎", duration: 5000 });
       if (isArkSeedance) {
         try {
           await runArkSeedanceBrowser();

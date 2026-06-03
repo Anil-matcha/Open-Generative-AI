@@ -614,7 +614,11 @@ var VideoGeneration = function VideoGeneration(_ref) {
             // Robust detection: match the model id OR display name in any format
             // ("doubao-seedance-2-0-fast-260128", "Seedance 2.0 Fast", …).
             modelHay = "".concat((selectedModel === null || selectedModel === void 0 ? void 0 : selectedModel.id) || "", " ").concat((selectedModel === null || selectedModel === void 0 ? void 0 : selectedModel.name) || "", " ").concat(((_data$selectedModel3 = data.selectedModel) === null || _data$selectedModel3 === void 0 ? void 0 : _data$selectedModel3.id) || "", " ").concat(((_data$selectedModel4 = data.selectedModel) === null || _data$selectedModel4 === void 0 ? void 0 : _data$selectedModel4.name) || "").toLowerCase();
-            isArkSeedance = /seedance[\s-]*2/.test(modelHay);
+            isArkSeedance = /seedance[\s-]*2/.test(modelHay); // DIAGNOSTIC: surface exactly what model id we got and which path runs.
+            (0, _reactHotToast.toast)("model: ".concat((selectedModel === null || selectedModel === void 0 ? void 0 : selectedModel.id) || "?", " \u2192 ").concat(isArkSeedance ? "ARK" : "server"), {
+              icon: "🔎",
+              duration: 5000
+            });
             if (!isArkSeedance) {
               _context3.n = 7;
               break;
