@@ -50,6 +50,7 @@ const VideoGeneration = ({ id, data, selected }) => {
   const prevHistoryLengthRef = useRef(outputHistory.length);
   const inFlightRef = useRef(false); // guards against duplicate concurrent generation requests
   const pollIntervalRef = useRef(null); // ref to current polling interval so it can be cancelled
+  const arkCancelRef = useRef(false); // set by Cancel to break the ARK browser poll loop
   const workflowId = getWorkflowId();
   const runId = data.runId ?? getRunId();
   const nodeSchemas = data.nodeSchemas || {};
@@ -283,9 +284,82 @@ const VideoGeneration = ({ id, data, selected }) => {
 
   const handleCancelGeneration = () => {
     stopPoll();
+    arkCancelRef.current = true;   // break the ARK browser poll loop on its next tick
     inFlightRef.current = false;
     data.onDataChange(id, { isLoading: false });
     toast("Генерация остановлена", { icon: "🛑" });
+  };
+
+  // Seedance 2.0 (Ark) — submit-and-poll FROM THE BROWSER, exactly like the Studio.
+  // The blocking workflow /run route holds a single HTTP connection for up to ~290s,
+  // which Vercel/proxies drop, leaving the node stuck on "GENERATING…". Short (<2s)
+  // submit + poll requests never hang.
+  const runArkSeedanceBrowser = async () => {
+    const fast = /fast/i.test(selectedModel?.id || "");
+    const src = formValues || {};
+    const body = {
+      fast,
+      prompt: src.prompt || "",
+      image_url: src.image_url || undefined,
+      image_urls: Array.isArray(src.images_list) ? src.images_list.filter(Boolean) : undefined,
+      video_url: src.video_url || undefined,
+      audio_url: src.audio_url || undefined,
+      resolution: src.resolution || undefined,
+      ratio: src.aspect_ratio || src.ratio || undefined,
+      duration: src.duration || undefined,
+      face_asset: src.face_asset || undefined,
+    };
+
+    // Step 1: submit — fast, just creates the Ark task and returns a taskId.
+    const submit = await axios.post("/api/ark/seedance", body);
+    const taskId = submit.data?.taskId;
+    if (!taskId) throw new Error(submit.data?.error || "ARK: задача не создана (нет taskId).");
+
+    // Step 2: poll from the browser — each request is < 1s, so no connection hangs.
+    for (let attempt = 0; attempt < 300; attempt++) {
+      if (arkCancelRef.current) { arkCancelRef.current = false; return; }
+      await new Promise((r) => setTimeout(r, 5000));
+      if (arkCancelRef.current) { arkCancelRef.current = false; return; }
+
+      let pd;
+      try {
+        const poll = await axios.get(`/api/ark/seedance?taskId=${encodeURIComponent(taskId)}`);
+        pd = poll.data;
+      } catch (e) {
+        continue; // transient — keep polling
+      }
+      const status = String(pd?.status || "").toLowerCase();
+      if (status === "succeeded" || status === "success") {
+        if (!pd.url) throw new Error("ARK: видео готово, но URL не получен.");
+        // ARK CDN (volces.com) has CORS restrictions — mirror to TOS so the
+        // browser can play it. Falls back to the ARK URL if mirroring fails.
+        let finalUrl = pd.url;
+        try {
+          const mirror = await axios.post("/api/upload-file", { url: pd.url });
+          if (mirror.data?.url) finalUrl = mirror.data.url;
+        } catch (e) { /* keep ARK URL */ }
+
+        const output = [{ type: "video_url", value: finalUrl }];
+        const newHistory = [
+          ...(data.outputHistory || []),
+          { status: "succeeded", result: { id: taskId, outputs: output } },
+        ];
+        data.onDataChange(id, {
+          outputs: output,
+          resultUrl: finalUrl,
+          isLoading: false,
+          errorMsg: null,
+          outputHistory: newHistory,
+        });
+        setCurrentHistoryIndex(newHistory.length - 1);
+        setCurrentVideoIndex(0);
+        return;
+      }
+      if (["failed", "error", "expired", "cancelled"].includes(status)) {
+        throw new Error(`ARK: генерация не удалась (${pd.error || status}).`);
+      }
+    }
+    throw new Error("ARK: превышено время ожидания генерации.");
   };
 
   const handleRunSingleNode = async () => {
@@ -299,8 +373,22 @@ const VideoGeneration = ({ id, data, selected }) => {
       return;
     }
     inFlightRef.current = true;
+    arkCancelRef.current = false;
     try {
       data.onDataChange(id, { isLoading: true });
+
+      // Seedance 2.0 (Ark) → browser submit-and-poll (same path as the Studio).
+      // Bypasses the blocking workflow /run route that hangs the node.
+      if (/doubao-seedance-2-0/i.test(selectedModel?.id || "")) {
+        try {
+          await runArkSeedanceBrowser();
+        } catch (e) {
+          data.onDataChange(id, { isLoading: false, errorMsg: e.message?.slice(0, 120) || "Ошибка генерации" });
+          toast.error(e.message?.slice(0, 80) || "Ошибка генерации");
+        }
+        return;
+      }
+
       const workflow_id = await data.handleSaveWorkFlow();
 
       if (!workflow_id) {

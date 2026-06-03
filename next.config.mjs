@@ -8,7 +8,7 @@ const nextConfig = {
   experimental: {
     serverBodySizeLimit: '50mb',
   },
-  generateBuildId: async () => 'build-cancel-facefix-v29',
+  generateBuildId: async () => 'build-ark-browser-poll-v30',
 };
 
 export default nextConfig;
