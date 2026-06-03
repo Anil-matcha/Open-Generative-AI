@@ -1568,6 +1568,33 @@ var NodeFlow = function NodeFlow(_ref) {
       return _ref6.apply(this, arguments);
     };
   }();
+
+  // Auto-save whenever any node's generation result changes, so generated
+  // videos/images persist with the workflow. The browser Seedance path updates
+  // node data directly (bypassing the server /run route) and would otherwise
+  // never trigger a save — a reload would lose the result.
+  var lastSavedResultsSig = (0, _react.useRef)("");
+  (0, _react.useEffect)(function () {
+    if (isRestoring || !interactionMode) return;
+    var sig = nodes.map(function (n) {
+      var _n$data;
+      return "".concat(n.id, ":").concat(((_n$data = n.data) === null || _n$data === void 0 ? void 0 : _n$data.resultUrl) || "");
+    }).join("|");
+    if (sig === lastSavedResultsSig.current) return;
+    // Establish the baseline on first run so we don't save immediately on load.
+    if (lastSavedResultsSig.current === "") {
+      lastSavedResultsSig.current = sig;
+      return;
+    }
+    lastSavedResultsSig.current = sig;
+    var t = setTimeout(function () {
+      handleSaveWorkFlow();
+    }, 1500);
+    return function () {
+      return clearTimeout(t);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nodes, interactionMode, isRestoring]);
   var handleDuplicateWorkflow = /*#__PURE__*/function () {
     var _ref7 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee4() {
       var workflowPayload, response, _t4;

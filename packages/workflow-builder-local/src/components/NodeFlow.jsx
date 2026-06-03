@@ -1419,6 +1419,23 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
     }
   };
 
+  // Auto-save whenever any node's generation result changes, so generated
+  // videos/images persist with the workflow. The browser Seedance path updates
+  // node data directly (bypassing the server /run route) and would otherwise
+  // never trigger a save — a reload would lose the result.
+  const lastSavedResultsSig = useRef("");
+  useEffect(() => {
+    if (isRestoring || !interactionMode) return;
+    const sig = nodes.map((n) => `${n.id}:${n.data?.resultUrl || ""}`).join("|");
+    if (sig === lastSavedResultsSig.current) return;
+    // Establish the baseline on first run so we don't save immediately on load.
+    if (lastSavedResultsSig.current === "") { lastSavedResultsSig.current = sig; return; }
+    lastSavedResultsSig.current = sig;
+    const t = setTimeout(() => { handleSaveWorkFlow(); }, 1500);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nodes, interactionMode, isRestoring]);
+
   const handleDuplicateWorkflow = async () => {
     if (interactionMode) return;
     setIsRunning(3);
