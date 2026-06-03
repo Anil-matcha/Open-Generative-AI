@@ -219,7 +219,7 @@ const UploadNode = ({ id, data, formValues, setFormValues, selectedModel, loadin
         .filter((sid) => {
           const n = nodesArr.find((nn) => nn.id === sid);
           if (!n) return false;
-          const mid = n?.data?.selectedModel?.id;
+          const mid = n?.data?.modelId || n?.data?.selectedModel?.id;
           return (n.type === "imageNode" && mid === "image-passthrough") ||
                  (n.type === "videoNode" && mid === "video-passthrough");
         })

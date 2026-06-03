@@ -331,12 +331,12 @@ var UploadNode = function UploadNode(_ref) {
     }).map(function (e) {
       return e.source;
     }).filter(function (sid) {
-      var _n$data;
+      var _n$data, _n$data2;
       var n = nodesArr.find(function (nn) {
         return nn.id === sid;
       });
       if (!n) return false;
-      var mid = n === null || n === void 0 || (_n$data = n.data) === null || _n$data === void 0 || (_n$data = _n$data.selectedModel) === null || _n$data === void 0 ? void 0 : _n$data.id;
+      var mid = (n === null || n === void 0 || (_n$data = n.data) === null || _n$data === void 0 ? void 0 : _n$data.modelId) || (n === null || n === void 0 || (_n$data2 = n.data) === null || _n$data2 === void 0 || (_n$data2 = _n$data2.selectedModel) === null || _n$data2 === void 0 ? void 0 : _n$data2.id);
       return n.type === "imageNode" && mid === "image-passthrough" || n.type === "videoNode" && mid === "video-passthrough";
     }));
     var tags = [];
