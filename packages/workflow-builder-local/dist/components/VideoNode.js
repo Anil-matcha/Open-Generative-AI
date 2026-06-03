@@ -104,6 +104,7 @@ var VideoGeneration = function VideoGeneration(_ref) {
   var outputHistory = data.outputHistory || [];
   var prevHistoryLengthRef = (0, _react.useRef)(outputHistory.length);
   var inFlightRef = (0, _react.useRef)(false); // guards against duplicate concurrent generation requests
+  var pollIntervalRef = (0, _react.useRef)(null); // ref to current polling interval so it can be cancelled
   var workflowId = (0, _WorkflowStore.getWorkflowId)();
   var runId = (_data$runId = data.runId) !== null && _data$runId !== void 0 ? _data$runId : (0, _WorkflowStore.getRunId)();
   var nodeSchemas = data.nodeSchemas || {};
@@ -196,7 +197,7 @@ var VideoGeneration = function VideoGeneration(_ref) {
     }, {});
 
     // Preserve UI-only flags that are not part of the model schema
-    var UI_KEYS = ["make_output", "make_input"];
+    var UI_KEYS = ["make_output", "make_input", "face_asset", "face_thumbnail"];
     UI_KEYS.forEach(function (k) {
       var _data$formValues;
       if (((_data$formValues = data.formValues) === null || _data$formValues === void 0 ? void 0 : _data$formValues[k]) !== undefined) merged[k] = data.formValues[k];
@@ -277,13 +278,18 @@ var VideoGeneration = function VideoGeneration(_ref) {
       loading: loading
     });
   }, [selectedModel, formValues, loading, data.formValues, data.selectedModel]);
+  var stopPoll = function stopPoll() {
+    if (pollIntervalRef.current) {
+      clearInterval(pollIntervalRef.current);
+      pollIntervalRef.current = null;
+    }
+  };
   var pollNodeStatus = function pollNodeStatus(run_id) {
-    var interval;
     var attempts = 0;
     var MAX_ATTEMPTS = 360; // 360 × 500ms = 3 minutes max
     var _check = function _check() {
       if (++attempts > MAX_ATTEMPTS) {
-        clearInterval(interval);
+        stopPoll();
         data.onDataChange(id, {
           isLoading: false,
           errorMsg: "Generation timed out"
@@ -324,7 +330,7 @@ var VideoGeneration = function VideoGeneration(_ref) {
           });
           setCurrentHistoryIndex(newHistory.length - 1);
           setCurrentVideoIndex(0);
-          clearInterval(interval);
+          stopPoll();
         }
         if (latest.status === "failed") {
           var _latest$result, _outputs$;
@@ -340,11 +346,11 @@ var VideoGeneration = function VideoGeneration(_ref) {
             errorMsg: errorMsg,
             outputHistory: _currentHistory
           });
-          clearInterval(interval);
+          stopPoll();
         }
       })["catch"](function (error) {
         console.log(error);
-        clearInterval(interval);
+        stopPoll();
         data.onDataChange(id, {
           isLoading: false
         });
@@ -352,7 +358,17 @@ var VideoGeneration = function VideoGeneration(_ref) {
       });
     };
     _check();
-    interval = setInterval(_check, 500);
+    pollIntervalRef.current = setInterval(_check, 500);
+  };
+  var handleCancelGeneration = function handleCancelGeneration() {
+    stopPoll();
+    inFlightRef.current = false;
+    data.onDataChange(id, {
+      isLoading: false
+    });
+    (0, _reactHotToast.toast)("Генерация остановлена", {
+      icon: "🛑"
+    });
   };
   var handleRunSingleNode = /*#__PURE__*/function () {
     var _ref1 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee() {
@@ -721,7 +737,14 @@ var VideoGeneration = function VideoGeneration(_ref) {
     className: "w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"
   }), /*#__PURE__*/_react["default"].createElement("span", {
     className: "text-[10px] font-bold text-orange-500 tracking-wider uppercase"
-  }, "Generating..."))) : data.errorMsg ? /*#__PURE__*/_react["default"].createElement("div", {
+  }, "Generating..."), /*#__PURE__*/_react["default"].createElement("button", {
+    type: "button",
+    onClick: function onClick(e) {
+      e.stopPropagation();
+      handleCancelGeneration();
+    },
+    className: "text-[10px] text-zinc-500 hover:text-red-400 transition-colors px-3 py-1 rounded-md border border-zinc-700 hover:border-red-500/50 bg-zinc-900/80"
+  }, "\u041E\u0442\u043C\u0435\u043D\u0430"))) : data.errorMsg ? /*#__PURE__*/_react["default"].createElement("div", {
     className: "text-red-400 text-xs font-medium p-3 bg-red-500/10 rounded-xl border border-red-500/20 m-3 w-full"
   }, data.errorMsg || "Generation failed") : currentOutput && !data.isLoading ? /*#__PURE__*/_react["default"].createElement("div", {
     className: "h-full w-full relative"

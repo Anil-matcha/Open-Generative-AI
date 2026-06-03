@@ -49,6 +49,7 @@ const VideoGeneration = ({ id, data, selected }) => {
   const outputHistory = data.outputHistory || [];
   const prevHistoryLengthRef = useRef(outputHistory.length);
   const inFlightRef = useRef(false); // guards against duplicate concurrent generation requests
+  const pollIntervalRef = useRef(null); // ref to current polling interval so it can be cancelled
   const workflowId = getWorkflowId();
   const runId = data.runId ?? getRunId();
   const nodeSchemas = data.nodeSchemas || {};
@@ -133,7 +134,7 @@ const VideoGeneration = ({ id, data, selected }) => {
     );
 
     // Preserve UI-only flags that are not part of the model schema
-    const UI_KEYS = ["make_output", "make_input"];
+    const UI_KEYS = ["make_output", "make_input", "face_asset", "face_thumbnail"];
     UI_KEYS.forEach((k) => {
       if (data.formValues?.[k] !== undefined) merged[k] = data.formValues[k];
     });
@@ -213,13 +214,19 @@ const VideoGeneration = ({ id, data, selected }) => {
     data.onDataChange(id, { selectedModel, formValues, loading });
   }, [selectedModel, formValues, loading, data.formValues, data.selectedModel]);
 
+  const stopPoll = () => {
+    if (pollIntervalRef.current) {
+      clearInterval(pollIntervalRef.current);
+      pollIntervalRef.current = null;
+    }
+  };
+
   const pollNodeStatus = (run_id) => {
-    let interval;
     let attempts = 0;
     const MAX_ATTEMPTS = 360; // 360 × 500ms = 3 minutes max
     const _check = () => {
       if (++attempts > MAX_ATTEMPTS) {
-        clearInterval(interval);
+        stopPoll();
         data.onDataChange(id, { isLoading: false, errorMsg: "Generation timed out" });
         toast.error(`Video generation timed out`);
         return;
@@ -247,7 +254,7 @@ const VideoGeneration = ({ id, data, selected }) => {
           data?.onDataChange?.(id, { outputs: output, resultUrl: val, isLoading: false, errorMsg: null, outputHistory: newHistory });
           setCurrentHistoryIndex(newHistory.length - 1);
           setCurrentVideoIndex(0);
-          clearInterval(interval);
+          stopPoll();
         }
 
         if (latest.status === "failed") {
@@ -260,16 +267,25 @@ const VideoGeneration = ({ id, data, selected }) => {
           toast.error(`Node ${id} failed`);
           const currentHistory = data.outputHistory || [];
           data.onDataChange(id, { isLoading: false, errorMsg, outputHistory: currentHistory });
-          clearInterval(interval);
+          stopPoll();
         }
       })
       .catch((error) => {
         console.log(error);
-        clearInterval(interval);
+        stopPoll();
         data.onDataChange(id, { isLoading: false });
         toast.error(`Failed to get workflow status Video ${id.replace(/^\D+/g, "")}`);
       });
-    }; _check(); interval = setInterval(_check, 500);
+    };
+    _check();
+    pollIntervalRef.current = setInterval(_check, 500);
+  };
+
+  const handleCancelGeneration = () => {
+    stopPoll();
+    inFlightRef.current = false;
+    data.onDataChange(id, { isLoading: false });
+    toast("Генерация остановлена", { icon: "🛑" });
   };
 
   const handleRunSingleNode = async () => {
@@ -565,6 +581,13 @@ const VideoGeneration = ({ id, data, selected }) => {
               <div className="flex flex-col items-center gap-3">
                 <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
                 <span className="text-[10px] font-bold text-orange-500 tracking-wider uppercase">Generating...</span>
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); handleCancelGeneration(); }}
+                  className="text-[10px] text-zinc-500 hover:text-red-400 transition-colors px-3 py-1 rounded-md border border-zinc-700 hover:border-red-500/50 bg-zinc-900/80"
+                >
+                  Отмена
+                </button>
               </div>
             </div>
           ) : data.errorMsg ? (

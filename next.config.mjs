@@ -8,7 +8,7 @@ const nextConfig = {
   experimental: {
     serverBodySizeLimit: '50mb',
   },
-  generateBuildId: async () => 'build-generate-feedback-v28',
+  generateBuildId: async () => 'build-cancel-facefix-v29',
 };
 
 export default nextConfig;
