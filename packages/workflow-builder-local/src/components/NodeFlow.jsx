@@ -2633,6 +2633,36 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
                 )}
               </div>
             </div>
+            {/* Face reference badge — shown when a CharacterNode feeds this video node */}
+            {selectedNode?.type === "videoNode" && selectedNode?.data?.formValues?.face_asset && (() => {
+              const fa = String(selectedNode.data.formValues.face_asset);
+              const isAsset = fa.startsWith("asset://");
+              return (
+                <div className="px-4 pb-3">
+                  <p className="text-[10px] font-semibold text-purple-300 uppercase tracking-wider mb-1.5">
+                    Референс лица
+                  </p>
+                  {isAsset ? (
+                    <div className="flex items-center gap-2 rounded-lg bg-purple-900/20 border border-purple-500/30 px-2.5 py-2">
+                      <div className="w-4 h-4 rounded-full bg-purple-600 flex-shrink-0" />
+                      <span className="text-[10px] font-mono text-purple-200 truncate">{fa}</span>
+                    </div>
+                  ) : (
+                    <div className="rounded-xl overflow-hidden border border-purple-500/30 relative">
+                      <img
+                        src={fa}
+                        alt="face reference"
+                        className="w-full h-28 object-cover object-top"
+                        onError={(e) => { e.target.parentElement.style.display = 'none'; }}
+                      />
+                      <div className="absolute top-1.5 right-1.5 bg-purple-600 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wide">
+                        Face
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
             <div className="p-4 flex flex-col gap-3">
               {/* Make Output Toggle */}
               <label className="flex items-center justify-between cursor-pointer group">

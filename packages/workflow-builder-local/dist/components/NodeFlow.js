@@ -270,7 +270,7 @@ var processWorkflowData = function processWorkflowData(workflowData, nodeSchemas
   };
 };
 var NodeFlow = function NodeFlow(_ref) {
-  var _initialState$metadat, _initialState$metadat2, _initialState$metadat3, _initialState$metadat4, _initialState$metadat5, _initialState$metadat6, _initialState$metadat7, _nodeSchemas$categori3, _selectedNode$data, _selectedNode$data2, _selectedNode$data3, _selectedNode$data6, _selectedNode$data16, _selectedNode$data17;
+  var _initialState$metadat, _initialState$metadat2, _initialState$metadat3, _initialState$metadat4, _initialState$metadat5, _initialState$metadat6, _initialState$metadat7, _nodeSchemas$categori3, _selectedNode$data, _selectedNode$data2, _selectedNode$data3, _selectedNode$data6, _selectedNode$data16, _selectedNode$data17, _selectedNode$data18;
   var initialNodeSchemas = _ref.initialNodeSchemas,
     initialWorkflowData = _ref.initialWorkflowData;
   var params = (0, _navigation.useParams)();
@@ -2895,7 +2895,32 @@ var NodeFlow = function NodeFlow(_ref) {
     className: "text-center py-8"
   }, /*#__PURE__*/_react["default"].createElement("p", {
     className: "text-sm text-gray-400"
-  }, "Please select a model first")))), /*#__PURE__*/_react["default"].createElement("div", {
+  }, "Please select a model first")))), (selectedNode === null || selectedNode === void 0 ? void 0 : selectedNode.type) === "videoNode" && (selectedNode === null || selectedNode === void 0 || (_selectedNode$data16 = selectedNode.data) === null || _selectedNode$data16 === void 0 || (_selectedNode$data16 = _selectedNode$data16.formValues) === null || _selectedNode$data16 === void 0 ? void 0 : _selectedNode$data16.face_asset) && function () {
+    var fa = String(selectedNode.data.formValues.face_asset);
+    var isAsset = fa.startsWith("asset://");
+    return /*#__PURE__*/_react["default"].createElement("div", {
+      className: "px-4 pb-3"
+    }, /*#__PURE__*/_react["default"].createElement("p", {
+      className: "text-[10px] font-semibold text-purple-300 uppercase tracking-wider mb-1.5"
+    }, "\u0420\u0435\u0444\u0435\u0440\u0435\u043D\u0441 \u043B\u0438\u0446\u0430"), isAsset ? /*#__PURE__*/_react["default"].createElement("div", {
+      className: "flex items-center gap-2 rounded-lg bg-purple-900/20 border border-purple-500/30 px-2.5 py-2"
+    }, /*#__PURE__*/_react["default"].createElement("div", {
+      className: "w-4 h-4 rounded-full bg-purple-600 flex-shrink-0"
+    }), /*#__PURE__*/_react["default"].createElement("span", {
+      className: "text-[10px] font-mono text-purple-200 truncate"
+    }, fa)) : /*#__PURE__*/_react["default"].createElement("div", {
+      className: "rounded-xl overflow-hidden border border-purple-500/30 relative"
+    }, /*#__PURE__*/_react["default"].createElement("img", {
+      src: fa,
+      alt: "face reference",
+      className: "w-full h-28 object-cover object-top",
+      onError: function onError(e) {
+        e.target.parentElement.style.display = 'none';
+      }
+    }), /*#__PURE__*/_react["default"].createElement("div", {
+      className: "absolute top-1.5 right-1.5 bg-purple-600 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wide"
+    }, "Face")));
+  }(), /*#__PURE__*/_react["default"].createElement("div", {
     className: "p-4 flex flex-col gap-3"
   }, /*#__PURE__*/_react["default"].createElement("label", {
     className: "flex items-center justify-between cursor-pointer group"
@@ -2906,7 +2931,7 @@ var NodeFlow = function NodeFlow(_ref) {
   }, /*#__PURE__*/_react["default"].createElement("input", {
     type: "checkbox",
     className: "sr-only peer",
-    checked: (selectedNode === null || selectedNode === void 0 || (_selectedNode$data16 = selectedNode.data) === null || _selectedNode$data16 === void 0 || (_selectedNode$data16 = _selectedNode$data16.formValues) === null || _selectedNode$data16 === void 0 ? void 0 : _selectedNode$data16.make_output) === true,
+    checked: (selectedNode === null || selectedNode === void 0 || (_selectedNode$data17 = selectedNode.data) === null || _selectedNode$data17 === void 0 || (_selectedNode$data17 = _selectedNode$data17.formValues) === null || _selectedNode$data17 === void 0 ? void 0 : _selectedNode$data17.make_output) === true,
     onChange: function onChange(e) {
       var checked = e.target.checked;
       setNodes(function (nds) {
@@ -2925,7 +2950,7 @@ var NodeFlow = function NodeFlow(_ref) {
     className: "w-9 h-5 bg-gray-700 rounded-full peer peer-checked:bg-blue-600 transition-colors"
   }), /*#__PURE__*/_react["default"].createElement("div", {
     className: "absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full peer-checked:translate-x-4 transition-transform"
-  }))), !(selectedNode !== null && selectedNode !== void 0 && (_selectedNode$data17 = selectedNode.data) !== null && _selectedNode$data17 !== void 0 && (_selectedNode$data17 = _selectedNode$data17.selectedModel) !== null && _selectedNode$data17 !== void 0 && (_selectedNode$data17 = _selectedNode$data17.id) !== null && _selectedNode$data17 !== void 0 && _selectedNode$data17.includes("passthrough")) && /*#__PURE__*/_react["default"].createElement("button", {
+  }))), !(selectedNode !== null && selectedNode !== void 0 && (_selectedNode$data18 = selectedNode.data) !== null && _selectedNode$data18 !== void 0 && (_selectedNode$data18 = _selectedNode$data18.selectedModel) !== null && _selectedNode$data18 !== void 0 && (_selectedNode$data18 = _selectedNode$data18.id) !== null && _selectedNode$data18 !== void 0 && _selectedNode$data18.includes("passthrough")) && /*#__PURE__*/_react["default"].createElement("button", {
     type: "button",
     suppressHydrationWarning: true,
     onClick: function onClick() {

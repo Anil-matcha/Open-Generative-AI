@@ -8,7 +8,7 @@ const nextConfig = {
   experimental: {
     serverBodySizeLimit: '50mb',
   },
-  generateBuildId: async () => 'build-character-connect-fix-v24',
+  generateBuildId: async () => 'build-face-ref-panel-v25',
 };
 
 export default nextConfig;
