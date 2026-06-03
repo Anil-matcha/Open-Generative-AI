@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
   getTemplateWorkflows,
@@ -278,19 +278,21 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
   const [isRunning, setIsRunning] = useState(false);
   const [runResult, setRunResult] = useState(null);
   const [showResults, setShowResults] = useState(false);
-  
+  const isNavigatingRef = useRef(false);
 
   // Handlers defined early so they can be used in effects
   const handleSelectWorkflow = useCallback(
     async (wf, fromUrl = false) => {
       setSelectedWorkflow(wf);
       setError(null);
-      
+
       const targetTab = "builder";
       setActiveSubTab(targetTab);
 
       if (!fromUrl) {
+        isNavigatingRef.current = true;
         router.push(`/workflow/${wf.id}/builder`);
+        setTimeout(() => { isNavigatingRef.current = false; }, 1500);
       }
     },
     [router],
@@ -453,7 +455,7 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
           );
         }
       }
-    } else if (selectedWorkflow) {
+    } else if (selectedWorkflow && !isNavigatingRef.current) {
       setSelectedWorkflow(null);
     }
   }, [
