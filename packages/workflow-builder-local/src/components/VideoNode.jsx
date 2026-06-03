@@ -380,6 +380,16 @@ const VideoGeneration = ({ id, data, selected }) => {
     setCurrentHistoryIndex(newHistory.length - 1);
     setCurrentVideoIndex(0);
 
+    // Сохраняем в Галерею (как Студия) — /api/gallery сам зеркалирует в TOS и
+    // добавляет запись в gallery/{userId}/entries.json. Браузерный ARK-путь
+    // минует серверный /run, который обычно это делает, поэтому зовём явно.
+    axios.post("/api/gallery", {
+      url: finishedUrl,
+      type: "video",
+      model: selectedModel?.id || data.selectedModel?.id || "",
+      prompt: src.prompt || "",
+    }).catch(() => { /* галерея не критична для ноды */ });
+
     // В фоне зеркалируем в TOS для постоянного хранения.
     // Если получится — тихо заменяем CDN URL на постоянный TOS URL.
     axios.post("/api/upload-file", { url: finishedUrl })
