@@ -270,7 +270,7 @@ var processWorkflowData = function processWorkflowData(workflowData, nodeSchemas
   };
 };
 var NodeFlow = function NodeFlow(_ref) {
-  var _initialState$metadat, _initialState$metadat2, _initialState$metadat3, _initialState$metadat4, _initialState$metadat5, _initialState$metadat6, _initialState$metadat7, _nodeSchemas$categori3, _selectedNode$data, _selectedNode$data2, _selectedNode$data3, _selectedNode$data6, _selectedNode$data16, _selectedNode$data17, _selectedNode$data18, _selectedNode$data19, _selectedNode$data20, _selectedNode$data21;
+  var _initialState$metadat, _initialState$metadat2, _initialState$metadat3, _initialState$metadat4, _initialState$metadat5, _initialState$metadat6, _initialState$metadat7, _nodeSchemas$categori3, _selectedNode$data, _selectedNode$data2, _selectedNode$data3, _selectedNode$data6, _selectedNode$data17, _selectedNode$data18, _selectedNode$data19, _selectedNode$data20, _selectedNode$data21;
   var initialNodeSchemas = _ref.initialNodeSchemas,
     initialWorkflowData = _ref.initialWorkflowData;
   var params = (0, _navigation.useParams)();
@@ -2918,6 +2918,9 @@ var NodeFlow = function NodeFlow(_ref) {
         key = _ref17[0],
         meta = _ref17[1];
       if (key === "schemas") return null;
+      // Hide the single image_url field on video nodes — connected
+      // images are shown together in the combined gallery below.
+      if (key === "image_url" && selectedNode.type === "videoNode") return null;
       return /*#__PURE__*/_react["default"].createElement(_RenderField["default"], {
         key: key,
         fieldName: key,
@@ -2952,42 +2955,65 @@ var NodeFlow = function NodeFlow(_ref) {
     className: "text-center py-8"
   }, /*#__PURE__*/_react["default"].createElement("p", {
     className: "text-sm text-gray-400"
-  }, "Please select a model first")))), (selectedNode === null || selectedNode === void 0 ? void 0 : selectedNode.type) === "videoNode" && Array.isArray(selectedNode === null || selectedNode === void 0 || (_selectedNode$data16 = selectedNode.data) === null || _selectedNode$data16 === void 0 || (_selectedNode$data16 = _selectedNode$data16.formValues) === null || _selectedNode$data16 === void 0 ? void 0 : _selectedNode$data16.images_list) && selectedNode.data.formValues.images_list.filter(Boolean).length > 0 && function () {
-    var list = selectedNode.data.formValues.images_list.filter(Boolean);
+  }, "Please select a model first")))), (selectedNode === null || selectedNode === void 0 ? void 0 : selectedNode.type) === "videoNode" && function (_selectedNode$data16) {
+    var fv = (selectedNode === null || selectedNode === void 0 || (_selectedNode$data16 = selectedNode.data) === null || _selectedNode$data16 === void 0 ? void 0 : _selectedNode$data16.formValues) || {};
+    var extra = Array.isArray(fv.images_list) ? fv.images_list.filter(Boolean) : [];
+    var all = [].concat(_toConsumableArray(fv.image_url ? [{
+      url: fv.image_url,
+      primary: true
+    }] : []), _toConsumableArray(extra.map(function (u) {
+      return {
+        url: u,
+        primary: false
+      };
+    })));
+    if (!all.length) return null;
+    var removeAt = function removeAt(item) {
+      setNodes(function (nds) {
+        return nds.map(function (n) {
+          if (n.id !== selectedNode.id) return n;
+          var cfv = _objectSpread({}, n.data.formValues);
+          if (item.primary) {
+            // Promote the first extra image to be the new first-frame.
+            var rest = Array.isArray(cfv.images_list) ? cfv.images_list.filter(Boolean) : [];
+            cfv.image_url = rest.length ? rest[0] : null;
+            cfv.images_list = rest.slice(1);
+          } else {
+            cfv.images_list = (Array.isArray(cfv.images_list) ? cfv.images_list.filter(Boolean) : []).filter(function (u) {
+              return u !== item.url;
+            });
+          }
+          return _objectSpread(_objectSpread({}, n), {}, {
+            data: _objectSpread(_objectSpread({}, n.data), {}, {
+              formValues: cfv
+            })
+          });
+        });
+      });
+    };
     return /*#__PURE__*/_react["default"].createElement("div", {
       className: "px-4 pb-3"
     }, /*#__PURE__*/_react["default"].createElement("p", {
       className: "text-[10px] font-semibold text-emerald-300 uppercase tracking-wider mb-1.5"
-    }, "\u0414\u043E\u043F. \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u044F (", list.length, ")"), /*#__PURE__*/_react["default"].createElement("div", {
+    }, "\u0418\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u044F (", all.length, ")"), /*#__PURE__*/_react["default"].createElement("div", {
       className: "grid grid-cols-3 gap-1.5"
-    }, list.map(function (u, i) {
+    }, all.map(function (item, i) {
       return /*#__PURE__*/_react["default"].createElement("div", {
-        key: "".concat(u, "-").concat(i),
+        key: "".concat(item.url, "-").concat(i),
         className: "relative group/refimg rounded-lg overflow-hidden border border-emerald-500/30"
       }, /*#__PURE__*/_react["default"].createElement("img", {
-        src: u,
-        alt: "ref ".concat(i + 1),
+        src: item.url,
+        alt: "img ".concat(i + 1),
         className: "w-full h-16 object-cover",
         onError: function onError(e) {
           e.target.style.display = 'none';
         }
-      }), /*#__PURE__*/_react["default"].createElement("button", {
+      }), item.primary && /*#__PURE__*/_react["default"].createElement("div", {
+        className: "absolute bottom-0.5 left-0.5 bg-emerald-600 text-white text-[7px] font-bold px-1 py-0.5 rounded uppercase tracking-wide"
+      }, "1\u0439 \u043A\u0430\u0434\u0440"), /*#__PURE__*/_react["default"].createElement("button", {
         type: "button",
         onClick: function onClick() {
-          var next = list.filter(function (_, idx) {
-            return idx !== i;
-          });
-          setNodes(function (nds) {
-            return nds.map(function (n) {
-              return n.id === selectedNode.id ? _objectSpread(_objectSpread({}, n), {}, {
-                data: _objectSpread(_objectSpread({}, n.data), {}, {
-                  formValues: _objectSpread(_objectSpread({}, n.data.formValues), {}, {
-                    images_list: next
-                  })
-                })
-              }) : n;
-            });
-          });
+          return removeAt(item);
         },
         className: "absolute top-0.5 right-0.5 bg-black/60 hover:bg-black text-white rounded px-1 text-[10px] opacity-0 group-hover/refimg:opacity-100 transition-opacity"
       }, "\xD7"));

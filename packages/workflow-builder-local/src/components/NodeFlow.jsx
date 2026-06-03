@@ -2641,6 +2641,9 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
                     ) : (inputSchema?.properties || (inputSchema && Object.keys(inputSchema).length > 0)) ? (
                       Object.entries(inputSchema?.properties || inputSchema).map(([key, meta], idx) => {
                         if (key === "schemas") return null;
+                        // Hide the single image_url field on video nodes — connected
+                        // images are shown together in the combined gallery below.
+                        if (key === "image_url" && selectedNode.type === "videoNode") return null;
                         return (
                           <RenderField
                             key={key}
@@ -2685,32 +2688,53 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
                 )}
               </div>
             </div>
-            {/* Additional reference images — extra image-passthrough nodes stacked
-                into images_list (beyond the first-frame image_url). */}
-            {selectedNode?.type === "videoNode" && Array.isArray(selectedNode?.data?.formValues?.images_list) && selectedNode.data.formValues.images_list.filter(Boolean).length > 0 && (() => {
-              const list = selectedNode.data.formValues.images_list.filter(Boolean);
+            {/* Connected images — first-frame image_url + extra images_list,
+                shown together as one gallery (replaces the single Image URL field). */}
+            {selectedNode?.type === "videoNode" && (() => {
+              const fv = selectedNode?.data?.formValues || {};
+              const extra = Array.isArray(fv.images_list) ? fv.images_list.filter(Boolean) : [];
+              const all = [
+                ...(fv.image_url ? [{ url: fv.image_url, primary: true }] : []),
+                ...extra.map((u) => ({ url: u, primary: false })),
+              ];
+              if (!all.length) return null;
+              const removeAt = (item) => {
+                setNodes((nds) => nds.map((n) => {
+                  if (n.id !== selectedNode.id) return n;
+                  const cfv = { ...n.data.formValues };
+                  if (item.primary) {
+                    // Promote the first extra image to be the new first-frame.
+                    const rest = Array.isArray(cfv.images_list) ? cfv.images_list.filter(Boolean) : [];
+                    cfv.image_url = rest.length ? rest[0] : null;
+                    cfv.images_list = rest.slice(1);
+                  } else {
+                    cfv.images_list = (Array.isArray(cfv.images_list) ? cfv.images_list.filter(Boolean) : []).filter((u) => u !== item.url);
+                  }
+                  return { ...n, data: { ...n.data, formValues: cfv } };
+                }));
+              };
               return (
                 <div className="px-4 pb-3">
                   <p className="text-[10px] font-semibold text-emerald-300 uppercase tracking-wider mb-1.5">
-                    Доп. изображения ({list.length})
+                    Изображения ({all.length})
                   </p>
                   <div className="grid grid-cols-3 gap-1.5">
-                    {list.map((u, i) => (
-                      <div key={`${u}-${i}`} className="relative group/refimg rounded-lg overflow-hidden border border-emerald-500/30">
+                    {all.map((item, i) => (
+                      <div key={`${item.url}-${i}`} className="relative group/refimg rounded-lg overflow-hidden border border-emerald-500/30">
                         <img
-                          src={u}
-                          alt={`ref ${i + 1}`}
+                          src={item.url}
+                          alt={`img ${i + 1}`}
                           className="w-full h-16 object-cover"
                           onError={(e) => { e.target.style.display = 'none'; }}
                         />
+                        {item.primary && (
+                          <div className="absolute bottom-0.5 left-0.5 bg-emerald-600 text-white text-[7px] font-bold px-1 py-0.5 rounded uppercase tracking-wide">
+                            1й кадр
+                          </div>
+                        )}
                         <button
                           type="button"
-                          onClick={() => {
-                            const next = list.filter((_, idx) => idx !== i);
-                            setNodes((nds) => nds.map((n) => n.id === selectedNode.id
-                              ? { ...n, data: { ...n.data, formValues: { ...n.data.formValues, images_list: next } } }
-                              : n));
-                          }}
+                          onClick={() => removeAt(item)}
                           className="absolute top-0.5 right-0.5 bg-black/60 hover:bg-black text-white rounded px-1 text-[10px] opacity-0 group-hover/refimg:opacity-100 transition-opacity"
                         >
                           ×
