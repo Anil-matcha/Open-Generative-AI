@@ -1652,6 +1652,8 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
   };
 
   const runNodeFromFlow = (nodeId) => {
+    console.log("🟢[GEN] runNodeFromFlow click →", nodeId);
+    try { toast(`▶ run ${nodeId}`, { icon: "🟢" }); } catch {}
     setNodes((nds) =>
       nds.map((n) =>
         n.id === nodeId
