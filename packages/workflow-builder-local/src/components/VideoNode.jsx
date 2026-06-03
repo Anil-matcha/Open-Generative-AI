@@ -386,10 +386,14 @@ const VideoGeneration = ({ id, data, selected }) => {
       type: "video",
       model: selectedModel?.id || data.selectedModel?.id || "",
       prompt: src.prompt || "",
-    }).catch(() => { /* галерея не критична для ноды */ });
+    }).catch((e) => {
+      toast.error("Не удалось сохранить в галерею: " + (e.response?.data?.error || e.message || "ошибка"), { duration: 4000 });
+    });
 
     // В фоне зеркалируем в TOS для постоянного хранения.
-    // Если получится — тихо заменяем CDN URL на постоянный TOS URL.
+    // Если получится — тихо заменяем CDN URL на постоянный TOS URL и
+    // сохраняем воркфлоу ещё раз, чтобы в БД лежала постоянная ссылка,
+    // а не истекающий ARK CDN URL.
     axios.post("/api/upload-file", { url: finishedUrl })
       .then((mirror) => {
         const tosUrl = mirror.data?.url;
@@ -401,6 +405,9 @@ const VideoGeneration = ({ id, data, selected }) => {
             : h
         );
         data.onDataChange(id, { outputs: tosOutput, resultUrl: tosUrl, outputHistory: tosHistory });
+        // onDataChange обновил currentNodesRef синхронно — теперь сохраняем
+        // воркфлоу с постоянным TOS URL вместо истекающей ARK CDN ссылки.
+        data.handleSaveWorkFlow?.();
       })
       .catch(() => { /* ARK URL остаётся */ });
   };

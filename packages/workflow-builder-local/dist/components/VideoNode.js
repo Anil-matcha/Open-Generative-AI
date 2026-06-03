@@ -537,14 +537,21 @@ var VideoGeneration = function VideoGeneration(_ref) {
               type: "video",
               model: (selectedModel === null || selectedModel === void 0 ? void 0 : selectedModel.id) || ((_data$selectedModel3 = data.selectedModel) === null || _data$selectedModel3 === void 0 ? void 0 : _data$selectedModel3.id) || "",
               prompt: src.prompt || ""
-            })["catch"](function () {/* галерея не критична для ноды */});
+            })["catch"](function (e) {
+              var _e$response4;
+              _reactHotToast.toast.error("Не удалось сохранить в галерею: " + (((_e$response4 = e.response) === null || _e$response4 === void 0 || (_e$response4 = _e$response4.data) === null || _e$response4 === void 0 ? void 0 : _e$response4.error) || e.message || "ошибка"), {
+                duration: 4000
+              });
+            });
 
             // В фоне зеркалируем в TOS для постоянного хранения.
-            // Если получится — тихо заменяем CDN URL на постоянный TOS URL.
+            // Если получится — тихо заменяем CDN URL на постоянный TOS URL и
+            // сохраняем воркфлоу ещё раз, чтобы в БД лежала постоянная ссылка,
+            // а не истекающий ARK CDN URL.
             _axios["default"].post("/api/upload-file", {
               url: finishedUrl
             }).then(function (mirror) {
-              var _mirror$data;
+              var _mirror$data, _data$handleSaveWorkF;
               var tosUrl = (_mirror$data = mirror.data) === null || _mirror$data === void 0 ? void 0 : _mirror$data.url;
               if (!tosUrl) return;
               var tosOutput = [{
@@ -564,6 +571,9 @@ var VideoGeneration = function VideoGeneration(_ref) {
                 resultUrl: tosUrl,
                 outputHistory: tosHistory
               });
+              // onDataChange обновил currentNodesRef синхронно — теперь сохраняем
+              // воркфлоу с постоянным TOS URL вместо истекающей ARK CDN ссылки.
+              (_data$handleSaveWorkF = data.handleSaveWorkFlow) === null || _data$handleSaveWorkF === void 0 || _data$handleSaveWorkF.call(data);
             })["catch"](function () {/* ARK URL остаётся */});
           case 20:
             return _context.a(2);
@@ -576,7 +586,7 @@ var VideoGeneration = function VideoGeneration(_ref) {
   }();
   var handleRunSingleNode = /*#__PURE__*/function () {
     var _ref10 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2() {
-      var _data$selectedModel4, _data$selectedModel5, _nodeSchemas$categori2, modelHay, isSeedance, _data$handleSaveWorkF, _e$message, _e$message2, workflow_id, modelSchema, params, inputSchema, localSources, _i, _Object$entries, _Object$entries$_i, key, meta, _meta$default2, response, _r, _nd, _lt, _o, _error$response, _t3, _t4;
+      var _data$selectedModel4, _data$selectedModel5, _nodeSchemas$categori2, modelHay, isSeedance, _data$handleSaveWorkF2, _e$message, _e$message2, workflow_id, modelSchema, params, inputSchema, localSources, _i, _Object$entries, _Object$entries$_i, key, meta, _meta$default2, response, _r, _nd, _lt, _o, _error$response, _t3, _t4;
       return _regenerator().w(function (_context2) {
         while (1) switch (_context2.p = _context2.n) {
           case 0:
@@ -623,7 +633,7 @@ var VideoGeneration = function VideoGeneration(_ref) {
             // currentNodesRef in NodeFlow was already updated synchronously inside
             // onDataChange, so buildWorkflowPayload captures the correct resultUrl
             // even if the React setNodes update was cancelled by concurrent mode.
-            (_data$handleSaveWorkF = data.handleSaveWorkFlow) === null || _data$handleSaveWorkF === void 0 || _data$handleSaveWorkF.call(data);
+            (_data$handleSaveWorkF2 = data.handleSaveWorkFlow) === null || _data$handleSaveWorkF2 === void 0 || _data$handleSaveWorkF2.call(data);
             _context2.n = 7;
             break;
           case 6:
