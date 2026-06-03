@@ -156,12 +156,6 @@ const VideoGeneration = ({ id, data, selected }) => {
       setSelectedModel(data.selectedModel);
     }
 
-    if (data.triggerRun) {
-      handleRunSingleNode();
-
-      data.onDataChange(id, { triggerRun: false });
-    }
-
     if (data.outputHistory && data.outputHistory.length > 0) {
       if (currentHistoryIndex === -1) {
         setCurrentHistoryIndex(data.outputHistory.length - 1);
@@ -172,7 +166,18 @@ const VideoGeneration = ({ id, data, selected }) => {
       }
     }
     prevHistoryLengthRef.current = data.outputHistory ? data.outputHistory.length : 0;
-  }, [data.selectedModel, data.triggerRun, data.outputHistory]);
+  }, [data.selectedModel, data.outputHistory]);
+
+  // Run trigger in its OWN effect, keyed ONLY on data.triggerRun. The combined
+  // effect above also fired on selectedModel/outputHistory changes, so while a
+  // run was in flight (which bumps outputHistory) it re-entered handleRunSingleNode
+  // with triggerRun still true → a second call hit the inFlightRef guard and got
+  // stuck on "Генерация уже идёт". Reset triggerRun FIRST so it's consumed once.
+  useEffect(() => {
+    if (!data.triggerRun) return;
+    data.onDataChange(id, { triggerRun: false });
+    handleRunSingleNode();
+  }, [data.triggerRun]);
 
   useEffect(() => {
     updateNodeInternals(id);
@@ -400,8 +405,10 @@ const VideoGeneration = ({ id, data, selected }) => {
     // stays pending for the whole generation (ARK polls up to ~290s), so a second
     // click would otherwise look like "Generate does nothing".
     if (inFlightRef.current) {
+      // A real generation is already running — just inform, don't touch isLoading
+      // (forcing it true here is what left the node stuck on "GENERATING" when a
+      // duplicate trigger fired after the run had already finished).
       toast("Генерация уже идёт — подождите завершения", { icon: "⏳" });
-      data.onDataChange(id, { isLoading: true });
       return;
     }
     inFlightRef.current = true;

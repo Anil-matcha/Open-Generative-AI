@@ -216,12 +216,6 @@ var VideoGeneration = function VideoGeneration(_ref) {
     if (data.selectedModel) {
       setSelectedModel(data.selectedModel);
     }
-    if (data.triggerRun) {
-      handleRunSingleNode();
-      data.onDataChange(id, {
-        triggerRun: false
-      });
-    }
     if (data.outputHistory && data.outputHistory.length > 0) {
       if (currentHistoryIndex === -1) {
         setCurrentHistoryIndex(data.outputHistory.length - 1);
@@ -232,7 +226,20 @@ var VideoGeneration = function VideoGeneration(_ref) {
       }
     }
     prevHistoryLengthRef.current = data.outputHistory ? data.outputHistory.length : 0;
-  }, [data.selectedModel, data.triggerRun, data.outputHistory]);
+  }, [data.selectedModel, data.outputHistory]);
+
+  // Run trigger in its OWN effect, keyed ONLY on data.triggerRun. The combined
+  // effect above also fired on selectedModel/outputHistory changes, so while a
+  // run was in flight (which bumps outputHistory) it re-entered handleRunSingleNode
+  // with triggerRun still true → a second call hit the inFlightRef guard and got
+  // stuck on "Генерация уже идёт". Reset triggerRun FIRST so it's consumed once.
+  (0, _react.useEffect)(function () {
+    if (!data.triggerRun) return;
+    data.onDataChange(id, {
+      triggerRun: false
+    });
+    handleRunSingleNode();
+  }, [data.triggerRun]);
   (0, _react.useEffect)(function () {
     updateNodeInternals(id);
   }, [formValues, id, selectedModel]);
@@ -589,11 +596,11 @@ var VideoGeneration = function VideoGeneration(_ref) {
               _context2.n = 1;
               break;
             }
+            // A real generation is already running — just inform, don't touch isLoading
+            // (forcing it true here is what left the node stuck on "GENERATING" when a
+            // duplicate trigger fired after the run had already finished).
             (0, _reactHotToast.toast)("Генерация уже идёт — подождите завершения", {
               icon: "⏳"
-            });
-            data.onDataChange(id, {
-              isLoading: true
             });
             return _context2.a(2);
           case 1:
