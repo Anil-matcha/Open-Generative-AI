@@ -23,7 +23,6 @@ var _useGenerationCost2 = require("./useGenerationCost");
 var _VideoPlayer = _interopRequireDefault(require("./VideoPlayer"));
 function _interopRequireDefault(e) { return e && e.__esModule ? e : { "default": e }; }
 function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function _interopRequireWildcard(e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, "default": e }; if (null === e || "object" != _typeof(e) && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (var _t6 in e) "default" !== _t6 && {}.hasOwnProperty.call(e, _t6) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, _t6)) && (i.get || i.set) ? o(f, _t6, i) : f[_t6] = e[_t6]); return f; })(e, t); }
-function _regeneratorValues(e) { if (null != e) { var t = e["function" == typeof Symbol && Symbol.iterator || "@@iterator"], r = 0; if (t) return t.call(e); if ("function" == typeof e.next) return e; if (!isNaN(e.length)) return { next: function next() { return e && r >= e.length && (e = void 0), { value: e && e[r++], done: !e }; } }; } throw new TypeError(_typeof(e) + " is not iterable"); }
 function _regenerator() { /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/babel/babel/blob/main/packages/babel-helpers/LICENSE */ var e, t, r = "function" == typeof Symbol ? Symbol : {}, n = r.iterator || "@@iterator", o = r.toStringTag || "@@toStringTag"; function i(r, n, o, i) { var c = n && n.prototype instanceof Generator ? n : Generator, u = Object.create(c.prototype); return _regeneratorDefine2(u, "_invoke", function (r, n, o) { var i, c, u, f = 0, p = o || [], y = !1, G = { p: 0, n: 0, v: e, a: d, f: d.bind(e, 4), d: function d(t, r) { return i = t, c = 0, u = e, G.n = r, a; } }; function d(r, n) { for (c = r, u = n, t = 0; !y && f && !o && t < p.length; t++) { var o, i = p[t], d = G.p, l = i[2]; r > 3 ? (o = l === n) && (u = i[(c = i[4]) ? 5 : (c = 3, 3)], i[4] = i[5] = e) : i[0] <= d && ((o = r < 2 && d < i[1]) ? (c = 0, G.v = n, G.n = i[1]) : d < l && (o = r < 3 || i[0] > n || n > l) && (i[4] = r, i[5] = n, G.n = l, c = 0)); } if (o || r > 1) return a; throw y = !0, n; } return function (o, p, l) { if (f > 1) throw TypeError("Generator is already running"); for (y && 1 === p && d(p, l), c = p, u = l; (t = c < 2 ? e : u) || !y;) { i || (c ? c < 3 ? (c > 1 && (G.n = -1), d(c, u)) : G.n = u : G.v = u); try { if (f = 2, i) { if (c || (o = "next"), t = i[o]) { if (!(t = t.call(i, u))) throw TypeError("iterator result is not an object"); if (!t.done) return t; u = t.value, c < 2 && (c = 0); } else 1 === c && (t = i["return"]) && t.call(i), c < 2 && (u = TypeError("The iterator does not provide a '" + o + "' method"), c = 1); i = e; } else if ((t = (y = G.n < 0) ? u : r.call(n, G)) !== a) break; } catch (t) { i = e, c = 1, u = t; } finally { f = 1; } } return { value: t, done: y }; }; }(r, o, i), !0), u; } var a = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} t = Object.getPrototypeOf; var c = [][n] ? t(t([][n]())) : (_regeneratorDefine2(t = {}, n, function () { return this; }), t), u = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(c); function f(e) { return Object.setPrototypeOf ? Object.setPrototypeOf(e, GeneratorFunctionPrototype) : (e.__proto__ = GeneratorFunctionPrototype, _regeneratorDefine2(e, o, "GeneratorFunction")), e.prototype = Object.create(u), e; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, _regeneratorDefine2(u, "constructor", GeneratorFunctionPrototype), _regeneratorDefine2(GeneratorFunctionPrototype, "constructor", GeneratorFunction), GeneratorFunction.displayName = "GeneratorFunction", _regeneratorDefine2(GeneratorFunctionPrototype, o, "GeneratorFunction"), _regeneratorDefine2(u), _regeneratorDefine2(u, o, "Generator"), _regeneratorDefine2(u, n, function () { return this; }), _regeneratorDefine2(u, "toString", function () { return "[object Generator]"; }), (_regenerator = function _regenerator() { return { w: i, m: f }; })(); }
 function _regeneratorDefine2(e, r, n, t) { var i = Object.defineProperty; try { i({}, "", {}); } catch (e) { i = 0; } _regeneratorDefine2 = function _regeneratorDefine(e, r, n, t) { function o(r, n) { _regeneratorDefine2(e, r, function (e) { return this._invoke(r, n, e); }); } r ? i ? i(e, r, { value: n, enumerable: !t, configurable: !t, writable: !t }) : e[r] = n : (o("next", 0), o("throw", 1), o("return", 2)); }, _regeneratorDefine2(e, r, n, t); }
 function asyncGeneratorStep(n, t, e, r, o, a, c) { try { var i = n[a](c), u = i.value; } catch (n) { return void e(n); } i.done ? t(u) : Promise.resolve(u).then(r, o); }
@@ -374,224 +373,229 @@ var VideoGeneration = function VideoGeneration(_ref) {
     });
   };
 
-  // Seedance 2.0 (Ark) — submit-and-poll FROM THE BROWSER, exactly like the Studio.
-  // The blocking workflow /run route holds a single HTTP connection for up to ~290s,
-  // which Vercel/proxies drop, leaving the node stuck on "GENERATING…". Short (<2s)
-  // submit + poll requests never hang.
-  var runArkSeedanceBrowser = /*#__PURE__*/function () {
+  // Map a workflow Seedance node model → the Studio's MuAPI model id. The Studio
+  // is reliable because it routes Seedance 2.0 through MuAPI (api.muapi.ai), not
+  // direct ARK. i2v ids are used when a start/reference image is present.
+  var toStudioSeedanceModel = function toStudioSeedanceModel(hasImage) {
+    var hay = "".concat((selectedModel === null || selectedModel === void 0 ? void 0 : selectedModel.id) || "", " ").concat((selectedModel === null || selectedModel === void 0 ? void 0 : selectedModel.name) || "").toLowerCase();
+    var fast = /fast/.test(hay);
+    if (hasImage) return fast ? "seedance-2.0-fast-i2v" : "seedance-2.0-i2v";
+    return fast ? "seedance-2.0-fast-t2v" : "seedance-2.0-t2v";
+  };
+
+  // Seedance 2.0 — submit-and-poll FROM THE BROWSER through MuAPI, exactly like
+  // the Studio. The blocking workflow /run route holds a single HTTP connection
+  // for up to ~290s, which Vercel/proxies drop, leaving the node stuck on
+  // "GENERATING…". Short (<2s) submit + poll requests never hang. The previous
+  // direct-ARK path could also leave a task stuck in "running" forever; MuAPI
+  // manages the ARK task server-side and returns a stable result.
+  var runStudioSeedanceBrowser = /*#__PURE__*/function () {
     var _ref1 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee() {
-      var _submit$data, _submit$data2;
-      var fast, src, body, submit, _e$response, _e$response2, taskId, pollErrors, _loop, _ret, attempt, _t2;
-      return _regenerator().w(function (_context2) {
-        while (1) switch (_context2.p = _context2.n) {
+      var _submit$data, _submit$data2, _submit$data3;
+      var src, realUrl, imageUrl, model, isFast, resolution, body, submit, _e$response, _e$response2, finishedUrl, requestId, pollErrors, attempt, _pd, pd, poll, _e$response3, status, histId, output, newHistory, _t, _t2;
+      return _regenerator().w(function (_context) {
+        while (1) switch (_context.p = _context.n) {
           case 0:
-            fast = /fast/i.test((selectedModel === null || selectedModel === void 0 ? void 0 : selectedModel.id) || "");
-            src = formValues || {};
+            src = formValues || {}; // Determine the reference image. MuAPI cannot resolve ARK `asset://…` trusted
+            // assets (those only work on the direct ARK path), so we use a real public
+            // image URL when one is available: an explicit image input, otherwise the
+            // character's uploaded photo. An `asset://…`-only face is dropped here — the
+            // generation still runs, just without the face reference.
+            // Only a real fetchable http(s) URL works as a MuAPI reference — asset://…
+            // (ARK-only) and data: (base64, rejected by the backend) are skipped.
+            realUrl = function realUrl(u) {
+              return u && typeof u === "string" && /^https?:\/\//i.test(u) ? u : undefined;
+            };
+            imageUrl = realUrl(src.image_url) || (Array.isArray(src.images_list) ? src.images_list.map(realUrl).find(Boolean) : undefined) || realUrl(src.face_asset) || realUrl(src.face_thumbnail) || undefined;
+            model = toStudioSeedanceModel(!!imageUrl);
+            isFast = /fast/.test(model);
+            resolution = src.resolution || undefined;
+            if (isFast && String(resolution).toLowerCase() === "1080p") resolution = "720p"; // Fast caps at 720p
             body = {
-              fast: fast,
+              model: model,
               prompt: src.prompt || "",
-              image_url: src.image_url || undefined,
-              image_urls: Array.isArray(src.images_list) ? src.images_list.filter(Boolean) : undefined,
-              video_url: src.video_url || undefined,
-              audio_url: src.audio_url || undefined,
-              resolution: src.resolution || undefined,
-              ratio: src.aspect_ratio || src.ratio || undefined,
-              duration: src.duration || undefined,
-              face_asset: src.face_asset || undefined
-            }; // Step 1: submit — fast, just creates the Ark task and returns a taskId.
-            (0, _reactHotToast.toast)("Отправляю в ARK…", {
+              image_url: imageUrl,
+              aspect_ratio: src.aspect_ratio || src.ratio || undefined,
+              resolution: resolution,
+              duration: src.duration || undefined
+            };
+            if (src.face_asset && String(src.face_asset).startsWith("asset://") && !imageUrl) {
+              (0, _reactHotToast.toast)("Лицо asset:// доступно только в прямом ARK — генерирую без референса лица", {
+                icon: "⚠️"
+              });
+            }
+
+            // Step 1: submit — fast, just creates the MuAPI task and returns a requestId.
+            (0, _reactHotToast.toast)("Отправляю в MuAPI…", {
               icon: "🚀"
             });
-            _context2.p = 1;
-            _context2.n = 2;
-            return _axios["default"].post("/api/ark/seedance", body);
+            _context.p = 1;
+            _context.n = 2;
+            return _axios["default"].post("/api/muapi/video", body);
           case 2:
-            submit = _context2.v;
-            _context2.n = 4;
+            submit = _context.v;
+            _context.n = 4;
             break;
           case 3:
-            _context2.p = 3;
-            _t2 = _context2.v;
-            throw new Error(((_e$response = _t2.response) === null || _e$response === void 0 || (_e$response = _e$response.data) === null || _e$response === void 0 ? void 0 : _e$response.error) || "ARK submit ".concat(((_e$response2 = _t2.response) === null || _e$response2 === void 0 ? void 0 : _e$response2.status) || "", ": ").concat(_t2.message));
+            _context.p = 3;
+            _t = _context.v;
+            throw new Error(((_e$response = _t.response) === null || _e$response === void 0 || (_e$response = _e$response.data) === null || _e$response === void 0 ? void 0 : _e$response.error) || "MuAPI submit ".concat(((_e$response2 = _t.response) === null || _e$response2 === void 0 ? void 0 : _e$response2.status) || "", ": ").concat(_t.message));
           case 4:
-            taskId = (_submit$data = submit.data) === null || _submit$data === void 0 ? void 0 : _submit$data.taskId;
-            if (taskId) {
-              _context2.n = 5;
+            // Some endpoints return a finished result immediately.
+            finishedUrl = ((_submit$data = submit.data) === null || _submit$data === void 0 ? void 0 : _submit$data.url) || null;
+            requestId = (_submit$data2 = submit.data) === null || _submit$data2 === void 0 ? void 0 : _submit$data2.requestId;
+            if (!(!requestId && !finishedUrl)) {
+              _context.n = 5;
               break;
             }
-            throw new Error(((_submit$data2 = submit.data) === null || _submit$data2 === void 0 ? void 0 : _submit$data2.error) || "ARK: задача не создана (нет taskId).");
+            throw new Error(((_submit$data3 = submit.data) === null || _submit$data3 === void 0 ? void 0 : _submit$data3.error) || "MuAPI: задача не создана.");
           case 5:
-            _reactHotToast.toast.success("ARK \u0437\u0430\u0434\u0430\u0447\u0430 \u0441\u043E\u0437\u0434\u0430\u043D\u0430: ".concat(String(taskId).slice(0, 12), "\u2026"));
+            if (requestId) _reactHotToast.toast.success("\u0417\u0430\u0434\u0430\u0447\u0430 \u0441\u043E\u0437\u0434\u0430\u043D\u0430: ".concat(String(requestId).slice(0, 12), "\u2026"));
 
             // Step 2: poll from the browser — each request is < 1s, so no connection hangs.
             pollErrors = 0;
-            _loop = /*#__PURE__*/_regenerator().m(function _loop() {
-              var _pd;
-              var pd, poll, _e$response3, status, arkUrl, output, newHistory, _t;
-              return _regenerator().w(function (_context) {
-                while (1) switch (_context.p = _context.n) {
-                  case 0:
-                    if (!arkCancelRef.current) {
-                      _context.n = 1;
-                      break;
-                    }
-                    arkCancelRef.current = false;
-                    return _context.a(2, {
-                      v: void 0
-                    });
-                  case 1:
-                    _context.n = 2;
-                    return new Promise(function (r) {
-                      return setTimeout(r, 5000);
-                    });
-                  case 2:
-                    if (!arkCancelRef.current) {
-                      _context.n = 3;
-                      break;
-                    }
-                    arkCancelRef.current = false;
-                    return _context.a(2, {
-                      v: void 0
-                    });
-                  case 3:
-                    _context.p = 3;
-                    _context.n = 4;
-                    return _axios["default"].get("/api/ark/seedance?taskId=".concat(encodeURIComponent(taskId)));
-                  case 4:
-                    poll = _context.v;
-                    pd = poll.data;
-                    pollErrors = 0;
-                    _context.n = 7;
-                    break;
-                  case 5:
-                    _context.p = 5;
-                    _t = _context.v;
-                    if (!(++pollErrors >= 12)) {
-                      _context.n = 6;
-                      break;
-                    }
-                    throw new Error(((_e$response3 = _t.response) === null || _e$response3 === void 0 || (_e$response3 = _e$response3.data) === null || _e$response3 === void 0 ? void 0 : _e$response3.error) || "ARK: опрос статуса не отвечает.");
-                  case 6:
-                    return _context.a(2, 0);
-                  case 7:
-                    status = String(((_pd = pd) === null || _pd === void 0 ? void 0 : _pd.status) || "").toLowerCase();
-                    if (!(status === "succeeded" || status === "success" || status === "completed")) {
-                      _context.n = 9;
-                      break;
-                    }
-                    if (pd.url) {
-                      _context.n = 8;
-                      break;
-                    }
-                    throw new Error("ARK: видео готово, но URL не получен.");
-                  case 8:
-                    // Показываем результат СРАЗУ с ARK-ссылкой — не ждём TOS-зеркалирования.
-                    // <video src> не требует CORS, ARK URL воспроизводится напрямую.
-                    arkUrl = pd.url;
-                    output = [{
-                      type: "video_url",
-                      value: arkUrl
-                    }];
-                    newHistory = [].concat(_toConsumableArray(data.outputHistory || []), [{
-                      status: "succeeded",
-                      result: {
-                        id: taskId,
-                        outputs: output
-                      }
-                    }]);
-                    data.onDataChange(id, {
-                      outputs: output,
-                      resultUrl: arkUrl,
-                      isLoading: false,
-                      errorMsg: null,
-                      outputHistory: newHistory
-                    });
-                    setCurrentHistoryIndex(newHistory.length - 1);
-                    setCurrentVideoIndex(0);
-
-                    // В фоне зеркалируем в TOS для постоянного хранения.
-                    // Если получится — тихо заменяем ARK URL на постоянный TOS URL.
-                    _axios["default"].post("/api/upload-file", {
-                      url: arkUrl
-                    }).then(function (mirror) {
-                      var _mirror$data;
-                      var tosUrl = (_mirror$data = mirror.data) === null || _mirror$data === void 0 ? void 0 : _mirror$data.url;
-                      if (!tosUrl) return;
-                      var tosOutput = [{
-                        type: "video_url",
-                        value: tosUrl
-                      }];
-                      var tosHistory = newHistory.map(function (h) {
-                        var _h$result3;
-                        return ((_h$result3 = h.result) === null || _h$result3 === void 0 ? void 0 : _h$result3.id) === taskId ? _objectSpread(_objectSpread({}, h), {}, {
-                          result: _objectSpread(_objectSpread({}, h.result), {}, {
-                            outputs: tosOutput
-                          })
-                        }) : h;
-                      });
-                      data.onDataChange(id, {
-                        outputs: tosOutput,
-                        resultUrl: tosUrl,
-                        outputHistory: tosHistory
-                      });
-                    })["catch"](function () {/* ARK URL остаётся */});
-                    return _context.a(2, {
-                      v: void 0
-                    });
-                  case 9:
-                    if (!["failed", "error", "expired", "cancelled"].includes(status)) {
-                      _context.n = 10;
-                      break;
-                    }
-                    throw new Error("ARK: \u0433\u0435\u043D\u0435\u0440\u0430\u0446\u0438\u044F \u043D\u0435 \u0443\u0434\u0430\u043B\u0430\u0441\u044C (".concat(pd.error || status, ")."));
-                  case 10:
-                    return _context.a(2);
-                }
-              }, _loop, null, [[3, 5]]);
-            });
             attempt = 0;
           case 6:
-            if (!(attempt < 300)) {
-              _context2.n = 10;
+            if (!(!finishedUrl && attempt < 360)) {
+              _context.n = 18;
               break;
             }
-            return _context2.d(_regeneratorValues(_loop()), 7);
+            if (!arkCancelRef.current) {
+              _context.n = 7;
+              break;
+            }
+            arkCancelRef.current = false;
+            return _context.a(2);
           case 7:
-            _ret = _context2.v;
-            if (!(_ret === 0)) {
-              _context2.n = 8;
-              break;
-            }
-            return _context2.a(3, 9);
+            _context.n = 8;
+            return new Promise(function (r) {
+              return setTimeout(r, 2500);
+            });
           case 8:
-            if (!_ret) {
-              _context2.n = 9;
+            if (!arkCancelRef.current) {
+              _context.n = 9;
               break;
             }
-            return _context2.a(2, _ret.v);
+            arkCancelRef.current = false;
+            return _context.a(2);
           case 9:
-            attempt++;
-            _context2.n = 6;
-            break;
-          case 10:
-            throw new Error("ARK: превышено время ожидания генерации.");
+            pd = void 0;
+            _context.p = 10;
+            _context.n = 11;
+            return _axios["default"].get("/api/muapi/video?id=".concat(encodeURIComponent(requestId)));
           case 11:
-            return _context2.a(2);
+            poll = _context.v;
+            pd = poll.data;
+            pollErrors = 0;
+            _context.n = 14;
+            break;
+          case 12:
+            _context.p = 12;
+            _t2 = _context.v;
+            if (!(++pollErrors >= 24)) {
+              _context.n = 13;
+              break;
+            }
+            throw new Error(((_e$response3 = _t2.response) === null || _e$response3 === void 0 || (_e$response3 = _e$response3.data) === null || _e$response3 === void 0 ? void 0 : _e$response3.error) || "MuAPI: опрос статуса не отвечает.");
+          case 13:
+            return _context.a(3, 17);
+          case 14:
+            status = String(((_pd = pd) === null || _pd === void 0 ? void 0 : _pd.status) || "").toLowerCase();
+            if (!(status === "succeeded" || status === "success" || status === "completed")) {
+              _context.n = 16;
+              break;
+            }
+            if (pd.url) {
+              _context.n = 15;
+              break;
+            }
+            throw new Error("MuAPI: видео готово, но URL не получен.");
+          case 15:
+            finishedUrl = pd.url;
+            return _context.a(3, 18);
+          case 16:
+            if (!["failed", "error", "expired", "cancelled"].includes(status)) {
+              _context.n = 17;
+              break;
+            }
+            throw new Error("MuAPI: \u0433\u0435\u043D\u0435\u0440\u0430\u0446\u0438\u044F \u043D\u0435 \u0443\u0434\u0430\u043B\u0430\u0441\u044C (".concat(pd.error || status, ")."));
+          case 17:
+            attempt++;
+            _context.n = 6;
+            break;
+          case 18:
+            if (finishedUrl) {
+              _context.n = 19;
+              break;
+            }
+            throw new Error("MuAPI: превышено время ожидания генерации.");
+          case 19:
+            // Показываем результат СРАЗУ — MuAPI отдаёт постоянный CDN URL.
+            histId = requestId || finishedUrl;
+            output = [{
+              type: "video_url",
+              value: finishedUrl
+            }];
+            newHistory = [].concat(_toConsumableArray(data.outputHistory || []), [{
+              status: "succeeded",
+              result: {
+                id: histId,
+                outputs: output
+              }
+            }]);
+            data.onDataChange(id, {
+              outputs: output,
+              resultUrl: finishedUrl,
+              isLoading: false,
+              errorMsg: null,
+              outputHistory: newHistory
+            });
+            setCurrentHistoryIndex(newHistory.length - 1);
+            setCurrentVideoIndex(0);
+
+            // В фоне зеркалируем в TOS для постоянного хранения.
+            // Если получится — тихо заменяем CDN URL на постоянный TOS URL.
+            _axios["default"].post("/api/upload-file", {
+              url: finishedUrl
+            }).then(function (mirror) {
+              var _mirror$data;
+              var tosUrl = (_mirror$data = mirror.data) === null || _mirror$data === void 0 ? void 0 : _mirror$data.url;
+              if (!tosUrl) return;
+              var tosOutput = [{
+                type: "video_url",
+                value: tosUrl
+              }];
+              var tosHistory = newHistory.map(function (h) {
+                var _h$result3;
+                return ((_h$result3 = h.result) === null || _h$result3 === void 0 ? void 0 : _h$result3.id) === histId ? _objectSpread(_objectSpread({}, h), {}, {
+                  result: _objectSpread(_objectSpread({}, h.result), {}, {
+                    outputs: tosOutput
+                  })
+                }) : h;
+              });
+              data.onDataChange(id, {
+                outputs: tosOutput,
+                resultUrl: tosUrl,
+                outputHistory: tosHistory
+              });
+            })["catch"](function () {/* MuAPI URL остаётся */});
+          case 20:
+            return _context.a(2);
         }
-      }, _callee, null, [[1, 3]]);
+      }, _callee, null, [[10, 12], [1, 3]]);
     }));
-    return function runArkSeedanceBrowser() {
+    return function runStudioSeedanceBrowser() {
       return _ref1.apply(this, arguments);
     };
   }();
   var handleRunSingleNode = /*#__PURE__*/function () {
     var _ref10 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2() {
-      var _data$selectedModel3, _data$selectedModel4, _nodeSchemas$categori2, modelHay, isArkSeedance, _e$message, _e$message2, workflow_id, modelSchema, params, inputSchema, localSources, _i, _Object$entries, _Object$entries$_i, key, meta, _meta$default2, response, _r, _nd, _lt, _o, _error$response, _t3, _t4;
-      return _regenerator().w(function (_context3) {
-        while (1) switch (_context3.p = _context3.n) {
+      var _data$selectedModel3, _data$selectedModel4, _nodeSchemas$categori2, modelHay, isSeedance, _e$message, _e$message2, workflow_id, modelSchema, params, inputSchema, localSources, _i, _Object$entries, _Object$entries$_i, key, meta, _meta$default2, response, _r, _nd, _lt, _o, _error$response, _t3, _t4;
+      return _regenerator().w(function (_context2) {
+        while (1) switch (_context2.p = _context2.n) {
           case 0:
             if (!inFlightRef.current) {
-              _context3.n = 1;
+              _context2.n = 1;
               break;
             }
             (0, _reactHotToast.toast)("Генерация уже идёт — подождите завершения", {
@@ -600,70 +604,67 @@ var VideoGeneration = function VideoGeneration(_ref) {
             data.onDataChange(id, {
               isLoading: true
             });
-            return _context3.a(2);
+            return _context2.a(2);
           case 1:
             inFlightRef.current = true;
             arkCancelRef.current = false;
-            _context3.p = 2;
+            _context2.p = 2;
             data.onDataChange(id, {
               isLoading: true
             });
 
-            // Seedance 2.0 (Ark) → browser submit-and-poll (same path as the Studio).
-            // Bypasses the blocking workflow /run route that hangs the node.
+            // Seedance 2.0 → browser submit-and-poll through MuAPI (same path as the
+            // Studio). Bypasses the blocking workflow /run route AND the fragile direct
+            // ARK path, both of which left the node stuck on "GENERATING…".
             // Robust detection: match the model id OR display name in any format
             // ("doubao-seedance-2-0-fast-260128", "Seedance 2.0 Fast", …).
             modelHay = "".concat((selectedModel === null || selectedModel === void 0 ? void 0 : selectedModel.id) || "", " ").concat((selectedModel === null || selectedModel === void 0 ? void 0 : selectedModel.name) || "", " ").concat(((_data$selectedModel3 = data.selectedModel) === null || _data$selectedModel3 === void 0 ? void 0 : _data$selectedModel3.id) || "", " ").concat(((_data$selectedModel4 = data.selectedModel) === null || _data$selectedModel4 === void 0 ? void 0 : _data$selectedModel4.name) || "").toLowerCase();
-            isArkSeedance = /seedance[\s-]*2/.test(modelHay); // DIAGNOSTIC: surface exactly what model id we got and which path runs.
-            (0, _reactHotToast.toast)("model: ".concat((selectedModel === null || selectedModel === void 0 ? void 0 : selectedModel.id) || "?", " \u2192 ").concat(isArkSeedance ? "ARK" : "server"), {
-              icon: "🔎",
-              duration: 5000
-            });
-            if (!isArkSeedance) {
-              _context3.n = 7;
+            isSeedance = /seedance[\s-]*2/.test(modelHay);
+            if (!isSeedance) {
+              _context2.n = 7;
               break;
             }
-            _context3.p = 3;
-            _context3.n = 4;
-            return runArkSeedanceBrowser();
+            _context2.p = 3;
+            _context2.n = 4;
+            return runStudioSeedanceBrowser();
           case 4:
-            _context3.n = 6;
+            _context2.n = 6;
             break;
           case 5:
-            _context3.p = 5;
-            _t3 = _context3.v;
+            _context2.p = 5;
+            _t3 = _context2.v;
             data.onDataChange(id, {
               isLoading: false,
               errorMsg: ((_e$message = _t3.message) === null || _e$message === void 0 ? void 0 : _e$message.slice(0, 120)) || "Ошибка генерации"
             });
             _reactHotToast.toast.error(((_e$message2 = _t3.message) === null || _e$message2 === void 0 ? void 0 : _e$message2.slice(0, 80)) || "Ошибка генерации");
           case 6:
-            return _context3.a(2);
+            return _context2.a(2);
           case 7:
-            _context3.n = 8;
+            _context2.n = 8;
             return data.handleSaveWorkFlow();
           case 8:
-            workflow_id = _context3.v;
+            workflow_id = _context2.v;
             if (workflow_id) {
-              _context3.n = 9;
+              _context2.n = 9;
               break;
             }
             _reactHotToast.toast.error("Failed to save workflow before running node");
             data.onDataChange(id, {
               isLoading: false
             });
-            return _context3.a(2);
+            return _context2.a(2);
           case 9:
             modelSchema = nodeSchemas === null || nodeSchemas === void 0 || (_nodeSchemas$categori2 = nodeSchemas.categories) === null || _nodeSchemas$categori2 === void 0 || (_nodeSchemas$categori2 = _nodeSchemas$categori2.video) === null || _nodeSchemas$categori2 === void 0 || (_nodeSchemas$categori2 = _nodeSchemas$categori2.models[selectedModel.id]) === null || _nodeSchemas$categori2 === void 0 || (_nodeSchemas$categori2 = _nodeSchemas$categori2.input_schema) === null || _nodeSchemas$categori2 === void 0 || (_nodeSchemas$categori2 = _nodeSchemas$categori2.schemas) === null || _nodeSchemas$categori2 === void 0 ? void 0 : _nodeSchemas$categori2.input_data;
             if (!(!modelSchema || !modelSchema.properties)) {
-              _context3.n = 10;
+              _context2.n = 10;
               break;
             }
             _reactHotToast.toast.error("No input schema found for this model");
             data.onDataChange(id, {
               isLoading: false
             });
-            return _context3.a(2);
+            return _context2.a(2);
           case 10:
             params = {};
             inputSchema = modelSchema.properties;
@@ -678,7 +679,7 @@ var VideoGeneration = function VideoGeneration(_ref) {
             }
             // face_asset isn't in the schema — carry it through when present.
             if (localSources.face_asset) params.face_asset = localSources.face_asset;
-            _context3.n = 11;
+            _context2.n = 11;
             return _axios["default"].post("/api/workflow/".concat(workflow_id, "/node/").concat(id, "/run"), {
               run_id: runId,
               model: selectedModel.id,
@@ -687,7 +688,7 @@ var VideoGeneration = function VideoGeneration(_ref) {
               node_id: "AI Video"
             });
           case 11:
-            response = _context3.v;
+            response = _context2.v;
             _r = response.data;
             _nd = _r && _r.nodes && (_r.nodes[id] || Object.values(_r.nodes)[0]);
             _lt = _nd && _nd[_nd.length - 1];
@@ -708,24 +709,24 @@ var VideoGeneration = function VideoGeneration(_ref) {
             } else {
               pollNodeStatus(_r.run_id);
             }
-            _context3.n = 13;
+            _context2.n = 13;
             break;
           case 12:
-            _context3.p = 12;
-            _t4 = _context3.v;
+            _context2.p = 12;
+            _t4 = _context2.v;
             data.onDataChange(id, {
               isLoading: false
             });
             _reactHotToast.toast.error(((_error$response = _t4.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.detail) || "Error running node");
             console.error(_t4);
           case 13:
-            _context3.p = 13;
+            _context2.p = 13;
             inFlightRef.current = false;
-            return _context3.f(13);
+            return _context2.f(13);
           case 14:
             ;
           case 15:
-            return _context3.a(2);
+            return _context2.a(2);
         }
       }, _callee2, null, [[3, 5], [2, 12, 13, 14]]);
     }));
@@ -834,23 +835,23 @@ var VideoGeneration = function VideoGeneration(_ref) {
   var handleDeleteHistory = /*#__PURE__*/function () {
     var _ref11 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee3(e) {
       var currentHistory, _data$onDataChange2, newHistory, _error$response2, _t5;
-      return _regenerator().w(function (_context4) {
-        while (1) switch (_context4.p = _context4.n) {
+      return _regenerator().w(function (_context3) {
+        while (1) switch (_context3.p = _context3.n) {
           case 0:
             e.stopPropagation();
             currentHistory = outputHistory[currentHistoryIndex];
             if (!(!currentHistory || !currentHistory.node_run_id)) {
-              _context4.n = 1;
+              _context3.n = 1;
               break;
             }
-            return _context4.a(2);
+            return _context3.a(2);
           case 1:
             if (!window.confirm("Are you sure you want to delete this history entry?")) {
-              _context4.n = 5;
+              _context3.n = 5;
               break;
             }
-            _context4.p = 2;
-            _context4.n = 3;
+            _context3.p = 2;
+            _context3.n = 3;
             return _axios["default"]["delete"]("/api/workflow/node-run/".concat(currentHistory.node_run_id));
           case 3:
             newHistory = outputHistory.filter(function (_, i) {
@@ -868,15 +869,15 @@ var VideoGeneration = function VideoGeneration(_ref) {
               setCurrentHistoryIndex(Math.max(0, currentHistoryIndex - 1));
             }
             _reactHotToast.toast.success("History entry deleted");
-            _context4.n = 5;
+            _context3.n = 5;
             break;
           case 4:
-            _context4.p = 4;
-            _t5 = _context4.v;
+            _context3.p = 4;
+            _t5 = _context3.v;
             _reactHotToast.toast.error(((_error$response2 = _t5.response) === null || _error$response2 === void 0 || (_error$response2 = _error$response2.data) === null || _error$response2 === void 0 ? void 0 : _error$response2.detail) || "Failed to delete history entry");
             console.error(_t5);
           case 5:
-            return _context4.a(2);
+            return _context3.a(2);
         }
       }, _callee3, null, [[2, 4]]);
     }));
