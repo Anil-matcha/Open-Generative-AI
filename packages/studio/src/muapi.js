@@ -591,7 +591,16 @@ async function generateSeedanceArk(modelInfo, params) {
     const taskId = submitData.taskId;
     if (!taskId) throw new Error('Ark: задача не создана (нет taskId).');
 
-    // Step 2: poll from the browser — each request is < 1s, no connection hangs
+    // Notify the caller as soon as we have a taskId so it can persist it for
+    // resumption if the user navigates away before polling finishes.
+    params.onTaskId?.(taskId);
+
+    return pollArkTask(taskId);
+}
+
+// Poll an already-submitted Ark Seedance task.
+// Exported so VideoStudio can resume an in-progress task after navigation.
+export async function pollArkTask(taskId) {
     for (let attempt = 0; attempt < 300; attempt++) {
         await new Promise((r) => setTimeout(r, 5000));
         const poll = await fetch(`/api/ark/seedance?taskId=${encodeURIComponent(taskId)}`);
@@ -600,8 +609,6 @@ async function generateSeedanceArk(modelInfo, params) {
         const status = (data.status || '').toLowerCase();
         if (status === 'succeeded' || status === 'success') {
             if (!data.url) throw new Error('Ark: видео готово, но URL не получен.');
-            // Return the Ark CDN URL. Permanent TOS mirroring (into videos/) happens
-            // server-side when VideoStudio saves the result to the gallery.
             return { url: data.url, id: taskId };
         }
         if (status === 'failed' || status === 'error' || status === 'expired' || status === 'cancelled') {

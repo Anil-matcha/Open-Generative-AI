@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { generateVideo, generateI2V, processV2V, uploadFile } from "../muapi.js";
+import { generateVideo, generateI2V, processV2V, uploadFile, pollArkTask } from "../muapi.js";
 import {
   t2vModels,
   i2vModels,
@@ -243,6 +243,7 @@ export default function VideoStudio({
   onFilesHandled,
 }) {
   const PERSIST_KEY = "mf_video_studio_persistent";
+  const ARK_TASK_KEY = "mf_video_active_ark_task";
 
   // ── mode state ──
   const [imageMode, setImageMode] = useState(false); // i2v
@@ -990,6 +991,47 @@ export default function VideoStudio({
     setShowCanvas(true);
   }, []);
 
+  // ── resume an ARK task that survived navigation ───────────────────────────
+  // If the user navigated away mid-generation the polling promise kept running
+  // in the background, but the React state was lost. On remount we check
+  // localStorage for an in-progress taskId and resume polling so the result
+  // is captured when the task finishes.
+  useEffect(() => {
+    let stored;
+    try { stored = JSON.parse(localStorage.getItem(ARK_TASK_KEY)); } catch {}
+    if (!stored?.taskId) return;
+
+    setGenerating(true);
+    pollArkTask(stored.taskId)
+      .then((res) => {
+        localStorage.removeItem(ARK_TASK_KEY);
+        const genId = res.id || stored.taskId;
+        setLastGenerationId(genId);
+        setLastGenerationModel(stored.model);
+        addToLocalHistory({
+          id: genId,
+          url: res.url,
+          prompt: stored.prompt || "",
+          model: stored.model,
+          aspect_ratio: stored.aspect_ratio,
+          duration: stored.duration,
+          timestamp: new Date().toISOString(),
+        });
+        showVideoInCanvas(res.url, stored.model);
+        fetch("/api/gallery", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: res.url, type: "video", model: stored.model, prompt: stored.prompt || "" }),
+        }).catch(() => {});
+      })
+      .catch((e) => {
+        localStorage.removeItem(ARK_TASK_KEY);
+        setGenerateError(e.message?.slice(0, 80) || "Ошибка генерации");
+        setTimeout(() => setGenerateError(null), 4000);
+      })
+      .finally(() => setGenerating(false));
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // ── generate ──────────────────────────────────────────────────────────────
   const handleGenerate = useCallback(async () => {
     const currentModel = getCurrentModel();
@@ -1018,6 +1060,19 @@ export default function VideoStudio({
           video_urls: readyRefs.filter((f) => f.kind === "video").map((f) => f.url),
           audio_urls: readyRefs.filter((f) => f.kind === "audio").map((f) => f.url),
           face_asset: faceAsset?.uri || undefined,
+          // Persist taskId to localStorage as soon as the ARK task is submitted so
+          // we can resume polling if the user navigates away before it finishes.
+          onTaskId: (taskId) => {
+            try {
+              localStorage.setItem(ARK_TASK_KEY, JSON.stringify({
+                taskId,
+                model: selectedModel,
+                prompt: trimmedPrompt,
+                aspect_ratio: selectedAr,
+                duration: selectedDuration,
+              }));
+            } catch {}
+          },
         };
         const durations = getCurrentDurations(selectedModel);
         if (durations.length > 0) params.duration = selectedDuration;
@@ -1030,6 +1085,7 @@ export default function VideoStudio({
           : await generateVideo(apiKey, params);
         if (!res?.url) throw new Error("No video URL returned by API");
 
+        localStorage.removeItem(ARK_TASK_KEY);
         const genId = res.id || Date.now().toString();
         setLastGenerationId(genId);
         setLastGenerationModel(selectedModel);
@@ -1053,6 +1109,7 @@ export default function VideoStudio({
         if (onGenerationComplete)
           onGenerationComplete({ url: res.url, model: selectedModel, prompt: trimmedPrompt, type: "video" });
       } catch (e) {
+        localStorage.removeItem(ARK_TASK_KEY);
         console.error("[VideoStudio]", e);
         setGenerateError(e.message?.slice(0, 80) || "Ошибка генерации");
         setTimeout(() => setGenerateError(null), 4000);
