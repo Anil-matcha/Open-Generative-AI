@@ -8,6 +8,7 @@ exports["default"] = void 0;
 var _react = _interopRequireWildcard(require("react"));
 var _reactHotToast = require("react-hot-toast");
 var _fi = require("react-icons/fi");
+var _md = require("react-icons/md");
 var _reactflow = require("reactflow");
 var _axios = _interopRequireDefault(require("axios"));
 var _AudioPlayer = _interopRequireDefault(require("./AudioPlayer"));
@@ -325,7 +326,7 @@ var UploadNode = function UploadNode(_ref) {
       return (n === null || n === void 0 ? void 0 : n.type) === "videoNode" || (n === null || n === void 0 ? void 0 : n.type) === "imageNode";
     }));
     if (!targetSet.size) return [];
-    var imgIds = new Set(rfEdges.filter(function (e) {
+    var mediaIds = new Set(rfEdges.filter(function (e) {
       return targetSet.has(e.target);
     }).map(function (e) {
       return e.source;
@@ -334,10 +335,12 @@ var UploadNode = function UploadNode(_ref) {
       var n = nodesArr.find(function (nn) {
         return nn.id === sid;
       });
-      return (n === null || n === void 0 ? void 0 : n.type) === "imageNode" && (n === null || n === void 0 || (_n$data = n.data) === null || _n$data === void 0 || (_n$data = _n$data.selectedModel) === null || _n$data === void 0 ? void 0 : _n$data.id) === "image-passthrough";
+      if (!n) return false;
+      var mid = n === null || n === void 0 || (_n$data = n.data) === null || _n$data === void 0 || (_n$data = _n$data.selectedModel) === null || _n$data === void 0 ? void 0 : _n$data.id;
+      return n.type === "imageNode" && mid === "image-passthrough" || n.type === "videoNode" && mid === "video-passthrough";
     }));
     var tags = [];
-    var _iterator2 = _createForOfIteratorHelper(imgIds),
+    var _iterator2 = _createForOfIteratorHelper(mediaIds),
       _step2;
     try {
       var _loop2 = function _loop2() {
@@ -347,10 +350,12 @@ var UploadNode = function UploadNode(_ref) {
           return nn.id === iid;
         });
         var fv = (inode === null || inode === void 0 || (_inode$data = inode.data) === null || _inode$data === void 0 ? void 0 : _inode$data.formValues) || {};
-        var url = fv.image_url || null;
+        var isVideo = (inode === null || inode === void 0 ? void 0 : inode.type) === "videoNode";
+        var url = isVideo ? fv.video_url || null : fv.image_url || null;
         if (url) tags.push({
           id: iid,
-          url: url
+          url: url,
+          isVideo: isVideo
         });
       };
       for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
@@ -459,15 +464,19 @@ var UploadNode = function UploadNode(_ref) {
       onClick: function onClick() {
         return insertImageTag(t.url);
       },
-      title: "\u0412\u0441\u0442\u0430\u0432\u0438\u0442\u044C \u0441\u0441\u044B\u043B\u043A\u0443 \u043D\u0430 \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435 \u0432 \u043F\u0440\u043E\u043C\u043F\u0442",
+      title: t.isVideo ? "Вставить ссылку на видео в промпт" : "Вставить ссылку на изображение в промпт",
       className: "flex items-center gap-1.5 pl-1 pr-2 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/30 border border-emerald-500/30 text-emerald-200 transition-colors"
-    }, /*#__PURE__*/_react["default"].createElement("img", {
+    }, t.isVideo ? /*#__PURE__*/_react["default"].createElement("span", {
+      className: "w-7 h-7 rounded-md bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center flex-shrink-0"
+    }, /*#__PURE__*/_react["default"].createElement(_md.MdVideocam, {
+      size: 14
+    })) : /*#__PURE__*/_react["default"].createElement("img", {
       src: t.url,
       alt: "image",
       className: "w-7 h-7 rounded-md object-cover flex-shrink-0 border border-emerald-500/30"
     }), /*#__PURE__*/_react["default"].createElement("span", {
       className: "text-[10px]"
-    }, "@image"));
+    }, t.isVideo ? "@video" : "@image"));
   })), /*#__PURE__*/_react["default"].createElement("textarea", {
     ref: textareaRef,
     className: "bg-transparent border border-gray-800 w-full h-full max-h-96 p-2 text-xs text-white resize-none overflow-y-auto custom-scrollbar",

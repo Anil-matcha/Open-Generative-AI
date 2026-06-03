@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { toast } from "react-hot-toast";
 import { FiUpload } from "react-icons/fi";
+import { MdVideocam } from "react-icons/md";
 import { useStore } from "reactflow";
 import axios from "axios";
 import AudioPlayer from "./AudioPlayer";
@@ -211,21 +212,25 @@ const UploadNode = ({ id, data, formValues, setFormValues, selectedModel, loadin
       })
     );
     if (!targetSet.size) return [];
-    const imgIds = new Set(
+    const mediaIds = new Set(
       rfEdges
         .filter((e) => targetSet.has(e.target))
         .map((e) => e.source)
         .filter((sid) => {
           const n = nodesArr.find((nn) => nn.id === sid);
-          return n?.type === "imageNode" && n?.data?.selectedModel?.id === "image-passthrough";
+          if (!n) return false;
+          const mid = n?.data?.selectedModel?.id;
+          return (n.type === "imageNode" && mid === "image-passthrough") ||
+                 (n.type === "videoNode" && mid === "video-passthrough");
         })
     );
     const tags = [];
-    for (const iid of imgIds) {
+    for (const iid of mediaIds) {
       const inode = nodesArr.find((nn) => nn.id === iid);
       const fv = inode?.data?.formValues || {};
-      const url = fv.image_url || null;
-      if (url) tags.push({ id: iid, url });
+      const isVideo = inode?.type === "videoNode";
+      const url = isVideo ? (fv.video_url || null) : (fv.image_url || null);
+      if (url) tags.push({ id: iid, url, isVideo });
     }
     return tags;
   }, [rfEdges, rfNodes, id, uploadType]);
@@ -306,11 +311,17 @@ const UploadNode = ({ id, data, formValues, setFormValues, selectedModel, loadin
                     key={t.id}
                     type="button"
                     onClick={() => insertImageTag(t.url)}
-                    title="Вставить ссылку на изображение в промпт"
+                    title={t.isVideo ? "Вставить ссылку на видео в промпт" : "Вставить ссылку на изображение в промпт"}
                     className="flex items-center gap-1.5 pl-1 pr-2 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/30 border border-emerald-500/30 text-emerald-200 transition-colors"
                   >
-                    <img src={t.url} alt="image" className="w-7 h-7 rounded-md object-cover flex-shrink-0 border border-emerald-500/30" />
-                    <span className="text-[10px]">@image</span>
+                    {t.isVideo ? (
+                      <span className="w-7 h-7 rounded-md bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center flex-shrink-0">
+                        <MdVideocam size={14} />
+                      </span>
+                    ) : (
+                      <img src={t.url} alt="image" className="w-7 h-7 rounded-md object-cover flex-shrink-0 border border-emerald-500/30" />
+                    )}
+                    <span className="text-[10px]">{t.isVideo ? "@video" : "@image"}</span>
                   </button>
                 ))}
               </div>
