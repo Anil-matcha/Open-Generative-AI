@@ -325,7 +325,7 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
             category: "image",
             model: "image-passthrough",
             position: { x: 50, y: 50 },
-            input_params: { images_list: [pendingImage.url] },
+            input_params: { image_url: pendingImage.url },
             output_params: {},
           };
           def = { ...def, data: { ...def.data, nodes: [injectedNode, ...(def.data?.nodes || [])] } };
