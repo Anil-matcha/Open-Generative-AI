@@ -2623,39 +2623,57 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
                         })}
                       </div>
                     ) : (inputSchema?.properties || (inputSchema && Object.keys(inputSchema).length > 0)) ? (
-                      Object.entries(inputSchema?.properties || inputSchema).map(([key, meta], idx) => {
-                        if (key === "schemas") return null;
-                        return (
-                          <RenderField
-                            key={key}
-                            fieldName={key}
-                            meta={meta}
-                            idx={idx}
-                            formValues={selectedNode?.data?.formValues || {}}
-                            setFormValues={(newValues) => {
-                              setNodes((nds) =>
-                                nds.map((node) => {
-                                  if (node.id === selectedNode?.id) {
-                                    return {
-                                      ...node,
-                                      data: {
-                                        ...node.data,
-                                        formValues: typeof newValues === 'function'
-                                          ? newValues(node.data?.formValues || {})
-                                          : newValues,
-                                      },
-                                    };
-                                  }
-                                  return node;
-                                })
-                              );
-                            }}
-                            handleChange={updateNodeFromPanel}
-                            data={inputSchema}
-                            modelName={selectedNode?.data?.selectedModel?.name}
-                          />
-                        );
-                      }).filter(Boolean)
+                      <>
+                        {/* Image chip — shown above the prompt when image_url is wired in from a connected node */}
+                        {selectedNode?.type === "videoNode" && selectedNode?.data?.formValues?.image_url && (
+                          <div className="flex items-center gap-3 px-3 py-2 mb-1 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
+                            <img
+                              src={selectedNode.data.formValues.image_url}
+                              alt=""
+                              className="w-14 h-14 rounded-lg object-cover border border-emerald-500/30 flex-shrink-0"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">📎 Изображение подключено</p>
+                              <p className="text-[10px] text-white/30 mt-0.5 leading-tight">Будет первым кадром видео. Опиши движение в промте ↓</p>
+                            </div>
+                          </div>
+                        )}
+                        {Object.entries(inputSchema?.properties || inputSchema).map(([key, meta], idx) => {
+                          if (key === "schemas") return null;
+                          // Hide raw image_url text field when it's already shown as a chip above
+                          if (key === "image_url" && selectedNode?.data?.formValues?.image_url) return null;
+                          return (
+                            <RenderField
+                              key={key}
+                              fieldName={key}
+                              meta={meta}
+                              idx={idx}
+                              formValues={selectedNode?.data?.formValues || {}}
+                              setFormValues={(newValues) => {
+                                setNodes((nds) =>
+                                  nds.map((node) => {
+                                    if (node.id === selectedNode?.id) {
+                                      return {
+                                        ...node,
+                                        data: {
+                                          ...node.data,
+                                          formValues: typeof newValues === 'function'
+                                            ? newValues(node.data?.formValues || {})
+                                            : newValues,
+                                        },
+                                      };
+                                    }
+                                    return node;
+                                  })
+                                );
+                              }}
+                              handleChange={updateNodeFromPanel}
+                              data={inputSchema}
+                              modelName={selectedNode?.data?.selectedModel?.name}
+                            />
+                          );
+                        }).filter(Boolean)}
+                      </>
                     ) : (
                       <div className="text-center py-8">
                         <p className="text-sm text-gray-400">No properties available</p>

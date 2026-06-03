@@ -270,7 +270,7 @@ var processWorkflowData = function processWorkflowData(workflowData, nodeSchemas
   };
 };
 var NodeFlow = function NodeFlow(_ref) {
-  var _initialState$metadat, _initialState$metadat2, _initialState$metadat3, _initialState$metadat4, _initialState$metadat5, _initialState$metadat6, _initialState$metadat7, _nodeSchemas$categori3, _selectedNode$data, _selectedNode$data2, _selectedNode$data3, _selectedNode$data6, _selectedNode$data16, _selectedNode$data17, _selectedNode$data18, _selectedNode$data19, _selectedNode$data20;
+  var _initialState$metadat, _initialState$metadat2, _initialState$metadat3, _initialState$metadat4, _initialState$metadat5, _initialState$metadat6, _initialState$metadat7, _nodeSchemas$categori3, _selectedNode$data, _selectedNode$data2, _selectedNode$data3, _selectedNode$data6, _selectedNode$data18, _selectedNode$data19, _selectedNode$data20, _selectedNode$data21, _selectedNode$data22;
   var initialNodeSchemas = _ref.initialNodeSchemas,
     initialWorkflowData = _ref.initialWorkflowData;
   var params = (0, _navigation.useParams)();
@@ -2794,7 +2794,7 @@ var NodeFlow = function NodeFlow(_ref) {
     }));
   }) : /*#__PURE__*/_react["default"].createElement("p", {
     className: "text-xs text-gray-400 text-center py-2"
-  }, "No models found")))), selectedNode !== null && selectedNode !== void 0 && (_selectedNode$data6 = selectedNode.data) !== null && _selectedNode$data6 !== void 0 && _selectedNode$data6.selectedModel ? function (_nodeSchemas$categori10, _selectedNode$data7, _fullSchema$schemas, _selectedNode$data8, _selectedNode$data9, _selectedNode$data0, _selectedNode$data1) {
+  }, "No models found")))), selectedNode !== null && selectedNode !== void 0 && (_selectedNode$data6 = selectedNode.data) !== null && _selectedNode$data6 !== void 0 && _selectedNode$data6.selectedModel ? function (_nodeSchemas$categori10, _selectedNode$data7, _fullSchema$schemas, _selectedNode$data8, _selectedNode$data9, _selectedNode$data0, _selectedNode$data1, _selectedNode$data14) {
     var nodeType = selectedNode.id.startsWith("text") ? "text" : selectedNode.id.startsWith("image") ? "image" : selectedNode.id.startsWith("video") ? "video" : selectedNode.id.startsWith("audio") ? "audio" : "utility";
     var fullSchema = nodeSchemas === null || nodeSchemas === void 0 || (_nodeSchemas$categori10 = nodeSchemas.categories) === null || _nodeSchemas$categori10 === void 0 || (_nodeSchemas$categori10 = _nodeSchemas$categori10[nodeType]) === null || _nodeSchemas$categori10 === void 0 || (_nodeSchemas$categori10 = _nodeSchemas$categori10.models[selectedNode === null || selectedNode === void 0 || (_selectedNode$data7 = selectedNode.data) === null || _selectedNode$data7 === void 0 || (_selectedNode$data7 = _selectedNode$data7.selectedModel) === null || _selectedNode$data7 === void 0 ? void 0 : _selectedNode$data7.id]) === null || _nodeSchemas$categori10 === void 0 ? void 0 : _nodeSchemas$categori10.input_schema;
     var inputSchema = (fullSchema === null || fullSchema === void 0 || (_fullSchema$schemas = fullSchema.schemas) === null || _fullSchema$schemas === void 0 ? void 0 : _fullSchema$schemas.input_data) || fullSchema || {};
@@ -2896,18 +2896,32 @@ var NodeFlow = function NodeFlow(_ref) {
           }
         }
       });
-    })) : inputSchema !== null && inputSchema !== void 0 && inputSchema.properties || inputSchema && Object.keys(inputSchema).length > 0 ? Object.entries((inputSchema === null || inputSchema === void 0 ? void 0 : inputSchema.properties) || inputSchema).map(function (_ref16, idx) {
-      var _selectedNode$data14, _selectedNode$data15;
+    })) : inputSchema !== null && inputSchema !== void 0 && inputSchema.properties || inputSchema && Object.keys(inputSchema).length > 0 ? /*#__PURE__*/_react["default"].createElement(_react["default"].Fragment, null, (selectedNode === null || selectedNode === void 0 ? void 0 : selectedNode.type) === "videoNode" && (selectedNode === null || selectedNode === void 0 || (_selectedNode$data14 = selectedNode.data) === null || _selectedNode$data14 === void 0 || (_selectedNode$data14 = _selectedNode$data14.formValues) === null || _selectedNode$data14 === void 0 ? void 0 : _selectedNode$data14.image_url) && /*#__PURE__*/_react["default"].createElement("div", {
+      className: "flex items-center gap-3 px-3 py-2 mb-1 bg-emerald-500/10 border border-emerald-500/20 rounded-xl"
+    }, /*#__PURE__*/_react["default"].createElement("img", {
+      src: selectedNode.data.formValues.image_url,
+      alt: "",
+      className: "w-14 h-14 rounded-lg object-cover border border-emerald-500/30 flex-shrink-0"
+    }), /*#__PURE__*/_react["default"].createElement("div", {
+      className: "flex-1 min-w-0"
+    }, /*#__PURE__*/_react["default"].createElement("p", {
+      className: "text-[10px] font-black text-emerald-400 uppercase tracking-widest"
+    }, "\uD83D\uDCCE \u0418\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435 \u043F\u043E\u0434\u043A\u043B\u044E\u0447\u0435\u043D\u043E"), /*#__PURE__*/_react["default"].createElement("p", {
+      className: "text-[10px] text-white/30 mt-0.5 leading-tight"
+    }, "\u0411\u0443\u0434\u0435\u0442 \u043F\u0435\u0440\u0432\u044B\u043C \u043A\u0430\u0434\u0440\u043E\u043C \u0432\u0438\u0434\u0435\u043E. \u041E\u043F\u0438\u0448\u0438 \u0434\u0432\u0438\u0436\u0435\u043D\u0438\u0435 \u0432 \u043F\u0440\u043E\u043C\u0442\u0435 \u2193"))), Object.entries((inputSchema === null || inputSchema === void 0 ? void 0 : inputSchema.properties) || inputSchema).map(function (_ref16, idx) {
+      var _selectedNode$data15, _selectedNode$data16, _selectedNode$data17;
       var _ref17 = _slicedToArray(_ref16, 2),
         key = _ref17[0],
         meta = _ref17[1];
       if (key === "schemas") return null;
+      // Hide raw image_url text field when it's already shown as a chip above
+      if (key === "image_url" && selectedNode !== null && selectedNode !== void 0 && (_selectedNode$data15 = selectedNode.data) !== null && _selectedNode$data15 !== void 0 && (_selectedNode$data15 = _selectedNode$data15.formValues) !== null && _selectedNode$data15 !== void 0 && _selectedNode$data15.image_url) return null;
       return /*#__PURE__*/_react["default"].createElement(_RenderField["default"], {
         key: key,
         fieldName: key,
         meta: meta,
         idx: idx,
-        formValues: (selectedNode === null || selectedNode === void 0 || (_selectedNode$data14 = selectedNode.data) === null || _selectedNode$data14 === void 0 ? void 0 : _selectedNode$data14.formValues) || {},
+        formValues: (selectedNode === null || selectedNode === void 0 || (_selectedNode$data16 = selectedNode.data) === null || _selectedNode$data16 === void 0 ? void 0 : _selectedNode$data16.formValues) || {},
         setFormValues: function setFormValues(newValues) {
           setNodes(function (nds) {
             return nds.map(function (node) {
@@ -2925,9 +2939,9 @@ var NodeFlow = function NodeFlow(_ref) {
         },
         handleChange: updateNodeFromPanel,
         data: inputSchema,
-        modelName: selectedNode === null || selectedNode === void 0 || (_selectedNode$data15 = selectedNode.data) === null || _selectedNode$data15 === void 0 || (_selectedNode$data15 = _selectedNode$data15.selectedModel) === null || _selectedNode$data15 === void 0 ? void 0 : _selectedNode$data15.name
+        modelName: selectedNode === null || selectedNode === void 0 || (_selectedNode$data17 = selectedNode.data) === null || _selectedNode$data17 === void 0 || (_selectedNode$data17 = _selectedNode$data17.selectedModel) === null || _selectedNode$data17 === void 0 ? void 0 : _selectedNode$data17.name
       });
-    }).filter(Boolean) : /*#__PURE__*/_react["default"].createElement("div", {
+    }).filter(Boolean)) : /*#__PURE__*/_react["default"].createElement("div", {
       className: "text-center py-8"
     }, /*#__PURE__*/_react["default"].createElement("p", {
       className: "text-sm text-gray-400"
@@ -2936,7 +2950,7 @@ var NodeFlow = function NodeFlow(_ref) {
     className: "text-center py-8"
   }, /*#__PURE__*/_react["default"].createElement("p", {
     className: "text-sm text-gray-400"
-  }, "Please select a model first")))), (selectedNode === null || selectedNode === void 0 ? void 0 : selectedNode.type) === "videoNode" && (selectedNode === null || selectedNode === void 0 || (_selectedNode$data16 = selectedNode.data) === null || _selectedNode$data16 === void 0 || (_selectedNode$data16 = _selectedNode$data16.formValues) === null || _selectedNode$data16 === void 0 ? void 0 : _selectedNode$data16.face_asset) && function () {
+  }, "Please select a model first")))), (selectedNode === null || selectedNode === void 0 ? void 0 : selectedNode.type) === "videoNode" && (selectedNode === null || selectedNode === void 0 || (_selectedNode$data18 = selectedNode.data) === null || _selectedNode$data18 === void 0 || (_selectedNode$data18 = _selectedNode$data18.formValues) === null || _selectedNode$data18 === void 0 ? void 0 : _selectedNode$data18.face_asset) && function () {
     var fa = String(selectedNode.data.formValues.face_asset);
     var isAsset = fa.startsWith("asset://");
     var thumb = selectedNode.data.formValues.face_thumbnail;
@@ -2976,7 +2990,7 @@ var NodeFlow = function NodeFlow(_ref) {
   }, /*#__PURE__*/_react["default"].createElement("input", {
     type: "checkbox",
     className: "sr-only peer",
-    checked: (selectedNode === null || selectedNode === void 0 || (_selectedNode$data17 = selectedNode.data) === null || _selectedNode$data17 === void 0 || (_selectedNode$data17 = _selectedNode$data17.formValues) === null || _selectedNode$data17 === void 0 ? void 0 : _selectedNode$data17.make_output) === true,
+    checked: (selectedNode === null || selectedNode === void 0 || (_selectedNode$data19 = selectedNode.data) === null || _selectedNode$data19 === void 0 || (_selectedNode$data19 = _selectedNode$data19.formValues) === null || _selectedNode$data19 === void 0 ? void 0 : _selectedNode$data19.make_output) === true,
     onChange: function onChange(e) {
       var checked = e.target.checked;
       setNodes(function (nds) {
@@ -2995,15 +3009,15 @@ var NodeFlow = function NodeFlow(_ref) {
     className: "w-9 h-5 bg-gray-700 rounded-full peer peer-checked:bg-blue-600 transition-colors"
   }), /*#__PURE__*/_react["default"].createElement("div", {
     className: "absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full peer-checked:translate-x-4 transition-transform"
-  }))), !(selectedNode !== null && selectedNode !== void 0 && (_selectedNode$data18 = selectedNode.data) !== null && _selectedNode$data18 !== void 0 && (_selectedNode$data18 = _selectedNode$data18.selectedModel) !== null && _selectedNode$data18 !== void 0 && (_selectedNode$data18 = _selectedNode$data18.id) !== null && _selectedNode$data18 !== void 0 && _selectedNode$data18.includes("passthrough")) && /*#__PURE__*/_react["default"].createElement("button", {
+  }))), !(selectedNode !== null && selectedNode !== void 0 && (_selectedNode$data20 = selectedNode.data) !== null && _selectedNode$data20 !== void 0 && (_selectedNode$data20 = _selectedNode$data20.selectedModel) !== null && _selectedNode$data20 !== void 0 && (_selectedNode$data20 = _selectedNode$data20.id) !== null && _selectedNode$data20 !== void 0 && _selectedNode$data20.includes("passthrough")) && /*#__PURE__*/_react["default"].createElement("button", {
     type: "button",
     suppressHydrationWarning: true,
     onClick: function onClick() {
       return selectedNode && runNodeFromFlow(selectedNode.id);
     },
-    disabled: loadingNodes[selectedNode.id] || (selectedNode === null || selectedNode === void 0 || (_selectedNode$data19 = selectedNode.data) === null || _selectedNode$data19 === void 0 ? void 0 : _selectedNode$data19.isLoading),
+    disabled: loadingNodes[selectedNode.id] || (selectedNode === null || selectedNode === void 0 || (_selectedNode$data21 = selectedNode.data) === null || _selectedNode$data21 === void 0 ? void 0 : _selectedNode$data21.isLoading),
     className: "text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 group disabled:cursor-not-allowed rounded-lg text-white bg-blue-500 px-4 py-2 border border-blue-500/50 hover:bg-blue-600 w-full transition-all shadow-lg shadow-blue-900/20 active:scale-[0.98]"
-  }, loadingNodes[selectedNode.id] || selectedNode !== null && selectedNode !== void 0 && (_selectedNode$data20 = selectedNode.data) !== null && _selectedNode$data20 !== void 0 && _selectedNode$data20.isLoading ? /*#__PURE__*/_react["default"].createElement(_react["default"].Fragment, null, /*#__PURE__*/_react["default"].createElement("div", {
+  }, loadingNodes[selectedNode.id] || selectedNode !== null && selectedNode !== void 0 && (_selectedNode$data22 = selectedNode.data) !== null && _selectedNode$data22 !== void 0 && _selectedNode$data22.isLoading ? /*#__PURE__*/_react["default"].createElement(_react["default"].Fragment, null, /*#__PURE__*/_react["default"].createElement("div", {
     className: "w-4 h-4 rounded-full border-2 border-white/20 border-t-white animate-spin"
   }), "Generating...") : /*#__PURE__*/_react["default"].createElement(_react["default"].Fragment, null, /*#__PURE__*/_react["default"].createElement(_fa.FaPlay, {
     size: 16
