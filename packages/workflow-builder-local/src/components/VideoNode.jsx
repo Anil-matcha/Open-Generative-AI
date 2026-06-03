@@ -273,8 +273,15 @@ const VideoGeneration = ({ id, data, selected }) => {
   };
 
   const handleRunSingleNode = async () => {
-    // Prevent duplicate billing: ignore re-entry while a generation is in flight
-    if (inFlightRef.current) return;
+    // Prevent duplicate billing: ignore re-entry while a generation is in flight.
+    // Give visible feedback instead of silently doing nothing — a video request
+    // stays pending for the whole generation (ARK polls up to ~290s), so a second
+    // click would otherwise look like "Generate does nothing".
+    if (inFlightRef.current) {
+      toast("Генерация уже идёт — подождите завершения", { icon: "⏳" });
+      data.onDataChange(id, { isLoading: true });
+      return;
+    }
     inFlightRef.current = true;
     try {
       data.onDataChange(id, { isLoading: true });

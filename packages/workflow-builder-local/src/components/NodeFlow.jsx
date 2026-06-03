@@ -2742,10 +2742,10 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
                   type="button"
                   suppressHydrationWarning={true}
                   onClick={() => selectedNode && runNodeFromFlow(selectedNode.id)}
-                  disabled={loadingNodes[selectedNode.id]}
+                  disabled={loadingNodes[selectedNode.id] || selectedNode?.data?.isLoading}
                   className="text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 group disabled:cursor-not-allowed rounded-lg text-white bg-blue-500 px-4 py-2 border border-blue-500/50 hover:bg-blue-600 w-full transition-all shadow-lg shadow-blue-900/20 active:scale-[0.98]"
                 >
-                  {loadingNodes[selectedNode.id] ? (
+                  {(loadingNodes[selectedNode.id] || selectedNode?.data?.isLoading) ? (
                     <><div className="w-4 h-4 rounded-full border-2 border-white/20 border-t-white animate-spin"></div>Generating...</>
                   ) : (
                     <>

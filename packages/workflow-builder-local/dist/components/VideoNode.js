@@ -364,6 +364,12 @@ var VideoGeneration = function VideoGeneration(_ref) {
               _context.n = 1;
               break;
             }
+            (0, _reactHotToast.toast)("Генерация уже идёт — подождите завершения", {
+              icon: "⏳"
+            });
+            data.onDataChange(id, {
+              isLoading: true
+            });
             return _context.a(2);
           case 1:
             inFlightRef.current = true;
