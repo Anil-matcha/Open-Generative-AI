@@ -2685,6 +2685,42 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
                 )}
               </div>
             </div>
+            {/* Additional reference images — extra image-passthrough nodes stacked
+                into images_list (beyond the first-frame image_url). */}
+            {selectedNode?.type === "videoNode" && Array.isArray(selectedNode?.data?.formValues?.images_list) && selectedNode.data.formValues.images_list.filter(Boolean).length > 0 && (() => {
+              const list = selectedNode.data.formValues.images_list.filter(Boolean);
+              return (
+                <div className="px-4 pb-3">
+                  <p className="text-[10px] font-semibold text-emerald-300 uppercase tracking-wider mb-1.5">
+                    Доп. изображения ({list.length})
+                  </p>
+                  <div className="grid grid-cols-3 gap-1.5">
+                    {list.map((u, i) => (
+                      <div key={`${u}-${i}`} className="relative group/refimg rounded-lg overflow-hidden border border-emerald-500/30">
+                        <img
+                          src={u}
+                          alt={`ref ${i + 1}`}
+                          className="w-full h-16 object-cover"
+                          onError={(e) => { e.target.style.display = 'none'; }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const next = list.filter((_, idx) => idx !== i);
+                            setNodes((nds) => nds.map((n) => n.id === selectedNode.id
+                              ? { ...n, data: { ...n.data, formValues: { ...n.data.formValues, images_list: next } } }
+                              : n));
+                          }}
+                          className="absolute top-0.5 right-0.5 bg-black/60 hover:bg-black text-white rounded px-1 text-[10px] opacity-0 group-hover/refimg:opacity-100 transition-opacity"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
             {/* Face reference badge — shown when a CharacterNode feeds this video node */}
             {selectedNode?.type === "videoNode" && selectedNode?.data?.formValues?.face_asset && (() => {
               const fa = String(selectedNode.data.formValues.face_asset);

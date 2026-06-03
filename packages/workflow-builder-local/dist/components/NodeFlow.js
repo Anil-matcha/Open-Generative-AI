@@ -270,7 +270,7 @@ var processWorkflowData = function processWorkflowData(workflowData, nodeSchemas
   };
 };
 var NodeFlow = function NodeFlow(_ref) {
-  var _initialState$metadat, _initialState$metadat2, _initialState$metadat3, _initialState$metadat4, _initialState$metadat5, _initialState$metadat6, _initialState$metadat7, _nodeSchemas$categori3, _selectedNode$data, _selectedNode$data2, _selectedNode$data3, _selectedNode$data6, _selectedNode$data16, _selectedNode$data17, _selectedNode$data18, _selectedNode$data19, _selectedNode$data20;
+  var _initialState$metadat, _initialState$metadat2, _initialState$metadat3, _initialState$metadat4, _initialState$metadat5, _initialState$metadat6, _initialState$metadat7, _nodeSchemas$categori3, _selectedNode$data, _selectedNode$data2, _selectedNode$data3, _selectedNode$data6, _selectedNode$data16, _selectedNode$data17, _selectedNode$data18, _selectedNode$data19, _selectedNode$data20, _selectedNode$data21;
   var initialNodeSchemas = _ref.initialNodeSchemas,
     initialWorkflowData = _ref.initialWorkflowData;
   var params = (0, _navigation.useParams)();
@@ -2952,7 +2952,47 @@ var NodeFlow = function NodeFlow(_ref) {
     className: "text-center py-8"
   }, /*#__PURE__*/_react["default"].createElement("p", {
     className: "text-sm text-gray-400"
-  }, "Please select a model first")))), (selectedNode === null || selectedNode === void 0 ? void 0 : selectedNode.type) === "videoNode" && (selectedNode === null || selectedNode === void 0 || (_selectedNode$data16 = selectedNode.data) === null || _selectedNode$data16 === void 0 || (_selectedNode$data16 = _selectedNode$data16.formValues) === null || _selectedNode$data16 === void 0 ? void 0 : _selectedNode$data16.face_asset) && function () {
+  }, "Please select a model first")))), (selectedNode === null || selectedNode === void 0 ? void 0 : selectedNode.type) === "videoNode" && Array.isArray(selectedNode === null || selectedNode === void 0 || (_selectedNode$data16 = selectedNode.data) === null || _selectedNode$data16 === void 0 || (_selectedNode$data16 = _selectedNode$data16.formValues) === null || _selectedNode$data16 === void 0 ? void 0 : _selectedNode$data16.images_list) && selectedNode.data.formValues.images_list.filter(Boolean).length > 0 && function () {
+    var list = selectedNode.data.formValues.images_list.filter(Boolean);
+    return /*#__PURE__*/_react["default"].createElement("div", {
+      className: "px-4 pb-3"
+    }, /*#__PURE__*/_react["default"].createElement("p", {
+      className: "text-[10px] font-semibold text-emerald-300 uppercase tracking-wider mb-1.5"
+    }, "\u0414\u043E\u043F. \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u044F (", list.length, ")"), /*#__PURE__*/_react["default"].createElement("div", {
+      className: "grid grid-cols-3 gap-1.5"
+    }, list.map(function (u, i) {
+      return /*#__PURE__*/_react["default"].createElement("div", {
+        key: "".concat(u, "-").concat(i),
+        className: "relative group/refimg rounded-lg overflow-hidden border border-emerald-500/30"
+      }, /*#__PURE__*/_react["default"].createElement("img", {
+        src: u,
+        alt: "ref ".concat(i + 1),
+        className: "w-full h-16 object-cover",
+        onError: function onError(e) {
+          e.target.style.display = 'none';
+        }
+      }), /*#__PURE__*/_react["default"].createElement("button", {
+        type: "button",
+        onClick: function onClick() {
+          var next = list.filter(function (_, idx) {
+            return idx !== i;
+          });
+          setNodes(function (nds) {
+            return nds.map(function (n) {
+              return n.id === selectedNode.id ? _objectSpread(_objectSpread({}, n), {}, {
+                data: _objectSpread(_objectSpread({}, n.data), {}, {
+                  formValues: _objectSpread(_objectSpread({}, n.data.formValues), {}, {
+                    images_list: next
+                  })
+                })
+              }) : n;
+            });
+          });
+        },
+        className: "absolute top-0.5 right-0.5 bg-black/60 hover:bg-black text-white rounded px-1 text-[10px] opacity-0 group-hover/refimg:opacity-100 transition-opacity"
+      }, "\xD7"));
+    })));
+  }(), (selectedNode === null || selectedNode === void 0 ? void 0 : selectedNode.type) === "videoNode" && (selectedNode === null || selectedNode === void 0 || (_selectedNode$data17 = selectedNode.data) === null || _selectedNode$data17 === void 0 || (_selectedNode$data17 = _selectedNode$data17.formValues) === null || _selectedNode$data17 === void 0 ? void 0 : _selectedNode$data17.face_asset) && function () {
     var fa = String(selectedNode.data.formValues.face_asset);
     var isAsset = fa.startsWith("asset://");
     var thumb = selectedNode.data.formValues.face_thumbnail;
@@ -2992,7 +3032,7 @@ var NodeFlow = function NodeFlow(_ref) {
   }, /*#__PURE__*/_react["default"].createElement("input", {
     type: "checkbox",
     className: "sr-only peer",
-    checked: (selectedNode === null || selectedNode === void 0 || (_selectedNode$data17 = selectedNode.data) === null || _selectedNode$data17 === void 0 || (_selectedNode$data17 = _selectedNode$data17.formValues) === null || _selectedNode$data17 === void 0 ? void 0 : _selectedNode$data17.make_output) === true,
+    checked: (selectedNode === null || selectedNode === void 0 || (_selectedNode$data18 = selectedNode.data) === null || _selectedNode$data18 === void 0 || (_selectedNode$data18 = _selectedNode$data18.formValues) === null || _selectedNode$data18 === void 0 ? void 0 : _selectedNode$data18.make_output) === true,
     onChange: function onChange(e) {
       var checked = e.target.checked;
       setNodes(function (nds) {
@@ -3011,15 +3051,15 @@ var NodeFlow = function NodeFlow(_ref) {
     className: "w-9 h-5 bg-gray-700 rounded-full peer peer-checked:bg-blue-600 transition-colors"
   }), /*#__PURE__*/_react["default"].createElement("div", {
     className: "absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full peer-checked:translate-x-4 transition-transform"
-  }))), !(selectedNode !== null && selectedNode !== void 0 && (_selectedNode$data18 = selectedNode.data) !== null && _selectedNode$data18 !== void 0 && (_selectedNode$data18 = _selectedNode$data18.selectedModel) !== null && _selectedNode$data18 !== void 0 && (_selectedNode$data18 = _selectedNode$data18.id) !== null && _selectedNode$data18 !== void 0 && _selectedNode$data18.includes("passthrough")) && /*#__PURE__*/_react["default"].createElement("button", {
+  }))), !(selectedNode !== null && selectedNode !== void 0 && (_selectedNode$data19 = selectedNode.data) !== null && _selectedNode$data19 !== void 0 && (_selectedNode$data19 = _selectedNode$data19.selectedModel) !== null && _selectedNode$data19 !== void 0 && (_selectedNode$data19 = _selectedNode$data19.id) !== null && _selectedNode$data19 !== void 0 && _selectedNode$data19.includes("passthrough")) && /*#__PURE__*/_react["default"].createElement("button", {
     type: "button",
     suppressHydrationWarning: true,
     onClick: function onClick() {
       return selectedNode && runNodeFromFlow(selectedNode.id);
     },
-    disabled: loadingNodes[selectedNode.id] || (selectedNode === null || selectedNode === void 0 || (_selectedNode$data19 = selectedNode.data) === null || _selectedNode$data19 === void 0 ? void 0 : _selectedNode$data19.isLoading),
+    disabled: loadingNodes[selectedNode.id] || (selectedNode === null || selectedNode === void 0 || (_selectedNode$data20 = selectedNode.data) === null || _selectedNode$data20 === void 0 ? void 0 : _selectedNode$data20.isLoading),
     className: "text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 group disabled:cursor-not-allowed rounded-lg text-white bg-blue-500 px-4 py-2 border border-blue-500/50 hover:bg-blue-600 w-full transition-all shadow-lg shadow-blue-900/20 active:scale-[0.98]"
-  }, loadingNodes[selectedNode.id] || selectedNode !== null && selectedNode !== void 0 && (_selectedNode$data20 = selectedNode.data) !== null && _selectedNode$data20 !== void 0 && _selectedNode$data20.isLoading ? /*#__PURE__*/_react["default"].createElement(_react["default"].Fragment, null, /*#__PURE__*/_react["default"].createElement("div", {
+  }, loadingNodes[selectedNode.id] || selectedNode !== null && selectedNode !== void 0 && (_selectedNode$data21 = selectedNode.data) !== null && _selectedNode$data21 !== void 0 && _selectedNode$data21.isLoading ? /*#__PURE__*/_react["default"].createElement(_react["default"].Fragment, null, /*#__PURE__*/_react["default"].createElement("div", {
     className: "w-4 h-4 rounded-full border-2 border-white/20 border-t-white animate-spin"
   }), "Generating...") : /*#__PURE__*/_react["default"].createElement(_react["default"].Fragment, null, /*#__PURE__*/_react["default"].createElement(_fa.FaPlay, {
     size: 16
