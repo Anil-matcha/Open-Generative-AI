@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { generateImage, generateI2I, uploadFile, persistImageToTOS } from "../muapi.js";
+import { useRouter } from "next/navigation";
+import { generateImage, generateI2I, uploadFile, persistImageToTOS, getUserWorkflows } from "../muapi.js";
 import {
   t2iModels,
   i2iModels,
@@ -759,6 +760,35 @@ export default function ImageStudio({
   const PERSIST_KEY = "mf_image_studio_persistent";
   const PENDING_KEY = "mf_image_studio_pending";
 
+  const router = useRouter();
+  const [workflowPicker, setWorkflowPicker] = useState(null); // { url, prompt } | null
+  const [pickerWorkflows, setPickerWorkflows] = useState([]);
+  const [pickerLoading, setPickerLoading] = useState(false);
+
+  const openWorkflowPicker = async (url, prompt) => {
+    setWorkflowPicker({ url, prompt });
+    setPickerLoading(true);
+    try {
+      const data = await getUserWorkflows(apiKey);
+      setPickerWorkflows(data || []);
+    } catch {
+      setPickerWorkflows([]);
+    } finally {
+      setPickerLoading(false);
+    }
+  };
+
+  const sendToWorkflow = (wf) => {
+    try {
+      localStorage.setItem("mf_pending_workflow_image", JSON.stringify({
+        url: workflowPicker.url,
+        workflowId: wf.id,
+      }));
+    } catch {}
+    setWorkflowPicker(null);
+    router.push(`/workflow/${wf.id}/builder`);
+  };
+
   // ── Model / mode state ──────────────────────────────────────────────────
   const [imageMode, setImageMode] = useState(false); // false=t2i, true=i2i
   const [selectedModelId, setSelectedModelId] = useState(t2iModels[0].id);
@@ -1363,6 +1393,19 @@ export default function ImageStudio({
                       <line x1="14" y1="11" x2="14" y2="17" />
                     </svg>
                   </button>
+                  <button
+                    type="button"
+                    title="Отправить в воркфлоу"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openWorkflowPicker(entry.url, entry.prompt);
+                    }}
+                    className="p-2 bg-black/60 backdrop-blur-md rounded-full text-white hover:bg-[#22d3ee] hover:text-black transition-all border border-white/10"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                    </svg>
+                  </button>
                 </div>
 
                 {/* Prompt & Details */}
@@ -1868,6 +1911,42 @@ export default function ImageStudio({
       </div>
 
       {/* ── FULLSCREEN IMAGE MODAL ── */}
+      {workflowPicker && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-6">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => setWorkflowPicker(null)} />
+          <div className="relative w-full max-w-xs bg-[#0a0a0a] border border-white/10 rounded-2xl p-6 shadow-2xl animate-fade-in-up">
+            <h3 className="text-sm font-black text-white mb-1 uppercase tracking-widest">Добавить в воркфлоу</h3>
+            <p className="text-white/40 text-xs mb-5">Изображение добавится как входной нод</p>
+            {pickerLoading ? (
+              <div className="py-8 flex justify-center">
+                <div className="w-8 h-8 border-2 border-white/10 border-t-[#22d3ee] rounded-full animate-spin" />
+              </div>
+            ) : pickerWorkflows.length === 0 ? (
+              <p className="text-white/30 text-xs text-center py-6">Нет воркфлоу</p>
+            ) : (
+              <div className="space-y-2 max-h-64 overflow-y-auto custom-scrollbar">
+                {pickerWorkflows.map((wf) => (
+                  <button
+                    key={wf.id}
+                    type="button"
+                    onClick={() => sendToWorkflow(wf)}
+                    className="w-full text-left px-4 py-3 rounded-xl bg-white/5 hover:bg-[#22d3ee]/10 border border-white/5 hover:border-[#22d3ee]/30 transition-all group flex items-center gap-3"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-white/30 group-hover:text-[#22d3ee] flex-shrink-0">
+                      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                    </svg>
+                    <span className="text-sm font-bold text-white group-hover:text-[#22d3ee] truncate">{wf.name || "Untitled Workflow"}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+            <button type="button" onClick={() => setWorkflowPicker(null)} className="mt-4 w-full py-2 text-xs text-white/30 hover:text-white transition-colors">
+              Отмена
+            </button>
+          </div>
+        </div>
+      )}
+
       {fullscreenUrl && (
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-sm animate-fade-in"

@@ -307,12 +307,30 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
         setLoading(true);
         const wfId = selectedWorkflow.id;
 
-        const [nodes, def] = await Promise.all([
+        const [nodes, rawDef] = await Promise.all([
           getAllNodeSchemas(apiKey, wfId).catch(() => []),
           getWorkflowData(apiKey, wfId).catch(() => ({ nodes: [], edges: [] })),
         ]);
+        let def = rawDef;
 
         setNodeSchemas(filterWorkflowImageModels(nodes));
+
+        // Inject a pending image from Photo Studio if the user navigated here via "Send to Workflow"
+        let pendingImage;
+        try { pendingImage = JSON.parse(localStorage.getItem("mf_pending_workflow_image")); } catch {}
+        if (pendingImage?.url && pendingImage?.workflowId === wfId) {
+          localStorage.removeItem("mf_pending_workflow_image");
+          const injectedNode = {
+            id: `image_${Date.now()}`,
+            category: "image",
+            model: "image-passthrough",
+            position: { x: 50, y: 50 },
+            input_params: { images_list: [pendingImage.url] },
+            output_params: {},
+          };
+          def = { ...def, data: { ...def.data, nodes: [injectedNode, ...(def.data?.nodes || [])] } };
+        }
+
         setWorkflowDef(def);
       } catch (err) {
         console.error("Error loading workflow:", err);
