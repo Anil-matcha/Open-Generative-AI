@@ -1004,7 +1004,15 @@ export default function VideoStudio({
     try { stored = JSON.parse(localStorage.getItem(ARK_TASK_KEY)); } catch {}
     if (!stored?.taskId) return;
 
+    // Cancelled becomes true when this component instance unmounts. Any async
+    // operations that complete after unmount skip UI updates and gallery saves,
+    // preventing duplicate saves when the user navigates back and forth while
+    // a generation is in progress (each mount would otherwise start a new poll
+    // and all of them would fire gallery saves when the task eventually finishes).
+    let cancelled = false;
+
     const showResult = (url, genId) => {
+      if (cancelled) return;
       localStorage.removeItem(ARK_TASK_KEY);
       setLastGenerationId(genId);
       setLastGenerationModel(stored.model);
@@ -1024,7 +1032,7 @@ export default function VideoStudio({
     // Task already finished while we were away — show result immediately.
     if (stored.status === "done" && stored.resultUrl) {
       showResult(stored.resultUrl, stored.genId || stored.taskId);
-      return;
+      return () => { cancelled = true; };
     }
 
     // Task still in progress — resume polling.
@@ -1033,11 +1041,14 @@ export default function VideoStudio({
     pollArkTask(stored.taskId)
       .then((res) => showResult(res.url, res.id || stored.taskId))
       .catch((e) => {
+        if (cancelled) return;
         localStorage.removeItem(ARK_TASK_KEY);
         setGenerateError(e.message?.slice(0, 80) || "Ошибка генерации");
         setTimeout(() => setGenerateError(null), 4000);
       })
-      .finally(() => setGenerating(false));
+      .finally(() => { if (!cancelled) setGenerating(false); });
+
+    return () => { cancelled = true; };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── generate ──────────────────────────────────────────────────────────────
