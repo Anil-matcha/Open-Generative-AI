@@ -1928,12 +1928,6 @@ var NodeFlow = function NodeFlow(_ref) {
     };
   }();
   var runNodeFromFlow = function runNodeFromFlow(nodeId) {
-    console.log("🟢[GEN] runNodeFromFlow click →", nodeId);
-    try {
-      (0, _reactHotToast.toast)("\u25B6 run ".concat(nodeId), {
-        icon: "🟢"
-      });
-    } catch (_unused) {}
     setNodes(function (nds) {
       return nds.map(function (n) {
         return n.id === nodeId ? _objectSpread(_objectSpread({}, n), {}, {

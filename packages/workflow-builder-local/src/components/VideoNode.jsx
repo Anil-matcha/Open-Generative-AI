@@ -398,8 +398,6 @@ const VideoGeneration = ({ id, data, selected }) => {
   };
 
   const handleRunSingleNode = async () => {
-    console.log("🟢[GEN] handleRunSingleNode", { id, inFlight: inFlightRef.current, selModel: selectedModel?.id, dataModel: data.selectedModel?.id });
-    try { toast(`run node: ${selectedModel?.id || data.selectedModel?.id || "?"}`, { icon: "🛠️", duration: 4000 }); } catch {}
     // Prevent duplicate billing: ignore re-entry while a generation is in flight.
     // Give visible feedback instead of silently doing nothing — a video request
     // stays pending for the whole generation (ARK polls up to ~290s), so a second
@@ -410,7 +408,6 @@ const VideoGeneration = ({ id, data, selected }) => {
       // component re-rendered). Clear the flag and proceed instead of blocking the
       // user forever on "Генерация уже идёт".
       if (!data.isLoading) {
-        console.log("🟢[GEN] stale inFlight flag — clearing and proceeding");
         inFlightRef.current = false;
       } else {
         toast("Генерация уже идёт — подождите завершения", { icon: "⏳" });
@@ -429,8 +426,6 @@ const VideoGeneration = ({ id, data, selected }) => {
       // ("doubao-seedance-2-0-fast-260128", "Seedance 2.0 Fast", …).
       const modelHay = `${selectedModel?.id || ""} ${selectedModel?.name || ""} ${data.selectedModel?.id || ""} ${data.selectedModel?.name || ""}`.toLowerCase();
       const isSeedance = /seedance[\s-]*2/.test(modelHay);
-      console.log("🟢[GEN] path decision", { modelHay, isSeedance });
-      try { toast(`path: ${isSeedance ? "ARK ✅" : "server ⚠️"} (${selectedModel?.id || "?"})`, { icon: "🔎", duration: 6000 }); } catch {}
       if (isSeedance) {
         try {
           await runArkSeedanceBrowser();
