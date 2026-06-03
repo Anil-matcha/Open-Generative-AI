@@ -3008,9 +3008,7 @@ var NodeFlow = function NodeFlow(_ref) {
         onError: function onError(e) {
           e.target.style.display = 'none';
         }
-      }), item.primary && /*#__PURE__*/_react["default"].createElement("div", {
-        className: "absolute bottom-0.5 left-0.5 bg-emerald-600 text-white text-[7px] font-bold px-1 py-0.5 rounded uppercase tracking-wide"
-      }, "1\u0439 \u043A\u0430\u0434\u0440"), /*#__PURE__*/_react["default"].createElement("button", {
+      }), /*#__PURE__*/_react["default"].createElement("button", {
         type: "button",
         onClick: function onClick() {
           return removeAt(item);

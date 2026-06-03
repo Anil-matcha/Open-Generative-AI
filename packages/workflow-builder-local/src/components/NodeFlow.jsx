@@ -2727,11 +2727,6 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
                           className="w-full h-16 object-cover"
                           onError={(e) => { e.target.style.display = 'none'; }}
                         />
-                        {item.primary && (
-                          <div className="absolute bottom-0.5 left-0.5 bg-emerald-600 text-white text-[7px] font-bold px-1 py-0.5 rounded uppercase tracking-wide">
-                            1й кадр
-                          </div>
-                        )}
                         <button
                           type="button"
                           onClick={() => removeAt(item)}
