@@ -197,6 +197,59 @@ const UploadNode = ({ id, data, formValues, setFormValues, selectedModel, loadin
     return tags;
   }, [rfEdges, rfNodes, id, uploadType]);
 
+  // Image tags: если этот текст-нод кормит видео/изображение-ноду, к которой
+  // подключён Image-нод (image-passthrough), показываем кликабельный чип с превью.
+  // Клик вставляет @image в промпт.
+  const imageTags = useMemo(() => {
+    if (uploadType !== "text") return [];
+    const nodesArr = rfNodes ? Array.from(rfNodes.values()) : [];
+    const fedTargets = rfEdges.filter((e) => e.source === id).map((e) => e.target);
+    const targetSet = new Set(
+      fedTargets.filter((tid) => {
+        const n = nodesArr.find((nn) => nn.id === tid);
+        return n?.type === "videoNode" || n?.type === "imageNode";
+      })
+    );
+    if (!targetSet.size) return [];
+    const imgIds = new Set(
+      rfEdges
+        .filter((e) => targetSet.has(e.target))
+        .map((e) => e.source)
+        .filter((sid) => {
+          const n = nodesArr.find((nn) => nn.id === sid);
+          return n?.type === "imageNode" && n?.data?.selectedModel?.id === "image-passthrough";
+        })
+    );
+    const tags = [];
+    for (const iid of imgIds) {
+      const inode = nodesArr.find((nn) => nn.id === iid);
+      const fv = inode?.data?.formValues || {};
+      const url = fv.image_url || null;
+      if (url) tags.push({ id: iid, url });
+    }
+    return tags;
+  }, [rfEdges, rfNodes, id, uploadType]);
+
+  const insertImageTag = (url) => {
+    const filename = url.split("/").pop()?.split("?")[0] || "image";
+    const token = "@" + filename.replace(/\.[^.]+$/, "").slice(0, 20) + " ";
+    const ta = textareaRef.current;
+    const cur = formValues?.prompt || "";
+    if (!ta) {
+      setFormValues((prev) => ({ ...prev, prompt: cur + token }));
+      return;
+    }
+    const start = ta.selectionStart ?? cur.length;
+    const end = ta.selectionEnd ?? cur.length;
+    const next = cur.slice(0, start) + token + cur.slice(end);
+    setFormValues((prev) => ({ ...prev, prompt: next }));
+    requestAnimationFrame(() => {
+      ta.focus();
+      const pos = start + token.length;
+      ta.setSelectionRange(pos, pos);
+    });
+  };
+
   const insertCharTag = (name) => {
     const token = "@" + String(name || "лицо").trim().replace(/\s+/g, "_") + " ";
     const ta = textareaRef.current;
@@ -230,7 +283,7 @@ const UploadNode = ({ id, data, formValues, setFormValues, selectedModel, loadin
       <div className="flex flex-col items-center justify-center w-full h-full flex-1">
         {uploadType === "text" ? (
           <div className="flex flex-col w-full h-full gap-1.5">
-            {characterTags.length > 0 && (
+            {(characterTags.length > 0 || imageTags.length > 0) && (
               <div className="flex flex-wrap gap-1.5">
                 {characterTags.map((t) => (
                   <button
@@ -246,6 +299,18 @@ const UploadNode = ({ id, data, formValues, setFormValues, selectedModel, loadin
                       <span className="w-7 h-7 rounded-md bg-purple-500/20 flex items-center justify-center text-[12px] flex-shrink-0">🙂</span>
                     )}
                     <span className="text-[10px]">@{t.name}</span>
+                  </button>
+                ))}
+                {imageTags.map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => insertImageTag(t.url)}
+                    title="Вставить ссылку на изображение в промпт"
+                    className="flex items-center gap-1.5 pl-1 pr-2 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/30 border border-emerald-500/30 text-emerald-200 transition-colors"
+                  >
+                    <img src={t.url} alt="image" className="w-7 h-7 rounded-md object-cover flex-shrink-0 border border-emerald-500/30" />
+                    <span className="text-[10px]">@image</span>
                   </button>
                 ))}
               </div>

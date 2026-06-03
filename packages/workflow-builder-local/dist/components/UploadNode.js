@@ -306,9 +306,67 @@ var UploadNode = function UploadNode(_ref) {
     }
     return tags;
   }, [rfEdges, rfNodes, id, uploadType]);
-  var insertCharTag = function insertCharTag(name) {
-    var _ta$selectionStart, _ta$selectionEnd;
-    var token = "@" + String(name || "лицо").trim().replace(/\s+/g, "_") + " ";
+
+  // Image tags: если этот текст-нод кормит видео/изображение-ноду, к которой
+  // подключён Image-нод (image-passthrough), показываем кликабельный чип с превью.
+  // Клик вставляет @image в промпт.
+  var imageTags = (0, _react.useMemo)(function () {
+    if (uploadType !== "text") return [];
+    var nodesArr = rfNodes ? Array.from(rfNodes.values()) : [];
+    var fedTargets = rfEdges.filter(function (e) {
+      return e.source === id;
+    }).map(function (e) {
+      return e.target;
+    });
+    var targetSet = new Set(fedTargets.filter(function (tid) {
+      var n = nodesArr.find(function (nn) {
+        return nn.id === tid;
+      });
+      return (n === null || n === void 0 ? void 0 : n.type) === "videoNode" || (n === null || n === void 0 ? void 0 : n.type) === "imageNode";
+    }));
+    if (!targetSet.size) return [];
+    var imgIds = new Set(rfEdges.filter(function (e) {
+      return targetSet.has(e.target);
+    }).map(function (e) {
+      return e.source;
+    }).filter(function (sid) {
+      var _n$data;
+      var n = nodesArr.find(function (nn) {
+        return nn.id === sid;
+      });
+      return (n === null || n === void 0 ? void 0 : n.type) === "imageNode" && (n === null || n === void 0 || (_n$data = n.data) === null || _n$data === void 0 || (_n$data = _n$data.selectedModel) === null || _n$data === void 0 ? void 0 : _n$data.id) === "image-passthrough";
+    }));
+    var tags = [];
+    var _iterator2 = _createForOfIteratorHelper(imgIds),
+      _step2;
+    try {
+      var _loop2 = function _loop2() {
+        var _inode$data;
+        var iid = _step2.value;
+        var inode = nodesArr.find(function (nn) {
+          return nn.id === iid;
+        });
+        var fv = (inode === null || inode === void 0 || (_inode$data = inode.data) === null || _inode$data === void 0 ? void 0 : _inode$data.formValues) || {};
+        var url = fv.image_url || null;
+        if (url) tags.push({
+          id: iid,
+          url: url
+        });
+      };
+      for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+        _loop2();
+      }
+    } catch (err) {
+      _iterator2.e(err);
+    } finally {
+      _iterator2.f();
+    }
+    return tags;
+  }, [rfEdges, rfNodes, id, uploadType]);
+  var insertImageTag = function insertImageTag(url) {
+    var _url$split$pop, _ta$selectionStart, _ta$selectionEnd;
+    var filename = ((_url$split$pop = url.split("/").pop()) === null || _url$split$pop === void 0 ? void 0 : _url$split$pop.split("?")[0]) || "image";
+    var token = "@" + filename.replace(/\.[^.]+$/, "").slice(0, 20) + " ";
     var ta = textareaRef.current;
     var cur = (formValues === null || formValues === void 0 ? void 0 : formValues.prompt) || "";
     if (!ta) {
@@ -321,6 +379,33 @@ var UploadNode = function UploadNode(_ref) {
     }
     var start = (_ta$selectionStart = ta.selectionStart) !== null && _ta$selectionStart !== void 0 ? _ta$selectionStart : cur.length;
     var end = (_ta$selectionEnd = ta.selectionEnd) !== null && _ta$selectionEnd !== void 0 ? _ta$selectionEnd : cur.length;
+    var next = cur.slice(0, start) + token + cur.slice(end);
+    setFormValues(function (prev) {
+      return _objectSpread(_objectSpread({}, prev), {}, {
+        prompt: next
+      });
+    });
+    requestAnimationFrame(function () {
+      ta.focus();
+      var pos = start + token.length;
+      ta.setSelectionRange(pos, pos);
+    });
+  };
+  var insertCharTag = function insertCharTag(name) {
+    var _ta$selectionStart2, _ta$selectionEnd2;
+    var token = "@" + String(name || "лицо").trim().replace(/\s+/g, "_") + " ";
+    var ta = textareaRef.current;
+    var cur = (formValues === null || formValues === void 0 ? void 0 : formValues.prompt) || "";
+    if (!ta) {
+      setFormValues(function (prev) {
+        return _objectSpread(_objectSpread({}, prev), {}, {
+          prompt: cur + token
+        });
+      });
+      return;
+    }
+    var start = (_ta$selectionStart2 = ta.selectionStart) !== null && _ta$selectionStart2 !== void 0 ? _ta$selectionStart2 : cur.length;
+    var end = (_ta$selectionEnd2 = ta.selectionEnd) !== null && _ta$selectionEnd2 !== void 0 ? _ta$selectionEnd2 : cur.length;
     var next = cur.slice(0, start) + token + cur.slice(end);
     setFormValues(function (prev) {
       return _objectSpread(_objectSpread({}, prev), {}, {
@@ -347,7 +432,7 @@ var UploadNode = function UploadNode(_ref) {
     className: "flex flex-col items-center justify-center w-full h-full flex-1"
   }, uploadType === "text" ? /*#__PURE__*/_react["default"].createElement("div", {
     className: "flex flex-col w-full h-full gap-1.5"
-  }, characterTags.length > 0 && /*#__PURE__*/_react["default"].createElement("div", {
+  }, (characterTags.length > 0 || imageTags.length > 0) && /*#__PURE__*/_react["default"].createElement("div", {
     className: "flex flex-wrap gap-1.5"
   }, characterTags.map(function (t) {
     return /*#__PURE__*/_react["default"].createElement("button", {
@@ -367,6 +452,22 @@ var UploadNode = function UploadNode(_ref) {
     }, "\uD83D\uDE42"), /*#__PURE__*/_react["default"].createElement("span", {
       className: "text-[10px]"
     }, "@", t.name));
+  }), imageTags.map(function (t) {
+    return /*#__PURE__*/_react["default"].createElement("button", {
+      key: t.id,
+      type: "button",
+      onClick: function onClick() {
+        return insertImageTag(t.url);
+      },
+      title: "\u0412\u0441\u0442\u0430\u0432\u0438\u0442\u044C \u0441\u0441\u044B\u043B\u043A\u0443 \u043D\u0430 \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435 \u0432 \u043F\u0440\u043E\u043C\u043F\u0442",
+      className: "flex items-center gap-1.5 pl-1 pr-2 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/30 border border-emerald-500/30 text-emerald-200 transition-colors"
+    }, /*#__PURE__*/_react["default"].createElement("img", {
+      src: t.url,
+      alt: "image",
+      className: "w-7 h-7 rounded-md object-cover flex-shrink-0 border border-emerald-500/30"
+    }), /*#__PURE__*/_react["default"].createElement("span", {
+      className: "text-[10px]"
+    }, "@image"));
   })), /*#__PURE__*/_react["default"].createElement("textarea", {
     ref: textareaRef,
     className: "bg-transparent border border-gray-800 w-full h-full max-h-96 p-2 text-xs text-white resize-none overflow-y-auto custom-scrollbar",
