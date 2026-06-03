@@ -533,6 +533,8 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
         // lands on, instead of treating it as a first-frame image.
         if (sourceNode?.type === "characterNode" && node.type === "videoNode") {
           updatedFormValues.face_asset = resultValue;
+          updatedFormValues.face_thumbnail =
+            sourceNode?.data?.formValues?.character_photo || updatedFormValues.face_thumbnail || null;
         }
 
         else if (["textInput", "imageInput", "videoInput", "audioInput2", "apiInput"].includes(targetHandle)) {
@@ -744,9 +746,20 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
               }
             }
 
-            // CharacterNode → VideoNode: treat the face reference as face_asset.
+            // CharacterNode → VideoNode: treat the face reference as face_asset,
+            // carry the thumbnail for display, and tag @Name into the prompt
+            // (same UX as Video Studio).
             if (sourceNode?.type === "characterNode" && n.type === "videoNode") {
               updatedFormValues.face_asset = resultValue || null;
+              updatedFormValues.face_thumbnail = sourceNode?.data?.formValues?.character_photo || null;
+              const cname = sourceNode?.data?.formValues?.character_name;
+              if (cname && cname.trim()) {
+                const token = "@" + cname.trim().replace(/\s+/g, "_");
+                const cur = updatedFormValues.prompt || "";
+                if (!cur.includes(token)) {
+                  updatedFormValues.prompt = (cur ? cur.trimEnd() + " " : "") + token;
+                }
+              }
             }
 
             if (color === "blue") {
@@ -1011,6 +1024,29 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
       const updatedEdges = eds.filter((e) => e.id !== edge.id);
 
       const targetNode = nodes.find((n) => n.id === edge.target);
+
+      // Disconnecting a Character node from a video node: clear the face
+      // reference and strip its @Name token out of the prompt.
+      const removedSource = nodes.find((n) => n.id === edge.source);
+      if (removedSource?.type === "characterNode" && targetNode?.type === "videoNode") {
+        const cname = removedSource?.data?.formValues?.character_name;
+        const token = cname && cname.trim() ? "@" + cname.trim().replace(/\s+/g, "_") : null;
+        setNodes((prev) =>
+          prev.map((n) => {
+            if (n.id !== targetNode.id) return n;
+            let updatedFormValues = { ...n.data.formValues };
+            updatedFormValues.face_asset = null;
+            updatedFormValues.face_thumbnail = null;
+            if (token && typeof updatedFormValues.prompt === "string") {
+              updatedFormValues.prompt = updatedFormValues.prompt
+                .replace(new RegExp("\\s*" + token.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\b", "g"), "")
+                .trim();
+            }
+            return { ...n, data: { ...n.data, formValues: updatedFormValues } };
+          })
+        );
+      }
+
       if (targetNode?.type === "concatNode" && edge.targetHandle === "concatInput") {
         setNodes((prev) =>
           prev.map((n) => {
@@ -2637,27 +2673,32 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
             {selectedNode?.type === "videoNode" && selectedNode?.data?.formValues?.face_asset && (() => {
               const fa = String(selectedNode.data.formValues.face_asset);
               const isAsset = fa.startsWith("asset://");
+              const thumb = selectedNode.data.formValues.face_thumbnail;
+              // Prefer the stored thumbnail; fall back to the asset value itself
+              // when it's a plain image URL.
+              const photo = thumb || (!isAsset ? fa : null);
               return (
                 <div className="px-4 pb-3">
                   <p className="text-[10px] font-semibold text-purple-300 uppercase tracking-wider mb-1.5">
                     Референс лица
                   </p>
-                  {isAsset ? (
-                    <div className="flex items-center gap-2 rounded-lg bg-purple-900/20 border border-purple-500/30 px-2.5 py-2">
-                      <div className="w-4 h-4 rounded-full bg-purple-600 flex-shrink-0" />
-                      <span className="text-[10px] font-mono text-purple-200 truncate">{fa}</span>
-                    </div>
-                  ) : (
-                    <div className="rounded-xl overflow-hidden border border-purple-500/30 relative">
+                  {photo && (
+                    <div className="rounded-xl overflow-hidden border border-purple-500/30 relative mb-1.5">
                       <img
-                        src={fa}
+                        src={photo}
                         alt="face reference"
                         className="w-full h-28 object-cover object-top"
-                        onError={(e) => { e.target.parentElement.style.display = 'none'; }}
+                        onError={(e) => { e.target.style.display = 'none'; }}
                       />
                       <div className="absolute top-1.5 right-1.5 bg-purple-600 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wide">
                         Face
                       </div>
+                    </div>
+                  )}
+                  {isAsset && (
+                    <div className="flex items-center gap-2 rounded-lg bg-purple-900/20 border border-purple-500/30 px-2.5 py-2">
+                      <div className="w-4 h-4 rounded-full bg-purple-600 flex-shrink-0" />
+                      <span className="text-[10px] font-mono text-purple-200 truncate">{fa}</span>
                     </div>
                   )}
                 </div>

@@ -687,7 +687,9 @@ var NodeFlow = function NodeFlow(_ref) {
         // it to face_asset (reference_image) regardless of which image handle it
         // lands on, instead of treating it as a first-frame image.
         if ((sourceNode === null || sourceNode === void 0 ? void 0 : sourceNode.type) === "characterNode" && node.type === "videoNode") {
+          var _sourceNode$data2;
           updatedFormValues.face_asset = resultValue;
+          updatedFormValues.face_thumbnail = (sourceNode === null || sourceNode === void 0 || (_sourceNode$data2 = sourceNode.data) === null || _sourceNode$data2 === void 0 || (_sourceNode$data2 = _sourceNode$data2.formValues) === null || _sourceNode$data2 === void 0 ? void 0 : _sourceNode$data2.character_photo) || updatedFormValues.face_thumbnail || null;
         } else if (["textInput", "imageInput", "videoInput", "audioInput2", "apiInput"].includes(targetHandle)) {
           updatedFormValues.prompt = sourceValue;
         } else if (targetHandle === "textInput4") {
@@ -761,11 +763,11 @@ var NodeFlow = function NodeFlow(_ref) {
           });
         }
         var concatValues = allConcatEdges.map(function (e) {
-          var _sourceNode$data2, _sourceNode$data3;
+          var _sourceNode$data3, _sourceNode$data4;
           var sourceNode = updatedNodes.find(function (n) {
             return n.id === e.source;
           });
-          return (sourceNode === null || sourceNode === void 0 || (_sourceNode$data2 = sourceNode.data) === null || _sourceNode$data2 === void 0 ? void 0 : _sourceNode$data2.resultUrl) || (sourceNode === null || sourceNode === void 0 || (_sourceNode$data3 = sourceNode.data) === null || _sourceNode$data3 === void 0 || (_sourceNode$data3 = _sourceNode$data3.outputs) === null || _sourceNode$data3 === void 0 || (_sourceNode$data3 = _sourceNode$data3[0]) === null || _sourceNode$data3 === void 0 ? void 0 : _sourceNode$data3.value) || "";
+          return (sourceNode === null || sourceNode === void 0 || (_sourceNode$data3 = sourceNode.data) === null || _sourceNode$data3 === void 0 ? void 0 : _sourceNode$data3.resultUrl) || (sourceNode === null || sourceNode === void 0 || (_sourceNode$data4 = sourceNode.data) === null || _sourceNode$data4 === void 0 || (_sourceNode$data4 = _sourceNode$data4.outputs) === null || _sourceNode$data4 === void 0 || (_sourceNode$data4 = _sourceNode$data4[0]) === null || _sourceNode$data4 === void 0 ? void 0 : _sourceNode$data4.value) || "";
         }).filter(function (v) {
           return typeof v === "string" && v.trim() !== "";
         });
@@ -799,7 +801,7 @@ var NodeFlow = function NodeFlow(_ref) {
       connectionMadeRef.current = true;
     }
     setEdges(function (eds) {
-      var _sourceData$outputs, _sourceNode$data4;
+      var _sourceData$outputs, _sourceNode$data5;
       var sourceNode = nodes.find(function (n) {
         return n.id === params.source;
       }) || {};
@@ -827,7 +829,7 @@ var NodeFlow = function NodeFlow(_ref) {
       var resultValue = sourceData.viewingOutput !== undefined ? sourceData.viewingOutput : sourceData.resultUrl || ((_sourceData$outputs = sourceData.outputs) === null || _sourceData$outputs === void 0 || (_sourceData$outputs = _sourceData$outputs[0]) === null || _sourceData$outputs === void 0 ? void 0 : _sourceData$outputs.value) || null;
       // if (!resultValue || resultValue.trim() === "") return newEdges;
 
-      var sourceValue = (sourceNode === null || sourceNode === void 0 ? void 0 : sourceNode.type) === "concatNode" ? sourceNode === null || sourceNode === void 0 || (_sourceNode$data4 = sourceNode.data) === null || _sourceNode$data4 === void 0 || (_sourceNode$data4 = _sourceNode$data4.formValues) === null || _sourceNode$data4 === void 0 ? void 0 : _sourceNode$data4.prompt : resultValue;
+      var sourceValue = (sourceNode === null || sourceNode === void 0 ? void 0 : sourceNode.type) === "concatNode" ? sourceNode === null || sourceNode === void 0 || (_sourceNode$data5 = sourceNode.data) === null || _sourceNode$data5 === void 0 || (_sourceNode$data5 = _sourceNode$data5.formValues) === null || _sourceNode$data5 === void 0 ? void 0 : _sourceNode$data5.prompt : resultValue;
       setNodes(function (prev) {
         return prev.map(function (n) {
           if (n.id !== targetNode.id) return n;
@@ -847,9 +849,21 @@ var NodeFlow = function NodeFlow(_ref) {
             }
           }
 
-          // CharacterNode → VideoNode: treat the face reference as face_asset.
+          // CharacterNode → VideoNode: treat the face reference as face_asset,
+          // carry the thumbnail for display, and tag @Name into the prompt
+          // (same UX as Video Studio).
           if ((sourceNode === null || sourceNode === void 0 ? void 0 : sourceNode.type) === "characterNode" && n.type === "videoNode") {
+            var _sourceNode$data6, _sourceNode$data7;
             updatedFormValues.face_asset = resultValue || null;
+            updatedFormValues.face_thumbnail = (sourceNode === null || sourceNode === void 0 || (_sourceNode$data6 = sourceNode.data) === null || _sourceNode$data6 === void 0 || (_sourceNode$data6 = _sourceNode$data6.formValues) === null || _sourceNode$data6 === void 0 ? void 0 : _sourceNode$data6.character_photo) || null;
+            var cname = sourceNode === null || sourceNode === void 0 || (_sourceNode$data7 = sourceNode.data) === null || _sourceNode$data7 === void 0 || (_sourceNode$data7 = _sourceNode$data7.formValues) === null || _sourceNode$data7 === void 0 ? void 0 : _sourceNode$data7.character_name;
+            if (cname && cname.trim()) {
+              var token = "@" + cname.trim().replace(/\s+/g, "_");
+              var cur = updatedFormValues.prompt || "";
+              if (!cur.includes(token)) {
+                updatedFormValues.prompt = (cur ? cur.trimEnd() + " " : "") + token;
+              }
+            }
           }
           if (color === "blue") {
             if (targetNode.type === "concatNode" && params.targetHandle === "concatInput") {
@@ -857,12 +871,12 @@ var NodeFlow = function NodeFlow(_ref) {
                 return e.target === targetNode.id && e.targetHandle === "concatInput";
               });
               var concatValues = allConcatEdges.map(function (e) {
-                var _sourceNode$data5, _sourceNode$data6;
+                var _sourceNode$data8, _sourceNode$data9;
                 if (e.source === params.source) return resultValue;
                 var sourceNode = prev.find(function (node) {
                   return node.id === e.source;
                 });
-                return (sourceNode === null || sourceNode === void 0 || (_sourceNode$data5 = sourceNode.data) === null || _sourceNode$data5 === void 0 ? void 0 : _sourceNode$data5.resultUrl) || (sourceNode === null || sourceNode === void 0 || (_sourceNode$data6 = sourceNode.data) === null || _sourceNode$data6 === void 0 || (_sourceNode$data6 = _sourceNode$data6.outputs) === null || _sourceNode$data6 === void 0 || (_sourceNode$data6 = _sourceNode$data6[0]) === null || _sourceNode$data6 === void 0 ? void 0 : _sourceNode$data6.value) || "";
+                return (sourceNode === null || sourceNode === void 0 || (_sourceNode$data8 = sourceNode.data) === null || _sourceNode$data8 === void 0 ? void 0 : _sourceNode$data8.resultUrl) || (sourceNode === null || sourceNode === void 0 || (_sourceNode$data9 = sourceNode.data) === null || _sourceNode$data9 === void 0 || (_sourceNode$data9 = _sourceNode$data9.outputs) === null || _sourceNode$data9 === void 0 || (_sourceNode$data9 = _sourceNode$data9[0]) === null || _sourceNode$data9 === void 0 ? void 0 : _sourceNode$data9.value) || "";
               }).filter(function (v) {
                 return v;
               });
@@ -1141,6 +1155,33 @@ var NodeFlow = function NodeFlow(_ref) {
       var targetNode = nodes.find(function (n) {
         return n.id === edge.target;
       });
+
+      // Disconnecting a Character node from a video node: clear the face
+      // reference and strip its @Name token out of the prompt.
+      var removedSource = nodes.find(function (n) {
+        return n.id === edge.source;
+      });
+      if ((removedSource === null || removedSource === void 0 ? void 0 : removedSource.type) === "characterNode" && (targetNode === null || targetNode === void 0 ? void 0 : targetNode.type) === "videoNode") {
+        var _removedSource$data;
+        var cname = removedSource === null || removedSource === void 0 || (_removedSource$data = removedSource.data) === null || _removedSource$data === void 0 || (_removedSource$data = _removedSource$data.formValues) === null || _removedSource$data === void 0 ? void 0 : _removedSource$data.character_name;
+        var token = cname && cname.trim() ? "@" + cname.trim().replace(/\s+/g, "_") : null;
+        setNodes(function (prev) {
+          return prev.map(function (n) {
+            if (n.id !== targetNode.id) return n;
+            var updatedFormValues = _objectSpread({}, n.data.formValues);
+            updatedFormValues.face_asset = null;
+            updatedFormValues.face_thumbnail = null;
+            if (token && typeof updatedFormValues.prompt === "string") {
+              updatedFormValues.prompt = updatedFormValues.prompt.replace(new RegExp("\\s*" + token.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\b", "g"), "").trim();
+            }
+            return _objectSpread(_objectSpread({}, n), {}, {
+              data: _objectSpread(_objectSpread({}, n.data), {}, {
+                formValues: updatedFormValues
+              })
+            });
+          });
+        });
+      }
       if ((targetNode === null || targetNode === void 0 ? void 0 : targetNode.type) === "concatNode" && edge.targetHandle === "concatInput") {
         setNodes(function (prev) {
           return prev.map(function (n) {
@@ -1151,11 +1192,11 @@ var NodeFlow = function NodeFlow(_ref) {
             var updatedFormValues = _objectSpread({}, n.data.formValues);
             if (remainingConcatEdges.length > 0) {
               var concatValues = remainingConcatEdges.map(function (e) {
-                var _sourceNode$data7, _sourceNode$data8;
+                var _sourceNode$data0, _sourceNode$data1;
                 var sourceNode = prev.find(function (node) {
                   return node.id === e.source;
                 });
-                return (sourceNode === null || sourceNode === void 0 || (_sourceNode$data7 = sourceNode.data) === null || _sourceNode$data7 === void 0 ? void 0 : _sourceNode$data7.resultUrl) || (sourceNode === null || sourceNode === void 0 || (_sourceNode$data8 = sourceNode.data) === null || _sourceNode$data8 === void 0 || (_sourceNode$data8 = _sourceNode$data8.outputs) === null || _sourceNode$data8 === void 0 || (_sourceNode$data8 = _sourceNode$data8[0]) === null || _sourceNode$data8 === void 0 ? void 0 : _sourceNode$data8.value) || "";
+                return (sourceNode === null || sourceNode === void 0 || (_sourceNode$data0 = sourceNode.data) === null || _sourceNode$data0 === void 0 ? void 0 : _sourceNode$data0.resultUrl) || (sourceNode === null || sourceNode === void 0 || (_sourceNode$data1 = sourceNode.data) === null || _sourceNode$data1 === void 0 || (_sourceNode$data1 = _sourceNode$data1.outputs) === null || _sourceNode$data1 === void 0 || (_sourceNode$data1 = _sourceNode$data1[0]) === null || _sourceNode$data1 === void 0 ? void 0 : _sourceNode$data1.value) || "";
               }).filter(function (v) {
                 return v;
               });
@@ -2006,7 +2047,7 @@ var NodeFlow = function NodeFlow(_ref) {
     });
   });
   var isValidConnection = function isValidConnection(connection) {
-    var _sourceNode$data9, _targetNode$data, _targetNode$data2, _targetNode$data3, _targetNode$data4;
+    var _sourceNode$data10, _targetNode$data, _targetNode$data2, _targetNode$data3, _targetNode$data4;
     var source = connection.source,
       target = connection.target,
       sourceHandle = connection.sourceHandle,
@@ -2024,7 +2065,7 @@ var NodeFlow = function NodeFlow(_ref) {
     if (sourceNode.type === "characterNode" && targetNode.type === "videoNode") {
       return ["videoInput2", "videoInput3", "videoInput6"].includes(targetHandle);
     }
-    var sourceType = sourceNode === null || sourceNode === void 0 || (_sourceNode$data9 = sourceNode.data) === null || _sourceNode$data9 === void 0 || (_sourceNode$data9 = _sourceNode$data9.handleTypes) === null || _sourceNode$data9 === void 0 ? void 0 : _sourceNode$data9[sourceHandle];
+    var sourceType = sourceNode === null || sourceNode === void 0 || (_sourceNode$data10 = sourceNode.data) === null || _sourceNode$data10 === void 0 || (_sourceNode$data10 = _sourceNode$data10.handleTypes) === null || _sourceNode$data10 === void 0 ? void 0 : _sourceNode$data10[sourceHandle];
     var targetType = targetNode === null || targetNode === void 0 || (_targetNode$data = targetNode.data) === null || _targetNode$data === void 0 || (_targetNode$data = _targetNode$data.handleTypes) === null || _targetNode$data === void 0 ? void 0 : _targetNode$data[targetHandle];
     if (!sourceType || !targetType || sourceType !== targetType && targetType !== 'white') return false;
     var isSourceOutput = sourceHandle.toLowerCase().includes("output");
@@ -2898,28 +2939,32 @@ var NodeFlow = function NodeFlow(_ref) {
   }, "Please select a model first")))), (selectedNode === null || selectedNode === void 0 ? void 0 : selectedNode.type) === "videoNode" && (selectedNode === null || selectedNode === void 0 || (_selectedNode$data16 = selectedNode.data) === null || _selectedNode$data16 === void 0 || (_selectedNode$data16 = _selectedNode$data16.formValues) === null || _selectedNode$data16 === void 0 ? void 0 : _selectedNode$data16.face_asset) && function () {
     var fa = String(selectedNode.data.formValues.face_asset);
     var isAsset = fa.startsWith("asset://");
+    var thumb = selectedNode.data.formValues.face_thumbnail;
+    // Prefer the stored thumbnail; fall back to the asset value itself
+    // when it's a plain image URL.
+    var photo = thumb || (!isAsset ? fa : null);
     return /*#__PURE__*/_react["default"].createElement("div", {
       className: "px-4 pb-3"
     }, /*#__PURE__*/_react["default"].createElement("p", {
       className: "text-[10px] font-semibold text-purple-300 uppercase tracking-wider mb-1.5"
-    }, "\u0420\u0435\u0444\u0435\u0440\u0435\u043D\u0441 \u043B\u0438\u0446\u0430"), isAsset ? /*#__PURE__*/_react["default"].createElement("div", {
+    }, "\u0420\u0435\u0444\u0435\u0440\u0435\u043D\u0441 \u043B\u0438\u0446\u0430"), photo && /*#__PURE__*/_react["default"].createElement("div", {
+      className: "rounded-xl overflow-hidden border border-purple-500/30 relative mb-1.5"
+    }, /*#__PURE__*/_react["default"].createElement("img", {
+      src: photo,
+      alt: "face reference",
+      className: "w-full h-28 object-cover object-top",
+      onError: function onError(e) {
+        e.target.style.display = 'none';
+      }
+    }), /*#__PURE__*/_react["default"].createElement("div", {
+      className: "absolute top-1.5 right-1.5 bg-purple-600 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wide"
+    }, "Face")), isAsset && /*#__PURE__*/_react["default"].createElement("div", {
       className: "flex items-center gap-2 rounded-lg bg-purple-900/20 border border-purple-500/30 px-2.5 py-2"
     }, /*#__PURE__*/_react["default"].createElement("div", {
       className: "w-4 h-4 rounded-full bg-purple-600 flex-shrink-0"
     }), /*#__PURE__*/_react["default"].createElement("span", {
       className: "text-[10px] font-mono text-purple-200 truncate"
-    }, fa)) : /*#__PURE__*/_react["default"].createElement("div", {
-      className: "rounded-xl overflow-hidden border border-purple-500/30 relative"
-    }, /*#__PURE__*/_react["default"].createElement("img", {
-      src: fa,
-      alt: "face reference",
-      className: "w-full h-28 object-cover object-top",
-      onError: function onError(e) {
-        e.target.parentElement.style.display = 'none';
-      }
-    }), /*#__PURE__*/_react["default"].createElement("div", {
-      className: "absolute top-1.5 right-1.5 bg-purple-600 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wide"
-    }, "Face")));
+    }, fa)));
   }(), /*#__PURE__*/_react["default"].createElement("div", {
     className: "p-4 flex flex-col gap-3"
   }, /*#__PURE__*/_react["default"].createElement("label", {
