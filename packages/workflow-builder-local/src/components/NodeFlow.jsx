@@ -565,7 +565,13 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
         }
 
         else if (["textInput2", "videoInput2", "imageInput3", "audioInput3"].includes(targetHandle)) {
-          updatedFormValues.image_url = resultValue;
+          if (targetHandle === "videoInput2" && updatedFormValues.image_url && updatedFormValues.image_url !== resultValue) {
+            const list = Array.isArray(updatedFormValues.images_list) ? [...updatedFormValues.images_list] : [];
+            if (!list.includes(resultValue) && resultValue && resultValue.trim() !== "") list.push(resultValue);
+            updatedFormValues.images_list = list;
+          } else {
+            updatedFormValues.image_url = resultValue;
+          }
         }
 
         else if (targetHandle === "apiInput3") {
@@ -787,7 +793,17 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
 
             if (color === "green") {
               if (["textInput2", "videoInput2", "imageInput3", "audioInput3"].includes(params.targetHandle)) {
-                updatedFormValues.image_url = resultValue || null;
+                // If image_url is already occupied on a videoNode, stack into images_list
+                // so both images reach Seedance as reference_images instead of overwriting.
+                if (params.targetHandle === "videoInput2" && updatedFormValues.image_url && updatedFormValues.image_url !== resultValue) {
+                  const list = Array.isArray(updatedFormValues.images_list) ? [...updatedFormValues.images_list] : [];
+                  if (!list.includes(resultValue) && resultValue && resultValue.trim() !== "") {
+                    list.push(resultValue);
+                  }
+                  updatedFormValues.images_list = list;
+                } else {
+                  updatedFormValues.image_url = resultValue || null;
+                }
               } else if (["textInput3", "imageInput2", "videoInput6"].includes(params.targetHandle)) {
                 const list = Array.isArray(updatedFormValues.images_list) ? [...updatedFormValues.images_list] : [];
                 if (!list.includes(resultValue) && resultValue && resultValue.trim() !== "") {

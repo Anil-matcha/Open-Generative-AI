@@ -709,7 +709,13 @@ var NodeFlow = function NodeFlow(_ref) {
           if (!list.includes(resultValue) && resultValue && resultValue.trim() !== "") list.push(resultValue);
           updatedFormValues.images = list;
         } else if (["textInput2", "videoInput2", "imageInput3", "audioInput3"].includes(targetHandle)) {
-          updatedFormValues.image_url = resultValue;
+          if (targetHandle === "videoInput2" && updatedFormValues.image_url && updatedFormValues.image_url !== resultValue) {
+            var _list = Array.isArray(updatedFormValues.images_list) ? _toConsumableArray(updatedFormValues.images_list) : [];
+            if (!_list.includes(resultValue) && resultValue && resultValue.trim() !== "") _list.push(resultValue);
+            updatedFormValues.images_list = _list;
+          } else {
+            updatedFormValues.image_url = resultValue;
+          }
         } else if (targetHandle === "apiInput3") {
           updatedFormValues.image = resultValue;
         } else if (targetHandle === "videoInput3") {
@@ -718,14 +724,14 @@ var NodeFlow = function NodeFlow(_ref) {
           updatedFormValues.video_url = resultValue;
         } else if (targetHandle === "videoInput7") {
           var key = updatedFormValues.video_files ? "video_files" : "videos_list";
-          var _list = Array.isArray(updatedFormValues[key]) ? _toConsumableArray(updatedFormValues[key]) : [];
-          if (!_list.includes(resultValue) && resultValue && resultValue.trim() !== "") _list.push(resultValue);
-          updatedFormValues[key] = _list;
+          var _list2 = Array.isArray(updatedFormValues[key]) ? _toConsumableArray(updatedFormValues[key]) : [];
+          if (!_list2.includes(resultValue) && resultValue && resultValue.trim() !== "") _list2.push(resultValue);
+          updatedFormValues[key] = _list2;
         } else if (targetHandle === "videoInput8") {
           var _key = updatedFormValues.audio_files ? "audio_files" : "audios_list";
-          var _list2 = Array.isArray(updatedFormValues[_key]) ? _toConsumableArray(updatedFormValues[_key]) : [];
-          if (!_list2.includes(resultValue) && resultValue && resultValue.trim() !== "") _list2.push(resultValue);
-          updatedFormValues[_key] = _list2;
+          var _list3 = Array.isArray(updatedFormValues[_key]) ? _toConsumableArray(updatedFormValues[_key]) : [];
+          if (!_list3.includes(resultValue) && resultValue && resultValue.trim() !== "") _list3.push(resultValue);
+          updatedFormValues[_key] = _list3;
         } else if (["videoInput5", "audioInput"].includes(targetHandle)) {
           updatedFormValues.audio_url = resultValue;
         } else if (node.type === "apiNode") {
@@ -733,11 +739,11 @@ var NodeFlow = function NodeFlow(_ref) {
           var listFields = ["images", "image_urls", "images_list"];
           var isList = listFields.includes(targetHandle) || ((_node$data$taskData = node.data.taskData) === null || _node$data$taskData === void 0 || (_node$data$taskData = _node$data$taskData[targetHandle]) === null || _node$data$taskData === void 0 ? void 0 : _node$data$taskData.type) === "array";
           if (isList) {
-            var _list3 = Array.isArray(updatedFormValues[targetHandle]) ? _toConsumableArray(updatedFormValues[targetHandle]) : [];
-            if (sourceValue && sourceValue.trim() !== "" && !_list3.includes(sourceValue)) {
-              _list3.push(sourceValue);
+            var _list4 = Array.isArray(updatedFormValues[targetHandle]) ? _toConsumableArray(updatedFormValues[targetHandle]) : [];
+            if (sourceValue && sourceValue.trim() !== "" && !_list4.includes(sourceValue)) {
+              _list4.push(sourceValue);
             }
-            updatedFormValues[targetHandle] = _list3;
+            updatedFormValues[targetHandle] = _list4;
           } else {
             updatedFormValues[targetHandle] = sourceValue;
           }
@@ -889,19 +895,29 @@ var NodeFlow = function NodeFlow(_ref) {
           }
           if (color === "green") {
             if (["textInput2", "videoInput2", "imageInput3", "audioInput3"].includes(params.targetHandle)) {
-              updatedFormValues.image_url = resultValue || null;
+              // If image_url is already occupied on a videoNode, stack into images_list
+              // so both images reach Seedance as reference_images instead of overwriting.
+              if (params.targetHandle === "videoInput2" && updatedFormValues.image_url && updatedFormValues.image_url !== resultValue) {
+                var _list5 = Array.isArray(updatedFormValues.images_list) ? _toConsumableArray(updatedFormValues.images_list) : [];
+                if (!_list5.includes(resultValue) && resultValue && resultValue.trim() !== "") {
+                  _list5.push(resultValue);
+                }
+                updatedFormValues.images_list = _list5;
+              } else {
+                updatedFormValues.image_url = resultValue || null;
+              }
             } else if (["textInput3", "imageInput2", "videoInput6"].includes(params.targetHandle)) {
-              var _list4 = Array.isArray(updatedFormValues.images_list) ? _toConsumableArray(updatedFormValues.images_list) : [];
-              if (!_list4.includes(resultValue) && resultValue && resultValue.trim() !== "") {
-                _list4.push(resultValue);
+              var _list6 = Array.isArray(updatedFormValues.images_list) ? _toConsumableArray(updatedFormValues.images_list) : [];
+              if (!_list6.includes(resultValue) && resultValue && resultValue.trim() !== "") {
+                _list6.push(resultValue);
               }
-              updatedFormValues.images_list = _list4;
+              updatedFormValues.images_list = _list6;
             } else if (params.targetHandle === "apiInput2") {
-              var _list5 = Array.isArray(updatedFormValues.images) ? _toConsumableArray(updatedFormValues.images) : [];
-              if (!_list5.includes(resultValue) && resultValue && resultValue.trim() !== "") {
-                _list5.push(resultValue);
+              var _list7 = Array.isArray(updatedFormValues.images) ? _toConsumableArray(updatedFormValues.images) : [];
+              if (!_list7.includes(resultValue) && resultValue && resultValue.trim() !== "") {
+                _list7.push(resultValue);
               }
-              updatedFormValues.images = _list5;
+              updatedFormValues.images = _list7;
             } else if (params.targetHandle === "videoInput3") {
               updatedFormValues.last_image = resultValue || null;
             } else if (params.targetHandle === "apiInput3") {
@@ -913,11 +929,11 @@ var NodeFlow = function NodeFlow(_ref) {
               updatedFormValues.video_url = resultValue || null;
             } else if (params.targetHandle === "videoInput7") {
               var key = updatedFormValues.video_files ? "video_files" : "videos_list";
-              var _list6 = Array.isArray(updatedFormValues[key]) ? _toConsumableArray(updatedFormValues[key]) : [];
-              if (!_list6.includes(resultValue) && resultValue && resultValue.trim() !== "") {
-                _list6.push(resultValue);
+              var _list8 = Array.isArray(updatedFormValues[key]) ? _toConsumableArray(updatedFormValues[key]) : [];
+              if (!_list8.includes(resultValue) && resultValue && resultValue.trim() !== "") {
+                _list8.push(resultValue);
               }
-              updatedFormValues[key] = _list6;
+              updatedFormValues[key] = _list8;
             }
           }
           if (color === "yellow") {
@@ -926,11 +942,11 @@ var NodeFlow = function NodeFlow(_ref) {
             }
             if (params.targetHandle === "videoInput8") {
               var _key2 = updatedFormValues.audio_files ? "audio_files" : "audios_list";
-              var _list7 = Array.isArray(updatedFormValues[_key2]) ? _toConsumableArray(updatedFormValues[_key2]) : [];
-              if (!_list7.includes(resultValue) && resultValue && resultValue.trim() !== "") {
-                _list7.push(resultValue);
+              var _list9 = Array.isArray(updatedFormValues[_key2]) ? _toConsumableArray(updatedFormValues[_key2]) : [];
+              if (!_list9.includes(resultValue) && resultValue && resultValue.trim() !== "") {
+                _list9.push(resultValue);
               }
-              updatedFormValues[_key2] = _list7;
+              updatedFormValues[_key2] = _list9;
             }
           }
           return _objectSpread(_objectSpread({}, n), {}, {
