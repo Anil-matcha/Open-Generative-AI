@@ -340,30 +340,43 @@ const VideoGeneration = ({ id, data, selected }) => {
         continue;
       }
       const status = String(pd?.status || "").toLowerCase();
-      if (status === "succeeded" || status === "success") {
+      if (status === "succeeded" || status === "success" || status === "completed") {
         if (!pd.url) throw new Error("ARK: видео готово, но URL не получен.");
-        // ARK CDN (volces.com) has CORS restrictions — mirror to TOS so the
-        // browser can play it. Falls back to the ARK URL if mirroring fails.
-        let finalUrl = pd.url;
-        try {
-          const mirror = await axios.post("/api/upload-file", { url: pd.url });
-          if (mirror.data?.url) finalUrl = mirror.data.url;
-        } catch (e) { /* keep ARK URL */ }
 
-        const output = [{ type: "video_url", value: finalUrl }];
+        // Показываем результат СРАЗУ с ARK-ссылкой — не ждём TOS-зеркалирования.
+        // <video src> не требует CORS, ARK URL воспроизводится напрямую.
+        const arkUrl = pd.url;
+        const output = [{ type: "video_url", value: arkUrl }];
         const newHistory = [
           ...(data.outputHistory || []),
           { status: "succeeded", result: { id: taskId, outputs: output } },
         ];
         data.onDataChange(id, {
           outputs: output,
-          resultUrl: finalUrl,
+          resultUrl: arkUrl,
           isLoading: false,
           errorMsg: null,
           outputHistory: newHistory,
         });
         setCurrentHistoryIndex(newHistory.length - 1);
         setCurrentVideoIndex(0);
+
+        // В фоне зеркалируем в TOS для постоянного хранения.
+        // Если получится — тихо заменяем ARK URL на постоянный TOS URL.
+        axios.post("/api/upload-file", { url: arkUrl })
+          .then((mirror) => {
+            const tosUrl = mirror.data?.url;
+            if (!tosUrl) return;
+            const tosOutput = [{ type: "video_url", value: tosUrl }];
+            const tosHistory = newHistory.map((h) =>
+              h.result?.id === taskId
+                ? { ...h, result: { ...h.result, outputs: tosOutput } }
+                : h
+            );
+            data.onDataChange(id, { outputs: tosOutput, resultUrl: tosUrl, outputHistory: tosHistory });
+          })
+          .catch(() => { /* ARK URL остаётся */ });
+
         return;
       }
       if (["failed", "error", "expired", "cancelled"].includes(status)) {
