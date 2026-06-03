@@ -593,20 +593,26 @@ var VideoGeneration = function VideoGeneration(_ref) {
             // stays pending for the whole generation (ARK polls up to ~290s), so a second
             // click would otherwise look like "Generate does nothing".
             if (!inFlightRef.current) {
+              _context2.n = 2;
+              break;
+            }
+            if (data.isLoading) {
               _context2.n = 1;
               break;
             }
-            // A real generation is already running — just inform, don't touch isLoading
-            // (forcing it true here is what left the node stuck on "GENERATING" when a
-            // duplicate trigger fired after the run had already finished).
+            console.log("🟢[GEN] stale inFlight flag — clearing and proceeding");
+            inFlightRef.current = false;
+            _context2.n = 2;
+            break;
+          case 1:
             (0, _reactHotToast.toast)("Генерация уже идёт — подождите завершения", {
               icon: "⏳"
             });
             return _context2.a(2);
-          case 1:
+          case 2:
             inFlightRef.current = true;
             arkCancelRef.current = false;
-            _context2.p = 2;
+            _context2.p = 3;
             data.onDataChange(id, {
               isLoading: true
             });
@@ -629,32 +635,32 @@ var VideoGeneration = function VideoGeneration(_ref) {
               });
             } catch (_unused2) {}
             if (!isSeedance) {
-              _context2.n = 7;
+              _context2.n = 8;
               break;
             }
-            _context2.p = 3;
-            _context2.n = 4;
+            _context2.p = 4;
+            _context2.n = 5;
             return runArkSeedanceBrowser();
-          case 4:
-            _context2.n = 6;
-            break;
           case 5:
-            _context2.p = 5;
+            _context2.n = 7;
+            break;
+          case 6:
+            _context2.p = 6;
             _t3 = _context2.v;
             data.onDataChange(id, {
               isLoading: false,
               errorMsg: ((_e$message = _t3.message) === null || _e$message === void 0 ? void 0 : _e$message.slice(0, 120)) || "Ошибка генерации"
             });
             _reactHotToast.toast.error(((_e$message2 = _t3.message) === null || _e$message2 === void 0 ? void 0 : _e$message2.slice(0, 80)) || "Ошибка генерации");
-          case 6:
-            return _context2.a(2);
           case 7:
-            _context2.n = 8;
-            return data.handleSaveWorkFlow();
+            return _context2.a(2);
           case 8:
+            _context2.n = 9;
+            return data.handleSaveWorkFlow();
+          case 9:
             workflow_id = _context2.v;
             if (workflow_id) {
-              _context2.n = 9;
+              _context2.n = 10;
               break;
             }
             _reactHotToast.toast.error("Failed to save workflow before running node");
@@ -662,10 +668,10 @@ var VideoGeneration = function VideoGeneration(_ref) {
               isLoading: false
             });
             return _context2.a(2);
-          case 9:
+          case 10:
             modelSchema = nodeSchemas === null || nodeSchemas === void 0 || (_nodeSchemas$categori2 = nodeSchemas.categories) === null || _nodeSchemas$categori2 === void 0 || (_nodeSchemas$categori2 = _nodeSchemas$categori2.video) === null || _nodeSchemas$categori2 === void 0 || (_nodeSchemas$categori2 = _nodeSchemas$categori2.models[selectedModel.id]) === null || _nodeSchemas$categori2 === void 0 || (_nodeSchemas$categori2 = _nodeSchemas$categori2.input_schema) === null || _nodeSchemas$categori2 === void 0 || (_nodeSchemas$categori2 = _nodeSchemas$categori2.schemas) === null || _nodeSchemas$categori2 === void 0 ? void 0 : _nodeSchemas$categori2.input_data;
             if (!(!modelSchema || !modelSchema.properties)) {
-              _context2.n = 10;
+              _context2.n = 11;
               break;
             }
             _reactHotToast.toast.error("No input schema found for this model");
@@ -673,7 +679,7 @@ var VideoGeneration = function VideoGeneration(_ref) {
               isLoading: false
             });
             return _context2.a(2);
-          case 10:
+          case 11:
             params = {};
             inputSchema = modelSchema.properties;
             localSources = formValues || {};
@@ -687,7 +693,7 @@ var VideoGeneration = function VideoGeneration(_ref) {
             }
             // face_asset isn't in the schema — carry it through when present.
             if (localSources.face_asset) params.face_asset = localSources.face_asset;
-            _context2.n = 11;
+            _context2.n = 12;
             return _axios["default"].post("/api/workflow/".concat(workflow_id, "/node/").concat(id, "/run"), {
               run_id: runId,
               model: selectedModel.id,
@@ -695,7 +701,7 @@ var VideoGeneration = function VideoGeneration(_ref) {
               cost: generationCost,
               node_id: "AI Video"
             });
-          case 11:
+          case 12:
             response = _context2.v;
             _r = response.data;
             _nd = _r && _r.nodes && (_r.nodes[id] || Object.values(_r.nodes)[0]);
@@ -717,26 +723,26 @@ var VideoGeneration = function VideoGeneration(_ref) {
             } else {
               pollNodeStatus(_r.run_id);
             }
-            _context2.n = 13;
+            _context2.n = 14;
             break;
-          case 12:
-            _context2.p = 12;
+          case 13:
+            _context2.p = 13;
             _t4 = _context2.v;
             data.onDataChange(id, {
               isLoading: false
             });
             _reactHotToast.toast.error(((_error$response = _t4.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.detail) || "Error running node");
             console.error(_t4);
-          case 13:
-            _context2.p = 13;
-            inFlightRef.current = false;
-            return _context2.f(13);
           case 14:
-            ;
+            _context2.p = 14;
+            inFlightRef.current = false;
+            return _context2.f(14);
           case 15:
+            ;
+          case 16:
             return _context2.a(2);
         }
-      }, _callee2, null, [[3, 5], [2, 12, 13, 14]]);
+      }, _callee2, null, [[4, 6], [3, 13, 14, 15]]);
     }));
     return function handleRunSingleNode() {
       return _ref10.apply(this, arguments);

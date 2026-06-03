@@ -405,11 +405,17 @@ const VideoGeneration = ({ id, data, selected }) => {
     // stays pending for the whole generation (ARK polls up to ~290s), so a second
     // click would otherwise look like "Generate does nothing".
     if (inFlightRef.current) {
-      // A real generation is already running — just inform, don't touch isLoading
-      // (forcing it true here is what left the node stuck on "GENERATING" when a
-      // duplicate trigger fired after the run had already finished).
-      toast("Генерация уже идёт — подождите завершения", { icon: "⏳" });
-      return;
+      // Self-heal a stale flag: if we think a run is in flight but the node is NOT
+      // actually loading, the previous run was orphaned (await never settled / the
+      // component re-rendered). Clear the flag and proceed instead of blocking the
+      // user forever on "Генерация уже идёт".
+      if (!data.isLoading) {
+        console.log("🟢[GEN] stale inFlight flag — clearing and proceeding");
+        inFlightRef.current = false;
+      } else {
+        toast("Генерация уже идёт — подождите завершения", { icon: "⏳" });
+        return;
+      }
     }
     inFlightRef.current = true;
     arkCancelRef.current = false;
