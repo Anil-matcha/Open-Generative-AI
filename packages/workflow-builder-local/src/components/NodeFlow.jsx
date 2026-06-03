@@ -744,6 +744,11 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
               }
             }
 
+            // CharacterNode → VideoNode: treat the face reference as face_asset.
+            if (sourceNode?.type === "characterNode" && n.type === "videoNode") {
+              updatedFormValues.face_asset = resultValue || null;
+            }
+
             if (color === "blue") {
               if (targetNode.type === "concatNode" && params.targetHandle === "concatInput") {
                 const allConcatEdges = newEdges.filter((e) =>
@@ -1696,6 +1701,7 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
         imageInput: "blue", imageInput2: "green", imageInput3: "green", imageOutput: "green",
         videoInput: "blue", videoInput2: "green", videoInput3: "green", videoInput4: "orange", videoInput5: "yellow", videoInput6: "green", videoInput7: "orange", videoInput8: "yellow", videoOutput: "orange",
         audioInput: "yellow", audioInput2: "blue", audioInput3: "green", audioInput4: "orange", audioOutput: "yellow",
+        characterOutput: "green",
       }
     },
   }));
@@ -1708,6 +1714,11 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
     const targetNode = nodesWithHandlers.find(n => n.id === target);
 
     if (!sourceNode || !targetNode) return false;
+
+    // CharacterNode feeds face_asset — allow it to land on any green image handle of a video node.
+    if (sourceNode.type === "characterNode" && targetNode.type === "videoNode") {
+      return ["videoInput2", "videoInput3", "videoInput6"].includes(targetHandle);
+    }
 
     const sourceType = sourceNode?.data?.handleTypes?.[sourceHandle];
     const targetType = targetNode?.data?.handleTypes?.[targetHandle];

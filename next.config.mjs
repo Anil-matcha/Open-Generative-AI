@@ -8,7 +8,7 @@ const nextConfig = {
   experimental: {
     serverBodySizeLimit: '50mb',
   },
-  generateBuildId: async () => 'build-character-photo-ref-v23',
+  generateBuildId: async () => 'build-character-connect-fix-v24',
 };
 
 export default nextConfig;

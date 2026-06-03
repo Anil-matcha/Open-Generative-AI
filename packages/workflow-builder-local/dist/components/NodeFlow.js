@@ -846,6 +846,11 @@ var NodeFlow = function NodeFlow(_ref) {
               updatedFormValues[params.targetHandle] = sourceValue;
             }
           }
+
+          // CharacterNode → VideoNode: treat the face reference as face_asset.
+          if ((sourceNode === null || sourceNode === void 0 ? void 0 : sourceNode.type) === "characterNode" && n.type === "videoNode") {
+            updatedFormValues.face_asset = resultValue || null;
+          }
           if (color === "blue") {
             if (targetNode.type === "concatNode" && params.targetHandle === "concatInput") {
               var allConcatEdges = newEdges.filter(function (e) {
@@ -1994,7 +1999,8 @@ var NodeFlow = function NodeFlow(_ref) {
           audioInput2: "blue",
           audioInput3: "green",
           audioInput4: "orange",
-          audioOutput: "yellow"
+          audioOutput: "yellow",
+          characterOutput: "green"
         })
       })
     });
@@ -2013,6 +2019,11 @@ var NodeFlow = function NodeFlow(_ref) {
       return n.id === target;
     });
     if (!sourceNode || !targetNode) return false;
+
+    // CharacterNode feeds face_asset — allow it to land on any green image handle of a video node.
+    if (sourceNode.type === "characterNode" && targetNode.type === "videoNode") {
+      return ["videoInput2", "videoInput3", "videoInput6"].includes(targetHandle);
+    }
     var sourceType = sourceNode === null || sourceNode === void 0 || (_sourceNode$data9 = sourceNode.data) === null || _sourceNode$data9 === void 0 || (_sourceNode$data9 = _sourceNode$data9.handleTypes) === null || _sourceNode$data9 === void 0 ? void 0 : _sourceNode$data9[sourceHandle];
     var targetType = targetNode === null || targetNode === void 0 || (_targetNode$data = targetNode.data) === null || _targetNode$data === void 0 || (_targetNode$data = _targetNode$data.handleTypes) === null || _targetNode$data === void 0 ? void 0 : _targetNode$data[targetHandle];
     if (!sourceType || !targetType || sourceType !== targetType && targetType !== 'white') return false;
