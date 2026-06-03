@@ -72,12 +72,17 @@ function buildContent({ prompt, image_url, image_urls, video_url, video_urls, au
   if (Array.isArray(audio_urls)) audios.push(...audio_urls.filter(Boolean));
 
   // Single image with no other media → first-frame I2V (no role, per Ark docs).
-  // Multiple images or image + video/audio → multimodal reference (role: reference_image).
+  // Multiple images, image + video/audio, OR image + a face reference → multimodal
+  // reference (role: reference_image). Mixing a first-frame image with a
+  // reference_image face is NOT supported by Seedance and leaves the task stuck
+  // in "running" — so when a face asset is present, treat every image as a
+  // reference, exactly like the (working) multi-image Studio path.
   const hasRefMedia = videos.length > 0 || audios.length > 0;
   const multiImage  = images.length > 1;
+  const hasFace     = !!face_asset;
   images.forEach((u) => {
     const item = { type: 'image_url', image_url: { url: u } };
-    if (hasRefMedia || multiImage) item.role = 'reference_image';
+    if (hasRefMedia || multiImage || hasFace) item.role = 'reference_image';
     content.push(item);
   });
   videos.forEach((u) => content.push({ type: 'video_url', video_url: { url: u }, role: 'reference_video' }));

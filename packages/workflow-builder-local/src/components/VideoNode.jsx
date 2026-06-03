@@ -311,11 +311,17 @@ const VideoGeneration = ({ id, data, selected }) => {
     };
 
     // Step 1: submit — fast, just creates the Ark task and returns a taskId.
-    const submit = await axios.post("/api/ark/seedance", body);
+    let submit;
+    try {
+      submit = await axios.post("/api/ark/seedance", body);
+    } catch (e) {
+      throw new Error(e.response?.data?.error || `ARK submit ${e.response?.status || ""}: ${e.message}`);
+    }
     const taskId = submit.data?.taskId;
     if (!taskId) throw new Error(submit.data?.error || "ARK: задача не создана (нет taskId).");
 
     // Step 2: poll from the browser — each request is < 1s, so no connection hangs.
+    let pollErrors = 0;
     for (let attempt = 0; attempt < 300; attempt++) {
       if (arkCancelRef.current) { arkCancelRef.current = false; return; }
       await new Promise((r) => setTimeout(r, 5000));
@@ -325,8 +331,13 @@ const VideoGeneration = ({ id, data, selected }) => {
       try {
         const poll = await axios.get(`/api/ark/seedance?taskId=${encodeURIComponent(taskId)}`);
         pd = poll.data;
+        pollErrors = 0;
       } catch (e) {
-        continue; // transient — keep polling
+        // Don't loop forever on a persistent failure — surface it after ~1 min.
+        if (++pollErrors >= 12) {
+          throw new Error(e.response?.data?.error || "ARK: опрос статуса не отвечает.");
+        }
+        continue;
       }
       const status = String(pd?.status || "").toLowerCase();
       if (status === "succeeded" || status === "success") {
