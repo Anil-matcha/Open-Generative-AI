@@ -1423,6 +1423,11 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
   // videos/images persist with the workflow. The browser Seedance path updates
   // node data directly (bypassing the server /run route) and would otherwise
   // never trigger a save — a reload would lose the result.
+  // NB: save IMMEDIATELY (no cancellable timer). A debounced setTimeout was
+  // being cleared by the effect cleanup on unmount when the user navigated away
+  // right after generating, so the POST never fired. Result changes are
+  // infrequent (generation done + one TOS-mirror swap), so an immediate save is
+  // cheap and the in-flight POST survives client-side navigation.
   const lastSavedResultsSig = useRef("");
   useEffect(() => {
     if (isRestoring || !interactionMode) return;
@@ -1431,8 +1436,7 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
     // Establish the baseline on first run so we don't save immediately on load.
     if (lastSavedResultsSig.current === "") { lastSavedResultsSig.current = sig; return; }
     lastSavedResultsSig.current = sig;
-    const t = setTimeout(() => { handleSaveWorkFlow(); }, 1500);
-    return () => clearTimeout(t);
+    handleSaveWorkFlow();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nodes, interactionMode, isRestoring]);
 
