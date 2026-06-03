@@ -408,9 +408,6 @@ var VideoGeneration = function VideoGeneration(_ref) {
               duration: src.duration || undefined,
               face_asset: src.face_asset || undefined
             }; // Step 1: submit — fast, just creates the Ark task and returns a taskId.
-            (0, _reactHotToast.toast)("Отправляю в ARK…", {
-              icon: "🚀"
-            });
             _context.p = 1;
             _context.n = 2;
             return _axios["default"].post("/api/ark/seedance", body);
@@ -430,8 +427,6 @@ var VideoGeneration = function VideoGeneration(_ref) {
             }
             throw new Error(((_submit$data2 = submit.data) === null || _submit$data2 === void 0 ? void 0 : _submit$data2.error) || "ARK: задача не создана (нет taskId).");
           case 5:
-            _reactHotToast.toast.success("\u0417\u0430\u0434\u0430\u0447\u0430 \u0441\u043E\u0437\u0434\u0430\u043D\u0430: ".concat(String(taskId).slice(0, 12), "\u2026"));
-
             // Step 2: poll from the browser — each request is < 1s, so no connection hangs.
             finishedUrl = null;
             pollErrors = 0;

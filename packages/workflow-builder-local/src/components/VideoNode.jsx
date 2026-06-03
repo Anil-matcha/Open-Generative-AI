@@ -319,7 +319,6 @@ const VideoGeneration = ({ id, data, selected }) => {
     };
 
     // Step 1: submit — fast, just creates the Ark task and returns a taskId.
-    toast("Отправляю в ARK…", { icon: "🚀" });
     let submit;
     try {
       submit = await axios.post("/api/ark/seedance", body);
@@ -328,7 +327,6 @@ const VideoGeneration = ({ id, data, selected }) => {
     }
     const taskId = submit.data?.taskId;
     if (!taskId) throw new Error(submit.data?.error || "ARK: задача не создана (нет taskId).");
-    toast.success(`Задача создана: ${String(taskId).slice(0, 12)}…`);
 
     // Step 2: poll from the browser — each request is < 1s, so no connection hangs.
     let finishedUrl = null;
