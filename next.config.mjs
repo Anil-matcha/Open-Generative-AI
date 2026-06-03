@@ -8,7 +8,7 @@ const nextConfig = {
   experimental: {
     serverBodySizeLimit: '50mb',
   },
-  generateBuildId: async () => 'build-instant-result-v32',
+  generateBuildId: async () => 'build-robust-ark-detect-v33',
 };
 
 export default nextConfig;

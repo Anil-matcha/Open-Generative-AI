@@ -61,7 +61,7 @@ var inputHandles = ["videoInput",
 ];
 var outputHandles = ["videoOutput"];
 var VideoGeneration = function VideoGeneration(_ref) {
-  var _data$runId, _nodeSchemas$categori, _data$selectedModel3, _data$selectedModel4, _data$selectedModel5, _data$selectedModel6, _data$selectedModel7, _data$selectedModel8, _data$selectedModel9, _data$selectedModel0, _outputHistory$curren, _currentOutputList$cu, _currentOutputList$, _data$selectedModel1;
+  var _data$runId, _nodeSchemas$categori, _data$selectedModel5, _data$selectedModel6, _data$selectedModel7, _data$selectedModel8, _data$selectedModel9, _data$selectedModel0, _data$selectedModel1, _data$selectedModel10, _outputHistory$curren, _currentOutputList$cu, _currentOutputList$, _data$selectedModel11;
   var id = _ref.id,
     data = _ref.data,
     selected = _ref.selected;
@@ -399,6 +399,9 @@ var VideoGeneration = function VideoGeneration(_ref) {
               duration: src.duration || undefined,
               face_asset: src.face_asset || undefined
             }; // Step 1: submit — fast, just creates the Ark task and returns a taskId.
+            (0, _reactHotToast.toast)("Отправляю в ARK…", {
+              icon: "🚀"
+            });
             _context2.p = 1;
             _context2.n = 2;
             return _axios["default"].post("/api/ark/seedance", body);
@@ -418,6 +421,8 @@ var VideoGeneration = function VideoGeneration(_ref) {
             }
             throw new Error(((_submit$data2 = submit.data) === null || _submit$data2 === void 0 ? void 0 : _submit$data2.error) || "ARK: задача не создана (нет taskId).");
           case 5:
+            _reactHotToast.toast.success("ARK \u0437\u0430\u0434\u0430\u0447\u0430 \u0441\u043E\u0437\u0434\u0430\u043D\u0430: ".concat(String(taskId).slice(0, 12), "\u2026"));
+
             // Step 2: poll from the browser — each request is < 1s, so no connection hangs.
             pollErrors = 0;
             _loop = /*#__PURE__*/_regenerator().m(function _loop() {
@@ -581,7 +586,7 @@ var VideoGeneration = function VideoGeneration(_ref) {
   }();
   var handleRunSingleNode = /*#__PURE__*/function () {
     var _ref10 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2() {
-      var _nodeSchemas$categori2, _e$message, _e$message2, workflow_id, modelSchema, params, inputSchema, localSources, _i, _Object$entries, _Object$entries$_i, key, meta, _meta$default2, response, _r, _nd, _lt, _o, _error$response, _t3, _t4;
+      var _data$selectedModel3, _data$selectedModel4, _nodeSchemas$categori2, modelHay, isArkSeedance, _e$message, _e$message2, workflow_id, modelSchema, params, inputSchema, localSources, _i, _Object$entries, _Object$entries$_i, key, meta, _meta$default2, response, _r, _nd, _lt, _o, _error$response, _t3, _t4;
       return _regenerator().w(function (_context3) {
         while (1) switch (_context3.p = _context3.n) {
           case 0:
@@ -606,7 +611,11 @@ var VideoGeneration = function VideoGeneration(_ref) {
 
             // Seedance 2.0 (Ark) → browser submit-and-poll (same path as the Studio).
             // Bypasses the blocking workflow /run route that hangs the node.
-            if (!/doubao-seedance-2-0/i.test((selectedModel === null || selectedModel === void 0 ? void 0 : selectedModel.id) || "")) {
+            // Robust detection: match the model id OR display name in any format
+            // ("doubao-seedance-2-0-fast-260128", "Seedance 2.0 Fast", …).
+            modelHay = "".concat((selectedModel === null || selectedModel === void 0 ? void 0 : selectedModel.id) || "", " ").concat((selectedModel === null || selectedModel === void 0 ? void 0 : selectedModel.name) || "", " ").concat(((_data$selectedModel3 = data.selectedModel) === null || _data$selectedModel3 === void 0 ? void 0 : _data$selectedModel3.id) || "", " ").concat(((_data$selectedModel4 = data.selectedModel) === null || _data$selectedModel4 === void 0 ? void 0 : _data$selectedModel4.name) || "").toLowerCase();
+            isArkSeedance = /seedance[\s-]*2/.test(modelHay);
+            if (!isArkSeedance) {
               _context3.n = 7;
               break;
             }
@@ -736,14 +745,14 @@ var VideoGeneration = function VideoGeneration(_ref) {
     }
     ;
   };
-  var hasPrompt = properties && "prompt" in properties && !((_data$selectedModel3 = data.selectedModel) !== null && _data$selectedModel3 !== void 0 && _data$selectedModel3.id.includes("passthrough"));
-  var hasImagesList = properties && "images_list" in properties && !((_data$selectedModel4 = data.selectedModel) !== null && _data$selectedModel4 !== void 0 && _data$selectedModel4.id.includes("passthrough"));
-  var hasVideosList = properties && ("videos_list" in properties || "video_files" in properties) && !((_data$selectedModel5 = data.selectedModel) !== null && _data$selectedModel5 !== void 0 && _data$selectedModel5.id.includes("passthrough"));
-  var hasLastImage = properties && "last_image" in properties && !((_data$selectedModel6 = data.selectedModel) !== null && _data$selectedModel6 !== void 0 && _data$selectedModel6.id.includes("passthrough"));
-  var hasImageUrl = properties && "image_url" in properties && !((_data$selectedModel7 = data.selectedModel) !== null && _data$selectedModel7 !== void 0 && _data$selectedModel7.id.includes("passthrough"));
-  var hasVideoUrl = properties && "video_url" in properties && !((_data$selectedModel8 = data.selectedModel) !== null && _data$selectedModel8 !== void 0 && _data$selectedModel8.id.includes("passthrough"));
-  var hasAudioUrl = properties && "audio_url" in properties && !((_data$selectedModel9 = data.selectedModel) !== null && _data$selectedModel9 !== void 0 && _data$selectedModel9.id.includes("passthrough"));
-  var hasAudiosList = properties && ("audios_list" in properties || "audio_files" in properties) && !((_data$selectedModel0 = data.selectedModel) !== null && _data$selectedModel0 !== void 0 && _data$selectedModel0.id.includes("passthrough"));
+  var hasPrompt = properties && "prompt" in properties && !((_data$selectedModel5 = data.selectedModel) !== null && _data$selectedModel5 !== void 0 && _data$selectedModel5.id.includes("passthrough"));
+  var hasImagesList = properties && "images_list" in properties && !((_data$selectedModel6 = data.selectedModel) !== null && _data$selectedModel6 !== void 0 && _data$selectedModel6.id.includes("passthrough"));
+  var hasVideosList = properties && ("videos_list" in properties || "video_files" in properties) && !((_data$selectedModel7 = data.selectedModel) !== null && _data$selectedModel7 !== void 0 && _data$selectedModel7.id.includes("passthrough"));
+  var hasLastImage = properties && "last_image" in properties && !((_data$selectedModel8 = data.selectedModel) !== null && _data$selectedModel8 !== void 0 && _data$selectedModel8.id.includes("passthrough"));
+  var hasImageUrl = properties && "image_url" in properties && !((_data$selectedModel9 = data.selectedModel) !== null && _data$selectedModel9 !== void 0 && _data$selectedModel9.id.includes("passthrough"));
+  var hasVideoUrl = properties && "video_url" in properties && !((_data$selectedModel0 = data.selectedModel) !== null && _data$selectedModel0 !== void 0 && _data$selectedModel0.id.includes("passthrough"));
+  var hasAudioUrl = properties && "audio_url" in properties && !((_data$selectedModel1 = data.selectedModel) !== null && _data$selectedModel1 !== void 0 && _data$selectedModel1.id.includes("passthrough"));
+  var hasAudiosList = properties && ("audios_list" in properties || "audio_files" in properties) && !((_data$selectedModel10 = data.selectedModel) !== null && _data$selectedModel10 !== void 0 && _data$selectedModel10.id.includes("passthrough"));
   (0, _react.useEffect)(function () {
     var timeout = setTimeout(function () {
       var validHandles = [hasPrompt && "videoInput", hasImageUrl && "videoInput2", hasLastImage && "videoInput3", hasVideoUrl && "videoInput4", hasAudioUrl && "videoInput5", hasImagesList && "videoInput6", hasVideosList && "videoInput7", hasAudiosList && "videoInput8"].filter(Boolean);
@@ -950,7 +959,7 @@ var VideoGeneration = function VideoGeneration(_ref) {
     onDuplicate: data.duplicateNode,
     onDelete: handleDeleteNode,
     downloadUrl: currentOutput
-  }))), ((_data$selectedModel1 = data.selectedModel) === null || _data$selectedModel1 === void 0 ? void 0 : _data$selectedModel1.id) === "video-passthrough" ? /*#__PURE__*/_react["default"].createElement("div", {
+  }))), ((_data$selectedModel11 = data.selectedModel) === null || _data$selectedModel11 === void 0 ? void 0 : _data$selectedModel11.id) === "video-passthrough" ? /*#__PURE__*/_react["default"].createElement("div", {
     className: "w-full h-full flex-1"
   }, /*#__PURE__*/_react["default"].createElement(_UploadNode["default"], {
     id: id,

@@ -311,6 +311,7 @@ const VideoGeneration = ({ id, data, selected }) => {
     };
 
     // Step 1: submit — fast, just creates the Ark task and returns a taskId.
+    toast("Отправляю в ARK…", { icon: "🚀" });
     let submit;
     try {
       submit = await axios.post("/api/ark/seedance", body);
@@ -319,6 +320,7 @@ const VideoGeneration = ({ id, data, selected }) => {
     }
     const taskId = submit.data?.taskId;
     if (!taskId) throw new Error(submit.data?.error || "ARK: задача не создана (нет taskId).");
+    toast.success(`ARK задача создана: ${String(taskId).slice(0, 12)}…`);
 
     // Step 2: poll from the browser — each request is < 1s, so no connection hangs.
     let pollErrors = 0;
@@ -403,7 +405,11 @@ const VideoGeneration = ({ id, data, selected }) => {
 
       // Seedance 2.0 (Ark) → browser submit-and-poll (same path as the Studio).
       // Bypasses the blocking workflow /run route that hangs the node.
-      if (/doubao-seedance-2-0/i.test(selectedModel?.id || "")) {
+      // Robust detection: match the model id OR display name in any format
+      // ("doubao-seedance-2-0-fast-260128", "Seedance 2.0 Fast", …).
+      const modelHay = `${selectedModel?.id || ""} ${selectedModel?.name || ""} ${data.selectedModel?.id || ""} ${data.selectedModel?.name || ""}`.toLowerCase();
+      const isArkSeedance = /seedance[\s-]*2/.test(modelHay);
+      if (isArkSeedance) {
         try {
           await runArkSeedanceBrowser();
         } catch (e) {
