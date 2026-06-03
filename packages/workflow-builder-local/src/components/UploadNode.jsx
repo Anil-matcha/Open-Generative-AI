@@ -187,13 +187,29 @@ const UploadNode = ({ id, data, formValues, setFormValues, selectedModel, loadin
         .map((e) => e.source)
         .filter((sid) => nodesArr.find((nn) => nn.id === sid)?.type === "characterNode")
     );
+    const isUrl = (v) => typeof v === "string" && v && !v.startsWith("asset://");
     const tags = [];
     for (const cid of charIds) {
       const cnode = nodesArr.find((nn) => nn.id === cid);
       const fv = cnode?.data?.formValues || {};
       const name = (fv.character_name || "лицо").trim();
-      const thumb = fv.character_photo || fv.face_thumbnail || null;
-      tags.push({ id: cid, name, thumb });
+      // Превью лица: фото персонажа, иначе любой пригодный URL из его полей.
+      // В крайнем случае берём face_thumbnail у подключённой видео-ноды
+      // (то же превью, что показывает панель «Референс лица»).
+      let thumb =
+        fv.character_photo ||
+        (isUrl(fv.face_thumbnail) ? fv.face_thumbnail : null) ||
+        (isUrl(fv.image_url) ? fv.image_url : null) ||
+        (isUrl(fv.face_asset) ? fv.face_asset : null);
+      if (!thumb) {
+        for (const tid of targetSet) {
+          if (!rfEdges.some((e) => e.source === cid && e.target === tid)) continue;
+          const tnode = nodesArr.find((nn) => nn.id === tid);
+          const tt = tnode?.data?.formValues?.face_thumbnail;
+          if (isUrl(tt)) { thumb = tt; break; }
+        }
+      }
+      tags.push({ id: cid, name, thumb: thumb || null });
     }
     return tags;
   }, [rfEdges, rfNodes, id, uploadType]);

@@ -278,6 +278,9 @@ var UploadNode = function UploadNode(_ref) {
         return nn.id === sid;
       })) === null || _nodesArr$find === void 0 ? void 0 : _nodesArr$find.type) === "characterNode";
     }));
+    var isUrl = function isUrl(v) {
+      return typeof v === "string" && v && !v.startsWith("asset://");
+    };
     var tags = [];
     var _iterator = _createForOfIteratorHelper(charIds),
       _step;
@@ -290,11 +293,45 @@ var UploadNode = function UploadNode(_ref) {
         });
         var fv = (cnode === null || cnode === void 0 || (_cnode$data = cnode.data) === null || _cnode$data === void 0 ? void 0 : _cnode$data.formValues) || {};
         var name = (fv.character_name || "лицо").trim();
-        var thumb = fv.character_photo || fv.face_thumbnail || null;
+        // Превью лица: фото персонажа, иначе любой пригодный URL из его полей.
+        // В крайнем случае берём face_thumbnail у подключённой видео-ноды
+        // (то же превью, что показывает панель «Референс лица»).
+        var thumb = fv.character_photo || (isUrl(fv.face_thumbnail) ? fv.face_thumbnail : null) || (isUrl(fv.image_url) ? fv.image_url : null) || (isUrl(fv.face_asset) ? fv.face_asset : null);
+        if (!thumb) {
+          var _iterator2 = _createForOfIteratorHelper(targetSet),
+            _step2;
+          try {
+            var _loop2 = function _loop2() {
+                var _tnode$data;
+                var tid = _step2.value;
+                if (!rfEdges.some(function (e) {
+                  return e.source === cid && e.target === tid;
+                })) return 0; // continue
+                var tnode = nodesArr.find(function (nn) {
+                  return nn.id === tid;
+                });
+                var tt = tnode === null || tnode === void 0 || (_tnode$data = tnode.data) === null || _tnode$data === void 0 || (_tnode$data = _tnode$data.formValues) === null || _tnode$data === void 0 ? void 0 : _tnode$data.face_thumbnail;
+                if (isUrl(tt)) {
+                  thumb = tt;
+                  return 1; // break
+                }
+              },
+              _ret;
+            for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+              _ret = _loop2();
+              if (_ret === 0) continue;
+              if (_ret === 1) break;
+            }
+          } catch (err) {
+            _iterator2.e(err);
+          } finally {
+            _iterator2.f();
+          }
+        }
         tags.push({
           id: cid,
           name: name,
-          thumb: thumb
+          thumb: thumb || null
         });
       };
       for (_iterator.s(); !(_step = _iterator.n()).done;) {
@@ -340,12 +377,12 @@ var UploadNode = function UploadNode(_ref) {
       return n.type === "imageNode" && mid === "image-passthrough" || n.type === "videoNode" && mid === "video-passthrough";
     }));
     var tags = [];
-    var _iterator2 = _createForOfIteratorHelper(mediaIds),
-      _step2;
+    var _iterator3 = _createForOfIteratorHelper(mediaIds),
+      _step3;
     try {
-      var _loop2 = function _loop2() {
+      var _loop3 = function _loop3() {
         var _inode$data;
-        var iid = _step2.value;
+        var iid = _step3.value;
         var inode = nodesArr.find(function (nn) {
           return nn.id === iid;
         });
@@ -358,13 +395,13 @@ var UploadNode = function UploadNode(_ref) {
           isVideo: isVideo
         });
       };
-      for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-        _loop2();
+      for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
+        _loop3();
       }
     } catch (err) {
-      _iterator2.e(err);
+      _iterator3.e(err);
     } finally {
-      _iterator2.f();
+      _iterator3.f();
     }
     return tags;
   }, [rfEdges, rfNodes, id, uploadType]);
