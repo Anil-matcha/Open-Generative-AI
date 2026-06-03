@@ -437,6 +437,11 @@ const VideoGeneration = ({ id, data, selected }) => {
       if (isSeedance) {
         try {
           await runArkSeedanceBrowser();
+          // Save immediately so the result survives SPA navigation.
+          // currentNodesRef in NodeFlow was already updated synchronously inside
+          // onDataChange, so buildWorkflowPayload captures the correct resultUrl
+          // even if the React setNodes update was cancelled by concurrent mode.
+          data.handleSaveWorkFlow?.();
         } catch (e) {
           data.onDataChange(id, { isLoading: false, errorMsg: e.message?.slice(0, 120) || "Ошибка генерации" });
           toast.error(e.message?.slice(0, 80) || "Ошибка генерации");

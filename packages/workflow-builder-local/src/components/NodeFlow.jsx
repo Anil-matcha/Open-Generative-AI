@@ -254,6 +254,10 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
   const [edgePicker, setEdgePicker] = useState(null);
   const connectionMadeRef = useRef(false);
   const onConnectRef = useRef(null);
+  // Tracks the latest nodes synchronously so buildWorkflowPayload always reads
+  // up-to-date data even when React 18 concurrent mode cancels a setNodes call
+  // during SPA navigation (which would otherwise lose a freshly-generated result).
+  const currentNodesRef = useRef(initialState?.nodes || []);
   const [interactionMode, setInteractionMode] = useState(initialState?.metadata?.interactionMode || false);
   const [publishWorkflow, setPublishWorkflow] = useState(initialState?.metadata?.publishWorkflow || false);
   const [template, setTemplate] = useState(initialState?.metadata?.template || {
@@ -489,6 +493,15 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
   }, [edges, setNodes]);
 
   const onDataChange = (id, newData, targetNodeId = null) => {
+    // Update ref NOW (synchronous) so buildWorkflowPayload captures the result
+    // even if the subsequent setNodes call is cancelled by React 18 concurrent
+    // mode when the user navigates away immediately after generation.
+    if (newData.resultUrl !== undefined || newData.outputs !== undefined) {
+      currentNodesRef.current = currentNodesRef.current.map((node) => {
+        const match = node.id.toLowerCase().replace(/\s+/g, '') === id.toLowerCase().replace(/\s+/g, '');
+        return match ? { ...node, data: { ...node.data, ...newData } } : node;
+      });
+    }
     setNodes((prevNodes) => {
       let updatedNodes = prevNodes.map((node) => {
         const match = node.id.toLowerCase().replace(/\s+/g, '') === id.toLowerCase().replace(/\s+/g, '');
@@ -1144,7 +1157,7 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
     return v;
   };
   const buildWorkflowPayload = () => {
-    const nodeData = nodes.map((node) => {
+    const nodeData = currentNodesRef.current.map((node) => {
 
       const connectedEdges = edges.filter((e) => e.target === node.id);
       const inputNodes = connectedEdges.map((e) => e.source);
@@ -1185,7 +1198,7 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
           : formValues?.system_prompt || null;
 
       // Character nodes feed face_asset (reference image), not image_url/list.
-      const isCharSource = (srcId) => nodes.find((n) => n.id === srcId)?.type === "characterNode";
+      const isCharSource = (srcId) => currentNodesRef.current.find((n) => n.id === srcId)?.type === "characterNode";
 
       const imageListConnections = connectedEdges.filter((e) =>
         ["textInput3", "imageInput2", "videoInput6", "apiInput2"].includes(e.targetHandle) && !isCharSource(e.source)
@@ -1439,6 +1452,11 @@ const NodeFlow = ({ initialNodeSchemas, initialWorkflowData }) => {
     handleSaveWorkFlow();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nodes, interactionMode, isRestoring]);
+
+  // Keep currentNodesRef in sync with React state for all normal updates.
+  useEffect(() => {
+    currentNodesRef.current = nodes;
+  }, [nodes]);
 
   const handleDuplicateWorkflow = async () => {
     if (interactionMode) return;

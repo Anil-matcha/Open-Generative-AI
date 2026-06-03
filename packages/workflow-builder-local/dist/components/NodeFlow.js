@@ -347,6 +347,10 @@ var NodeFlow = function NodeFlow(_ref) {
     setEdgePicker = _useState24[1];
   var connectionMadeRef = (0, _react.useRef)(false);
   var onConnectRef = (0, _react.useRef)(null);
+  // Tracks the latest nodes synchronously so buildWorkflowPayload always reads
+  // up-to-date data even when React 18 concurrent mode cancels a setNodes call
+  // during SPA navigation (which would otherwise lose a freshly-generated result).
+  var currentNodesRef = (0, _react.useRef)((initialState === null || initialState === void 0 ? void 0 : initialState.nodes) || []);
   var _useState25 = (0, _react.useState)((initialState === null || initialState === void 0 || (_initialState$metadat3 = initialState.metadata) === null || _initialState$metadat3 === void 0 ? void 0 : _initialState$metadat3.interactionMode) || false),
     _useState26 = _slicedToArray(_useState25, 2),
     interactionMode = _useState26[0],
@@ -640,6 +644,17 @@ var NodeFlow = function NodeFlow(_ref) {
   }, [edges, setNodes]);
   var onDataChange = function onDataChange(id, newData) {
     var targetNodeId = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+    // Update ref NOW (synchronous) so buildWorkflowPayload captures the result
+    // even if the subsequent setNodes call is cancelled by React 18 concurrent
+    // mode when the user navigates away immediately after generation.
+    if (newData.resultUrl !== undefined || newData.outputs !== undefined) {
+      currentNodesRef.current = currentNodesRef.current.map(function (node) {
+        var match = node.id.toLowerCase().replace(/\s+/g, '') === id.toLowerCase().replace(/\s+/g, '');
+        return match ? _objectSpread(_objectSpread({}, node), {}, {
+          data: _objectSpread(_objectSpread({}, node.data), newData)
+        }) : node;
+      });
+    }
     setNodes(function (prevNodes) {
       var _newData$outputs;
       var updatedNodes = prevNodes.map(function (node) {
@@ -1284,7 +1299,7 @@ var NodeFlow = function NodeFlow(_ref) {
     return v;
   };
   var buildWorkflowPayload = function buildWorkflowPayload() {
-    var nodeData = nodes.map(function (node) {
+    var nodeData = currentNodesRef.current.map(function (node) {
       var _node$data2, _node$data3, _nodeSchemas$categori4, _nodeSchemas$categori5, _nodeSchemas$categori6, _nodeSchemas$categori7, _node$data4;
       var connectedEdges = edges.filter(function (e) {
         return e.target === node.id;
@@ -1322,10 +1337,10 @@ var NodeFlow = function NodeFlow(_ref) {
 
       // Character nodes feed face_asset (reference image), not image_url/list.
       var isCharSource = function isCharSource(srcId) {
-        var _nodes$find;
-        return ((_nodes$find = nodes.find(function (n) {
+        var _currentNodesRef$curr;
+        return ((_currentNodesRef$curr = currentNodesRef.current.find(function (n) {
           return n.id === srcId;
-        })) === null || _nodes$find === void 0 ? void 0 : _nodes$find.type) === "characterNode";
+        })) === null || _currentNodesRef$curr === void 0 ? void 0 : _currentNodesRef$curr.type) === "characterNode";
       };
       var imageListConnections = connectedEdges.filter(function (e) {
         return ["textInput3", "imageInput2", "videoInput6", "apiInput2"].includes(e.targetHandle) && !isCharSource(e.source);
@@ -1595,6 +1610,11 @@ var NodeFlow = function NodeFlow(_ref) {
     handleSaveWorkFlow();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nodes, interactionMode, isRestoring]);
+
+  // Keep currentNodesRef in sync with React state for all normal updates.
+  (0, _react.useEffect)(function () {
+    currentNodesRef.current = nodes;
+  }, [nodes]);
   var handleDuplicateWorkflow = /*#__PURE__*/function () {
     var _ref7 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee4() {
       var workflowPayload, response, _t4;

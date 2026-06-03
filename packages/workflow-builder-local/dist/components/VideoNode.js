@@ -576,7 +576,7 @@ var VideoGeneration = function VideoGeneration(_ref) {
   }();
   var handleRunSingleNode = /*#__PURE__*/function () {
     var _ref10 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2() {
-      var _data$selectedModel4, _data$selectedModel5, _nodeSchemas$categori2, modelHay, isSeedance, _e$message, _e$message2, workflow_id, modelSchema, params, inputSchema, localSources, _i, _Object$entries, _Object$entries$_i, key, meta, _meta$default2, response, _r, _nd, _lt, _o, _error$response, _t3, _t4;
+      var _data$selectedModel4, _data$selectedModel5, _nodeSchemas$categori2, modelHay, isSeedance, _data$handleSaveWorkF, _e$message, _e$message2, workflow_id, modelSchema, params, inputSchema, localSources, _i, _Object$entries, _Object$entries$_i, key, meta, _meta$default2, response, _r, _nd, _lt, _o, _error$response, _t3, _t4;
       return _regenerator().w(function (_context2) {
         while (1) switch (_context2.p = _context2.n) {
           case 0:
@@ -619,6 +619,11 @@ var VideoGeneration = function VideoGeneration(_ref) {
             _context2.n = 5;
             return runArkSeedanceBrowser();
           case 5:
+            // Save immediately so the result survives SPA navigation.
+            // currentNodesRef in NodeFlow was already updated synchronously inside
+            // onDataChange, so buildWorkflowPayload captures the correct resultUrl
+            // even if the React setNodes update was cancelled by concurrent mode.
+            (_data$handleSaveWorkF = data.handleSaveWorkFlow) === null || _data$handleSaveWorkF === void 0 || _data$handleSaveWorkF.call(data);
             _context2.n = 7;
             break;
           case 6:
