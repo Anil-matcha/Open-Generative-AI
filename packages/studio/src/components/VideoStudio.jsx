@@ -326,6 +326,8 @@ export default function VideoStudio({
   const [promptDisabled, setPromptDisabled] = useState(false);
 
   // ── refs ──
+  const isMountedRef = useRef(true);
+  useEffect(() => { return () => { isMountedRef.current = false; }; }, []);
   const containerRef = useRef(null);
   const textareaRef = useRef(null);
   const dropdownRef = useRef(null);
@@ -1002,30 +1004,34 @@ export default function VideoStudio({
     try { stored = JSON.parse(localStorage.getItem(ARK_TASK_KEY)); } catch {}
     if (!stored?.taskId) return;
 
+    const showResult = (url, genId) => {
+      localStorage.removeItem(ARK_TASK_KEY);
+      setLastGenerationId(genId);
+      setLastGenerationModel(stored.model);
+      addToLocalHistory({
+        id: genId, url, prompt: stored.prompt || "",
+        model: stored.model, aspect_ratio: stored.aspect_ratio,
+        duration: stored.duration, timestamp: new Date().toISOString(),
+      });
+      showVideoInCanvas(url, stored.model);
+      fetch("/api/gallery", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url, type: "video", model: stored.model, prompt: stored.prompt || "" }),
+      }).catch(() => {});
+    };
+
+    // Task already finished while we were away — show result immediately.
+    if (stored.status === "done" && stored.resultUrl) {
+      showResult(stored.resultUrl, stored.genId || stored.taskId);
+      return;
+    }
+
+    // Task still in progress — resume polling.
     setGenerating(true);
     setGeneratingPrompt(stored.prompt || "");
     pollArkTask(stored.taskId)
-      .then((res) => {
-        localStorage.removeItem(ARK_TASK_KEY);
-        const genId = res.id || stored.taskId;
-        setLastGenerationId(genId);
-        setLastGenerationModel(stored.model);
-        addToLocalHistory({
-          id: genId,
-          url: res.url,
-          prompt: stored.prompt || "",
-          model: stored.model,
-          aspect_ratio: stored.aspect_ratio,
-          duration: stored.duration,
-          timestamp: new Date().toISOString(),
-        });
-        showVideoInCanvas(res.url, stored.model);
-        fetch("/api/gallery", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url: res.url, type: "video", model: stored.model, prompt: stored.prompt || "" }),
-        }).catch(() => {});
-      })
+      .then((res) => showResult(res.url, res.id || stored.taskId))
       .catch((e) => {
         localStorage.removeItem(ARK_TASK_KEY);
         setGenerateError(e.message?.slice(0, 80) || "Ошибка генерации");
@@ -1088,29 +1094,35 @@ export default function VideoStudio({
           : await generateVideo(apiKey, params);
         if (!res?.url) throw new Error("No video URL returned by API");
 
-        localStorage.removeItem(ARK_TASK_KEY);
         const genId = res.id || Date.now().toString();
-        setLastGenerationId(genId);
-        setLastGenerationModel(selectedModel);
-        const entry = {
-          id: genId,
-          url: res.url,
-          prompt: trimmedPrompt,
-          model: selectedModel,
-          aspect_ratio: selectedAr,
-          duration: selectedDuration,
-          timestamp: new Date().toISOString(),
-        };
-        addToLocalHistory(entry);
-        showVideoInCanvas(res.url, selectedModel);
-        // Save to persistent gallery
-        fetch('/api/gallery', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
-          body: JSON.stringify({ url: res.url, type: 'video', model: selectedModel, prompt: trimmedPrompt }),
-        }).catch(() => {});
-        if (onGenerationComplete)
-          onGenerationComplete({ url: res.url, model: selectedModel, prompt: trimmedPrompt, type: "video" });
+        if (isMountedRef.current) {
+          // Normal path: component still mounted — update state and clear localStorage.
+          localStorage.removeItem(ARK_TASK_KEY);
+          setLastGenerationId(genId);
+          setLastGenerationModel(selectedModel);
+          addToLocalHistory({
+            id: genId, url: res.url, prompt: trimmedPrompt,
+            model: selectedModel, aspect_ratio: selectedAr,
+            duration: selectedDuration, timestamp: new Date().toISOString(),
+          });
+          showVideoInCanvas(res.url, selectedModel);
+          fetch('/api/gallery', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+            body: JSON.stringify({ url: res.url, type: 'video', model: selectedModel, prompt: trimmedPrompt }),
+          }).catch(() => {});
+          if (onGenerationComplete)
+            onGenerationComplete({ url: res.url, model: selectedModel, prompt: trimmedPrompt, type: "video" });
+        } else {
+          // Component unmounted while polling — write result back to localStorage so
+          // the resume effect can show it when the user navigates back.
+          try {
+            const stored = JSON.parse(localStorage.getItem(ARK_TASK_KEY) || '{}');
+            localStorage.setItem(ARK_TASK_KEY, JSON.stringify({
+              ...stored, status: 'done', resultUrl: res.url, genId,
+            }));
+          } catch {}
+        }
       } catch (e) {
         localStorage.removeItem(ARK_TASK_KEY);
         console.error("[VideoStudio]", e);
