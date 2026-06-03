@@ -290,107 +290,76 @@ const VideoGeneration = ({ id, data, selected }) => {
     toast("Генерация остановлена", { icon: "🛑" });
   };
 
-  // Map a workflow Seedance node model → the Studio's MuAPI model id. The Studio
-  // is reliable because it routes Seedance 2.0 through MuAPI (api.muapi.ai), not
-  // direct ARK. i2v ids are used when a start/reference image is present.
-  const toStudioSeedanceModel = (hasImage) => {
-    const hay = `${selectedModel?.id || ""} ${selectedModel?.name || ""}`.toLowerCase();
-    const fast = /fast/.test(hay);
-    if (hasImage) return fast ? "seedance-2.0-fast-i2v" : "seedance-2.0-i2v";
-    return fast ? "seedance-2.0-fast-t2v" : "seedance-2.0-t2v";
-  };
-
-  // Seedance 2.0 — submit-and-poll FROM THE BROWSER through MuAPI, exactly like
-  // the Studio. The blocking workflow /run route holds a single HTTP connection
-  // for up to ~290s, which Vercel/proxies drop, leaving the node stuck on
-  // "GENERATING…". Short (<2s) submit + poll requests never hang. The previous
-  // direct-ARK path could also leave a task stuck in "running" forever; MuAPI
-  // manages the ARK task server-side and returns a stable result.
-  const runStudioSeedanceBrowser = async () => {
+  // Seedance 2.0 — submit-and-poll FROM THE BROWSER via /api/ark/seedance,
+  // EXACTLY like the Studio (packages/studio → generateSeedanceArk). The Studio
+  // generates Seedance reliably through this same route — including the character
+  // face reference (`face_asset`, e.g. an asset://… trusted asset) — so the
+  // workflow node uses the identical path. The blocking workflow /run route holds
+  // one HTTP connection up to ~290s (Vercel drops it → node stuck on
+  // "GENERATING…"); the short submit + poll requests here never hang.
+  const runArkSeedanceBrowser = async () => {
+    const fast = /fast/.test(`${selectedModel?.id || ""} ${selectedModel?.name || ""}`.toLowerCase());
     const src = formValues || {};
-
-    // Determine the reference image. MuAPI cannot resolve ARK `asset://…` trusted
-    // assets (those only work on the direct ARK path), so we use a real public
-    // image URL when one is available: an explicit image input, otherwise the
-    // character's uploaded photo. An `asset://…`-only face is dropped here — the
-    // generation still runs, just without the face reference.
-    // Only a real fetchable http(s) URL works as a MuAPI reference — asset://…
-    // (ARK-only) and data: (base64, rejected by the backend) are skipped.
-    const realUrl = (u) => (u && typeof u === "string" && /^https?:\/\//i.test(u) ? u : undefined);
-    const imageUrl =
-      realUrl(src.image_url) ||
-      (Array.isArray(src.images_list) ? src.images_list.map(realUrl).find(Boolean) : undefined) ||
-      realUrl(src.face_asset) ||
-      realUrl(src.face_thumbnail) ||
-      undefined;
-
-    const model = toStudioSeedanceModel(!!imageUrl);
-    const isFast = /fast/.test(model);
-    let resolution = src.resolution || undefined;
-    if (isFast && String(resolution).toLowerCase() === "1080p") resolution = "720p"; // Fast caps at 720p
-
     const body = {
-      model,
+      fast,
       prompt: src.prompt || "",
-      image_url: imageUrl,
-      aspect_ratio: src.aspect_ratio || src.ratio || undefined,
-      resolution,
+      image_url: src.image_url || undefined,
+      image_urls: Array.isArray(src.images_list) ? src.images_list.filter(Boolean) : undefined,
+      video_url: src.video_url || undefined,
+      audio_url: src.audio_url || undefined,
+      resolution: src.resolution || undefined,
+      ratio: src.aspect_ratio || src.ratio || undefined,
       duration: src.duration || undefined,
+      face_asset: src.face_asset || undefined,
     };
 
-    if (src.face_asset && String(src.face_asset).startsWith("asset://") && !imageUrl) {
-      toast("Лицо asset:// доступно только в прямом ARK — генерирую без референса лица", { icon: "⚠️" });
-    }
-
-    // Step 1: submit — fast, just creates the MuAPI task and returns a requestId.
-    toast("Отправляю в MuAPI…", { icon: "🚀" });
+    // Step 1: submit — fast, just creates the Ark task and returns a taskId.
+    toast("Отправляю в ARK…", { icon: "🚀" });
     let submit;
     try {
-      submit = await axios.post("/api/muapi/video", body);
+      submit = await axios.post("/api/ark/seedance", body);
     } catch (e) {
-      throw new Error(e.response?.data?.error || `MuAPI submit ${e.response?.status || ""}: ${e.message}`);
+      throw new Error(e.response?.data?.error || `ARK submit ${e.response?.status || ""}: ${e.message}`);
     }
-
-    // Some endpoints return a finished result immediately.
-    let finishedUrl = submit.data?.url || null;
-    const requestId = submit.data?.requestId;
-    if (!requestId && !finishedUrl) throw new Error(submit.data?.error || "MuAPI: задача не создана.");
-    if (requestId) toast.success(`Задача создана: ${String(requestId).slice(0, 12)}…`);
+    const taskId = submit.data?.taskId;
+    if (!taskId) throw new Error(submit.data?.error || "ARK: задача не создана (нет taskId).");
+    toast.success(`Задача создана: ${String(taskId).slice(0, 12)}…`);
 
     // Step 2: poll from the browser — each request is < 1s, so no connection hangs.
+    let finishedUrl = null;
     let pollErrors = 0;
-    for (let attempt = 0; !finishedUrl && attempt < 360; attempt++) {
+    for (let attempt = 0; attempt < 300; attempt++) {
       if (arkCancelRef.current) { arkCancelRef.current = false; return; }
-      await new Promise((r) => setTimeout(r, 2500));
+      await new Promise((r) => setTimeout(r, 5000));
       if (arkCancelRef.current) { arkCancelRef.current = false; return; }
 
       let pd;
       try {
-        const poll = await axios.get(`/api/muapi/video?id=${encodeURIComponent(requestId)}`);
+        const poll = await axios.get(`/api/ark/seedance?taskId=${encodeURIComponent(taskId)}`);
         pd = poll.data;
         pollErrors = 0;
       } catch (e) {
         // Don't loop forever on a persistent failure — surface it after ~1 min.
-        if (++pollErrors >= 24) {
-          throw new Error(e.response?.data?.error || "MuAPI: опрос статуса не отвечает.");
+        if (++pollErrors >= 12) {
+          throw new Error(e.response?.data?.error || "ARK: опрос статуса не отвечает.");
         }
         continue;
       }
       const status = String(pd?.status || "").toLowerCase();
       if (status === "succeeded" || status === "success" || status === "completed") {
-        if (!pd.url) throw new Error("MuAPI: видео готово, но URL не получен.");
+        if (!pd.url) throw new Error("ARK: видео готово, но URL не получен.");
         finishedUrl = pd.url;
         break;
       }
       if (["failed", "error", "expired", "cancelled"].includes(status)) {
-        throw new Error(`MuAPI: генерация не удалась (${pd.error || status}).`);
+        throw new Error(`ARK: генерация не удалась (${pd.error || status}).`);
       }
     }
 
-    if (!finishedUrl) throw new Error("MuAPI: превышено время ожидания генерации.");
+    if (!finishedUrl) throw new Error("ARK: превышено время ожидания генерации.");
 
-    // Показываем результат СРАЗУ — MuAPI отдаёт постоянный CDN URL.
-    const histId = requestId || finishedUrl;
+    // Показываем результат СРАЗУ с ARK-ссылкой — не ждём TOS-зеркалирования.
+    const histId = taskId;
     const output = [{ type: "video_url", value: finishedUrl }];
     const newHistory = [
       ...(data.outputHistory || []),
@@ -420,7 +389,7 @@ const VideoGeneration = ({ id, data, selected }) => {
         );
         data.onDataChange(id, { outputs: tosOutput, resultUrl: tosUrl, outputHistory: tosHistory });
       })
-      .catch(() => { /* MuAPI URL остаётся */ });
+      .catch(() => { /* ARK URL остаётся */ });
   };
 
   const handleRunSingleNode = async () => {
@@ -438,16 +407,16 @@ const VideoGeneration = ({ id, data, selected }) => {
     try {
       data.onDataChange(id, { isLoading: true });
 
-      // Seedance 2.0 → browser submit-and-poll through MuAPI (same path as the
-      // Studio). Bypasses the blocking workflow /run route AND the fragile direct
-      // ARK path, both of which left the node stuck on "GENERATING…".
+      // Seedance 2.0 → browser submit-and-poll via /api/ark/seedance (same path
+      // as the Studio). Bypasses the blocking workflow /run route that hangs the
+      // node, and carries face_asset so the character reference works.
       // Robust detection: match the model id OR display name in any format
       // ("doubao-seedance-2-0-fast-260128", "Seedance 2.0 Fast", …).
       const modelHay = `${selectedModel?.id || ""} ${selectedModel?.name || ""} ${data.selectedModel?.id || ""} ${data.selectedModel?.name || ""}`.toLowerCase();
       const isSeedance = /seedance[\s-]*2/.test(modelHay);
       if (isSeedance) {
         try {
-          await runStudioSeedanceBrowser();
+          await runArkSeedanceBrowser();
         } catch (e) {
           data.onDataChange(id, { isLoading: false, errorMsg: e.message?.slice(0, 120) || "Ошибка генерации" });
           toast.error(e.message?.slice(0, 80) || "Ошибка генерации");

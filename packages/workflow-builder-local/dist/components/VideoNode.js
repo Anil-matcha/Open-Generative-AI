@@ -373,65 +373,40 @@ var VideoGeneration = function VideoGeneration(_ref) {
     });
   };
 
-  // Map a workflow Seedance node model → the Studio's MuAPI model id. The Studio
-  // is reliable because it routes Seedance 2.0 through MuAPI (api.muapi.ai), not
-  // direct ARK. i2v ids are used when a start/reference image is present.
-  var toStudioSeedanceModel = function toStudioSeedanceModel(hasImage) {
-    var hay = "".concat((selectedModel === null || selectedModel === void 0 ? void 0 : selectedModel.id) || "", " ").concat((selectedModel === null || selectedModel === void 0 ? void 0 : selectedModel.name) || "").toLowerCase();
-    var fast = /fast/.test(hay);
-    if (hasImage) return fast ? "seedance-2.0-fast-i2v" : "seedance-2.0-i2v";
-    return fast ? "seedance-2.0-fast-t2v" : "seedance-2.0-t2v";
-  };
-
-  // Seedance 2.0 — submit-and-poll FROM THE BROWSER through MuAPI, exactly like
-  // the Studio. The blocking workflow /run route holds a single HTTP connection
-  // for up to ~290s, which Vercel/proxies drop, leaving the node stuck on
-  // "GENERATING…". Short (<2s) submit + poll requests never hang. The previous
-  // direct-ARK path could also leave a task stuck in "running" forever; MuAPI
-  // manages the ARK task server-side and returns a stable result.
-  var runStudioSeedanceBrowser = /*#__PURE__*/function () {
+  // Seedance 2.0 — submit-and-poll FROM THE BROWSER via /api/ark/seedance,
+  // EXACTLY like the Studio (packages/studio → generateSeedanceArk). The Studio
+  // generates Seedance reliably through this same route — including the character
+  // face reference (`face_asset`, e.g. an asset://… trusted asset) — so the
+  // workflow node uses the identical path. The blocking workflow /run route holds
+  // one HTTP connection up to ~290s (Vercel drops it → node stuck on
+  // "GENERATING…"); the short submit + poll requests here never hang.
+  var runArkSeedanceBrowser = /*#__PURE__*/function () {
     var _ref1 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee() {
-      var _submit$data, _submit$data2, _submit$data3;
-      var src, realUrl, imageUrl, model, isFast, resolution, body, submit, _e$response, _e$response2, finishedUrl, requestId, pollErrors, attempt, _pd, pd, poll, _e$response3, status, histId, output, newHistory, _t, _t2;
+      var _submit$data, _submit$data2;
+      var fast, src, body, submit, _e$response, _e$response2, taskId, finishedUrl, pollErrors, attempt, _pd, pd, poll, _e$response3, status, histId, output, newHistory, _t, _t2;
       return _regenerator().w(function (_context) {
         while (1) switch (_context.p = _context.n) {
           case 0:
-            src = formValues || {}; // Determine the reference image. MuAPI cannot resolve ARK `asset://…` trusted
-            // assets (those only work on the direct ARK path), so we use a real public
-            // image URL when one is available: an explicit image input, otherwise the
-            // character's uploaded photo. An `asset://…`-only face is dropped here — the
-            // generation still runs, just without the face reference.
-            // Only a real fetchable http(s) URL works as a MuAPI reference — asset://…
-            // (ARK-only) and data: (base64, rejected by the backend) are skipped.
-            realUrl = function realUrl(u) {
-              return u && typeof u === "string" && /^https?:\/\//i.test(u) ? u : undefined;
-            };
-            imageUrl = realUrl(src.image_url) || (Array.isArray(src.images_list) ? src.images_list.map(realUrl).find(Boolean) : undefined) || realUrl(src.face_asset) || realUrl(src.face_thumbnail) || undefined;
-            model = toStudioSeedanceModel(!!imageUrl);
-            isFast = /fast/.test(model);
-            resolution = src.resolution || undefined;
-            if (isFast && String(resolution).toLowerCase() === "1080p") resolution = "720p"; // Fast caps at 720p
+            fast = /fast/.test("".concat((selectedModel === null || selectedModel === void 0 ? void 0 : selectedModel.id) || "", " ").concat((selectedModel === null || selectedModel === void 0 ? void 0 : selectedModel.name) || "").toLowerCase());
+            src = formValues || {};
             body = {
-              model: model,
+              fast: fast,
               prompt: src.prompt || "",
-              image_url: imageUrl,
-              aspect_ratio: src.aspect_ratio || src.ratio || undefined,
-              resolution: resolution,
-              duration: src.duration || undefined
-            };
-            if (src.face_asset && String(src.face_asset).startsWith("asset://") && !imageUrl) {
-              (0, _reactHotToast.toast)("Лицо asset:// доступно только в прямом ARK — генерирую без референса лица", {
-                icon: "⚠️"
-              });
-            }
-
-            // Step 1: submit — fast, just creates the MuAPI task and returns a requestId.
-            (0, _reactHotToast.toast)("Отправляю в MuAPI…", {
+              image_url: src.image_url || undefined,
+              image_urls: Array.isArray(src.images_list) ? src.images_list.filter(Boolean) : undefined,
+              video_url: src.video_url || undefined,
+              audio_url: src.audio_url || undefined,
+              resolution: src.resolution || undefined,
+              ratio: src.aspect_ratio || src.ratio || undefined,
+              duration: src.duration || undefined,
+              face_asset: src.face_asset || undefined
+            }; // Step 1: submit — fast, just creates the Ark task and returns a taskId.
+            (0, _reactHotToast.toast)("Отправляю в ARK…", {
               icon: "🚀"
             });
             _context.p = 1;
             _context.n = 2;
-            return _axios["default"].post("/api/muapi/video", body);
+            return _axios["default"].post("/api/ark/seedance", body);
           case 2:
             submit = _context.v;
             _context.n = 4;
@@ -439,24 +414,23 @@ var VideoGeneration = function VideoGeneration(_ref) {
           case 3:
             _context.p = 3;
             _t = _context.v;
-            throw new Error(((_e$response = _t.response) === null || _e$response === void 0 || (_e$response = _e$response.data) === null || _e$response === void 0 ? void 0 : _e$response.error) || "MuAPI submit ".concat(((_e$response2 = _t.response) === null || _e$response2 === void 0 ? void 0 : _e$response2.status) || "", ": ").concat(_t.message));
+            throw new Error(((_e$response = _t.response) === null || _e$response === void 0 || (_e$response = _e$response.data) === null || _e$response === void 0 ? void 0 : _e$response.error) || "ARK submit ".concat(((_e$response2 = _t.response) === null || _e$response2 === void 0 ? void 0 : _e$response2.status) || "", ": ").concat(_t.message));
           case 4:
-            // Some endpoints return a finished result immediately.
-            finishedUrl = ((_submit$data = submit.data) === null || _submit$data === void 0 ? void 0 : _submit$data.url) || null;
-            requestId = (_submit$data2 = submit.data) === null || _submit$data2 === void 0 ? void 0 : _submit$data2.requestId;
-            if (!(!requestId && !finishedUrl)) {
+            taskId = (_submit$data = submit.data) === null || _submit$data === void 0 ? void 0 : _submit$data.taskId;
+            if (taskId) {
               _context.n = 5;
               break;
             }
-            throw new Error(((_submit$data3 = submit.data) === null || _submit$data3 === void 0 ? void 0 : _submit$data3.error) || "MuAPI: задача не создана.");
+            throw new Error(((_submit$data2 = submit.data) === null || _submit$data2 === void 0 ? void 0 : _submit$data2.error) || "ARK: задача не создана (нет taskId).");
           case 5:
-            if (requestId) _reactHotToast.toast.success("\u0417\u0430\u0434\u0430\u0447\u0430 \u0441\u043E\u0437\u0434\u0430\u043D\u0430: ".concat(String(requestId).slice(0, 12), "\u2026"));
+            _reactHotToast.toast.success("\u0417\u0430\u0434\u0430\u0447\u0430 \u0441\u043E\u0437\u0434\u0430\u043D\u0430: ".concat(String(taskId).slice(0, 12), "\u2026"));
 
             // Step 2: poll from the browser — each request is < 1s, so no connection hangs.
+            finishedUrl = null;
             pollErrors = 0;
             attempt = 0;
           case 6:
-            if (!(!finishedUrl && attempt < 360)) {
+            if (!(attempt < 300)) {
               _context.n = 18;
               break;
             }
@@ -469,7 +443,7 @@ var VideoGeneration = function VideoGeneration(_ref) {
           case 7:
             _context.n = 8;
             return new Promise(function (r) {
-              return setTimeout(r, 2500);
+              return setTimeout(r, 5000);
             });
           case 8:
             if (!arkCancelRef.current) {
@@ -482,7 +456,7 @@ var VideoGeneration = function VideoGeneration(_ref) {
             pd = void 0;
             _context.p = 10;
             _context.n = 11;
-            return _axios["default"].get("/api/muapi/video?id=".concat(encodeURIComponent(requestId)));
+            return _axios["default"].get("/api/ark/seedance?taskId=".concat(encodeURIComponent(taskId)));
           case 11:
             poll = _context.v;
             pd = poll.data;
@@ -492,11 +466,11 @@ var VideoGeneration = function VideoGeneration(_ref) {
           case 12:
             _context.p = 12;
             _t2 = _context.v;
-            if (!(++pollErrors >= 24)) {
+            if (!(++pollErrors >= 12)) {
               _context.n = 13;
               break;
             }
-            throw new Error(((_e$response3 = _t2.response) === null || _e$response3 === void 0 || (_e$response3 = _e$response3.data) === null || _e$response3 === void 0 ? void 0 : _e$response3.error) || "MuAPI: опрос статуса не отвечает.");
+            throw new Error(((_e$response3 = _t2.response) === null || _e$response3 === void 0 || (_e$response3 = _e$response3.data) === null || _e$response3 === void 0 ? void 0 : _e$response3.error) || "ARK: опрос статуса не отвечает.");
           case 13:
             return _context.a(3, 17);
           case 14:
@@ -509,7 +483,7 @@ var VideoGeneration = function VideoGeneration(_ref) {
               _context.n = 15;
               break;
             }
-            throw new Error("MuAPI: видео готово, но URL не получен.");
+            throw new Error("ARK: видео готово, но URL не получен.");
           case 15:
             finishedUrl = pd.url;
             return _context.a(3, 18);
@@ -518,7 +492,7 @@ var VideoGeneration = function VideoGeneration(_ref) {
               _context.n = 17;
               break;
             }
-            throw new Error("MuAPI: \u0433\u0435\u043D\u0435\u0440\u0430\u0446\u0438\u044F \u043D\u0435 \u0443\u0434\u0430\u043B\u0430\u0441\u044C (".concat(pd.error || status, ")."));
+            throw new Error("ARK: \u0433\u0435\u043D\u0435\u0440\u0430\u0446\u0438\u044F \u043D\u0435 \u0443\u0434\u0430\u043B\u0430\u0441\u044C (".concat(pd.error || status, ")."));
           case 17:
             attempt++;
             _context.n = 6;
@@ -528,10 +502,10 @@ var VideoGeneration = function VideoGeneration(_ref) {
               _context.n = 19;
               break;
             }
-            throw new Error("MuAPI: превышено время ожидания генерации.");
+            throw new Error("ARK: превышено время ожидания генерации.");
           case 19:
-            // Показываем результат СРАЗУ — MuAPI отдаёт постоянный CDN URL.
-            histId = requestId || finishedUrl;
+            // Показываем результат СРАЗУ с ARK-ссылкой — не ждём TOS-зеркалирования.
+            histId = taskId;
             output = [{
               type: "video_url",
               value: finishedUrl
@@ -578,13 +552,13 @@ var VideoGeneration = function VideoGeneration(_ref) {
                 resultUrl: tosUrl,
                 outputHistory: tosHistory
               });
-            })["catch"](function () {/* MuAPI URL остаётся */});
+            })["catch"](function () {/* ARK URL остаётся */});
           case 20:
             return _context.a(2);
         }
       }, _callee, null, [[10, 12], [1, 3]]);
     }));
-    return function runStudioSeedanceBrowser() {
+    return function runArkSeedanceBrowser() {
       return _ref1.apply(this, arguments);
     };
   }();
@@ -613,9 +587,9 @@ var VideoGeneration = function VideoGeneration(_ref) {
               isLoading: true
             });
 
-            // Seedance 2.0 → browser submit-and-poll through MuAPI (same path as the
-            // Studio). Bypasses the blocking workflow /run route AND the fragile direct
-            // ARK path, both of which left the node stuck on "GENERATING…".
+            // Seedance 2.0 → browser submit-and-poll via /api/ark/seedance (same path
+            // as the Studio). Bypasses the blocking workflow /run route that hangs the
+            // node, and carries face_asset so the character reference works.
             // Robust detection: match the model id OR display name in any format
             // ("doubao-seedance-2-0-fast-260128", "Seedance 2.0 Fast", …).
             modelHay = "".concat((selectedModel === null || selectedModel === void 0 ? void 0 : selectedModel.id) || "", " ").concat((selectedModel === null || selectedModel === void 0 ? void 0 : selectedModel.name) || "", " ").concat(((_data$selectedModel3 = data.selectedModel) === null || _data$selectedModel3 === void 0 ? void 0 : _data$selectedModel3.id) || "", " ").concat(((_data$selectedModel4 = data.selectedModel) === null || _data$selectedModel4 === void 0 ? void 0 : _data$selectedModel4.name) || "").toLowerCase();
@@ -626,7 +600,7 @@ var VideoGeneration = function VideoGeneration(_ref) {
             }
             _context2.p = 3;
             _context2.n = 4;
-            return runStudioSeedanceBrowser();
+            return runArkSeedanceBrowser();
           case 4:
             _context2.n = 6;
             break;
