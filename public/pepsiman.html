@@ -85,6 +85,14 @@
   }
   #touch button:active { background: rgba(255,255,255,0.28); }
   @media (pointer: coarse) { #touch { display: grid; } }
+  #muteBtn {
+    position: absolute; top: 12px; right: 50%; transform: translateX(140px);
+    width: 38px; height: 38px; border-radius: 10px; border: none;
+    background: rgba(0,0,0,0.35); color: #fff; font-size: 18px; cursor: pointer;
+  }
+  #muteBtn:active { background: rgba(0,0,0,0.6); }
+  .powers { font-family: Arial; font-size: 12px; opacity:.85; line-height:1.7; }
+  .powers b { color:#19e6c8; }
 </style>
 </head>
 <body>
@@ -93,9 +101,12 @@
 
   <div id="hud" class="hidden">
     <div><div class="label">SCORE</div><span id="score">0</span></div>
+    <div style="text-align:center"><div class="label">LVL</div><span id="level">1</span></div>
     <div style="text-align:center"><div class="label">CANS</div><span id="cans">0</span></div>
     <div style="text-align:right"><div class="label">BEST</div><span id="best">0</span></div>
   </div>
+
+  <button id="muteBtn" title="Mute / unmute">🔊</button>
 
   <!-- Start screen -->
   <div id="start" class="overlay">
@@ -107,6 +118,11 @@
       <div><b>SPACE</b> / <b>↑</b> / <b>W</b> &nbsp; jump</div>
       <div><b>↓</b> / <b>S</b> &nbsp; slide</div>
       <div style="opacity:.7">(on phone use the buttons below)</div>
+    </div>
+    <div class="powers">
+      Grab power-ups: <b style="color:#19e6c8">S</b> shield ·
+      <b style="color:#ff7a18">M</b> magnet · <b style="color:#2b8fd6">×2</b> double score<br>
+      Survive longer to climb levels &amp; new worlds!
     </div>
     <button class="btn" id="startBtn">START</button>
   </div>
@@ -151,7 +167,7 @@
   }
 
   // ---- Game state ----
-  let state, score, cans, best, speed, spawnTimer, obstacles, particles, t, shake;
+  let state, score, cans, best, speed, spawnTimer, obstacles, particles, floaters, t, shake, level;
   best = +(localStorage.getItem('pepsiman_best') || 0);
   document.getElementById('best').textContent = best;
 
@@ -164,35 +180,97 @@
     sliding: false,
     slideT: 0,
     runFrame: 0,
+    shieldT: 0,         // invincibility frames remaining
+    magnetT: 0,         // can-magnet frames remaining
+    x2T: 0,             // double-score frames remaining
   };
 
   const GRAVITY = 0.9;
   const JUMP_V = 17;
   const SLIDE_TIME = 42; // frames
+  const POWER_TIME = 360; // ~6s of power-up
+
+  // 5 level themes (cycle): [name, sky top, sky bottom, road, accent]
+  const THEMES = [
+    ['CITY',     '#0b1d4d', '#2b8fd6', '#3a3f4b', '#c8102e'],
+    ['SUNSET',   '#3a0d4d', '#ff7a18', '#4a2a3b', '#ffd34d'],
+    ['NIGHT',    '#05060f', '#1a2a5a', '#23252e', '#2b8fd6'],
+    ['DESERT',   '#3d2a0d', '#e0a23b', '#5a4a2e', '#c8102e'],
+    ['NEON',     '#10043d', '#d61a9a', '#2a1840', '#19e6c8'],
+  ];
+  function theme() { return THEMES[level % THEMES.length]; }
+
+  // ---- Sound (Web Audio, no external files) ----
+  let actx = null;
+  function ac() {
+    if (!actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} }
+    return actx;
+  }
+  let muted = false;
+  function tone(freq, dur, type = 'square', vol = 0.12, slide = 0) {
+    if (muted) return;
+    const a = ac(); if (!a) return;
+    const o = a.createOscillator(), g = a.createGain();
+    o.type = type; o.frequency.value = freq;
+    if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(20, freq + slide), a.currentTime + dur);
+    g.gain.setValueAtTime(vol, a.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001, a.currentTime + dur);
+    o.connect(g); g.connect(a.destination);
+    o.start(); o.stop(a.currentTime + dur);
+  }
+  const sfx = {
+    jump:   () => tone(420, 0.18, 'square', 0.10, 360),
+    slide:  () => tone(240, 0.20, 'sawtooth', 0.08, -140),
+    coin:   () => { tone(880, 0.07, 'square', 0.10); setTimeout(() => tone(1320, 0.10, 'square', 0.10), 60); },
+    power:  () => { tone(523, 0.10, 'triangle', 0.12); setTimeout(() => tone(784, 0.10, 'triangle', 0.12), 90); setTimeout(() => tone(1047, 0.14, 'triangle', 0.12), 180); },
+    hit:    () => { tone(160, 0.35, 'sawtooth', 0.18, -120); shake = 18; },
+    shield: () => tone(300, 0.18, 'sine', 0.14, 220),
+    level:  () => { [523,659,784,1047].forEach((f,i) => setTimeout(() => tone(f, 0.12, 'triangle', 0.12), i*70)); },
+  };
 
   function reset() {
+    if (ac() && actx.state === 'suspended') actx.resume();
     state = 'play';
-    score = 0; cans = 0; speed = 0.011; spawnTimer = 0;
-    obstacles = []; particles = []; t = 0; shake = 0;
+    score = 0; cans = 0; speed = 0.011; spawnTimer = 0; level = 0;
+    obstacles = []; particles = []; floaters = []; t = 0; shake = 0;
     player.lane = 1; player.x = 0; player.y = 0; player.vy = 0;
     player.jumping = false; player.sliding = false; player.slideT = 0;
+    player.shieldT = 0; player.magnetT = 0; player.x2T = 0;
     document.getElementById('hud').classList.remove('hidden');
     document.getElementById('start').classList.add('hidden');
     document.getElementById('gameover').classList.add('hidden');
+    updateLevel();
+  }
+
+  // current score multiplier from x2 power-up
+  function scoreMult() { return player.x2T > 0 ? 2 : 1; }
+
+  // levels advance every 1500 points
+  function updateLevel() {
+    const lv = Math.floor(score / 1500);
+    if (lv !== level) {
+      const goingUp = lv > level;
+      level = lv;
+      if (goingUp) { sfx.level(); floaters.push({ text: 'LEVEL ' + (level + 1) + ' — ' + theme()[0], x: W/2, y: H*0.4, life: 90, color: theme()[4], size: 26 }); }
+    }
+    document.getElementById('level').textContent = level + 1;
   }
 
   // ---- Spawning ----
-  // types: 'crate' (jump over), 'bar' (slide under), 'cone' (jump), 'can' (collect)
+  // hazards: 'crate'/'cone' (jump over), 'bar' (slide under)
+  // pickups: 'can' (score), 'shield'/'magnet'/'x2' (power-ups)
   function spawn() {
     const lane = Math.floor(Math.random() * 3);
     const r = Math.random();
     let type;
-    if (r < 0.30) type = 'crate';
-    else if (r < 0.50) type = 'bar';
-    else if (r < 0.62) type = 'cone';
-    else type = 'can';
+    if (r < 0.030)      type = 'shield';   // rare power-ups
+    else if (r < 0.060) type = 'magnet';
+    else if (r < 0.090) type = 'x2';
+    else if (r < 0.36)  type = 'crate';
+    else if (r < 0.56)  type = 'bar';
+    else if (r < 0.66)  type = 'cone';
+    else                type = 'can';
 
-    // avoid impossible double-blockers: ensure at least one safe lane sometimes
     obstacles.push({ lane, z: 0.0, type, alive: true, scored: false });
   }
 
@@ -202,13 +280,13 @@
   function jump() {
     if (state !== 'play') return;
     if (!player.jumping && !player.sliding) {
-      player.jumping = true; player.vy = JUMP_V;
+      player.jumping = true; player.vy = JUMP_V; sfx.jump();
     }
   }
   function slide() {
     if (state !== 'play') return;
     if (!player.jumping && !player.sliding) {
-      player.sliding = true; player.slideT = SLIDE_TIME;
+      player.sliding = true; player.slideT = SLIDE_TIME; sfx.slide();
     }
   }
 
@@ -226,6 +304,9 @@
 
   document.getElementById('startBtn').onclick = reset;
   document.getElementById('retryBtn').onclick = reset;
+
+  const muteBtn = document.getElementById('muteBtn');
+  muteBtn.onclick = () => { muted = !muted; muteBtn.textContent = muted ? '🔇' : '🔊'; };
 
   // Touch buttons
   document.querySelectorAll('#touch button').forEach(b => {
@@ -282,40 +363,76 @@
     }
     player.runFrame += 0.35 + speed * 8;
 
-    // difficulty ramp
-    speed = Math.min(0.030, 0.011 + t * 0.000006);
+    // power-up timers
+    if (player.shieldT > 0) player.shieldT--;
+    if (player.magnetT > 0) player.magnetT--;
+    if (player.x2T > 0) player.x2T--;
+
+    // difficulty ramp (also scales a little with level)
+    speed = Math.min(0.034, 0.011 + t * 0.000006 + level * 0.0012);
 
     // spawn
     spawnTimer--;
     if (spawnTimer <= 0) {
       spawn();
-      spawnTimer = Math.max(28, 70 - t * 0.01) + Math.random() * 22;
+      spawnTimer = Math.max(24, 70 - t * 0.01 - level * 2) + Math.random() * 22;
     }
+
+    const isPickup = (ty) => ty === 'can' || ty === 'shield' || ty === 'magnet' || ty === 'x2';
 
     // move obstacles toward player
     for (const o of obstacles) {
       o.z += speed;
-      // collect can
-      if (o.type === 'can' && !o.scored && o.lane === player.lane &&
+
+      // magnet: pull nearby cans into the player's lane as they approach
+      if (player.magnetT > 0 && o.type === 'can' && o.z > 0.55) {
+        o.lane = player.lane;
+      }
+
+      if (isPickup(o.type) && !o.scored && o.lane === player.lane &&
           o.z > PLAYER_Z - 0.06 && o.z < PLAYER_Z + 0.06) {
-        // can collected if not high-jumping over it irrelevantly; just collect when in lane band
         o.scored = true; o.alive = false;
-        cans++; score += 50;
-        burst(W/2 + player.x * LANE_W, HORIZON + (H-HORIZON)*PLAYER_Z - 40, '#ffd34d');
+        const px = W/2 + player.x * LANE_W;
+        const py = HORIZON + (H-HORIZON)*PLAYER_Z - 40;
+        if (o.type === 'can') {
+          cans++; score += 50 * scoreMult();
+          burst(px, py, '#ffd34d'); sfx.coin();
+        } else if (o.type === 'shield') {
+          player.shieldT = POWER_TIME; burst(px, py, '#19e6c8'); sfx.power();
+          floaters.push({ text: 'SHIELD!', x: px, y: py, life: 50, color: '#19e6c8', size: 22 });
+        } else if (o.type === 'magnet') {
+          player.magnetT = POWER_TIME; burst(px, py, '#ff7a18'); sfx.power();
+          floaters.push({ text: 'MAGNET!', x: px, y: py, life: 50, color: '#ff7a18', size: 22 });
+        } else if (o.type === 'x2') {
+          player.x2T = POWER_TIME; burst(px, py, '#2b8fd6'); sfx.power();
+          floaters.push({ text: 'SCORE x2!', x: px, y: py, life: 50, color: '#2b8fd6', size: 22 });
+        }
       }
       // collision with hazard
-      if (o.type !== 'can' && !o.scored && collide(o)) {
+      if (!isPickup(o.type) && !o.scored && collide(o)) {
         o.scored = true;
-        gameOver();
+        if (player.shieldT > 0) {
+          // shield absorbs the hit and breaks the obstacle
+          o.alive = false;
+          player.shieldT = Math.max(0, player.shieldT - 90);
+          burst(W/2 + player.x * LANE_W, H*0.78, '#19e6c8'); sfx.shield();
+        } else {
+          gameOver();
+        }
       }
       if (o.z > 1.15) o.alive = false;
     }
     obstacles = obstacles.filter(o => o.alive);
 
     // passive score
-    score += Math.round(1 + speed * 30);
+    score += Math.round((1 + speed * 30) * scoreMult());
+    updateLevel();
     document.getElementById('score').textContent = score;
     document.getElementById('cans').textContent = cans;
+
+    // floating text
+    for (const f of floaters) { f.y -= 0.6; f.life--; }
+    floaters = floaters.filter(f => f.life > 0);
 
     // particles
     for (const p of particles) { p.x += p.vx; p.y += p.vy; p.vy += 0.4; p.life--; }
@@ -336,7 +453,7 @@
 
   function gameOver() {
     state = 'over';
-    shake = 18;
+    sfx.hit();
     burst(W/2 + player.x * LANE_W, H*0.8, '#c8102e');
     if (score > best) {
       best = score;
@@ -353,10 +470,11 @@
 
   // ---- Render ----
   function drawRoad() {
+    const th = theme();
     // sky / city backdrop
     const sky = ctx.createLinearGradient(0, 0, 0, HORIZON);
-    sky.addColorStop(0, '#0b1d4d');
-    sky.addColorStop(1, '#2b8fd6');
+    sky.addColorStop(0, th[1]);
+    sky.addColorStop(1, th[2]);
     ctx.fillStyle = sky;
     ctx.fillRect(0, 0, W, HORIZON);
 
@@ -374,7 +492,7 @@
 
     // ground
     const grd = ctx.createLinearGradient(0, HORIZON, 0, H);
-    grd.addColorStop(0, '#1d3a6e');
+    grd.addColorStop(0, th[2]);
     grd.addColorStop(1, '#0e1f42');
     ctx.fillStyle = grd;
     ctx.fillRect(0, HORIZON, W, H - HORIZON);
@@ -382,7 +500,7 @@
     // road trapezoid
     const farL = project(-1.6, 0.001).x, farR = project(1.6, 0.001).x;
     const nearL = project(-1.6, 1).x, nearR = project(1.6, 1).x;
-    ctx.fillStyle = '#3a3f4b';
+    ctx.fillStyle = th[3];
     ctx.beginPath();
     ctx.moveTo(farL, HORIZON); ctx.lineTo(farR, HORIZON);
     ctx.lineTo(nearR, H); ctx.lineTo(nearL, H); ctx.closePath(); ctx.fill();
@@ -400,7 +518,7 @@
       }
     }
     // road edges
-    ctx.strokeStyle = '#c8102e'; ctx.lineWidth = 3;
+    ctx.strokeStyle = theme()[4]; ctx.lineWidth = 3;
     for (const edge of [-1.6, 1.6]) {
       const a = project(edge, 0.001), b = project(edge, 1);
       ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
@@ -455,6 +573,22 @@
       ctx.fillStyle = '#ffd34d';
       const tw = (Math.sin(t*0.2 + o.z*10)+1)*2*s;
       ctx.fillRect(p.x - tw/2, cy - 6*s, tw, tw);
+    } else if (o.type === 'shield' || o.type === 'magnet' || o.type === 'x2') {
+      // floating power-up orb with glow + icon
+      const r = 26*s;
+      const cy = p.y - 60*s + Math.sin(t*0.12 + o.z*8) * 5*s;
+      const col = o.type === 'shield' ? '#19e6c8' : o.type === 'magnet' ? '#ff7a18' : '#2b8fd6';
+      ctx.save();
+      ctx.shadowColor = col; ctx.shadowBlur = 18*s;
+      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+      ctx.beginPath(); ctx.arc(p.x, cy, r, 0, Math.PI*2); ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.lineWidth = Math.max(2, 4*s); ctx.strokeStyle = col;
+      ctx.beginPath(); ctx.arc(p.x, cy, r, 0, Math.PI*2); ctx.stroke();
+      ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.font = `bold ${Math.max(12, 24*s)}px Arial`;
+      ctx.fillText(o.type === 'x2' ? '×2' : (o.type === 'shield' ? 'S' : 'M'), p.x, cy + 1);
+      ctx.restore();
     }
     ctx.restore();
   }
@@ -529,6 +663,25 @@
     ctx.fillStyle = 'rgba(20,40,90,0.7)';
     ctx.fillRect(p.x - headR*0.7, hy - 2*s, headR*1.4, headR*0.8);
 
+    // shield bubble (blink when about to expire)
+    if (player.shieldT > 0 && (player.shieldT > 60 || (t >> 2) & 1)) {
+      ctx.strokeStyle = 'rgba(25,230,200,0.85)'; ctx.lineWidth = 3;
+      ctx.fillStyle = 'rgba(25,230,200,0.12)';
+      ctx.beginPath();
+      ctx.ellipse(p.x, baseY - bodyH*0.5, bw*0.9, bodyH*0.7, 0, 0, Math.PI*2);
+      ctx.fill(); ctx.stroke();
+    }
+    // magnet field rings
+    if (player.magnetT > 0) {
+      ctx.strokeStyle = 'rgba(255,122,24,0.5)'; ctx.lineWidth = 2;
+      for (let r = 0; r < 3; r++) {
+        const rad = ((t*2 + r*22) % 70);
+        ctx.globalAlpha = 1 - rad/70;
+        ctx.beginPath(); ctx.ellipse(p.x, baseY - 30*s, rad, rad*0.4, 0, 0, Math.PI*2); ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    }
+
     ctx.restore();
   }
 
@@ -539,6 +692,34 @@
       ctx.fillRect(p.x, p.y, 5, 5);
     }
     ctx.globalAlpha = 1;
+  }
+
+  function drawFloaters() {
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    for (const f of floaters) {
+      ctx.globalAlpha = Math.min(1, f.life/30);
+      ctx.fillStyle = f.color;
+      ctx.font = `bold ${f.size}px 'Arial Black', Arial`;
+      ctx.fillText(f.text, f.x, f.y);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // active power-up timer bars at bottom of screen
+  function drawPowerHUD() {
+    const items = [];
+    if (player.shieldT > 0) items.push(['SHIELD', '#19e6c8', player.shieldT]);
+    if (player.magnetT > 0) items.push(['MAGNET', '#ff7a18', player.magnetT]);
+    if (player.x2T > 0)     items.push(['x2', '#2b8fd6', player.x2T]);
+    let y = 70;
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    for (const [name, col, tt] of items) {
+      ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.fillRect(14, y, 120, 16);
+      ctx.fillStyle = col; ctx.fillRect(14, y, 120 * (tt / POWER_TIME), 16);
+      ctx.fillStyle = '#fff'; ctx.font = "bold 11px Arial";
+      ctx.fillText(name, 20, y + 8);
+      y += 22;
+    }
   }
 
   function render() {
@@ -555,6 +736,8 @@
 
     drawPlayer();
     drawParticles();
+    drawFloaters();
+    if (state === 'play') drawPowerHUD();
     ctx.restore();
   }
 
