@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Pepsi Man — Web Runner</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    width: 100%; height: 100%; overflow: hidden;
+    background: #0a0a1a;
+    font-family: 'Arial Black', Arial, sans-serif;
+    user-select: none;
+  }
+  #wrap {
+    position: relative; width: 100vw; height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+  }
+  canvas {
+    display: block; background: #1b2a4a;
+    image-rendering: pixelated;
+    box-shadow: 0 0 60px rgba(0,0,0,0.6);
+    max-width: 100%; max-height: 100%;
+  }
+  /* HUD */
+  #hud {
+    position: absolute; top: 14px; left: 0; right: 0;
+    display: flex; justify-content: space-between;
+    padding: 0 22px; pointer-events: none;
+    color: #fff; text-shadow: 2px 2px 0 #c8102e;
+    font-size: 20px; letter-spacing: 1px;
+  }
+  #hud .label { font-size: 11px; opacity: 0.8; letter-spacing: 2px; }
+  /* Overlays */
+  .overlay {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center;
+    color: #fff; gap: 18px; padding: 24px;
+    background: radial-gradient(circle at 50% 35%, rgba(0,40,104,0.55), rgba(10,10,26,0.92));
+    backdrop-filter: blur(2px);
+  }
+  .hidden { display: none !important; }
+  .logo {
+    font-size: 54px; line-height: 1; letter-spacing: 2px;
+    color: #fff;
+    text-shadow: 0 4px 0 #c8102e, 0 8px 14px rgba(0,0,0,0.5);
+  }
+  .logo .red { color: #c8102e; }
+  .logo .blue { color: #2b8fd6; }
+  .tagline { font-size: 14px; opacity: 0.85; font-weight: normal; font-family: Arial; max-width: 460px; }
+  .pepsi-orb {
+    width: 84px; height: 84px; border-radius: 50%;
+    background:
+      linear-gradient(0deg, #c8102e 0 50%, #fff 50% 60%, #004b93 60% 100%);
+    transform: rotate(-18deg);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.5), inset 0 0 0 5px #fff;
+    animation: spin 4s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(342deg); } }
+  .btn {
+    pointer-events: auto; cursor: pointer;
+    background: linear-gradient(#e23, #b00d27);
+    color: #fff; border: 3px solid #fff; border-radius: 40px;
+    padding: 14px 38px; font-size: 20px; letter-spacing: 1px;
+    box-shadow: 0 6px 0 #7a0a1c, 0 10px 18px rgba(0,0,0,0.4);
+    transition: transform .05s ease;
+  }
+  .btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #7a0a1c; }
+  .controls {
+    font-family: Arial; font-size: 13px; opacity: 0.85; line-height: 1.9;
+    background: rgba(0,0,0,0.25); border-radius: 12px; padding: 14px 20px;
+  }
+  .controls b { color: #ffd34d; }
+  .big-score { font-size: 38px; color: #ffd34d; }
+  /* mobile touch buttons */
+  #touch {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 30%;
+    display: none; grid-template-columns: 1fr 1fr 1fr; gap: 6px;
+    padding: 6px; pointer-events: none;
+  }
+  #touch button {
+    pointer-events: auto; border: none; border-radius: 14px;
+    background: rgba(255,255,255,0.10); color: #fff; font-size: 22px;
+    font-family: Arial; backdrop-filter: blur(3px);
+  }
+  #touch button:active { background: rgba(255,255,255,0.28); }
+  @media (pointer: coarse) { #touch { display: grid; } }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <canvas id="game" width="480" height="800"></canvas>
+
+  <div id="hud" class="hidden">
+    <div><div class="label">SCORE</div><span id="score">0</span></div>
+    <div style="text-align:center"><div class="label">CANS</div><span id="cans">0</span></div>
+    <div style="text-align:right"><div class="label">BEST</div><span id="best">0</span></div>
+  </div>
+
+  <!-- Start screen -->
+  <div id="start" class="overlay">
+    <div class="pepsi-orb"></div>
+    <div class="logo"><span class="red">PEPSI</span> <span class="blue">MAN</span></div>
+    <div class="tagline">The classic PlayStation runner — reborn for the web. Dash through the city, leap over crates, slide under bars, and grab every Pepsi can you can!</div>
+    <div class="controls">
+      <div><b>←  →</b> / <b>A  D</b> &nbsp; switch lane</div>
+      <div><b>SPACE</b> / <b>↑</b> / <b>W</b> &nbsp; jump</div>
+      <div><b>↓</b> / <b>S</b> &nbsp; slide</div>
+      <div style="opacity:.7">(on phone use the buttons below)</div>
+    </div>
+    <button class="btn" id="startBtn">START</button>
+  </div>
+
+  <!-- Game over screen -->
+  <div id="gameover" class="overlay hidden">
+    <div class="logo" style="font-size:34px">GAME OVER</div>
+    <div>SCORE</div>
+    <div class="big-score" id="finalScore">0</div>
+    <div id="newBest" class="hidden" style="color:#ffd34d">★ NEW BEST! ★</div>
+    <button class="btn" id="retryBtn">RUN AGAIN</button>
+  </div>
+
+  <!-- Touch controls -->
+  <div id="touch">
+    <button data-act="left">◀</button>
+    <button data-act="jump">JUMP ▲<br><span style="font-size:12px">slide ▼</span></button>
+    <button data-act="right">▶</button>
+  </div>
+</div>
+
+<script>
+(() => {
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  // ---- Pseudo-3D road config ----
+  const LANES = [-1, 0, 1];        // left, center, right
+  const LANE_W = 150;              // world horizontal spacing of lanes
+  const HORIZON = H * 0.34;        // vanishing point y
+  const CAM_Z = 0.6;               // camera distance factor
+
+  // Project a world point (lane offset x in lane-units, ground depth z 0..1, height h)
+  // z = 1 near player, z -> 0 at horizon
+  function project(laneX, z, h = 0) {
+    const scale = z;                       // 0 (far) .. 1 (near)
+    const sx = W / 2 + laneX * LANE_W * scale;
+    const groundY = HORIZON + (H - HORIZON) * z;
+    const sy = groundY - h * scale;
+    return { x: sx, y: sy, scale };
+  }
+
+  // ---- Game state ----
+  let state, score, cans, best, speed, spawnTimer, obstacles, particles, t, shake;
+  best = +(localStorage.getItem('pepsiman_best') || 0);
+  document.getElementById('best').textContent = best;
+
+  const player = {
+    lane: 1,            // index into LANES (start center)
+    x: 0,               // current interpolated lane position
+    y: 0,               // jump height (world units)
+    vy: 0,
+    jumping: false,
+    sliding: false,
+    slideT: 0,
+    runFrame: 0,
+  };
+
+  const GRAVITY = 0.9;
+  const JUMP_V = 17;
+  const SLIDE_TIME = 42; // frames
+
+  function reset() {
+    state = 'play';
+    score = 0; cans = 0; speed = 0.011; spawnTimer = 0;
+    obstacles = []; particles = []; t = 0; shake = 0;
+    player.lane = 1; player.x = 0; player.y = 0; player.vy = 0;
+    player.jumping = false; player.sliding = false; player.slideT = 0;
+    document.getElementById('hud').classList.remove('hidden');
+    document.getElementById('start').classList.add('hidden');
+    document.getElementById('gameover').classList.add('hidden');
+  }
+
+  // ---- Spawning ----
+  // types: 'crate' (jump over), 'bar' (slide under), 'cone' (jump), 'can' (collect)
+  function spawn() {
+    const lane = Math.floor(Math.random() * 3);
+    const r = Math.random();
+    let type;
+    if (r < 0.30) type = 'crate';
+    else if (r < 0.50) type = 'bar';
+    else if (r < 0.62) type = 'cone';
+    else type = 'can';
+
+    // avoid impossible double-blockers: ensure at least one safe lane sometimes
+    obstacles.push({ lane, z: 0.0, type, alive: true, scored: false });
+  }
+
+  // ---- Input ----
+  function moveLeft()  { if (state === 'play' && player.lane > 0) player.lane--; }
+  function moveRight() { if (state === 'play' && player.lane < 2) player.lane++; }
+  function jump() {
+    if (state !== 'play') return;
+    if (!player.jumping && !player.sliding) {
+      player.jumping = true; player.vy = JUMP_V;
+    }
+  }
+  function slide() {
+    if (state !== 'play') return;
+    if (!player.jumping && !player.sliding) {
+      player.sliding = true; player.slideT = SLIDE_TIME;
+    }
+  }
+
+  window.addEventListener('keydown', (e) => {
+    switch (e.key) {
+      case 'ArrowLeft': case 'a': case 'A': moveLeft(); e.preventDefault(); break;
+      case 'ArrowRight': case 'd': case 'D': moveRight(); e.preventDefault(); break;
+      case 'ArrowUp': case 'w': case 'W': case ' ': jump(); e.preventDefault(); break;
+      case 'ArrowDown': case 's': case 'S': slide(); e.preventDefault(); break;
+      case 'Enter':
+        if (state !== 'play') reset();
+        break;
+    }
+  }, { passive: false });
+
+  document.getElementById('startBtn').onclick = reset;
+  document.getElementById('retryBtn').onclick = reset;
+
+  // Touch buttons
+  document.querySelectorAll('#touch button').forEach(b => {
+    b.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      const a = b.dataset.act;
+      if (a === 'left') moveLeft();
+      else if (a === 'right') moveRight();
+      else if (a === 'jump') jump();
+    }, { passive: false });
+  });
+  // swipe down on jump button = slide
+  let touchStartY = null;
+  canvas.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, {passive:true});
+  canvas.addEventListener('touchend', e => {
+    if (touchStartY == null) return;
+    const dy = e.changedTouches[0].clientY - touchStartY;
+    if (dy > 50) slide(); else if (dy < -50) jump();
+    touchStartY = null;
+  }, {passive:true});
+
+  // ---- Collision (player at z ~ 0.96) ----
+  const PLAYER_Z = 0.97;
+  function collide(o) {
+    if (o.lane !== player.lane) return false;
+    // same lane and obstacle reaches the player band
+    if (o.z < PLAYER_Z - 0.05 || o.z > PLAYER_Z + 0.05) return false;
+    if (o.type === 'bar') {
+      // must be sliding to pass; collide if not sliding
+      return !player.sliding;
+    } else { // crate, cone -> must jump
+      const clear = player.y > 40;
+      return !clear;
+    }
+  }
+
+  // ---- Update ----
+  function update() {
+    t++;
+    // smooth lane interpolation
+    const targetX = LANES[player.lane];
+    player.x += (targetX - player.x) * 0.25;
+
+    // jump physics
+    if (player.jumping) {
+      player.y += player.vy;
+      player.vy -= GRAVITY;
+      if (player.y <= 0) { player.y = 0; player.jumping = false; player.vy = 0; }
+    }
+    // slide timer
+    if (player.sliding) {
+      player.slideT--;
+      if (player.slideT <= 0) player.sliding = false;
+    }
+    player.runFrame += 0.35 + speed * 8;
+
+    // difficulty ramp
+    speed = Math.min(0.030, 0.011 + t * 0.000006);
+
+    // spawn
+    spawnTimer--;
+    if (spawnTimer <= 0) {
+      spawn();
+      spawnTimer = Math.max(28, 70 - t * 0.01) + Math.random() * 22;
+    }
+
+    // move obstacles toward player
+    for (const o of obstacles) {
+      o.z += speed;
+      // collect can
+      if (o.type === 'can' && !o.scored && o.lane === player.lane &&
+          o.z > PLAYER_Z - 0.06 && o.z < PLAYER_Z + 0.06) {
+        // can collected if not high-jumping over it irrelevantly; just collect when in lane band
+        o.scored = true; o.alive = false;
+        cans++; score += 50;
+        burst(W/2 + player.x * LANE_W, HORIZON + (H-HORIZON)*PLAYER_Z - 40, '#ffd34d');
+      }
+      // collision with hazard
+      if (o.type !== 'can' && !o.scored && collide(o)) {
+        o.scored = true;
+        gameOver();
+      }
+      if (o.z > 1.15) o.alive = false;
+    }
+    obstacles = obstacles.filter(o => o.alive);
+
+    // passive score
+    score += Math.round(1 + speed * 30);
+    document.getElementById('score').textContent = score;
+    document.getElementById('cans').textContent = cans;
+
+    // particles
+    for (const p of particles) { p.x += p.vx; p.y += p.vy; p.vy += 0.4; p.life--; }
+    particles = particles.filter(p => p.life > 0);
+
+    if (shake > 0) shake *= 0.85;
+  }
+
+  function burst(x, y, color) {
+    for (let i = 0; i < 14; i++) {
+      particles.push({
+        x, y,
+        vx: (Math.random()-0.5)*8, vy: (Math.random()-0.7)*8,
+        life: 20 + Math.random()*15, color
+      });
+    }
+  }
+
+  function gameOver() {
+    state = 'over';
+    shake = 18;
+    burst(W/2 + player.x * LANE_W, H*0.8, '#c8102e');
+    if (score > best) {
+      best = score;
+      localStorage.setItem('pepsiman_best', best);
+      document.getElementById('newBest').classList.remove('hidden');
+    } else {
+      document.getElementById('newBest').classList.add('hidden');
+    }
+    document.getElementById('best').textContent = best;
+    document.getElementById('finalScore').textContent = score;
+    document.getElementById('hud').classList.add('hidden');
+    document.getElementById('gameover').classList.remove('hidden');
+  }
+
+  // ---- Render ----
+  function drawRoad() {
+    // sky / city backdrop
+    const sky = ctx.createLinearGradient(0, 0, 0, HORIZON);
+    sky.addColorStop(0, '#0b1d4d');
+    sky.addColorStop(1, '#2b8fd6');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, W, HORIZON);
+
+    // distant city skyline
+    ctx.fillStyle = 'rgba(255,255,255,0.10)';
+    const off = (t * 0.4) % 60;
+    for (let i = -1; i < W/60 + 1; i++) {
+      const bx = i*60 - off;
+      const bh = 30 + ((i*53)%5)*10;
+      ctx.fillRect(bx, HORIZON - bh, 44, bh);
+    }
+    // sun/Pepsi glow
+    ctx.fillStyle = 'rgba(255,211,77,0.35)';
+    ctx.beginPath(); ctx.arc(W*0.5, HORIZON-20, 70, 0, Math.PI*2); ctx.fill();
+
+    // ground
+    const grd = ctx.createLinearGradient(0, HORIZON, 0, H);
+    grd.addColorStop(0, '#1d3a6e');
+    grd.addColorStop(1, '#0e1f42');
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, HORIZON, W, H - HORIZON);
+
+    // road trapezoid
+    const farL = project(-1.6, 0.001).x, farR = project(1.6, 0.001).x;
+    const nearL = project(-1.6, 1).x, nearR = project(1.6, 1).x;
+    ctx.fillStyle = '#3a3f4b';
+    ctx.beginPath();
+    ctx.moveTo(farL, HORIZON); ctx.lineTo(farR, HORIZON);
+    ctx.lineTo(nearR, H); ctx.lineTo(nearL, H); ctx.closePath(); ctx.fill();
+
+    // lane dividers (scrolling dashes)
+    const scroll = (t * speed * 2) % 0.12;
+    for (const dx of [-0.5, 0.5]) {
+      for (let z = 0.02; z < 1; z += 0.12) {
+        const zz = z + scroll;
+        if (zz > 1) continue;
+        const a = project(dx, zz), b = project(dx, Math.min(1, zz + 0.05));
+        ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+        ctx.lineWidth = Math.max(1, 6 * a.scale);
+        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+      }
+    }
+    // road edges
+    ctx.strokeStyle = '#c8102e'; ctx.lineWidth = 3;
+    for (const edge of [-1.6, 1.6]) {
+      const a = project(edge, 0.001), b = project(edge, 1);
+      ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+    }
+  }
+
+  function drawObstacle(o) {
+    const p = project(LANES[o.lane], o.z);
+    const s = p.scale;
+    ctx.save();
+    if (o.type === 'crate') {
+      const w = 70*s, h = 70*s;
+      ctx.fillStyle = '#7a4a1d';
+      ctx.fillRect(p.x - w/2, p.y - h, w, h);
+      ctx.strokeStyle = '#5a3614'; ctx.lineWidth = Math.max(1,3*s);
+      ctx.strokeRect(p.x - w/2, p.y - h, w, h);
+      ctx.beginPath();
+      ctx.moveTo(p.x-w/2, p.y-h); ctx.lineTo(p.x+w/2, p.y);
+      ctx.moveTo(p.x+w/2, p.y-h); ctx.lineTo(p.x-w/2, p.y); ctx.stroke();
+    } else if (o.type === 'cone') {
+      const w = 46*s, h = 60*s;
+      ctx.fillStyle = '#ff7a18';
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y - h); ctx.lineTo(p.x - w/2, p.y); ctx.lineTo(p.x + w/2, p.y);
+      ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(p.x - w*0.35, p.y - h*0.55, w*0.7, h*0.18);
+    } else if (o.type === 'bar') {
+      // overhead bar -> must slide under. Draw posts + high bar
+      const w = LANE_W*1.0*s, h = 150*s, gap = 70*s;
+      ctx.fillStyle = '#c8102e';
+      ctx.fillRect(p.x - w/2, p.y - h, 12*s, h);
+      ctx.fillRect(p.x + w/2 - 12*s, p.y - h, 12*s, h);
+      ctx.fillStyle = '#ffd34d';
+      ctx.fillRect(p.x - w/2, p.y - h, w, gap*0.5);
+      ctx.fillStyle = '#fff'; ctx.font = `bold ${Math.max(8,16*s)}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.fillText('SLIDE', p.x, p.y - h + 14*s);
+    } else if (o.type === 'can') {
+      const w = 30*s, h = 54*s;
+      const cy = p.y - h*0.5 - 18*s; // float a bit
+      // can body Pepsi colors
+      const g = ctx.createLinearGradient(p.x - w/2, 0, p.x + w/2, 0);
+      g.addColorStop(0, '#1a4fa0'); g.addColorStop(0.5, '#3b9ae0'); g.addColorStop(1, '#1a4fa0');
+      ctx.fillStyle = g;
+      ctx.fillRect(p.x - w/2, cy, w, h);
+      ctx.fillStyle = '#c8102e'; ctx.fillRect(p.x - w/2, cy + h*0.38, w, h*0.16);
+      ctx.fillStyle = '#fff'; ctx.fillRect(p.x - w/2, cy + h*0.30, w, h*0.08);
+      ctx.fillStyle = 'rgba(255,255,255,0.7)';
+      ctx.fillRect(p.x - w/2, cy, w*0.18, h);
+      // sparkle
+      ctx.fillStyle = '#ffd34d';
+      const tw = (Math.sin(t*0.2 + o.z*10)+1)*2*s;
+      ctx.fillRect(p.x - tw/2, cy - 6*s, tw, tw);
+    }
+    ctx.restore();
+  }
+
+  function drawPlayer() {
+    const p = project(player.x, PLAYER_Z);
+    const s = p.scale;
+    const baseY = p.y - player.y * s;
+    const bob = Math.sin(player.runFrame) * 4 * s;
+
+    ctx.save();
+    // shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    const shW = 60*s * (1 - player.y/300);
+    ctx.beginPath();
+    ctx.ellipse(p.x, p.y, Math.max(8, shW), Math.max(3, 12*s*(1-player.y/300)), 0, 0, Math.PI*2);
+    ctx.fill();
+
+    const bodyH = player.sliding ? 60*s : 110*s;
+    const top = baseY - bodyH + bob;
+    const headR = 22*s;
+
+    // legs (running cycle) when not sliding
+    if (!player.sliding) {
+      ctx.strokeStyle = '#0a2a5e'; ctx.lineWidth = 10*s; ctx.lineCap = 'round';
+      const swing = Math.sin(player.runFrame) * 16 * s;
+      ctx.beginPath();
+      ctx.moveTo(p.x, baseY - 40*s); ctx.lineTo(p.x - swing, baseY);
+      ctx.moveTo(p.x, baseY - 40*s); ctx.lineTo(p.x + swing, baseY);
+      ctx.stroke();
+    }
+
+    // body suit (Pepsi: blue top, red lower with white wave)
+    const bw = player.sliding ? 80*s : 48*s;
+    const bodyTop = player.sliding ? baseY - 50*s : top + headR;
+    const bh = player.sliding ? 44*s : bodyH - headR;
+    // blue upper
+    ctx.fillStyle = '#1a4fa0';
+    ctx.fillRect(p.x - bw/2, bodyTop, bw, bh*0.5);
+    // white wave
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.moveTo(p.x - bw/2, bodyTop + bh*0.5);
+    ctx.quadraticCurveTo(p.x, bodyTop + bh*0.42, p.x + bw/2, bodyTop + bh*0.5);
+    ctx.lineTo(p.x + bw/2, bodyTop + bh*0.62);
+    ctx.quadraticCurveTo(p.x, bodyTop + bh*0.54, p.x - bw/2, bodyTop + bh*0.62);
+    ctx.closePath(); ctx.fill();
+    // red lower
+    ctx.fillStyle = '#c8102e';
+    ctx.fillRect(p.x - bw/2, bodyTop + bh*0.62, bw, bh*0.38);
+
+    // arms
+    if (!player.sliding) {
+      ctx.strokeStyle = '#1a4fa0'; ctx.lineWidth = 9*s;
+      const aswing = Math.sin(player.runFrame + Math.PI) * 14 * s;
+      ctx.beginPath();
+      ctx.moveTo(p.x, bodyTop + 6*s); ctx.lineTo(p.x - bw*0.6, bodyTop + 6*s + aswing);
+      ctx.moveTo(p.x, bodyTop + 6*s); ctx.lineTo(p.x + bw*0.6, bodyTop + 6*s - aswing);
+      ctx.stroke();
+    }
+
+    // head with helmet visor
+    const hy = player.sliding ? baseY - 60*s : top;
+    ctx.fillStyle = '#e8c39e'; // face
+    ctx.beginPath(); ctx.arc(p.x, hy, headR, 0, Math.PI*2); ctx.fill();
+    // helmet (red + blue)
+    ctx.fillStyle = '#1a4fa0';
+    ctx.beginPath(); ctx.arc(p.x, hy, headR, Math.PI, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#c8102e';
+    ctx.fillRect(p.x - headR, hy - 2*s, headR*2, 5*s);
+    // visor
+    ctx.fillStyle = 'rgba(20,40,90,0.7)';
+    ctx.fillRect(p.x - headR*0.7, hy - 2*s, headR*1.4, headR*0.8);
+
+    ctx.restore();
+  }
+
+  function drawParticles() {
+    for (const p of particles) {
+      ctx.globalAlpha = Math.max(0, p.life/30);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(p.x, p.y, 5, 5);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function render() {
+    ctx.save();
+    if (shake > 0.5) ctx.translate((Math.random()-0.5)*shake, (Math.random()-0.5)*shake);
+    ctx.clearRect(-30, -30, W+60, H+60);
+    drawRoad();
+
+    // draw obstacles far -> near (painter's order)
+    obstacles.slice().sort((a,b) => a.z - b.z).forEach(o => {
+      // skip if far behind
+      if (o.z > 0.001) drawObstacle(o);
+    });
+
+    drawPlayer();
+    drawParticles();
+    ctx.restore();
+  }
+
+  // ---- Main loop ----
+  let last = 0;
+  function loop(ts) {
+    requestAnimationFrame(loop);
+    if (state === 'play') update();
+    render();
+  }
+  requestAnimationFrame(loop);
+
+  // responsive scale: keep aspect, fit height
+  function fit() {
+    const ar = W / H;
+    let h = window.innerHeight, w = h * ar;
+    if (w > window.innerWidth) { w = window.innerWidth; h = w / ar; }
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+  }
+  window.addEventListener('resize', fit); fit();
+
+  // initial idle render so the player shows on start screen
+  state = 'idle';
+})();
+</script>
+</body>
+</html>
