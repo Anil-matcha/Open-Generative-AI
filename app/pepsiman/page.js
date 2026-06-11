@@ -16,7 +16,7 @@ export default function PepsiManPage() {
       }}
     >
       <iframe
-        src="/pepsiman.html"
+        src="/pepsiman3d.html"
         title="Pepsi Man"
         style={{ width: '100%', height: '100%', border: 'none' }}
         allow="autoplay; fullscreen"
