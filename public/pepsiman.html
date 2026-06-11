@@ -16,131 +16,163 @@
     position: relative; width: 100vw; height: 100vh;
     display: flex; align-items: center; justify-content: center;
   }
+  #stage { position: relative; }
   canvas {
     display: block; background: #1b2a4a;
-    image-rendering: pixelated;
     box-shadow: 0 0 60px rgba(0,0,0,0.6);
-    max-width: 100%; max-height: 100%;
   }
-  /* HUD */
+  /* ---- HUD (styled after the original PS1 game) ---- */
   #hud {
-    position: absolute; top: 14px; left: 0; right: 0;
-    display: flex; justify-content: space-between;
-    padding: 0 22px; pointer-events: none;
-    color: #fff; text-shadow: 2px 2px 0 #c8102e;
-    font-size: 20px; letter-spacing: 1px;
+    position: absolute; top: 0; left: 0; right: 0;
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding: 10px 16px; pointer-events: none;
+    color: #fff;
   }
-  #hud .label { font-size: 11px; opacity: 0.8; letter-spacing: 2px; }
+  .hud-left { display: flex; align-items: center; gap: 8px; }
+  .can-icon {
+    width: 22px; height: 38px; border-radius: 4px;
+    background: linear-gradient(90deg, #1a4fa0, #3b9ae0 40%, #1a4fa0);
+    position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  }
+  .can-icon::after {
+    content: ''; position: absolute; left: 3px; top: 13px; width: 16px; height: 12px;
+    border-radius: 50%;
+    background: linear-gradient(160deg, #c8102e 0 45%, #fff 45% 58%, #1a4fa0 58% 100%);
+  }
+  .hud-num {
+    font-size: 30px; font-style: italic; letter-spacing: 1px;
+    text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+  }
+  .hud-center { display: flex; align-items: center; gap: 14px; }
+  .pepsi-orb {
+    width: 46px; height: 46px; border-radius: 50%;
+    background: linear-gradient(0deg, #c8102e 0 47%, #fff 47% 58%, #004b93 58% 100%);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.5), inset 0 0 0 3px #fff;
+    animation: spin 3s linear infinite;
+  }
+  @keyframes spin { from { transform: rotate(-18deg);} to { transform: rotate(342deg); } }
+  #score {
+    font-size: 46px; font-style: italic; line-height: 1;
+    text-shadow: 3px 3px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+  }
+  .hud-right { text-align: right; font-size: 13px; }
+  .hud-right .label { font-size: 10px; opacity: 0.85; letter-spacing: 2px; }
+  #timer {
+    font-size: 24px; font-style: italic;
+    text-shadow: 2px 2px 0 #000;
+  }
+  /* big orb for menus */
+  .pepsi-orb.big { width: 84px; height: 84px; animation-duration: 4s; box-shadow: 0 6px 24px rgba(0,0,0,0.5), inset 0 0 0 5px #fff; }
   /* Overlays */
   .overlay {
     position: absolute; inset: 0; display: flex; flex-direction: column;
     align-items: center; justify-content: center; text-align: center;
-    color: #fff; gap: 18px; padding: 24px;
+    color: #fff; gap: 14px; padding: 24px;
     background: radial-gradient(circle at 50% 35%, rgba(0,40,104,0.55), rgba(10,10,26,0.92));
     backdrop-filter: blur(2px);
   }
   .hidden { display: none !important; }
   .logo {
-    font-size: 54px; line-height: 1; letter-spacing: 2px;
+    font-size: 54px; line-height: 1; letter-spacing: 2px; font-style: italic;
     color: #fff;
     text-shadow: 0 4px 0 #c8102e, 0 8px 14px rgba(0,0,0,0.5);
   }
   .logo .red { color: #c8102e; }
   .logo .blue { color: #2b8fd6; }
-  .tagline { font-size: 14px; opacity: 0.85; font-weight: normal; font-family: Arial; max-width: 460px; }
-  .pepsi-orb {
-    width: 84px; height: 84px; border-radius: 50%;
-    background:
-      linear-gradient(0deg, #c8102e 0 50%, #fff 50% 60%, #004b93 60% 100%);
-    transform: rotate(-18deg);
-    box-shadow: 0 6px 24px rgba(0,0,0,0.5), inset 0 0 0 5px #fff;
-    animation: spin 4s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(342deg); } }
+  .tagline { font-size: 13px; opacity: 0.85; font-weight: normal; font-family: Arial; max-width: 460px; }
   .btn {
     pointer-events: auto; cursor: pointer;
     background: linear-gradient(#e23, #b00d27);
     color: #fff; border: 3px solid #fff; border-radius: 40px;
-    padding: 14px 38px; font-size: 20px; letter-spacing: 1px;
+    padding: 12px 38px; font-size: 20px; letter-spacing: 1px;
     box-shadow: 0 6px 0 #7a0a1c, 0 10px 18px rgba(0,0,0,0.4);
     transition: transform .05s ease;
   }
   .btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #7a0a1c; }
   .controls {
-    font-family: Arial; font-size: 13px; opacity: 0.85; line-height: 1.9;
-    background: rgba(0,0,0,0.25); border-radius: 12px; padding: 14px 20px;
+    font-family: Arial; font-size: 12px; opacity: 0.85; line-height: 1.8;
+    background: rgba(0,0,0,0.25); border-radius: 12px; padding: 10px 18px;
   }
   .controls b { color: #ffd34d; }
-  .big-score { font-size: 38px; color: #ffd34d; }
+  .powers { font-family: Arial; font-size: 12px; opacity:.85; line-height:1.7; }
+  .big-score { font-size: 38px; font-style: italic; color: #ffd34d; text-shadow: 2px 2px 0 #000; }
+  #muteBtn {
+    position: absolute; bottom: 10px; right: 10px;
+    width: 38px; height: 38px; border-radius: 10px; border: none;
+    background: rgba(0,0,0,0.35); color: #fff; font-size: 18px; cursor: pointer; z-index: 5;
+  }
+  #muteBtn:active { background: rgba(0,0,0,0.6); }
   /* mobile touch buttons */
   #touch {
-    position: absolute; bottom: 0; left: 0; right: 0; height: 30%;
+    position: absolute; bottom: 0; left: 0; right: 0; height: 26%;
     display: none; grid-template-columns: 1fr 1fr 1fr; gap: 6px;
     padding: 6px; pointer-events: none;
   }
   #touch button {
     pointer-events: auto; border: none; border-radius: 14px;
-    background: rgba(255,255,255,0.10); color: #fff; font-size: 22px;
+    background: rgba(255,255,255,0.10); color: #fff; font-size: 20px;
     font-family: Arial; backdrop-filter: blur(3px);
   }
   #touch button:active { background: rgba(255,255,255,0.28); }
   @media (pointer: coarse) { #touch { display: grid; } }
-  #muteBtn {
-    position: absolute; top: 12px; right: 50%; transform: translateX(140px);
-    width: 38px; height: 38px; border-radius: 10px; border: none;
-    background: rgba(0,0,0,0.35); color: #fff; font-size: 18px; cursor: pointer;
-  }
-  #muteBtn:active { background: rgba(0,0,0,0.6); }
-  .powers { font-family: Arial; font-size: 12px; opacity:.85; line-height:1.7; }
-  .powers b { color:#19e6c8; }
 </style>
 </head>
 <body>
 <div id="wrap">
-  <canvas id="game" width="480" height="800"></canvas>
+  <div id="stage">
+    <canvas id="game" width="960" height="540"></canvas>
 
-  <div id="hud" class="hidden">
-    <div><div class="label">SCORE</div><span id="score">0</span></div>
-    <div style="text-align:center"><div class="label">LVL</div><span id="level">1</span></div>
-    <div style="text-align:center"><div class="label">CANS</div><span id="cans">0</span></div>
-    <div style="text-align:right"><div class="label">BEST</div><span id="best">0</span></div>
-  </div>
-
-  <button id="muteBtn" title="Mute / unmute">🔊</button>
-
-  <!-- Start screen -->
-  <div id="start" class="overlay">
-    <div class="pepsi-orb"></div>
-    <div class="logo"><span class="red">PEPSI</span> <span class="blue">MAN</span></div>
-    <div class="tagline">The classic PlayStation runner — reborn for the web. Dash through the city, leap over crates, slide under bars, and grab every Pepsi can you can!</div>
-    <div class="controls">
-      <div><b>←  →</b> / <b>A  D</b> &nbsp; switch lane</div>
-      <div><b>SPACE</b> / <b>↑</b> / <b>W</b> &nbsp; jump</div>
-      <div><b>↓</b> / <b>S</b> &nbsp; slide</div>
-      <div style="opacity:.7">(on phone use the buttons below)</div>
+    <!-- HUD styled after the PS1 original: cans top-left, spinning ball + score center, timer right -->
+    <div id="hud" class="hidden">
+      <div class="hud-left">
+        <div class="can-icon"></div>
+        <span class="hud-num" id="cans">0</span>
+      </div>
+      <div class="hud-center">
+        <div class="pepsi-orb"></div>
+        <div id="score">0</div>
+      </div>
+      <div class="hud-right">
+        <div class="label">TOTAL</div>
+        <div id="timer">0:00</div>
+        <div class="label">LVL <span id="level">1</span> · BEST <span id="best">0</span></div>
+      </div>
     </div>
-    <div class="powers">
-      Grab power-ups: <b style="color:#19e6c8">S</b> shield ·
-      <b style="color:#ff7a18">M</b> magnet · <b style="color:#2b8fd6">×2</b> double score<br>
-      Survive longer to climb levels &amp; new worlds!
+
+    <button id="muteBtn" title="Mute / unmute">🔊</button>
+
+    <!-- Start screen -->
+    <div id="start" class="overlay">
+      <div class="pepsi-orb big"></div>
+      <div class="logo"><span class="red">PEPSI</span> <span class="blue">MAN</span></div>
+      <div class="tagline">The classic PlayStation runner — reborn for the web. Dash through the suburbs, leap over crates, slide under Pepsi trucks, and grab every can!</div>
+      <div class="controls">
+        <b>← →</b> / <b>A D</b> switch lane &nbsp;·&nbsp;
+        <b>SPACE</b>/<b>↑</b>/<b>W</b> jump &nbsp;·&nbsp;
+        <b>↓</b>/<b>S</b> slide
+      </div>
+      <div class="powers">
+        Power-ups: <b style="color:#19e6c8">S</b> shield ·
+        <b style="color:#ff7a18">M</b> magnet · <b style="color:#2b8fd6">×2</b> double score
+      </div>
+      <button class="btn" id="startBtn">START</button>
     </div>
-    <button class="btn" id="startBtn">START</button>
-  </div>
 
-  <!-- Game over screen -->
-  <div id="gameover" class="overlay hidden">
-    <div class="logo" style="font-size:34px">GAME OVER</div>
-    <div>SCORE</div>
-    <div class="big-score" id="finalScore">0</div>
-    <div id="newBest" class="hidden" style="color:#ffd34d">★ NEW BEST! ★</div>
-    <button class="btn" id="retryBtn">RUN AGAIN</button>
-  </div>
+    <!-- Game over screen -->
+    <div id="gameover" class="overlay hidden">
+      <div class="logo" style="font-size:34px">GAME OVER</div>
+      <div>SCORE</div>
+      <div class="big-score" id="finalScore">0</div>
+      <div id="newBest" class="hidden" style="color:#ffd34d">★ NEW BEST! ★</div>
+      <button class="btn" id="retryBtn">RUN AGAIN</button>
+    </div>
 
-  <!-- Touch controls -->
-  <div id="touch">
-    <button data-act="left">◀</button>
-    <button data-act="jump">JUMP ▲<br><span style="font-size:12px">slide ▼</span></button>
-    <button data-act="right">▶</button>
+    <!-- Touch controls -->
+    <div id="touch">
+      <button data-act="left">◀</button>
+      <button data-act="jump">JUMP ▲<br><span style="font-size:11px">slide ▼</span></button>
+      <button data-act="right">▶</button>
+    </div>
   </div>
 </div>
 
@@ -150,14 +182,14 @@
   const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
 
-  // ---- Pseudo-3D road config ----
+  // ---- Pseudo-3D road config (landscape, camera behind the runner like the PS1 game) ----
   const LANES = [-1, 0, 1];        // left, center, right
-  const LANE_W = 150;              // world horizontal spacing of lanes
-  const HORIZON = H * 0.34;        // vanishing point y
-  const CAM_Z = 0.6;               // camera distance factor
+  const LANE_W = 190;              // world horizontal spacing of lanes
+  const HORIZON = H * 0.42;        // vanishing point y
+  const ROAD_EDGE = 1.7;           // road half-width in lane units
+  const WALK_EDGE = 2.15;          // sidewalk outer edge
 
   // Project a world point (lane offset x in lane-units, ground depth z 0..1, height h)
-  // z = 1 near player, z -> 0 at horizon
   function project(laneX, z, h = 0) {
     const scale = z;                       // 0 (far) .. 1 (near)
     const sx = W / 2 + laneX * LANE_W * scale;
@@ -167,36 +199,29 @@
   }
 
   // ---- Game state ----
-  let state, score, cans, best, speed, spawnTimer, obstacles, particles, floaters, t, shake, level;
+  let state, score, cans, best, speed, spawnTimer, obstacles, props, propTimer,
+      particles, floaters, t, shake, level;
   best = +(localStorage.getItem('pepsiman_best') || 0);
   document.getElementById('best').textContent = best;
 
   const player = {
-    lane: 1,            // index into LANES (start center)
-    x: 0,               // current interpolated lane position
-    y: 0,               // jump height (world units)
-    vy: 0,
-    jumping: false,
-    sliding: false,
-    slideT: 0,
-    runFrame: 0,
-    shieldT: 0,         // invincibility frames remaining
-    magnetT: 0,         // can-magnet frames remaining
-    x2T: 0,             // double-score frames remaining
+    lane: 1, x: 0, y: 0, vy: 0,
+    jumping: false, sliding: false, slideT: 0, runFrame: 0,
+    shieldT: 0, magnetT: 0, x2T: 0,
   };
 
   const GRAVITY = 0.9;
   const JUMP_V = 17;
-  const SLIDE_TIME = 42; // frames
-  const POWER_TIME = 360; // ~6s of power-up
+  const SLIDE_TIME = 42;
+  const POWER_TIME = 360;
 
-  // 5 level themes (cycle): [name, sky top, sky bottom, road, accent]
+  // Level themes: [name, skyTop, skyBottom, road, accent, grassTop, grassBottom]
   const THEMES = [
-    ['CITY',     '#0b1d4d', '#2b8fd6', '#3a3f4b', '#c8102e'],
-    ['SUNSET',   '#3a0d4d', '#ff7a18', '#4a2a3b', '#ffd34d'],
-    ['NIGHT',    '#05060f', '#1a2a5a', '#23252e', '#2b8fd6'],
-    ['DESERT',   '#3d2a0d', '#e0a23b', '#5a4a2e', '#c8102e'],
-    ['NEON',     '#10043d', '#d61a9a', '#2a1840', '#19e6c8'],
+    ['SUBURBIA', '#5db5e8', '#bfe6ff', '#909498', '#c8102e', '#5dbb63', '#2e7d32'],
+    ['CITY',     '#0b1d4d', '#2b8fd6', '#5a5f6b', '#c8102e', '#3a4a5e', '#1e2a3e'],
+    ['SUNSET',   '#3a0d4d', '#ff7a18', '#6b5560', '#ffd34d', '#7a5a3a', '#4a3020'],
+    ['FACTORY',  '#3e4a4e', '#8a9aa0', '#6e5a50', '#ffd34d', '#55606a', '#39444c'],
+    ['NEON',     '#10043d', '#d61a9a', '#2a1840', '#19e6c8', '#1a0d30', '#0a0518'],
   ];
   function theme() { return THEMES[level % THEMES.length]; }
 
@@ -232,20 +257,24 @@
     if (ac() && actx.state === 'suspended') actx.resume();
     state = 'play';
     score = 0; cans = 0; speed = 0.011; spawnTimer = 0; level = 0;
-    obstacles = []; particles = []; floaters = []; t = 0; shake = 0;
+    obstacles = []; props = []; propTimer = 0;
+    particles = []; floaters = []; t = 0; shake = 0;
     player.lane = 1; player.x = 0; player.y = 0; player.vy = 0;
     player.jumping = false; player.sliding = false; player.slideT = 0;
     player.shieldT = 0; player.magnetT = 0; player.x2T = 0;
+    // pre-seed roadside scenery so the street isn't empty at start
+    for (let z = 0.08; z < 1; z += 0.13) {
+      props.push(makeProp(-1, z));
+      props.push(makeProp(1, z + 0.06));
+    }
     document.getElementById('hud').classList.remove('hidden');
     document.getElementById('start').classList.add('hidden');
     document.getElementById('gameover').classList.add('hidden');
     updateLevel();
   }
 
-  // current score multiplier from x2 power-up
   function scoreMult() { return player.x2T > 0 ? 2 : 1; }
 
-  // levels advance every 1500 points
   function updateLevel() {
     const lv = Math.floor(score / 1500);
     if (lv !== level) {
@@ -256,18 +285,25 @@
     document.getElementById('level').textContent = level + 1;
   }
 
+  // ---- Roadside scenery ----
+  const PROP_KINDS = ['house', 'tree', 'fence', 'hydrant', 'trash', 'lamp'];
+  function makeProp(side, z) {
+    const kind = PROP_KINDS[Math.floor(Math.random() * PROP_KINDS.length)];
+    return { side, z, kind };
+  }
+
   // ---- Spawning ----
-  // hazards: 'crate'/'cone' (jump over), 'bar' (slide under)
+  // hazards: 'crate'/'cone' (jump over), 'truck' (slide under)
   // pickups: 'can' (score), 'shield'/'magnet'/'x2' (power-ups)
   function spawn() {
     const lane = Math.floor(Math.random() * 3);
     const r = Math.random();
     let type;
-    if (r < 0.030)      type = 'shield';   // rare power-ups
+    if (r < 0.030)      type = 'shield';
     else if (r < 0.060) type = 'magnet';
     else if (r < 0.090) type = 'x2';
     else if (r < 0.36)  type = 'crate';
-    else if (r < 0.56)  type = 'bar';
+    else if (r < 0.56)  type = 'truck';
     else if (r < 0.66)  type = 'cone';
     else                type = 'can';
 
@@ -318,7 +354,7 @@
       else if (a === 'jump') jump();
     }, { passive: false });
   });
-  // swipe down on jump button = slide
+  // swipe on canvas: up = jump, down = slide
   let touchStartY = null;
   canvas.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, {passive:true});
   canvas.addEventListener('touchend', e => {
@@ -328,63 +364,61 @@
     touchStartY = null;
   }, {passive:true});
 
-  // ---- Collision (player at z ~ 0.96) ----
-  const PLAYER_Z = 0.97;
+  // ---- Collision ----
+  const PLAYER_Z = 0.92;
   function collide(o) {
     if (o.lane !== player.lane) return false;
-    // same lane and obstacle reaches the player band
     if (o.z < PLAYER_Z - 0.05 || o.z > PLAYER_Z + 0.05) return false;
-    if (o.type === 'bar') {
-      // must be sliding to pass; collide if not sliding
-      return !player.sliding;
+    if (o.type === 'truck') {
+      return !player.sliding;      // must slide under the trailer
     } else { // crate, cone -> must jump
-      const clear = player.y > 40;
-      return !clear;
+      return !(player.y > 40);
     }
   }
 
   // ---- Update ----
   function update() {
     t++;
-    // smooth lane interpolation
     const targetX = LANES[player.lane];
     player.x += (targetX - player.x) * 0.25;
 
-    // jump physics
     if (player.jumping) {
       player.y += player.vy;
       player.vy -= GRAVITY;
       if (player.y <= 0) { player.y = 0; player.jumping = false; player.vy = 0; }
     }
-    // slide timer
     if (player.sliding) {
       player.slideT--;
       if (player.slideT <= 0) player.sliding = false;
     }
     player.runFrame += 0.35 + speed * 8;
 
-    // power-up timers
     if (player.shieldT > 0) player.shieldT--;
     if (player.magnetT > 0) player.magnetT--;
     if (player.x2T > 0) player.x2T--;
 
-    // difficulty ramp (also scales a little with level)
     speed = Math.min(0.034, 0.011 + t * 0.000006 + level * 0.0012);
 
-    // spawn
     spawnTimer--;
     if (spawnTimer <= 0) {
       spawn();
       spawnTimer = Math.max(24, 70 - t * 0.01 - level * 2) + Math.random() * 22;
     }
 
+    // roadside scenery
+    propTimer--;
+    if (propTimer <= 0) {
+      props.push(makeProp(Math.random() < 0.5 ? -1 : 1, 0));
+      propTimer = 10 + Math.random() * 14;
+    }
+    for (const pr of props) pr.z += speed;
+    props = props.filter(pr => pr.z <= 1.25);
+
     const isPickup = (ty) => ty === 'can' || ty === 'shield' || ty === 'magnet' || ty === 'x2';
 
-    // move obstacles toward player
     for (const o of obstacles) {
       o.z += speed;
 
-      // magnet: pull nearby cans into the player's lane as they approach
       if (player.magnetT > 0 && o.type === 'can' && o.z > 0.55) {
         o.lane = player.lane;
       }
@@ -408,11 +442,9 @@
           floaters.push({ text: 'SCORE x2!', x: px, y: py, life: 50, color: '#2b8fd6', size: 22 });
         }
       }
-      // collision with hazard
       if (!isPickup(o.type) && !o.scored && collide(o)) {
         o.scored = true;
         if (player.shieldT > 0) {
-          // shield absorbs the hit and breaks the obstacle
           o.alive = false;
           player.shieldT = Math.max(0, player.shieldT - 90);
           burst(W/2 + player.x * LANE_W, H*0.78, '#19e6c8'); sfx.shield();
@@ -424,17 +456,16 @@
     }
     obstacles = obstacles.filter(o => o.alive);
 
-    // passive score
     score += Math.round((1 + speed * 30) * scoreMult());
     updateLevel();
     document.getElementById('score').textContent = score;
     document.getElementById('cans').textContent = cans;
+    const sec = Math.floor(t / 60);
+    document.getElementById('timer').textContent = Math.floor(sec/60) + ':' + String(sec % 60).padStart(2, '0');
 
-    // floating text
     for (const f of floaters) { f.y -= 0.6; f.life--; }
     floaters = floaters.filter(f => f.life > 0);
 
-    // particles
     for (const p of particles) { p.x += p.vx; p.y += p.vy; p.vy += 0.4; p.life--; }
     particles = particles.filter(p => p.life > 0);
 
@@ -468,42 +499,101 @@
     document.getElementById('gameover').classList.remove('hidden');
   }
 
+  // ---- Render helpers ----
+  // small Pepsi ball logo (red top / white wave / blue bottom)
+  function drawPepsiBall(x, y, r) {
+    ctx.save();
+    ctx.translate(x, y); ctx.rotate(-0.3);
+    ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI*2); ctx.clip();
+    ctx.fillStyle = '#c8102e'; ctx.fillRect(-r, -r, r*2, r);
+    ctx.fillStyle = '#004b93'; ctx.fillRect(-r, 0, r*2, r);
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.moveTo(-r, -r*0.05);
+    ctx.quadraticCurveTo(-r*0.3, -r*0.45, r*0.1, -r*0.05);
+    ctx.quadraticCurveTo(r*0.5, r*0.3, r, -r*0.1);
+    ctx.lineTo(r, r*0.25);
+    ctx.quadraticCurveTo(r*0.4, r*0.55, -r*0.05, r*0.18);
+    ctx.quadraticCurveTo(-r*0.5, -r*0.15, -r, r*0.3);
+    ctx.closePath(); ctx.fill();
+    ctx.restore();
+    ctx.lineWidth = Math.max(1, r*0.12); ctx.strokeStyle = '#fff';
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.stroke();
+  }
+
+  function chromeGrad(x0, x1, dark, mid, light) {
+    const g = ctx.createLinearGradient(x0, 0, x1, 0);
+    g.addColorStop(0, dark); g.addColorStop(0.35, mid);
+    g.addColorStop(0.5, light); g.addColorStop(0.65, mid); g.addColorStop(1, dark);
+    return g;
+  }
+
   // ---- Render ----
-  function drawRoad() {
+  function drawBackground() {
     const th = theme();
-    // sky / city backdrop
+    // sky
     const sky = ctx.createLinearGradient(0, 0, 0, HORIZON);
-    sky.addColorStop(0, th[1]);
-    sky.addColorStop(1, th[2]);
+    sky.addColorStop(0, th[1]); sky.addColorStop(1, th[2]);
     ctx.fillStyle = sky;
     ctx.fillRect(0, 0, W, HORIZON);
 
-    // distant city skyline
-    ctx.fillStyle = 'rgba(255,255,255,0.10)';
-    const off = (t * 0.4) % 60;
-    for (let i = -1; i < W/60 + 1; i++) {
-      const bx = i*60 - off;
-      const bh = 30 + ((i*53)%5)*10;
-      ctx.fillRect(bx, HORIZON - bh, 44, bh);
+    // clouds (suburbia/sunset) or stars (night-ish themes)
+    if (level % THEMES.length === 0 || level % THEMES.length === 2) {
+      ctx.fillStyle = 'rgba(255,255,255,0.75)';
+      for (let i = 0; i < 4; i++) {
+        const cx = ((i * 260 + t * 0.18) % (W + 200)) - 100;
+        const cy = 30 + (i % 2) * 45 + i * 8;
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, 55, 16, 0, 0, Math.PI*2);
+        ctx.ellipse(cx + 35, cy - 8, 35, 13, 0, 0, Math.PI*2);
+        ctx.fill();
+      }
+    } else {
+      ctx.fillStyle = 'rgba(255,255,255,0.8)';
+      for (let i = 0; i < 30; i++) {
+        const sx = (i * 137) % W, sy = (i * 71) % (HORIZON - 30);
+        ctx.fillRect(sx, sy, 2, 2);
+      }
     }
-    // sun/Pepsi glow
-    ctx.fillStyle = 'rgba(255,211,77,0.35)';
-    ctx.beginPath(); ctx.arc(W*0.5, HORIZON-20, 70, 0, Math.PI*2); ctx.fill();
 
-    // ground
+    // distant horizon strip: rooftops / buildings
+    ctx.fillStyle = 'rgba(0,0,0,0.18)';
+    const off = (t * 0.4) % 80;
+    for (let i = -1; i < W/80 + 1; i++) {
+      const bx = i*80 - off;
+      const bh = 16 + ((i*53) % 4) * 9;
+      ctx.fillRect(bx, HORIZON - bh, 62, bh);
+      // little roof
+      ctx.beginPath();
+      ctx.moveTo(bx - 4, HORIZON - bh); ctx.lineTo(bx + 31, HORIZON - bh - 12); ctx.lineTo(bx + 66, HORIZON - bh);
+      ctx.closePath(); ctx.fill();
+    }
+
+    // grass / ground on both sides
     const grd = ctx.createLinearGradient(0, HORIZON, 0, H);
-    grd.addColorStop(0, th[2]);
-    grd.addColorStop(1, '#0e1f42');
+    grd.addColorStop(0, th[5]); grd.addColorStop(1, th[6]);
     ctx.fillStyle = grd;
     ctx.fillRect(0, HORIZON, W, H - HORIZON);
 
-    // road trapezoid
-    const farL = project(-1.6, 0.001).x, farR = project(1.6, 0.001).x;
-    const nearL = project(-1.6, 1).x, nearR = project(1.6, 1).x;
+    // sidewalks
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    for (const side of [-1, 1]) {
+      ctx.beginPath();
+      ctx.moveTo(project(side*ROAD_EDGE, 0.001).x, HORIZON);
+      ctx.lineTo(project(side*WALK_EDGE, 0.001).x, HORIZON);
+      ctx.lineTo(project(side*WALK_EDGE, 1).x, H);
+      ctx.lineTo(project(side*ROAD_EDGE, 1).x, H);
+      ctx.closePath(); ctx.fill();
+    }
+
+    // road (asphalt)
     ctx.fillStyle = th[3];
     ctx.beginPath();
-    ctx.moveTo(farL, HORIZON); ctx.lineTo(farR, HORIZON);
-    ctx.lineTo(nearR, H); ctx.lineTo(nearL, H); ctx.closePath(); ctx.fill();
+    ctx.moveTo(project(-ROAD_EDGE, 0.001).x, HORIZON);
+    ctx.lineTo(project(ROAD_EDGE, 0.001).x, HORIZON);
+    ctx.lineTo(project(ROAD_EDGE, 1).x, H);
+    ctx.lineTo(project(-ROAD_EDGE, 1).x, H);
+    ctx.closePath(); ctx.fill();
 
     // lane dividers (scrolling dashes)
     const scroll = (t * speed * 2) % 0.12;
@@ -512,17 +602,80 @@
         const zz = z + scroll;
         if (zz > 1) continue;
         const a = project(dx, zz), b = project(dx, Math.min(1, zz + 0.05));
-        ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+        ctx.strokeStyle = 'rgba(255,255,255,0.65)';
         ctx.lineWidth = Math.max(1, 6 * a.scale);
         ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
       }
     }
-    // road edges
-    ctx.strokeStyle = theme()[4]; ctx.lineWidth = 3;
-    for (const edge of [-1.6, 1.6]) {
+    // curb lines
+    ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+    for (const edge of [-ROAD_EDGE, ROAD_EDGE]) {
       const a = project(edge, 0.001), b = project(edge, 1);
       ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
     }
+  }
+
+  function drawProp(pr) {
+    const far = pr.kind === 'house';
+    const lx = pr.side * (far ? 3.1 : 2.45);
+    const p = project(lx, pr.z);
+    const s = p.scale;
+    if (s < 0.03) return;
+    ctx.save();
+    if (pr.kind === 'house') {
+      const w = 230*s, h = 130*s;
+      ctx.fillStyle = '#e8e0d0';
+      ctx.fillRect(p.x - w/2, p.y - h, w, h);
+      // roof
+      ctx.fillStyle = '#6b6f78';
+      ctx.beginPath();
+      ctx.moveTo(p.x - w/2 - 14*s, p.y - h);
+      ctx.lineTo(p.x, p.y - h - 60*s);
+      ctx.lineTo(p.x + w/2 + 14*s, p.y - h);
+      ctx.closePath(); ctx.fill();
+      // door + window
+      ctx.fillStyle = '#7a4a2a';
+      ctx.fillRect(p.x - 18*s, p.y - 56*s, 36*s, 56*s);
+      ctx.fillStyle = '#9ad0f0';
+      ctx.fillRect(p.x - w/2 + 22*s, p.y - h + 28*s, 44*s, 36*s);
+      ctx.fillRect(p.x + w/2 - 66*s, p.y - h + 28*s, 44*s, 36*s);
+    } else if (pr.kind === 'tree') {
+      ctx.fillStyle = '#6b4a2a';
+      ctx.fillRect(p.x - 7*s, p.y - 70*s, 14*s, 70*s);
+      ctx.fillStyle = '#2f8f3f';
+      ctx.beginPath();
+      ctx.arc(p.x, p.y - 95*s, 42*s, 0, Math.PI*2);
+      ctx.arc(p.x - 24*s, p.y - 72*s, 30*s, 0, Math.PI*2);
+      ctx.arc(p.x + 24*s, p.y - 72*s, 30*s, 0, Math.PI*2);
+      ctx.fill();
+    } else if (pr.kind === 'fence') {
+      const w = 150*s, h = 44*s;
+      ctx.fillStyle = '#f2f2ee';
+      for (let i = 0; i < 5; i++) {
+        ctx.fillRect(p.x - w/2 + i*(w/5), p.y - h, w/9, h);
+      }
+      ctx.fillRect(p.x - w/2, p.y - h*0.75, w, h*0.14);
+      ctx.fillRect(p.x - w/2, p.y - h*0.35, w, h*0.14);
+    } else if (pr.kind === 'hydrant') {
+      ctx.fillStyle = '#d22020';
+      ctx.fillRect(p.x - 10*s, p.y - 34*s, 20*s, 34*s);
+      ctx.beginPath(); ctx.arc(p.x, p.y - 34*s, 10*s, Math.PI, 0); ctx.fill();
+      ctx.fillRect(p.x - 16*s, p.y - 24*s, 32*s, 7*s);
+    } else if (pr.kind === 'trash') {
+      ctx.fillStyle = '#9aa2aa';
+      ctx.fillRect(p.x - 14*s, p.y - 40*s, 28*s, 40*s);
+      ctx.fillStyle = '#7a838c';
+      ctx.fillRect(p.x - 17*s, p.y - 46*s, 34*s, 8*s);
+    } else if (pr.kind === 'lamp') {
+      ctx.fillStyle = '#3a3f46';
+      ctx.fillRect(p.x - 4*s, p.y - 150*s, 8*s, 150*s);
+      ctx.fillRect(p.x - 4*s, p.y - 150*s, pr.side < 0 ? 40*s : -40*s, 6*s);
+      ctx.fillStyle = '#ffe9a0';
+      ctx.beginPath();
+      ctx.arc(p.x + (pr.side < 0 ? 40*s : -40*s), p.y - 144*s, 7*s, 0, Math.PI*2);
+      ctx.fill();
+    }
+    ctx.restore();
   }
 
   function drawObstacle(o) {
@@ -530,51 +683,69 @@
     const s = p.scale;
     ctx.save();
     if (o.type === 'crate') {
-      const w = 70*s, h = 70*s;
-      ctx.fillStyle = '#7a4a1d';
+      const w = 78*s, h = 74*s;
+      ctx.fillStyle = '#a8743a';
       ctx.fillRect(p.x - w/2, p.y - h, w, h);
-      ctx.strokeStyle = '#5a3614'; ctx.lineWidth = Math.max(1,3*s);
+      ctx.strokeStyle = '#6e4a20'; ctx.lineWidth = Math.max(1,3*s);
       ctx.strokeRect(p.x - w/2, p.y - h, w, h);
       ctx.beginPath();
       ctx.moveTo(p.x-w/2, p.y-h); ctx.lineTo(p.x+w/2, p.y);
       ctx.moveTo(p.x+w/2, p.y-h); ctx.lineTo(p.x-w/2, p.y); ctx.stroke();
     } else if (o.type === 'cone') {
-      const w = 46*s, h = 60*s;
+      const w = 46*s, h = 58*s;
       ctx.fillStyle = '#ff7a18';
       ctx.beginPath();
       ctx.moveTo(p.x, p.y - h); ctx.lineTo(p.x - w/2, p.y); ctx.lineTo(p.x + w/2, p.y);
       ctx.closePath(); ctx.fill();
       ctx.fillStyle = '#fff';
       ctx.fillRect(p.x - w*0.35, p.y - h*0.55, w*0.7, h*0.18);
-    } else if (o.type === 'bar') {
-      // overhead bar -> must slide under. Draw posts + high bar
-      const w = LANE_W*1.0*s, h = 150*s, gap = 70*s;
-      ctx.fillStyle = '#c8102e';
-      ctx.fillRect(p.x - w/2, p.y - h, 12*s, h);
-      ctx.fillRect(p.x + w/2 - 12*s, p.y - h, 12*s, h);
+    } else if (o.type === 'truck') {
+      // Pepsi truck trailer blocking the lane — slide under it!
+      const w = LANE_W*1.05*s, gap = 58*s, bodyH = 110*s;
+      const bodyBottom = p.y - gap;
+      // wheels
+      ctx.fillStyle = '#1a1a1a';
+      for (const wx of [-w*0.36, w*0.36]) {
+        ctx.beginPath(); ctx.arc(p.x + wx, bodyBottom + 14*s, 18*s, 0, Math.PI*2); ctx.fill();
+      }
+      // trailer body
+      const g = ctx.createLinearGradient(0, bodyBottom - bodyH, 0, bodyBottom);
+      g.addColorStop(0, '#2a6fd6'); g.addColorStop(1, '#0d3a80');
+      ctx.fillStyle = g;
+      ctx.fillRect(p.x - w/2, bodyBottom - bodyH, w, bodyH);
+      ctx.strokeStyle = '#08244e'; ctx.lineWidth = Math.max(1, 3*s);
+      ctx.strokeRect(p.x - w/2, bodyBottom - bodyH, w, bodyH);
+      // PEPSI branding
+      drawPepsiBall(p.x - w*0.28, bodyBottom - bodyH*0.5, 22*s);
+      ctx.fillStyle = '#fff';
+      ctx.font = `italic bold ${Math.max(10, 30*s)}px 'Arial Black', Arial`;
+      ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+      ctx.fillText('PEPSI', p.x - w*0.12, bodyBottom - bodyH*0.5);
+      // slide hint
       ctx.fillStyle = '#ffd34d';
-      ctx.fillRect(p.x - w/2, p.y - h, w, gap*0.5);
-      ctx.fillStyle = '#fff'; ctx.font = `bold ${Math.max(8,16*s)}px Arial`;
+      ctx.font = `bold ${Math.max(8, 13*s)}px Arial`;
       ctx.textAlign = 'center';
-      ctx.fillText('SLIDE', p.x, p.y - h + 14*s);
+      ctx.fillText('▼ SLIDE ▼', p.x, bodyBottom + 4*s - gap*0.5);
     } else if (o.type === 'can') {
-      const w = 30*s, h = 54*s;
-      const cy = p.y - h*0.5 - 18*s; // float a bit
-      // can body Pepsi colors
+      const w = 34*s, h = 56*s;
+      const cy = p.y - h - 16*s + Math.sin(t*0.15 + o.z*9) * 4*s;
       const g = ctx.createLinearGradient(p.x - w/2, 0, p.x + w/2, 0);
-      g.addColorStop(0, '#1a4fa0'); g.addColorStop(0.5, '#3b9ae0'); g.addColorStop(1, '#1a4fa0');
+      g.addColorStop(0, '#1a4fa0'); g.addColorStop(0.5, '#4aa6e8'); g.addColorStop(1, '#1a4fa0');
       ctx.fillStyle = g;
       ctx.fillRect(p.x - w/2, cy, w, h);
-      ctx.fillStyle = '#c8102e'; ctx.fillRect(p.x - w/2, cy + h*0.38, w, h*0.16);
-      ctx.fillStyle = '#fff'; ctx.fillRect(p.x - w/2, cy + h*0.30, w, h*0.08);
-      ctx.fillStyle = 'rgba(255,255,255,0.7)';
-      ctx.fillRect(p.x - w/2, cy, w*0.18, h);
+      // lid + base
+      ctx.fillStyle = '#c8ccd2';
+      ctx.fillRect(p.x - w/2, cy, w, 5*s);
+      ctx.fillRect(p.x - w/2, cy + h - 4*s, w, 4*s);
+      // white label band with pepsi ball
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(p.x - w/2, cy + h*0.3, w, h*0.4);
+      drawPepsiBall(p.x, cy + h*0.5, w*0.32);
       // sparkle
       ctx.fillStyle = '#ffd34d';
       const tw = (Math.sin(t*0.2 + o.z*10)+1)*2*s;
-      ctx.fillRect(p.x - tw/2, cy - 6*s, tw, tw);
+      ctx.fillRect(p.x - tw/2, cy - 8*s, tw, tw);
     } else if (o.type === 'shield' || o.type === 'magnet' || o.type === 'x2') {
-      // floating power-up orb with glow + icon
       const r = 26*s;
       const cy = p.y - 60*s + Math.sin(t*0.12 + o.z*8) * 5*s;
       const col = o.type === 'shield' ? '#19e6c8' : o.type === 'magnet' ? '#ff7a18' : '#2b8fd6';
@@ -593,6 +764,7 @@
     ctx.restore();
   }
 
+  // Pepsiman seen from behind: shiny chrome-blue body, bare silver head
   function drawPlayer() {
     const p = project(player.x, PLAYER_Z);
     const s = p.scale;
@@ -602,73 +774,99 @@
     ctx.save();
     // shadow
     ctx.fillStyle = 'rgba(0,0,0,0.35)';
-    const shW = 60*s * (1 - player.y/300);
+    const shW = 56*s * (1 - player.y/320);
     ctx.beginPath();
-    ctx.ellipse(p.x, p.y, Math.max(8, shW), Math.max(3, 12*s*(1-player.y/300)), 0, 0, Math.PI*2);
+    ctx.ellipse(p.x, p.y, Math.max(8, shW), Math.max(3, 12*s*(1-player.y/320)), 0, 0, Math.PI*2);
     ctx.fill();
 
-    const bodyH = player.sliding ? 60*s : 110*s;
-    const top = baseY - bodyH + bob;
-    const headR = 22*s;
+    const blue = (x0, x1) => chromeGrad(x0, x1, '#0a2a6e', '#2e64c8', '#a8ccff');
+    const silver = (x0, x1) => chromeGrad(x0, x1, '#7a838f', '#c2cad4', '#ffffff');
 
-    // legs (running cycle) when not sliding
-    if (!player.sliding) {
-      ctx.strokeStyle = '#0a2a5e'; ctx.lineWidth = 10*s; ctx.lineCap = 'round';
-      const swing = Math.sin(player.runFrame) * 16 * s;
+    if (player.sliding) {
+      // low slide pose: body stretched flat, head forward
+      const bw = 120*s, bh = 36*s;
+      ctx.fillStyle = blue(p.x - bw/2, p.x + bw/2);
       ctx.beginPath();
-      ctx.moveTo(p.x, baseY - 40*s); ctx.lineTo(p.x - swing, baseY);
-      ctx.moveTo(p.x, baseY - 40*s); ctx.lineTo(p.x + swing, baseY);
-      ctx.stroke();
-    }
-
-    // body suit (Pepsi: blue top, red lower with white wave)
-    const bw = player.sliding ? 80*s : 48*s;
-    const bodyTop = player.sliding ? baseY - 50*s : top + headR;
-    const bh = player.sliding ? 44*s : bodyH - headR;
-    // blue upper
-    ctx.fillStyle = '#1a4fa0';
-    ctx.fillRect(p.x - bw/2, bodyTop, bw, bh*0.5);
-    // white wave
-    ctx.fillStyle = '#fff';
-    ctx.beginPath();
-    ctx.moveTo(p.x - bw/2, bodyTop + bh*0.5);
-    ctx.quadraticCurveTo(p.x, bodyTop + bh*0.42, p.x + bw/2, bodyTop + bh*0.5);
-    ctx.lineTo(p.x + bw/2, bodyTop + bh*0.62);
-    ctx.quadraticCurveTo(p.x, bodyTop + bh*0.54, p.x - bw/2, bodyTop + bh*0.62);
-    ctx.closePath(); ctx.fill();
-    // red lower
-    ctx.fillStyle = '#c8102e';
-    ctx.fillRect(p.x - bw/2, bodyTop + bh*0.62, bw, bh*0.38);
-
-    // arms
-    if (!player.sliding) {
-      ctx.strokeStyle = '#1a4fa0'; ctx.lineWidth = 9*s;
-      const aswing = Math.sin(player.runFrame + Math.PI) * 14 * s;
+      ctx.ellipse(p.x, baseY - bh*0.8, bw*0.5, bh*0.55, 0, 0, Math.PI*2);
+      ctx.fill();
+      // trailing legs
+      ctx.strokeStyle = '#1a3f8e'; ctx.lineWidth = 12*s; ctx.lineCap = 'round';
       ctx.beginPath();
-      ctx.moveTo(p.x, bodyTop + 6*s); ctx.lineTo(p.x - bw*0.6, bodyTop + 6*s + aswing);
-      ctx.moveTo(p.x, bodyTop + 6*s); ctx.lineTo(p.x + bw*0.6, bodyTop + 6*s - aswing);
+      ctx.moveTo(p.x - bw*0.3, baseY - bh*0.7); ctx.lineTo(p.x - bw*0.62, baseY - 4*s);
       ctx.stroke();
-    }
+      // silver head poking forward
+      ctx.fillStyle = silver(p.x + bw*0.3, p.x + bw*0.62);
+      ctx.beginPath(); ctx.arc(p.x + bw*0.45, baseY - bh*0.95, 17*s, 0, Math.PI*2); ctx.fill();
+    } else {
+      const bodyH = 150*s;
+      const top = baseY - bodyH + bob;
+      const headR = 19*s;
+      const hipY = baseY - bodyH*0.45 + bob;
+      const shoulderY = top + headR*2.1;
+      const bw = 56*s;
 
-    // head with helmet visor
-    const hy = player.sliding ? baseY - 60*s : top;
-    ctx.fillStyle = '#e8c39e'; // face
-    ctx.beginPath(); ctx.arc(p.x, hy, headR, 0, Math.PI*2); ctx.fill();
-    // helmet (red + blue)
-    ctx.fillStyle = '#1a4fa0';
-    ctx.beginPath(); ctx.arc(p.x, hy, headR, Math.PI, Math.PI*2); ctx.fill();
-    ctx.fillStyle = '#c8102e';
-    ctx.fillRect(p.x - headR, hy - 2*s, headR*2, 5*s);
-    // visor
-    ctx.fillStyle = 'rgba(20,40,90,0.7)';
-    ctx.fillRect(p.x - headR*0.7, hy - 2*s, headR*1.4, headR*0.8);
+      // legs — chrome blue, running scissor
+      const swing = Math.sin(player.runFrame) * 24 * s;
+      const lift = Math.abs(Math.cos(player.runFrame)) * 10 * s;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = '#163e8e';
+      ctx.lineWidth = 15*s;
+      ctx.beginPath();
+      ctx.moveTo(p.x - 8*s, hipY); ctx.lineTo(p.x - 8*s - swing*0.4, baseY - lift);
+      ctx.stroke();
+      ctx.strokeStyle = '#2e64c8';
+      ctx.beginPath();
+      ctx.moveTo(p.x + 8*s, hipY); ctx.lineTo(p.x + 8*s + swing*0.4, baseY - (10*s - lift));
+      ctx.stroke();
+
+      // torso — muscular chrome teardrop (wide shoulders, narrow waist)
+      ctx.fillStyle = blue(p.x - bw*0.6, p.x + bw*0.6);
+      ctx.beginPath();
+      ctx.moveTo(p.x - bw*0.55, shoulderY);
+      ctx.quadraticCurveTo(p.x - bw*0.62, shoulderY + 30*s, p.x - bw*0.3, hipY);
+      ctx.lineTo(p.x + bw*0.3, hipY);
+      ctx.quadraticCurveTo(p.x + bw*0.62, shoulderY + 30*s, p.x + bw*0.55, shoulderY);
+      ctx.quadraticCurveTo(p.x, shoulderY - 14*s, p.x - bw*0.55, shoulderY);
+      ctx.closePath(); ctx.fill();
+      // spine highlight (chrome shine)
+      ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+      ctx.lineWidth = 4*s;
+      ctx.beginPath();
+      ctx.moveTo(p.x - 2*s, shoulderY + 4*s);
+      ctx.quadraticCurveTo(p.x + 4*s, (shoulderY + hipY)/2, p.x, hipY - 4*s);
+      ctx.stroke();
+
+      // arms — pumping
+      const aswing = Math.sin(player.runFrame + Math.PI) * 20 * s;
+      ctx.lineWidth = 11*s;
+      ctx.strokeStyle = '#1d4eae';
+      ctx.beginPath();
+      ctx.moveTo(p.x - bw*0.5, shoulderY + 4*s);
+      ctx.lineTo(p.x - bw*0.72, shoulderY + 34*s + aswing);
+      ctx.stroke();
+      ctx.strokeStyle = '#3a72d8';
+      ctx.beginPath();
+      ctx.moveTo(p.x + bw*0.5, shoulderY + 4*s);
+      ctx.lineTo(p.x + bw*0.72, shoulderY + 34*s - aswing);
+      ctx.stroke();
+
+      // head — bare polished silver (the iconic Pepsiman look)
+      ctx.fillStyle = silver(p.x - headR, p.x + headR);
+      ctx.beginPath(); ctx.arc(p.x, top + headR, headR, 0, Math.PI*2); ctx.fill();
+      // glint
+      ctx.fillStyle = 'rgba(255,255,255,0.85)';
+      ctx.beginPath(); ctx.arc(p.x - headR*0.35, top + headR*0.7, headR*0.22, 0, Math.PI*2); ctx.fill();
+      // neck
+      ctx.fillStyle = '#2e64c8';
+      ctx.fillRect(p.x - 7*s, top + headR*1.8, 14*s, 8*s);
+    }
 
     // shield bubble (blink when about to expire)
     if (player.shieldT > 0 && (player.shieldT > 60 || (t >> 2) & 1)) {
       ctx.strokeStyle = 'rgba(25,230,200,0.85)'; ctx.lineWidth = 3;
       ctx.fillStyle = 'rgba(25,230,200,0.12)';
       ctx.beginPath();
-      ctx.ellipse(p.x, baseY - bodyH*0.5, bw*0.9, bodyH*0.7, 0, 0, Math.PI*2);
+      ctx.ellipse(p.x, baseY - 75*s, 70*s, 95*s, 0, 0, Math.PI*2);
       ctx.fill(); ctx.stroke();
     }
     // magnet field rings
@@ -705,13 +903,12 @@
     ctx.globalAlpha = 1;
   }
 
-  // active power-up timer bars at bottom of screen
   function drawPowerHUD() {
     const items = [];
     if (player.shieldT > 0) items.push(['SHIELD', '#19e6c8', player.shieldT]);
     if (player.magnetT > 0) items.push(['MAGNET', '#ff7a18', player.magnetT]);
     if (player.x2T > 0)     items.push(['x2', '#2b8fd6', player.x2T]);
-    let y = 70;
+    let y = 64;
     ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
     for (const [name, col, tt] of items) {
       ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.fillRect(14, y, 120, 16);
@@ -726,13 +923,11 @@
     ctx.save();
     if (shake > 0.5) ctx.translate((Math.random()-0.5)*shake, (Math.random()-0.5)*shake);
     ctx.clearRect(-30, -30, W+60, H+60);
-    drawRoad();
+    drawBackground();
 
-    // draw obstacles far -> near (painter's order)
-    obstacles.slice().sort((a,b) => a.z - b.z).forEach(o => {
-      // skip if far behind
-      if (o.z > 0.001) drawObstacle(o);
-    });
+    // scenery then obstacles, far -> near
+    props.slice().sort((a,b) => a.z - b.z).forEach(pr => { if (pr.z > 0.001) drawProp(pr); });
+    obstacles.slice().sort((a,b) => a.z - b.z).forEach(o => { if (o.z > 0.001) drawObstacle(o); });
 
     drawPlayer();
     drawParticles();
@@ -742,25 +937,23 @@
   }
 
   // ---- Main loop ----
-  let last = 0;
-  function loop(ts) {
+  function loop() {
     requestAnimationFrame(loop);
     if (state === 'play') update();
     render();
   }
   requestAnimationFrame(loop);
 
-  // responsive scale: keep aspect, fit height
+  // responsive scale: keep aspect, fit viewport
   function fit() {
     const ar = W / H;
-    let h = window.innerHeight, w = h * ar;
-    if (w > window.innerWidth) { w = window.innerWidth; h = w / ar; }
+    let w = window.innerWidth, h = w / ar;
+    if (h > window.innerHeight) { h = window.innerHeight; w = h * ar; }
     canvas.style.width = w + 'px';
     canvas.style.height = h + 'px';
   }
   window.addEventListener('resize', fit); fit();
 
-  // initial idle render so the player shows on start screen
   state = 'idle';
 })();
 </script>
