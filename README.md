@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/anil-matcha-open-generative-ai-badge.png)](https://mseep.ai/app/anil-matcha-open-generative-ai)
+
 # Open Generative AI — Open-Source Alternative to AI Video Platforms
 
 > **The free, open-source alternative to AI Video Platforms.** Generate AI images and videos using 200+ state-of-the-art models — no content filters, no closed ecosystem, no subscription fees.
