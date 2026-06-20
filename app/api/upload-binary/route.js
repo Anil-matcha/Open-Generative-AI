@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { validateUploadProxyTarget } from '../../../src/lib/uploadProxyTarget';
 
 export async function POST(request) {
     try {
@@ -9,6 +10,14 @@ export async function POST(request) {
         
         if (!targetUrl) {
             return NextResponse.json({ error: 'Missing proxy target URL' }, { status: 400 });
+        }
+
+        const validatedTarget = validateUploadProxyTarget(targetUrl);
+        if (!validatedTarget.ok) {
+            return NextResponse.json(
+                { error: 'Invalid upload target', reason: validatedTarget.reason },
+                { status: 400 }
+            );
         }
 
         // Reconstruct the FormData for S3 (excluding our internal proxy marker)
@@ -25,7 +34,7 @@ export async function POST(request) {
 
         // Perform the server-to-server POST to S3
         // This bypasses browser CORS/Preflight security entirely
-        const s3Response = await fetch(targetUrl, {
+        const s3Response = await fetch(validatedTarget.url, {
             method: 'POST',
             body: s3FormData,
         });

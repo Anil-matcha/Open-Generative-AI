@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { validateUploadProxyTarget } from '../../../../src/lib/uploadProxyTarget';
 
 export async function POST(request) {
     try {
@@ -11,6 +12,14 @@ export async function POST(request) {
             return NextResponse.json({ error: 'Missing proxy target URL' }, { status: 400 });
         }
 
+        const validatedTarget = validateUploadProxyTarget(targetUrl);
+        if (!validatedTarget.ok) {
+            return NextResponse.json(
+                { error: 'Invalid upload target', reason: validatedTarget.reason },
+                { status: 400 }
+            );
+        }
+
         const s3FormData = new FormData();
         for (const [key, value] of formData.entries()) {
             if (key !== 'x-proxy-target-url') {
@@ -18,7 +27,7 @@ export async function POST(request) {
             }
         }
 
-        const s3Response = await fetch(targetUrl, {
+        const s3Response = await fetch(validatedTarget.url, {
             method: 'POST',
             body: s3FormData,
         });
