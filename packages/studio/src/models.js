@@ -7929,6 +7929,21 @@ export const i2vModels = [
       }
     }
   }
+  ,{
+    "id": "seedance-2-mini-omni-reference",
+    "name": "Seedance 2 Mini Omni",
+    "endpoint": "seedance-2-mini-omni-reference",
+    "family": "seedance-v2.0",
+    "imageField": "images_list",
+    "hasPrompt": true,
+    "maxImages": 9,
+    "inputs": {
+      "prompt": { "type": "string", "title": "Prompt", "name": "prompt", "description": "Text prompt. Reference images with @image1, @image2, etc." },
+      "aspect_ratio": { "type": "string", "title": "Aspect Ratio", "name": "aspect_ratio", "enum": ["16:9", "9:16", "4:3", "3:4"], "default": "16:9" },
+      "duration": { "type": "int", "title": "Duration", "name": "duration", "enum": [5, 10, 15], "default": 5 },
+      "resolution": { "type": "string", "title": "Resolution", "name": "resolution", "enum": ["480p", "720p"], "default": "720p" }
+    }
+  }
 ];
 
 export const getI2IModelById = (id) => i2iModels.find(m => m.id === id);

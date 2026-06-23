@@ -292,6 +292,7 @@ export default function VideoStudio({
   // ── generation / canvas ──
   const [generating, setGenerating] = useState(false);
   const [generateError, setGenerateError] = useState(null);
+  const [estimatedCost, setEstimatedCost] = useState(null);
   const [fullscreenUrl, setFullscreenUrl] = useState(null);
   const [canvasUrl, setCanvasUrl] = useState(null);
   const [canvasModel, setCanvasModel] = useState(null);
@@ -657,6 +658,28 @@ export default function VideoStudio({
     return () => window.removeEventListener("click", handler);
   }, [openDropdown]);
 
+  // ── cost estimation ──────────────────────────────────────────────────────
+  useEffect(() => {
+    const model = getCurrentModel();
+    if (!model) { setEstimatedCost(null); return; }
+    const params = { prompt: "test" };
+    if (selectedDuration) params.duration = selectedDuration;
+    if (selectedResolution) params.resolution = selectedResolution;
+    if (selectedAr) params.aspect_ratio = selectedAr;
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch("/api/estimate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ model: model.id, ...params }),
+        });
+        const data = await res.json();
+        if (data.cost !== undefined) setEstimatedCost(data.cost.toFixed(3));
+        else setEstimatedCost(null);
+      } catch { setEstimatedCost(null); }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [selectedModel, selectedDuration, selectedResolution, selectedAr, imageMode]);
   // ── textarea auto-resize ──────────────────────────────────────────────────
   const handlePromptInput = (e) => {
     setPrompt(e.target.value);
@@ -1901,7 +1924,7 @@ export default function VideoStudio({
                 `Error: ${generateError}`
               ) : (
                 <>
-                  <span>Generate</span>
+                  <span>Generate{estimatedCost ? ` · $${estimatedCost}` : ""}</span>
                 </>
               )}
             </button>

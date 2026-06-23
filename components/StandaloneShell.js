@@ -293,12 +293,10 @@ export default function StandaloneShell() {
         <header className="flex-shrink-0 h-14 border-b border-white/[0.03] flex items-center justify-between px-6 bg-black/20 backdrop-blur-md z-40 gap-4">
           {/* Left: Logo */}
           <div className="flex-shrink-0 flex items-center gap-2">
-            <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-              </svg>
+            <div className="flex items-center justify-center">
+              <img src="/logo.webp" alt="Criativos 1PRA1" style={{ height:"32px", objectFit:"contain" }} />
             </div>
-            <span className="text-sm font-bold tracking-tight hidden sm:block">OpenGenerativeAI</span>
+            <span className="text-sm font-bold tracking-tight hidden sm:block">Criativos 1PRA1</span>
           </div>
 
           {/* Center: Navigation Container with fade edges */}

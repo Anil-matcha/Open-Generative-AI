@@ -768,6 +768,7 @@ export default function ImageStudio({
   const [dropdownOpen, setDropdownOpen] = useState(null); // 'model' | 'ar' | 'quality' | null
   const [generating, setGenerating] = useState(false);
   const [generateError, setGenerateError] = useState(null);
+  const [estimatedCost, setEstimatedCost] = useState(null);
   const [fullscreenUrl, setFullscreenUrl] = useState(null);
 
   // ── Canvas / history state ──────────────────────────────────────────────
@@ -911,6 +912,31 @@ export default function ImageStudio({
       onFilesHandled?.();
     }
   }, [droppedFiles, onFilesHandled, processDroppedImages]);
+  useEffect(() => {
+    const model = (imageMode ? i2iModels : t2iModels).find(m => m.id === selectedModelId);
+    if (model == null) { setEstimatedCost(null); return; }
+    const params = { prompt: "test" };
+    if (selectedAr) params.aspect_ratio = selectedAr;
+    if (selectedQuality) {
+      const hasResolution = model.inputs && model.inputs.resolution;
+      const hasQuality = model.inputs && model.inputs.quality;
+      if (hasResolution) params.resolution = selectedQuality;
+      else if (hasQuality) params.quality = selectedQuality;
+    }
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch("/api/estimate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ model: model.endpoint || model.id, ...params }),
+        });
+        const data = await res.json();
+        if (data.cost !== undefined) setEstimatedCost(data.cost.toFixed(3));
+        else setEstimatedCost(null);
+      } catch (e) { setEstimatedCost(null); }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [selectedModelId, selectedAr, selectedQuality, imageMode]);
 
   // ── Derived: current model lists & helpers ───────────────────────────────
   const currentModels = imageMode ? i2iModels : t2iModels;
@@ -1431,7 +1457,7 @@ export default function ImageStudio({
                 `Error: ${generateError}`
               ) : (
                 <>
-                  <span>Generate</span>
+                  <span>Generate{estimatedCost ? ` · $${estimatedCost}` : ""}</span>
                 </>
               )}
             </button>
