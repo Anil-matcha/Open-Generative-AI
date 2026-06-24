@@ -210,6 +210,13 @@ export default function StandaloneShell() {
     // Snapshot the projectId at the moment the generation finished — if the user
     // switches projects mid-flight we still attribute the result to where it was made.
     const projectIdAtTime = activeProjectId ? parseInt(activeProjectId) : null;
+    // Estimate credit cost from the generation type (mirrors ENDPOINT_COSTS in
+    // app/api/v1/[[...path]]/route.js). Studio callbacks don't pass a real cost yet;
+    // this gives the DB a meaningful number so the per-project total is accurate
+    // for new generations. Older generations with credits_used=0 will still read
+    // as 0 — historical backfill is out of scope.
+    const TYPE_COSTS = { image: 1, video: 5, audio: 1, lipsync: 3, cinema: 5, clipping: 2 };
+    const creditsUsed = payload.creditsUsed ?? TYPE_COSTS[payload.type] ?? 1;
     fetch('/api/generations', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -221,7 +228,7 @@ export default function StandaloneShell() {
         model: payload.model || '',
         outputUrl: payload.url,
         params: payload.params || {},
-        creditsUsed: payload.creditsUsed || 0,
+        creditsUsed,
       }),
     })
       .then(r => r.ok ? r.json() : null)
@@ -238,9 +245,12 @@ export default function StandaloneShell() {
           created_at: new Date().toISOString(),
         });
         if (entry) setProjectGenerations(prev => [entry, ...prev.filter(e => e.id !== entry.id)]);
+        // Refresh the project list so the per-project cost in the header updates
+        // (the new generation added credits to whichever project owns it).
+        loadProjects();
       })
       .catch(err => console.error('[gen save]', err));
-  }, [activeProjectId, mapDbToEntry]);
+  }, [activeProjectId, mapDbToEntry, loadProjects]);
 
   const activeProject = projects.find(p => String(p.id) === String(activeProjectId));
 
@@ -431,15 +441,22 @@ export default function StandaloneShell() {
             <div className="relative" data-project-selector>
               <button
                 onClick={() => setProjectDropdownOpen(o => !o)}
-                title="Projeto ativo — gerações serão salvas nele"
+                title={activeProject ? `${activeProject.name} — ${(activeProject.cost?.total || 0).toFixed(1)} cr gastos até agora` : 'Gerações serão salvas sem projeto'}
                 className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-white/10 bg-white/5 text-[13px] font-semibold text-white/80 hover:text-white hover:bg-white/10 hover:border-white/20 transition-colors"
               >
                 <span
                   className="w-2.5 h-2.5 rounded-full flex-shrink-0"
                   style={{ background: activeProject?.color || 'rgba(255,255,255,0.25)' }}
                 />
-                <span className="max-w-[140px] truncate">
-                  {activeProject?.name || 'Sem projeto'}
+                <span className="flex flex-col items-start leading-tight max-w-[140px]">
+                  <span className="truncate w-full">
+                    {activeProject?.name || 'Sem projeto'}
+                  </span>
+                  {activeProject && (
+                    <span className="text-[10px] font-medium text-white/35 tracking-wide">
+                      {(activeProject.cost?.total || 0).toFixed(1)} cr gastos
+                    </span>
+                  )}
                 </span>
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="opacity-50 flex-shrink-0">
                   <path d="M6 9l6 6 6-6" />
@@ -448,7 +465,7 @@ export default function StandaloneShell() {
 
               {projectDropdownOpen && (
                 <div
-                  className="absolute top-[calc(100%+6px)] right-0 z-50 bg-[#0a0a0a] border border-white/10 rounded-lg shadow-2xl w-64 overflow-hidden"
+                  className="absolute top-[calc(100%+6px)] right-0 z-50 bg-[#0a0a0a] border border-white/10 rounded-lg shadow-2xl w-72 overflow-hidden"
                 >
                   <div className="px-3 py-2 text-[10px] font-semibold text-white/30 uppercase tracking-wider border-b border-white/[0.05]">
                     Projeto ativo
@@ -462,18 +479,35 @@ export default function StandaloneShell() {
                       <span className="text-white/60 flex-1">Sem projeto</span>
                       {!activeProjectId && <span className="text-[#22d3ee] text-[10px]">●</span>}
                     </button>
-                    {projects.map(p => (
-                      <button
-                        key={p.id}
-                        onClick={() => { setActiveProjectId(String(p.id)); setProjectDropdownOpen(false); }}
-                        className={`w-full flex items-center gap-2 px-3 py-2.5 text-left text-[13px] hover:bg-white/[0.04] transition-colors ${String(p.id) === String(activeProjectId) ? 'bg-white/[0.03]' : ''}`}
-                      >
-                        <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: p.color }} />
-                        <span className="text-white/80 flex-1 truncate">{p.name}</span>
-                        <span className="text-[10px] text-white/30">{p.gen_count}</span>
-                        {String(p.id) === String(activeProjectId) && <span className="text-[#22d3ee] text-[10px]">●</span>}
-                      </button>
-                    ))}
+                    {projects.map(p => {
+                      const cost = p.cost?.total || 0;
+                      const byType = p.cost?.byType || {};
+                      const typeBits = Object.entries(byType)
+                        .filter(([, v]) => v > 0)
+                        .map(([k, v]) => `${v}${k[0]}`)
+                        .join(' ');
+                      return (
+                        <button
+                          key={p.id}
+                          onClick={() => { setActiveProjectId(String(p.id)); setProjectDropdownOpen(false); }}
+                          className={`w-full flex items-center gap-2 px-3 py-2.5 text-left text-[13px] hover:bg-white/[0.04] transition-colors ${String(p.id) === String(activeProjectId) ? 'bg-white/[0.03]' : ''}`}
+                        >
+                          <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: p.color }} />
+                          <span className="text-white/80 flex-1 truncate">{p.name}</span>
+                          <span className="flex flex-col items-end leading-tight flex-shrink-0">
+                            <span className="text-[11px] font-semibold text-white/70 tabular-nums">
+                              {cost.toFixed(1)} cr
+                            </span>
+                            {typeBits && (
+                              <span className="text-[9px] text-white/30 tracking-wide">
+                                {typeBits}
+                              </span>
+                            )}
+                          </span>
+                          {String(p.id) === String(activeProjectId) && <span className="text-[#22d3ee] text-[10px]">●</span>}
+                        </button>
+                      );
+                    })}
                   </div>
                   <div className="border-t border-white/[0.05]">
                     <a

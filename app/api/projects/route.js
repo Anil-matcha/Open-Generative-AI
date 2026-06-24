@@ -1,12 +1,17 @@
 import { NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/requireAuth';
-import { getProjectsForUser, createProject } from '@/lib/db-projects';
+import { getProjectsForUser, getProjectsCostForUser, createProject } from '@/lib/db-projects';
 
 export async function GET(request) {
   const { user, error } = await requireAuth(request);
   if (error) return error;
   const projects = getProjectsForUser(user.uid);
-  return NextResponse.json(projects);
+  const costMap = getProjectsCostForUser(user.uid);
+  const enriched = projects.map(p => ({
+    ...p,
+    cost: costMap.get(p.id) || { total: 0, byType: {} },
+  }));
+  return NextResponse.json(enriched);
 }
 
 export async function POST(request) {

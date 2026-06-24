@@ -137,6 +137,8 @@ export default function ProjectsPage() {
                   <div style={S.cardTitle}>{p.name}</div>
                   <div style={S.cardSub}>
                     {p.gen_count} {p.gen_count === 1 ? 'geração' : 'gerações'}
+                    <span style={{ color: 'rgba(255,255,255,0.5)' }}> · </span>
+                    <span style={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>{(p.cost?.total || 0).toFixed(1)} cr</span>
                     {p.member_count > 1 && ` · ${p.member_count} membros`}
                     {p.my_role !== 'owner' && <span style={{ marginLeft:'6px', background:'rgba(34,211,238,0.1)', color:'#22d3ee', borderRadius:'4px', padding:'1px 6px', fontSize:'10px' }}>{p.my_role}</span>}
                   </div>
