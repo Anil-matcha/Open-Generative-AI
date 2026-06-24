@@ -1142,17 +1142,54 @@ export default function ImageStudio({
       <div className="flex-1 overflow-y-auto custom-scrollbar pb-4 px-4 pt-2">
         {history.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full pt-4 animate-fade-in-up">
-            {history.map((entry, idx) => (
+            {history.map((entry, idx) => {
+              const isVideo = entry.type === "video";
+              const isAudio = entry.type === "audio";
+              const aspectClass = isVideo ? "aspect-video" : "aspect-square";
+              const typeLabel = isVideo ? "Vídeo" : isAudio ? "Áudio" : null;
+              return (
               <div
                 key={entry.id || idx}
                 className="relative group rounded-lg overflow-hidden border border-white/10 bg-[#0a0a0a] shadow-xl hover:border-primary/50 transition-all duration-300 flex flex-col"
               >
-                <img
-                  src={entry.url}
-                  alt={entry.prompt?.substring(0, 30) || "Generated image"}
-                  className="w-full aspect-square object-cover bg-black/40 cursor-pointer hover:opacity-80 transition-opacity"
-                  onClick={() => setFullscreenUrl(entry.url)}
-                />
+                {isAudio ? (
+                  <div className={`w-full ${aspectClass} bg-gradient-to-br from-white/[0.04] to-white/[0.01] flex items-center justify-center`}>
+                    <audio src={entry.url} controls className="w-[85%]" onClick={(e) => e.stopPropagation()} />
+                  </div>
+                ) : (
+                  isVideo ? (
+                    <video
+                      src={entry.url}
+                      className={`w-full ${aspectClass} object-cover bg-black/40 cursor-pointer hover:opacity-80 transition-opacity`}
+                      onClick={() => setFullscreenUrl(entry.url)}
+                      controls={false}
+                      loop
+                      muted
+                      playsInline
+                      onMouseOver={(e) => e.target.play()}
+                      onMouseOut={(e) => { e.target.pause(); e.target.currentTime = 0; }}
+                    />
+                  ) : (
+                    <img
+                      src={entry.url}
+                      alt={entry.prompt?.substring(0, 30) || "Generated image"}
+                      className={`w-full ${aspectClass} object-cover bg-black/40 cursor-pointer hover:opacity-80 transition-opacity`}
+                      onClick={() => setFullscreenUrl(entry.url)}
+                    />
+                  )
+                )}
+
+                {/* Type badge for non-image entries */}
+                {typeLabel && (
+                  <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/70 backdrop-blur-sm rounded text-[10px] font-bold text-white/80 border border-white/10 flex items-center gap-1">
+                    {isVideo ? (
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+                    ) : (
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" /><path d="M19.07 4.93a10 10 0 0 1 0 14.14" /></svg>
+                    )}
+                    {typeLabel}
+                  </div>
+                )}
                 
                 {/* Overlay actions */}
                 <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -1200,7 +1237,8 @@ export default function ImageStudio({
                   </div>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-full animate-fade-in-up transition-all duration-700 min-h-[50vh]">
