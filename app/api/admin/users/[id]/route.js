@@ -38,6 +38,7 @@ export async function PATCH(request, { params }) {
   if (body.email !== undefined) fields.email = body.email.toLowerCase().trim();
   if (body.active !== undefined) fields.active = body.active ? 1 : 0;
   if (body.role !== undefined) fields.role = body.role;
+  if (body.credit_limit !== undefined) fields.credit_limit = body.credit_limit == null || body.credit_limit === '' ? null : parseFloat(body.credit_limit);
 
   if (Object.keys(fields).length > 0) {
     updateUser(user.id, fields);

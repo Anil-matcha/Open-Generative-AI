@@ -180,6 +180,7 @@ function UserModal({ user, onClose, onSave }) {
     password: '',
     role: user?.role || 'user',
     credits: user?.credits ?? 0,
+    credit_limit: user?.credit_limit ?? '',
     active: user?.active ?? 1,
   });
   const [saving, setSaving] = useState(false);
@@ -201,6 +202,7 @@ function UserModal({ user, onClose, onSave }) {
             email: form.email,
             role: form.role,
             active: form.active,
+            credit_limit: form.credit_limit === '' ? null : parseFloat(form.credit_limit) || null,
             ...(form.password ? { password: form.password } : {}),
           }),
         });
@@ -265,6 +267,10 @@ function UserModal({ user, onClose, onSave }) {
               <input style={S.input} type="number" min="0" step="1" value={form.credits} onChange={e => set('credits', parseFloat(e.target.value) || 0)} />
             </div>
           )}
+          <div>
+            <label style={S.label}>Limite de créditos (deixe vazio para sem limite)</label>
+            <input style={S.input} type="number" min="0" step="1" value={form.credit_limit} onChange={e => set('credit_limit', e.target.value)} placeholder="Ex: 10" />
+          </div>
           {err && <div style={{ color: '#f87171', fontSize: '12px' }}>{err}</div>}
           <button style={{ ...S.btn, marginTop: '4px' }} onClick={submit} disabled={saving}>
             {saving ? 'Salvando...' : isEdit ? 'Salvar alterações' : 'Criar usuário'}
@@ -522,14 +528,14 @@ export default function AdminPage() {
               <table style={S.table}>
                 <thead>
                   <tr>
-                    {['Nome', 'Email', 'Status', 'Créditos', 'Último acesso', 'Ações'].map(h => (
+                    {['Nome', 'Email', 'Status', 'Créditos', 'Limite', 'Último acesso', 'Ações'].map(h => (
                       <th key={h} style={S.th}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {nonAdmins.length === 0 ? (
-                    <tr><td colSpan="6" style={{ ...S.td, textAlign: 'center', color: 'rgba(255,255,255,0.2)', padding: '32px' }}>
+                    <tr><td colSpan="7" style={{ ...S.td, textAlign: 'center', color: 'rgba(255,255,255,0.2)', padding: '32px' }}>
                       Nenhum usuário cadastrado ainda. Clique em "Novo usuário" para começar.
                     </td></tr>
                   ) : nonAdmins.map(user => (
@@ -541,6 +547,9 @@ export default function AdminPage() {
                       </td>
                       <td style={{ ...S.td, fontWeight: '600', color: '#22d3ee' }}>
                         {user.credits.toFixed(1)}
+                      </td>
+                      <td style={{ ...S.td, color: 'rgba(255,255,255,0.4)' }}>
+                        {user.credit_limit != null ? user.credit_limit : '—'}
                       </td>
                       <td style={{ ...S.td, fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>
                         {user.last_login ? new Date(user.last_login).toLocaleDateString('pt-BR') : '—'}

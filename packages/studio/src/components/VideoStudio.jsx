@@ -1605,7 +1605,6 @@ export default function VideoStudio({
               </button>
             </div>
           </div>
-          </div>
 
           {/* Prompt textarea */}
           <div className="flex flex-col gap-1.5">
@@ -1842,7 +1841,6 @@ export default function VideoStudio({
             </button>
           </div>
         </div>
-      </div>
 
       {/* ── FULLSCREEN VIDEO MODAL ── */}
       {fullscreenUrl && (

@@ -525,7 +525,7 @@ export default function StandaloneShell() {
               <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
               <div className="flex flex-col">
                 <span className="text-xs font-bold text-white/90">
-                  {userInfo?.credits != null ? `${userInfo.credits.toFixed(1)} cr` : '---'}
+                  {userInfo?.credits != null ? `${userInfo.credits.toFixed(1)}${userInfo.credit_limit != null ? ' / ' + userInfo.credit_limit : ''} cr` : '---'}
                 </span>
               </div>
             </div>

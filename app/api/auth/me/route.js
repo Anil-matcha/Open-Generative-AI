@@ -15,5 +15,6 @@ export async function GET(request) {
     email: user.email,
     role: user.role,
     credits: user.credits,
+    credit_limit: user.credit_limit ?? null,
   });
 }

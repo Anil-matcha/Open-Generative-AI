@@ -70,6 +70,12 @@ async function proxyRequest(request, params) {
       { status: 402 }
     );
   }
+  if (isGeneration && user.credit_limit != null && user.credits >= user.credit_limit) {
+    return NextResponse.json(
+      { error: `Limite de créditos atingido (${user.credit_limit}). Aguarde recarga.` },
+      { status: 402 }
+    );
+  }
 
   try {
     const upstream = await fetch(targetUrl, { method, headers, body });

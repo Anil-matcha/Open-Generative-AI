@@ -20,7 +20,7 @@ export async function POST(request) {
   const { error } = await requireAdmin(request);
   if (error) return error;
 
-  const { name, email, password, role = 'user', credits = 0 } = await request.json();
+  const { name, email, password, role = 'user', credits = 0, credit_limit = null } = await request.json();
   if (!name || !email || !password) {
     return NextResponse.json({ error: 'name, email e password são obrigatórios' }, { status: 400 });
   }
@@ -34,6 +34,7 @@ export async function POST(request) {
       password: hashed,
       role,
       credits: parseFloat(credits) || 0,
+      credit_limit: credit_limit == null || credit_limit === '' ? null : parseFloat(credit_limit),
     });
     return NextResponse.json({ id: result.lastInsertRowid, ok: true });
   } catch (err) {
