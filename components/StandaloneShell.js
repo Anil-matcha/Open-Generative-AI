@@ -67,6 +67,22 @@ export default function StandaloneShell() {
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   const [userInfo, setUserInfo] = useState(null);
 
+  // ─── Active project (for grouping generations) ────────────────────────────
+  const ACTIVE_PROJECT_KEY = '1pra1_active_project_id';
+  const [projects, setProjects] = useState([]);
+  const [activeProjectId, setActiveProjectId] = useState(null);
+  const [projectDropdownOpen, setProjectDropdownOpen] = useState(false);
+  const [hydratedProject, setHydratedProject] = useState(false);
+
+  const loadProjects = useCallback(async () => {
+    try {
+      const r = await fetch('/api/projects', { credentials: 'include' });
+      if (!r.ok) return;
+      const data = await r.json();
+      setProjects(Array.isArray(data) ? data : []);
+    } catch {}
+  }, []);
+
   // Drag and Drop
   const [isDragging, setIsDragging] = useState(false);
   const [droppedFiles, setDroppedFiles] = useState(null);
@@ -84,9 +100,63 @@ export default function StandaloneShell() {
         setAuthChecked(true);
       })
       .catch(() => {
-        window.location.href = '/login';
+        window.location.href = '/login');
       });
   }, []);
+
+  // Load projects after auth and hydrate active selection from localStorage
+  useEffect(() => {
+    if (!authChecked) return;
+    loadProjects();
+    const stored = localStorage.getItem(ACTIVE_PROJECT_KEY);
+    if (stored) setActiveProjectId(stored);
+    setHydratedProject(true);
+    // Refresh list when user comes back to the tab (e.g. from /projects)
+    const onFocus = () => loadProjects();
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
+  }, [authChecked, loadProjects]);
+
+  // Persist active project selection
+  useEffect(() => {
+    if (!hydratedProject) return;
+    if (activeProjectId) localStorage.setItem(ACTIVE_PROJECT_KEY, activeProjectId);
+    else localStorage.removeItem(ACTIVE_PROJECT_KEY);
+  }, [activeProjectId, hydratedProject]);
+
+  // Close project dropdown on outside click
+  useEffect(() => {
+    if (!projectDropdownOpen) return;
+    const handler = (e) => {
+      const el = e.target;
+      if (el.closest && !el.closest('[data-project-selector]')) {
+        setProjectDropdownOpen(false);
+      }
+    };
+    window.addEventListener('mousedown', handler);
+    return () => window.removeEventListener('mousedown', handler);
+  }, [projectDropdownOpen]);
+
+  // ─── Save each completed generation to the DB ────────────────────────────
+  const handleGenerationComplete = useCallback((payload) => {
+    if (!payload || !payload.url) return;
+    fetch('/api/generations', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        projectId: activeProjectId ? parseInt(activeProjectId) : null,
+        type: payload.type || 'image',
+        prompt: payload.prompt || '',
+        model: payload.model || '',
+        outputUrl: payload.url,
+        params: payload.params || {},
+        creditsUsed: payload.creditsUsed || 0,
+      }),
+    }).catch(err => console.error('[gen save]', err));
+  }, [activeProjectId]);
+
+  const activeProject = projects.find(p => String(p.id) === String(activeProjectId));
 
   // Sync tab with URL
   useEffect(() => {
@@ -258,7 +328,67 @@ export default function StandaloneShell() {
             <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[#030303] to-transparent pointer-events-none z-10 block lg:hidden" />
           </div>
 
-          <div className="flex-shrink-0 flex items-center gap-4">
+          <div className="flex-shrink-0 flex items-center gap-3">
+            {/* Project selector */}
+            <div className="relative" data-project-selector>
+              <button
+                onClick={() => setProjectDropdownOpen(o => !o)}
+                title="Projeto ativo — gerações serão salvas nele"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-white/10 bg-white/5 text-[13px] font-semibold text-white/80 hover:text-white hover:bg-white/10 hover:border-white/20 transition-colors"
+              >
+                <span
+                  className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                  style={{ background: activeProject?.color || 'rgba(255,255,255,0.25)' }}
+                />
+                <span className="max-w-[140px] truncate">
+                  {activeProject?.name || 'Sem projeto'}
+                </span>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="opacity-50 flex-shrink-0">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </button>
+
+              {projectDropdownOpen && (
+                <div
+                  className="absolute top-[calc(100%+6px)] right-0 z-50 bg-[#0a0a0a] border border-white/10 rounded-lg shadow-2xl w-64 overflow-hidden"
+                >
+                  <div className="px-3 py-2 text-[10px] font-semibold text-white/30 uppercase tracking-wider border-b border-white/[0.05]">
+                    Projeto ativo
+                  </div>
+                  <div className="max-h-72 overflow-y-auto custom-scrollbar">
+                    <button
+                      onClick={() => { setActiveProjectId(null); setProjectDropdownOpen(false); }}
+                      className={`w-full flex items-center gap-2 px-3 py-2.5 text-left text-[13px] hover:bg-white/[0.04] transition-colors ${!activeProjectId ? 'bg-white/[0.03]' : ''}`}
+                    >
+                      <span className="w-2.5 h-2.5 rounded-full bg-white/20 flex-shrink-0" />
+                      <span className="text-white/60 flex-1">Sem projeto</span>
+                      {!activeProjectId && <span className="text-[#22d3ee] text-[10px]">●</span>}
+                    </button>
+                    {projects.map(p => (
+                      <button
+                        key={p.id}
+                        onClick={() => { setActiveProjectId(String(p.id)); setProjectDropdownOpen(false); }}
+                        className={`w-full flex items-center gap-2 px-3 py-2.5 text-left text-[13px] hover:bg-white/[0.04] transition-colors ${String(p.id) === String(activeProjectId) ? 'bg-white/[0.03]' : ''}`}
+                      >
+                        <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: p.color }} />
+                        <span className="text-white/80 flex-1 truncate">{p.name}</span>
+                        <span className="text-[10px] text-white/30">{p.gen_count}</span>
+                        {String(p.id) === String(activeProjectId) && <span className="text-[#22d3ee] text-[10px]">●</span>}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="border-t border-white/[0.05]">
+                    <a
+                      href="/projects"
+                      className="block px-3 py-2.5 text-[12px] text-[#22d3ee] hover:bg-white/[0.04] font-semibold"
+                    >
+                      Gerenciar projetos →
+                    </a>
+                  </div>
+                </div>
+              )}
+            </div>
+
             <div className="flex items-center gap-3 bg-white/5 px-3 py-1.5 rounded-full border border-white/5 transition-colors">
               <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
               <div className="flex flex-col">
@@ -288,13 +418,13 @@ export default function StandaloneShell() {
 
       {/* Studio Content */}
       <div className="flex-1 min-h-0 relative overflow-hidden">
-        {activeTab === 'image'   && <ImageStudio   apiKey={apiKeyProp} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} />}
-        {activeTab === 'video'   && <VideoStudio   apiKey={apiKeyProp} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} />}
+        {activeTab === 'image'   && <ImageStudio   apiKey={apiKeyProp} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationComplete={handleGenerationComplete} />}
+        {activeTab === 'video'   && <VideoStudio   apiKey={apiKeyProp} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationComplete={handleGenerationComplete} />}
         {activeTab === 'clipping' && <ClippingStudio apiKey={apiKeyProp} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} />}
         {activeTab === 'vibe-motion' && <VibeMotionStudio apiKey={apiKeyProp} />}
-        {activeTab === 'lipsync' && <LipSyncStudio apiKey={apiKeyProp} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} />}
-        {activeTab === 'cinema'  && <CinemaStudio  apiKey={apiKeyProp} />}
-        {activeTab === 'audio'   && <AudioStudio   apiKey={apiKeyProp} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} />}
+        {activeTab === 'lipsync' && <LipSyncStudio apiKey={apiKeyProp} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationComplete={handleGenerationComplete} />}
+        {activeTab === 'cinema'  && <CinemaStudio  apiKey={apiKeyProp} onGenerationComplete={handleGenerationComplete} />}
+        {activeTab === 'audio'   && <AudioStudio   apiKey={apiKeyProp} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationComplete={handleGenerationComplete} />}
         {activeTab === 'marketing' && <MarketingStudio apiKey={apiKeyProp} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} />}
         {activeTab === 'workflows' && <WorkflowStudio apiKey={apiKeyProp} isHeaderVisible={isHeaderVisible} onToggleHeader={setIsHeaderVisible} />}
         {activeTab === 'agents' && <AgentStudio apiKey={apiKeyProp} isHeaderVisible={isHeaderVisible} onToggleHeader={setIsHeaderVisible} />}
