@@ -69,10 +69,16 @@ export default function StandaloneShell() {
 
   // ─── Active project (for grouping generations) ────────────────────────────
   const ACTIVE_PROJECT_KEY = '1pra1_active_project_id';
+  const TYPE_FILTER_KEY = '1pra1_type_filter';
   const [projects, setProjects] = useState([]);
   const [activeProjectId, setActiveProjectId] = useState(null);
   const [projectDropdownOpen, setProjectDropdownOpen] = useState(false);
   const [hydratedProject, setHydratedProject] = useState(false);
+  const [projectGenerations, setProjectGenerations] = useState([]);
+  const [typeFilter, setTypeFilter] = useState('all');
+  const [hydratedFilter, setHydratedFilter] = useState(false);
+
+  const STUDIO_TABS_WITH_FILTER = ['image', 'video', 'audio', 'lipsync', 'cinema'];
 
   const loadProjects = useCallback(async () => {
     try {
@@ -81,6 +87,24 @@ export default function StandaloneShell() {
       const data = await r.json();
       setProjects(Array.isArray(data) ? data : []);
     } catch {}
+  }, []);
+
+  // Normalize DB row → studio history entry shape
+  const mapDbToEntry = useCallback((row) => {
+    if (!row) return null;
+    let params = {};
+    try { params = row.params ? JSON.parse(row.params) : {}; } catch {}
+    return {
+      id: row.id,
+      url: row.output_url,
+      prompt: row.prompt || '',
+      model: row.model || '',
+      type: row.type,
+      aspect_ratio: params.aspect_ratio || null,
+      duration: params.duration || null,
+      timestamp: row.created_at,
+      params,
+    };
   }, []);
 
   // Drag and Drop
@@ -117,6 +141,49 @@ export default function StandaloneShell() {
     return () => window.removeEventListener('focus', onFocus);
   }, [authChecked, loadProjects]);
 
+  // Hydrate type filter from localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem(TYPE_FILTER_KEY);
+    if (stored) setTypeFilter(stored);
+    setHydratedFilter(true);
+  }, []);
+
+  // Persist type filter
+  useEffect(() => {
+    if (!hydratedFilter) return;
+    if (typeFilter && typeFilter !== 'all') localStorage.setItem(TYPE_FILTER_KEY, typeFilter);
+    else localStorage.removeItem(TYPE_FILTER_KEY);
+  }, [typeFilter, hydratedFilter]);
+
+  // Load generations whenever active project changes
+  const loadGenerations = useCallback(async (projectId) => {
+    try {
+      const qs = projectId ? `?projectId=${encodeURIComponent(projectId)}` : '?projectId=none';
+      const r = await fetch(`/api/generations${qs}`, { credentials: 'include' });
+      if (!r.ok) {
+        setProjectGenerations([]);
+        return;
+      }
+      const rows = await r.json();
+      setProjectGenerations(Array.isArray(rows) ? rows.map(mapDbToEntry).filter(Boolean) : []);
+    } catch {
+      setProjectGenerations([]);
+    }
+  }, [mapDbToEntry]);
+
+  useEffect(() => {
+    if (!hydratedProject) return;
+    loadGenerations(activeProjectId);
+  }, [activeProjectId, hydratedProject, loadGenerations]);
+
+  // Refresh generations when window regains focus (e.g. came back from /projects)
+  useEffect(() => {
+    if (!hydratedProject) return;
+    const onFocus = () => loadGenerations(activeProjectId);
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
+  }, [hydratedProject, activeProjectId, loadGenerations]);
+
   // Persist active project selection
   useEffect(() => {
     if (!hydratedProject) return;
@@ -140,12 +207,15 @@ export default function StandaloneShell() {
   // ─── Save each completed generation to the DB ────────────────────────────
   const handleGenerationComplete = useCallback((payload) => {
     if (!payload || !payload.url) return;
+    // Snapshot the projectId at the moment the generation finished — if the user
+    // switches projects mid-flight we still attribute the result to where it was made.
+    const projectIdAtTime = activeProjectId ? parseInt(activeProjectId) : null;
     fetch('/api/generations', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
       body: JSON.stringify({
-        projectId: activeProjectId ? parseInt(activeProjectId) : null,
+        projectId: projectIdAtTime,
         type: payload.type || 'image',
         prompt: payload.prompt || '',
         model: payload.model || '',
@@ -153,10 +223,38 @@ export default function StandaloneShell() {
         params: payload.params || {},
         creditsUsed: payload.creditsUsed || 0,
       }),
-    }).catch(err => console.error('[gen save]', err));
-  }, [activeProjectId]);
+    })
+      .then(r => r.ok ? r.json() : null)
+      .then(saved => {
+        // Only inject into the visible gallery if the user is still on the same project
+        if (String(projectIdAtTime) !== String(activeProjectId ? parseInt(activeProjectId) : null)) return;
+        const entry = mapDbToEntry({
+          id: saved?.id,
+          output_url: payload.url,
+          prompt: payload.prompt || '',
+          model: payload.model || '',
+          type: payload.type || 'image',
+          params: payload.params || {},
+          created_at: new Date().toISOString(),
+        });
+        if (entry) setProjectGenerations(prev => [entry, ...prev.filter(e => e.id !== entry.id)]);
+      })
+      .catch(err => console.error('[gen save]', err));
+  }, [activeProjectId, mapDbToEntry]);
 
   const activeProject = projects.find(p => String(p.id) === String(activeProjectId));
+
+  // Apply type filter for the gallery
+  const filteredGenerations = typeFilter === 'all'
+    ? projectGenerations
+    : projectGenerations.filter(g => g.type === typeFilter);
+
+  // Count per type (for badges in the filter bar)
+  const typeCounts = projectGenerations.reduce((acc, g) => {
+    acc[g.type] = (acc[g.type] || 0) + 1;
+    acc.all = (acc.all || 0) + 1;
+    return acc;
+  }, {});
 
   // Sync tab with URL
   useEffect(() => {
@@ -417,19 +515,70 @@ export default function StandaloneShell() {
       )}
 
       {/* Studio Content */}
-      <div className="flex-1 min-h-0 relative overflow-hidden">
-        {activeTab === 'image'   && <ImageStudio   apiKey={apiKeyProp} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationComplete={handleGenerationComplete} />}
-        {activeTab === 'video'   && <VideoStudio   apiKey={apiKeyProp} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationComplete={handleGenerationComplete} />}
-        {activeTab === 'clipping' && <ClippingStudio apiKey={apiKeyProp} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} />}
-        {activeTab === 'vibe-motion' && <VibeMotionStudio apiKey={apiKeyProp} />}
-        {activeTab === 'lipsync' && <LipSyncStudio apiKey={apiKeyProp} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationComplete={handleGenerationComplete} />}
-        {activeTab === 'cinema'  && <CinemaStudio  apiKey={apiKeyProp} onGenerationComplete={handleGenerationComplete} />}
-        {activeTab === 'audio'   && <AudioStudio   apiKey={apiKeyProp} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationComplete={handleGenerationComplete} />}
-        {activeTab === 'marketing' && <MarketingStudio apiKey={apiKeyProp} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} />}
-        {activeTab === 'workflows' && <WorkflowStudio apiKey={apiKeyProp} isHeaderVisible={isHeaderVisible} onToggleHeader={setIsHeaderVisible} />}
-        {activeTab === 'agents' && <AgentStudio apiKey={apiKeyProp} isHeaderVisible={isHeaderVisible} onToggleHeader={setIsHeaderVisible} />}
-        {activeTab === 'design-agent' && <DesignAgentStudio apiKey={apiKeyProp} isHeaderVisible={isHeaderVisible} onToggleHeader={setIsHeaderVisible} />}
-        {activeTab === 'apps' && <AppsStudio apiKey={apiKeyProp} />}
+      <div className="flex-1 min-h-0 relative overflow-hidden flex flex-col">
+        {/* Type filter bar (only for studios that read historyItems) */}
+        {STUDIO_TABS_WITH_FILTER.includes(activeTab) && hydratedProject && (
+          <div className="flex items-center gap-3 px-4 py-2 border-b border-white/[0.06] bg-[#0a0a0a] flex-shrink-0">
+            <div className="flex items-center gap-1 bg-white/[0.03] rounded-md p-1 border border-white/[0.04]">
+              {[
+                { id: 'all', label: 'Todas' },
+                { id: 'image', label: 'Imagens' },
+                { id: 'video', label: 'Vídeos' },
+                { id: 'audio', label: 'Áudio' },
+                { id: 'lipsync', label: 'Lip Sync' },
+                { id: 'cinema', label: 'Cinema' },
+              ].map(opt => {
+                const count = typeCounts[opt.id] || 0;
+                const isActive = typeFilter === opt.id;
+                return (
+                  <button
+                    key={opt.id}
+                    onClick={() => setTypeFilter(opt.id)}
+                    className={`px-3 py-1.5 rounded text-[11px] font-bold transition-all flex items-center gap-1.5 ${
+                      isActive
+                        ? 'bg-primary/15 text-primary'
+                        : 'text-white/50 hover:text-white/80 hover:bg-white/[0.04]'
+                    }`}
+                  >
+                    <span>{opt.label}</span>
+                    {count > 0 && (
+                      <span className={`text-[9px] px-1.5 py-0.5 rounded-full ${
+                        isActive ? 'bg-primary/20 text-primary' : 'bg-white/[0.06] text-white/40'
+                      }`}>
+                        {count}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="text-[11px] text-white/30 font-medium">
+              {activeProject ? (
+                <>
+                  Projeto: <span className="text-white/60">{activeProject.name}</span>
+                </>
+              ) : (
+                <span className="text-white/40 italic">Sem projeto (gerações órfãs)</span>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Wrap each studio in a flex-1 div so it fills the remaining vertical space */}
+        <div className="flex-1 min-h-0 relative overflow-hidden">
+          {activeTab === 'image'   && <ImageStudio   apiKey={apiKeyProp} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationComplete={handleGenerationComplete} historyItems={STUDIO_TABS_WITH_FILTER.includes(activeTab) ? filteredGenerations : undefined} />}
+          {activeTab === 'video'   && <VideoStudio   apiKey={apiKeyProp} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationComplete={handleGenerationComplete} historyItems={STUDIO_TABS_WITH_FILTER.includes(activeTab) ? filteredGenerations : undefined} />}
+          {activeTab === 'clipping' && <ClippingStudio apiKey={apiKeyProp} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} />}
+          {activeTab === 'vibe-motion' && <VibeMotionStudio apiKey={apiKeyProp} />}
+          {activeTab === 'lipsync' && <LipSyncStudio apiKey={apiKeyProp} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationComplete={handleGenerationComplete} historyItems={STUDIO_TABS_WITH_FILTER.includes(activeTab) ? filteredGenerations : undefined} />}
+          {activeTab === 'cinema'  && <CinemaStudio  apiKey={apiKeyProp} onGenerationComplete={handleGenerationComplete} historyItems={STUDIO_TABS_WITH_FILTER.includes(activeTab) ? filteredGenerations : undefined} />}
+          {activeTab === 'audio'   && <AudioStudio   apiKey={apiKeyProp} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationComplete={handleGenerationComplete} historyItems={STUDIO_TABS_WITH_FILTER.includes(activeTab) ? filteredGenerations : undefined} />}
+          {activeTab === 'marketing' && <MarketingStudio apiKey={apiKeyProp} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} />}
+          {activeTab === 'workflows' && <WorkflowStudio apiKey={apiKeyProp} isHeaderVisible={isHeaderVisible} onToggleHeader={setIsHeaderVisible} />}
+          {activeTab === 'agents' && <AgentStudio apiKey={apiKeyProp} isHeaderVisible={isHeaderVisible} onToggleHeader={setIsHeaderVisible} />}
+          {activeTab === 'design-agent' && <DesignAgentStudio apiKey={apiKeyProp} isHeaderVisible={isHeaderVisible} onToggleHeader={setIsHeaderVisible} />}
+          {activeTab === 'apps' && <AppsStudio apiKey={apiKeyProp} />}
+        </div>
       </div>
     </div>
   );
