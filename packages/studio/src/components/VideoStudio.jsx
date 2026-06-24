@@ -1198,10 +1198,10 @@ export default function VideoStudio({
   return (
     <div
       ref={containerRef}
-      className="w-full h-full flex flex-col items-center justify-center bg-app-bg relative overflow-hidden"
+      className="w-full h-full flex flex-row bg-app-bg overflow-hidden"
     >
       {/* ── CENTRAL GALLERY AREA ── */}
-      <div className="flex-1 w-full max-w-7xl mx-auto overflow-y-auto custom-scrollbar pb-40 lg:pb-32 px-2">
+      <div className="flex-1 overflow-y-auto custom-scrollbar pb-4 px-4 pt-2">
         {history.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full pt-4 animate-fade-in-up">
             {history.map((entry, idx) => {
@@ -1323,10 +1323,11 @@ export default function VideoStudio({
         )}
       </div>
 
-      {/* ── BOTTOM PROMPT BAR ── */}
-      <div className="absolute bottom-4 w-full max-w-[95%] lg:max-w-4xl z-40 animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
-        <div className="w-full bg-[#0a0a0a]/80 backdrop-blur-3xl rounded-md border border-white/10 p-4 flex flex-col gap-2 shadow-2xl">
-          <div className="flex items-center gap-2 px-1">
+      {/* ── LEFT SIDEBAR ── */}
+      <div className="w-[300px] flex-shrink-0 flex flex-col bg-[#0a0a0a] border-r border-white/[0.06] overflow-y-auto z-10 order-first">
+        <div className="flex flex-col gap-4 p-4 flex-1">
+          {/* Upload row (image + video buttons) */}
+          <div className="flex items-center gap-2 flex-wrap">
             {/* Image upload button / thumbnails */}
             {imageMode && getMaxImagesForI2VModel(selectedModel) > 2 ? (
               <div className="flex items-center gap-2 flex-wrap">
@@ -1599,24 +1600,24 @@ export default function VideoStudio({
                 )}
               </button>
             </div>
+          </div>
 
-            {/* Prompt textarea */}
-            <div className="flex-1 flex flex-col gap-1">
-              <textarea
-                ref={textareaRef}
-                value={prompt}
-                onChange={handlePromptInput}
-                placeholder={promptPlaceholder}
-                disabled={promptDisabled}
-                rows={1}
-                className="w-full bg-transparent border-none text-white text-sm placeholder:text-white/10 focus:outline-none resize-none pt-1 leading-relaxed min-h-[40px] max-h-[150px] md:max-h-[250px] overflow-y-auto custom-scrollbar disabled:opacity-40"
-              />
-            </div>
+          {/* Prompt textarea */}
+          <div className="flex flex-col gap-1">
+            <textarea
+              ref={textareaRef}
+              value={prompt}
+              onChange={handlePromptInput}
+              placeholder={promptPlaceholder}
+              disabled={promptDisabled}
+              rows={3}
+              className="w-full bg-white/[0.03] border border-white/[0.05] rounded-lg text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-[#22d3ee]/30 resize-none p-3 leading-relaxed min-h-[100px] max-h-[200px] overflow-y-auto custom-scrollbar disabled:opacity-40"
+            />
           </div>
 
           {/* Extend banner */}
           {isExtendMode && (
-            <div className="flex items-center gap-2 px-3 py-1.5 mx-3 bg-primary/5 border border-primary/10 rounded-lg text-[10px] text-primary/80 font-medium tracking-tight">
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-primary/5 border border-primary/10 rounded-lg text-[10px] text-primary/80 font-medium tracking-tight">
               <svg
                 width="13"
                 height="13"
@@ -1632,8 +1633,8 @@ export default function VideoStudio({
           )}
 
           {/* Bottom row: controls + generate */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-2 border-t border-white/[0.03] relative">
-            <div className="flex items-center gap-2 relative flex-wrap pb-1 md:pb-0">
+          <div className="flex flex-col gap-3 pt-2 border-t border-white/[0.03]">
+            <div className="flex items-center gap-2 flex-wrap">
               {/* Model btn */}
               <div className="relative">
                 <button
@@ -1665,7 +1666,7 @@ export default function VideoStudio({
                   <div
                     ref={dropdownRef}
                     onClick={(e) => e.stopPropagation()}
-                    className="absolute bottom-[calc(100%+12px)] left-0 z-50 bg-[#0a0a0a] rounded-[1.5rem] p-3 shadow-2xl border border-white/[0.05] w-[calc(100vw-3rem)] max-w-xs"
+                    className="absolute top-[calc(100%+6px)] left-0 z-50 bg-[#0a0a0a] rounded-[1.5rem] p-3 shadow-2xl border border-white/[0.05] w-[calc(100vw-3rem)] max-w-xs"
                   >
                     <ModelDropdown
                       imageMode={imageMode}
@@ -1711,7 +1712,7 @@ export default function VideoStudio({
                     <div
                       ref={dropdownRef}
                       onClick={(e) => e.stopPropagation()}
-                      className="absolute bottom-[calc(100%+12px)] left-0 z-50 bg-[#0a0a0a] rounded-lg p-3 shadow-2xl border border-white/[0.05] max-h-80 overflow-y-auto custom-scrollbar min-w-[160px]"
+                      className="absolute top-[calc(100%+6px)] left-0 z-50 bg-[#0a0a0a] rounded-lg p-3 shadow-2xl border border-white/[0.05] max-h-80 overflow-y-auto custom-scrollbar min-w-[160px]"
                     >
                       <div className="text-xs font-bold text-white/20 border-b border-white/[0.03] mb-2">
                         Aspect Ratio
@@ -1766,7 +1767,7 @@ export default function VideoStudio({
                     <div
                       ref={dropdownRef}
                       onClick={(e) => e.stopPropagation()}
-                      className="absolute bottom-[calc(100%+12px)] left-0 z-50 bg-[#0a0a0a] rounded-lg p-3 shadow-2xl border border-white/[0.05] max-h-80 overflow-y-auto custom-scrollbar min-w-[200px]"
+                      className="absolute top-[calc(100%+6px)] left-0 z-50 bg-[#0a0a0a] rounded-lg p-3 shadow-2xl border border-white/[0.05] max-h-80 overflow-y-auto custom-scrollbar min-w-[200px]"
                     >
                       <div className="text-xs font-bold text-white/20 border-b border-white/[0.03] mb-2">
                         Effect Type
@@ -1822,7 +1823,7 @@ export default function VideoStudio({
                     <div
                       ref={dropdownRef}
                       onClick={(e) => e.stopPropagation()}
-                      className="absolute bottom-[calc(100%+12px)] left-0 z-50 bg-[#0a0a0a] rounded-md p-3 shadow-2xl border border-white/10 min-w-[140px]"
+                      className="absolute top-[calc(100%+6px)] left-0 z-50 bg-[#0a0a0a] rounded-md p-3 shadow-2xl border border-white/10 min-w-[140px]"
                     >
                       <div className="text-xs font-bold text-white/20 border-b border-white/[0.03] mb-2">
                         Duration
@@ -1877,7 +1878,7 @@ export default function VideoStudio({
                     <div
                       ref={dropdownRef}
                       onClick={(e) => e.stopPropagation()}
-                      className="absolute bottom-[calc(100%+12px)] left-0 z-50 bg-[#0a0a0a] rounded-md p-3 shadow-2xl border border-white/[0.05] min-w-[140px]"
+                      className="absolute top-[calc(100%+6px)] left-0 z-50 bg-[#0a0a0a] rounded-md p-3 shadow-2xl border border-white/[0.05] min-w-[140px]"
                     >
                       <div className="text-xs font-bold text-white/20 border-b border-white/[0.03] mb-2">
                         Resolution
@@ -1911,7 +1912,7 @@ export default function VideoStudio({
               type="button"
               onClick={handleGenerate}
               disabled={generating}
-              className="bg-[#22d3ee] text-black px-4 py-2 rounded-md font-medium text-sm hover:bg-[#e5ff33] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 w-full sm:w-auto shadow-lg shadow-[#22d3ee]/10 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-[#22d3ee] text-black px-4 py-3 rounded-md font-semibold text-sm hover:bg-[#e5ff33] active:scale-[0.98] transition-all flex items-center justify-center gap-2 w-full shadow-lg shadow-[#22d3ee]/10 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {generating ? (
                 <>

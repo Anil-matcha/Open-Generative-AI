@@ -1,12 +1,18 @@
 import { NextResponse } from 'next/server';
+import { getApiKeyFromSession } from '@/lib/getSessionKey';
 
 const MUAPI_BASE = 'https://api.muapi.ai';
 
 function getApiKey(request) {
+    // 1PRA1 mode: prefer the server-managed master key from the session
+    const sessionKey = getApiKeyFromSession(request);
+    if (sessionKey) return sessionKey;
+    // Legacy: client-provided key
     const headerKey = request.headers.get('x-api-key');
-    if (headerKey) return headerKey;
+    if (headerKey && headerKey !== 'server-managed') return headerKey;
     const cookieKey = request.cookies.get('muapi_key')?.value;
-    return cookieKey;
+    if (cookieKey && cookieKey !== 'server-managed') return cookieKey;
+    return null;
 }
 
 function cleanHeaders(request) {
@@ -23,14 +29,13 @@ export async function GET(request, { params }) {
     const slug = await params;
     const pathSegments = slug.path || [];
     const path = pathSegments.join('/');
-    
+
     const { search } = new URL(request.url);
     const targetUrl = `${MUAPI_BASE}/api/v1/${path}${search}`;
 
     const headers = cleanHeaders(request);
     const apiKey = getApiKey(request);
-    
-    console.log(`[double-api proxy GET] ${targetUrl} | apiKey: ${apiKey ? apiKey.slice(0,8)+'...' : 'MISSING'}`);
+
     if (apiKey) headers.set('x-api-key', apiKey);
 
     try {
@@ -46,7 +51,7 @@ export async function POST(request, { params }) {
     const slug = await params;
     const pathSegments = slug.path || [];
     const path = pathSegments.join('/');
-    
+
     const { search } = new URL(request.url);
     const targetUrl = `${MUAPI_BASE}/api/v1/${path}${search}`;
 

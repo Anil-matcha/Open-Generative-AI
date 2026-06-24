@@ -1136,10 +1136,10 @@ export default function ImageStudio({
 
   // ── Render ───────────────────────────────────────────────────────────────
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center bg-app-bg relative p-4 md:p-6 overflow-hidden">
+    <div className="w-full h-full flex flex-row bg-app-bg relative overflow-hidden">
       
       {/* ── CENTRAL GALLERY AREA ── */}
-      <div className="flex-1 w-full max-w-7xl mx-auto overflow-y-auto custom-scrollbar pb-40 lg:pb-32 px-2">
+      <div className="flex-1 overflow-y-auto custom-scrollbar pb-4 px-4 pt-2">
         {history.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full pt-4 animate-fade-in-up">
             {history.map((entry, idx) => (
@@ -1239,117 +1239,125 @@ export default function ImageStudio({
         )}
       </div>
 
-      {/* ── BOTTOM PROMPT BAR ── */}
-      <div 
-        className="absolute bottom-4 w-full max-w-[95%] lg:max-w-4xl z-40 animate-fade-in-up" 
-        style={{ animationDelay: "0.2s" }}
+      {/* ── LEFT SIDEBAR ── */}
+      <div
+        className="w-[300px] flex-shrink-0 flex flex-col bg-[#0a0a0a] border-r border-white/[0.06] overflow-y-auto z-10 order-first"
       >
-        <div className="w-full bg-[#0a0a0a]/80 backdrop-blur-3xl rounded-md border border-white/10 p-4 flex flex-col gap-2 shadow-2xl">
-          {/* Top row: upload picker + textarea */}
-          <div className="flex items-center gap-2">
-            <UploadButton
-              apiKey={apiKey}
-              maxImages={maxImages}
-              onSelect={handleUploadSelect}
-              onClear={handleUploadClear}
-              initialUrls={uploadedImageUrls}
+        <div className="flex flex-col gap-4 p-4 flex-1">
+          {/* Top: textarea */}
+          <div className="flex flex-col gap-2">
+            <textarea
+              ref={textareaRef}
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              onInput={handleTextareaInput}
+              placeholder={placeholderText}
+              rows={1}
+              className="w-full bg-white/[0.03] border border-white/[0.05] rounded-lg text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-[#22d3ee]/30 resize-none p-3 leading-relaxed min-h-[120px] max-h-[200px] overflow-y-auto custom-scrollbar"
             />
-            <div className="flex-1 flex flex-col gap-2">
-              <textarea
-                ref={textareaRef}
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                onInput={handleTextareaInput}
-                placeholder={placeholderText}
-                rows={1}
-                className="w-full bg-transparent border-none text-white text-sm placeholder:text-white/20 focus:outline-none resize-none pt-1 leading-relaxed min-h-[40px] max-h-[150px] md:max-h-[250px] overflow-y-auto custom-scrollbar"
+          </div>
+
+          {/* Upload picker (only relevant in I2I mode) */}
+          {imageMode && (
+            <div className="flex items-center gap-2">
+              <UploadButton
+                apiKey={apiKey}
+                maxImages={maxImages}
+                onSelect={handleUploadSelect}
+                onClear={handleUploadClear}
+                initialUrls={uploadedImageUrls}
               />
+              <span className="text-[11px] text-white/40">
+                {uploadedImageUrls.length}/{maxImages} imagens
+              </span>
+            </div>
+          )}
+
+          {/* Model + AR row */}
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Model button */}
+            <div className="relative flex-1 min-w-0">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setDropdownOpen((o) => (o === "model" ? null : "model"));
+                }}
+                className="w-full flex items-center gap-2 px-3 py-2 bg-white/[0.03] hover:bg-white/[0.06] rounded-md transition-all border border-white/[0.03] group"
+              >
+                <div className="w-4 h-4 bg-[#22d3ee] rounded flex items-center justify-center flex-shrink-0">
+                  <span className="text-[9px] font-bold text-black uppercase">G</span>
+                </div>
+                <span className="text-xs font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors truncate">
+                  {selectedModelName}
+                </span>
+                <svg
+                  width="10"
+                  height="10"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  className="opacity-50 group-hover:opacity-100 transition-opacity flex-shrink-0 ml-auto"
+                >
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </button>
+
+              {dropdownOpen === "model" && (
+                <div
+                  ref={dropdownRef}
+                  onClick={(e) => e.stopPropagation()}
+                  className="absolute top-[calc(100%+6px)] left-0 right-0 z-50 bg-[#0a0a0a] rounded-lg p-3 shadow-2xl border border-white/[0.05] max-h-[60vh] overflow-y-auto custom-scrollbar"
+                >
+                  <ModelDropdown
+                    models={currentModels}
+                    selectedModel={selectedModelId}
+                    onSelect={handleModelSelect}
+                    onClose={() => setDropdownOpen(null)}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Aspect ratio button */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setDropdownOpen((o) => (o === "ar" ? null : "ar"));
+                }}
+                className="flex items-center gap-2 px-3 py-2 bg-white/[0.03] hover:bg-white/[0.06] rounded-md transition-all border border-white/[0.03] group whitespace-nowrap"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="opacity-40 text-white">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                </svg>
+                <span className="text-[11px] font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors">
+                  {selectedAr}
+                </span>
+              </button>
+
+              {dropdownOpen === "ar" && (
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  className="absolute top-[calc(100%+6px)] left-0 z-50 bg-[#0a0a0a] rounded-md p-3 max-h-[40vh] overflow-y-auto custom-scrollbar shadow-2xl border border-white/10 min-w-[160px]"
+                >
+                  <SimpleDropdown
+                    title="Aspect Ratio"
+                    options={currentAspectRatios}
+                    selected={selectedAr}
+                    onSelect={(val) => setSelectedAr(val)}
+                    onClose={() => setDropdownOpen(null)}
+                  />
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Bottom row: controls + generate */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-2 border-t border-white/[0.03] relative">
-            {/* Left controls */}
-            <div className="flex items-center gap-2 relative flex-wrap pb-1 md:pb-0">
-              {/* Model button */}
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setDropdownOpen((o) => (o === "model" ? null : "model"));
-                  }}
-                  className="flex items-center gap-2 px-3 py-2 bg-white/[0.03] hover:bg-white/[0.06] rounded-md transition-all border border-white/[0.03] group whitespace-nowrap"
-                >
-                  <div className="w-4 h-4 bg-[#22d3ee] rounded flex items-center justify-center">
-                    <span className="text-[9px] font-bold text-black uppercase">G</span>
-                  </div>
-                  <span className="text-xs font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors">
-                    {selectedModelName}
-                  </span>
-                  <svg
-                    width="10"
-                    height="10"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                    className="opacity-50 group-hover:opacity-100 transition-opacity flex-shrink-0"
-                  >
-                    <path d="M6 9l6 6 6-6" />
-                  </svg>
-                </button>
-
-                {dropdownOpen === "model" && (
-                  <div
-                    ref={dropdownRef}
-                    onClick={(e) => e.stopPropagation()}
-                    className="absolute bottom-[calc(100%+12px)] left-0 z-50 bg-[#0a0a0a] rounded-lg p-3 shadow-2xl border border-white/[0.05] w-[calc(100vw-3rem)] max-w-xs"
-                  >
-                    <ModelDropdown
-                      models={currentModels}
-                      selectedModel={selectedModelId}
-                      onSelect={handleModelSelect}
-                      onClose={() => setDropdownOpen(null)}
-                    />
-                  </div>
-                )}
-              </div>
-
-              {/* Aspect ratio button */}
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setDropdownOpen((o) => (o === "ar" ? null : "ar"));
-                  }}
-                  className="flex items-center gap-2 px-3 py-2 bg-white/[0.03] hover:bg-white/[0.06] rounded-md transition-all border border-white/[0.03] group whitespace-nowrap"
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="opacity-40 text-white">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                  </svg>
-                  <span className="text-[11px] font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors">
-                    {selectedAr}
-                  </span>
-                </button>
-
-                {dropdownOpen === "ar" && (
-                  <div
-                    onClick={(e) => e.stopPropagation()}
-                    className="absolute bottom-[calc(100%+12px)] left-0 z-50 bg-[#0a0a0a] rounded-md p-3 max-h-[40vh] overflow-y-auto custom-scrollbar shadow-2xl border border-white/10 min-w-[160px]"
-                  >
-                    <SimpleDropdown
-                      title="Aspect Ratio"
-                      options={currentAspectRatios}
-                      selected={selectedAr}
-                      onSelect={(val) => setSelectedAr(val)}
-                      onClose={() => setDropdownOpen(null)}
-                    />
-                  </div>
-                )}
-              </div>
-
+          {/* Quality / Effect row (when available) */}
+          {(showQualityBtn || showEffectBtn) && (
+            <div className="flex items-center gap-2 flex-wrap">
               {/* Quality/resolution button */}
               {showQualityBtn && (
                 <div className="relative">
@@ -1372,7 +1380,7 @@ export default function ImageStudio({
                   {dropdownOpen === "quality" && (
                     <div
                       onClick={(e) => e.stopPropagation()}
-                      className="absolute bottom-[calc(100%+12px)] left-0 z-50 bg-[#0a0a0a] rounded-md p-3 max-h-[40vh] overflow-y-auto custom-scrollbar shadow-2xl border border-white/[0.05] min-w-[160px]"
+                      className="absolute top-[calc(100%+6px)] left-0 z-50 bg-[#0a0a0a] rounded-md p-3 max-h-[40vh] overflow-y-auto custom-scrollbar shadow-2xl border border-white/[0.05] min-w-[160px]"
                     >
                       <SimpleDropdown
                         title="Resolution"
@@ -1408,7 +1416,7 @@ export default function ImageStudio({
                   {dropdownOpen === "effect" && (
                     <div
                       onClick={(e) => e.stopPropagation()}
-                      className="absolute bottom-[calc(100%+12px)] left-0 z-50 bg-[#0a0a0a] rounded-md p-3 max-h-[40vh] overflow-y-auto custom-scrollbar shadow-2xl border border-white/[0.05] min-w-[200px]"
+                      className="absolute top-[calc(100%+6px)] left-0 z-50 bg-[#0a0a0a] rounded-md p-3 max-h-[40vh] overflow-y-auto custom-scrollbar shadow-2xl border border-white/[0.05] min-w-[200px]"
                     >
                       <SimpleDropdown
                         title="Effect Type"
@@ -1421,47 +1429,50 @@ export default function ImageStudio({
                   )}
                 </div>
               )}
-
-              {/* Batch size selector */}
-              <div className="flex items-center gap-1 bg-white/[0.03] rounded-md p-1 border border-white/[0.03]">
-                {[1, 2, 3, 4].map((num) => (
-                  <button
-                    key={num}
-                    type="button"
-                    onClick={() => setBatchSize(num)}
-                    className={`w-7 h-7 flex items-center justify-center rounded-md text-[10px] font-black transition-all ${
-                      batchSize === num
-                        ? "bg-[#22d3ee] text-black shadow-lg shadow-[#22d3ee]/20"
-                        : "text-white/40 hover:text-white/80 hover:bg-white/5"
-                    }`}
-                  >
-                    {num}
-                  </button>
-                ))}
-              </div>
             </div>
+          )}
 
-            {/* Generate button */}
-            <button
-              type="button"
-              onClick={handleGenerate}
-              disabled={generating}
-              className="bg-[#22d3ee] text-black px-4 py-2 rounded-md font-medium text-sm hover:bg-[#e5ff33] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 w-full sm:w-auto shadow-lg shadow-[#22d3ee]/10 disabled:opacity-50 disabled:cursor-not-allowed z-10"
-            >
-              {generating ? (
-                <>
-                  <span className="animate-spin inline-block text-black">◌</span>
-                  Generating...
-                </>
-              ) : generateError ? (
-                `Error: ${generateError}`
-              ) : (
-                <>
-                  <span>Generate{estimatedCost ? ` · $${estimatedCost}` : ""}</span>
-                </>
-              )}
-            </button>
+          {/* Batch size selector */}
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[11px] text-white/40 uppercase tracking-wider font-semibold">Quantidade</span>
+            <div className="flex items-center gap-1 bg-white/[0.03] rounded-md p-1 border border-white/[0.03]">
+              {[1, 2, 3, 4].map((num) => (
+                <button
+                  key={num}
+                  type="button"
+                  onClick={() => setBatchSize(num)}
+                  className={`w-7 h-7 flex items-center justify-center rounded-md text-[10px] font-black transition-all ${
+                    batchSize === num
+                      ? "bg-[#22d3ee] text-black shadow-lg shadow-[#22d3ee]/20"
+                      : "text-white/40 hover:text-white/80 hover:bg-white/5"
+                  }`}
+                >
+                  {num}
+                </button>
+              ))}
+            </div>
           </div>
+
+          {/* Generate button */}
+          <button
+            type="button"
+            onClick={handleGenerate}
+            disabled={generating}
+            className="bg-[#22d3ee] text-black px-4 py-3 rounded-md font-semibold text-sm hover:bg-[#e5ff33] active:scale-[0.98] transition-all flex items-center justify-center gap-2 w-full shadow-lg shadow-[#22d3ee]/10 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {generating ? (
+              <>
+                <span className="animate-spin inline-block text-black">◌</span>
+                Generating...
+              </>
+            ) : generateError ? (
+              `Error: ${generateError}`
+            ) : (
+              <>
+                <span>Generate{estimatedCost ? ` · $${estimatedCost}` : ""}</span>
+              </>
+            )}
+          </button>
         </div>
       </div>
 

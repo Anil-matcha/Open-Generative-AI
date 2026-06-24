@@ -31,6 +31,10 @@ release/
 .next/
 out/
 
+# SQLite WAL (transient files)
+*.db-shm
+*.db-wal
+
 # Misc
 *.pem
 .env
