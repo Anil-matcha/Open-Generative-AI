@@ -100,7 +100,7 @@ export default function StandaloneShell() {
         setAuthChecked(true);
       })
       .catch(() => {
-        window.location.href = '/login');
+        window.location.href = '/login';
       });
   }, []);
 
