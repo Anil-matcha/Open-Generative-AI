@@ -1279,54 +1279,68 @@ export default function ImageStudio({
 
       {/* ── LEFT SIDEBAR ── */}
       <div
-        className="w-[300px] flex-shrink-0 flex flex-col bg-[#0a0a0a] border-r border-white/[0.06] overflow-y-auto z-10 order-first"
+        className="w-[300px] flex-shrink-0 flex flex-col bg-[#0a0a0a] border-r border-white/[0.06] overflow-y-auto z-10 order-first custom-scrollbar"
       >
-        <div className="flex flex-col gap-4 p-4 flex-1">
-          {/* Top: textarea */}
-          <div className="flex flex-col gap-2">
-            <textarea
-              ref={textareaRef}
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              onInput={handleTextareaInput}
-              placeholder={placeholderText}
-              rows={1}
-              className="w-full bg-white/[0.03] border border-white/[0.05] rounded-lg text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-[#22d3ee]/30 resize-none p-3 leading-relaxed min-h-[120px] max-h-[200px] overflow-y-auto custom-scrollbar"
-            />
-          </div>
-
+        <div className="flex flex-col gap-3 p-3 flex-1">
           {/* Upload picker (only relevant in I2I mode) */}
           {imageMode && (
-            <div className="flex items-center gap-2">
-              <UploadButton
-                apiKey={apiKey}
-                maxImages={maxImages}
-                onSelect={handleUploadSelect}
-                onClear={handleUploadClear}
-                initialUrls={uploadedImageUrls}
-              />
-              <span className="text-[11px] text-white/40">
-                {uploadedImageUrls.length}/{maxImages} imagens
+            <div className="flex flex-col gap-1.5">
+              <span className="text-[10px] text-white/30 uppercase tracking-wider font-bold px-1">
+                References
               </span>
+              <div className="bg-white/[0.03] border border-white/[0.05] hover:border-white/[0.08] transition-colors rounded-lg p-2.5">
+                <div className="flex items-center gap-2.5">
+                  <UploadButton
+                    apiKey={apiKey}
+                    maxImages={maxImages}
+                    onSelect={handleUploadSelect}
+                    onClear={handleUploadClear}
+                    initialUrls={uploadedImageUrls}
+                  />
+                  <span className="text-[11px] text-white/40 font-medium">
+                    {uploadedImageUrls.length}/{maxImages} imagens
+                  </span>
+                </div>
+              </div>
             </div>
           )}
 
-          {/* Model + AR row */}
-          <div className="flex items-center gap-2 flex-wrap">
-            {/* Model button */}
-            <div className="relative flex-1 min-w-0">
+          {/* Prompt card */}
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[10px] text-white/30 uppercase tracking-wider font-bold px-1">
+              Prompt
+            </span>
+            <div className="bg-white/[0.03] border border-white/[0.05] hover:border-white/[0.08] transition-colors rounded-lg p-2.5">
+              <textarea
+                ref={textareaRef}
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                onInput={handleTextareaInput}
+                placeholder={placeholderText}
+                rows={4}
+                className="w-full bg-transparent text-white text-sm placeholder:text-white/30 focus:outline-none resize-none leading-relaxed min-h-[120px] max-h-[200px] overflow-y-auto custom-scrollbar"
+              />
+            </div>
+          </div>
+
+          {/* Model card */}
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[10px] text-white/30 uppercase tracking-wider font-bold px-1">
+              Model
+            </span>
+            <div className="relative">
               <button
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
                   setDropdownOpen((o) => (o === "model" ? null : "model"));
                 }}
-                className="w-full flex items-center gap-2 px-3 py-2 bg-white/[0.03] hover:bg-white/[0.06] rounded-md transition-all border border-white/[0.03] group"
+                className="w-full flex items-center gap-2.5 px-3 py-2.5 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.05] hover:border-white/[0.08] rounded-lg transition-all group"
               >
-                <div className="w-4 h-4 bg-[#22d3ee] rounded flex items-center justify-center flex-shrink-0">
-                  <span className="text-[9px] font-bold text-black uppercase">G</span>
+                <div className="w-5 h-5 bg-[#22d3ee] rounded flex items-center justify-center flex-shrink-0">
+                  <span className="text-[10px] font-bold text-black uppercase">G</span>
                 </div>
-                <span className="text-xs font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors truncate">
+                <span className="text-[13px] font-semibold text-white/80 group-hover:text-[#22d3ee] transition-colors truncate">
                   {selectedModelName}
                 </span>
                 <svg
@@ -1357,8 +1371,13 @@ export default function ImageStudio({
                 </div>
               )}
             </div>
+          </div>
 
-            {/* Aspect ratio button */}
+          {/* Aspect ratio card */}
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[10px] text-white/30 uppercase tracking-wider font-bold px-1">
+              Aspect Ratio
+            </span>
             <div className="relative">
               <button
                 type="button"
@@ -1366,20 +1385,31 @@ export default function ImageStudio({
                   e.stopPropagation();
                   setDropdownOpen((o) => (o === "ar" ? null : "ar"));
                 }}
-                className="flex items-center gap-2 px-3 py-2 bg-white/[0.03] hover:bg-white/[0.06] rounded-md transition-all border border-white/[0.03] group whitespace-nowrap"
+                className="w-full flex items-center gap-2.5 px-3 py-2.5 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.05] hover:border-white/[0.08] rounded-lg transition-all group"
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="opacity-40 text-white">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="opacity-50 text-white">
                   <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
                 </svg>
-                <span className="text-[11px] font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors">
+                <span className="text-[13px] font-semibold text-white/80 group-hover:text-[#22d3ee] transition-colors">
                   {selectedAr}
                 </span>
+                <svg
+                  width="10"
+                  height="10"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  className="opacity-50 group-hover:opacity-100 transition-opacity flex-shrink-0 ml-auto"
+                >
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
               </button>
 
               {dropdownOpen === "ar" && (
                 <div
                   onClick={(e) => e.stopPropagation()}
-                  className="absolute top-[calc(100%+6px)] left-0 z-50 bg-[#0a0a0a] rounded-md p-3 max-h-[40vh] overflow-y-auto custom-scrollbar shadow-2xl border border-white/10 min-w-[160px]"
+                  className="absolute top-[calc(100%+6px)] left-0 right-0 z-50 bg-[#0a0a0a] rounded-md p-3 max-h-[40vh] overflow-y-auto custom-scrollbar shadow-2xl border border-white/10"
                 >
                   <SimpleDropdown
                     title="Aspect Ratio"
@@ -1393,93 +1423,105 @@ export default function ImageStudio({
             </div>
           </div>
 
-          {/* Quality / Effect row (when available) */}
+          {/* Quality / Effect grid 2 cols */}
           {(showQualityBtn || showEffectBtn) && (
-            <div className="flex items-center gap-2 flex-wrap">
-              {/* Quality/resolution button */}
+            <div className="grid grid-cols-2 gap-2">
+              {/* Quality/resolution card */}
               {showQualityBtn && (
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setDropdownOpen((o) => (o === "quality" ? null : "quality"));
-                    }}
-                    className="flex items-center gap-2 px-3 py-2 bg-white/[0.03] hover:bg-white/[0.06] rounded-md transition-all border border-white/[0.03] group whitespace-nowrap"
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="opacity-40 text-white">
-                      <path d="M6 2L3 6v15a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z" />
-                    </svg>
-                    <span className="text-[11px] font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors">
-                      {selectedQuality || currentResolutions[0]}
-                    </span>
-                  </button>
-
-                  {dropdownOpen === "quality" && (
-                    <div
-                      onClick={(e) => e.stopPropagation()}
-                      className="absolute top-[calc(100%+6px)] left-0 z-50 bg-[#0a0a0a] rounded-md p-3 max-h-[40vh] overflow-y-auto custom-scrollbar shadow-2xl border border-white/[0.05] min-w-[160px]"
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-[10px] text-white/30 uppercase tracking-wider font-bold px-1">
+                    Quality
+                  </span>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDropdownOpen((o) => (o === "quality" ? null : "quality"));
+                      }}
+                      className="w-full flex items-center gap-1.5 px-2.5 py-2.5 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.05] hover:border-white/[0.08] rounded-lg transition-all group"
                     >
-                      <SimpleDropdown
-                        title="Resolution"
-                        options={currentResolutions}
-                        selected={selectedQuality}
-                        onSelect={(val) => setSelectedQuality(val)}
-                        onClose={() => setDropdownOpen(null)}
-                      />
-                    </div>
-                  )}
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="opacity-50 text-white flex-shrink-0">
+                        <path d="M6 2L3 6v15a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z" />
+                      </svg>
+                      <span className="text-[12px] font-semibold text-white/80 group-hover:text-[#22d3ee] transition-colors truncate">
+                        {selectedQuality || currentResolutions[0]}
+                      </span>
+                    </button>
+
+                    {dropdownOpen === "quality" && (
+                      <div
+                        onClick={(e) => e.stopPropagation()}
+                        className="absolute top-[calc(100%+6px)] left-0 right-0 z-50 bg-[#0a0a0a] rounded-md p-3 max-h-[40vh] overflow-y-auto custom-scrollbar shadow-2xl border border-white/[0.05]"
+                      >
+                        <SimpleDropdown
+                          title="Resolution"
+                          options={currentResolutions}
+                          selected={selectedQuality}
+                          onSelect={(val) => setSelectedQuality(val)}
+                          onClose={() => setDropdownOpen(null)}
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
 
-              {/* Effect type button */}
+              {/* Effect card */}
               {showEffectBtn && (
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setDropdownOpen((o) => (o === "effect" ? null : "effect"));
-                    }}
-                    className="flex items-center gap-2 px-3 py-2 bg-white/[0.03] hover:bg-white/[0.06] rounded-md transition-all border border-white/[0.03] group whitespace-nowrap"
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="opacity-40 text-white">
-                      <path d="M5 3l14 9-14 9V3z" />
-                    </svg>
-                    <span className="text-[11px] font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors max-w-[140px] truncate">
-                      {selectedEffect || "Effect"}
-                    </span>
-                  </button>
-
-                  {dropdownOpen === "effect" && (
-                    <div
-                      onClick={(e) => e.stopPropagation()}
-                      className="absolute top-[calc(100%+6px)] left-0 z-50 bg-[#0a0a0a] rounded-md p-3 max-h-[40vh] overflow-y-auto custom-scrollbar shadow-2xl border border-white/[0.05] min-w-[200px]"
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-[10px] text-white/30 uppercase tracking-wider font-bold px-1">
+                    Effect
+                  </span>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDropdownOpen((o) => (o === "effect" ? null : "effect"));
+                      }}
+                      className="w-full flex items-center gap-1.5 px-2.5 py-2.5 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.05] hover:border-white/[0.08] rounded-lg transition-all group"
                     >
-                      <SimpleDropdown
-                        title="Effect Type"
-                        options={currentEffects}
-                        selected={selectedEffect}
-                        onSelect={(val) => setSelectedEffect(val)}
-                        onClose={() => setDropdownOpen(null)}
-                      />
-                    </div>
-                  )}
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="opacity-50 text-white flex-shrink-0">
+                        <path d="M5 3l14 9-14 9V3z" />
+                      </svg>
+                      <span className="text-[12px] font-semibold text-white/80 group-hover:text-[#22d3ee] transition-colors truncate">
+                        {selectedEffect || "None"}
+                      </span>
+                    </button>
+
+                    {dropdownOpen === "effect" && (
+                      <div
+                        onClick={(e) => e.stopPropagation()}
+                        className="absolute top-[calc(100%+6px)] left-0 right-0 z-50 bg-[#0a0a0a] rounded-md p-3 max-h-[40vh] overflow-y-auto custom-scrollbar shadow-2xl border border-white/[0.05]"
+                      >
+                        <SimpleDropdown
+                          title="Effect Type"
+                          options={currentEffects}
+                          selected={selectedEffect}
+                          onSelect={(val) => setSelectedEffect(val)}
+                          onClose={() => setDropdownOpen(null)}
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
           )}
 
-          {/* Batch size selector */}
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-[11px] text-white/40 uppercase tracking-wider font-semibold">Quantidade</span>
-            <div className="flex items-center gap-1 bg-white/[0.03] rounded-md p-1 border border-white/[0.03]">
+          {/* Batch size card */}
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[10px] text-white/30 uppercase tracking-wider font-bold px-1">
+              Quantidade
+            </span>
+            <div className="bg-white/[0.03] border border-white/[0.05] hover:border-white/[0.08] transition-colors rounded-lg p-1.5 flex items-center gap-1">
               {[1, 2, 3, 4].map((num) => (
                 <button
                   key={num}
                   type="button"
                   onClick={() => setBatchSize(num)}
-                  className={`w-7 h-7 flex items-center justify-center rounded-md text-[10px] font-black transition-all ${
+                  className={`flex-1 h-8 flex items-center justify-center rounded-md text-[12px] font-bold transition-all ${
                     batchSize === num
                       ? "bg-[#22d3ee] text-black shadow-lg shadow-[#22d3ee]/20"
                       : "text-white/40 hover:text-white/80 hover:bg-white/5"
@@ -1491,12 +1533,15 @@ export default function ImageStudio({
             </div>
           </div>
 
+          {/* Spacer */}
+          <div className="flex-1" />
+
           {/* Generate button */}
           <button
             type="button"
             onClick={handleGenerate}
             disabled={generating}
-            className="bg-[#22d3ee] text-black px-4 py-3 rounded-md font-semibold text-sm hover:bg-[#e5ff33] active:scale-[0.98] transition-all flex items-center justify-center gap-2 w-full shadow-lg shadow-[#22d3ee]/10 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-lime-300 hover:bg-lime-400 text-black rounded-lg font-bold text-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2 w-full py-3.5 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-lime-300/20"
           >
             {generating ? (
               <>
@@ -1507,6 +1552,7 @@ export default function ImageStudio({
               `Error: ${generateError}`
             ) : (
               <>
+                <span className="text-base">✦</span>
                 <span>Generate{estimatedCost ? ` · $${estimatedCost}` : ""}</span>
               </>
             )}

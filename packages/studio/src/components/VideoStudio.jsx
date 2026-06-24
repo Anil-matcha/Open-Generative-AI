@@ -1324,10 +1324,14 @@ export default function VideoStudio({
       </div>
 
       {/* ── LEFT SIDEBAR ── */}
-      <div className="w-[300px] flex-shrink-0 flex flex-col bg-[#0a0a0a] border-r border-white/[0.06] overflow-y-auto z-10 order-first">
-        <div className="flex flex-col gap-4 p-4 flex-1">
+      <div className="w-[300px] flex-shrink-0 flex flex-col bg-[#0a0a0a] border-r border-white/[0.06] overflow-y-auto z-10 order-first custom-scrollbar">
+        <div className="flex flex-col gap-3 p-3 flex-1">
           {/* Upload row (image + video buttons) */}
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[10px] text-white/30 uppercase tracking-wider font-bold px-1">
+              References
+            </span>
+            <div className="flex items-center gap-2 flex-wrap bg-white/[0.03] border border-white/[0.05] rounded-lg p-2.5">
             {/* Image upload button / thumbnails */}
             {imageMode && getMaxImagesForI2VModel(selectedModel) > 2 ? (
               <div className="flex items-center gap-2 flex-wrap">
@@ -1601,18 +1605,24 @@ export default function VideoStudio({
               </button>
             </div>
           </div>
+          </div>
 
           {/* Prompt textarea */}
-          <div className="flex flex-col gap-1">
-            <textarea
-              ref={textareaRef}
-              value={prompt}
-              onChange={handlePromptInput}
-              placeholder={promptPlaceholder}
-              disabled={promptDisabled}
-              rows={3}
-              className="w-full bg-white/[0.03] border border-white/[0.05] rounded-lg text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-[#22d3ee]/30 resize-none p-3 leading-relaxed min-h-[100px] max-h-[200px] overflow-y-auto custom-scrollbar disabled:opacity-40"
-            />
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[10px] text-white/30 uppercase tracking-wider font-bold px-1">
+              Prompt
+            </span>
+            <div className="bg-white/[0.03] border border-white/[0.05] rounded-lg p-2.5">
+              <textarea
+                ref={textareaRef}
+                value={prompt}
+                onChange={handlePromptInput}
+                placeholder={promptPlaceholder}
+                disabled={promptDisabled}
+                rows={3}
+                className="w-full bg-transparent text-white text-sm placeholder:text-white/30 focus:outline-none resize-none leading-relaxed min-h-[100px] max-h-[200px] overflow-y-auto custom-scrollbar disabled:opacity-40"
+              />
+            </div>
           </div>
 
           {/* Extend banner */}
@@ -1634,31 +1644,20 @@ export default function VideoStudio({
 
           {/* Bottom row: controls + generate */}
           <div className="flex flex-col gap-3 pt-2 border-t border-white/[0.03]">
-            <div className="flex items-center gap-2 flex-wrap">
-              {/* Model btn */}
+            {/* Model card */}
+            <div className="flex flex-col gap-1.5">
+              <span className="text-[10px] text-white/30 uppercase tracking-wider font-bold px-1">Model</span>
               <div className="relative">
                 <button
                   type="button"
                   onClick={toggleDropdown("model")}
-                  className="flex items-center gap-2 px-3 py-2 bg-white/[0.03] hover:bg-white/[0.06] rounded-md transition-all border border-white/[0.03] group whitespace-nowrap"
+                  className="w-full flex items-center gap-2.5 px-3 py-2.5 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.05] hover:border-white/[0.08] rounded-lg transition-all group"
                 >
-                  <div className="w-4 h-4 bg-[#22d3ee] rounded flex items-center justify-center shadow-lg shadow-[#22d3ee]/10">
-                    <span className="text-[9px] font-bold text-black uppercase">
-                      V
-                    </span>
+                  <div className="w-5 h-5 bg-[#22d3ee] rounded flex items-center justify-center shadow-lg shadow-[#22d3ee]/10 flex-shrink-0">
+                    <span className="text-[10px] font-bold text-black uppercase">V</span>
                   </div>
-                  <span className="text-xs font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors">
-                    {selectedModelName}
-                  </span>
-                  <svg
-                    width="8"
-                    height="8"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                    className="opacity-20 group-hover:opacity-100 transition-opacity"
-                  >
+                  <span className="text-[13px] font-semibold text-white/80 group-hover:text-[#22d3ee] transition-colors truncate">{selectedModelName}</span>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" className="opacity-30 group-hover:opacity-100 transition-opacity ml-auto flex-shrink-0">
                     <path d="M6 9l6 6 6-6" />
                   </svg>
                 </button>
@@ -1677,254 +1676,166 @@ export default function VideoStudio({
                   </div>
                 )}
               </div>
+            </div>
 
-              {/* Aspect ratio btn */}
+            {/* Controls grid 2 cols */}
+            <div className="grid grid-cols-2 gap-2">
               {showAr && (
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={toggleDropdown("ar")}
-                    className="flex items-center gap-2 px-3 py-2 bg-white/[0.03] hover:bg-white/[0.06] rounded-md transition-all border border-white/[0.03] group whitespace-nowrap"
-                  >
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      className="opacity-40 text-white"
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-[10px] text-white/30 uppercase tracking-wider font-bold px-1">Aspect Ratio</span>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={toggleDropdown("ar")}
+                      className="w-full flex items-center gap-2 px-2.5 py-2 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.05] hover:border-white/[0.08] rounded-lg transition-all group text-left"
                     >
-                      <rect
-                        x="3"
-                        y="3"
-                        width="18"
-                        height="18"
-                        rx="2"
-                        ry="2"
-                      />
-                    </svg>
-                    <span className="text-[11px] font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors">
-                      {selectedAr}
-                    </span>
-                  </button>
-                  {openDropdown === "ar" && (
-                    <div
-                      ref={dropdownRef}
-                      onClick={(e) => e.stopPropagation()}
-                      className="absolute top-[calc(100%+6px)] left-0 z-50 bg-[#0a0a0a] rounded-lg p-3 shadow-2xl border border-white/[0.05] max-h-80 overflow-y-auto custom-scrollbar min-w-[160px]"
-                    >
-                      <div className="text-xs font-bold text-white/20 border-b border-white/[0.03] mb-2">
-                        Aspect Ratio
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="opacity-40 text-white flex-shrink-0">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                      </svg>
+                      <span className="text-[12px] font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors truncate">{selectedAr}</span>
+                      <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" className="opacity-20 group-hover:opacity-80 transition-opacity ml-auto flex-shrink-0">
+                        <path d="M6 9l6 6 6-6" />
+                      </svg>
+                    </button>
+                    {openDropdown === "ar" && (
+                      <div ref={dropdownRef} onClick={(e) => e.stopPropagation()} className="absolute top-[calc(100%+6px)] left-0 z-50 bg-[#0a0a0a] rounded-lg p-3 shadow-2xl border border-white/[0.05] max-h-80 overflow-y-auto custom-scrollbar min-w-[160px]">
+                        <div className="text-xs font-bold text-white/20 border-b border-white/[0.03] mb-2">Aspect Ratio</div>
+                        <div className="flex flex-col gap-1">
+                          {getCurrentAspectRatios(selectedModel).map((r) => (
+                            <div key={r} className="flex items-center justify-between p-3 hover:bg-white/5 rounded cursor-pointer transition-all group/opt" onClick={(e) => { e.stopPropagation(); setSelectedAr(r); setOpenDropdown(null); }}>
+                              <span className="text-[11px] font-semibold text-white/70 group-hover/opt:text-white transition-opacity">{r}</span>
+                              {selectedAr === r && <CheckSvg />}
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                      <div className="flex flex-col gap-1">
-                        {getCurrentAspectRatios(selectedModel).map((r) => (
-                          <div
-                            key={r}
-                            className="flex items-center justify-between p-3 hover:bg-white/5 rounded cursor-pointer transition-all group/opt"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedAr(r);
-                              setOpenDropdown(null);
-                            }}
-                          >
-                            <span className="text-[11px] font-semibold text-white/70 group-hover/opt:text-white transition-opacity">
-                              {r}
-                            </span>
-                            {selectedAr === r && <CheckSvg />}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               )}
 
-              {/* Effect btn */}
-              {showEffect && (
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={toggleDropdown("effect")}
-                    className="flex items-center gap-2 px-3 py-2 bg-white/[0.03] hover:bg-white/[0.06] rounded-md transition-all border border-white/[0.03] group whitespace-nowrap"
-                  >
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      className="opacity-40 text-white"
-                    >
-                      <path d="M5 3l14 9-14 9V3z" />
-                    </svg>
-                    <span className="text-[11px] font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors max-w-[140px] truncate">
-                      {selectedEffect || "Effect"}
-                    </span>
-                  </button>
-                  {openDropdown === "effect" && (
-                    <div
-                      ref={dropdownRef}
-                      onClick={(e) => e.stopPropagation()}
-                      className="absolute top-[calc(100%+6px)] left-0 z-50 bg-[#0a0a0a] rounded-lg p-3 shadow-2xl border border-white/[0.05] max-h-80 overflow-y-auto custom-scrollbar min-w-[200px]"
-                    >
-                      <div className="text-xs font-bold text-white/20 border-b border-white/[0.03] mb-2">
-                        Effect Type
-                      </div>
-                      <div className="flex flex-col gap-1">
-                        {getEffectsForI2VModel(selectedModel).map((eff) => (
-                          <div
-                            key={eff}
-                            className="flex items-center justify-between p-2 hover:bg-white/5 rounded cursor-pointer transition-all group/opt"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedEffect(eff);
-                              setOpenDropdown(null);
-                            }}
-                          >
-                            <span className="text-[11px] font-semibold text-white/70 group-hover/opt:text-white">
-                              {eff}
-                            </span>
-                            {selectedEffect === eff && <CheckSvg />}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Duration btn */}
               {showDuration && (
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={toggleDropdown("duration")}
-                    className="flex items-center gap-2 px-3 py-2 bg-white/[0.03] hover:bg-white/[0.06] rounded-md transition-all border border-white/[0.03] group whitespace-nowrap"
-                  >
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      className="opacity-40 text-white"
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-[10px] text-white/30 uppercase tracking-wider font-bold px-1">Duration</span>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={toggleDropdown("duration")}
+                      className="w-full flex items-center gap-2 px-2.5 py-2 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.05] hover:border-white/[0.08] rounded-lg transition-all group text-left"
                     >
-                      <circle cx="12" cy="12" r="10" />
-                      <polyline points="12 6 12 12 16 14" />
-                    </svg>
-                    <span className="text-xs font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors">
-                      {selectedDuration}s
-                    </span>
-                  </button>
-                  {openDropdown === "duration" && (
-                    <div
-                      ref={dropdownRef}
-                      onClick={(e) => e.stopPropagation()}
-                      className="absolute top-[calc(100%+6px)] left-0 z-50 bg-[#0a0a0a] rounded-md p-3 shadow-2xl border border-white/10 min-w-[140px]"
-                    >
-                      <div className="text-xs font-bold text-white/20 border-b border-white/[0.03] mb-2">
-                        Duration
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="opacity-40 text-white flex-shrink-0">
+                        <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+                      </svg>
+                      <span className="text-[12px] font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors">{selectedDuration}s</span>
+                      <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" className="opacity-20 group-hover:opacity-80 transition-opacity ml-auto flex-shrink-0">
+                        <path d="M6 9l6 6 6-6" />
+                      </svg>
+                    </button>
+                    {openDropdown === "duration" && (
+                      <div ref={dropdownRef} onClick={(e) => e.stopPropagation()} className="absolute top-[calc(100%+6px)] left-0 z-50 bg-[#0a0a0a] rounded-md p-3 shadow-2xl border border-white/10 min-w-[140px]">
+                        <div className="text-xs font-bold text-white/20 border-b border-white/[0.03] mb-2">Duration</div>
+                        <div className="flex flex-col gap-1">
+                          {getCurrentDurations(selectedModel).map((d) => (
+                            <div key={d} className="flex items-center justify-between p-2 hover:bg-white/5 rounded-md cursor-pointer transition-all group/opt" onClick={(e) => { e.stopPropagation(); setSelectedDuration(d); setOpenDropdown(null); }}>
+                              <span className="text-xs font-semibold text-white/70 group-hover/opt:text-white">{d}s</span>
+                              {selectedDuration === d && <CheckSvg />}
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                      <div className="flex flex-col gap-1">
-                        {getCurrentDurations(selectedModel).map((d) => (
-                          <div
-                            key={d}
-                            className="flex items-center justify-between p-2 hover:bg-white/5 rounded-md cursor-pointer transition-all group/opt"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedDuration(d);
-                              setOpenDropdown(null);
-                            }}
-                          >
-                            <span className="text-xs font-semibold text-white/70 group-hover/opt:text-white">
-                              {d}s
-                            </span>
-                            {selectedDuration === d && <CheckSvg />}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               )}
 
-              {/* Resolution btn */}
               {showResolution && (
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={toggleDropdown("resolution")}
-                    className="flex items-center gap-2 px-3 py-2 bg-white/[0.03] hover:bg-white/[0.06] rounded-md transition-all border border-white/[0.03] group whitespace-nowrap"
-                  >
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      className="opacity-40 text-white"
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-[10px] text-white/30 uppercase tracking-wider font-bold px-1">Resolution</span>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={toggleDropdown("resolution")}
+                      className="w-full flex items-center gap-2 px-2.5 py-2 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.05] hover:border-white/[0.08] rounded-lg transition-all group text-left"
                     >
-                      <path d="M6 2L3 6v15a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z" />
-                    </svg>
-                    <span className="text-[11px] font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors">
-                      {selectedResolution || "720p"}
-                    </span>
-                  </button>
-                  {openDropdown === "resolution" && (
-                    <div
-                      ref={dropdownRef}
-                      onClick={(e) => e.stopPropagation()}
-                      className="absolute top-[calc(100%+6px)] left-0 z-50 bg-[#0a0a0a] rounded-md p-3 shadow-2xl border border-white/[0.05] min-w-[140px]"
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="opacity-40 text-white flex-shrink-0">
+                        <path d="M6 2L3 6v15a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z" />
+                      </svg>
+                      <span className="text-[12px] font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors">{selectedResolution || "720p"}</span>
+                      <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" className="opacity-20 group-hover:opacity-80 transition-opacity ml-auto flex-shrink-0">
+                        <path d="M6 9l6 6 6-6" />
+                      </svg>
+                    </button>
+                    {openDropdown === "resolution" && (
+                      <div ref={dropdownRef} onClick={(e) => e.stopPropagation()} className="absolute top-[calc(100%+6px)] left-0 z-50 bg-[#0a0a0a] rounded-md p-3 shadow-2xl border border-white/[0.05] min-w-[140px]">
+                        <div className="text-xs font-bold text-white/20 border-b border-white/[0.03] mb-2">Resolution</div>
+                        <div className="flex flex-col gap-1">
+                          {getCurrentResolutions(selectedModel).map((r) => (
+                            <div key={r} className="flex items-center justify-between p-3 hover:bg-white/5 rounded cursor-pointer transition-all group/opt" onClick={(e) => { e.stopPropagation(); setSelectedResolution(r); setOpenDropdown(null); }}>
+                              <span className="text-[11px] font-semibold text-white/70 group-hover/opt:text-white">{r}</span>
+                              {selectedResolution === r && <CheckSvg />}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {showEffect && (
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-[10px] text-white/30 uppercase tracking-wider font-bold px-1">Effect</span>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={toggleDropdown("effect")}
+                      className="w-full flex items-center gap-2 px-2.5 py-2 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.05] hover:border-white/[0.08] rounded-lg transition-all group text-left"
                     >
-                      <div className="text-xs font-bold text-white/20 border-b border-white/[0.03] mb-2">
-                        Resolution
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="opacity-40 text-white flex-shrink-0">
+                        <path d="M5 3l14 9-14 9V3z" />
+                      </svg>
+                      <span className="text-[12px] font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors truncate max-w-[100px]">{selectedEffect || "Effect"}</span>
+                      <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" className="opacity-20 group-hover:opacity-80 transition-opacity ml-auto flex-shrink-0">
+                        <path d="M6 9l6 6 6-6" />
+                      </svg>
+                    </button>
+                    {openDropdown === "effect" && (
+                      <div ref={dropdownRef} onClick={(e) => e.stopPropagation()} className="absolute top-[calc(100%+6px)] left-0 z-50 bg-[#0a0a0a] rounded-lg p-3 shadow-2xl border border-white/[0.05] max-h-80 overflow-y-auto custom-scrollbar min-w-[200px]">
+                        <div className="text-xs font-bold text-white/20 border-b border-white/[0.03] mb-2">Effect Type</div>
+                        <div className="flex flex-col gap-1">
+                          {getEffectsForI2VModel(selectedModel).map((eff) => (
+                            <div key={eff} className="flex items-center justify-between p-2 hover:bg-white/5 rounded cursor-pointer transition-all group/opt" onClick={(e) => { e.stopPropagation(); setSelectedEffect(eff); setOpenDropdown(null); }}>
+                              <span className="text-[11px] font-semibold text-white/70 group-hover/opt:text-white">{eff}</span>
+                              {selectedEffect === eff && <CheckSvg />}
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                      <div className="flex flex-col gap-1">
-                        {getCurrentResolutions(selectedModel).map((r) => (
-                          <div
-                            key={r}
-                            className="flex items-center justify-between p-3 hover:bg-white/5 rounded cursor-pointer transition-all group/opt"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedResolution(r);
-                              setOpenDropdown(null);
-                            }}
-                          >
-                            <span className="text-[11px] font-semibold text-white/70 group-hover/opt:text-white">
-                              {r}
-                            </span>
-                            {selectedResolution === r && <CheckSvg />}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               )}
             </div>
+
+            <div className="flex-1" />
 
             {/* Generate button */}
             <button
               type="button"
               onClick={handleGenerate}
               disabled={generating}
-              className="bg-[#22d3ee] text-black px-4 py-3 rounded-md font-semibold text-sm hover:bg-[#e5ff33] active:scale-[0.98] transition-all flex items-center justify-center gap-2 w-full shadow-lg shadow-[#22d3ee]/10 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-lime-300 hover:bg-lime-400 text-black rounded-lg font-bold text-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2 w-full py-3.5 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-lime-300/20"
             >
               {generating ? (
                 <>
-                  <span className="animate-spin inline-block text-black">
-                    ◌
-                  </span>{" "}
+                  <span className="animate-spin inline-block text-black">◌</span>
                   Generating...
                 </>
               ) : generateError ? (
                 `Error: ${generateError}`
               ) : (
                 <>
+                  <span className="text-base">✦</span>
                   <span>Generate{estimatedCost ? ` · $${estimatedCost}` : ""}</span>
                 </>
               )}
