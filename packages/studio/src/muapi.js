@@ -1,4 +1,4 @@
-import { getModelById, getVideoModelById, getI2IModelById, getI2VModelById, getV2VModelById, getLipSyncModelById, getAudioModelById } from './models.js';
+import { getModelById, getVideoModelById, getI2IModelById, getI2VModelById, getV2VModelById, getRecastModelById, getLipSyncModelById, getAudioModelById } from './models.js';
 
 // In an http(s) browser we route through the host app's proxy (Next.js routes
 // under /api/* re-issue the call server-side) so api.muapi.ai CORS is bypassed.
@@ -170,6 +170,23 @@ export async function processV2V(apiKey, params) {
     }
     if (modelInfo?.hasPrompt && params.prompt) {
         payload.prompt = params.prompt;
+    }
+    return submitAndPoll(endpoint, payload, apiKey, params.onRequestId, 900);
+}
+
+export async function processRecast(apiKey, params) {
+    const modelInfo = getRecastModelById(params.model);
+    const endpoint = modelInfo?.endpoint || params.model;
+    const videoField = modelInfo?.videoField || 'video_url';
+    const payload = { [videoField]: params.video_url };
+    if (modelInfo?.imageField && params.image_url) {
+        payload[modelInfo.imageField] = params.image_url;
+    }
+    if (modelInfo?.hasPrompt && params.prompt) {
+        payload.prompt = params.prompt;
+    }
+    if (params.aspect_ratio) {
+        payload.aspect_ratio = params.aspect_ratio;
     }
     return submitAndPoll(endpoint, payload, apiKey, params.onRequestId, 900);
 }

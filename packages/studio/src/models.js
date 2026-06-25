@@ -8240,6 +8240,49 @@ export const videoLipSyncModels = lipsyncModels.filter(m => m.category === 'vide
 
 export const getV2VModelById = (id) => v2vModels.find(m => m.id === id);
 
+// ─── Recast / Body Swap models ───────────────────────────────────────────────
+// Source video (the performance / motion) + character image (the new identity)
+// → a video of the new character performing the source video's motion.
+// Mirrors Higgsfield Recast: "swap the character in any video".
+export const recastModels = [
+  {
+    "id": "kling-v3.0-pro-recast",
+    "name": "Kling 3.0 Pro Motion Control",
+    "endpoint": "kling-v3.0-pro-motion-control",
+    "family": "kling",
+    "videoField": "video_url",
+    "imageField": "image_url",
+    "hasPrompt": true,
+    "description": "Transfer the motion from your video onto a character image with maximum fidelity."
+  },
+  {
+    "id": "runway-act-two-recast",
+    "name": "Runway Act Two",
+    "endpoint": "runway-act-two-i2v",
+    "family": "runway",
+    "videoField": "video_url",
+    "imageField": "image_url",
+    "hasPrompt": false,
+    "inputs": {
+      "aspect_ratio": {
+        "type": "string",
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "enum": ["16:9", "9:16", "1:1", "4:3", "3:4", "21:9"],
+        "default": "16:9"
+      }
+    },
+    "description": "Recast any character — drive a character image with the motion and performance from your video."
+  }
+];
+
+export const getRecastModelById = (id) => recastModels.find(m => m.id === id);
+
+export const getAspectRatiosForRecastModel = (id) => {
+  const model = recastModels.find(m => m.id === id);
+  return model?.inputs?.aspect_ratio?.enum || [];
+};
+
 
 // ── Audio Models ──────────────────────────────────────────────────────────
 export const audioModels = [
