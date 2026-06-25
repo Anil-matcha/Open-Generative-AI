@@ -6,11 +6,13 @@ import {
   t2vModels,
   i2vModels,
   v2vModels,
+  getActiveVariant,
   getAspectRatiosForVideoModel,
   getDurationsForModel,
   getResolutionsForVideoModel,
   getAspectRatiosForI2VModel,
   getDurationsForI2VModel,
+  getDurationSchemaForI2VModel,
   getResolutionsForI2VModel,
   getEffectsForI2VModel,
   getDefaultEffectForI2VModel,
@@ -251,6 +253,7 @@ export default function VideoStudio({
   const defaultModel = t2vModels[0];
   const [selectedModel, setSelectedModel] = useState(defaultModel.id);
   const [selectedModelName, setSelectedModelName] = useState(defaultModel.name);
+  const [selectedVariant, setSelectedVariant] = useState(defaultModel.defaultVariantId || "");
   const [selectedAr, setSelectedAr] = useState(
     defaultModel.inputs?.aspect_ratio?.default || "16:9",
   );
@@ -359,8 +362,17 @@ export default function VideoStudio({
   );
 
   const getCurrentModel = useCallback(
-    () => getCurrentModels().find((m) => m.id === selectedModel),
-    [getCurrentModels, selectedModel],
+    () => {
+      const m = getCurrentModels().find((x) => x.id === selectedModel);
+      if (!m) return null;
+      // Se tem variantes, retorna a variante ativa com merge do modelo pai
+      if (m.hasVariants && m.variants?.length) {
+        const v = m.variants.find(x => x.id === selectedVariant) || m.variants.find(x => x.id === m.defaultVariantId) || m.variants[0];
+        return { ...m, ...v, _variant: v, _isVariant: true };
+      }
+      return m;
+    },
+    [getCurrentModels, selectedModel, selectedVariant],
   );
 
   const isMotionControlSelection = useCallback(
@@ -387,6 +399,11 @@ export default function VideoStudio({
 
       const modelList = isImageMode ? i2vModels : t2vModels;
       const model = modelList.find((m) => m.id === modelId);
+      const active = getActiveVariant(modelId, isImageMode ? undefined : undefined);
+      // Se modelo tem variantes, lê inputs da variante; senão, do modelo direto
+      const inputsRef = active?.hasVariants && active?._variant?.inputs
+        ? active._variant.inputs
+        : model?.inputs || {};
 
       const ars = isImageMode
         ? getAspectRatiosForI2VModel(modelId)
@@ -402,7 +419,7 @@ export default function VideoStudio({
         ? getDurationsForI2VModel(modelId)
         : getDurationsForModel(modelId);
       if (durations.length > 0) {
-        setSelectedDuration(durations[0]);
+        setSelectedDuration((cur) => (durations.includes(cur) ? cur : durations[0]));
         setShowDuration(true);
       } else {
         setShowDuration(false);
@@ -420,7 +437,7 @@ export default function VideoStudio({
 
       const qualities = getQualitiesForModel(modelList, modelId);
       if (qualities.length > 0) {
-        setSelectedQuality(model?.inputs?.quality?.default || qualities[0]);
+        setSelectedQuality((cur) => (qualities.includes(cur) ? cur : model?.inputs?.quality?.default || qualities[0]));
         setShowQuality(true);
       } else {
         setSelectedQuality("");
@@ -679,12 +696,14 @@ export default function VideoStudio({
     if (selectedDuration) params.duration = selectedDuration;
     if (selectedResolution) params.resolution = selectedResolution;
     if (selectedAr) params.aspect_ratio = selectedAr;
+    if (selectedQuality) params.quality = selectedQuality;
     const timer = setTimeout(async () => {
       try {
+        const estimateModel = model._isVariant && model.endpoint ? model.endpoint : model.id;
         const res = await fetch("/api/estimate", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ model: model.id, ...params }),
+          body: JSON.stringify({ model: estimateModel, ...params }),
         });
         const data = await res.json();
         if (data.cost !== undefined) setEstimatedCost(data.cost.toFixed(3));
@@ -692,7 +711,7 @@ export default function VideoStudio({
       } catch { setEstimatedCost(null); }
     }, 300);
     return () => clearTimeout(timer);
-  }, [selectedModel, selectedDuration, selectedResolution, selectedAr, imageMode]);
+  }, [selectedModel, selectedVariant, selectedDuration, selectedResolution, selectedAr, selectedQuality, imageMode]);
   // ── textarea auto-resize ──────────────────────────────────────────────────
   const handlePromptInput = (e) => {
     setPrompt(e.target.value);
@@ -980,6 +999,8 @@ export default function VideoStudio({
         }
         setSelectedModel(m.id);
         setSelectedModelName(m.name);
+        // Se o modelo tem variantes, seleciona a padrão; senão, limpa
+        setSelectedVariant(m.defaultVariantId || "");
         applyControlsForModel(m.id, imageMode, false);
       }
     },
@@ -1090,17 +1111,46 @@ export default function VideoStudio({
           });
       } else if (imageMode) {
         const maxImgs = getMaxImagesForI2VModel(selectedModel);
-        const i2vParams = { model: selectedModel };
-        if (maxImgs > 2) {
-          i2vParams.images_list = uploadedImageUrls;
+        // Endpoint: se a variante tem endpoint, usa ela; senão usa o model id
+        const activeVariant = i2vModels.find((m) => m.id === selectedModel);
+        const v = activeVariant?.hasVariants
+          ? activeVariant.variants.find(x => x.id === selectedVariant) || activeVariant.variants[0]
+          : null;
+        const endpoint = v?.endpoint || selectedModel;
+        const i2vParams = { model: endpoint };
+        // imageField pode vir do modelo OU da variante
+        const imageField = v?.imageField || activeVariant?.imageField;
+        const videoField = v?.videoField || activeVariant?.videoField;
+        const audioField = v?.audioField || activeVariant?.audioField;
+
+        if (imageField === "images_list") {
+          // Modelo aceita múltiplas imagens
+          const imgs = uploadedImageUrls.filter(Boolean);
+          if (imgs.length === 1) i2vParams.image_url = imgs[0];
+          if (imgs.length > 1) i2vParams.images_list = imgs;
         } else {
-          i2vParams.image_url = uploadedImageUrl;
+          i2vParams.image_url = uploadedImageUrl || uploadedImageUrls[0];
+        }
+        // Video refs
+        if (videoField && uploadedVideoUrls.length > 0) {
+          if (videoField === "video_files" || videoField === "videos_list") {
+            i2vParams[videoField] = uploadedVideoUrls;
+          } else {
+            i2vParams[videoField] = uploadedVideoUrls[0];
+          }
+        }
+        // Audio refs
+        if (audioField && uploadedAudioUrls.length > 0) {
+          if (audioField === "audio_files" || audioField === "audios_list") {
+            i2vParams[audioField] = uploadedAudioUrls;
+          } else {
+            i2vParams[audioField] = uploadedAudioUrls[0];
+          }
         }
         if (trimmedPrompt) i2vParams.prompt = trimmedPrompt;
         i2vParams.aspect_ratio = selectedAr;
-        const i2vModel = i2vModels.find((m) => m.id === selectedModel);
-        if (uploadedEndImageUrl && i2vModel?.lastImageField) {
-          i2vParams.last_image = uploadedEndImageUrl;
+        if (uploadedEndImageUrl && activeVariant?.lastImageField) {
+          i2vParams[activeVariant.lastImageField] = uploadedEndImageUrl;
         }
         const durations = getDurationsForI2VModel(selectedModel);
         if (durations.length > 0) i2vParams.duration = selectedDuration;
@@ -1114,7 +1164,8 @@ export default function VideoStudio({
         if (!res?.url) throw new Error("No video URL returned by API");
 
         const genId = res.id || Date.now().toString();
-        if (selectedModel === "seedance-v2.0-i2v") {
+        // Detecta se o endpoint (variante ou modelo) é extendable
+        if (selectedModel === "seedance-v2.0-i2v" || endpoint === "seedance-v2.0-i2v") {
           setLastGenerationId(genId);
           setLastGenerationModel(selectedModel);
         } else {
@@ -1790,6 +1841,68 @@ export default function VideoStudio({
               </div>
             </div>
 
+            {/* Variant card (only for models with hasVariants) */}
+            {(() => {
+              const m = i2vModels.find((x) => x.id === selectedModel);
+              if (!m?.hasVariants) return null;
+              return (
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-[10px] text-white/30 uppercase tracking-wider font-bold px-1">Variante</span>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={toggleDropdown("variant")}
+                      className="w-full flex items-center gap-2 px-2.5 py-2 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.05] hover:border-white/[0.08] rounded-lg transition-all group text-left"
+                    >
+                      <span className="text-[12px] font-semibold text-white/80 group-hover:text-[#22d3ee] transition-colors truncate">
+                        {(() => {
+                          const v = m.variants.find(x => x.id === selectedVariant) || m.variants[0];
+                          return v?.name || "—";
+                        })()}
+                      </span>
+                      <span className="text-[10px] text-white/40 ml-auto">
+                        {m.variants.length} opções
+                      </span>
+                      <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" className="opacity-20 group-hover:opacity-80 transition-opacity flex-shrink-0">
+                        <path d="M6 9l6 6 6-6" />
+                      </svg>
+                    </button>
+                    {openDropdown === "variant" && (
+                      <div ref={dropdownRef} onClick={(e) => e.stopPropagation()} className="absolute top-[calc(100%+6px)] left-0 z-50 bg-[#0a0a0a] rounded-md p-3 shadow-2xl border border-white/10 min-w-[200px]">
+                        <div className="text-xs font-bold text-white/20 border-b border-white/[0.03] mb-2">Variantes</div>
+                        <div className="flex flex-col gap-1">
+                          {m.variants.map((v) => (
+                            <div
+                              key={v.id}
+                              className="flex items-center justify-between p-2 hover:bg-white/5 rounded cursor-pointer transition-all group/opt"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedVariant(v.id);
+                                setOpenDropdown(null);
+                              }}
+                            >
+                              <div className="flex flex-col gap-0.5">
+                                <span className="text-[11px] font-semibold text-white/80 group-hover/opt:text-white transition-opacity">
+                                  {v.name}
+                                </span>
+                                <span className="text-[9px] text-white/40">
+                                  {v.maxImages ? `até ${v.maxImages} imgs` : ""}
+                                  {v.maxVideos ? ` · ${v.maxVideos} vid` : ""}
+                                  {v.maxAudios ? ` · ${v.maxAudios} aud` : ""}
+                                  {v.cost ? ` · $${v.cost.toFixed(3)}` : ""}
+                                </span>
+                              </div>
+                              {selectedVariant === v.id && <CheckSvg />}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
+
             {/* Controls grid 2 cols */}
             <div className="grid grid-cols-2 gap-2">
               {showAr && (
@@ -1826,31 +1939,88 @@ export default function VideoStudio({
                 </div>
               )}
 
-              {showDuration && (
+              {showDuration && (() => {
+                const durSchema = imageMode ? getDurationSchemaForI2VModel(selectedModel) : null;
+                const useSlider = durSchema && durSchema.minValue !== durSchema.maxValue;
+                return (
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex items-center justify-between px-1">
+                      <span className="text-[10px] text-white/30 uppercase tracking-wider font-bold">Duration</span>
+                      <span className="text-[11px] font-mono font-semibold text-[#22d3ee] bg-[#22d3ee]/10 px-2 py-0.5 rounded border border-[#22d3ee]/20">{selectedDuration}s</span>
+                    </div>
+                    {useSlider ? (
+                      <div className="flex items-center gap-2 px-2.5 py-2 bg-white/[0.03] border border-white/[0.05] rounded-lg">
+                        <span className="text-[10px] text-white/40 font-medium w-4 text-right">{durSchema.minValue}</span>
+                        <input
+                          type="range"
+                          min={durSchema.minValue}
+                          max={durSchema.maxValue}
+                          step={durSchema.step || 1}
+                          value={selectedDuration}
+                          onChange={(e) => setSelectedDuration(parseInt(e.target.value))}
+                          className="flex-1 h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer accent-[#22d3ee] hover:bg-white/20 transition-all"
+                        />
+                        <span className="text-[10px] text-white/40 font-medium w-4 text-left">{durSchema.maxValue}</span>
+                      </div>
+                    ) : (
+                      <div className="relative">
+                        <button
+                          type="button"
+                          onClick={toggleDropdown("duration")}
+                          className="w-full flex items-center gap-2 px-2.5 py-2 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.05] hover:border-white/[0.08] rounded-lg transition-all group text-left"
+                        >
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="opacity-40 text-white flex-shrink-0">
+                            <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+                          </svg>
+                          <span className="text-[12px] font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors">{selectedDuration}s</span>
+                          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" className="opacity-20 group-hover:opacity-80 transition-opacity ml-auto flex-shrink-0">
+                            <path d="M6 9l6 6 6-6" />
+                          </svg>
+                        </button>
+                        {openDropdown === "duration" && (
+                          <div ref={dropdownRef} onClick={(e) => e.stopPropagation()} className="absolute top-[calc(100%+6px)] left-0 z-50 bg-[#0a0a0a] rounded-md p-3 shadow-2xl border border-white/10 min-w-[140px]">
+                            <div className="text-xs font-bold text-white/20 border-b border-white/[0.03] mb-2">Duration</div>
+                            <div className="flex flex-col gap-1">
+                              {getCurrentDurations(selectedModel).map((d) => (
+                                <div key={d} className="flex items-center justify-between p-2 hover:bg-white/5 rounded-md cursor-pointer transition-all group/opt" onClick={(e) => { e.stopPropagation(); setSelectedDuration(d); setOpenDropdown(null); }}>
+                                  <span className="text-xs font-semibold text-white/70 group-hover/opt:text-white">{d}s</span>
+                                  {selectedDuration === d && <CheckSvg />}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+
+              {showQuality && (
                 <div className="flex flex-col gap-1.5">
-                  <span className="text-[10px] text-white/30 uppercase tracking-wider font-bold px-1">Duration</span>
+                  <span className="text-[10px] text-white/30 uppercase tracking-wider font-bold px-1">Quality</span>
                   <div className="relative">
                     <button
                       type="button"
-                      onClick={toggleDropdown("duration")}
+                      onClick={toggleDropdown("quality")}
                       className="w-full flex items-center gap-2 px-2.5 py-2 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.05] hover:border-white/[0.08] rounded-lg transition-all group text-left"
                     >
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="opacity-40 text-white flex-shrink-0">
-                        <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                       </svg>
-                      <span className="text-[12px] font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors">{selectedDuration}s</span>
+                      <span className="text-[12px] font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors capitalize">{selectedQuality || "basic"}</span>
                       <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" className="opacity-20 group-hover:opacity-80 transition-opacity ml-auto flex-shrink-0">
                         <path d="M6 9l6 6 6-6" />
                       </svg>
                     </button>
-                    {openDropdown === "duration" && (
+                    {openDropdown === "quality" && (
                       <div ref={dropdownRef} onClick={(e) => e.stopPropagation()} className="absolute top-[calc(100%+6px)] left-0 z-50 bg-[#0a0a0a] rounded-md p-3 shadow-2xl border border-white/10 min-w-[140px]">
-                        <div className="text-xs font-bold text-white/20 border-b border-white/[0.03] mb-2">Duration</div>
+                        <div className="text-xs font-bold text-white/20 border-b border-white/[0.03] mb-2">Quality</div>
                         <div className="flex flex-col gap-1">
-                          {getCurrentDurations(selectedModel).map((d) => (
-                            <div key={d} className="flex items-center justify-between p-2 hover:bg-white/5 rounded-md cursor-pointer transition-all group/opt" onClick={(e) => { e.stopPropagation(); setSelectedDuration(d); setOpenDropdown(null); }}>
-                              <span className="text-xs font-semibold text-white/70 group-hover/opt:text-white">{d}s</span>
-                              {selectedDuration === d && <CheckSvg />}
+                          {(imageMode ? getQualitiesForModel(i2vModels, selectedModel) : []).map((q) => (
+                            <div key={q} className="flex items-center justify-between p-2 hover:bg-white/5 rounded-md cursor-pointer transition-all group/opt" onClick={(e) => { e.stopPropagation(); setSelectedQuality(q); setOpenDropdown(null); }}>
+                              <span className="text-xs font-semibold text-white/70 group-hover/opt:text-white capitalize">{q}</span>
+                              {selectedQuality === q && <CheckSvg />}
                             </div>
                           ))}
                         </div>
