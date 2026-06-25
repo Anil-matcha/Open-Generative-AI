@@ -37,7 +37,7 @@ async function downloadImage(url, filename) {
 
 // ─── UploadButton (inline picker) ───────────────────────────────────────────
 
-function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [] }) {
+function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [], variant = "default" }) {
   const [panelOpen, setPanelOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [selectedEntries, setSelectedEntries] = useState([]); // [{url, thumbnail}]
@@ -94,7 +94,8 @@ function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [] }
       if (trimmed.length === 0) onClear?.();
     }
     if (fileInputRef.current) {
-      fileInputRef.current.multiple = maxImages > 1;
+      // Sempre permite selecionar múltiplos — UI controla quantos enviar
+      fileInputRef.current.multiple = true;
     }
   }, [maxImages]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -412,15 +413,45 @@ function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [] }
         title={triggerTitle}
         onClick={(e) => {
           e.stopPropagation();
+          if (variant === "slot") {
+            fileInputRef.current?.click();
+            return;
+          }
           setPanelOpen((o) => !o);
         }}
-        className={`w-10 h-10 shrink-0 rounded-full border transition-all flex items-center justify-center relative overflow-hidden mt-1.5 bg-white/5 hover:bg-white/10 group ${
-          hasSelection
-            ? "border-primary/60 hover:border-primary/40"
-            : "border-white/10 hover:border-primary/40"
-        }`}
+        className={
+          variant === "slot"
+            ? `aspect-square w-full rounded-md border-2 border-dashed transition-all flex flex-col items-center justify-center gap-0.5 group ${
+                "border-white/15 bg-white/[0.02] hover:bg-white/[0.05] hover:border-primary/40"
+              }`
+            : `w-10 h-10 shrink-0 rounded-full border transition-all flex items-center justify-center relative overflow-hidden mt-1.5 bg-white/5 hover:bg-white/10 group ${
+                hasSelection
+                  ? "border-primary/60 hover:border-primary/40"
+                  : "border-white/10 hover:border-primary/40"
+              }`
+        }
       >
-        {triggerContent}
+        {variant === "slot" ? (
+          <>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              className="text-white/40 group-hover:text-[#22d3ee] transition-colors"
+            >
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            <span className="text-[9px] text-white/40 group-hover:text-white/70 font-medium transition-colors">
+              Adicionar
+            </span>
+          </>
+        ) : (
+          triggerContent
+        )}
       </button>
 
       {/* Panel */}
@@ -1285,23 +1316,69 @@ export default function ImageStudio({
           {/* Upload picker (only relevant in I2I mode) */}
           {imageMode && (
             <div className="flex flex-col gap-1.5">
-              <span className="text-[10px] text-white/30 uppercase tracking-wider font-bold px-1">
-                References
-              </span>
-              <div className="bg-white/[0.03] border border-white/[0.05] hover:border-white/[0.08] transition-colors rounded-lg p-2.5">
-                <div className="flex items-center gap-2.5">
-                  <UploadButton
-                    apiKey={apiKey}
-                    maxImages={maxImages}
-                    onSelect={handleUploadSelect}
-                    onClear={handleUploadClear}
-                    initialUrls={uploadedImageUrls}
-                  />
-                  <span className="text-[11px] text-white/40 font-medium">
-                    {uploadedImageUrls.length}/{maxImages} imagens
-                  </span>
-                </div>
+              <div className="flex items-center justify-between px-1">
+                <span className="text-[10px] text-white/30 uppercase tracking-wider font-bold">
+                  References
+                </span>
+                <span className="text-[10px] text-white/40 font-medium">
+                  {uploadedImageUrls.length}/{Math.max(maxImages, 9)}
+                </span>
               </div>
+              <div className="bg-white/[0.03] border border-white/[0.05] hover:border-white/[0.08] transition-colors rounded-lg p-2.5">
+                <div className="grid grid-cols-3 gap-1.5">
+                  {uploadedImageUrls.map((url, i) => (
+                    <div
+                      key={i}
+                      className="relative aspect-square rounded-md overflow-hidden border border-white/10 group/ref"
+                    >
+                      <img
+                        src={url}
+                        alt={`ref ${i + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                      <span className="absolute top-1 left-1 bg-black/70 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
+                        @{i + 1}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const next = uploadedImageUrls.filter((_, idx) => idx !== i);
+                          setUploadedImageUrls(next);
+                          if (next.length === 0) handleUploadClear?.();
+                        }}
+                        className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/70 hover:bg-red-500 text-white flex items-center justify-center text-[10px] font-bold opacity-0 group-hover/ref:opacity-100 transition-opacity"
+                        title="Remover referência"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                  {uploadedImageUrls.length < Math.max(maxImages, 9) && (
+                    <UploadButton
+                      apiKey={apiKey}
+                      maxImages={Math.max(maxImages, 9)}
+                      onSelect={handleUploadSelect}
+                      onClear={handleUploadClear}
+                      initialUrls={uploadedImageUrls}
+                      variant="slot"
+                    />
+                  )}
+                </div>
+                {uploadedImageUrls.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={handleUploadClear}
+                    className="mt-2 w-full text-[10px] text-white/40 hover:text-red-400 transition-colors font-medium"
+                  >
+                    Limpar todas
+                  </button>
+                )}
+              </div>
+              {uploadedImageUrls.length > 1 && (
+                <p className="text-[10px] text-white/40 px-1 leading-relaxed">
+                  Use <span className="text-[#22d3ee] font-mono">@1, @2, @3</span> no prompt para referenciar cada imagem.
+                </p>
+              )}
             </div>
           )}
 

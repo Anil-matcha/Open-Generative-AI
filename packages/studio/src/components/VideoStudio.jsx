@@ -288,6 +288,13 @@ export default function VideoStudio({
   const [uploadedVideoUrl, setUploadedVideoUrl] = useState(null);
   const [videoUploading, setVideoUploading] = useState(false);
   const [uploadedVideoName, setUploadedVideoName] = useState(null);
+  // Multi-type refs: imagens, vídeos e áudios misturados num único grid
+  const [uploadedVideoUrls, setUploadedVideoUrls] = useState([]);
+  const [videoListUploading, setVideoListUploading] = useState(false);
+  const [uploadedAudioUrls, setUploadedAudioUrls] = useState([]);
+  const [audioUploading, setAudioUploading] = useState(false);
+  const audioFileInputRef = useRef(null);
+  const videoListFileInputRef = useRef(null);
 
   // ── generation / canvas ──
   const [generating, setGenerating] = useState(false);
@@ -465,6 +472,8 @@ export default function VideoStudio({
         }
         if (data.uploadedVideoUrl) setUploadedVideoUrl(data.uploadedVideoUrl);
         if (data.uploadedVideoName) setUploadedVideoName(data.uploadedVideoName);
+        if (data.uploadedVideoUrls) setUploadedVideoUrls(data.uploadedVideoUrls);
+        if (data.uploadedAudioUrls) setUploadedAudioUrls(data.uploadedAudioUrls);
         if (data.prompt) setPrompt(data.prompt);
         if (data.localHistory) setLocalHistory(data.localHistory);
 
@@ -514,6 +523,8 @@ export default function VideoStudio({
           uploadedImageUrls,
           uploadedVideoUrl,
           uploadedVideoName,
+          uploadedVideoUrls,
+          uploadedAudioUrls,
           prompt,
           localHistory,
         };
@@ -538,6 +549,8 @@ export default function VideoStudio({
     uploadedImageUrls,
     uploadedVideoUrl,
     uploadedVideoName,
+    uploadedVideoUrls,
+    uploadedAudioUrls,
     prompt,
     localHistory,
   ]);
@@ -691,53 +704,64 @@ export default function VideoStudio({
 
   // ── image upload ─────────────────────────────────────────────────────────
   const handleImageFileChange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    if (file.size > 10 * 1024 * 1024) {
-      alert("Image exceeds 10MB limit.");
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
+    if (files.some((f) => f.size > 10 * 1024 * 1024)) {
+      alert("One or more images exceed 10MB limit.");
       return;
     }
+
+    // Determine target model first (sibling of current t2v if not imageMode yet)
+    let targetModelId = selectedModel;
+    if (!imageMode) {
+      const currentT2V = t2vModels.find((m) => m.id === selectedModel);
+      const sibling = currentT2V?.family
+        ? i2vModels.find((m) => m.family === currentT2V.family)
+        : null;
+      targetModelId = sibling ? sibling.id : i2vModels[0].id;
+    }
+    const maxImgs = getMaxImagesForI2VModel(targetModelId);
+
     setImageUploading(true);
     setImageProgress(0);
 
     try {
-      const url = await uploadFile(apiKey, file, (pct) => {
-        setImageProgress(pct);
-      });
-      setUploadedImageUrl(url);
+      const urls = [];
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const url = await uploadFile(apiKey, file, (pct) => {
+          setImageProgress(Math.round(((i + pct / 100) / files.length) * 100));
+        });
+        urls.push(url);
+      }
+
+      setUploadedImageUrl(urls[0]);
 
       // Motion-control v2v: image is a second input, not a mode switch
       if (isMotionControlSelection(selectedModel, v2vMode)) {
         setPromptDisabled(false);
-        setUploadedImageUrls([url]);
+        setUploadedImageUrls([urls[0]]);
       } else {
         // Clear v2v if active
         setUploadedVideoUrl(null);
         setUploadedVideoName(null);
         setV2vMode(false);
 
-        let targetModelId = selectedModel;
         if (!imageMode) {
-          const currentT2V = t2vModels.find((m) => m.id === selectedModel);
-          const sibling = currentT2V?.family
-            ? i2vModels.find((m) => m.family === currentT2V.family)
-            : null;
-          const target = sibling || i2vModels[0];
-          targetModelId = target.id;
           setImageMode(true);
-          setSelectedModel(target.id);
-          setSelectedModelName(target.name);
-          applyControlsForModel(target.id, true, false);
+          setSelectedModel(targetModelId);
+          const target = i2vModels.find((m) => m.id === targetModelId);
+          if (target) setSelectedModelName(target.name);
+          applyControlsForModel(targetModelId, true, false);
         }
 
-        const maxImgs = getMaxImagesForI2VModel(targetModelId);
         if (maxImgs > 2) {
           setUploadedImageUrls((prev) => {
-            if (prev.includes(url)) return prev;
-            return [...prev, url].slice(0, maxImgs);
+            const combined = [...prev, ...urls].filter((u, i, arr) => arr.indexOf(u) === i);
+            return combined.slice(0, maxImgs);
           });
         } else {
-          setUploadedImageUrls([url]);
+          setUploadedImageUrls([urls[0]]);
         }
         setPromptDisabled(false);
       }
@@ -851,6 +875,68 @@ export default function VideoStudio({
       setVideoProgress(0);
       if (videoFileInputRef.current) videoFileInputRef.current.value = "";
     }
+  };
+
+  // ── multi-ref video upload (used in imageMode for models that take video refs) ──
+  const handleVideoListFileChange = async (e) => {
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
+    if (files.some((f) => f.size > 50 * 1024 * 1024)) {
+      alert("Um ou mais vídeos excedem 50MB.");
+      return;
+    }
+    setVideoListUploading(true);
+    try {
+      const urls = [];
+      for (let i = 0; i < files.length; i++) {
+        const url = await uploadFile(apiKey, files[i], () => {});
+        urls.push(url);
+      }
+      setUploadedVideoUrls((prev) => [...prev, ...urls]);
+    } catch (err) {
+      console.error("[VideoStudio] Video list upload failed:", err);
+      alert(`Video upload failed: ${err.message}`);
+    } finally {
+      setVideoListUploading(false);
+      if (videoListFileInputRef.current) videoListFileInputRef.current.value = "";
+    }
+  };
+
+  // ── multi-ref audio upload ──
+  const handleAudioFileChange = async (e) => {
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
+    if (files.some((f) => f.size > 10 * 1024 * 1024)) {
+      alert("Um ou mais áudios excedem 10MB.");
+      return;
+    }
+    setAudioUploading(true);
+    try {
+      const urls = [];
+      for (let i = 0; i < files.length; i++) {
+        const url = await uploadFile(apiKey, files[i], () => {});
+        urls.push(url);
+      }
+      setUploadedAudioUrls((prev) => [...prev, ...urls]);
+    } catch (err) {
+      console.error("[VideoStudio] Audio upload failed:", err);
+      alert(`Audio upload failed: ${err.message}`);
+    } finally {
+      setAudioUploading(false);
+      if (audioFileInputRef.current) audioFileInputRef.current.value = "";
+    }
+  };
+
+  const removeRefAt = (arrName, idx) => {
+    if (arrName === "image") setUploadedImageUrls((p) => p.filter((_, i) => i !== idx));
+    if (arrName === "video") setUploadedVideoUrls((p) => p.filter((_, i) => i !== idx));
+    if (arrName === "audio") setUploadedAudioUrls((p) => p.filter((_, i) => i !== idx));
+  };
+
+  const clearAllRefs = () => {
+    setUploadedImageUrls([]);
+    setUploadedVideoUrls([]);
+    setUploadedAudioUrls([]);
   };
 
   const clearVideoUpload = () => {
@@ -1328,155 +1414,179 @@ export default function VideoStudio({
         <div className="flex flex-col gap-3 p-3 flex-1">
           {/* Upload row (image + video buttons) */}
           <div className="flex flex-col gap-1.5">
-            <span className="text-[10px] text-white/30 uppercase tracking-wider font-bold px-1">
-              References
-            </span>
-            <div className="flex items-center gap-2 flex-wrap bg-white/[0.03] border border-white/[0.05] rounded-lg p-2.5">
-            {/* Image upload button / thumbnails */}
-            {imageMode && getMaxImagesForI2VModel(selectedModel) > 2 ? (
-              <div className="flex items-center gap-2 flex-wrap">
-                {uploadedImageUrls.map((url, idx) => (
-                  <div key={idx} className="relative w-10 h-10 shrink-0 rounded-full border border-primary/60 bg-primary/5 overflow-hidden group">
+            <div className="flex items-center justify-between px-1">
+              <span className="text-[10px] text-white/30 uppercase tracking-wider font-bold">
+                References
+              </span>
+              <span className="text-[10px] text-white/40 font-medium">
+                {uploadedImageUrls.length}/{getMaxImagesForI2VModel(selectedModel)}
+              </span>
+            </div>
+            <div className="bg-white/[0.03] border border-white/[0.05] hover:border-white/[0.08] transition-colors rounded-lg p-2.5">
+              {/* Tipos de ref: 3 botões pequenos (Img/Video/Audio) */}
+              {imageMode && (
+                <div className="flex items-center gap-1.5 mb-2">
+                  <input
+                    ref={imageFileInputRef}
+                    type="file"
+                    accept="image/*"
+                    multiple={getMaxImagesForI2VModel(selectedModel) > 1}
+                    className="hidden"
+                    onChange={handleImageFileChange}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => imageFileInputRef.current?.click()}
+                    className="flex-1 flex items-center justify-center gap-1 px-1.5 py-1.5 rounded-md border border-white/10 bg-white/[0.03] hover:bg-white/[0.08] hover:border-primary/40 transition-all group"
+                    title="Adicionar imagens de referência"
+                  >
+                    {imageUploading ? (
+                      <span className="text-[10px] text-primary font-bold">{imageProgress}%</span>
+                    ) : (
+                      <>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-white/50 group-hover:text-primary">
+                          <rect x="3" y="3" width="18" height="18" rx="2" />
+                          <circle cx="8.5" cy="8.5" r="1.5" />
+                          <polyline points="21 15 16 10 5 21" />
+                        </svg>
+                        <span className="text-[10px] text-white/60 group-hover:text-white font-bold">IMG</span>
+                      </>
+                    )}
+                  </button>
+                  <input
+                    ref={videoListFileInputRef}
+                    type="file"
+                    accept="video/*"
+                    multiple
+                    className="hidden"
+                    onChange={handleVideoListFileChange}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => videoListFileInputRef.current?.click()}
+                    className="flex-1 flex items-center justify-center gap-1 px-1.5 py-1.5 rounded-md border border-white/10 bg-white/[0.03] hover:bg-white/[0.08] hover:border-primary/40 transition-all group"
+                    title="Adicionar vídeos de referência"
+                  >
+                    {videoListUploading ? (
+                      <span className="text-[10px] text-primary font-bold">...</span>
+                    ) : (
+                      <>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-white/50 group-hover:text-primary">
+                          <polygon points="5 3 19 12 5 21 5 3" />
+                        </svg>
+                        <span className="text-[10px] text-white/60 group-hover:text-white font-bold">VID</span>
+                      </>
+                    )}
+                  </button>
+                  <input
+                    ref={audioFileInputRef}
+                    type="file"
+                    accept="audio/*"
+                    multiple
+                    className="hidden"
+                    onChange={handleAudioFileChange}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => audioFileInputRef.current?.click()}
+                    className="flex-1 flex items-center justify-center gap-1 px-1.5 py-1.5 rounded-md border border-white/10 bg-white/[0.03] hover:bg-white/[0.08] hover:border-primary/40 transition-all group"
+                    title="Adicionar áudios de referência"
+                  >
+                    {audioUploading ? (
+                      <span className="text-[10px] text-primary font-bold">...</span>
+                    ) : (
+                      <>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-white/50 group-hover:text-primary">
+                          <path d="M9 18V5l12-2v13" />
+                          <circle cx="6" cy="18" r="3" />
+                          <circle cx="18" cy="16" r="3" />
+                        </svg>
+                        <span className="text-[10px] text-white/60 group-hover:text-white font-bold">AUD</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
+              {/* Grid misto: imagens, vídeos, áudios */}
+              <div className="grid grid-cols-3 gap-1.5">
+                {imageMode && uploadedImageUrls.map((url, idx) => (
+                  <div
+                    key={`img-${idx}`}
+                    className="relative aspect-square rounded-md overflow-hidden border border-white/10 group/ref"
+                  >
                     <img src={url} alt="" className="w-full h-full object-cover" />
+                    <span className="absolute top-1 left-1 bg-black/70 text-[#22d3ee] text-[8px] font-black px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                      IMG · {idx + 1}
+                    </span>
                     <button
                       type="button"
-                      onClick={() => removeImageAtIndex(idx)}
-                      className="absolute inset-0 bg-black/75 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs font-black transition-opacity"
-                      title="Remove image"
+                      onClick={() => removeRefAt("image", idx)}
+                      className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/70 hover:bg-red-500 text-white flex items-center justify-center text-[10px] font-bold opacity-0 group-hover/ref:opacity-100 transition-opacity"
+                      title="Remover"
                     >
-                      ✕
+                      ×
                     </button>
-                    <span className="absolute bottom-0.5 right-0.5 px-1 h-3.5 bg-black/60 rounded-full text-[8px] font-black text-primary leading-none flex items-center justify-center pointer-events-none">
-                      {idx + 1}
-                    </span>
                   </div>
                 ))}
-                {uploadedImageUrls.length < getMaxImagesForI2VModel(selectedModel) && (
-                  <div className="relative">
-                    <input
-                      ref={imageFileInputRef}
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleImageFileChange}
-                    />
+                {imageMode && uploadedVideoUrls.map((url, idx) => (
+                  <div
+                    key={`vid-${idx}`}
+                    className="relative aspect-square rounded-md overflow-hidden border border-white/10 bg-black group/ref"
+                  >
+                    <video src={url} className="w-full h-full object-cover" muted />
+                    <span className="absolute top-1 left-1 bg-black/70 text-purple-300 text-[8px] font-black px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                      VID · {idx + 1}
+                    </span>
                     <button
                       type="button"
-                      title="Upload reference image"
-                      onClick={() => imageFileInputRef.current?.click()}
-                      className="w-10 h-10 shrink-0 rounded-full border transition-all flex items-center justify-center bg-white/5 border-white/[0.03] hover:bg-white/10 hover:border-primary/40 relative overflow-hidden group"
+                      onClick={() => removeRefAt("video", idx)}
+                      className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/70 hover:bg-red-500 text-white flex items-center justify-center text-[10px] font-bold opacity-0 group-hover/ref:opacity-100 transition-opacity"
+                      title="Remover"
                     >
-                      {imageUploading ? (
-                        <div className="flex flex-col items-center justify-center w-full h-full absolute inset-0 bg-black/80 z-20 backdrop-blur-[2px]">
-                          <svg className="w-8 h-8 -rotate-90">
-                            <circle cx="16" cy="16" r="14" stroke="currentColor" strokeWidth="2" fill="transparent" className="text-white/10" />
-                            <circle
-                              cx="16"
-                              cy="16"
-                              r="14"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              fill="transparent"
-                              strokeDasharray={88}
-                              strokeDashoffset={88 - (88 * imageProgress) / 100}
-                              className="text-primary transition-all duration-300"
-                            />
-                          </svg>
-                          <span className="absolute text-[9px] font-black text-primary leading-none">{imageProgress}%</span>
-                        </div>
-                      ) : (
-                        <span className="text-lg font-bold text-white/40 group-hover:text-primary transition-colors">+</span>
-                      )}
+                      ×
+                    </button>
+                  </div>
+                ))}
+                {imageMode && uploadedAudioUrls.map((url, idx) => (
+                  <div
+                    key={`aud-${idx}`}
+                    className="relative aspect-square rounded-md overflow-hidden border border-white/10 bg-gradient-to-br from-emerald-900/40 to-emerald-700/20 group/ref flex items-center justify-center"
+                  >
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-emerald-300">
+                      <path d="M9 18V5l12-2v13" />
+                      <circle cx="6" cy="18" r="3" />
+                      <circle cx="18" cy="16" r="3" />
+                    </svg>
+                    <span className="absolute top-1 left-1 bg-black/70 text-emerald-300 text-[8px] font-black px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                      AUD · {idx + 1}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeRefAt("audio", idx)}
+                      className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/70 hover:bg-red-500 text-white flex items-center justify-center text-[10px] font-bold opacity-0 group-hover/ref:opacity-100 transition-opacity"
+                      title="Remover"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+                {imageMode && (uploadedImageUrls.length + uploadedVideoUrls.length + uploadedAudioUrls.length) > 0 && (
+                  <div className="col-span-3 mt-1">
+                    <button
+                      type="button"
+                      onClick={clearAllRefs}
+                      className="w-full text-[10px] text-white/40 hover:text-red-400 transition-colors font-medium"
+                    >
+                      Limpar todas
                     </button>
                   </div>
                 )}
+                {imageMode && (uploadedImageUrls.length + uploadedVideoUrls.length + uploadedAudioUrls.length) > 1 && (
+                  <div className="col-span-3 mt-1 text-[10px] text-white/40 leading-relaxed">
+                    Use <span className="text-[#22d3ee] font-mono">@1, @2, @3</span> no prompt para referenciar cada item.
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="relative">
-                <input
-                  ref={imageFileInputRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleImageFileChange}
-                />
-                <button
-                  type="button"
-                  title={
-                    uploadedImageUrl
-                      ? "Clear image"
-                      : "Upload image for Image-to-Video"
-                  }
-                  onClick={() =>
-                    uploadedImageUrl
-                      ? clearImageUpload()
-                      : imageFileInputRef.current?.click()
-                  }
-                  className={`w-10 h-10 shrink-0 rounded-full border transition-all flex items-center justify-center relative overflow-hidden ${uploadedImageUrl ? "border-primary/60 bg-primary/5" : "bg-white/5 border-white/[0.03] hover:bg-white/10 hover:border-primary/40"} group`}
-                >
-                  {imageUploading ? (
-                    <div className="flex flex-col items-center justify-center w-full h-full absolute inset-0 bg-black/80 z-20 backdrop-blur-[2px]">
-                      <svg className="w-8 h-8 -rotate-90">
-                        <circle
-                          cx="16"
-                          cy="16"
-                          r="14"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          fill="transparent"
-                          className="text-white/10"
-                        />
-                        <circle
-                          cx="16"
-                          cy="16"
-                          r="14"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          fill="transparent"
-                          strokeDasharray={88}
-                          strokeDashoffset={88 - (88 * imageProgress) / 100}
-                          className="text-primary transition-all duration-300"
-                        />
-                      </svg>
-                      <span className="absolute text-[9px] font-black text-primary leading-none">
-                        {imageProgress}%
-                      </span>
-                    </div>
-                  ) : null}
-
-                  {uploadedImageUrl ? (
-                    <img
-                      src={uploadedImageUrl}
-                      alt=""
-                      className={`w-full h-full object-cover rounded-full ${imageUploading ? "opacity-40 blur-[2px]" : "opacity-100"}`}
-                    />
-                  ) : (
-                    !imageUploading && (
-                      <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        className="text-white/40 group-hover:text-primary transition-colors"
-                      >
-                        <rect
-                          x="3"
-                          y="3"
-                          width="18"
-                          height="18"
-                          rx="2"
-                          ry="2"
-                        />
-                        <circle cx="8.5" cy="8.5" r="1.5" />
-                        <polyline points="21 15 16 10 5 21" />
-                      </svg>
-                    )
-                  )}
-                </button>
-              </div>
-            )}
 
             {/* End-frame upload button (FLF i2v models only) */}
             {imageMode && i2vModels.find((m) => m.id === selectedModel)?.lastImageField && (
@@ -1542,14 +1652,15 @@ export default function VideoStudio({
               </div>
             )}
 
-            {/* Video upload button */}
-            <div className="relative">
-              <input
-                ref={videoFileInputRef}
-                type="file"
-                accept="video/*"
-                className="hidden"
-                onChange={handleVideoFileChange}
+            {/* Video upload button — só aparece em modo t2v/v2v, não em imageMode (que tem o botão VID no grid) */}
+            {!imageMode && (
+              <div className="relative">
+                <input
+                  ref={videoFileInputRef}
+                  type="file"
+                  accept="video/*"
+                  className="hidden"
+                  onChange={handleVideoFileChange}
               />
               <button
                 type="button"
@@ -1604,6 +1715,8 @@ export default function VideoStudio({
                 )}
               </button>
             </div>
+            )}
+          </div>
           </div>
 
           {/* Prompt textarea */}
@@ -1841,6 +1954,7 @@ export default function VideoStudio({
             </button>
           </div>
         </div>
+      </div>
 
       {/* ── FULLSCREEN VIDEO MODAL ── */}
       {fullscreenUrl && (
