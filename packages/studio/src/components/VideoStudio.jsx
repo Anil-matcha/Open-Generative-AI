@@ -13,6 +13,7 @@ import {
   getAspectRatiosForI2VModel,
   getDurationsForI2VModel,
   getDurationSchemaForI2VModel,
+  getDurationSchemaForVideoModel,
   getResolutionsForI2VModel,
   getEffectsForI2VModel,
   getDefaultEffectForI2VModel,
@@ -1940,7 +1941,9 @@ export default function VideoStudio({
               )}
 
               {showDuration && (() => {
-                const durSchema = imageMode ? getDurationSchemaForI2VModel(selectedModel) : null;
+                const durSchema = imageMode
+                  ? getDurationSchemaForI2VModel(selectedModel)
+                  : getDurationSchemaForVideoModel(selectedModel);
                 const useSlider = durSchema && durSchema.minValue !== durSchema.maxValue;
                 return (
                   <div className="flex flex-col gap-1.5">

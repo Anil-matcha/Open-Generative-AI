@@ -4780,9 +4780,10 @@ export const i2vModels = [
 export const getI2IModelById = (id) => i2iModels.find(m => m.id === id);
 export const getI2VModelById = (id) => i2vModels.find(m => m.id === id);
 
-// Resolve a variante ativa de um modelo (se tem hasVariants) ou o próprio modelo
+// Resolve a variante ativa de um modelo (se tem hasVariants) ou o próprio modelo.
+// Procura primeiro em t2vModels (Seedance 2 Omni, etc.) e depois em i2vModels.
 export const getActiveVariant = (modelId, variantId) => {
-    const model = getI2VModelById(modelId);
+    const model = getVideoModelById(modelId) || getI2VModelById(modelId);
     if (!model) return null;
     if (model.hasVariants && model.variants?.length) {
         const v = model.variants.find(x => x.id === variantId) || model.variants.find(x => x.id === model.defaultVariantId) || model.variants[0];
@@ -4838,6 +4839,12 @@ export const getDurationSchemaForI2VModel = (modelId) => {
     if (!dur) return null;
     if (dur.minValue !== undefined && dur.maxValue !== undefined) return dur;
     return null;
+};
+
+// Same as getDurationSchemaForI2VModel but for t2vModels (uses getActiveVariant,
+// which now searches both arrays, so this is effectively universal).
+export const getDurationSchemaForVideoModel = (modelId) => {
+    return getDurationSchemaForI2VModel(modelId);
 };
 
 export const getResolutionsForI2VModel = (modelId) => {
