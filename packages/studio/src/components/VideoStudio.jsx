@@ -1843,7 +1843,7 @@ export default function VideoStudio({
 
             {/* Variant card (only for models with hasVariants) */}
             {(() => {
-              const m = i2vModels.find((x) => x.id === selectedModel);
+              const m = getCurrentModels().find((x) => x.id === selectedModel);
               if (!m?.hasVariants) return null;
               return (
                 <div className="flex flex-col gap-1.5">

@@ -2530,6 +2530,72 @@ export const t2vModels = [
       "duration": { "title": "Duration", "name": "duration", "type": "int", "description": "The duration of the generated video in seconds", "default": 5, "minValue": 5, "maxValue": 20, "step": 1 },
       "resolution": { "enum": ["480p", "720p", "1080p"], "title": "Resolution", "name": "resolution", "type": "string", "description": "The resolution of the generated video.", "default": "720p" }
     }
+  },
+  {
+    "id": "seedance-2",
+    "name": "Seedance 2",
+    "family": "seedance-v2.0",
+    "hasPrompt": true,
+    "hasVariants": true,
+    "defaultVariantId": "omni-4k",
+    "variants": [
+      {
+        "id": "omni-4k",
+        "name": "Omni 4K",
+        "endpoint": "seedance-2-vip-omni-reference-4k",
+        "imageField": "images_list",
+        "videoField": "video_files",
+        "audioField": "audio_files",
+        "maxImages": 9,
+        "maxVideos": 3,
+        "maxAudios": 3,
+        "cost": 6.750,
+        "inputs": {
+          "prompt": { "type": "string", "title": "Prompt", "name": "prompt", "description": "Text prompt. Reference images with @image1..@image9, videos with @video1..@video3, audios with @audio1..@audio3" },
+          "aspect_ratio": { "type": "string", "title": "Aspect Ratio", "name": "aspect_ratio", "enum": ["16:9", "9:16", "4:3", "3:4"], "default": "16:9" },
+          "duration": { "type": "int", "title": "Duration", "name": "duration", "description": "Video duration in seconds", "minValue": 4, "maxValue": 15, "step": 1, "default": 5 }
+        }
+      },
+      {
+        "id": "omni-1080p",
+        "name": "Omni 1080p",
+        "endpoint": "seedance-2-vip-omni-reference-1080p",
+        "imageField": "images_list",
+        "videoField": "video_files",
+        "audioField": "audio_files",
+        "maxImages": 9,
+        "maxVideos": 3,
+        "maxAudios": 3,
+        "cost": 10.125,
+        "inputs": {
+          "prompt": { "type": "string", "title": "Prompt", "name": "prompt", "description": "Text prompt. Reference images with @image1..@image9, videos with @video1..@video3, audios with @audio1..@audio3" },
+          "aspect_ratio": { "type": "string", "title": "Aspect Ratio", "name": "aspect_ratio", "enum": ["16:9", "9:16", "4:3", "3:4"], "default": "16:9" },
+          "duration": { "type": "int", "title": "Duration", "name": "duration", "description": "Video duration in seconds", "minValue": 4, "maxValue": 15, "step": 1, "default": 5 }
+        }
+      },
+      {
+        "id": "omni-pro",
+        "name": "Omni Pro",
+        "endpoint": "seedance-2-vip-omni-reference",
+        "imageField": "images_list",
+        "videoField": "video_files",
+        "audioField": "audio_files",
+        "maxImages": 9,
+        "maxVideos": 3,
+        "maxAudios": 3,
+        "cost": 1.200,
+        "inputs": {
+          "prompt": { "type": "string", "title": "Prompt", "name": "prompt", "description": "Text prompt. Reference images with @image1..@image9, videos with @video1..@video3, audios with @audio1..@audio3. Also supports @omni-character:<char_id>" },
+          "aspect_ratio": { "type": "string", "title": "Aspect Ratio", "name": "aspect_ratio", "enum": ["16:9", "9:16", "4:3", "3:4"], "default": "16:9" },
+          "duration": { "type": "int", "title": "Duration", "name": "duration", "description": "Video duration in seconds", "minValue": 4, "maxValue": 15, "step": 1, "default": 5 }
+        }
+      }
+    ],
+    "inputs": {
+      "prompt": { "type": "string", "title": "Prompt", "name": "prompt" },
+      "aspect_ratio": { "type": "string", "title": "Aspect Ratio", "name": "aspect_ratio", "enum": ["16:9", "9:16", "4:3", "3:4"], "default": "16:9" },
+      "duration": { "type": "int", "title": "Duration", "name": "duration", "description": "Video duration in seconds", "minValue": 4, "maxValue": 15, "step": 1, "default": 5 }
+    }
   }
 ];
 
@@ -4694,72 +4760,6 @@ export const i2iModels = [
 
 // Auto-generated from schema_data.json — Image to Video models
 export const i2vModels = [
-  {
-    "id": "seedance-2",
-    "name": "Seedance 2",
-    "family": "seedance-v2.0",
-    "hasPrompt": true,
-    "hasVariants": true,
-    "defaultVariantId": "omni-4k",
-    "variants": [
-      {
-        "id": "omni-4k",
-        "name": "Omni 4K",
-        "endpoint": "seedance-2-vip-omni-reference-4k",
-        "imageField": "images_list",
-        "videoField": "video_files",
-        "audioField": "audio_files",
-        "maxImages": 9,
-        "maxVideos": 3,
-        "maxAudios": 3,
-        "cost": 6.750,
-        "inputs": {
-          "prompt": { "type": "string", "title": "Prompt", "name": "prompt", "description": "Text prompt. Reference images with @image1..@image9, videos with @video1..@video3, audios with @audio1..@audio3" },
-          "aspect_ratio": { "type": "string", "title": "Aspect Ratio", "name": "aspect_ratio", "enum": ["16:9", "9:16", "4:3", "3:4"], "default": "16:9" },
-          "duration": { "type": "int", "title": "Duration", "name": "duration", "description": "Video duration in seconds", "minValue": 4, "maxValue": 15, "step": 1, "default": 5 }
-        }
-      },
-      {
-        "id": "omni-1080p",
-        "name": "Omni 1080p",
-        "endpoint": "seedance-2-vip-omni-reference-1080p",
-        "imageField": "images_list",
-        "videoField": "video_files",
-        "audioField": "audio_files",
-        "maxImages": 9,
-        "maxVideos": 3,
-        "maxAudios": 3,
-        "cost": 10.125,
-        "inputs": {
-          "prompt": { "type": "string", "title": "Prompt", "name": "prompt", "description": "Text prompt. Reference images with @image1..@image9, videos with @video1..@video3, audios with @audio1..@audio3" },
-          "aspect_ratio": { "type": "string", "title": "Aspect Ratio", "name": "aspect_ratio", "enum": ["16:9", "9:16", "4:3", "3:4"], "default": "16:9" },
-          "duration": { "type": "int", "title": "Duration", "name": "duration", "description": "Video duration in seconds", "minValue": 4, "maxValue": 15, "step": 1, "default": 5 }
-        }
-      },
-      {
-        "id": "omni-pro",
-        "name": "Omni Pro",
-        "endpoint": "seedance-2-vip-omni-reference",
-        "imageField": "images_list",
-        "videoField": "video_files",
-        "audioField": "audio_files",
-        "maxImages": 9,
-        "maxVideos": 3,
-        "maxAudios": 3,
-        "cost": 1.200,
-        "inputs": {
-          "prompt": { "type": "string", "title": "Prompt", "name": "prompt", "description": "Text prompt. Reference images with @image1..@image9, videos with @video1..@video3, audios with @audio1..@audio3. Also supports @omni-character:<char_id>" },
-          "aspect_ratio": { "type": "string", "title": "Aspect Ratio", "name": "aspect_ratio", "enum": ["16:9", "9:16", "4:3", "3:4"], "default": "16:9" },
-          "duration": { "type": "int", "title": "Duration", "name": "duration", "description": "Video duration in seconds", "minValue": 4, "maxValue": 15, "step": 1, "default": 5 }
-        }
-      }
-    ],
-    "inputs": {
-      "prompt": { "type": "string", "title": "Prompt", "name": "prompt" },
-      "aspect_ratio": { "type": "string", "title": "Aspect Ratio", "name": "aspect_ratio", "enum": ["16:9", "9:16", "4:3", "3:4"], "default": "16:9" },
-      "duration": { "type": "int", "title": "Duration", "name": "duration", "description": "Video duration in seconds", "minValue": 4, "maxValue": 15, "step": 1, "default": 5 }
-    }
-  },
   {
     "id": "seedance-2-i2v",
     "name": "Seedance 2 I2V",
