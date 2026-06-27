@@ -66,7 +66,7 @@ export function Header(navigate) {
 
     const settingsBtn = document.createElement('button');
     settingsBtn.className = 'flex items-center gap-2 px-3 py-1.5 rounded-md border border-white/10 bg-white/5 text-[13px] font-bold text-white/80 hover:text-white hover:bg-white/10 hover:border-white/20 transition-colors';
-    settingsBtn.title = 'Settings — API key, local models, preferences';
+    settingsBtn.title = t('web.settingsTitle');
     settingsBtn.innerHTML = `
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="3"/>
@@ -82,9 +82,9 @@ export function Header(navigate) {
     const langBtn = document.createElement('button');
     const currentLang = getLang();
     langBtn.className = 'flex items-center px-3 py-1.5 rounded-md border border-white/10 bg-white/5 text-[13px] font-bold text-white/80 hover:text-white hover:bg-white/10 hover:border-white/20 transition-colors';
-    langBtn.title = currentLang === 'zh' ? 'Switch to English' : '切换为中文';
-    langBtn.textContent = currentLang === 'zh' ? 'EN' : '中文';
-    langBtn.onclick = () => setLang(currentLang === 'zh' ? 'en' : 'zh');
+    langBtn.title = currentLang === 'zh-CN' ? t('web.switchToEn') : t('web.switchToZh');
+    langBtn.textContent = currentLang === 'zh-CN' ? 'EN' : '中文';
+    langBtn.onclick = () => setLang(currentLang === 'zh-CN' ? 'en' : 'zh-CN');
 
     rightPart.appendChild(langBtn);
     rightPart.appendChild(settingsBtn);

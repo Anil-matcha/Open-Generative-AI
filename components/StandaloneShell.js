@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { ImageStudio, VideoStudio, ClippingStudio, VibeMotionStudio, LipSyncStudio, CinemaStudio, AudioStudio, MarketingStudio, WorkflowStudio, AgentStudio, AppsStudio, getUserBalance } from 'studio';
+import { I18nProvider, useI18n } from './I18nProvider';
+import { initLocale, tabLabel } from '../src/lib/i18n.js';
 
 const DesignAgentStudio = dynamic(() => import('studio').then(mod => mod.DesignAgentStudio), {
   ssr: false,
@@ -12,24 +14,24 @@ const DesignAgentStudio = dynamic(() => import('studio').then(mod => mod.DesignA
 import axios from 'axios';
 import ApiKeyModal from './ApiKeyModal';
 
-const TABS = [
-  { id: 'image',   label: 'Image Studio' },
-  { id: 'video',   label: 'Video Studio' },
-  { id: 'audio',   label: 'Audio Studio' },
-  { id: 'clipping', label: 'AI Clipping' },
-  { id: 'vibe-motion', label: 'Vibe Motion' },
-  { id: 'lipsync', label: 'Lip Sync' },
-  { id: 'cinema',  label: 'Cinema Studio' },
-  { id: 'marketing', label: 'Marketing Studio' },
-  { id: 'workflows', label: 'Workflows' },
-  { id: 'agents', label: 'Agents' },
-  { id: 'design-agent', label: 'Design Agent' },
-  { id: 'apps', label: 'Explore Apps' },
+const TAB_IDS = [
+  'image', 'video', 'audio', 'clipping', 'vibe-motion', 'lipsync', 'cinema',
+  'marketing', 'workflows', 'agents', 'design-agent', 'apps',
 ];
 
 const STORAGE_KEY = 'muapi_key';
 
 export default function StandaloneShell() {
+  return (
+    <I18nProvider>
+      <StandaloneShellInner />
+    </I18nProvider>
+  );
+}
+
+function StandaloneShellInner() {
+  const { t, lang, setLang } = useI18n();
+  const tabs = useMemo(() => TAB_IDS.map((id) => ({ id, label: tabLabel(id) })), [lang, t]);
   const params = useParams();
   const router = useRouter();
   const slug = params?.slug || []; 
@@ -58,7 +60,7 @@ export default function StandaloneShell() {
     if (slug.includes('design-agent')) return 'design-agent';
     if (slug.includes('apps')) return 'apps';
     const firstSegment = slug[0];
-    if (firstSegment && TABS.find(t => t.id === firstSegment)) return firstSegment;
+    if (firstSegment && tabs.find(tab => tab.id === firstSegment)) return firstSegment;
     return 'image';
   };
   
@@ -91,7 +93,7 @@ export default function StandaloneShell() {
         setActiveTab('apps');
     } else {
         const firstSegment = slug[0];
-        if (firstSegment && TABS.find(t => t.id === firstSegment)) {
+        if (firstSegment && tabs.find(tab => tab.id === firstSegment)) {
           setActiveTab(firstSegment);
         }
     }
@@ -136,6 +138,7 @@ export default function StandaloneShell() {
   }, []);
 
   useEffect(() => {
+    initLocale();
     setHasMounted(true);
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
@@ -257,8 +260,8 @@ export default function StandaloneShell() {
               </svg>
             </div>
             <div className="flex flex-col items-center">
-              <span className="text-xl font-bold text-white">Drop your media here</span>
-              <span className="text-sm text-white/40">Images, videos, or audio files</span>
+              <span className="text-xl font-bold text-white">{t('web.dropTitle')}</span>
+              <span className="text-sm text-white/40">{t('web.dropSubtitle')}</span>
             </div>
           </div>
         </div>
@@ -307,7 +310,7 @@ export default function StandaloneShell() {
             <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-[#030303] to-transparent pointer-events-none z-10 block lg:hidden" />
             
             <nav className="flex items-center gap-4 overflow-x-auto scrollbar-none w-full lg:w-auto h-full px-4 lg:px-0">
-              {TABS.map((tab) => (
+              {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => handleTabChange(tab.id)}
@@ -341,15 +344,23 @@ export default function StandaloneShell() {
             </div>
 
             <button
+              onClick={() => setLang(lang === 'zh-CN' ? 'en' : 'zh-CN')}
+              title={lang === 'zh-CN' ? t('web.switchToEn') : t('web.switchToZh')}
+              className="flex items-center px-3 py-1.5 rounded-md border border-white/10 bg-white/5 text-[13px] font-bold text-white/80 hover:text-white hover:bg-white/10 hover:border-white/20 transition-colors"
+            >
+              {lang === 'zh-CN' ? 'EN' : '中文'}
+            </button>
+
+            <button
               onClick={() => setShowSettings(true)}
-              title="Settings — API key, local models, preferences"
+              title={t('web.settingsTitle')}
               className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-white/10 bg-white/5 text-[13px] font-bold text-white/80 hover:text-white hover:bg-white/10 hover:border-white/20 transition-colors"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="3" />
                 <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
               </svg>
-              <span>Settings</span>
+              <span>{t('nav.settings')}</span>
             </button>
           </div>
         </header>
@@ -375,15 +386,15 @@ export default function StandaloneShell() {
       {showSettings && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in-up">
           <div className="bg-[#0a0a0a] border border-white/10 rounded-xl p-8 w-full max-w-sm shadow-2xl">
-            <h2 className="text-white font-bold text-lg mb-2">Settings</h2>
+            <h2 className="text-white font-bold text-lg mb-2">{t('settings.title')}</h2>
             <p className="text-white/40 text-[13px] mb-8">
-              Manage your AI studio preferences and authentication.
+              {t('web.settingsDesc')}
             </p>
             
             <div className="space-y-4 mb-8">
               <div className="bg-white/5 border border-white/[0.03] rounded-md p-4">
                 <label className="block text-xs font-bold text-white/30 mb-2">
-                   Active API Key
+                   {t('web.activeKey')}
                 </label>
                 <div className="text-[13px] font-mono text-white/80">
                   {apiKey.slice(0, 8)}••••••••••••••••
@@ -396,13 +407,13 @@ export default function StandaloneShell() {
                 onClick={handleKeyChange}
                 className="flex-1 h-10 rounded-md bg-red-500/10 text-red-400 hover:bg-red-500/20 text-xs font-semibold transition-all"
               >
-                Change Key
+                {t('web.changeKey')}
               </button>
               <button
                 onClick={() => setShowSettings(false)}
                 className="flex-1 h-10 rounded-md bg-white/5 text-white/80 hover:bg-white/10 text-xs font-semibold transition-all border border-white/5"
               >
-                Close
+                {t('web.close')}
               </button>
             </div>
           </div>
