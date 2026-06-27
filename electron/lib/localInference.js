@@ -535,7 +535,11 @@ async function generate(params, mainWindow) {
             console.error('[sd-cli] full output:\n' + allOutput);
             if (code !== 0) {
                 const tail = outputLines.filter(l => l.trim()).slice(-20).join('\n');
-                reject(new Error(`sd-cli exited (code ${code}):\n${tail}`));
+                const killed = code === null;
+                const hint = killed
+                    ? 'sd-cli was terminated before finishing (often OOM on Z-Image/SDXL — try a smaller SD 1.5 model or close other apps). '
+                    : '';
+                reject(new Error(`${hint}sd-cli exited (code ${code ?? 'signal'}):\n${tail}`));
                 return;
             }
             if (!fs.existsSync(outPath)) {
