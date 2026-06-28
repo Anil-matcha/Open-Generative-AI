@@ -82,7 +82,7 @@ export async function PATCH(request, { params }) {
 
     const headers = cleanHeaders(request);
     const apiKey = getApiKey(request);
-    console.log(`[creative-agent proxy PATCH] ${targetUrl} | apiKey: ${apiKey ? apiKey.slice(0,8)+'...' : 'MISSING'}`);
+    // NOTE: credential logging removed for security (CWE-200)
 
     if (apiKey) headers.set('x-api-key', apiKey);
 
@@ -107,7 +107,7 @@ export async function DELETE(request, { params }) {
 
     const headers = cleanHeaders(request);
     const apiKey = getApiKey(request);
-    console.log(`[creative-agent proxy DELETE] ${targetUrl} | apiKey: ${apiKey ? apiKey.slice(0,8)+'...' : 'MISSING'}`);
+    // NOTE: credential logging removed for security (CWE-200)
 
     if (apiKey) headers.set('x-api-key', apiKey);
 

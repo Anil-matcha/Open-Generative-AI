@@ -1,5 +1,22 @@
 import { NextResponse } from 'next/server';
 
+function addSecurityHeaders(response) {
+    // Prevent MIME type sniffing (CWE-693)
+    response.headers.set('X-Content-Type-Options', 'nosniff');
+    // Prevent clickjacking (CWE-1021)
+    response.headers.set('X-Frame-Options', 'DENY');
+    // Enable XSS filter in legacy browsers
+    response.headers.set('X-XSS-Protection', '1; mode=block');
+    // Referrer policy
+    response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+    // Content Security Policy - restricts script sources to prevent XSS (CWE-79)
+    response.headers.set(
+        'Content-Security-Policy',
+        "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; media-src 'self' data: blob: https:; connect-src 'self' https://api.muapi.ai; font-src 'self' data:;"
+    );
+    return response;
+}
+
 export function middleware(request) {
     const url = request.nextUrl;
 
@@ -16,39 +33,19 @@ export function middleware(request) {
 
         if (url.pathname.startsWith('/api/v1') && !isHandledByRoute) {
             const targetUrl = new URL(url.pathname + url.search, 'https://api.muapi.ai');
-            return NextResponse.rewrite(targetUrl);
+            const rewriteResponse = NextResponse.rewrite(targetUrl);
+            return addSecurityHeaders(rewriteResponse);
         }
     }
 
     // Add security headers to all responses
-    const response = NextResponse.next();
-
-    // Prevent MIME type sniffing (CWE-693)
-    response.headers.set('X-Content-Type-Options', 'nosniff');
-
-    // Prevent clickjacking (CWE-1021)
-    response.headers.set('X-Frame-Options', 'DENY');
-
-    // Enable XSS filter in legacy browsers
-    response.headers.set('X-XSS-Protection', '1; mode=block');
-
-    // Referrer policy
-    response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-
-    // Content Security Policy - restricts script sources to prevent XSS (CWE-79)
-    response.headers.set(
-        'Content-Security-Policy',
-        "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; media-src 'self' data: blob: https:; connect-src 'self' https://api.muapi.ai; font-src 'self' data:;"
-    );
-
-    return response;
+    return addSecurityHeaders(NextResponse.next());
 }
 
-// Match the paths we want to proxy
+// Match all paths for security headers. Exclude Next.js internal paths.
 export const config = {
     matcher: [
-        '/api/workflow/:path*',
-        '/api/app/:path*',
-        '/api/v1/:path*'
+        '/api/:path*',
+        '/((?!_next/static|_next/image|favicon.ico|__nextjs_original-stack-frame).*)',
     ],
 };
