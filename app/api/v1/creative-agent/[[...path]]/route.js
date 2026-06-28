@@ -9,8 +9,8 @@ function getApiKey(request) {
     }
     const headerKey = request.headers.get('x-api-key');
     if (headerKey) return headerKey;
-    const cookieKey = request.cookies.get('muapi_key')?.value;
-    return cookieKey;
+    // Cookie-based auth removed for security: no HttpOnly flag exposes key to XSS (CWE-522)
+    return null;
 }
 
 function cleanHeaders(request) {
@@ -33,8 +33,8 @@ export async function GET(request, { params }) {
 
     const headers = cleanHeaders(request);
     const apiKey = getApiKey(request);
-    console.log(`[creative-agent proxy GET] ${targetUrl} | apiKey: ${apiKey ? apiKey.slice(0,8)+'...' : 'MISSING'}`);
-    
+    // NOTE: credential logging removed for security (CWE-200)
+
     if (apiKey) headers.set('x-api-key', apiKey);
 
     try {
@@ -57,7 +57,7 @@ export async function POST(request, { params }) {
 
     const headers = cleanHeaders(request);
     const apiKey = getApiKey(request);
-    console.log(`[creative-agent proxy POST] ${targetUrl} | apiKey: ${apiKey ? apiKey.slice(0,8)+'...' : 'MISSING'}`);
+    // NOTE: credential logging removed for security (CWE-200)
 
     if (apiKey) headers.set('x-api-key', apiKey);
 

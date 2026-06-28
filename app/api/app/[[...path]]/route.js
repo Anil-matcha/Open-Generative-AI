@@ -3,13 +3,10 @@ import { NextResponse } from 'next/server';
 const MUAPI_BASE = 'https://api.muapi.ai';
 
 function getApiKey(request) {
-    // Priority 1: Direct x-api-key header
+    // Only accept x-api-key header. Cookie-based auth is removed for security:
+    // cookies without HttpOnly flag can be stolen by XSS (CWE-522).
     const headerKey = request.headers.get('x-api-key');
-    if (headerKey) return headerKey;
-
-    // Priority 2: muapi_key cookie (used by the fixed builder library)
-    const cookieKey = request.cookies.get('muapi_key')?.value;
-    return cookieKey;
+    return headerKey || null;
 }
 
 function cleanHeaders(request) {
