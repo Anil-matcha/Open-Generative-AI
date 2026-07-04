@@ -1,4 +1,4 @@
-import './globals.css';
+import "./globals.css";
 import { Inter } from "next/font/google";
 
 const inter = Inter({
@@ -7,13 +7,13 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: 'Open Generative AI — Free AI Image & Video Studio',
-  description: 'Generate AI images and videos using 200+ models — Flux, Midjourney, Kling, Veo, Seedance and more.',
+  title: "Replicate Video Studio",
+  description: "Dark desktop-first image-to-video workspace for Replicate models.",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <body className={inter.variable}>{children}</body>
     </html>
   );
