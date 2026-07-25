@@ -13,7 +13,7 @@
   ],
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run build:packages && next build",
     "start": "next start",
     "lint": "next lint",
     "build:studio": "npm run build -w studio",
@@ -21,7 +21,7 @@
     "build:agent": "npm run build -w ai-agent",
     "build:design": "npm run build -w design-agent",
     "build:packages": "npm run build:workflow && npm run build:agent && npm run build:design && npm run build:studio",
-    "setup": "git submodule update --init --recursive && npm install && npm run build:packages",
+    "setup": "git submodule update --init --recursive && npm install --include=dev && npm run build:packages",
     "vite:dev": "vite",
     "vite:build": "vite build",
     "electron:dev": "npm run vite:build && electron .",
@@ -138,3 +138,4 @@
   },
   "main": "electron/main.js"
 }
+
