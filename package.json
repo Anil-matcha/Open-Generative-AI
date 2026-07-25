@@ -1,107 +1,48 @@
 {
-  "name": "open-higgsfield-ai",
-  "description": "Open-source alternative to Higgsfield AI — AI image, video, cinema and lip sync studio",
+  "name": "open-generative-ai",
+  "version": "2.0.0",
   "private": true,
-  "version": "1.0.0",
+  "license": "MIT",
+  "description": "Open-source alternative to AI video platforms — Free AI image & video generation studio",
+  "homepage": "https://github.com/Anil-matcha/Open-Generative-AI",
   "workspaces": [
-    "packages/studio"
+    "packages/studio",
+    "packages/Vibe-Workflow/packages/workflow-builder",
+    "packages/Open-Poe-AI/packages/agents",
+    "packages/Open-AI-Design-Agent/packages/design-agent"
   ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "build:studio": "cd packages/studio && npm run build",
-    "setup": "npm install --include=dev && npm run build:studio",
-    "vite:dev": "vite",
-    "vite:build": "vite build",
-    "electron:build": "vite build && electron-builder --mac",
-    "electron:build:win": "vite build && electron-builder --win",
-    "electron:build:all": "vite build && electron-builder --mac --win"
-  },
-  "build": {
-    "appId": "ai.higgsfield.open",
-    "productName": "Open Higgsfield AI",
-    "copyright": "Copyright © 2025",
-    "directories": {
-      "output": "release"
-    },
-    "afterPack": "./afterPack.js",
-    "files": [
-      "dist/**/*",
-      "electron/**/*"
-    ],
-    "mac": {
-      "category": "public.app-category.graphics-design",
-      "icon": "public/banner.png",
-      "gatekeeperAssess": false,
-      "target": [
-        {
-          "target": "dmg",
-          "arch": [
-            "x64",
-            "arm64"
-          ]
-        }
-      ]
-    },
-    "win": {
-      "icon": "public/banner.png",
-      "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "x64",
-            "arm64"
-          ]
-        }
-      ]
-    }
+    "build:studio": "npm run build -w studio",
+    "build:workflow": "npm run build -w workflow-builder",
+    "build:agent": "npm run build -w ai-agent",
+    "build:design": "npm run build -w design-agent",
+    "build:packages": "npm run build --workspaces --if-present",
+    "setup": "git submodule update --init --recursive && npm install --legacy-peer-deps && npm run build:packages"
   },
   "dependencies": {
-    "next": "^15.0.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "studio": "*",
-    "axios": "^1.7.0",
-    "react-hot-toast": "^2.4.1"
-  },
-  "devDependencies": {
-    "@eslint/eslintrc": "^3",
-    "autoprefixer": "^10.4.24",
-    "electron": "^33.4.11",
-    "electron-builder": "^25.1.8",
-    "eslint": "^9",
-    "eslint-config-next": "^15.0.0",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^3.4.0",
-    "vite": "^5.4.0",
-    "@tailwindcss/vite": "^4.1.18"
-  }
-}
-  "dependencies": {
-    "@huggingface/inference": "^4.13.23",
-    "ai-agent": "file:./packages/Open-Poe-AI/packages/agents",
     "axios": "^1.7.0",
     "next": "^15.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.4.1",
     "studio": "*",
-    "workflow-builder": "file:./packages/Vibe-Workflow/packages/workflow-builder"
+    "workflow-builder": "file:./packages/Vibe-Workflow/packages/workflow-builder",
+    "ai-agent": "file:./packages/Open-Poe-AI/packages/agents",
+    "tailwindcss": "^3.4.0",
+    "postcss": "^8.5.6",
+    "autoprefixer": "^10.4.24"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/vite": "^4.1.18",
-    "@types/react": "19.2.17",
-    "autoprefixer": "^10.4.24",
     "electron": "^33.4.11",
     "electron-builder": "^25.1.8",
     "eslint": "^9",
     "eslint-config-next": "^15.0.0",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^3.4.0",
     "vite": "^5.4.0"
-  },
-  "main": "electron/main.js"
+  }
 }
