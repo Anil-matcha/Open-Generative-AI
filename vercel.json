@@ -1,4 +1,7 @@
 {
-  "buildCommand": "git submodule update --init --recursive && npm install --legacy-peer-deps && npm run build:packages && next build",
-  "installCommand": "npm install --legacy-peer-deps"
+  "build": {
+    "env": {
+      "INSTALL_DEV_DEPENDENCIES": "true"
+    }
+  }
 }
