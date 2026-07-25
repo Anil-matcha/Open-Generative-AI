@@ -13,6 +13,7 @@
   ],
   "scripts": {
     "dev": "next dev",
+    "build:packages": "npm run build --workspaces --if-present",
     "build": "npm run build:packages && next build",
     "start": "next start",
     "lint": "next lint"
@@ -31,6 +32,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/vite": "^4.1.18",
+    "@types/react": "19.2.17",
     "autoprefixer": "^10.4.24",
     "electron": "^33.4.11",
     "electron-builder": "^25.1.8",

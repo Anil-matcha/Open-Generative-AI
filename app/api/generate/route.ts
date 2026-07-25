@@ -1,4 +1,5 @@
 import { InferenceClient } from "@huggingface/inference";
+import { toBufferFromPayload } from "../../../lib/binaryPayload";
 
 const client = new InferenceClient(process.env.HF_TOKEN);
 
@@ -45,7 +46,7 @@ export async function POST(req: Request) {
         ? await client.imageToImage(payload) 
         : await client.textToImage(payload);
 
-      const buffer = Buffer.from(await imageBlob.arrayBuffer());
+      const buffer = await toBufferFromPayload(imageBlob);
       return Response.json({ success: true, data: `data:image/jpeg;base64,${buffer.toString("base64")}` });
     }
 
@@ -69,7 +70,7 @@ export async function POST(req: Request) {
         }
       });
 
-      const buffer = Buffer.from(await videoBlob.arrayBuffer());
+      const buffer = await toBufferFromPayload(videoBlob);
       return Response.json({ success: true, data: `data:video/mp4;base64,${buffer.toString("base64")}` });
     }
 
