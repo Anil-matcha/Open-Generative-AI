@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@babel/cli": "8.0.4",
+    "@huggingface/inference": "^3.0.0",
     "@supabase/supabase-js": "^2.110.8",
     "ai-agent": "file:./packages/Open-Poe-AI/packages/agents",
     "autoprefixer": "^10.4.24",
