@@ -1,4 +1,6 @@
 {
-  "installCommand": "npm install --legacy-peer-deps --include=dev",
-  "buildCommand": "git submodule update --init --recursive && npm run build:packages && next build"
+  "installCommand": "npm install --legacy-peer-deps",
+  "buildCommand": "git submodule update --init --recursive && npm run build:packages && npm run build",
+  "framework": "nextjs",
+  "outputDirectory": ".next"
 }
