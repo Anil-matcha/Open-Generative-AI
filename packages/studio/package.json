@@ -8,10 +8,10 @@
     "src",
     "dist"
   ],
-  "scripts": {
-    "build:css": "tailwindcss -i ./src/tailwind.css -o ./dist/tailwind.css --minify",
-    "build": "npm run build:css && babel src --out-dir dist --extensions .js,.jsx"
-  },
+"scripts": {
+  "build": "npm run build:css && babel src --out-dir dist --extensions .js,.jsx",
+  "build:css": "npx tailwindcss -i ./src/tailwind.css -o ./dist/tailwind.css --minify"
+},
   "license": "MIT",
   "dependencies": {
     "@xyflow/react": "^12.10.2",
