@@ -25,17 +25,18 @@
     "setup": "git submodule update --init --recursive && npm install --legacy-peer-deps && npm run build:packages"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.110.8",
+    "ai-agent": "file:./packages/Open-Poe-AI/packages/agents",
+    "autoprefixer": "^10.4.24",
     "axios": "^1.7.0",
     "next": "^15.0.0",
+    "postcss": "^8.5.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.4.1",
     "studio": "*",
-    "workflow-builder": "file:./packages/Vibe-Workflow/packages/workflow-builder",
-    "ai-agent": "file:./packages/Open-Poe-AI/packages/agents",
     "tailwindcss": "^3.4.0",
-    "postcss": "^8.5.6",
-    "autoprefixer": "^10.4.24"
+    "workflow-builder": "file:./packages/Vibe-Workflow/packages/workflow-builder"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
