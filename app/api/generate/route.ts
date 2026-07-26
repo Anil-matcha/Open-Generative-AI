@@ -59,7 +59,7 @@ export async function POST(req: Request) {
         selectedModel = "ali-vilab/text-to-video-ms-1.7b";
       }
 
-      const videoBlob = await client.textToVideo({
+      const videoBlob = await client.request({
         model: selectedModel,
         inputs: referenceAsset 
           ? { prompt: `${prompt}, preserving identical face, features, figure, curves, and skintone`, video: referenceAsset }
