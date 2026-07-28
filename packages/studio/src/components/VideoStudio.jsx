@@ -1256,8 +1256,8 @@ export default function VideoStudio({
       hadError = true;
       console.error("[VideoStudio]", e);
       const errMsg = formatErrorMessage(e, "Video generation failed");
-      toast.error(errMsg);
-      onGenerationError?.(errMsg);
+      if (onGenerationError) onGenerationError(errMsg);
+      else toast.error(errMsg);
     } finally {
       setGenerating(false);
     }

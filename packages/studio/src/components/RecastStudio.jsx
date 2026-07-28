@@ -765,8 +765,8 @@ export default function RecastStudio({
     } catch (e) {
       console.error("[RecastStudio]", e);
       const errMsg = formatErrorMessage(e, "Body swap generation failed");
-      toast.error(errMsg);
-      onGenerationError?.(errMsg);
+      if (onGenerationError) onGenerationError(errMsg);
+      else toast.error(errMsg);
     } finally {
       setIsGenerating(false);
     }

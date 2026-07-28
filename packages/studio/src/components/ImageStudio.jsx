@@ -1272,8 +1272,8 @@ export default function ImageStudio({
     } catch (e) {
       console.error("[ImageStudio] Generation failed:", e);
       const errMsg = formatErrorMessage(e, "Image generation failed");
-      toast.error(errMsg);
-      onGenerationError?.(errMsg);
+      if (onGenerationError) onGenerationError(errMsg);
+      else toast.error(errMsg);
     } finally {
       setGenerating(false);
     }

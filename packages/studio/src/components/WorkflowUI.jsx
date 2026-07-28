@@ -6,7 +6,13 @@ import "reactflow/dist/style.css";
 import "react-toastify/dist/ReactToastify.css";
 
 
-const WorkflowUI = ({ workflowId, initialNodeSchemas, initialWorkflowData }) => {
+const WorkflowUI = ({
+  workflowId,
+  initialNodeSchemas,
+  initialWorkflowData,
+  onGenerationComplete,
+  onGenerationError,
+}) => {
   useEffect(() => {
     sessionStorage.setItem("fromWorkflowBuilder", "true");
   }, []);
@@ -18,6 +24,8 @@ const WorkflowUI = ({ workflowId, initialNodeSchemas, initialWorkflowData }) => 
         initialNodeSchemas={initialNodeSchemas} 
         initialWorkflowData={initialWorkflowData}
         costType="dollars" 
+        onGenerationComplete={onGenerationComplete}
+        onGenerationError={onGenerationError}
       />
     </div>
   );

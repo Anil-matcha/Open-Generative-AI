@@ -332,7 +332,13 @@ function HoverPill({ label, img, onClick }) {
 }
 
 // ─── Main Component ─────────────────────────────────────────────────────────
-export default function AiInfluencerStudio({ apiKey, onGenerate, isGenerating: externalIsGenerating }) {
+export default function AiInfluencerStudio({
+  apiKey,
+  onGenerate,
+  onGenerationComplete,
+  onGenerationError,
+  isGenerating: externalIsGenerating,
+}) {
   const [activeTab, setActiveTab] = useState("face");
 
   const [selectedOptions, setSelectedOptions] = useState(() => {
@@ -408,9 +414,17 @@ export default function AiInfluencerStudio({ apiKey, onGenerate, isGenerating: e
         setCurrentResult(res.url);
         setHistory((prev) => [{ url: res.url, ts: Date.now() }, ...prev]);
         setSelectedHistoryIdx(0);
+        onGenerationComplete?.({
+          url: res.url,
+          model: INFLUENCER_MODEL,
+          prompt,
+          type: "image",
+        });
       }
     } catch (err) {
-      toast.error(formatErrorMessage(err, "Generation failed. Please try again."));
+      const message = formatErrorMessage(err, "Generation failed. Please try again.");
+      if (onGenerationError) onGenerationError(message);
+      else toast.error(message);
     } finally {
       setIsGeneratingInternal(false);
     }

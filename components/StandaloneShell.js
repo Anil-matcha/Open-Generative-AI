@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { ImageStudio, VideoStudio, ClippingStudio, VibeMotionStudio, LipSyncStudio, RecastStudio, CinemaStudio, AudioStudio, MarketingStudio, WorkflowStudio, AgentStudio, AppsStudio, AiInfluencerStudio, getUserBalance } from 'studio';
@@ -238,6 +238,35 @@ const getNavigationCategory = (tabId) => (
 );
 
 const STORAGE_KEY = 'muapi_key';
+const NOTIFICATIONS_STORAGE_KEY = 'open_gen_notifications_v1';
+const MAX_VISIBLE_NOTIFICATIONS = 3;
+
+const loadStoredNotifications = () => {
+  if (typeof window === 'undefined') return [];
+
+  try {
+    const stored = JSON.parse(window.sessionStorage.getItem(NOTIFICATIONS_STORAGE_KEY) || '[]');
+    const now = Date.now();
+    return Array.isArray(stored)
+      ? stored.filter((notification) => notification.expiresAt > now).slice(0, MAX_VISIBLE_NOTIFICATIONS)
+      : [];
+  } catch {
+    return [];
+  }
+};
+
+const persistNotifications = (notifications) => {
+  if (typeof window === 'undefined') return;
+
+  try {
+    window.sessionStorage.setItem(
+      NOTIFICATIONS_STORAGE_KEY,
+      JSON.stringify(notifications),
+    );
+  } catch {
+    // Notification persistence is optional; rendering still works without storage.
+  }
+};
 
 export default function StandaloneShell() {
   const params = useParams();
@@ -327,26 +356,64 @@ export default function StandaloneShell() {
   const [isDragging, setIsDragging] = useState(false);
   const [droppedFiles, setDroppedFiles] = useState(null);
 
-  // ── Global Generation Notifications ────────────────────────────────────────
+  // Global generation notifications remain mounted while users switch studios.
   const [notifications, setNotifications] = useState([]);
-  const activeTabRef = useRef(null);
-  useEffect(() => { activeTabRef.current = activeTab; }, [activeTab]);
+  const [notificationsHydrated, setNotificationsHydrated] = useState(false);
+
+  useEffect(() => {
+    setNotifications(loadStoredNotifications());
+    setNotificationsHydrated(true);
+  }, []);
 
   const pushNotification = useCallback((notif) => {
+    const now = Date.now();
     const id = `notif-${Date.now()}-${Math.random()}`;
-    const entry = { ...notif, id };
-    setNotifications(prev => [entry, ...prev].slice(0, 5));
-    const ttl = notif.type === 'success' ? 8000 : 6000;
-    setTimeout(() => setNotifications(prev => prev.filter(n => n.id !== id)), ttl);
+    const ttl = 12000;
+    const entry = { ...notif, id, expiresAt: now + ttl };
+    setNotifications((previous) => {
+      const next = [
+        ...previous.filter((notification) => notification.expiresAt > now),
+        entry,
+      ].slice(-MAX_VISIBLE_NOTIFICATIONS);
+      persistNotifications(next);
+      return next;
+    });
   }, []);
 
   const dismissNotification = useCallback((id) => {
-    setNotifications(prev => prev.filter(n => n.id !== id));
+    setNotifications((previous) => {
+      const next = previous.filter((notification) => notification.id !== id);
+      persistNotifications(next);
+      return next;
+    });
   }, []);
+
+  useEffect(() => {
+    if (!notificationsHydrated) return;
+
+    persistNotifications(notifications);
+  }, [notifications, notificationsHydrated]);
+
+  useEffect(() => {
+    if (notifications.length === 0) return undefined;
+
+    const nextExpiry = Math.min(...notifications.map((notification) => notification.expiresAt));
+    const timer = window.setTimeout(() => {
+      const now = Date.now();
+      setNotifications((previous) => previous.filter((notification) => notification.expiresAt > now));
+    }, Math.max(0, nextExpiry - Date.now()));
+
+    return () => window.clearTimeout(timer);
+  }, [notifications]);
 
   const makeSuccessCallback = useCallback((tabId) => (data) => {
     const tab = TABS.find(t => t.id === tabId);
-    pushNotification({ type: 'success', tabId, label: tab?.label || tabId, data });
+    pushNotification({
+      type: 'success',
+      tabId,
+      label: tab?.label || tabId,
+      resultUrl: data?.url || null,
+    });
   }, [pushNotification]);
 
   const makeErrorCallback = useCallback((tabId) => (message) => {
@@ -368,10 +435,15 @@ export default function StandaloneShell() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  const handleTabChange = (tabId) => {
+  const handleTabChange = useCallback((tabId) => {
     window.history.pushState(null, '', `/studio/${tabId}`);
     setActiveTab(tabId);
-  };
+  }, []);
+
+  const handleOpenNotification = useCallback((notification) => {
+    handleTabChange(notification.tabId);
+    dismissNotification(notification.id);
+  }, [dismissNotification, handleTabChange]);
 
   const handleTabClick = (e, tabId) => {
     if (e.button === 0 && !e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey) {
@@ -848,85 +920,119 @@ export default function StandaloneShell() {
           <MarketingStudio apiKey={apiKey} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationComplete={makeSuccessCallback('marketing')} onGenerationError={makeErrorCallback('marketing')} />
         </div>
         <div className={activeTab === 'workflows' ? "h-full w-full" : "hidden"}>
-          <WorkflowStudio apiKey={apiKey} isHeaderVisible={isHeaderVisible} onToggleHeader={setIsHeaderVisible} />
+          <WorkflowStudio
+            apiKey={apiKey}
+            isHeaderVisible={isHeaderVisible}
+            onToggleHeader={setIsHeaderVisible}
+            onGenerationComplete={makeSuccessCallback('workflows')}
+            onGenerationError={makeErrorCallback('workflows')}
+          />
         </div>
         <div className={activeTab === 'agents' ? "h-full w-full" : "hidden"}>
           <AgentStudio apiKey={apiKey} isHeaderVisible={isHeaderVisible} onToggleHeader={setIsHeaderVisible} />
         </div>
         <div className={activeTab === 'design-agent' ? "h-full w-full" : "hidden"}>
           {activeTab === 'design-agent' && (
-            <DesignAgentStudio apiKey={apiKey} isHeaderVisible={isHeaderVisible} onToggleHeader={setIsHeaderVisible} />
+            <DesignAgentStudio
+              apiKey={apiKey}
+              isHeaderVisible={isHeaderVisible}
+              onToggleHeader={setIsHeaderVisible}
+              onGenerationComplete={makeSuccessCallback('design-agent')}
+              onGenerationError={makeErrorCallback('design-agent')}
+            />
           )}
         </div>
         <div className={activeTab === 'apps' ? "h-full w-full" : "hidden"}>
           <AppsStudio apiKey={apiKey} />
         </div>
         <div className={activeTab === 'ai-influencer' ? "h-full w-full" : "hidden"}>
-          <AiInfluencerStudio apiKey={apiKey} />
+          <AiInfluencerStudio
+            apiKey={apiKey}
+            onGenerationComplete={makeSuccessCallback('ai-influencer')}
+            onGenerationError={makeErrorCallback('ai-influencer')}
+          />
         </div>
       </div>
     </div>
 
-      {/* ── Global Generation Notification Stack ── */}
+      {/* Global generation notification stack */}
       {notifications.length > 0 && (
         <div
           aria-live="polite"
-          className="fixed bottom-6 right-6 z-[200] flex flex-col gap-3 pointer-events-none"
-          style={{ maxWidth: '360px' }}
+          aria-label="Generation notifications"
+          className="fixed bottom-5 right-5 z-[200] flex w-[340px] max-w-[calc(100vw-32px)] flex-col gap-2 pointer-events-none"
+          data-testid="global-notification-stack"
         >
           {notifications.map((notif) => (
             <div
               key={notif.id}
-              className="pointer-events-auto flex items-start gap-3 bg-[#0e0e10] border rounded-xl px-4 py-3 shadow-2xl shadow-black/60"
+              role={notif.type === 'error' ? 'alert' : 'status'}
+              data-notification-type={notif.type}
+              data-notification-tab={notif.tabId}
+              className="pointer-events-auto flex items-start gap-3 rounded-xl border bg-[#0d0d0f] px-3.5 py-3 text-[13px] text-zinc-100 shadow-[0_16px_48px_rgba(0,0,0,0.65)]"
               style={{
                 borderColor: notif.type === 'success' ? 'rgba(34,211,238,0.35)' : 'rgba(239,68,68,0.35)',
-                borderLeftWidth: '3px',
-                borderLeftColor: notif.type === 'success' ? '#22d3ee' : '#ef4444',
                 animation: 'slideInRight 280ms cubic-bezier(0.16,1,0.3,1) forwards',
               }}
             >
-              {/* Icon */}
-              <div
-                className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center mt-0.5"
-                style={{ background: notif.type === 'success' ? 'rgba(34,211,238,0.12)' : 'rgba(239,68,68,0.12)' }}
+              <span
+                className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border ${
+                  notif.type === 'success'
+                    ? 'border-cyan-400/35 bg-cyan-400/10 text-cyan-300'
+                    : 'border-red-500/35 bg-red-500/10 text-red-400'
+                }`}
               >
                 {notif.type === 'success' ? (
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="m5 12 4 4L19 6" />
+                  </svg>
                 ) : (
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="3"><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="M12 7v6" />
+                    <path d="M12 17h.01" />
+                  </svg>
                 )}
-              </div>
+              </span>
 
-              {/* Body */}
-              <div className="flex-1 min-w-0">
-                <p className="text-[12px] font-bold text-white/90 leading-tight">
+              <div className="min-w-0 flex-1">
+                <p className="font-semibold leading-5 text-zinc-100">
                   {notif.label}
-                  <span className="font-normal text-white/50">
-                    {notif.type === 'success' ? ' · Generation complete' : ' · Generation failed'}
+                  <span className="font-normal text-zinc-400">
+                    {notif.type === 'success' ? ' - Generation complete' : ' - Generation failed'}
                   </span>
                 </p>
                 {notif.type === 'error' && notif.message && (
-                  <p className="text-[11px] text-red-400/80 mt-0.5 leading-snug truncate" title={notif.message}>
+                  <p className="mt-0.5 line-clamp-2 text-[12px] font-medium leading-4 text-red-300/85" title={notif.message}>
                     {notif.message}
                   </p>
                 )}
                 {notif.type === 'success' && (
+                  <p className="mt-0.5 text-[12px] leading-4 text-zinc-400">
+                    Your result is ready.
+                  </p>
+                )}
+                {notif.type === 'success' && (
                   <button
-                    onClick={() => { handleTabChange(notif.tabId); dismissNotification(notif.id); }}
-                    className="mt-1.5 text-[11px] font-bold text-[#22d3ee] hover:underline"
+                    type="button"
+                    onClick={() => handleOpenNotification(notif)}
+                    className="mt-1.5 text-[11px] font-bold text-cyan-300 transition-colors hover:text-cyan-100"
+                    aria-label={`Open ${notif.label} result`}
                   >
-                    Open →
+                    Open
                   </button>
                 )}
               </div>
 
-              {/* Dismiss */}
               <button
+                type="button"
                 onClick={() => dismissNotification(notif.id)}
-                className="flex-shrink-0 text-white/30 hover:text-white/70 transition-colors text-lg leading-none mt-0.5"
-                aria-label="Dismiss"
+                className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-white/20"
+                aria-label="Dismiss notification"
               >
-                ×
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                  <path d="M18 6 6 18M6 6l12 12" />
+                </svg>
               </button>
             </div>
           ))}

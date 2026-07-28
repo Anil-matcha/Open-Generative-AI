@@ -23,6 +23,25 @@ import {
   promptMediaButtonClassName,
 } from "./prompt/PromptComposer.jsx";
 
+const MAX_VIDEO_SIZE_MB = 100;
+const MAX_VIDEO_SIZE_BYTES = MAX_VIDEO_SIZE_MB * 1024 * 1024;
+const CLIPPING_TOASTER_ID = "clipping-studio";
+const VIDEO_TOO_LARGE_FOR_MODE_MESSAGE =
+  "The file is too large for this mode. Compress or trim the video, then upload a smaller file.";
+const MAX_VISIBLE_ERROR_TOASTS = 3;
+const ERROR_TOAST_DURATION_MS = 7000;
+const activeErrorToastIds = [];
+
+const forgetErrorToast = (toastId) => {
+  const index = activeErrorToastIds.indexOf(toastId);
+  if (index !== -1) activeErrorToastIds.splice(index, 1);
+};
+
+const dismissErrorToast = (toastId) => {
+  forgetErrorToast(toastId);
+  toast.dismiss(toastId, CLIPPING_TOASTER_ID);
+};
+
 // ---------------------------------------------------------------------------
 // Inline SVG Icons
 // ---------------------------------------------------------------------------
@@ -62,6 +81,104 @@ const CopyIcon = () => (
     <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
   </svg>
 );
+
+const ErrorToast = ({ toastInstance, message }) => (
+  <div
+    className={`pointer-events-auto flex w-[340px] max-w-[calc(100vw-32px)] items-start gap-3 rounded-xl border border-red-500/35 bg-[#0d0d0f] px-3.5 py-3 text-[13px] text-zinc-100 shadow-[0_16px_48px_rgba(0,0,0,0.65)] transition-all duration-200 ${
+      toastInstance.visible ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
+    }`}
+    role="alert"
+  >
+    <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-red-500/35 bg-red-500/10 text-red-400">
+      <svg
+        width="17"
+        height="17"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 7v6" />
+        <path d="M12 17h.01" />
+      </svg>
+    </span>
+    <span className="min-w-0 flex-1 py-1 font-medium leading-5">{message}</span>
+    <button
+      type="button"
+      onClick={() => dismissErrorToast(toastInstance.id)}
+      className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-red-400/60"
+      aria-label="Dismiss notification"
+    >
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        aria-hidden="true"
+      >
+        <path d="M18 6 6 18M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+);
+
+const showErrorToast = (message) => {
+  const options = {
+    duration: ERROR_TOAST_DURATION_MS,
+    position: "bottom-right",
+    toasterId: CLIPPING_TOASTER_ID,
+  };
+
+  while (activeErrorToastIds.length >= MAX_VISIBLE_ERROR_TOASTS) {
+    const oldestToastId = activeErrorToastIds.shift();
+    toast.remove(oldestToastId, CLIPPING_TOASTER_ID);
+  }
+
+  const toastId = toast.custom(
+    (toastInstance) => (
+      <ErrorToast
+        toastInstance={toastInstance}
+        message={message}
+      />
+    ),
+    options,
+  );
+
+  activeErrorToastIds.push(toastId);
+  setTimeout(
+    () => forgetErrorToast(toastId),
+    ERROR_TOAST_DURATION_MS + 1000,
+  );
+};
+
+const showVideoSizeLimitToast = () => {
+  showErrorToast(`Video exceeds ${MAX_VIDEO_SIZE_MB}MB limit.`);
+};
+
+const isFileSizeError = (error) => {
+  const message = String(error?.message || error || "");
+  return /(?:\b413\b|payload too large|request entity too large|file(?: size)? (?:is )?too large|file is too heavy|exceeds?.*(?:size|limit)|слишком (?:больш|тяж)|превышает.*(?:размер|лимит))/i.test(message);
+};
+
+const showVideoUploadError = (error) => {
+  if (isFileSizeError(error)) {
+    showErrorToast(VIDEO_TOO_LARGE_FOR_MODE_MESSAGE);
+    return;
+  }
+
+  const message = formatErrorMessage(
+    error,
+    "Video upload failed. Please try again.",
+  );
+  showErrorToast(message);
+};
 
 const getAspectClass = (ar) => {
   switch (ar) {
@@ -209,8 +326,8 @@ export default function ClippingStudio({
       const videoFiles = droppedFiles.filter(f => f.type.startsWith('video/'));
       if (videoFiles.length > 0) {
         const file = videoFiles[0];
-        if (file.size > 100 * 1024 * 1024) {
-          alert("Video exceeds 100MB limit.");
+        if (file.size > MAX_VIDEO_SIZE_BYTES) {
+          showVideoSizeLimitToast();
           onFilesHandled?.();
           return;
         }
@@ -225,7 +342,7 @@ export default function ClippingStudio({
           })
           .catch(err => {
             setVideoUploading(false);
-            alert(`Failed to upload dropped file: ${err.message}`);
+            showVideoUploadError(err);
           });
       }
       onFilesHandled?.();
@@ -286,8 +403,9 @@ export default function ClippingStudio({
   const handleVideoFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    if (file.size > 100 * 1024 * 1024) {
-      alert("Video exceeds 100MB limit.");
+    if (file.size > MAX_VIDEO_SIZE_BYTES) {
+      showVideoSizeLimitToast();
+      if (videoFileInputRef.current) videoFileInputRef.current.value = "";
       return;
     }
     setVideoUploading(true);
@@ -299,7 +417,7 @@ export default function ClippingStudio({
       setVideoUrl(url);
     } catch (err) {
       console.error("[ClippingStudio] Video upload failed:", err);
-      alert(`Video upload failed: ${err.message}`);
+      showVideoUploadError(err);
     } finally {
       setVideoUploading(false);
       setVideoProgress(0);
@@ -374,8 +492,11 @@ export default function ClippingStudio({
     } catch (err) {
       console.error("[ClippingStudio] Error generating clips:", err);
       const errMsg = formatErrorMessage(err, "Failed to process AI clipping.");
-      toast.error(errMsg);
-      onGenerationError?.(errMsg);
+      const notificationMessage = isFileSizeError(err)
+        ? VIDEO_TOO_LARGE_FOR_MODE_MESSAGE
+        : errMsg;
+      if (onGenerationError) onGenerationError(notificationMessage);
+      else showErrorToast(notificationMessage);
     } finally {
       setIsGenerating(false);
     }
@@ -988,7 +1109,34 @@ export default function ClippingStudio({
           scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
         }
       `}</style>
-      <Toaster position="top-right" containerStyle={{ zIndex: 99999 }} toastOptions={{ duration: 5000, style: { background: '#18181b', color: '#ffffff', border: '1px solid rgba(255,255,255,0.15)', fontSize: '13px', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.6)', maxWidth: '440px', wordBreak: 'break-word', whiteSpace: 'pre-wrap', padding: '12px 16px' } }} />
+      <Toaster
+        toasterId={CLIPPING_TOASTER_ID}
+        position="bottom-right"
+        reverseOrder={false}
+        gutter={8}
+        containerStyle={{ zIndex: 99999, right: 20, bottom: 20 }}
+        toastOptions={{
+          duration: 6000,
+          style: {
+            background: "#0d0d0f",
+            color: "#f4f4f5",
+            border: "1px solid rgba(239,68,68,0.35)",
+            fontSize: "13px",
+            borderRadius: "12px",
+            boxShadow: "0 16px 48px rgba(0,0,0,0.65)",
+            maxWidth: "380px",
+            wordBreak: "break-word",
+            whiteSpace: "pre-wrap",
+            padding: "12px 14px",
+          },
+          error: {
+            iconTheme: {
+              primary: "#f87171",
+              secondary: "#0d0d0f",
+            },
+          },
+        }}
+      />
     </div>
   );
 }

@@ -5,7 +5,13 @@ import { CreativeCanvas } from 'design-agent';
 
 import { getUserBalance } from '../muapi';
 
-export default function DesignAgentStudio({ apiKey, isHeaderVisible, onToggleHeader }) {
+export default function DesignAgentStudio({
+  apiKey,
+  isHeaderVisible,
+  onToggleHeader,
+  onGenerationComplete,
+  onGenerationError,
+}) {
   const [userData, setUserData] = useState(null);
 
   useEffect(() => {
@@ -38,6 +44,8 @@ export default function DesignAgentStudio({ apiKey, isHeaderVisible, onToggleHea
         theme="dark"
         onToggleHeader={onToggleHeader}
         isHeaderVisible={isHeaderVisible}
+        onGenerationComplete={onGenerationComplete}
+        onGenerationError={onGenerationError}
       />
     </div>
   );

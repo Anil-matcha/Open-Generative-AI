@@ -691,8 +691,8 @@ export default function LipSyncStudio({
     } catch (e) {
       console.error("[LipSyncStudio]", e);
       const errMsg = formatErrorMessage(e, "Lip sync generation failed");
-      toast.error(errMsg);
-      onGenerationError?.(errMsg);
+      if (onGenerationError) onGenerationError(errMsg);
+      else toast.error(errMsg);
     } finally {
       setIsGenerating(false);
     }

@@ -193,14 +193,15 @@ export default function VibeMotionStudio({ apiKey, onGenerationComplete, onGener
       if (isStaleEdit) {
         console.warn("[VibeMotionStudio] Remix unavailable:", raw.slice(0, 120));
         const msg = "This generation can't be remixed — the animation code wasn't saved server-side. Generate a new motion graphic first, then remix that result.";
-        toast.error(msg);
+        if (onGenerationError) onGenerationError(msg);
+        else toast.error(msg);
         setEditMode(false);
         setEditSourceId(null);
       } else {
         console.error("[VibeMotionStudio]", err);
         const errMsg = formatErrorMessage(raw || err, "Vibe Motion generation failed");
-        toast.error(errMsg);
-        onGenerationError?.(errMsg);
+        if (onGenerationError) onGenerationError(errMsg);
+        else toast.error(errMsg);
       }
     } finally {
       setGenerating(false);

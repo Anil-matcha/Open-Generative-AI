@@ -125,7 +125,13 @@ function WorkflowCard({ workflow, onClick, activeTab, onRename, onDelete }) {
   );
 }
 
-export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggleHeader }) {
+export default function WorkflowStudio({
+  apiKey,
+  isHeaderVisible = true,
+  onToggleHeader,
+  onGenerationComplete,
+  onGenerationError,
+}) {
   const params = useParams();
   const router = useRouter();
   const slug = params?.slug || [];
@@ -414,9 +420,15 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
 
       const data = await executeWorkflow(apiKey, selectedWorkflow.id, inputs);
       setResult(data);
+      onGenerationComplete?.({
+        url: data?.url || data?.output?.url || data?.outputs?.[0]?.url || null,
+        type: "workflow",
+      });
     } catch (err) {
       console.error("Execution failed:", err);
-      setError(err.message || "Execution failed");
+      const message = err.message || "Execution failed";
+      setError(message);
+      onGenerationError?.(message);
     } finally {
       setIsExecuting(false);
     }
@@ -815,6 +827,8 @@ export default function WorkflowStudio({ apiKey, isHeaderVisible = true, onToggl
                     // Inject ID to prevent builder from assuming this is a new unsaved flow
                     workflow_id: selectedWorkflow?.id
                   }}
+                  onGenerationComplete={onGenerationComplete}
+                  onGenerationError={onGenerationError}
                 />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center">
