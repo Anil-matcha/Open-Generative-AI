@@ -10,6 +10,8 @@ const WorkflowUI = ({
   workflowId,
   initialNodeSchemas,
   initialWorkflowData,
+  onGenerationStart,
+  onGenerationEnd,
   onGenerationComplete,
   onGenerationError,
 }) => {
@@ -24,6 +26,8 @@ const WorkflowUI = ({
         initialNodeSchemas={initialNodeSchemas} 
         initialWorkflowData={initialWorkflowData}
         costType="dollars" 
+        onGenerationStart={onGenerationStart}
+        onGenerationEnd={onGenerationEnd}
         onGenerationComplete={onGenerationComplete}
         onGenerationError={onGenerationError}
       />

@@ -9,6 +9,8 @@ export default function DesignAgentStudio({
   apiKey,
   isHeaderVisible,
   onToggleHeader,
+  onGenerationStart,
+  onGenerationEnd,
   onGenerationComplete,
   onGenerationError,
 }) {
@@ -44,6 +46,8 @@ export default function DesignAgentStudio({
         theme="dark"
         onToggleHeader={onToggleHeader}
         isHeaderVisible={isHeaderVisible}
+        onGenerationStart={onGenerationStart}
+        onGenerationEnd={onGenerationEnd}
         onGenerationComplete={onGenerationComplete}
         onGenerationError={onGenerationError}
       />
