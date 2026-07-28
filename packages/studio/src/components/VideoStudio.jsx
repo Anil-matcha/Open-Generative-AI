@@ -384,4 +384,1768 @@ function ModelDropdown({ imageMode, selectedModel, onSelect, onClose }) {
                   <div className="text-xs font-bold text-orange-400/70 px-3 py-2 mt-1 border-t border-white/5">
                     Video Tools
                   </div>
-                  {filteredV2V.map((m) => renderItem(×Ý·âÚ$z{-®éÜj×7ƒÒ#b ¢7“Ò#b ¢#Ò#B ¢7G&ö¶SÒ&7W'&VçD6öÆ÷" ¢7G&ö¶Uv–GFƒÒ#" ¢f–ÆÃÒ'G&ç7&VçB ¢7G&ö¶TF6†'&“×³ƒ‡Ð¢7G&ö¶TF6†öfg6WC×³ƒ‚Òƒƒ‚¢f–FVõ&öw&W72’òÐ¢6Æ74æÖSÒ'FW‡BÕ²3#&C6VUÒG&ç6—F–öâÖÆÂGW&F–öâÓ3 ¢óà¢Â÷7fsà¢Ç7â6Æ74æÖSÒ&'6öÇWFRFW‡BÕ³—…ÒföçBÖ&Æ6²FW‡BÕ²3#&C6VUÒÆVF–ærÖæöæR#ç·f–FVõ&öw&W77ÒSÂ÷7ãà¢ÂöF—cà¢’¢€¢Ç7fp¢v–GFƒÒ#b ¢†V–v‡CÒ#b ¢f–Wt&÷ƒÒ##B#B ¢f–ÆÃÒ&æöæR ¢7G&ö¶SÒ&7W'&VçD6öÆ÷" ¢7G&ö¶Uv–GFƒÒ#"ãR ¢6Æ74æÖSÒ'FW‡B×v†—FRóCw&÷WÖ†÷fW#§FW‡BÕ²3#&C6VUÒG&ç6—F–öâÖ6öÆ÷'2 ¢à¢ÇöÇ–vöâö–çG3Ò##2rb"#2r#2r"f–ÆÃÒ&7W'&VçD6öÆ÷""óà¢Ç&V7BƒÒ#"“Ò#R"v–GFƒÒ#R"†V–v‡CÒ#B"'ƒÒ#""'“Ò#""f–ÆÃÒ&7W'&VçD6öÆ÷""óà¢Â÷7fsà¢—Ð¢Âö'WGFöãà¢ÂöF—cà¢—Ð¢ÂöF—cà ¢²ò¢&ö×BFW‡F&V¢÷Ð¢ÆF—b6Æ74æÖSÒ&fÆW‚ÓfÆW‚fÆW‚Ö6öÂvÓ#à¢Å&ö×EFW‡F&V¢&Vc×·FW‡F&V&VgÐ¢fÇVS×·&ö×GÐ¢öä6†ævS×¶†æFÆU&ö×D–çWGÐ¢Æ6V†öÆFW#×·&ö×EÆ6V†öÆFW'Ð¢F—6&ÆVC×·&ö×DF—6&ÆVGÐ¢óà¢ÂöF—cà¢ÂöF—cà ¢²ò¢W‡FVæB&ææW"¢÷Ð¢¶—4W‡FVæDÖöFRbb€¢ÆF—b6Æ74æÖSÒ&fÆW‚—FV×2Ö6VçFW"vÓ"‚Ó2’ÓãR×‚Ó2&r×&–Ö'’óR&÷&FW"&÷&FW"×&–Ö'’ó&÷VæFVBÖÆrFW‡BÕ³…ÒFW‡B×&–Ö'’óƒföçBÖÖVF—VÒG&6¶–ær×F–v‡B#à¢Ç7fp¢v–GFƒÒ#2 ¢†V–v‡CÒ#2 ¢f–Wt&÷ƒÒ##B#B ¢f–ÆÃÒ&æöæR ¢7G&ö¶SÒ&7W'&VçD6öÆ÷" ¢7G&ö¶Uv–GFƒÒ#"ãR ¢à¢ÇF‚CÒ$ÓR&ƒDÓ"VÃrrÓrr"óà¢Â÷7fsà¢Ç7ãäW‡FVæF–ær&Wf–÷W26VVFæ6R"ãvVæW&F–öãÂ÷7ãà¢ÂöF—cà¢—Ð ¢²ò¢&÷GFöÒ&÷s¢6öçG&öÇ2²vVæW&FR¢÷Ð¢Å&ö×Dfö÷FW#à¢Å&ö×D6öçG&öÇ2&Vc×¶G&÷F÷vå&VgÓà¢²ò¢ÖöFVÂ'Fâ¢÷Ð¢ÆF—b6Æ74æÖSÒ'&VÆF—fR#à¢Æ'WGFöà¢G—SÒ&'WGFöâ ¢öä6Æ–6³×·FövvÆTG&÷F÷vâ‚&ÖöFVÂ"—Ð¢6Æ74æÖS×·&ö×D6öçG&öÄ6Æ74æÖR‡°¢7F—fS¢÷VäG&÷F÷vâÓÓÒ&ÖöFVÂ"À¢Ò—Ð¢à¢ÆF—b6Æ74æÖSÒ'rÓB‚ÓB&÷VæFVB÷fW&fÆ÷rÖ†–FFVâ6‡&–æ²ÓfÆW‚—FV×2Ö6VçFW"§W7F–g’Ö6VçFW"&r×v†—FRóR#à¢²‚‚’Óâ°¢6öç7BÆÄ7W'&VçDÖöFVÇ2Ò²ââçC'dÖöFVÇ2Âââæ“'dÖöFVÇ2Âââçc'dÖöFVÇ5Ó°¢6öç7B6VÆV7FVDÖöFVÄö&¢ÒÆÄ7W'&VçDÖöFVÇ2æf–æB†ÒÓâÒæ–BÓÓÒ6VÆV7FVDÖöFVÂ“°¢6öç7B6VÆV7FVDÖöFVÅ&÷f–FW"Ò6VÆV7FVDÖöFVÄö&£òç&÷f–FW"ÇÂv×V’s°¢&WGW&â$õd”DU%ôÄôtõ5·6VÆV7FVDÖöFVÅ&÷f–FW%Òò€¢Æ–Ör ¢7&3×µ$õd”DU%ôÄôtõ5·6VÆV7FVDÖöFVÅ&÷f–FW%×Ò ¢ÇCÒ"" ¢6Æ74æÖS×¶rÖgVÆÂ‚ÖgVÆÂö&¦V7BÖ6öçF–âG¶–çfW'DÆöv÷2æ–æ6ÇVFW2‡6VÆV7FVDÖöFVÅ&÷f–FW"’ò&–çfW'B"¢"'ÖÒ ¢óà¢’¢€¢Ç7â6Æ74æÖSÒ'FW‡BÕ³—…ÒföçBÖ&öÆBFW‡BÖ&Æ6²WW&66R#åcÂ÷7ãà¢“°¢Ò’‚—Ð¢ÂöF—cà¢Ç7â6Æ74æÖS×µ$ôÕEô4ôåE$ôÅôÄ$TÅô4Ä57Óà¢·6VÆV7FVDÖöFVÄæÖWÐ¢Â÷7ãà¢Å&ö×D6†Wg&öä–6öâóà¢Âö'WGFöãà¢¶÷VäG&÷F÷vâÓÓÒ&ÖöFVÂ"bb€¢Å&ö×E÷÷fW ¢öä6Æ–6³×²†R’ÓâRç7F÷&÷vF–öâ‚—Ð¢6Æ74æÖSÒ'rÕ¶6Æ2ƒgrÓ'&VÒ•ÒÖC§rÕ³Cƒ…ÒÖ‚×rÖÖBÖC¦Ö‚×rÖæöæRÖ‚Ö‚Õ³sf…Ò ¢à¢Å&ö×E÷÷fW$†VFW#äÖöFVÃÂõ&ö×E÷÷fW$†VFW#à¢ÄÖöFVÄG&÷F÷và¢–ÖvTÖöFS×¶–ÖvTÖöFWÐ¢6VÆV7FVDÖöFVÃ×·6VÆV7FVDÖöFVÇÐ¢öå6VÆV7C×¶†æFÆTÖöFVÅ6VÆV7GÐ¢öä6Æ÷6S×²‚’Óâ6WD÷VäG&÷F÷vâ†çVÆÂ—Ð¢óà¢Âõ&ö×E÷÷fW#à¢—Ð¢ÂöF—cà ¢²ò¢7V7B&F–ò'Fâ¢÷Ð¢·6†÷t"bb€¢ÆF—b6Æ74æÖSÒ'&VÆF—fR#à¢Æ'WGFöà¢G—SÒ&'WGFöâ ¢öä6Æ–6³×·FövvÆTG&÷F÷vâ‚&""—Ð¢6Æ74æÖS×·&ö×D6öçG&öÄ6Æ74æÖR‡°¢7F—fS¢÷VäG&÷F÷vâÓÓÒ&""À¢Ò—Ð¢à¢Å&ö×D7V7E&F–ô–6öâóà¢Ç7â6Æ74æÖS×µ$ôÕEô4ôåE$ôÅôÄ$TÅô4Ä57Óà¢·6VÆV7FVD'Ð¢Â÷7ãà¢Âö'WGFöãà¢¶÷VäG&÷F÷vâÓÓÒ&""bb€¢Å&ö×E÷÷fW ¢öä6Æ–6³×²†R’ÓâRç7F÷&÷vF–öâ‚—Ð¢à¢Å&ö×E÷÷fW$†VFW#à¢7V7B&F–ð¢Âõ&ö×E÷÷fW$†VFW#à¢Å&ö×DÖVçTÆ—7Cà¢¶vWD7W'&VçD7V7E&F–÷2‡6VÆV7FVDÖöFVÂ’æÖ‚‡"’Óâ€¢Å&ö×DÖVçT—FVÐ¢¶W“×·'Ð¢6VÆV7FVC×·6VÆV7FVD"ÓÓÒ'Ð¢öä6Æ–6³×²†R’Óâ°¢Rç7F÷&÷vF–öâ‚“°¢6WE6VÆV7FVD"‡"“°¢6WD÷VäG&÷F÷vâ†çVÆÂ“°¢×Ð¢à¢·'Ð¢Âõ&ö×DÖVçT—FVÓà¢’—Ð¢Âõ&ö×DÖVçTÆ—7Cà¢Âõ&ö×E÷÷fW#à¢—Ð¢ÂöF—cà¢—Ð ¢²ò¢VffV7B'Fâ¢÷Ð¢·6†÷tVffV7Bbb€¢ÆF—b6Æ74æÖSÒ'&VÆF—fR#à¢Æ'WGFöà¢G—SÒ&'WGFöâ ¢öä6Æ–6³×·FövvÆTG&÷F÷vâ‚&VffV7B"—Ð¢6Æ74æÖS×·&ö×D6öçG&öÄ6Æ74æÖR‡°¢7F—fS¢÷VäG&÷F÷vâÓÓÒ&VffV7B"À¢Ò—Ð¢à¢Ç7fp¢v–GFƒÒ#b ¢†V–v‡CÒ#b ¢f–Wt&÷ƒÒ##B#B ¢f–ÆÃÒ&æöæR ¢7G&ö¶SÒ&7W'&VçD6öÆ÷" ¢7G&ö¶Uv–GFƒÒ#" ¢6Æ74æÖSÒ&÷6—G’ÓCFW‡B×v†—FR ¢à¢ÇF‚CÒ$ÓR6ÃB’ÓB•c7¢"óà¢Â÷7fsà¢Ç7â6Æ74æÖS×¶Gµ$ôÕEô4ôåE$ôÅôÄ$TÅô4Ä57ÒÖ‚×rÕ³C…ÒG'Væ6FVÓà¢·6VÆV7FVDVffV7BÇÂ$VffV7B'Ð¢Â÷7ãà¢Âö'WGFöãà¢¶÷VäG&÷F÷vâÓÓÒ&VffV7B"bb€¢Å&ö×E÷÷fW ¢öä6Æ–6³×²†R’ÓâRç7F÷&÷vF–öâ‚—Ð¢6Æ74æÖSÒ&Ö–â×rÕ³#…Ò ¢à¢Å&ö×E÷÷fW$†VFW#à¢VffV7BG—P¢Âõ&ö×E÷÷fW$†VFW#à¢Å&ö×DÖVçTÆ—7Cà¢¶vWDVffV7G4f÷$“%dÖöFVÂ‡6VÆV7FVDÖöFVÂ’æÖ‚†Vfb’Óâ€¢Å&ö×DÖVçT—FVÐ¢¶W“×¶VfgÐ¢6VÆV7FVC×·6VÆV7FVDVffV7BÓÓÒVfgÐ¢öä6Æ–6³×²†R’Óâ°¢Rç7F÷&÷vF–öâ‚“°¢6WE6VÆV7FVDVffV7B†Vfb“°¢6WD÷VäG&÷F÷vâ†çVÆÂ“°¢×Ð¢à¢¶VfgÐ¢Âõ&ö×DÖVçT—FVÓà¢’—Ð¢Âõ&ö×DÖVçTÆ—7Cà¢Âõ&ö×E÷÷fW#à¢—Ð¢ÂöF—cà¢—Ð ¢²ò¢GW&F–öâ'Fâ¢÷Ð¢·6†÷tGW&F–öâbb€¢ÆF—b6Æ74æÖSÒ'&VÆF—fR#à¢Æ'WGFöà¢G—SÒ&'WGFöâ ¢öä6Æ–6³×·FövvÆTG&÷F÷vâ‚&GW&F–öâ"—Ð¢6Æ74æÖS×·&ö×D6öçG&öÄ6Æ74æÖR‡°¢7F—fS¢÷VäG&÷F÷vâÓÓÒ&GW&F–öâ"À¢Ò—Ð¢à¢Å&ö×DGW&F–öä–6öâóà¢Ç7â6Æ74æÖS×µ$ôÕEô4ôåE$ôÅôÄ$TÅô4Ä57Óà¢·6VÆV7FVDGW&F–öç×0¢Â÷7ãà¢Âö'WGFöãà¢¶÷VäG&÷F÷vâÓÓÒ&GW&F–öâ"bb€¢Å&ö×E÷÷fW ¢öä6Æ–6³×²†R’ÓâRç7F÷&÷vF–öâ‚—Ð¢à¢Å&ö×E÷÷fW$†VFW#à¢GW&F–öà¢Âõ&ö×E÷÷fW$†VFW#à¢Å&ö×DÖVçTÆ—7Cà¢¶vWD7W'&VçDGW&F–öç2‡6VÆV7FVDÖöFVÂ’æÖ‚†B’Óâ€¢Å&ö×DÖVçT—FVÐ¢¶W“×¶GÐ¢6VÆV7FVC×·6VÆV7FVDGW&F–öâÓÓÒGÐ¢öä6Æ–6³×²†R’Óâ°¢Rç7F÷&÷vF–öâ‚“°¢6WE6VÆV7FVDGW&F–öâ†B“°¢6WD÷VäG&÷F÷vâ†çVÆÂ“°¢×Ð¢à¢¶G×0¢Âõ&ö×DÖVçT—FVÓà¢’—Ð¢Âõ&ö×DÖVçTÆ—7Cà¢Âõ&ö×E÷÷fW#à¢—Ð¢ÂöF—cà¢—Ð ¢²ò¢&W6öÇWF–öâ'Fâ¢÷Ð¢·6†÷u&W6öÇWF–öâbb€¢ÆF—b6Æ74æÖSÒ'&VÆF—fR#à¢Æ'WGFöà¢G—SÒ&'WGFöâ ¢öä6Æ–6³×·FövvÆTG&÷F÷vâ‚'&W6öÇWF–öâ"—Ð¢6Æ74æÖS×·&ö×D6öçG&öÄ6Æ74æÖR‡°¢7F—fS¢÷VäG&÷F÷vâÓÓÒ'&W6öÇWF–öâ"À¢Ò—Ð¢à¢Å&ö×EVÆ—G”–6öâóà¢Ç7â6Æ74æÖS×µ$ôÕEô4ôåE$ôÅôÄ$TÅô4Ä57Óà¢·6VÆV7FVE&W6öÇWF–öâÇÂ#s#'Ð¢Â÷7ãà¢Âö'WGFöãà¢¶÷VäG&÷F÷vâÓÓÒ'&W6öÇWF–öâ"bb€¢Å&ö×E÷÷fW ¢öä6Æ–6³×²†R’ÓâRç7F÷&÷vF–öâ‚—Ð¢à¢Å&ö×E÷÷fW$†VFW#à¢&W6öÇWF–öà¢Âõ&ö×E÷÷fW$†VFW#à¢Å&ö×DÖVçTÆ—7Cà¢¶vWD7W'&VçE&W6öÇWF–öç2‡6VÆV7FVDÖöFVÂ’æÖ‚‡"’Óâ€¢Å&ö×DÖVçT—FVÐ¢¶W“×·'Ð¢6VÆV7FVC×·6VÆV7FVE&W6öÇWF–öâÓÓÒ'Ð¢öä6Æ–6³×²†R’Óâ°¢Rç7F÷&÷vF–öâ‚“°¢6WE6VÆV7FVE&W6öÇWF–öâ‡"“°¢6WD÷VäG&÷F÷vâ†çVÆÂ“°¢×Ð¢à¢·'Ð¢Âõ&ö×DÖVçT—FVÓà¢’—Ð¢Âõ&ö×DÖVçTÆ—7Cà¢Âõ&ö×E÷÷fW#à¢—Ð¢ÂöF—cà¢—Ð ¢¶6åWÆöD–ÖvU&VfW&Væ6Rbb€¢Æ'WGFöà¢G—SÒ&'WGFöâ ¢6Æ74æÖS×·&ö×D6öçG&öÄ6Æ74æÖR‚—Ð¢öä6Æ–6³×²‚’Óâ6WD—4G&tÖöFÄ÷Vâ‡G'VR—Ð¢à¢Ç7fp¢v–GFƒÒ#b ¢†V–v‡CÒ#b ¢f–Wt&÷ƒÒ##B#B ¢f–ÆÃÒ&æöæR ¢7G&ö¶SÒ&7W'&VçD6öÆ÷" ¢7G&ö¶Uv–GFƒÒ#"ãR ¢6Æ74æÖSÒ&÷6—G’ÓCFW‡B×v†—FRw&÷WÖ†÷fW#§FW‡BÕ²3#&C6VUÒG&ç6—F–öâÖ6öÆ÷'2 ¢à¢ÇF‚CÒ$Ó"#ƒ’"óà¢ÇF‚CÒ$ÓbãR2ãV"ã#"ã#24Ãr–ÂÓBÓDÃbãR2ãW¢"óà¢Â÷7fsà¢Ç7â6Æ74æÖS×µ$ôÕEô4ôåE$ôÅôÄ$TÅô4Ä57ÓäG&sÂ÷7ãà¢Âö'WGFöãà¢—Ð¢Âõ&ö×D6öçG&öÇ3à ¢²ò¢vVæW&FR'WGFöâ¢÷Ð¢Å&ö×D7F–öà¢öä6Æ–6³×¶†æFÆTvVæW&FWÐ¢F—6&ÆVC×¶vVæW&F–æwÐ¢à¢¶vVæW&F–ærò€¢Ãà¢Ç7â6Æ74æÖSÒ&æ–ÖFR×7–â–æÆ–æRÖ&Æö6²FW‡BÖ&Æ6²#à¢)xÀ¢Â÷7ãç²"'Ð¢vVæW&F–ærââà¢Âóà¢’¢€¢Ãà¢Ç7ãävVæW&FSÂ÷7ãà¢Âóà¢—Ð¢Âõ&ö×D7F–öãà¢Âõ&ö×Dfö÷FW#à¢Âõ&ö×D6ö×÷6W#à ¢²ò¢)H)HeTÄÅ45$TTâd”DTòÔôDÂ)H)H¢÷Ð¢¶gVÆÇ67&VVåW&Âbb€¢ÆF—b ¢6Æ74æÖSÒ&f—†VB–ç6WBÓ¢Õ³ÒfÆW‚—FV×2Ö6VçFW"§W7F–g’Ö6VçFW"&rÖ&Æ6²ó“R&6¶G&÷Ö&ÇW"×6Òæ–ÖFRÖfFRÖ–â ¢öä6Æ–6³×²‚’Óâ6WDgVÆÇ67&VVåW&Â†çVÆÂ—Ð¢à¢Æ'WGFöà¢G—SÒ&'WGFöâ ¢6Æ74æÖSÒ&'6öÇWFRF÷Ób&–v‡BÓbÓ2&r×v†—FRó†÷fW#¦&r×v†—FRó#&÷VæFVBÖgVÆÂFW‡B×v†—FRG&ç6—F–öâÖ6öÆ÷'2&÷&FW"&÷&FW"×v†—FRó ¢öä6Æ–6³×²†R’Óâ°¢Rç7F÷&÷vF–öâ‚“°¢6WDgVÆÇ67&VVåW&Â†çVÆÂ“°¢×Ð¢à¢Ç7frv–GFƒÒ##B"†V–v‡CÒ##B"f–Wt&÷ƒÒ##B#B"f–ÆÃÒ&æöæR"7G&ö¶SÒ&7W'&VçD6öÆ÷""7G&ö¶Uv–GFƒÒ#"ãR"7G&ö¶TÆ–æV6Ò'&÷VæB"7G&ö¶TÆ–æV¦ö–ãÒ'&÷VæB#à¢ÆÆ–æRƒÒ#‚"“Ò#b"ƒ#Ò#b"“#Ò#‚"óà¢ÆÆ–æRƒÒ#b"“Ò#b"ƒ#Ò#‚"“#Ò#‚"óà¢Â÷7fsà¢Âö'WGFöãà¢Çf–FVò ¢7&3×¶gVÆÇ67&VVåW&ÇÒ ¢6öçG&öÇ2 ¢WFõÆ’ ¢Æö÷ ¢6Æ74æÖSÒ&Ö‚×rÕ³“WguÒÖ‚Ö‚Õ³“Wf…Ò&÷VæFVBÓ'†Â6†F÷rÓ'†Âö&¦V7BÖ6öçF–âæ–ÖFR×66ÆR×W" ¢öä6Æ–6³×²†R’ÓâRç7F÷&÷vF–öâ‚—Ð¢óà¢ÂöF—cà¢—Ð ¢ÄG&tÖöFÀ¢—4÷Vã×¶—4G&tÖöFÄ÷VçÐ¢öä6Æ÷6S×²‚’Óâ6WD—4G&tÖöFÄ÷Vâ†fÇ6R—Ð¢”¶W“×¶”¶W—Ð¢&F6…6—¦S×³Ð¢öäFD†—7F÷'”—FVÓ×¶†æFÆTG&u&VfW&Væ6WÐ¢óà¢ÅFö7FW"÷6—F–öãÒ'F÷×&–v‡B"6öçF–æW%7G–ÆS×·²¤–æFWƒ¢““““’×ÒFö7D÷F–öç3×·²GW&F–öã¢SÂ7G–ÆS¢²&6¶w&÷VæC¢r3ƒƒ"rÂ6öÆ÷#¢r6fffffbrÂ&÷&FW#¢s‚6öÆ–B&v&ƒ#SRÃ#SRÃ#SRÃãR’rÂföçE6—¦S¢s7‚rÂ&÷&FW%&F—W3¢s'‚rÂ&÷…6†F÷s¢s‚3‚&v&ƒÃÃÃãb’rÂÖ…v–GFƒ¢sCC‚rÂv÷&D'&V³¢v'&V²×v÷&BrÂv†—FU76S¢w&R×w&rÂFF–æs¢s'‚g‚rÒ×Òóà¢ÂöF—cà¢“°§Ð
+                  {filteredV2V.map((m) => renderItem(m, true))}
+                </>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// â”€â”€ Control button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+// â”€â”€ Dropdown panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Rendered inside a `relative` wrapper div; floats above the anchor button.
+
+// â”€â”€ Main component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+export default function VideoStudio({
+  apiKey,
+  onGenerationStart,
+  onGenerationEnd,
+  onGenerationComplete,
+  onGenerationError,
+  historyItems,
+  droppedFiles,
+  onFilesHandled,
+}) {
+  const LEGACY_PERSIST_KEY = "hg_video_studio_persistent";
+  const PERSIST_KEY = scopedPersistKey(LEGACY_PERSIST_KEY, apiKey);
+  useEffect(() => {
+    migrateLegacyPersistKey(LEGACY_PERSIST_KEY, PERSIST_KEY);
+  }, [PERSIST_KEY]);
+
+  // â”€â”€ mode state â”€â”€
+  const [imageMode, setImageMode] = useState(false); // i2v
+  const [v2vMode, setV2vMode] = useState(false);
+
+  // â”€â”€ model / params â”€â”€
+  const defaultModel = t2vModels[0];
+  const [selectedModel, setSelectedModel] = useState(defaultModel.id);
+  const [selectedModelName, setSelectedModelName] = useState(defaultModel.name);
+  const [selectedAr, setSelectedAr] = useState(
+    defaultModel.inputs?.aspect_ratio?.default || "16:9",
+  );
+  const [selectedDuration, setSelectedDuration] = useState(
+    defaultModel.inputs?.duration?.default || 5,
+  );
+  const [selectedResolution, setSelectedResolution] = useState(
+    defaultModel.inputs?.resolution?.default || "",
+  );
+  const [selectedQuality, setSelectedQuality] = useState(
+    defaultModel.inputs?.quality?.default || "",
+  );
+  const [selectedMode, setSelectedMode] = useState("");
+  const [selectedEffect, setSelectedEffect] = useState("");
+
+  // â”€â”€ upload progress â”€â”€
+  const [imageProgress, setImageProgress] = useState(0);
+  const [videoProgress, setVideoProgress] = useState(0);
+
+  // â”€â”€ control visibility â”€â”€
+  const [showAr, setShowAr] = useState(true);
+  const [showDuration, setShowDuration] = useState(true);
+  const [showResolution, setShowResolution] = useState(false);
+  const [showQuality, setShowQuality] = useState(false);
+  const [showMode, setShowMode] = useState(false);
+  const [showEffect, setShowEffect] = useState(false);
+
+  // â”€â”€ uploads â”€â”€
+  const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
+  const [uploadedImageUrls, setUploadedImageUrls] = useState([]);
+  const [imageUploading, setImageUploading] = useState(false);
+  const [uploadedEndImageUrl, setUploadedEndImageUrl] = useState(null);
+  const [endImageUploading, setEndImageUploading] = useState(false);
+  const [endImageProgress, setEndImageProgress] = useState(0);
+  const [uploadedVideoUrl, setUploadedVideoUrl] = useState(null);
+  const [videoUploading, setVideoUploading] = useState(false);
+  const [uploadedVideoName, setUploadedVideoName] = useState(null);
+
+  // â”€â”€ generation / canvas â”€â”€
+  const [generating, setGenerating] = useState(false);
+  const [generateError, setGenerateError] = useState(null);
+  const [fullscreenUrl, setFullscreenUrl] = useState(null);
+  const [canvasUrl, setCanvasUrl] = useState(null);
+  const [canvasModel, setCanvasModel] = useState(null);
+  const [showCanvas, setShowCanvas] = useState(false);
+  const [isDrawModalOpen, setIsDrawModalOpen] = useState(false);
+  const [lastGenerationId, setLastGenerationId] = useState(null);
+  const [lastGenerationModel, setLastGenerationModel] = useState(null);
+
+  // â”€â”€ history â”€â”€
+  const [localHistory, setLocalHistory] = useState([]);
+  const [activeHistoryIdx, setActiveHistoryIdx] = useState(0);
+
+  // â”€â”€ dropdown â”€â”€
+  const [openDropdown, setOpenDropdown] = useState(null); // 'model'|'ar'|'duration'|'resolution'|'quality'|'mode'|null
+
+  // â”€â”€ prompt â”€â”€
+  const [prompt, setPrompt] = useState("");
+  const [promptDisabled, setPromptDisabled] = useState(false);
+
+  // â”€â”€ refs â”€â”€
+  const containerRef = useRef(null);
+  const textareaRef = useRef(null);
+  const dropdownRef = useRef(null);
+  const imageFileInputRef = useRef(null);
+  const endImageFileInputRef = useRef(null);
+  const videoFileInputRef = useRef(null);
+  const resultVideoRef = useRef(null);
+  const hasRestored = useRef(false);
+
+  // â”€â”€ derived data â”€â”€
+  const history = historyItems ?? localHistory;
+
+  const getCurrentModels = useCallback(() => {
+    if (v2vMode) return v2vModels;
+    return imageMode ? i2vModels : t2vModels;
+  }, [imageMode, v2vMode]);
+
+  const getCurrentAspectRatios = useCallback(
+    (id) =>
+      imageMode
+        ? getAspectRatiosForI2VModel(id)
+        : getAspectRatiosForVideoModel(id),
+    [imageMode],
+  );
+
+  const getCurrentDurations = useCallback(
+    (id) =>
+      imageMode ? getDurationsForI2VModel(id) : getDurationsForModel(id),
+    [imageMode],
+  );
+
+  const getCurrentResolutions = useCallback(
+    (id) =>
+      imageMode
+        ? getResolutionsForI2VModel(id)
+        : getResolutionsForVideoModel(id),
+    [imageMode],
+  );
+
+  const getCurrentModel = useCallback(
+    () => getCurrentModels().find((m) => m.id === selectedModel),
+    [getCurrentModels, selectedModel],
+  );
+
+  const isMotionControlSelection = useCallback(
+    (modelId, isV2v) => {
+      if (!isV2v) return false;
+      const m = v2vModels.find((x) => x.id === modelId);
+      return !!m?.imageField;
+    },
+    [],
+  );
+
+  // â”€â”€ update controls when model/mode changes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  const applyControlsForModel = useCallback(
+    (modelId, isImageMode, isV2vMode) => {
+      if (isV2vMode) {
+        setShowAr(false);
+        setShowDuration(false);
+        setShowResolution(false);
+        setShowQuality(false);
+        setShowMode(false);
+        setShowEffect(false);
+        return;
+      }
+
+      const modelList = isImageMode ? i2vModels : t2vModels;
+      const model = modelList.find((m) => m.id === modelId);
+
+      const ars = isImageMode
+        ? getAspectRatiosForI2VModel(modelId)
+        : getAspectRatiosForVideoModel(modelId);
+      if (ars.length > 0) {
+        setSelectedAr(ars[0]);
+        setShowAr(true);
+      } else {
+        setShowAr(false);
+      }
+
+      const durations = isImageMode
+        ? getDurationsForI2VModel(modelId)
+        : getDurationsForModel(modelId);
+      if (durations.length > 0) {
+        setSelectedDuration(durations[0]);
+        setShowDuration(true);
+      } else {
+        setShowDuration(false);
+      }
+
+      const resolutions = isImageMode
+        ? getResolutionsForI2VModel(modelId)
+        : getResolutionsForVideoModel(modelId);
+      if (resolutions.length > 0) {
+        setSelectedResolution(resolutions[0]);
+        setShowResolution(true);
+      } else {
+        setShowResolution(false);
+      }
+
+      const qualities = getQualitiesForModel(modelList, modelId);
+      if (qualities.length > 0) {
+        setSelectedQuality(model?.inputs?.quality?.default || qualities[0]);
+        setShowQuality(true);
+      } else {
+        setSelectedQuality("");
+        setShowQuality(false);
+      }
+
+      const modes = getModesForModel(modelId);
+      if (modes.length > 0) {
+        setSelectedMode(model?.inputs?.mode?.default || modes[0]);
+        setShowMode(true);
+      } else {
+        setSelectedMode("");
+        setShowMode(false);
+      }
+
+      const effects = isImageMode ? getEffectsForI2VModel(modelId) : [];
+      if (effects.length > 0) {
+        setSelectedEffect(getDefaultEffectForI2VModel(modelId) || effects[0]);
+        setShowEffect(true);
+      } else {
+        setSelectedEffect("");
+        setShowEffect(false);
+      }
+    },
+    [],
+  );
+
+  // â”€â”€ Persistence: Load â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(PERSIST_KEY);
+      if (stored) {
+        const data = JSON.parse(stored);
+        if (data.imageMode !== undefined) setImageMode(data.imageMode);
+        if (data.v2vMode !== undefined) setV2vMode(data.v2vMode);
+        if (data.selectedModel) setSelectedModel(data.selectedModel);
+        if (data.selectedModelName) setSelectedModelName(data.selectedModelName);
+        if (data.selectedAr) setSelectedAr(data.selectedAr);
+        if (data.selectedDuration) setSelectedDuration(data.selectedDuration);
+        if (data.selectedResolution) setSelectedResolution(data.selectedResolution);
+        if (data.selectedQuality) setSelectedQuality(data.selectedQuality);
+        if (data.selectedMode) setSelectedMode(data.selectedMode);
+        if (data.selectedEffect) setSelectedEffect(data.selectedEffect);
+        if (data.uploadedImageUrl) setUploadedImageUrl(data.uploadedImageUrl);
+        if (data.uploadedImageUrls) {
+          setUploadedImageUrls(data.uploadedImageUrls);
+        } else if (data.uploadedImageUrl) {
+          setUploadedImageUrls([data.uploadedImageUrl]);
+        }
+        if (data.uploadedVideoUrl) setUploadedVideoUrl(data.uploadedVideoUrl);
+        if (data.uploadedVideoName) setUploadedVideoName(data.uploadedVideoName);
+        if (data.prompt) setPrompt(data.prompt);
+        if (data.localHistory) setLocalHistory(data.localHistory);
+
+        // Update control visibility based on restored model/mode
+        applyControlsForModel(
+          data.selectedModel || defaultModel.id,
+          !!data.imageMode,
+          !!data.v2vMode
+        );
+      }
+    } catch (err) {
+      console.warn("Failed to load VideoStudio persistence:", err);
+    } finally {
+      hasRestored.current = true;
+    }
+  }, [applyControlsForModel, defaultModel.id]);
+
+  // â”€â”€ Persistence: Save â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      try {
+        const state = {
+          imageMode,
+          v2vMode,
+          selectedModel,
+          selectedModelName,
+          selectedAr,
+          selectedDuration,
+          selectedResolution,
+          selectedQuality,
+          selectedMode,
+          selectedEffect,
+          uploadedImageUrl,
+          uploadedImageUrls,
+          uploadedVideoUrl,
+          uploadedVideoName,
+          prompt,
+          localHistory,
+        };
+        localStorage.setItem(PERSIST_KEY, JSON.stringify(state));
+      } catch (err) {
+        console.warn("Failed to save VideoStudio persistence:", err);
+      }
+    }, 500); // 500ms debounce
+    return () => clearTimeout(timer);
+  }, [
+    imageMode,
+    v2vMode,
+    selectedModel,
+    selectedModelName,
+    selectedAr,
+    selectedDuration,
+    selectedResolution,
+    selectedQuality,
+    selectedMode,
+    selectedEffect,
+    uploadedImageUrl,
+    uploadedImageUrls,
+    uploadedVideoUrl,
+    uploadedVideoName,
+    prompt,
+    localHistory,
+  ]);
+
+  // â”€â”€ Derived UI values â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+  const applyImageReferenceUrl = useCallback(
+    (url) => {
+      if (!url) return;
+
+      setUploadedImageUrl(url);
+
+      // Motion-control models use the image alongside the uploaded video.
+      if (isMotionControlSelection(selectedModel, v2vMode)) {
+        setUploadedImageUrls([url]);
+        setPromptDisabled(false);
+        return;
+      }
+
+      const currentT2V = t2vModels.find((model) => model.id === selectedModel);
+
+      // Models with native image inputs stay in their current mode.
+      if (currentT2V?.inputs?.images_list) {
+        const maxImages = currentT2V.inputs.images_list.maxItems || 8;
+        setUploadedImageUrls((previousUrls) => {
+          if (previousUrls.includes(url)) return previousUrls;
+          return [...previousUrls, url].slice(0, maxImages);
+        });
+        setPromptDisabled(false);
+        return;
+      }
+
+      setUploadedVideoUrl(null);
+      setUploadedVideoName(null);
+      setV2vMode(false);
+
+      const sibling = currentT2V?.family
+        ? i2vModels.find((model) => model.family === currentT2V.family)
+        : null;
+      const targetModel = imageMode
+        ? i2vModels.find((model) => model.id === selectedModel)
+        : sibling || i2vModels[0];
+
+      if (!targetModel) return;
+
+      if (!imageMode) {
+        setImageMode(true);
+        setSelectedModel(targetModel.id);
+        setSelectedModelName(targetModel.name);
+        applyControlsForModel(targetModel.id, true, false);
+      }
+
+      const maxImages = getMaxImagesForI2VModel(targetModel.id);
+      if (maxImages > 2) {
+        setUploadedImageUrls((previousUrls) => {
+          if (previousUrls.includes(url)) return previousUrls;
+          return [...previousUrls, url].slice(0, maxImages);
+        });
+      } else {
+        setUploadedImageUrls([url]);
+      }
+      setPromptDisabled(false);
+    },
+    [
+      applyControlsForModel,
+      imageMode,
+      isMotionControlSelection,
+      selectedModel,
+      v2vMode,
+    ],
+  );
+
+  const handleDrawReference = useCallback(
+    (entry) => {
+      applyImageReferenceUrl(entry?.url);
+    },
+    [applyImageReferenceUrl],
+  );
+
+  const uploadImageReference = useCallback(
+    async (file) => {
+      if (file.size > 10 * 1024 * 1024) {
+        alert("Image exceeds 10MB limit.");
+        return;
+      }
+
+      setImageUploading(true);
+      setImageProgress(0);
+      try {
+        const url = await uploadFile(apiKey, file, setImageProgress);
+        applyImageReferenceUrl(url);
+      } catch (err) {
+        console.error("[VideoStudio] Image upload failed:", err);
+        alert(`Image upload failed: ${err.message}`);
+      } finally {
+        setImageUploading(false);
+        setImageProgress(0);
+      }
+    },
+    [apiKey, applyImageReferenceUrl],
+  );
+
+  const processDroppedVideo = useCallback(
+    async (file) => {
+      if (file.size > 50 * 1024 * 1024) {
+        alert("Video exceeds 50MB limit.");
+        return;
+      }
+      setVideoUploading(true);
+      setVideoProgress(0);
+      try {
+        const url = await uploadFile(apiKey, file, setVideoProgress);
+        setUploadedVideoUrl(url);
+        setUploadedVideoName(file.name);
+        if (imageMode) {
+          setUploadedImageUrl(null);
+          setImageMode(false);
+        }
+        setV2vMode(true);
+        const firstV2V = v2vModels[0];
+        setSelectedModel(firstV2V.id);
+        setSelectedModelName(firstV2V.name);
+        applyControlsForModel(firstV2V.id, false, true);
+        setPrompt("");
+        setPromptDisabled(true);
+      } catch (err) {
+        alert(`Video upload failed: ${err.message}`);
+      } finally {
+        setVideoUploading(false);
+        setVideoProgress(0);
+      }
+    },
+    [apiKey, applyControlsForModel, imageMode],
+  );
+
+  // â”€â”€ Handle Dropped Files â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  useEffect(() => {
+    if (droppedFiles && droppedFiles.length > 0) {
+      const imageFiles = droppedFiles.filter(f => f.type.startsWith('image/'));
+      const videoFiles = droppedFiles.filter(f => f.type.startsWith('video/'));
+      
+      if (videoFiles.length > 0) {
+        processDroppedVideo(videoFiles[0]);
+      } else if (imageFiles.length > 0) {
+        uploadImageReference(imageFiles[0]);
+      }
+      onFilesHandled?.();
+    }
+  }, [droppedFiles, onFilesHandled, processDroppedVideo, uploadImageReference]);
+
+  // Initialise controls for default model on mount
+  useEffect(() => {
+    if (hasRestored.current) return;
+    applyControlsForModel(defaultModel.id, false, false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // â”€â”€ close dropdown on outside click â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  useEffect(() => {
+    if (!openDropdown) return;
+    const handler = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setOpenDropdown(null);
+      }
+    };
+    window.addEventListener("click", handler);
+    return () => window.removeEventListener("click", handler);
+  }, [openDropdown]);
+
+  const handlePromptInput = (e) => {
+    setPrompt(e.target.value);
+  };
+
+  // â”€â”€ image upload â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  const handleImageFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      await uploadImageReference(file);
+    } finally {
+      if (imageFileInputRef.current) imageFileInputRef.current.value = "";
+    }
+  };
+
+  const clearImageUpload = () => {
+    setUploadedImageUrl(null);
+    setUploadedImageUrls([]);
+    setUploadedEndImageUrl(null);
+    // Motion-control v2v or model with inputs.images_list: keep model, just drop the image
+    if (isMotionControlSelection(selectedModel, v2vMode)) return;
+    const currentT2V = t2vModels.find((m) => m.id === selectedModel);
+    if (currentT2V?.inputs?.images_list) return;
+    setImageMode(false);
+    const first = t2vModels[0];
+    setSelectedModel(first.id);
+    setSelectedModelName(first.name);
+    applyControlsForModel(first.id, false, false);
+    setPromptDisabled(false);
+  };
+
+  const removeImageAtIndex = (idx) => {
+    const nextUrls = uploadedImageUrls.filter((_, i) => i !== idx);
+    setUploadedImageUrls(nextUrls);
+    if (nextUrls.length === 0) {
+      setUploadedImageUrl(null);
+      // Reset to text-to-video if empty list
+      if (isMotionControlSelection(selectedModel, v2vMode)) return;
+      setImageMode(false);
+      const first = t2vModels[0];
+      setSelectedModel(first.id);
+      setSelectedModelName(first.name);
+      applyControlsForModel(first.id, false, false);
+      setPromptDisabled(false);
+    } else {
+      setUploadedImageUrl(nextUrls[0]);
+    }
+  };
+
+  // â”€â”€ end-frame upload (FLF i2v models) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  const handleEndImageFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      alert("Image exceeds 10MB limit.");
+      return;
+    }
+    setEndImageUploading(true);
+    setEndImageProgress(0);
+    try {
+      const url = await uploadFile(apiKey, file, (pct) => {
+        setEndImageProgress(pct);
+      });
+      setUploadedEndImageUrl(url);
+    } catch (err) {
+      alert(`End frame upload failed: ${err.message}`);
+    } finally {
+      setEndImageUploading(false);
+      setEndImageProgress(0);
+      if (endImageFileInputRef.current) endImageFileInputRef.current.value = "";
+    }
+  };
+
+  const clearEndImage = () => setUploadedEndImageUrl(null);
+
+  // â”€â”€ video upload â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  const handleVideoFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 50 * 1024 * 1024) {
+      alert("Video exceeds 50MB limit.");
+      return;
+    }
+    setVideoUploading(true);
+    setVideoProgress(0);
+    try {
+      const url = await uploadFile(apiKey, file, (pct) => {
+        setVideoProgress(pct);
+      });
+      setUploadedVideoUrl(url);
+      setUploadedVideoName(file.name);
+
+      if (isMotionControlSelection(selectedModel, v2vMode)) {
+        // Already in motion-control mode â€” keep model and image, allow prompt
+        setPromptDisabled(false);
+      } else {
+        // Model-native video reference (e.g. Seedance 2.0 Extend with inputs.video_files):
+        // keep the current model & mode; just store the video URL as a reference
+        const currentT2VOrExtend = t2vModels.find((m) => m.id === selectedModel);
+        if (currentT2VOrExtend?.inputs?.video_files) {
+          setPromptDisabled(false);
+        } else {
+          // Default v2v flow (e.g. watermark remover) â€” auto-pick the first v2v model
+          if (imageMode) {
+            setUploadedImageUrl(null);
+            setImageMode(false);
+          }
+          setV2vMode(true);
+          const firstV2V = v2vModels[0];
+          setSelectedModel(firstV2V.id);
+          setSelectedModelName(firstV2V.name);
+          applyControlsForModel(firstV2V.id, false, true);
+          setPrompt("");
+          setPromptDisabled(true);
+        }
+      }
+    } catch (err) {
+      console.error("[VideoStudio] Video upload failed:", err);
+      alert(`Video upload failed: ${err.message}`);
+    } finally {
+      setVideoUploading(false);
+      setVideoProgress(0);
+      if (videoFileInputRef.current) videoFileInputRef.current.value = "";
+    }
+  };
+
+  const clearVideoUpload = () => {
+    setUploadedVideoUrl(null);
+    setUploadedVideoName(null);
+    setV2vMode(false);
+    const first = t2vModels[0];
+    setSelectedModel(first.id);
+    setSelectedModelName(first.name);
+    applyControlsForModel(first.id, false, false);
+    setPromptDisabled(false);
+  };
+
+  // â”€â”€ model selection from dropdown â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  const handleModelSelect = useCallback(
+    (m, isV2V) => {
+      if (isV2V) {
+        setV2vMode(true);
+        setImageMode(false);
+        const isMC = !!m.imageField;
+        if (!isMC) {
+          // Single-input v2v (watermark remover etc.) â€” drop any image
+          setUploadedImageUrl(null);
+        }
+        setSelectedModel(m.id);
+        setSelectedModelName(m.name);
+        applyControlsForModel(m.id, false, true);
+        if (isMC) {
+          // Motion-control: prompt is editable, video+image are needed
+          setPromptDisabled(false);
+        } else {
+          setPrompt("");
+          setPromptDisabled(true);
+        }
+      } else {
+        if (v2vMode) {
+          setV2vMode(false);
+          setUploadedVideoUrl(null);
+          setUploadedVideoName(null);
+          setPromptDisabled(false);
+        }
+        setSelectedModel(m.id);
+        setSelectedModelName(m.name);
+        applyControlsForModel(m.id, imageMode, false);
+      }
+    },
+    [v2vMode, imageMode, applyControlsForModel],
+  );
+
+  // â”€â”€ add to local history â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  const addToLocalHistory = useCallback((entry) => {
+    setLocalHistory((prev) => [entry, ...prev].slice(0, 30));
+    setActiveHistoryIdx(0);
+  }, []);
+
+  // â”€â”€ show result in canvas â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  const showVideoInCanvas = useCallback((url, model) => {
+    setCanvasUrl(url);
+    setCanvasModel(model);
+    setShowCanvas(true);
+  }, []);
+
+  // â”€â”€ generate â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  const handleGenerate = useCallback(async () => {
+    const currentModel = getCurrentModel();
+    const isExtendMode = currentModel?.requiresRequestId;
+    const trimmedPrompt = prompt.trim();
+
+    if (v2vMode) {
+      if (!uploadedVideoUrl) {
+        alert("Please upload a video first.");
+        return;
+      }
+      if (currentModel?.imageField && !uploadedImageUrl) {
+        alert("Please upload a reference image for motion control.");
+        return;
+      }
+      if (currentModel?.promptRequired && !trimmedPrompt) {
+        alert("Please describe the motion you want.");
+        return;
+      }
+    } else if (isExtendMode) {
+      if (!lastGenerationId) {
+        alert(
+          "No Seedance 2.0 generation found to extend. Generate a video first.",
+        );
+        return;
+      }
+    } else if (imageMode) {
+      const maxImgs = getMaxImagesForI2VModel(selectedModel);
+      if (maxImgs > 2) {
+        if (uploadedImageUrls.length === 0) {
+          alert("Please upload at least one reference image first.");
+          return;
+        }
+      } else {
+        if (!uploadedImageUrl) {
+          alert("Please upload a start frame image first.");
+          return;
+        }
+      }
+    } else {
+      if (!trimmedPrompt) {
+        alert("Please enter a prompt to generate a video.");
+        return;
+      }
+    }
+
+    onGenerationStart?.();
+    setGenerating(true);
+    setGenerateError(null);
+
+    let hadError = false;
+
+    try {
+      let res;
+
+      if (v2vMode) {
+        // V2V: dedicated processV2V handles single-input tools (e.g. watermark
+        // remover) and motion-control models (which take video + image + prompt)
+        const v2vParams = {
+          model: selectedModel,
+          video_url: uploadedVideoUrl,
+        };
+        if (currentModel?.imageField && uploadedImageUrl) {
+          v2vParams.image_url = uploadedImageUrl;
+        }
+        if (currentModel?.hasPrompt && trimmedPrompt) {
+          v2vParams.prompt = trimmedPrompt;
+        }
+        res = await processV2V(apiKey, v2vParams);
+        if (!res?.url) throw new Error("No video URL returned by API");
+
+        const genId = res.id || Date.now().toString();
+        setLastGenerationId(null);
+        setLastGenerationModel(null);
+        const entry = {
+          id: genId,
+          url: res.url,
+          prompt: currentModel?.hasPrompt ? trimmedPrompt : "",
+          model: selectedModel,
+          timestamp: new Date().toISOString(),
+        };
+        addToLocalHistory(entry);
+        showVideoInCanvas(res.url, selectedModel);
+        if (onGenerationComplete)
+          onGenerationComplete({
+            url: res.url,
+            model: selectedModel,
+            prompt: currentModel?.hasPrompt ? trimmedPrompt : "",
+            type: "video",
+          });
+      } else if (imageMode) {
+        const maxImgs = getMaxImagesForI2VModel(selectedModel);
+        const i2vParams = { model: selectedModel };
+        if (maxImgs > 2) {
+          i2vParams.images_list = uploadedImageUrls;
+        } else {
+          i2vParams.image_url = uploadedImageUrl;
+        }
+        if (trimmedPrompt) i2vParams.prompt = trimmedPrompt;
+        i2vParams.aspect_ratio = selectedAr;
+        const i2vModel = i2vModels.find((m) => m.id === selectedModel);
+        if (uploadedEndImageUrl && i2vModel?.lastImageField) {
+          i2vParams.last_image = uploadedEndImageUrl;
+        }
+        const durations = getDurationsForI2VModel(selectedModel);
+        if (durations.length > 0) i2vParams.duration = selectedDuration;
+        const resolutions = getResolutionsForI2VModel(selectedModel);
+        if (resolutions.length > 0) i2vParams.resolution = selectedResolution;
+        if (selectedQuality) i2vParams.quality = selectedQuality;
+        if (selectedMode) i2vParams.mode = selectedMode;
+        if (showEffect && selectedEffect) i2vParams.name = selectedEffect;
+
+        res = await generateI2V(apiKey, i2vParams);
+        if (!res?.url) throw new Error("No video URL returned by API");
+
+        const genId = res.id || Date.now().toString();
+        if (selectedModel === "seedance-v2.0-i2v") {
+          setLastGenerationId(genId);
+          setLastGenerationModel(selectedModel);
+        } else {
+          setLastGenerationId(null);
+          setLastGenerationModel(null);
+        }
+        const entry = {
+          id: genId,
+          url: res.url,
+          prompt: trimmedPrompt,
+          model: selectedModel,
+          aspect_ratio: selectedAr,
+          duration: selectedDuration,
+          timestamp: new Date().toISOString(),
+        };
+        addToLocalHistory(entry);
+        showVideoInCanvas(res.url, selectedModel);
+        if (onGenerationComplete)
+          onGenerationComplete({
+            url: res.url,
+            model: selectedModel,
+            prompt: trimmedPrompt,
+            type: "video",
+          });
+      } else {
+        // T2V (including extend mode)
+        const params = { model: selectedModel };
+        if (trimmedPrompt) params.prompt = trimmedPrompt;
+
+        if (isExtendMode) {
+          params.request_id = lastGenerationId;
+          // Optional reference media for Seedance 2.0 Extend:
+          // images map to @image2â€¦@image9 and videos map to @video1â€¦@video3 in the prompt
+          if (uploadedImageUrls.length > 0) {
+            params.images_list = uploadedImageUrls;
+          }
+          if (uploadedVideoUrl) {
+            params.videos_list = [uploadedVideoUrl];
+          }
+        } else {
+          params.aspect_ratio = selectedAr;
+        }
+
+        const durations = getDurationsForModel(selectedModel);
+        if (durations.length > 0) params.duration = selectedDuration;
+        const resolutions = getResolutionsForVideoModel(selectedModel);
+        if (resolutions.length > 0) params.resolution = selectedResolution;
+        if (selectedQuality) params.quality = selectedQuality;
+        if (selectedMode) params.mode = selectedMode;
+
+        res = await generateVideo(apiKey, params);
+        if (!res?.url) throw new Error("No video URL returned by API");
+
+        const genId = res.id || Date.now().toString();
+        if (
+          selectedModel === "seedance-v2.0-t2v" ||
+          selectedModel === "seedance-v2.0-i2v"
+        ) {
+          setLastGenerationId(genId);
+          setLastGenerationModel(selectedModel);
+        } else {
+          setLastGenerationId(null);
+          setLastGenerationModel(null);
+        }
+        const entry = {
+          id: genId,
+          url: res.url,
+          prompt: trimmedPrompt,
+          model: selectedModel,
+          aspect_ratio: selectedAr,
+          duration: selectedDuration,
+          timestamp: new Date().toISOString(),
+        };
+        addToLocalHistory(entry);
+        showVideoInCanvas(res.url, selectedModel);
+        if (onGenerationComplete)
+          onGenerationComplete({
+            url: res.url,
+            model: selectedModel,
+            prompt: trimmedPrompt,
+            type: "video",
+          });
+      }
+    } catch (e) {
+      hadError = true;
+      console.error("[VideoStudio]", e);
+      const errMsg = formatErrorMessage(e, "Video generation failed");
+      if (onGenerationError) onGenerationError(errMsg);
+      else toast.error(errMsg);
+    } finally {
+      setGenerating(false);
+      onGenerationEnd?.();
+    }
+  }, [
+    apiKey,
+    prompt,
+    v2vMode,
+    imageMode,
+    selectedModel,
+    selectedAr,
+    selectedDuration,
+    selectedResolution,
+    selectedQuality,
+    selectedMode,
+    selectedEffect,
+    showEffect,
+    uploadedImageUrl,
+    uploadedImageUrls,
+    uploadedVideoUrl,
+    lastGenerationId,
+    getCurrentModel,
+    addToLocalHistory,
+    showVideoInCanvas,
+    onGenerationComplete,
+    onGenerationEnd,
+    onGenerationError,
+    onGenerationStart,
+  ]);
+
+  // â”€â”€ reset to prompt bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  const resetToPromptBar = useCallback(() => {
+    setShowCanvas(false);
+  }, []);
+
+  const handleNewPrompt = useCallback(() => {
+    resetToPromptBar();
+    setPrompt("");
+    setUploadedImageUrl(null);
+    setUploadedImageUrls([]);
+    setImageMode(false);
+    setUploadedVideoUrl(null);
+    setUploadedVideoName(null);
+    setV2vMode(false);
+    const first = t2vModels[0];
+    setSelectedModel(first.id);
+    setSelectedModelName(first.name);
+    applyControlsForModel(first.id, false, false);
+    setPromptDisabled(false);
+    setTimeout(() => textareaRef.current?.focus(), 50);
+  }, [resetToPromptBar, applyControlsForModel]);
+
+  const handleExtend = useCallback(() => {
+    if (!lastGenerationId) return;
+    resetToPromptBar();
+    setPrompt("");
+    setUploadedImageUrl(null);
+    setUploadedImageUrls([]);
+    setImageMode(false);
+    setSelectedModel("seedance-v2.0-extend");
+    setSelectedModelName("Seedance 2.0 Extend");
+    applyControlsForModel("seedance-v2.0-extend", false, false);
+    setPromptDisabled(false);
+    setTimeout(() => textareaRef.current?.focus(), 50);
+  }, [lastGenerationId, resetToPromptBar, applyControlsForModel]);
+
+  // â”€â”€ derived UI values â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  const isSeedance2Canvas =
+    canvasModel === "seedance-v2.0-t2v" || canvasModel === "seedance-v2.0-i2v";
+  const currentModelObj = getCurrentModel();
+  const isExtendMode = currentModelObj?.requiresRequestId;
+  const canUploadImageReference =
+    (!v2vMode || isMotionControlSelection(selectedModel, v2vMode)) &&
+    (!isExtendMode || currentModelObj?.inputs?.images_list);
+
+  const promptPlaceholder = v2vMode
+    ? currentModelObj?.imageField
+      ? currentModelObj?.promptRequired
+        ? "Describe the motion"
+        : "Describe the motion (optional)"
+      : "Video ready â€” click Generate to remove watermark"
+    : imageMode
+      ? "Describe the motion or effect (optional)"
+      : isExtendMode
+        ? "Optional: describe how to continue the video..."
+        : "Describe the video you want to create";
+
+  const toggleDropdown = (type) => (e) => {
+    e.stopPropagation();
+    setOpenDropdown((prev) => (prev === type ? null : type));
+  };
+
+  // â”€â”€ render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  return (
+    <div
+      ref={containerRef}
+      className="w-full h-full flex flex-col items-center justify-center bg-app-bg relative overflow-hidden"
+    >
+      {/* â”€â”€ CENTRAL GALLERY AREA â”€â”€ */}
+      <div className="flex-1 w-full max-w-7xl mx-auto overflow-y-auto custom-scrollbar pb-40 lg:pb-32 px-2">
+        {history.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full pt-4 animate-fade-in-up">
+            {history.map((entry, idx) => {
+              const isSeedance2 = entry.model === "seedance-v2.0-t2v" || entry.model === "seedance-v2.0-i2v";
+              return (
+                <div
+                  key={entry.id || idx}
+                  className="relative group rounded-lg overflow-hidden border border-white/10 bg-[#0a0a0a] shadow-xl hover:border-primary/50 transition-all duration-300 flex flex-col"
+                >
+                  <video
+                    src={entry.url}
+                    className="w-full aspect-video object-cover bg-black/40 cursor-pointer hover:opacity-80 transition-opacity"
+                    onClick={() => setFullscreenUrl(entry.url)}
+                    controls={false}
+                    loop
+                    muted
+                    playsInline
+                    onMouseOver={(e) => e.target.play()}
+                    onMouseOut={(e) => {
+                      e.target.pause();
+                      e.target.currentTime = 0;
+                    }}
+                  />
+                  
+                  {/* Overlay actions */}
+                  <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      type="button"
+                      title="Fullscreen"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setFullscreenUrl(entry.url);
+                      }}
+                      className="p-2 bg-black/60 backdrop-blur-md rounded-full text-white hover:bg-primary hover:text-black transition-all border border-white/10"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <polyline points="15 3 21 3 21 9" />
+                        <polyline points="9 21 3 21 3 15" />
+                        <line x1="21" y1="3" x2="14" y2="10" />
+                        <line x1="3" y1="21" x2="10" y2="14" />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      title="Download"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        downloadFile(entry.url, `video-${entry.id || idx}.mp4`);
+                      }}
+                      className="p-2 bg-black/60 backdrop-blur-md rounded-full text-white hover:bg-primary hover:text-black transition-all border border-white/10"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" />
+                      </svg>
+                    </button>
+                    {isSeedance2 && (
+                      <button
+                        type="button"
+                        title="Extend this video using Seedance 2.0 Extend"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setLastGenerationId(entry.id);
+                          handleExtend();
+                        }}
+                        className="p-2 bg-black/60 backdrop-blur-md rounded-full text-white hover:bg-primary hover:text-black transition-all border border-white/10"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      title="Delete"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (confirm("Are you sure you want to delete this generated item?")) {
+                          setLocalHistory(prev => prev.filter((_, i) => i !== idx));
+                        }
+                      }}
+                      className="p-2 bg-black/60 backdrop-blur-md rounded-full text-red-400 hover:bg-red-500 hover:text-white transition-all border border-white/10"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                        <line x1="10" y1="11" x2="10" y2="17" />
+                        <line x1="14" y1="11" x2="14" y2="17" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* Prompt & Details */}
+                  <div className="p-3 bg-black/80 backdrop-blur-sm border-t border-white/5 flex-1 flex flex-col justify-between gap-2">
+                    <p className="text-white/70 text-xs line-clamp-3 leading-relaxed" title={entry.prompt}>
+                      {entry.prompt || "No prompt provided"}
+                    </p>
+                    <div className="flex items-center justify-between mt-1 flex-wrap gap-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-bold text-primary px-2 py-0.5 bg-primary/10 rounded border border-primary/20 whitespace-nowrap capitalize">
+                          {entry.model?.replace("-", " ") || "Video Studio"}
+                        </span>
+                        <div className="flex gap-2">
+                          {entry.resolution && (
+                            <span className="text-[10px] text-white/40">{entry.resolution}</span>
+                          )}
+                          {entry.duration && (
+                            <span className="text-[10px] text-white/40">{entry.duration}s</span>
+                          )}
+                        </div>
+                      </div>
+                      {entry.prompt && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigator.clipboard.writeText(entry.prompt);
+                            const btn = e.currentTarget;
+                            btn.innerText = "Copied!";
+                            setTimeout(() => { btn.innerText = "Copy"; }, 2000);
+                          }}
+                          className="px-2 py-0.5 bg-white/5 hover:bg-primary/20 hover:text-primary rounded text-[10px] font-medium text-white/70 transition-all border border-white/10"
+                          title="Copy prompt"
+                        >
+                          Copy Prompt
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full animate-fade-in-up transition-all duration-700 min-h-[50vh]">
+            {/* Overlapping floating cards */}
+            <div className="flex items-center justify-center gap-1.5 md:gap-3 mb-10 select-none scale-90 sm:scale-100">
+              <div className="w-18 h-22 sm:w-24 sm:h-28 rounded-2xl border border-white/10 shadow-2xl -rotate-[12deg] transform hover:rotate-0 hover:scale-110 hover:z-20 transition-all duration-300 overflow-hidden bg-white/[0.01] flex-shrink-0">
+                <img
+                  src="https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/sdxl-image.avif"
+                  alt="Creative asset 1"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="w-18 h-22 sm:w-24 sm:h-28 rounded-2xl border border-white/10 shadow-2xl -rotate-[4deg] transform hover:rotate-0 hover:scale-110 hover:z-20 transition-all duration-300 overflow-hidden bg-white/[0.01] -ml-3 sm:-ml-4 flex-shrink-0">
+                <img
+                  src="https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/chroma-image.avif"
+                  alt="Creative asset 2"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="w-18 h-18 sm:w-24 sm:h-24 rounded-full border border-white/10 shadow-2xl rotate-[6deg] transform hover:rotate-0 hover:scale-110 hover:z-20 transition-all duration-300 overflow-hidden bg-white/[0.01] -ml-3 sm:-ml-4 flex-shrink-0">
+                <img
+                  src="https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/neta-lumina.avif"
+                  alt="Creative asset 3"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="w-18 h-22 sm:w-24 sm:h-28 rounded-2xl border border-white/10 shadow-2xl rotate-[12deg] transform hover:rotate-0 hover:scale-110 hover:z-20 transition-all duration-300 overflow-hidden bg-white/[0.01] -ml-3 sm:-ml-4 flex-shrink-0">
+                <img
+                  src="https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/perfect-pony-xl.avif"
+                  alt="Creative asset 4"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+
+            <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-center px-4 flex flex-col items-center">
+              <span className="text-white font-black uppercase text-xl sm:text-3xl tracking-wide mb-1 opacity-90">START CREATING WITH</span>
+              <span className="text-[#22d3ee] font-black uppercase text-2xl sm:text-4xl sm:mt-1 tracking-tight">
+                {selectedModelName}
+              </span>
+            </h1>
+            <p className="text-white/40 text-xs sm:text-sm font-medium tracking-wide text-center max-w-lg leading-relaxed px-4">
+              Animate images into stunning AI videos with motion effects
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* â”€â”€ BOTTOM PROMPT BAR â”€â”€ */}
+      <PromptComposer>
+          <div className="flex flex-col gap-3">
+            {/* Inline list of uploaded media files */}
+            <div className="flex items-center gap-2.5 flex-wrap">
+              {/* Main image preview */}
+              {uploadedImageUrl && (
+                <div className={PROMPT_MEDIA_PREVIEW_CLASS}>
+                  <img src={uploadedImageUrl} alt="" className="w-full h-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={clearImageUpload}
+                    className="absolute top-0.5 right-0.5 w-4 h-4 bg-black/60 hover:bg-black rounded-full flex items-center justify-center text-white/85 hover:text-white text-[8px] border border-white/5"
+                  >
+                    Ã—
+                  </button>
+                </div>
+              )}
+
+              {/* End frame image preview */}
+              {uploadedEndImageUrl && (
+                <div className={PROMPT_MEDIA_PREVIEW_CLASS}>
+                  <img src={uploadedEndImageUrl} alt="" className="w-full h-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={clearEndImage}
+                    className="absolute top-0.5 right-0.5 w-4 h-4 bg-black/60 hover:bg-black rounded-full flex items-center justify-center text-white/85 hover:text-white text-[8px] border border-white/5"
+                  >
+                    Ã—
+                  </button>
+                  <span className="absolute bottom-0.5 left-0.5 px-1 h-3.5 bg-black/60 rounded-md text-[7px] font-black text-[#22d3ee] leading-none flex items-center justify-center pointer-events-none">
+                    END
+                  </span>
+                </div>
+              )}
+
+              {/* Video preview */}
+              {uploadedVideoUrl && (
+                <div className={PROMPT_MEDIA_PREVIEW_CLASS}>
+                  <video src={uploadedVideoUrl} className="w-full h-full object-cover" muted />
+                  <button
+                    type="button"
+                    onClick={clearVideoUpload}
+                    className="absolute top-0.5 right-0.5 w-4 h-4 bg-black/60 hover:bg-black rounded-full flex items-center justify-center text-white/85 hover:text-white text-[8px] border border-white/5"
+                  >
+                    Ã—
+                  </button>
+                </div>
+              )}
+
+              {/* Multiple images layout if supported */}
+              {imageMode && getMaxImagesForI2VModel(selectedModel) > 2 && (
+                <>
+                  {uploadedImageUrls.map((url, idx) => (
+                    <div key={url} className={PROMPT_MEDIA_PREVIEW_CLASS}>
+                      <img src={url} alt="" className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => removeImageAtIndex(idx)}
+                        className="absolute top-0.5 right-0.5 w-4 h-4 bg-black/60 hover:bg-black rounded-full flex items-center justify-center text-white/85 hover:text-white text-[8px] border border-white/5"
+                      >
+                        Ã—
+                      </button>
+                      <span className="absolute bottom-0.5 right-0.5 px-1 h-3.5 bg-black/60 rounded-full text-[8px] font-black text-[#22d3ee] leading-none flex items-center justify-center pointer-events-none">
+                        {idx + 1}
+                      </span>
+                    </div>
+                  ))}
+                </>
+              )}
+
+              {/* Upload trigger buttons */}
+              {/* Image upload button â€” shown when the model accepts image input:
+                  â€¢ T2V mode: uploading an image auto-switches to the sibling I2V model
+                  â€¢ I2V mode: uploading the start-frame (multi-image logic applies)
+                  â€¢ V2V motion-control: reference image is required alongside the video
+                  â€¢ T2V with inputs.images_list: optional reference images (e.g. Seedance 2.0 Extend)
+                  â€¢ Hidden in regular V2V mode (watermark remover etc. needs no image)
+                  â€¢ Hidden for extend-type models without inputs.images_list */}
+              {canUploadImageReference && (
+                getMaxImagesForI2VModel(selectedModel) > 2 ? (
+                  uploadedImageUrls.length < getMaxImagesForI2VModel(selectedModel) && (
+                    <div className="relative">
+                      <input
+                        ref={imageFileInputRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleImageFileChange}
+                      />
+                      <button
+                        type="button"
+                        title="Upload reference image"
+                        onClick={() => imageFileInputRef.current?.click()}
+                        className={promptMediaButtonClassName()}
+                      >
+                        {imageUploading ? (
+                          <div className="flex flex-col items-center justify-center w-full h-full absolute inset-0 bg-black/80 z-20 backdrop-blur-[2px]">
+                            <svg className="w-8 h-8 -rotate-90">
+                              <circle cx="16" cy="16" r="14" stroke="currentColor" strokeWidth="2" fill="transparent" className="text-white/10" />
+                              <circle
+                                cx="16"
+                                cy="16"
+                                r="14"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                fill="transparent"
+                                strokeDasharray={88}
+                                strokeDashoffset={88 - (88 * imageProgress) / 100}
+                                className="text-[#22d3ee] transition-all duration-300"
+                              />
+                            </svg>
+                            <span className="absolute text-[9px] font-black text-[#22d3ee] leading-none">{imageProgress}%</span>
+                          </div>
+                        ) : (
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-white/40 group-hover:text-[#22d3ee] transition-colors">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
+                  )
+                ) : (
+                  !uploadedImageUrl && (
+                    <div className="relative">
+                      <input
+                        ref={imageFileInputRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleImageFileChange}
+                      />
+                      <button
+                        type="button"
+                        title="Upload reference image"
+                        onClick={() => imageFileInputRef.current?.click()}
+                        className={promptMediaButtonClassName()}
+                      >
+                        {imageUploading ? (
+                          <div className="flex flex-col items-center justify-center w-full h-full absolute inset-0 bg-black/80 z-20 backdrop-blur-[2px]">
+                            <svg className="w-8 h-8 -rotate-90">
+                              <circle cx="16" cy="16" r="14" stroke="currentColor" strokeWidth="2" fill="transparent" className="text-white/10" />
+                              <circle
+                                cx="16"
+                                cy="16"
+                                r="14"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                fill="transparent"
+                                strokeDasharray={88}
+                                strokeDashoffset={88 - (88 * imageProgress) / 100}
+                                className="text-[#22d3ee] transition-all duration-300"
+                              />
+                            </svg>
+                            <span className="absolute text-[9px] font-black text-[#22d3ee] leading-none">{imageProgress}%</span>
+                          </div>
+                        ) : (
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-white/40 group-hover:text-[#22d3ee] transition-colors">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
+                  )
+                )
+              )}
+
+              {/* End frame image button */}
+              {imageMode && i2vModels.find((m) => m.id === selectedModel)?.lastImageField && !uploadedEndImageUrl && (
+                <div className="relative">
+                  <input
+                    ref={endImageFileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleEndImageFileChange}
+                  />
+                  <button
+                    type="button"
+                    title="Upload end frame (optional)"
+                    onClick={() => endImageFileInputRef.current?.click()}
+                    className={promptMediaButtonClassName()}
+                  >
+                    {endImageUploading ? (
+                      <div className="flex flex-col items-center justify-center w-full h-full absolute inset-0 bg-black/80 z-20 backdrop-blur-[2px]">
+                        <svg className="w-8 h-8 -rotate-90">
+                          <circle cx="16" cy="16" r="14" stroke="currentColor" strokeWidth="2" fill="transparent" className="text-white/10" />
+                          <circle
+                            cx="16"
+                            cy="16"
+                            r="14"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            fill="transparent"
+                            strokeDasharray={88}
+                            strokeDashoffset={88 - (88 * endImageProgress) / 100}
+                            className="text-[#22d3ee] transition-all duration-300"
+                          />
+                        </svg>
+                        <span className="absolute text-[9px] font-black text-[#22d3ee] leading-none">{endImageProgress}%</span>
+                      </div>
+                    ) : (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-white/40 group-hover:text-[#22d3ee] transition-colors">
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
+              )}
+
+              {/* Video upload button â€” shown when a V2V model is active, OR when
+                  the current model has inputs.video_files (e.g. Seedance 2.0 Extend). */}
+              {!uploadedVideoUrl && (v2vMode || currentModelObj?.inputs?.video_files) && (
+                <div className="relative">
+                  <input
+                    ref={videoFileInputRef}
+                    type="file"
+                    accept="video/*"
+                    className="hidden"
+                    onChange={handleVideoFileChange}
+                  />
+                  <button
+                    type="button"
+                    title="Upload video to remove watermark"
+                    onClick={() => videoFileInputRef.current?.click()}
+                    className={promptMediaButtonClassName()}
+                  >
+                    {videoUploading ? (
+                      <div className="flex flex-col items-center justify-center w-full h-full absolute inset-0 bg-black/80 z-20 backdrop-blur-[2px]">
+                        <svg className="w-8 h-8 -rotate-90">
+                          <circle cx="16" cy="16" r="14" stroke="currentColor" strokeWidth="2" fill="transparent" className="text-white/10" />
+                          <circle
+                            cx="16"
+                            cy="16"
+                            r="14"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            fill="transparent"
+                            strokeDasharray={88}
+                            strokeDashoffset={88 - (88 * videoProgress) / 100}
+                            className="text-[#22d3ee] transition-all duration-300"
+                          />
+                        </svg>
+                        <span className="absolute text-[9px] font-black text-[#22d3ee] leading-none">{videoProgress}%</span>
+                      </div>
+                    ) : (
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        className="text-white/40 group-hover:text-[#22d3ee] transition-colors"
+                      >
+                        <polygon points="23 7 16 12 23 17 23 7" fill="currentColor" />
+                        <rect x="1" y="5" width="15" height="14" rx="2" ry="2" fill="currentColor" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Prompt textarea */}
+            <div className="flex-1 flex flex-col gap-1">
+              <PromptTextarea
+                ref={textareaRef}
+                value={prompt}
+                onChange={handlePromptInput}
+                placeholder={promptPlaceholder}
+                disabled={promptDisabled}
+              />
+            </div>
+          </div>
+
+          {/* Extend banner */}
+          {isExtendMode && (
+            <div className="flex items-center gap-2 px-3 py-1.5 mx-3 bg-primary/5 border border-primary/10 rounded-lg text-[10px] text-primary/80 font-medium tracking-tight">
+              <svg
+                width="13"
+                height="13"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+              <span>Extending previous Seedance 2.0 generation</span>
+            </div>
+          )}
+
+          {/* Bottom row: controls + generate */}
+          <PromptFooter>
+            <PromptControls ref={dropdownRef}>
+              {/* Model btn */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={toggleDropdown("model")}
+                  className={promptControlClassName({
+                    active: openDropdown === "model",
+                  })}
+                >
+                  <div className="w-4 h-4 rounded overflow-hidden shrink-0 flex items-center justify-center bg-white/5">
+                    {(() => {
+                      const allCurrentModels = [...t2vModels, ...i2vModels, ...v2vModels];
+                      const selectedModelObj = allCurrentModels.find(m => m.id === selectedModel);
+                      const selectedModelProvider = selectedModelObj?.provider || 'muapi';
+                      return PROVIDER_LOGOS[selectedModelProvider] ? (
+                        <img 
+                          src={PROVIDER_LOGOS[selectedModelProvider]} 
+                          alt="" 
+                          className={`w-full h-full object-contain ${invertLogos.includes(selectedModelProvider) ? "invert" : ""}`} 
+                        />
+                      ) : (
+                        <span className="text-[9px] font-bold text-black uppercase">V</span>
+                      );
+                    })()}
+                  </div>
+                <span className={PROMPT_CONTROL_LABEL_CLASS}>
+                    {selectedModelName}
+                  </span>
+                  <PromptChevronIcon />
+                </button>
+                {openDropdown === "model" && (
+                  <PromptPopover
+                    onClick={(e) => e.stopPropagation()}
+                    className="w-[calc(100vw-2rem)] md:w-[480px] max-w-md md:max-w-none max-h-[70vh]"
+                  >
+                    <PromptPopoverHeader>Model</PromptPopoverHeader>
+                    <ModelDropdown
+                      imageMode={imageMode}
+                      selectedModel={selectedModel}
+                      onSelect={handleModelSelect}
+                      onClose={() => setOpenDropdown(null)}
+                    />
+                  </PromptPopover>
+                )}
+              </div>
+
+              {/* Aspect ratio btn */}
+              {showAr && (
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={toggleDropdown("ar")}
+                    className={promptControlClassName({
+                      active: openDropdown === "ar",
+                    })}
+                  >
+                    <PromptAspectRatioIcon />
+                    <span className={PROMPT_CONTROL_LABEL_CLASS}>
+                      {selectedAr}
+                    </span>
+                  </button>
+                  {openDropdown === "ar" && (
+                    <PromptPopover
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <PromptPopoverHeader>
+                        Aspect Ratio
+                      </PromptPopoverHeader>
+                      <PromptMenuList>
+                        {getCurrentAspectRatios(selectedModel).map((r) => (
+                          <PromptMenuItem
+                            key={r}
+                            selected={selectedAr === r}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedAr(r);
+                              setOpenDropdown(null);
+                            }}
+                          >
+                            {r}
+                          </PromptMenuItem>
+                        ))}
+                      </PromptMenuList>
+                    </PromptPopover>
+                  )}
+                </div>
+              )}
+
+              {/* Effect btn */}
+              {showEffect && (
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={toggleDropdown("effect")}
+                    className={promptControlClassName({
+                      active: openDropdown === "effect",
+                    })}
+                  >
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      className="opacity-40 text-white"
+                    >
+                      <path d="M5 3l14 9-14 9V3z" />
+                    </svg>
+                    <span className={`${PROMPT_CONTROL_LABEL_CLASS} max-w-[140px] truncate`}>
+                      {selectedEffect || "Effect"}
+                    </span>
+                  </button>
+                  {openDropdown === "effect" && (
+                    <PromptPopover
+                      onClick={(e) => e.stopPropagation()}
+                      className="min-w-[200px]"
+                    >
+                      <PromptPopoverHeader>
+                        Effect Type
+                      </PromptPopoverHeader>
+                      <PromptMenuList>
+                        {getEffectsForI2VModel(selectedModel).map((eff) => (
+                          <PromptMenuItem
+                            key={eff}
+                            selected={selectedEffect === eff}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedEffect(eff);
+                              setOpenDropdown(null);
+                            }}
+                          >
+                            {eff}
+                          </PromptMenuItem>
+                        ))}
+                      </PromptMenuList>
+                    </PromptPopover>
+                  )}
+                </div>
+              )}
+
+              {/* Duration btn */}
+              {showDuration && (
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={toggleDropdown("duration")}
+                    className={promptControlClassName({
+                      active: openDropdown === "duration",
+                    })}
+                  >
+                    <PromptDurationIcon />
+                    <span className={PROMPT_CONTROL_LABEL_CLASS}>
+                      {selectedDuration}s
+                    </span>
+                  </button>
+                  {openDropdown === "duration" && (
+                    <PromptPopover
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <PromptPopoverHeader>
+                        Duration
+                      </PromptPopoverHeader>
+                      <PromptMenuList>
+                        {getCurrentDurations(selectedModel).map((d) => (
+                          <PromptMenuItem
+                            key={d}
+                            selected={selectedDuration === d}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedDuration(d);
+                              setOpenDropdown(null);
+                            }}
+                          >
+                            {d}s
+                          </PromptMenuItem>
+                        ))}
+                      </PromptMenuList>
+                    </PromptPopover>
+                  )}
+                </div>
+              )}
+
+              {/* Resolution btn */}
+              {showResolution && (
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={toggleDropdown("resolution")}
+                    className={promptControlClassName({
+                      active: openDropdown === "resolution",
+                    })}
+                  >
+                    <PromptQualityIcon />
+                    <span className={PROMPT_CONTROL_LABEL_CLASS}>
+                      {selectedResolution || "720p"}
+                    </span>
+                  </button>
+                  {openDropdown === "resolution" && (
+                    <PromptPopover
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <PromptPopoverHeader>
+                        Resolution
+                      </PromptPopoverHeader>
+                      <PromptMenuList>
+                        {getCurrentResolutions(selectedModel).map((r) => (
+                          <PromptMenuItem
+                            key={r}
+                            selected={selectedResolution === r}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedResolution(r);
+                              setOpenDropdown(null);
+                            }}
+                          >
+                            {r}
+                          </PromptMenuItem>
+                        ))}
+                      </PromptMenuList>
+                    </PromptPopover>
+                  )}
+                </div>
+              )}
+
+              {canUploadImageReference && (
+                <button
+                  type="button"
+                  className={promptControlClassName()}
+                  onClick={() => setIsDrawModalOpen(true)}
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    className="opacity-40 text-white group-hover:text-[#22d3ee] transition-colors"
+                  >
+                    <path d="M12 20h9" />
+                    <path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
+                  </svg>
+                  <span className={PROMPT_CONTROL_LABEL_CLASS}>Draw</span>
+                </button>
+              )}
+            </PromptControls>
+
+            {/* Generate button */}
+            <PromptAction
+              onClick={handleGenerate}
+              disabled={generating}
+            >
+              {generating ? (
+                <>
+                  <span className="animate-spin inline-block text-black">
+                    â—Œ
+                  </span>{" "}
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <span>Generate</span>
+                </>
+              )}
+            </PromptAction>
+          </PromptFooter>
+      </PromptComposer>
+
+      {/* â”€â”€ FULLSCREEN VIDEO MODAL â”€â”€ */}
+      {fullscreenUrl && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-sm animate-fade-in"
+          onClick={() => setFullscreenUrl(null)}
+        >
+          <button
+            type="button"
+            className="absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors border border-white/10"
+            onClick={(e) => {
+              e.stopPropagation();
+              setFullscreenUrl(null);
+            }}
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+          <video 
+            src={fullscreenUrl} 
+            controls 
+            autoPlay 
+            loop 
+            className="max-w-[95vw] max-h-[95vh] rounded-2xl shadow-2xl object-contain animate-scale-up" 
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
+
+      <DrawModal
+        isOpen={isDrawModalOpen}
+        onClose={() => setIsDrawModalOpen(false)}
+        apiKey={apiKey}
+        batchSize={1}
+        onAddHistoryItem={handleDrawReference}
+      />
+      <Toaster position="top-right" containerStyle={{ zIndex: 99999 }} toastOptions={{ duration: 5000, style: { background: '#18181b', color: '#ffffff', border: '1px solid rgba(255,255,255,0.15)', fontSize: '13px', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.6)', maxWidth: '440px', wordBreak: 'break-word', whiteSpace: 'pre-wrap', padding: '12px 16px' } }} />
+    </div>
+  );
+}

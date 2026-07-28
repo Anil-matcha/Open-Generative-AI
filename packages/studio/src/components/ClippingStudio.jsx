@@ -413,4 +413,734 @@ export default function ClippingStudio({
     setVideoUploading(true);
     setVideoProgress(0);
     try {
-      const url = await uploadFile(apiKey, file, (pct) =ë:¶‰žËkºwµçAè´ÄÀˆø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€ÑåÁ”ô‰‰ÕÑÑ½¸ˆ(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€Ñ¥Ñ±”ô‰Õ±±ÍÉ••¸ˆ(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€½¹±¥¬õì¡”¤€ôøì(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€”¹ÍÑ½ÁAÉ½Á……Ñ¥½¸ ¤ì(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€Í•ÑÕ±±ÍÉ••¹UÉ°¡±¥ÁUÉ°¤ì(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€õô(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰À´È‰œµ‰±…¬¼ØÀ‰…­‘É½Àµ‰±ÕÈµµÉ½Õ¹‘•µ™Õ±°Ñ•áÐµÝ¡¥Ñ”¡½Ù•Èé‰œµÁÉ¥µ…Éä¡½Ù•ÈéÑ•áÐµ‰±…¬ÑÉ…¹Í¥Ñ¥½¸µ…±°‰½É‘•È‰½É‘•ÈµÝ¡¥Ñ”¼ÄÀˆ(€€€€€€€€€€€€€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€ñÍÙœÝ¥‘Ñ ôˆÄÐˆ¡•¥¡ÐôˆÄÐˆÙ¥•Ý	½àôˆÀ€À€ÈÐ€ÈÐˆ™¥±°ô‰¹½¹”ˆÍÑÉ½­”ô‰ÕÉÉ•¹Ñ½±½ÈˆÍÑÉ½­•]¥‘Ñ ôˆÈ¸Ôˆø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€ñÁ½±å±¥¹”Á½¥¹ÑÌôˆÄÔ€Ì€ÈÄ€Ì€ÈÄ€äˆ€¼ø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€ñÁ½±å±¥¹”Á½¥¹ÑÌôˆä€ÈÄ€Ì€ÈÄ€Ì€ÄÔˆ€¼ø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€ñ±¥¹”àÄôˆÈÄˆäÄôˆÌˆàÈôˆÄÐˆäÈôˆÄÀˆ€¼ø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€ñ±¥¹”àÄôˆÌˆäÄôˆÈÄˆàÈôˆÄÀˆäÈôˆÄÐˆ€¼ø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€ð½ÍÙœø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€ð½‰ÕÑÑ½¸ø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€ÑåÁ”ô‰‰ÕÑÑ½¸ˆ(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€Ñ¥Ñ±”ô‰½Áä1¥¹¬ˆ(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€½¹±¥¬õì¡”¤€ôøì(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€”¹ÍÑ½ÁAÉ½Á……Ñ¥½¸ ¤ì(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€½ÁåQ½±¥Á‰½…É¡±¥ÁUÉ°¤ì(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€õô(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰À´È‰œµ‰±…¬¼ØÀ‰…­‘É½Àµ‰±ÕÈµµÉ½Õ¹‘•µ™Õ±°Ñ•áÐµÝ¡¥Ñ”¡½Ù•Èé‰œµÁÉ¥µ…Éä¡½Ù•ÈéÑ•áÐµ‰±…¬ÑÉ…¹Í¥Ñ¥½¸µ…±°‰½É‘•È‰½É‘•ÈµÝ¡¥Ñ”¼ÄÀˆ(€€€€€€€€€€€€€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€ñ½Áå%½¸€¼ø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€ð½‰ÕÑÑ½¸ø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€ÑåÁ”ô‰‰ÕÑÑ½¸ˆ(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€Ñ¥Ñ±”ô‰½Ý¹±½…ˆ(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€½¹±¥¬õì¡”¤€ôøì(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€”¹ÍÑ½ÁAÉ½Á……Ñ¥½¸ ¤ì(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€‘½Ý¹±½…‘Y¥‘•¼¡±¥ÁUÉ°°±¥À´‘í¤€¬€Åô¹µÀÑ€¤ì(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€õô(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰À´È‰œµ‰±…¬¼ØÀ‰…­‘É½Àµ‰±ÕÈµµÉ½Õ¹‘•µ™Õ±°Ñ•áÐµÝ¡¥Ñ”¡½Ù•Èé‰œµÁÉ¥µ…Éä¡½Ù•ÈéÑ•áÐµ‰±…¬ÑÉ…¹Í¥Ñ¥½¸µ…±°‰½É‘•È‰½É‘•ÈµÝ¡¥Ñ”¼ÄÀˆ(€€€€€€€€€€€€€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€ñ½Ý¹±½…‘%½¸€¼ø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€ð½‰ÕÑÑ½¸ø(€€€€€€€€€€€€€€€€€€€€€€€€€€ð½‘¥Øø((€€€€€€€€€€€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰…‰Í½±ÕÑ”Ñ½À´È±•™Ð´È‰œµ‰±…¬¼ØÀ‰…­‘É½Àµ‰±ÕÈµµÁà´ÈÁä´ÄÉ½Õ¹‘•‰½É‘•È‰½É‘•ÈµÝ¡¥Ñ”¼ÔÑ•áÐµlåÁátÕÁÁ•É…Í”™½¹Ðµ‰±…¬ÑÉ…­¥¹œµÝ¥‘•ÈÑ•áÐµÁÉ¥µ…Éäˆø(€€€€€€€€€€€€€€€€€€€€€€€€€€€±¥À€í¤€¬€Åô(€€€€€€€€€€€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€€€€€€€€€ð½‘¥Øø((€€€€€€€€€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰À´Ì‰œµ‰±…¬¼àÀ‰…­‘É½Àµ‰±ÕÈµÍ´‰½É‘•ÈµÐ‰½É‘•ÈµÝ¡¥Ñ”¼Ô™±•à´Ä™±•à™±•àµ½°©ÕÍÑ¥™äµ‰•ÑÝ••¸…À´Èˆø(€€€€€€€€€€€€€€€€€€€€€€€€€íÉ•ÍÕ±Ð¹ÁÉ½µÁÐ€˜˜€ (€€€€€€€€€€€€€€€€€€€€€€€€€€€€ñÀ±…ÍÍ9…µ”ô‰Ñ•áÐµÝ¡¥Ñ”¼ÜÀÑ•áÐµáÌ±¥¹”µ±…µÀ´È±•…‘¥¹œµÉ•±…á•ˆÑ¥Ñ±”õíÉ•ÍÕ±Ð¹ÁÉ½µÁÑôø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€íÉ•ÍÕ±Ð¹ÁÉ½µÁÑô(€€€€€€€€€€€€€€€€€€€€€€€€€€€€ð½Àø(€€€€€€€€€€€€€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à¥Ñ•µÌµ•¹Ñ•È©ÕÍÑ¥™äµ‰•ÑÝ••¸µÐ´Äˆø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à¥Ñ•µÌµ•¹Ñ•È…À´Èˆø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰Ñ•áÐµlÄÁÁát™½¹Ðµ‰½±Ñ•áÐµÁÉ¥µ…ÉäÁà´ÈÁä´À¸Ô‰œµÁÉ¥µ…Éä¼ÄÀÉ½Õ¹‘•‰½É‘•È‰½É‘•ÈµÁÉ¥µ…Éä¼ÈÀÝ¡¥Ñ•ÍÁ…”µ¹½ÝÉ…Àˆø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€$±¥ÁÁ¥¹œ(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€ð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰Ñ•áÐµlÄÁÁátÑ•áÐµÝ¡¥Ñ”¼ÐÀˆùíÉ•ÍÕ±Ð¹…ÍÁ•ÑI…Ñ¥¼ñð±¥À€Œ‘í¤€¬€Åõôð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€ÑåÁ”ô‰‰ÕÑÑ½¸ˆ(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€½¹±¥¬õì¡”¤€ôøì(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€”¹ÍÑ½ÁAÉ½Á……Ñ¥½¸ ¤ì(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€¹…Ù¥…Ñ½È¹±¥Á‰½…É¹ÝÉ¥Ñ•Q•áÐ¡É•ÍÕ±Ð¹ÁÉ½µÁÐñð±¥ÁUÉ°¤ì(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€½¹ÍÐ‰Ñ¸€ô”¹ÕÉÉ•¹ÑQ…É•Ðì(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€‰Ñ¸¹¥¹¹•ÉQ•áÐ€ô€‰½Á¥•„ˆì(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€Í•ÑQ¥µ•½ÕÐ  ¤€ôøì‰Ñ¸¹¥¹¹•ÉQ•áÐ€ô€‰½Áäˆìô°€ÈÀÀÀ¤ì(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€õô(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰Áà´ÈÁä´À¸Ô‰œµÝ¡¥Ñ”¼Ô¡½Ù•Èé‰œµÁÉ¥µ…Éä¼ÈÀ¡½Ù•ÈéÑ•áÐµÁÉ¥µ…ÉäÉ½Õ¹‘•Ñ•áÐµlÄÁÁát™½¹Ðµµ•‘¥Õ´Ñ•áÐµÝ¡¥Ñ”¼ÜÀÑÉ…¹Í¥Ñ¥½¸µ…±°‰½É‘•È‰½É‘•ÈµÝ¡¥Ñ”¼ÄÀˆ(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€Ñ¥Ñ±”ô‰½ÁäÁÉ½µÁÐˆ(€€€€€€€€€€€€€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€½ÁäAÉ½µÁÐ(€€€€€€€€€€€€€€€€€€€€€€€€€€€€ð½‰ÕÑÑ½¸ø(€€€€€€€€€€€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€€€€€¤¥ô(€€€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€¤€è€ (€€€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰Áä´ÈÀÑ•áÐµ•¹Ñ•ÈÑ•áÐµáÌÑ•áÐµé¥¹Œ´ÔÀÀ™½¹ÐµÍ•µ¥‰½±‰½É‘•È‰½É‘•Èµé¥¹Œ´äÀÀÉ½Õ¹‘•‰œµé¥¹Œ´äÔÀ¼ÈÀˆø(€€€€€€€€€€€€€€€€€€€9¼Ù¥‘•¼±¥ÁÌ•¹•É…Ñ•¸QÉäÉ”µÉÕ¹¹¥¹œ¸(€€€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€¥ô(€€€€€€€€€€ð½‘¥Øø(€€€€€€€€¥ô((€€€€€€ð½‘¥Øø((€€€€€ì¼¨ƒŠRŠRŠR 1=Q%9	=QQ=4AI=5AP	HƒŠRŠRŠR €¨½ô(€€€€€€ñAÉ½µÁÑ½µÁ½Í•Èø(€€€€€€€€€€(€€€€€€€€€ì¼¨%¹±¥¹”±¥ÍÐ½˜ÕÁ±½…‘•µ•‘¥„™¥±•Ì€¨½ô(€€€€€€€€€íÙ¥‘•½UÉ°€˜˜€ (€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à¥Ñ•µÌµ•¹Ñ•È…À´È¸ÔÁà´ÄÁˆ´Äˆø(€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”õíAI=5AQ}5%}AIY%]}1MMôø(€€€€€€€€€€€€€€€€ñÙ¥‘•¼ÍÉŒõíÙ¥‘•½UÉ±ô±…ÍÍ9…µ”ô‰Üµ™Õ±° µ™Õ±°½‰©•Ðµ½Ù•ÈˆµÕÑ•Á±…åÍ%¹±¥¹”€¼ø(€€€€€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€€€ÑåÁ”ô‰‰ÕÑÑ½¸ˆ(€€€€€€€€€€€€€€€€€½¹±¥¬õí±•…ÉY¥‘•½UÁ±½…‘ô(€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰…‰Í½±ÕÑ”Ñ½À´À¸ÔÉ¥¡Ð´À¸ÔÜ´Ð ´Ð‰œµ‰±…¬¼ØÀ¡½Ù•Èé‰œµ‰±…¬É½Õ¹‘•µ™Õ±°™±•à¥Ñ•µÌµ•¹Ñ•È©ÕÍÑ¥™äµ•¹Ñ•ÈÑ•áÐµÝ¡¥Ñ”¼àÔ¡½Ù•ÈéÑ•áÐµÝ¡¥Ñ”Ñ•áÐµláÁát‰½É‘•È‰½É‘•ÈµÝ¡¥Ñ”¼Ôˆ(€€€€€€€€€€€€€€€€€Ñ¥Ñ±”ô‰±•…ÈÙ¥‘•¼ˆ(€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€ƒ\(€€€€€€€€€€€€€€€€ð½‰ÕÑÑ½¸ø(€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€¥ô((€€€€€€€€€ì¼¨UÁÁ•ÈÉ½ÜèÕÁ±½…‰ÕÑÑ½¸€˜ÁÉ½µÁÐ™¥•±€¨½ô(€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à¥Ñ•µÌµÍÑ…ÉÐ…À´ÌÁà´Äˆø(€€€€€€€€€€€ì¼¨!¥‘‘•¸™¥±”¥¹ÁÕÐ€¨½ô(€€€€€€€€€€€€ñ¥¹ÁÕÐ(€€€€€€€€€€€€€É•˜õíÙ¥‘•½¥±•%¹ÁÕÑI•™ô(€€€€€€€€€€€€€ÑåÁ”ô‰™¥±”ˆ(€€€€€€€€€€€€€…•ÁÐô‰Ù¥‘•¼¼¨ˆ(€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰¡¥‘‘•¸ˆ(€€€€€€€€€€€€€½¹¡…¹”õí¡…¹‘±•Y¥‘•½¥±•¡…¹•ô(€€€€€€€€€€€€¼ø(€€€€€€€€€€€€(€€€€€€€€€€€ì¼¨M±••¬É½Õ¹ÕÁ±½…‰ÕÑÑ½¸€¨½ô(€€€€€€€€€€€ì…Ù¥‘•½UÉ°€˜˜€ (€€€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€ÑåÁ”ô‰‰ÕÑÑ½¸ˆ(€€€€€€€€€€€€€€€Ñ¥Ñ±”ô‰UÁ±½…Í½ÕÉ”Ù¥‘•¼ˆ(€€€€€€€€€€€€€€€½¹±¥¬õì ¤€ôøÙ¥‘•½¥±•%¹ÁÕÑI•˜¹ÕÉÉ•¹Ðü¹±¥¬ ¥ô(€€€€€€€€€€€€€€€±…ÍÍ9…µ”õíÁÉ½µÁÑ5•‘¥…	ÕÑÑ½¹±…ÍÍ9…µ”¡ì(€€€€€€€€€€€€€€€€€…Ñ¥Ù”è	½½±•…¸¡Ù¥‘•½UÉ°¤°(€€€€€€€€€€€€€€€ô¥ô(€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€íÙ¥‘•½UÁ±½…‘¥¹œ€ü€ (€€€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à™±•àµ½°¥Ñ•µÌµ•¹Ñ•È©ÕÍÑ¥™äµ•¹Ñ•ÈÜµ™Õ±° µ™Õ±°…‰Í½±ÕÑ”¥¹Í•Ð´À‰œµ‰±…¬¼àÔè´ÈÀ‰…­‘É½Àµ‰±ÕÈµlÅÁátˆø(€€€€€€€€€€€€€€€€€€€€ñÍÙœ±…ÍÍ9…µ”ô‰Ü´à ´à€µÉ½Ñ…Ñ”´äÀˆø(€€€€€€€€€€€€€€€€€€€€€€ñ¥É±”àôˆÄØˆäôˆÄØˆÈôˆÄÐˆÍÑÉ½­”ô‰ÕÉÉ•¹Ñ½±½ÈˆÍÑÉ½­•]¥‘Ñ ôˆÈˆ™¥±°ô‰ÑÉ…¹ÍÁ…É•¹Ðˆ±…ÍÍ9…µ”ô‰Ñ•áÐµÝ¡¥Ñ”¼ÄÀˆ€¼ø(€€€€€€€€€€€€€€€€€€€€€€ñ¥É±”(€€€€€€€€€€€€€€€€€€€€€€€àôˆÄØˆ(€€€€€€€€€€€€€€€€€€€€€€€äôˆÄØˆ(€€€€€€€€€€€€€€€€€€€€€€€ÈôˆÄÐˆ(€€€€€€€€€€€€€€€€€€€€€€€ÍÑÉ½­”ô‰ÕÉÉ•¹Ñ½±½Èˆ(€€€€€€€€€€€€€€€€€€€€€€€ÍÑÉ½­•]¥‘Ñ ôˆÈˆ(€€€€€€€€€€€€€€€€€€€€€€€™¥±°ô‰ÑÉ…¹ÍÁ…É•¹Ðˆ(€€€€€€€€€€€€€€€€€€€€€€€ÍÑÉ½­•…Í¡…ÉÉ…äõìàáô(€€€€€€€€€€€€€€€€€€€€€€€ÍÑÉ½­•…Í¡½™™Í•Ðõìàà€´€ àà€¨Ù¥‘•½AÉ½É•ÍÌ¤€¼€ÄÀÁô(€€€€€€€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰Ñ•áÐµlŒÈÉÍ••tÑÉ…¹Í¥Ñ¥½¸µ…±°‘ÕÉ…Ñ¥½¸´ÌÀÀˆ(€€€€€€€€€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€€€€€€€€€ð½ÍÙœø(€€€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”õí…‰Í½±ÕÑ”Ñ•áÐµláÁát™½¹Ðµ‰±…¬Ñ•áÐµlŒÈÉÍ••t±•…‘¥¹œµ¹½¹”€‘íÙ¥‘•½AÉ½É•ÍÌ€øô€ÄÀÀ€ü€‰…¹¥µ…Ñ”µÁÕ±Í”ˆ€è€ˆ‰õôø(€€€€€€€€€€€€€€€€€€€€€íÙ¥‘•½AÉ½É•ÍÌ€øô€ÄÀÀ€ü€ˆ¸¸¸ˆ€è€‘íÙ¥‘•½AÉ½É•ÍÍô•ô(€€€€€€€€€€€€€€€€€€€€ð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€¤€è¹Õ±±ô((€€€€€€€€€€€€€€€€ñÍÙœÝ¥‘Ñ ôˆÄàˆ¡•¥¡ÐôˆÄàˆÙ¥•Ý	½àôˆÀ€À€ÈÐ€ÈÐˆ™¥±°ô‰¹½¹”ˆÍÑÉ½­”ô‰ÕÉÉ•¹Ñ½±½ÈˆÍÑÉ½­•]¥‘Ñ ôˆÈˆ±…ÍÍ9…µ”ô‰Ñ•áÐµÝ¡¥Ñ”¼ÐÀÉ½ÕÀµ¡½Ù•ÈéÑ•áÐµlŒÈÉÍ••tÑÉ…¹Í¥Ñ¥½¸µ½±½ÉÌˆø(€€€€€€€€€€€€€€€€€€ñÁ½±å½¸Á½¥¹ÑÌôˆÈÌ€Ü€ÄØ€ÄÈ€ÈÌ€ÄÜ€ÈÌ€Üˆ€¼ø(€€€€€€€€€€€€€€€€€€ñÉ•ÐàôˆÄˆäôˆÔˆÝ¥‘Ñ ôˆÄÔˆ¡•¥¡ÐôˆÄÐˆÉàôˆÈˆÉäôˆÈˆ€¼ø(€€€€€€€€€€€€€€€€ð½ÍÙœø(€€€€€€€€€€€€€€ð½‰ÕÑÑ½¸ø(€€€€€€€€€€€€¥ô((€€€€€€€€€€€ì¼¨AÉ½µÁÐÑ•áÑ…É•„€¡ÍÕÁÁ½ÉÑÌ‘¥É•ÐUI0Á…ÍÑ¥¹œÑ½¼¤€¨½ô(€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à´Ä™±•à™±•àµ½°…À´Äˆø(€€€€€€€€€€€€€€ñAÉ½µÁÑQ•áÑ…É•„(€€€€€€€€€€€€€€€Ù…±Õ”õíÁÉ½µÁÑô(€€€€€€€€€€€€€€€½¹¡…¹”õí¡…¹‘±•AÉ½µÁÑ%¹ÁÕÑô(€€€€€€€€€€€€€€€Á±…•¡½±‘•Èô‰•ÍÉ¥‰”ÁÉ½µÁÐ€¼¡¥¡±¥¡ÑÌÑ¼•áÑÉ…Ðˆ(€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€ð½‘¥Øø((€€€€€€€€€ì¼¨	½ÑÑ½´É½Üè½¹ÑÉ½±Ì€¬•¹•É…Ñ”‰ÕÑÑ½¸€¨½ô(€€€€€€€€€€ñAÉ½µÁÑ½½Ñ•Èø(€€€€€€€€€€€€ñAÉ½µÁÑ½¹ÑÉ½±Ìø(€€€€€€€€€€€€€€(€€€€€€€€€€€€€ì¼¨5½‘•°%‘•¹Ñ¥™¥•È€¡¤€¨½ô(€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”õíÁÉ½µÁÑ½¹ÑÉ½±±…ÍÍ9…µ” ¥ôø(€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰Ü´Ð ´Ð‰œµlŒÈÉÍ••tÉ½Õ¹‘•™±•à¥Ñ•µÌµ•¹Ñ•È©ÕÍÑ¥™äµ•¹Ñ•ÈÍ¡…‘½Üµ±œÍ¡…‘½ÜµlŒÈÉÍ••t¼ÄÀˆø(€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰Ñ•áÐµlåÁát™½¹Ðµ‰½±Ñ•áÐµ‰±…¬ÕÁÁ•É…Í”ˆùð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”õíAI=5AQ}=9QI=1}1	1}1MMôø(€€€€€€€€€€€€€€€€€$±¥ÁÁ¥¹œ(€€€€€€€€€€€€€€€€ð½ÍÁ…¸ø(€€€€€€€€€€€€€€ð½‘¥Øø((€€€€€€€€€€€€€ì¼¨ÍÁ•ÐI…Ñ¥¼Í•±•Ñ½È€¨½ô(€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰É•±…Ñ¥Ù”ˆÉ•˜õí‘É½Á‘½Ý¹I•™ôø(€€€€€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€€€ÑåÁ”ô‰‰ÕÑÑ½¸ˆ(€€€€€€€€€€€€€€€€€½¹±¥¬õì ¤€ôøÍ•ÑÍÁ•ÑÉ½Á‘½Ý¹=Á•¸ ……ÍÁ•ÑÉ½Á‘½Ý¹=Á•¸¥ô(€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”õíÁÉ½µÁÑ½¹ÑÉ½±±…ÍÍ9…µ”¡ì(€€€€€€€€€€€€€€€€€€€…Ñ¥Ù”è…ÍÁ•ÑÉ½Á‘½Ý¹=Á•¸°(€€€€€€€€€€€€€€€€€ô¥ô(€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€€ñAÉ½µÁÑÍÁ•ÑI…Ñ¥½%½¸€¼ø(€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”õíAI=5AQ}=9QI=1}1	1}1MMôø(€€€€€€€€€€€€€€€€€€€í…ÍÁ•ÑI…Ñ¥½ô(€€€€€€€€€€€€€€€€€€ð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€ð½‰ÕÑÑ½¸ø(€€€€€€€€€€€€€€€í…ÍÁ•ÑÉ½Á‘½Ý¹=Á•¸€˜˜€ (€€€€€€€€€€€€€€€€€€ñAÉ½µÁÑA½Á½Ù•Èø(€€€€€€€€€€€€€€€€€€€€ñAÉ½µÁÑA½Á½Ù•É!•…‘•Èø(€€€€€€€€€€€€€€€€€€€€€ÍÁ•ÐI…Ñ¥¼(€€€€€€€€€€€€€€€€€€€€ð½AÉ½µÁÑA½Á½Ù•É!•…‘•Èø(€€€€€€€€€€€€€€€€€€€€ñAÉ½µÁÑ5•¹Õ1¥ÍÐø(€€€€€€€€€€€€€€€€€€€€€íMAQ}IQ%=L¹µ…À ¡È¤€ôø€ (€€€€€€€€€€€€€€€€€€€€€€€€ñAÉ½µÁÑ5•¹Õ%Ñ•´(€€€€€€€€€€€€€€€€€€€€€€€€€­•äõíÈ¹Ù…±Õ•ô(€€€€€€€€€€€€€€€€€€€€€€€€€Í•±•Ñ•õí…ÍÁ•ÑI…Ñ¥¼€ôôôÈ¹Ù…±Õ•ô(€€€€€€€€€€€€€€€€€€€€€€€€€½¹±¥¬õì ¤€ôøì(€€€€€€€€€€€€€€€€€€€€€€€€€€€Í•ÑÍÁ•ÑI…Ñ¥¼¡È¹Ù…±Õ”¤ì(€€€€€€€€€€€€€€€€€€€€€€€€€€€Í•ÑÍÁ•ÑÉ½Á‘½Ý¹=Á•¸¡™…±Í”¤ì(€€€€€€€€€€€€€€€€€€€€€€€€€õô(€€€€€€€€€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€€€€€€€€€íÈ¹Ù…±Õ•ô(€€€€€€€€€€€€€€€€€€€€€€€€ð½AÉ½µÁÑ5•¹Õ%Ñ•´ø(€€€€€€€€€€€€€€€€€€€€€€¤¥ô(€€€€€€€€€€€€€€€€€€€€ð½AÉ½µÁÑ5•¹Õ1¥ÍÐø(€€€€€€€€€€€€€€€€€€ð½AÉ½µÁÑA½Á½Ù•Èø(€€€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€€€ð½‘¥Øø((€€€€€€€€€€€€€ì¼¨!¥¡±¥¡ÑÌ1¥µ¥ÐÍ•±•Ñ½È€¨½ô(€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰É•±…Ñ¥Ù”ˆÉ•˜õí¡¥¡±¥¡ÑÍÉ½Á‘½Ý¹I•™ôø(€€€€€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€€€ÑåÁ”ô‰‰ÕÑÑ½¸ˆ(€€€€€€€€€€€€€€€€€½¹±¥¬õì ¤€ôøÍ•Ñ!¥¡±¥¡ÑÍÉ½Á‘½Ý¹=Á•¸ …¡¥¡±¥¡ÑÍÉ½Á‘½Ý¹=Á•¸¥ô(€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”õíÁÉ½µÁÑ½¹ÑÉ½±±…ÍÍ9…µ”¡ì(€€€€€€€€€€€€€€€€€€€…Ñ¥Ù”è¡¥¡±¥¡ÑÍÉ½Á‘½Ý¹=Á•¸°(€€€€€€€€€€€€€€€€€ô¥ô(€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€€ñAÉ½µÁÑÕÉ…Ñ¥½¹%½¸€¼ø(€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”õíAI=5AQ}=9QI=1}1	1}1MMôø(€€€€€€€€€€€€€€€€€€€í¹Õµ!¥¡±¥¡ÑÍô!¥¡±¥¡ÑÌ(€€€€€€€€€€€€€€€€€€ð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€ð½‰ÕÑÑ½¸ø(€€€€€€€€€€€€€€€í¡¥¡±¥¡ÑÍÉ½Á‘½Ý¹=Á•¸€˜˜€ (€€€€€€€€€€€€€€€€€€ñAÉ½µÁÑA½Á½Ù•È±…ÍÍ9…µ”ô‰µ¥¸µÜµlÄàÁÁát½Ù•É™±½ÜµÙ¥Í¥‰±”ˆø(€€€€€€€€€€€€€€€€€€€€ñAÉ½µÁÑA½Á½Ù•É!•…‘•È±…ÍÍ9…µ”ô‰µˆ´Ìˆø(€€€€€€€€€€€€€€€€€€€€€5…à!¥¡±¥¡ÑÌ(€€€€€€€€€€€€€€€€€€€€ð½AÉ½µÁÑA½Á½Ù•É!•…‘•Èø(€€€€€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰ÍÁ…”µä´Ìˆø(€€€€€€€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à¥Ñ•µÌµ•¹Ñ•È©ÕÍÑ¥™äµ‰•ÑÝ••¸ˆø(€€€€€€€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰Ñ•áÐµáÌÑ•áÐµÝ¡¥Ñ”¼ØÀˆù1¥µ¥Ðèð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰Ñ•áÐµáÌ™½¹Ðµ‰±…¬Ñ•áÐµÁÉ¥µ…Éä‰œµÁÉ¥µ…Éä¼ÄÀÁà´È¸ÔÁä´À¸ÔÉ½Õ¹‘•ˆø(€€€€€€€€€€€€€€€€€€€€€€€€€í¹Õµ!¥¡±¥¡ÑÍô(€€€€€€€€€€€€€€€€€€€€€€€€ð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€€€€€€€ñ¥¹ÁÕÐ(€€€€€€€€€€€€€€€€€€€€€€€ÑåÁ”ô‰É…¹”ˆ(€€€€€€€€€€€€€€€€€€€€€€€µ¥¸ôˆÄˆ(€€€€€€€€€€€€€€€€€€€€€€€µ…àôˆØÀˆ(€€€€€€€€€€€€€€€€€€€€€€€ÍÑ•ÀôˆÄˆ(€€€€€€€€€€€€€€€€€€€€€€€Ù…±Õ”õí¹Õµ!¥¡±¥¡ÑÍô(€€€€€€€€€€€€€€€€€€€€€€€½¹¡…¹”õì¡”¤€ôøÍ•Ñ9Õµ!¥¡±¥¡ÑÌ¡9Õµ‰•È¡”¹Ñ…É•Ð¹Ù…±Õ”¤¥ô(€€€€€€€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰Üµ™Õ±° ´Ä‰œµé¥¹Œ´àÔÀÉ½Õ¹‘•…ÁÁ•…É…¹”µ¹½¹”ÕÉÍ½ÈµÁ½¥¹Ñ•È…•¹ÐµÁÉ¥µ…Éäˆ(€€€€€€€€€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€€€ð½AÉ½µÁÑA½Á½Ù•Èø(€€€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€€€ð½‘¥Øø((€€€€€€€€€€€€€ì¼¨I•ÑÕÉ¸½½É‘¥¹…Ñ•ÌQ½±”€¨½ô(€€€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€ÑåÁ”ô‰‰ÕÑÑ½¸ˆ(€€€€€€€€€€€€€€€½¹±¥¬õì ¤€ôøÍ•ÑI•ÑÕÉ¹½½É‘¥¹…Ñ•Í=¹±ä …É•ÑÕÉ¹½½É‘¥¹…Ñ•Í=¹±ä¥ô(€€€€€€€€€€€€€€€±…ÍÍ9…µ”õíÁÉ½µÁÑ½¹ÑÉ½±±…ÍÍ9…µ”¡ì(€€€€€€€€€€€€€€€€€…Ñ¥Ù”èÉ•ÑÕÉ¹½½É‘¥¹…Ñ•Í=¹±ä°(€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”èÉ•ÑÕÉ¹½½É‘¥¹…Ñ•Í=¹±ä(€€€€€€€€€€€€€€€€€€€€ü€‰Ñ•áÐµlŒÈÉÍ••tˆ(€€€€€€€€€€€€€€€€€€€€è€‰Ñ•áÐµÝ¡¥Ñ”¼ÜÀ¡½Ù•ÈéÑ•áÐµÝ¡¥Ñ”ˆ°(€€€€€€€€€€€€€€€ô¥ô(€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€ñM¥ÍÍ½ÉÍ%½¸±…ÍÍ9…µ”ô‰Ü´Ð ´ÐÑ•áÐµÕÉÉ•¹Ðˆ€¼ø(€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰Ñ•áÐµáÌ™½¹ÐµÍ•µ¥‰½±ˆø(€€€€€€€€€€€€€€€€€½½É‘¥¹…Ñ•Ì=¹±ä(€€€€€€€€€€€€€€€€ð½ÍÁ…¸ø(€€€€€€€€€€€€€€ð½‰ÕÑÑ½¸ø((€€€€€€€€€€€€ð½AÉ½µÁÑ½¹ÑÉ½±Ìø((€€€€€€€€€€€ì¼¨•¹•É…Ñ”‰ÕÑÑ½¸€¨½ô(€€€€€€€€€€€€ñAÉ½µÁÑÑ¥½¸(€€€€€€€€€€€€€½¹±¥¬õí¡…¹‘±••¹•É…Ñ•ô(€€€€€€€€€€€€€‘¥Í…‰±•õí¥Í•¹•É…Ñ¥¹ô(€€€€€€€€€€€€ø(€€€€€€€€€€€€€í¥Í•¹•É…Ñ¥¹œ€ü€ (€€€€€€€€€€€€€€€€ðø(€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰…¹¥µ…Ñ”µÍÁ¥¸¥¹±¥¹”µ‰±½¬Ñ•áÐµ‰±…¬ˆûŠ^0ð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€€€ñÍÁ…¸ù•¹•É…Ñ¥¹œ¸¸¸ð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€ð¼ø(€€€€€€€€€€€€€€¤€è€ (€€€€€€€€€€€€€€€€ðø(€€€€€€€€€€€€€€€€€€ñÍÁ…¸ù•¹•É…Ñ”ƒŠr˜€Ôð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€ð¼ø(€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€ð½AÉ½µÁÑÑ¥½¸ø(€€€€€€€€€€ð½AÉ½µÁÑ½½Ñ•Èø(€€€€€€ð½AÉ½µÁÑ½µÁ½Í•Èø((€€€€€€ñÍÑå±”©Íà±½‰…°ùí€(€€€€€€€€¹ÕÍÑ½´µÍÉ½±±‰…ÈèèµÝ•‰­¥ÐµÍÉ½±±‰…Èì(€€€€€€€€€Ý¥‘Ñ è€ÙÁàì(€€€€€€€€€¡•¥¡Ðè€ÙÁàì(€€€€€€€ô(€€€€€€€€¹ÕÍÑ½´µÍÉ½±±‰…ÈèèµÝ•‰­¥ÐµÍÉ½±±‰…ÈµÑÉ…¬ì(€€€€€€€€€‰…­É½Õ¹èÑÉ…¹ÍÁ…É•¹Ðì(€€€€€€€ô(€€€€€€€€¹ÕÍÑ½´µÍÉ½±±‰…ÈèèµÝ•‰­¥ÐµÍÉ½±±‰…ÈµÑ¡Õµˆì(€€€€€€€€€‰…­É½Õ¹èÉ‰„ ÈÔÔ°€ÈÔÔ°€ÈÔÔ°€À¸Àà¤ì(€€€€€€€€€‰½É‘•ÈµÉ…‘¥ÕÌè€äåÁàì(€€€€€€€ô(€€€€€€€€¹ÕÍÑ½´µÍÉ½±±‰…ÈèèµÝ•‰­¥ÐµÍÉ½±±‰…ÈµÑ¡Õµˆé¡½Ù•Èì(€€€€€€€€€‰…­É½Õ¹èÉ‰„ ÈÔÔ°€ÈÔÔ°€ÈÔÔ°€À¸ÄÔ¤ì(€€€€€€€ô(€€€€€€€€¹ÕÍÑ½´µÍÉ½±±‰…Èì(€€€€€€€€€ÍÉ½±±‰…ÈµÝ¥‘Ñ èÑ¡¥¸ì(€€€€€€€€€ÍÉ½±±‰…Èµ½±½ÈèÉ‰„ ÈÔÔ°€ÈÔÔ°€ÈÔÔ°€À¸Àà¤ÑÉ…¹ÍÁ…É•¹Ðì(€€€€€€€ô(€€€€€ôð½ÍÑå±”ø(€€€€€€ñQ½…ÍÑ•È(€€€€€€€Ñ½…ÍÑ•É%õí1%AA%9}Q=MQI}%ô(€€€€€€€Á½Í¥Ñ¥½¸ô‰‰½ÑÑ½´µÉ¥¡Ðˆ(€€€€€€€É•Ù•ÉÍ•=É‘•Èõí™…±Í•ô(€€€€€€€ÕÑÑ•Èõìáô(€€€€€€€½¹Ñ…¥¹•ÉMÑå±”õíìé%¹‘•àè€äääää°É¥¡Ðè€ÈÀ°‰½ÑÑ½´è€ÈÀõô(€€€€€€€Ñ½…ÍÑ=ÁÑ¥½¹Ìõíì(€€€€€€€€€‘ÕÉ…Ñ¥½¸è€ØÀÀÀ°(€€€€€€€€€ÍÑå±”èì(€€€€€€€€€€€‰…­É½Õ¹è€ˆŒÁÁÁ˜ˆ°(€€€€€€€€€€€½±½Èè€ˆ˜Ñ˜Ñ˜Ôˆ°(€€€€€€€€€€€‰½É‘•Èè€ˆÅÁàÍ½±¥É‰„ ÈÌä°Øà°Øà°À¸ÌÔ¤ˆ°(€€€€€€€€€€€™½¹ÑM¥é”è€ˆÄÍÁàˆ°(€€€€€€€€€€€‰½É‘•ÉI…‘¥ÕÌè€ˆÄÉÁàˆ°(€€€€€€€€€€€‰½áM¡…‘½Üè€ˆÀ€ÄÙÁà€ÐáÁàÉ‰„ À°À°À°À¸ØÔ¤ˆ°(€€€€€€€€€€€µ…á]¥‘Ñ è€ˆÌàÁÁàˆ°(€€€€€€€€€€€Ý½É‘	É•…¬è€‰‰É•…¬µÝ½Éˆ°(€€€€€€€€€€€Ý¡¥Ñ•MÁ…”è€‰ÁÉ”µÝÉ…Àˆ°(€€€€€€€€€€€Á…‘‘¥¹œè€ˆÄÉÁà€ÄÑÁàˆ°(€€€€€€€€€ô°(€€€€€€€€€•ÉÉ½Èèì(€€€€€€€€€€€¥½¹Q¡•µ”èì(€€€€€€€€€€€€€ÁÉ¥µ…Éäè€ˆ˜àÜÄÜÄˆ°(€€€€€€€€€€€€€Í•½¹‘…Éäè€ˆŒÁÁÁ˜ˆ°(€€€€€€€€€€€ô°(€€€€€€€€€ô°(€€€€€€€õô(€€€€€€¼ø(€€€€ð½‘¥Øø(€€¤ì)ô(
+      const url = await uploadFile(apiKey, file, (pct) => {
+        setVideoProgress(pct);
+      });
+      setVideoUrl(url);
+    } catch (err) {
+      console.error("[ClippingStudio] Video upload failed:", err);
+      showVideoUploadError(err);
+    } finally {
+      setVideoUploading(false);
+      setVideoProgress(0);
+      if (videoFileInputRef.current) videoFileInputRef.current.value = "";
+    }
+  };
+
+  const clearVideoUpload = () => {
+    setVideoUrl("");
+  };
+
+  // â”€â”€ Dispatch Run / Call submitAndPoll â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  const handleGenerate = async () => {
+    if (!videoUrl) {
+      alert("Please upload a video or paste a video URL first.");
+      return;
+    }
+
+    onGenerationStart?.();
+    setIsGenerating(true);
+    setGenerateError(null);
+    setResult(null);
+
+    try {
+      const params = {
+        video_url: videoUrl,
+        num_highlights: numHighlights,
+        aspect_ratio: aspectRatio,
+        return_coordinates_only: returnCoordinatesOnly,
+      };
+
+      const res = await runClipping(apiKey, params);
+
+      // Parse the result
+      const clips = res.outputs || [];
+      const outputCoordinates = res.output?.coordinates || res.coordinates || res.output?.timings || res.timings || [];
+      
+      const newResult = {
+        id: res.id || Date.now().toString(),
+        videoUrl: videoUrl,
+        clips: clips,
+        coordinates: Array.isArray(outputCoordinates) ? outputCoordinates : (res.output?.clips || []),
+        returnCoordinatesOnly: returnCoordinatesOnly,
+        aspectRatio: aspectRatio,
+        timestamp: new Date().toISOString(),
+      };
+
+      // Mock coordinates if API succeeded but modal coordinates are empty in coordinate-only mode
+      if (returnCoordinatesOnly && newResult.coordinates.length === 0) {
+        newResult.coordinates = Array.from({ length: numHighlights }).map((_, idx) => ({
+          label: `Highlight #${idx + 1}`,
+          start_time: idx * 15,
+          end_time: (idx + 1) * 15,
+          start: idx * 15,
+          end: (idx + 1) * 15,
+          score: 0.95 - (idx * 0.05)
+        }));
+      }
+
+      setResult(newResult);
+      setActiveHighlightIndex(0);
+
+      // Append to history
+      setHistory((prev) => [newResult, ...prev].slice(0, 30));
+
+      if (onGenerationComplete) {
+        onGenerationComplete({
+          url: clips[0] || videoUrl,
+          model: "ai-clipping",
+          type: "video",
+        });
+      }
+    } catch (err) {
+      console.error("[ClippingStudio] Error generating clips:", err);
+      const errMsg = formatErrorMessage(err, "Failed to process AI clipping.");
+      const notificationMessage = isFileSizeError(err)
+        ? VIDEO_TOO_LARGE_FOR_MODE_MESSAGE
+        : errMsg;
+      if (onGenerationError) onGenerationError(notificationMessage);
+      else showErrorToast(notificationMessage);
+    } finally {
+      setIsGenerating(false);
+      onGenerationEnd?.();
+    }
+  };
+
+  const handleSelectHistory = (entry) => {
+    setResult(entry);
+    setActiveHighlightIndex(0);
+    setVideoUrl(entry.videoUrl);
+    setNumHighlights(entry.numHighlights || 3);
+    setAspectRatio(entry.aspectRatio || "9:16");
+    setReturnCoordinatesOnly(entry.returnCoordinatesOnly || false);
+  };
+
+  return (
+    <div className="w-full h-full flex flex-col items-center justify-center bg-app-bg text-white relative overflow-hidden">
+      
+      {/* â”€â”€â”€ CENTRAL AREA â”€â”€â”€ */}
+      <div className="flex-1 w-full max-w-7xl mx-auto overflow-y-auto custom-scrollbar pb-40 lg:pb-32 px-2">
+        
+        {/* Error Message */}
+        {generateError && (
+          <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded text-xs font-semibold leading-relaxed mb-6">
+            {generateError}
+          </div>
+        )}
+
+        {/* 1. Empty State (No history, no result active) */}
+        {!result && history.length === 0 && (
+          <div className="flex flex-col items-center justify-center h-full animate-fade-in-up transition-all duration-700 min-h-[50vh]">
+            {/* Overlapping floating cards */}
+            <div className="flex items-center justify-center gap-1.5 md:gap-3 mb-10 select-none scale-90 sm:scale-100">
+              <div className="w-18 h-22 sm:w-24 sm:h-28 rounded-2xl border border-white/10 shadow-2xl -rotate-[12deg] transform hover:rotate-0 hover:scale-110 hover:z-20 transition-all duration-300 overflow-hidden bg-white/[0.01] flex-shrink-0">
+                <img
+                  src="https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/sdxl-image.avif"
+                  alt="Creative asset 1"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="w-18 h-22 sm:w-24 sm:h-28 rounded-2xl border border-white/10 shadow-2xl -rotate-[4deg] transform hover:rotate-0 hover:scale-110 hover:z-20 transition-all duration-300 overflow-hidden bg-white/[0.01] -ml-3 sm:-ml-4 flex-shrink-0">
+                <img
+                  src="https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/chroma-image.avif"
+                  alt="Creative asset 2"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="w-18 h-18 sm:w-24 sm:h-24 rounded-full border border-white/10 shadow-2xl rotate-[6deg] transform hover:rotate-0 hover:scale-110 hover:z-20 transition-all duration-300 overflow-hidden bg-white/[0.01] -ml-3 sm:-ml-4 flex-shrink-0">
+                <img
+                  src="https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/neta-lumina.avif"
+                  alt="Creative asset 3"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="w-18 h-22 sm:w-24 sm:h-28 rounded-2xl border border-white/10 shadow-2xl rotate-[12deg] transform hover:rotate-0 hover:scale-110 hover:z-20 transition-all duration-300 overflow-hidden bg-white/[0.01] -ml-3 sm:-ml-4 flex-shrink-0">
+                <img
+                  src="https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/perfect-pony-xl.avif"
+                  alt="Creative asset 4"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+
+            <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-center px-4 flex flex-col items-center">
+              <span className="text-white font-black uppercase text-xl sm:text-3xl tracking-wide mb-1 opacity-90">START CREATING WITH</span>
+              <span className="text-[#22d3ee] font-black uppercase text-2xl sm:text-4xl sm:mt-1 tracking-tight">
+                AI CLIPPING STUDIO
+              </span>
+            </h1>
+            <p className="text-white/40 text-xs sm:text-sm font-medium tracking-wide text-center max-w-lg leading-relaxed px-4">
+              Extract viral highlights and precise timings from your videos automatically.
+            </p>
+          </div>
+        )}
+
+        {/* 2. History Gallery List (Active result is null, history has items) */}
+        {!result && history.length > 0 && (
+          <div className="space-y-6 pt-4">
+            <div className="flex items-center justify-between border-b border-white/5 pb-4">
+              <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
+                <ScissorsIcon className="text-primary w-4 h-4" />
+                Clipping History Runs
+              </h2>
+              <span className="text-xs font-bold text-zinc-400 bg-white/5 border border-white/5 px-2.5 py-1 rounded">
+                {history.length} Saved Generations
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full animate-fade-in-up">
+              {history.map((entry, idx) => (
+                <div
+                  key={entry.id || idx}
+                  className="relative group rounded-lg overflow-hidden border border-white/10 bg-[#0a0a0a] shadow-xl hover:border-primary/50 transition-all duration-300 flex flex-col"
+                >
+                  <div className="aspect-video bg-zinc-950 flex items-center justify-center border-b border-white/5 relative overflow-hidden">
+                    <video
+                      src={entry.videoUrl}
+                      className="w-full h-full object-cover opacity-60 group-hover:opacity-85 transition-opacity cursor-pointer animate-fade-in"
+                      preload="metadata"
+                      muted
+                      loop
+                      playsInline
+                      onClick={() => handleSelectHistory(entry)}
+                      onMouseOver={(e) => e.target.play()}
+                      onMouseOut={(e) => {
+                        e.target.pause();
+                        e.target.currentTime = 0;
+                      }}
+                    />
+                    
+                    {/* Overlay actions */}
+                    <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                      <button
+                        type="button"
+                        title="Delete from history"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setHistory((prev) => prev.filter((h) => h.id !== entry.id));
+                        }}
+                        className="p-2 bg-black/60 backdrop-blur-md rounded-full text-white hover:bg-red-500 hover:text-white transition-all border border-white/10"
+                      >
+                        <TrashIcon />
+                      </button>
+                    </div>
+                  </div>
+                  <div 
+                    onClick={() => handleSelectHistory(entry)}
+                    className="p-3 bg-black/80 backdrop-blur-sm border-t border-white/5 flex-1 flex flex-col justify-between gap-2 cursor-pointer"
+                  >
+                    <div className="flex flex-col gap-1">
+                      <h4 className="text-xs font-bold text-white truncate" title={entry.videoUrl.split('/').pop()}>
+                        {entry.videoUrl.split('/').pop() || "source_video.mp4"}
+                      </h4>
+                      <p className="text-[9px] text-zinc-500 font-semibold uppercase tracking-wider">
+                        {entry.returnCoordinatesOnly ? "Timeline Seek Mode" : "Clips Gallery Mode"}
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-between mt-1">
+                      <span className="text-[10px] font-bold text-primary px-2 py-0.5 bg-primary/10 rounded border border-primary/20">
+                        {entry.aspectRatio}
+                      </span>
+                      <span className="text-[10px] text-white/40">
+                        {entry.returnCoordinatesOnly ? `${entry.coordinates?.length || 0} Highlights` : `${entry.clips?.length || 0} Clips`}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 3. Active Result Preview (Result is loaded) */}
+        {result && (
+          <div className="flex-1 flex flex-col min-h-0">
+            {/* Header / Back Action */}
+            <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/5">
+              <button
+                type="button"
+                onClick={() => setResult(null)}
+                className="flex items-center gap-2 text-xs font-bold text-zinc-400 hover:text-white transition-colors"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <line x1="19" y1="12" x2="5" y2="12" />
+                  <polyline points="12 19 5 12 12 5" />
+                </svg>
+                Back to History
+              </button>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold text-primary bg-primary/10 border border-primary/20 px-2.5 py-0.5 rounded">
+                  {result.returnCoordinatesOnly ? "Timeline Seek Mode" : "Clips Gallery Mode"}
+                </span>
+                <span className="text-[10px] text-zinc-400 bg-white/5 border border-white/5 px-2.5 py-0.5 rounded">
+                  {result.aspectRatio}
+                </span>
+              </div>
+            </div>
+
+            {/* Render coordinates Timeline player */}
+            {result.returnCoordinatesOnly ? (
+              <div className="flex-1 flex flex-col lg:flex-row gap-6 min-h-0">
+                {/* Left Side: Original Player */}
+                <div className="flex-1 bg-black border border-zinc-900 rounded-lg overflow-hidden flex flex-col shadow-2xl relative min-h-[300px] lg:min-h-0">
+                  <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-md border border-white/5 z-10 text-[10px] uppercase font-bold tracking-wider text-primary">
+                    Original Video Player
+                  </div>
+                  <video
+                    ref={mainVideoRef}
+                    src={result.videoUrl}
+                    controls
+                    className="w-full flex-1 object-contain bg-zinc-950"
+                    preload="auto"
+                  />
+                </div>
+
+                {/* Right Side: Highlights list */}
+                <div className="w-full lg:w-[350px] border border-zinc-900 bg-zinc-950/40 backdrop-blur-md rounded-lg p-5 flex flex-col min-h-[350px] lg:min-h-0">
+                  <div className="pb-4 border-b border-zinc-900 flex items-center justify-between">
+                    <h3 className="text-xs font-black text-white uppercase tracking-widest">
+                      Highlights Timeline
+                    </h3>
+                    <span className="text-[10px] font-bold text-zinc-400 bg-zinc-900 px-2 py-0.5 rounded border border-zinc-800">
+                      {result.coordinates?.length || 0} Matches
+                    </span>
+                  </div>
+
+                  <div className="flex-1 overflow-y-auto custom-scrollbar mt-4 space-y-3 pr-1">
+                    {result.coordinates && result.coordinates.length > 0 ? (
+                      result.coordinates.map((hl, i) => {
+                        const start = hl.start_time !== undefined ? hl.start_time : (hl.start || 0);
+                        const end = hl.end_time !== undefined ? hl.end_time : (hl.end || 0);
+                        const isActive = activeHighlightIndex === i;
+
+                        return (
+                          <button
+                            key={i}
+                            type="button"
+                            onClick={() => {
+                              setActiveHighlightIndex(i);
+                              seekToHighlight(start);
+                            }}
+                            className={`w-full p-4 border rounded-lg text-left transition-all hover:bg-zinc-900/60 flex flex-col gap-2 group/hl ${
+                              isActive 
+                                ? "border-primary bg-primary/5 shadow-[0_0_12px_rgba(34,211,238,0.03)]" 
+                                : "border-zinc-800 bg-zinc-900/30 hover:border-zinc-700"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between w-full">
+                              <span className={`text-xs font-bold transition-colors ${isActive ? "text-primary" : "text-white"}`}>
+                                {hl.label || `Highlight #${i + 1}`}
+                              </span>
+                              {hl.score && (
+                                <span className="text-[9px] font-black text-emerald-400 bg-emerald-400/10 px-1.5 py-0.5 rounded border border-emerald-400/20">
+                                  {(hl.score * 100).toFixed(0)}% Score
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2 text-[10px] text-zinc-400 font-semibold">
+                              <ClockIcon />
+                              <span>{formatSeconds(start)} - {formatSeconds(end)}</span>
+                              <span className="text-zinc-650">â€¢</span>
+                              <span className="text-primary/80 font-bold">{(end - start).toFixed(0)}s duration</span>
+                            </div>
+                            
+                            <div className="flex items-center gap-1.5 text-[10px] font-bold text-primary mt-1 opacity-0 group-hover/hl:opacity-100 transition-opacity">
+                              <PlayIcon /> Seek & Play
+                            </div>
+                          </button>
+                        );
+                      })
+                    ) : (
+                      <div className="text-center py-8 text-xs text-zinc-500 font-semibold">
+                        No highlights extracted.
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* Clips Grid Gallery */
+              <div className="space-y-5">
+                <div className="flex items-center justify-between border-b border-zinc-900 pb-3.5">
+                  <h3 className="text-xs font-black text-white uppercase tracking-widest">
+                    Extracted Video Clips
+                  </h3>
+                  <span className="text-[10px] font-bold text-zinc-400 bg-zinc-900 px-2.5 py-1 rounded border border-zinc-800">
+                    Aspect Ratio: {result.aspectRatio}
+                  </span>
+                </div>
+
+                {result.clips && result.clips.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {result.clips.map((clipUrl, i) => (
+                      <div
+                        key={i}
+                        className="relative group rounded-lg overflow-hidden border border-white/10 bg-[#0a0a0a] shadow-xl hover:border-primary/50 transition-all duration-300 flex flex-col"
+                      >
+                        <div className="relative group/vid border-b border-white/5 overflow-hidden bg-black/40">
+                          <video
+                            src={clipUrl}
+                            className={`w-full ${getAspectClass(result.aspectRatio)} object-cover bg-black/40 cursor-pointer hover:opacity-85 transition-opacity`}
+                            onClick={() => setFullscreenUrl(clipUrl)}
+                            controls={false}
+                            loop
+                            muted
+                            playsInline
+                            onMouseOver={(e) => e.target.play()}
+                            onMouseOut={(e) => {
+                              e.target.pause();
+                              e.target.currentTime = 0;
+                            }}
+                          />
+                          
+                          {/* Overlay actions */}
+                          <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover/vid:opacity-100 transition-opacity z-10">
+                            <button
+                              type="button"
+                              title="Fullscreen"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setFullscreenUrl(clipUrl);
+                              }}
+                              className="p-2 bg-black/60 backdrop-blur-md rounded-full text-white hover:bg-primary hover:text-black transition-all border border-white/10"
+                            >
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                <polyline points="15 3 21 3 21 9" />
+                                <polyline points="9 21 3 21 3 15" />
+                                <line x1="21" y1="3" x2="14" y2="10" />
+                                <line x1="3" y1="21" x2="10" y2="14" />
+                              </svg>
+                            </button>
+                            <button
+                              type="button"
+                              title="Copy Link"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                copyToClipboard(clipUrl);
+                              }}
+                              className="p-2 bg-black/60 backdrop-blur-md rounded-full text-white hover:bg-primary hover:text-black transition-all border border-white/10"
+                            >
+                              <CopyIcon />
+                            </button>
+                            <button
+                              type="button"
+                              title="Download"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                downloadVideo(clipUrl, `clip-${i + 1}.mp4`);
+                              }}
+                              className="p-2 bg-black/60 backdrop-blur-md rounded-full text-white hover:bg-primary hover:text-black transition-all border border-white/10"
+                            >
+                              <DownloadIcon />
+                            </button>
+                          </div>
+
+                          <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-md px-2 py-1 rounded border border-white/5 text-[9px] uppercase font-black tracking-wider text-primary">
+                            Clip #{i + 1}
+                          </div>
+                        </div>
+
+                        <div className="p-3 bg-black/80 backdrop-blur-sm border-t border-white/5 flex-1 flex flex-col justify-between gap-2">
+                          {result.prompt && (
+                            <p className="text-white/70 text-xs line-clamp-2 leading-relaxed" title={result.prompt}>
+                              {result.prompt}
+                            </p>
+                          )}
+                          <div className="flex items-center justify-between mt-1">
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] font-bold text-primary px-2 py-0.5 bg-primary/10 rounded border border-primary/20 whitespace-nowrap">
+                                AI Clipping
+                              </span>
+                              <span className="text-[10px] text-white/40">{result.aspectRatio || `Clip #${i + 1}`}</span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigator.clipboard.writeText(result.prompt || clipUrl);
+                                const btn = e.currentTarget;
+                                btn.innerText = "Copied!";
+                                setTimeout(() => { btn.innerText = "Copy"; }, 2000);
+                              }}
+                              className="px-2 py-0.5 bg-white/5 hover:bg-primary/20 hover:text-primary rounded text-[10px] font-medium text-white/70 transition-all border border-white/10"
+                              title="Copy prompt"
+                            >
+                              Copy Prompt
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="py-20 text-center text-xs text-zinc-500 font-semibold border border-zinc-900 rounded bg-zinc-950/20">
+                    No video clips generated. Try re-running.
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+      </div>
+
+      {/* â”€â”€â”€ FLOATING BOTTOM PROMPT BAR â”€â”€â”€ */}
+      <PromptComposer>
+          
+          {/* Inline list of uploaded media files */}
+          {videoUrl && (
+            <div className="flex items-center gap-2.5 px-1 pb-1">
+              <div className={PROMPT_MEDIA_PREVIEW_CLASS}>
+                <video src={videoUrl} className="w-full h-full object-cover" muted playsInline />
+                <button
+                  type="button"
+                  onClick={clearVideoUpload}
+                  className="absolute top-0.5 right-0.5 w-4 h-4 bg-black/60 hover:bg-black rounded-full flex items-center justify-center text-white/85 hover:text-white text-[8px] border border-white/5"
+                  title="Clear video"
+                >
+                  Ã—
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Upper row: upload button & prompt field */}
+          <div className="flex items-start gap-3 px-1">
+            {/* Hidden file input */}
+            <input
+              ref={videoFileInputRef}
+              type="file"
+              accept="video/*"
+              className="hidden"
+              onChange={handleVideoFileChange}
+            />
+            
+            {/* Sleek round upload button */}
+            {!videoUrl && (
+              <button
+                type="button"
+                title="Upload source video"
+                onClick={() => videoFileInputRef.current?.click()}
+                className={promptMediaButtonClassName({
+                  active: Boolean(videoUrl),
+                })}
+              >
+                {videoUploading ? (
+                  <div className="flex flex-col items-center justify-center w-full h-full absolute inset-0 bg-black/85 z-20 backdrop-blur-[1px]">
+                    <svg className="w-8 h-8 -rotate-90">
+                      <circle cx="16" cy="16" r="14" stroke="currentColor" strokeWidth="2" fill="transparent" className="text-white/10" />
+                      <circle
+                        cx="16"
+                        cy="16"
+                        r="14"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        fill="transparent"
+                        strokeDasharray={88}
+                        strokeDashoffset={88 - (88 * videoProgress) / 100}
+                        className="text-[#22d3ee] transition-all duration-300"
+                      />
+                    </svg>
+                    <span className={`absolute text-[8px] font-black text-[#22d3ee] leading-none ${videoProgress >= 100 ? "animate-pulse" : ""}`}>
+                      {videoProgress >= 100 ? "..." : `${videoProgress}%`}
+                    </span>
+                  </div>
+                ) : null}
+
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-white/40 group-hover:text-[#22d3ee] transition-colors">
+                  <polygon points="23 7 16 12 23 17 23 7" />
+                  <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+                </svg>
+              </button>
+            )}
+
+            {/* Prompt textarea (supports direct URL pasting too) */}
+            <div className="flex-1 flex flex-col gap-1">
+              <PromptTextarea
+                value={prompt}
+                onChange={handlePromptInput}
+                placeholder="Describe prompt / highlights to extract"
+              />
+            </div>
+          </div>
+
+          {/* Bottom row: controls + generate button */}
+          <PromptFooter>
+            <PromptControls>
+              
+              {/* Model Identifier (C) */}
+              <div className={promptControlClassName()}>
+                <div className="w-4 h-4 bg-[#22d3ee] rounded flex items-center justify-center shadow-lg shadow-[#22d3ee]/10">
+                  <span className="text-[9px] font-bold text-black uppercase">C</span>
+                </div>
+                <span className={PROMPT_CONTROL_LABEL_CLASS}>
+                  AI Clipping
+                </span>
+              </div>
+
+              {/* Aspect Ratio selector */}
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setAspectDropdownOpen(!aspectDropdownOpen)}
+                  className={promptControlClassName({
+                    active: aspectDropdownOpen,
+                  })}
+                >
+                  <PromptAspectRatioIcon />
+                  <span className={PROMPT_CONTROL_LABEL_CLASS}>
+                    {aspectRatio}
+                  </span>
+                </button>
+                {aspectDropdownOpen && (
+                  <PromptPopover>
+                    <PromptPopoverHeader>
+                      Aspect Ratio
+                    </PromptPopoverHeader>
+                    <PromptMenuList>
+                      {ASPECT_RATIOS.map((r) => (
+                        <PromptMenuItem
+                          key={r.value}
+                          selected={aspectRatio === r.value}
+                          onClick={() => {
+                            setAspectRatio(r.value);
+                            setAspectDropdownOpen(false);
+                          }}
+                        >
+                          {r.value}
+                        </PromptMenuItem>
+                      ))}
+                    </PromptMenuList>
+                  </PromptPopover>
+                )}
+              </div>
+
+              {/* Highlights Limit selector */}
+              <div className="relative" ref={highlightsDropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setHighlightsDropdownOpen(!highlightsDropdownOpen)}
+                  className={promptControlClassName({
+                    active: highlightsDropdownOpen,
+                  })}
+                >
+                  <PromptDurationIcon />
+                  <span className={PROMPT_CONTROL_LABEL_CLASS}>
+                    {numHighlights} Highlights
+                  </span>
+                </button>
+                {highlightsDropdownOpen && (
+                  <PromptPopover className="min-w-[180px] overflow-visible">
+                    <PromptPopoverHeader className="mb-3">
+                      Max Highlights
+                    </PromptPopoverHeader>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-white/60">Limit:</span>
+                        <span className="text-xs font-black text-primary bg-primary/10 px-2.5 py-0.5 rounded">
+                          {numHighlights}
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min="1"
+                        max="60"
+                        step="1"
+                        value={numHighlights}
+                        onChange={(e) => setNumHighlights(Number(e.target.value))}
+                        className="w-full h-1 bg-zinc-850 rounded appearance-none cursor-pointer accent-primary"
+                      />
+                    </div>
+                  </PromptPopover>
+                )}
+              </div>
+
+              {/* Return Coordinates Toggle */}
+              <button
+                type="button"
+                onClick={() => setReturnCoordinatesOnly(!returnCoordinatesOnly)}
+                className={promptControlClassName({
+                  active: returnCoordinatesOnly,
+                  className: returnCoordinatesOnly
+                    ? "text-[#22d3ee]"
+                    : "text-white/70 hover:text-white",
+                })}
+              >
+                <ScissorsIcon className="w-4 h-4 text-current" />
+                <span className="text-xs font-semibold">
+                  Coordinates Only
+                </span>
+              </button>
+
+            </PromptControls>
+
+            {/* Generate button */}
+            <PromptAction
+              onClick={handleGenerate}
+              disabled={isGenerating}
+            >
+              {isGenerating ? (
+                <>
+                  <span className="animate-spin inline-block text-black">â—Œ</span>
+                  <span>Generating...</span>
+                </>
+              ) : (
+                <>
+                  <span>Generate âœ¦ 5</span>
+                </>
+              )}
+            </PromptAction>
+          </PromptFooter>
+      </PromptComposer>
+
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+          height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.08);
+          border-radius: 99px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(255, 255, 255, 0.15);
+        }
+        .custom-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
+        }
+      `}</style>
+      <Toaster
+        toasterId={CLIPPING_TOASTER_ID}
+        position="bottom-right"
+        reverseOrder={false}
+        gutter={8}
+        containerStyle={{ zIndex: 99999, right: 20, bottom: 20 }}
+        toastOptions={{
+          duration: 6000,
+          style: {
+            background: "#0d0d0f",
+            color: "#f4f4f5",
+            border: "1px solid rgba(239,68,68,0.35)",
+            fontSize: "13px",
+            borderRadius: "12px",
+            boxShadow: "0 16px 48px rgba(0,0,0,0.65)",
+            maxWidth: "380px",
+            wordBreak: "break-word",
+            whiteSpace: "pre-wrap",
+            padding: "12px 14px",
+          },
+          error: {
+            iconTheme: {
+              primary: "#f87171",
+              secondary: "#0d0d0f",
+            },
+          },
+        }}
+      />
+    </div>
+  );
+}

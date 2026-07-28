@@ -188,4 +188,579 @@ const TABS_CONFIG = {
         label: "Left Arm",
         options: [
           { id: "left_arm_normal",     label: "Normal",         img: `${CDN}/left_arm_left_arm_normal.webp`,                          promptVal: "normal left arm" },
-          { id: "left_arm_cute",       label: "Cute Prosthetic",img: `${CDN}/left_arm_make_lefç^¸¶‰ËkºwµçCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠV@(€€€€€€€€€1PƒŠP	Õ¥±‘•È€¼=ÁÑ¥½¹ÌA…¹•°(€€€€€ƒŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠV@€¨½ô(€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à™±•àµ½°ÜµlÌÈÁÁátÍ¡É¥¹¬´À‰½É‘•ÈµÈ‰½É‘•Èµİ¡¥Ñ”½lÀ¸Àİt‰œµlŒÄÄÄÄÄÅt½Ù•É™±½Üµ¡¥‘‘•¸ˆø((€€€€€€€ì¼¨	Õ¥±‘•È¡•…‘•È€¨½ô(€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à¥Ñ•µÌµ•¹Ñ•È©ÕÍÑ¥™äµ‰•Ñİ••¸Áà´ĞÁä´Ì‰½É‘•Èµˆ‰½É‘•Èµİ¡¥Ñ”½lÀ¸ÀİtÍ¡É¥¹¬´Àˆø(€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰Ñ•áĞµlÄÍÁát™½¹Ğµ‰½±Ñ•áĞµİ¡¥Ñ”ÑÉ…­¥¹œµÑ¥¡Ğˆù	Õ¥±‘•Èğ½ÍÁ…¸ø(€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€½¹±¥¬õì ¤€ôøÍ•ÑM•±•Ñ•‘=ÁÑ¥½¹Ì   ¤€ôøì(€€€€€€€€€€€€€½¹ÍĞ¥¹¥Ğ€ôíôì(€€€€€€€€€€€€€=‰©•Ğ¹Ù…±Õ•Ì¡Q	M}=9%¤¹™½É…  ¡Ñ…ˆ¤€ôø(€€€€€€€€€€€€€€€Ñ…ˆ¹ÍÕ‰…Ñ•½É¥•Ì¹™½É…  ¡ÍÕˆ¤€ôøì(€€€€€€€€€€€€€€€€€¥˜€¡ÍÕˆ¹½ÁÑ¥½¹Ìü¹±•¹Ñ €ø€À¤¥¹¥ÑmÍÕˆ¹¥‘t€ôÍÕˆ¹½ÁÑ¥½¹ÍlÁt¹¥ì(€€€€€€€€€€€€€€€ô¤(€€€€€€€€€€€€€€¤ì(€€€€€€€€€€€€€É•ÑÕÉ¸¥¹¥Ğì(€€€€€€€€€€€ô¤ ¤¥ô(€€€€€€€€€€€±…ÍÍ9…µ”ô‰Ñ•áĞµlÄÅÁátÑ•áĞµÉ…ä´ÔÀÀ¡½Ù•ÈéÑ•áĞµİ¡¥Ñ”ÑÉ…¹Í¥Ñ¥½¸µ½±½ÉÌ™½¹Ğµµ•‘¥Õ´ˆ(€€€€€€€€€€ø(€€€€€€€€€€€I•Í•Ğ(€€€€€€€€€€ğ½‰ÕÑÑ½¸ø(€€€€€€€€ğ½‘¥Øø((€€€€€€€ì¼¨Q…ˆÁ¥±±Ì€¨½ô(€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à…À´ÄÁà´ÌÁä´È‰½É‘•Èµˆ‰½É‘•Èµİ¡¥Ñ”½lÀ¸ÀİtÍ¡É¥¹¬´Àˆø(€€€€€€€€€í=‰©•Ğ¹­•åÌ¡Q	M}=9%¤¹µ…À ¡­•ä¤€ôø€ (€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€­•äõí­•åô(€€€€€€€€€€€€€½¹±¥¬õì ¤€ôøÍ•ÑÑ¥Ù•Q…ˆ¡­•ä¥ô(€€€€€€€€€€€€€±…ÍÍ9…µ”õí™±•à´ÄÁä´Ä¸ÔÉ½Õ¹‘•µ±œÑ•áĞµlÄÉÁát™½¹ĞµÍ•µ¥‰½±ÑÉ…¹Í¥Ñ¥½¸µ…±°€‘ì(€€€€€€€€€€€€€€€…Ñ¥Ù•Q…ˆ€ôôô­•ä(€€€€€€€€€€€€€€€€€€ü€‰‰œµİ¡¥Ñ”Ñ•áĞµ‰±…¬Í¡…‘½Üˆ(€€€€€€€€€€€€€€€€€€è€‰Ñ•áĞµÉ…ä´ÔÀÀ¡½Ù•ÈéÑ•áĞµİ¡¥Ñ”¡½Ù•Èé‰œµİ¡¥Ñ”½lÀ¸ÀÙtˆ(€€€€€€€€€€€€€õô(€€€€€€€€€€€€ø(€€€€€€€€€€€€€íQ	M}=9%m­•åt¹±…‰•±ô(€€€€€€€€€€€€ğ½‰ÕÑÑ½¸ø(€€€€€€€€€€¤¥ô(€€€€€€€€ğ½‘¥Øø((€€€€€€€ì¼¨MÕ‰…Ñ•½Éä½ÁÑ¥½¹ÌÍÉ½±°…É•„€¨½ô(€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à´Ä½Ù•É™±½Üµäµ…ÕÑ¼À´ÌÍÁ…”µä´Ôˆø(€€€€€€€€€íQ	M}=9%m…Ñ¥Ù•Q…‰tü¹ÍÕ‰…Ñ•½É¥•Ìü¹µ…À ¡ÍÕ‰…Ğ¤€ôø€ (€€€€€€€€€€€€ñ‘¥Ø­•äõíÍÕ‰…Ğ¹¥‘ôø(€€€€€€€€€€€€€€ñÀ±…ÍÍ9…µ”ô‰Ñ•áĞµlÄÁÁát™½¹Ğµ‰½±Ñ•áĞµÉ…ä´ÔÀÀÕÁÁ•É…Í”ÑÉ…­¥¹œµİ¥‘•ÍĞµˆ´ÈÁà´À¸Ôˆø(€€€€€€€€€€€€€€€íÍÕ‰…Ğ¹±…‰•±ô(€€€€€€€€€€€€€€ğ½Àø(€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰É¥É¥µ½±Ì´Ì…À´Ä¸Ôˆø(€€€€€€€€€€€€€€€íÍÕ‰…Ğ¹½ÁÑ¥½¹Ìü¹µ…À ¡½ÁĞ¤€ôøì(€€€€€€€€€€€€€€€€€½¹ÍĞÍ•°€ôÍ•±•Ñ•‘=ÁÑ¥½¹ÍmÍÕ‰…Ğ¹¥‘t€ôôô½ÁĞ¹¥ì(€€€€€€€€€€€€€€€€€É•ÑÕÉ¸€ (€€€€€€€€€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€€€€€€€­•äõí½ÁĞ¹¥‘ô(€€€€€€€€€€€€€€€€€€€€€½¹±¥¬õì ¤€ôø¡…¹‘±•=ÁÑ¥½¹M•±•Ğ¡ÍÕ‰…Ğ¹¥°½ÁĞ¹¥¥ô(€€€€€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”õíÉ½ÕÀÉ•±…Ñ¥Ù”…ÍÁ•ĞµÍÅÕ…É”É½Õ¹‘•µá°½Ù•É™±½Üµ¡¥‘‘•¸‰½É‘•ÈÑÉ…¹Í¥Ñ¥½¸µ…±°€‘ì(€€€€€€€€€€€€€€€€€€€€€€€Í•°(€€€€€€€€€€€€€€€€€€€€€€€€€€ü€‰‰½É‘•Èµİ¡¥Ñ”¼àÀÉ¥¹œ´ÄÉ¥¹œµİ¡¥Ñ”¼ÌÀÍ¡…‘½Üµ±œˆ(€€€€€€€€€€€€€€€€€€€€€€€€€€è€‰‰½É‘•Èµİ¡¥Ñ”½lÀ¸Àát¡½Ù•Èé‰½É‘•Èµİ¡¥Ñ”¼ÈÔˆ(€€€€€€€€€€€€€€€€€€€€€õô(€€€€€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€€€€€€ñ¥µœ(€€€€€€€€€€€€€€€€€€€€€€€ÍÉŒõí½ÁĞ¹¥µô(€€€€€€€€€€€€€€€€€€€€€€€…±Ğõí½ÁĞ¹±…‰•±ô(€€€€€€€€€€€€€€€€€€€€€€€±½…‘¥¹œô‰±…éäˆ(€€€€€€€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰Üµ™Õ±° µ™Õ±°½‰©•Ğµ½Ù•Èˆ(€€€€€€€€€€€€€€€€€€€€€€€½¹ÉÉ½Èõì¡”¤€ôøì”¹Ñ…É•Ğ¹½¹•ÉÉ½È€ô¹Õ±°ì”¹Ñ…É•Ğ¹ÍÉŒ€ô€‘í9ô½¡…É…Ñ•É}ÑåÁ•}¡Õµ…¸¹İ•‰Á€ìõô(€€€€€€€€€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€€€€€€€€€€ì¼¨1…‰•°½Ù•É±…ä€¨½ô(€€€€€€€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰…‰Í½±ÕÑ”¥¹Í•Ğµà´À‰½ÑÑ½´´À‰œµÉ…‘¥•¹ĞµÑ¼µĞ™É½´µ‰±…¬¼àÀÙ¥„µ‰±…¬¼ĞÀÑ¼µÑÉ…¹ÍÁ…É•¹ĞÁĞ´ĞÁˆ´ÄÁà´Äˆø(€€€€€€€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰Ñ•áĞµlåÁát™½¹ĞµÍ•µ¥‰½±Ñ•áĞµİ¡¥Ñ”±•…‘¥¹œµ¹½¹”ˆùí½ÁĞ¹±…‰•±ôğ½ÍÁ…¸ø(€€€€€€€€€€€€€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€€€€€€€€€€€€€€ì¼¨M•±•Ñ•¡•¬‰…‘”€¨½ô(€€€€€€€€€€€€€€€€€€€€€íÍ•°€˜˜€ (€€€€€€€€€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰…‰Í½±ÕÑ”Ñ½À´ÄÉ¥¡Ğ´ÄÜ´Ğ ´ĞÉ½Õ¹‘•µ™Õ±°‰œµİ¡¥Ñ”Ñ•áĞµ‰±…¬™±•à¥Ñ•µÌµ•¹Ñ•È©ÕÍÑ¥™äµ•¹Ñ•Èˆø(€€€€€€€€€€€€€€€€€€€€€€€€€€ñ¡•­%½¸€¼ø(€€€€€€€€€€€€€€€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€€€€€€€€€ğ½‰ÕÑÑ½¸ø(€€€€€€€€€€€€€€€€€€¤ì(€€€€€€€€€€€€€€€ô¥ô(€€€€€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€€€¤¥ô(€€€€€€€€ğ½‘¥Øø(€€€€€€ğ½‘¥Øø((€€€€€ì¼¨ƒŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠV@(€€€€€€€€€9QHƒŠPÕÉÉ•¹Ğ¡…É…Ñ•ÈAÉ•Ù¥•Ü(€€€€€ƒŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠV@€¨½ô(€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à™±•àµ½°™±•à´Äµ¥¸µÜ´À½Ù•É™±½Üµ¡¥‘‘•¸‰œµlŒÁ„Á„Á…tˆø((€€€€€€€ì¼¨•¹Ñ•ÈÑ½À‰…Èè…ÍÁ•ĞÉ…Ñ¥¼€¬•¹•É…Ñ”€¨½ô(€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à¥Ñ•µÌµ•¹Ñ•È©ÕÍÑ¥™äµ‰•Ñİ••¸Áà´ØÁä´Ì‰½É‘•Èµˆ‰½É‘•Èµİ¡¥Ñ”½lÀ¸ÀİtÍ¡É¥¹¬´Àˆø(€€€€€€€€€ì¼¨ÍÁ•ĞÉ…Ñ¥¼€¨½ô(€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à…À´À¸Ô‰œµİ¡¥Ñ”½lÀ¸ÀÕt‰½É‘•È‰½É‘•Èµİ¡¥Ñ”½lÀ¸ÀátÉ½Õ¹‘•µá°À´Äˆø(€€€€€€€€€€€ílˆÌèĞˆ°€ˆÄèÄˆ°€ˆäèÄØˆ°€ˆÄØèä‰t¹µ…À ¡È¤€ôø€ (€€€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€­•äõíÉô(€€€€€€€€€€€€€€€½¹±¥¬õì ¤€ôøÍ•ÑÍÁ•ÑI…Ñ¥¼¡È¥ô(€€€€€€€€€€€€€€€±…ÍÍ9…µ”õíÁà´ÌÁä´Ä¸ÔÉ½Õ¹‘•µ±œÑ•áĞµlÄÅÁát™½¹Ğµ‰½±ÑÉ…¹Í¥Ñ¥½¸µ…±°€‘ì(€€€€€€€€€€€€€€€€€…ÍÁ•ÑI…Ñ¥¼€ôôôÈ(€€€€€€€€€€€€€€€€€€€€ü€‰‰œµÙ¥½±•Ğ´ØÀÀÑ•áĞµİ¡¥Ñ”Í¡…‘½ÜµµÍ¡…‘½ÜµÙ¥½±•Ğ´ØÀÀ¼ĞÀˆ(€€€€€€€€€€€€€€€€€€€€è€‰Ñ•áĞµÉ…ä´ÔÀÀ¡½Ù•ÈéÑ•áĞµİ¡¥Ñ”ˆ(€€€€€€€€€€€€€€€õô(€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€íÉô(€€€€€€€€€€€€€€ğ½‰ÕÑÑ½¸ø(€€€€€€€€€€€€¤¥ô(€€€€€€€€€€ğ½‘¥Øø((€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à¥Ñ•µÌµ•¹Ñ•È…À´Èˆø(€€€€€€€€€€€ì¼¨M¡Õ™™±”€¨½ô(€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€½¹±¥¬õí¡…¹‘±•M¡Õ™™±•ô(€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰™±•à¥Ñ•µÌµ•¹Ñ•È…À´Ä¸ÔÁà´ÌÁä´ÈÉ½Õ¹‘•µá°‰œµİ¡¥Ñ”½lÀ¸ÀÕt‰½É‘•È‰½É‘•Èµİ¡¥Ñ”½lÀ¸ÀátÑ•áĞµÉ…ä´ĞÀÀ¡½Ù•ÈéÑ•áĞµİ¡¥Ñ”¡½Ù•Èé‰œµİ¡¥Ñ”¼ÄÀÑ•áĞµlÄÉÁát™½¹ĞµÍ•µ¥‰½±ÑÉ…¹Í¥Ñ¥½¸µ…±°ˆ(€€€€€€€€€€€€ø(€€€€€€€€€€€€€€ñM¡Õ™™±•%½¸€¼ø(€€€€€€€€€€€€€M¡Õ™™±”(€€€€€€€€€€€€ğ½‰ÕÑÑ½¸ø((€€€€€€€€€€€ì¼¨•¹•É…Ñ”€¨½ô(€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€½¹±¥¬õí¡…¹‘±••¹•É…Ñ•ô(€€€€€€€€€€€€€‘¥Í…‰±•õí¥Í•¹•É…Ñ¥¹ô(€€€€€€€€€€€€€±…ÍÍ9…µ”õí™±•à¥Ñ•µÌµ•¹Ñ•È…À´ÈÁà´ÔÁä´ÈÉ½Õ¹‘•µá°Ñ•áĞµlÄÍÁát™½¹Ğµ‰½±ÑÉ…¹Í¥Ñ¥½¸µ…±°Í¡…‘½Üµ±œ€‘ì(€€€€€€€€€€€€€€€¥Í•¹•É…Ñ¥¹œ(€€€€€€€€€€€€€€€€€€ü€‰‰œµÙ¥½±•Ğ´ØÀÀ¼ĞÀÑ•áĞµİ¡¥Ñ”¼ØÀÕÉÍ½Èµ¹½Ğµ…±±½İ•ˆ(€€€€€€€€€€€€€€€€€€è€‰‰œµÉ…‘¥•¹ĞµÑ¼µÈ™É½´µÙ¥½±•Ğ´ØÀÀÑ¼µ¥¹‘¥¼´ØÀÀ¡½Ù•Èé™É½´µÙ¥½±•Ğ´ÔÀÀ¡½Ù•ÈéÑ¼µ¥¹‘¥¼´ÔÀÀÑ•áĞµİ¡¥Ñ”Í¡…‘½ÜµÙ¥½±•Ğ´ØÀÀ¼ÌÀ¡½Ù•ÈéÍ¡…‘½ÜµÙ¥½±•Ğ´ÔÀÀ¼ĞÀˆ(€€€€€€€€€€€€€õô(€€€€€€€€€€€€ø(€€€€€€€€€€€€€í¥Í•¹•É…Ñ¥¹œ€ü€ (€€€€€€€€€€€€€€€€ğø(€€€€€€€€€€€€€€€€€€ñÍÙœ±…ÍÍ9…µ”ô‰…¹¥µ…Ñ”µÍÁ¥¸ˆİ¥‘Ñ ôˆÄĞˆ¡•¥¡ĞôˆÄĞˆÙ¥•İ	½àôˆÀ€À€ÈĞ€ÈĞˆ™¥±°ô‰¹½¹”ˆÍÑÉ½­”ô‰ÕÉÉ•¹Ñ½±½ÈˆÍÑÉ½­•]¥‘Ñ ôˆÈ¸Ôˆø(€€€€€€€€€€€€€€€€€€€€ñÁ…Ñ ô‰4ÈÄ€ÄÉ„ä€ä€À€ÄÄ´Äà€À€ä€ä€À€ÀÄÄà€ÁèˆÍÑÉ½­•=Á…¥ÑäôˆÀ¸Ìˆ€¼ø(€€€€€€€€€€€€€€€€€€€€ñÁ…Ñ ô‰4ÈÄ€ÄÉ„ä€ä€À€ÀÀ´ä´äˆ€¼ø(€€€€€€€€€€€€€€€€€€ğ½ÍÙœø(€€€€€€€€€€€€€€€€€•¹•É…Ñ¥¹ŸŠ˜(€€€€€€€€€€€€€€€€ğ¼ø(€€€€€€€€€€€€€€¤€è€ (€€€€€€€€€€€€€€€€ğøñ	½±Ñ%½¸€¼ù•¹•É…Ñ”¡…É…Ñ•Èğ¼ø(€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€ğ½‰ÕÑÑ½¸ø(€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€ğ½‘¥Øø((€€€€€€€ì¼¨AÉ•Ù¥•Ü…É•„€¨½ô(€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à´Ä™±•à¥Ñ•µÌµ•¹Ñ•È©ÕÍÑ¥™äµ•¹Ñ•ÈÀ´Ø½Ù•É™±½Üµ¡¥‘‘•¸ˆø(€€€€€€€€€€ñ‘¥Ø(€€€€€€€€€€€±…ÍÍ9…µ”ô‰É•±…Ñ¥Ù”É½Õ¹‘•´Éá°½Ù•É™±½Üµ¡¥‘‘•¸‰œµlŒÄĞÄĞÄÑt‰½É‘•È‰½É‘•Èµİ¡¥Ñ”½lÀ¸ÀİtÍ¡…‘½Ü´Éá°™±•à¥Ñ•µÌµ•¹Ñ•È©ÕÍÑ¥™äµ•¹Ñ•Èˆ(€€€€€€€€€€€ÍÑå±”õíì…ÍÁ•ÑI…Ñ¥¼è…É5…Ám…ÍÁ•ÑI…Ñ¥½t€üü€ˆÌ¼Ğˆ°µ…á!•¥¡Ğè€ˆÄÀÀ”ˆ°µ…á]¥‘Ñ è€ˆÄÀÀ”ˆõô(€€€€€€€€€€ø(€€€€€€€€€€€í¥Í•¹•É…Ñ¥¹œ€ü€ (€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à™±•àµ½°¥Ñ•µÌµ•¹Ñ•È…À´ĞÑ•áĞµ•¹Ñ•ÈÁà´àÁä´ÄÈˆø(€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰Ü´ÄÈ ´ÄÈ‰½É‘•ÈµlÍÁát‰½É‘•ÈµÙ¥½±•Ğ´ÔÀÀ¼ÈÀ‰½É‘•ÈµĞµÙ¥½±•Ğ´ÔÀÀÉ½Õ¹‘•µ™Õ±°…¹¥µ…Ñ”µÍÁ¥¸ˆ€¼ø(€€€€€€€€€€€€€€€€ñÀ±…ÍÍ9…µ”ô‰Ñ•áĞµÍ´Ñ•áĞµÉ…ä´ĞÀÀ™½¹Ğµµ•‘¥Õ´ˆù•¹•É…Ñ¥¹œå½ÕÈ$¥¹™±Õ•¹•ËŠ˜ğ½Àø(€€€€€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€€€€€¤€èÁÉ•Ù¥•İUÉ°€ü€ (€€€€€€€€€€€€€€ğø(€€€€€€€€€€€€€€€€ñ¥µœÍÉŒõíÁÉ•Ù¥•İUÉ±ô…±Ğô‰•¹•É…Ñ•$¡…É…Ñ•Èˆ±…ÍÍ9…µ”ô‰Üµ™Õ±° µ™Õ±°½‰©•Ğµ½Ù•Èˆ€¼ø(€€€€€€€€€€€€€€€ì¼¨½İ¹±½…½Ù•É±…ä‰ÕÑÑ½¸€¨½ô(€€€€€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€€€½¹±¥¬õì ¤€ôø‘½İ¹±½…‘%µœ¡ÁÉ•Ù¥•İUÉ°¥ô(€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰…‰Í½±ÕÑ”‰½ÑÑ½´´ÌÉ¥¡Ğ´Ì™±•à¥Ñ•µÌµ•¹Ñ•È…À´Ä¸ÔÁà´ÌÁä´Ä¸ÔÉ½Õ¹‘•µ±œ‰œµ‰±…¬¼ØÀ‰…­‘É½Àµ‰±ÕÈµÍ´‰½É‘•È‰½É‘•Èµİ¡¥Ñ”¼ÄÀÑ•áĞµİ¡¥Ñ”Ñ•áĞµlÄÅÁát™½¹ĞµÍ•µ¥‰½±¡½Ù•Èé‰œµ‰±…¬¼àÀÑÉ…¹Í¥Ñ¥½¸µ…±°ˆ(€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€€ñ½İ¹±½…‘%½¸€¼ø(€€€€€€€€€€€€€€€€€M…Ù”(€€€€€€€€€€€€€€€€ğ½‰ÕÑÑ½¸ø(€€€€€€€€€€€€€€ğ¼ø(€€€€€€€€€€€€¤€è€ (€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à™±•àµ½°¥Ñ•µÌµ•¹Ñ•È…À´ÌÑ•áĞµ•¹Ñ•ÈÁà´àÁä´ÄÈˆø(€€€€€€€€€€€€€€€€ñÍÙœİ¥‘Ñ ôˆĞàˆ¡•¥¡ĞôˆĞàˆÙ¥•İ	½àôˆÀ€À€ÈĞ€ÈĞˆ™¥±°ô‰¹½¹”ˆÍÑÉ½­”ô‰ÕÉÉ•¹Ñ½±½ÈˆÍÑÉ½­•]¥‘Ñ ôˆÀ¸àˆ±…ÍÍ9…µ”ô‰Ñ•áĞµÉ…ä´ÜÀÀˆø(€€€€€€€€€€€€€€€€€€ñÁ…Ñ ô‰4ÈÀ€ÈÅØ´É„Ğ€Ğ€À€ÀÀ´Ğ´Ñ á„Ğ€Ğ€À€ÀÀ´Ğ€ÑØÈˆ€¼øñ¥É±”àôˆÄÈˆäôˆÜˆÈôˆĞˆ€¼ø(€€€€€€€€€€€€€€€€ğ½ÍÙœø(€€€€€€€€€€€€€€€€ñÀ±…ÍÍ9…µ”ô‰Ñ•áĞµÍ´Ñ•áĞµÉ…ä´ØÀÀ™½¹Ğµµ•‘¥Õ´ˆùe½ÕÈ$¥¹™±Õ•¹•È±¥Ù•Ì¡•É”¸ğ½Àø(€€€€€€€€€€€€€€€€ñÀ±…ÍÍ9…µ”ô‰Ñ•áĞµáÌÑ•áĞµÉ…ä´ÜÀÀˆù•Í¥¸…¹‰Õ¥±å½ÕÈ$¥¹™±Õ•¹•Èñ‰È€¼ù™É½´ÍÉ…Ñ ğ½Àø(€€€€€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€€€€€¥ô(€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€ğ½‘¥Øø((€€€€€€€ì¼¨ƒŠRŠR M•±•Ñ•½ÁÑ¥½¸Á¥±±ÌƒŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠR €¨½ô(€€€€€€€íÍ•±•Ñ•‘Q…Ì¹±•¹Ñ €ø€À€˜˜€ (€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰Áà´ØÁˆ´ÌÍ¡É¥¹¬´Àˆø(€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à™±•àµİÉ…À…À´Ä¸Ô¥Ñ•µÌµ•¹Ñ•Èˆø(€€€€€€€€€€€€€ì¡Í¡½İ±±Q…Ì€üÍ•±•Ñ•‘Q…Ì€èÍ•±•Ñ•‘Q…Ì¹Í±¥” À°QM}Y%M%	1¤¤¹µ…À ¡Ñ…œ¤€ôø€ (€€€€€€€€€€€€€€€€ñ!½Ù•ÉA¥±°(€€€€€€€€€€€€€€€€€­•äõíÑ…œ¹ÍÕ‰…Ñ%‘ô(€€€€€€€€€€€€€€€€€±…‰•°õíÑ…œ¹±…‰•±ô(€€€€€€€€€€€€€€€€€¥µœõíÑ…œ¹¥µô(€€€€€€€€€€€€€€€€€½¹±¥¬õì ¤€ôøì(€€€€€€€€€€€€€€€€€€€€¼¼)ÕµÀ‰Õ¥±‘•ÈÁ…¹•°Ñ¼Ñ¡”Ñ…ˆÑ¡…Ğ½İ¹ÌÑ¡¥ÌÍÕ‰…Ñ•½Éä(€€€€€€€€€€€€€€€€€€€½¹ÍĞ½İ¹•ÉQ…ˆ€ô=‰©•Ğ¹­•åÌ¡Q	M}=9%¤¹™¥¹ ¡Ñ¬¤€ôø(€€€€€€€€€€€€€€€€€€€€€Q	M}=9%mÑ­t¹ÍÕ‰…Ñ•½É¥•Ì¹Í½µ” ¡Ì¤€ôøÌ¹¥€ôôôÑ…œ¹ÍÕ‰…Ñ%¤(€€€€€€€€€€€€€€€€€€€€¤ì(€€€€€€€€€€€€€€€€€€€¥˜€¡½İ¹•ÉQ…ˆ¤Í•ÑÑ¥Ù•Q…ˆ¡½İ¹•ÉQ…ˆ¤ì(€€€€€€€€€€€€€€€€€õô(€€€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€€€¤¥ô(€€€€€€€€€€€€€íÍ•±•Ñ•‘Q…Ì¹±•¹Ñ €øQM}Y%M%	1€˜˜€ (€€€€€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€€€ÑåÁ”ô‰‰ÕÑÑ½¸ˆ(€€€€€€€€€€€€€€€€€½¹±¥¬õì ¤€ôøÍ•ÑM¡½İ±±Q…Ì ¡Ø¤€ôø€…Ø¥ô(€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰ µlÈÉÁátÁà´ÈÉ½Õ¹‘•µµ‰œµİ¡¥Ñ”½lÀ¸ÀÑt¡½Ù•Èé‰œµİ¡¥Ñ”½lÀ¸Àåt‰½É‘•È‰½É‘•Èµİ¡¥Ñ”½lÀ¸ÀátÑ•áĞµlÄÅÁátÑ•áĞµÉ…ä´ÔÀÀ¡½Ù•ÈéÑ•áĞµÉ…ä´ÌÀÀİ¡¥Ñ•ÍÁ…”µ¹½İÉ…ÀÑÉ…¹Í¥Ñ¥½¸µ…±°ˆ(€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€íÍ¡½İ±±Q…Ì€ü€‰¡¥‘”ˆ€èÍ¡½Üµ½É•ô(€€€€€€€€€€€€€€€€ğ½‰ÕÑÑ½¸ø(€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€¥ô((€€€€€€€ì¼¨ÉÉ½È€¨½ô(€€€€€€€í•ÉÉ½É5Íœ€˜˜€ (€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰µà´Øµˆ´ĞÁà´ĞÁä´ÌÉ½Õ¹‘•µá°‰œµÉ•´ÔÀÀ¼ÄÀ‰½É‘•È‰½É‘•ÈµÉ•´ÔÀÀ¼ÈÀÑ•áĞµÉ•´ĞÀÀÑ•áĞµlÄÉÁátÍ¡É¥¹¬´Àˆø(€€€€€€€€€€€í•ÉÉ½É5Íô(€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€¥ô((€€€€€€€ì¼¨ÕÍÑ½´ÁÉ½µÁĞ‰…È…Ğ‰½ÑÑ½´€¨½ô(€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰Áà´ØÁˆ´ĞÍ¡É¥¹¬´Àˆø(€€€€€€€€€€ñ¥¹ÁÕĞ(€€€€€€€€€€€ÑåÁ”ô‰Ñ•áĞˆ(€€€€€€€€€€€Ù…±Õ”õíÕÍÑ½µAÉ½µÁÑô(€€€€€€€€€€€½¹¡…¹”õì¡”¤€ôøÍ•ÑÕÍÑ½µAÉ½µÁĞ¡”¹Ñ…É•Ğ¹Ù…±Õ”¥ô(€€€€€€€€€€€Á±…•¡½±‘•Èô‰‘•áÑÉ„‘•Ñ…¥±ÏŠ˜”¹œ¸¹•½¸å‰•ÉÁÕ¹¬±¥¡Ñ¥¹œ°‘É…µ…Ñ¥ŒÍ¡…‘½İÌˆ(€€€€€€€€€€€±…ÍÍ9…µ”ô‰Üµ™Õ±° ´ä‰œµlŒÄØÄØÄÙt‰½É‘•È‰½É‘•Èµİ¡¥Ñ”½lÀ¸ÀİtÉ½Õ¹‘•µá°Áà´ÌÑ•áĞµlÄÉÁátÑ•áĞµÉ…ä´ÈÀÀÁ±…•¡½±‘•ÈµÉ…ä´ØÀÀ½ÕÑ±¥¹”µ¹½¹”™½ÕÌé‰½É‘•ÈµÙ¥½±•Ğ´ÔÀÀ¼ĞÀÑÉ…¹Í¥Ñ¥½¸µ½±½ÉÌˆ(€€€€€€€€€€¼ø(€€€€€€€€ğ½‘¥Øø(€€€€€€ğ½‘¥Øø((€€€€€ì¼¨ƒŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠV@(€€€€€€€€€I%!PƒŠP•¹•É…Ñ•¡…É…Ñ•ÉÌ!¥ÍÑ½Éä…±±•Éä(€€€€€ƒŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠVCŠV@€¨½ô(€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à™±•àµ½°ÜµlÄØÁÁátÍ¡É¥¹¬´À‰½É‘•Èµ°‰½É‘•Èµİ¡¥Ñ”½lÀ¸Àİt‰œµlŒÄÄÄÄÄÅt½Ù•É™±½Üµ¡¥‘‘•¸ˆø((€€€€€€€ì¼¨…±±•Éä¡•…‘•È€¨½ô(€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰Áà´ÌÁä´Ì‰½É‘•Èµˆ‰½É‘•Èµİ¡¥Ñ”½lÀ¸ÀİtÍ¡É¥¹¬´Àˆø(€€€€€€€€€€ñÀ±…ÍÍ9…µ”ô‰Ñ•áĞµlÄÅÁát™½¹Ğµ‰½±Ñ•áĞµİ¡¥Ñ”ÑÉ…­¥¹œµÑ¥¡Ğˆù•¹•É…Ñ•ğ½Àø(€€€€€€€€€€ñÀ±…ÍÍ9…µ”ô‰Ñ•áĞµlåÁátÑ•áĞµÉ…ä´ØÀÀµĞ´À¸Ôˆùí¡¥ÍÑ½Éä¹±•¹Ñ¡ô¡…É…Ñ•ÉÌğ½Àø(€€€€€€€€ğ½‘¥Øø((€€€€€€€ì¼¨…±±•ÉäÍÉ½±°€¨½ô(€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à´Ä½Ù•É™±½Üµäµ…ÕÑ¼À´ÈÍÁ…”µä´Èˆø(€€€€€€€€€í¡¥ÍÑ½Éä¹±•¹Ñ €ôôô€À€ü€ (€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à™±•àµ½°¥Ñ•µÌµ•¹Ñ•È©ÕÍÑ¥™äµ•¹Ñ•È ´ÌÈÑ•áĞµ•¹Ñ•ÈÁà´Èˆø(€€€€€€€€€€€€€€ñÍÙœİ¥‘Ñ ôˆÈàˆ¡•¥¡ĞôˆÈàˆÙ¥•İ	½àôˆÀ€À€ÈĞ€ÈĞˆ™¥±°ô‰¹½¹”ˆÍÑÉ½­”ô‰ÕÉÉ•¹Ñ½±½ÈˆÍÑÉ½­•]¥‘Ñ ôˆÄˆ±…ÍÍ9…µ”ô‰Ñ•áĞµÉ…ä´ÜÀÀµˆ´Èˆø(€€€€€€€€€€€€€€€€ñÉ•ĞàôˆÌˆäôˆÌˆİ¥‘Ñ ôˆÄàˆ¡•¥¡ĞôˆÄàˆÉàôˆÈˆÉäôˆÈˆ€¼øñ¥É±”àôˆà¸Ôˆäôˆà¸ÔˆÈôˆÄ¸Ôˆ€¼øñÁ½±å±¥¹”Á½¥¹ÑÌôˆÈÄ€ÄÔ€ÄØ€ÄÀ€Ô€ÈÄˆ€¼ø(€€€€€€€€€€€€€€ğ½ÍÙœø(€€€€€€€€€€€€€€ñÀ±…ÍÍ9…µ”ô‰Ñ•áĞµlåÁátÑ•áĞµÉ…ä´ÜÀÀ±•…‘¥¹œµÉ•±…á•ˆù•¹•É…Ñ•¡…É…Ñ•ÉÌñ‰È€¼ù…ÁÁ•…È¡•É”ğ½Àø(€€€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€€€¤€è€ (€€€€€€€€€€€¡¥ÍÑ½Éä¹µ…À ¡¥Ñ•´°¥‘à¤€ôø€ (€€€€€€€€€€€€€€ñ‘¥Ø(€€€€€€€€€€€€€€€­•äõí¥Ñ•´¹ÑÍô(€€€€€€€€€€€€€€€É½±”ô‰‰ÕÑÑ½¸ˆ(€€€€€€€€€€€€€€€Ñ…‰%¹‘•àõìÁô(€€€€€€€€€€€€€€€½¹±¥¬õì ¤€ôøÍ•ÑM•±•Ñ•‘!¥ÍÑ½Éå%‘à¡¥‘à¥ô(€€€€€€€€€€€€€€€½¹-•å½İ¸õì¡”¤€ôø”¹­•ä€ôôô€‰¹Ñ•Èˆ€˜˜Í•ÑM•±•Ñ•‘!¥ÍÑ½Éå%‘à¡¥‘à¥ô(€€€€€€€€€€€€€€€±…ÍÍ9…µ”õíÉ½ÕÀÉ•±…Ñ¥Ù”Üµ™Õ±°…ÍÁ•ĞµlÌ¼ÑtÉ½Õ¹‘•µá°½Ù•É™±½Üµ¡¥‘‘•¸‰½É‘•ÈÑÉ…¹Í¥Ñ¥½¸µ…±°ÕÉÍ½ÈµÁ½¥¹Ñ•È€‘ì(€€€€€€€€€€€€€€€€€Í•±•Ñ•‘!¥ÍÑ½Éå%‘à€ôôô¥‘à(€€€€€€€€€€€€€€€€€€€€ü€‰‰½É‘•ÈµÙ¥½±•Ğ´ÔÀÀÉ¥¹œ´ÄÉ¥¹œµÙ¥½±•Ğ´ÔÀÀ¼ĞÀˆ(€€€€€€€€€€€€€€€€€€€€è€‰‰½É‘•Èµİ¡¥Ñ”½lÀ¸Àát¡½Ù•Èé‰½É‘•Èµİ¡¥Ñ”¼ÈÀˆ(€€€€€€€€€€€€€€€õô(€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€ñ¥µœÍÉŒõí¥Ñ•´¹ÕÉ±ô…±Ğõí¡…É…Ñ•È€‘í¥‘à€¬€Åõô±…ÍÍ9…µ”ô‰Üµ™Õ±° µ™Õ±°½‰©•Ğµ½Ù•Èˆ€¼ø(€€€€€€€€€€€€€€€ì¼¨½İ¹±½…½¸¡½Ù•È€¨½ô(€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰…‰Í½±ÕÑ”¥¹Í•Ğ´À‰œµ‰±…¬¼ÔÀ½Á…¥Ñä´ÀÉ½ÕÀµ¡½Ù•Èé½Á…¥Ñä´ÄÀÀÑÉ…¹Í¥Ñ¥½¸µ½Á…¥Ñä™±•à¥Ñ•µÌµ•¹©ÕÍÑ¥™äµ•¹Ñ•ÈÁˆ´Èˆø(€€€€€€€€€€€€€€€€€€ñ‘¥Ø(€€€€€€€€€€€€€€€€€€€É½±”ô‰‰ÕÑÑ½¸ˆ(€€€€€€€€€€€€€€€€€€€Ñ…‰%¹‘•àõìÁô(€€€€€€€€€€€€€€€€€€€½¹±¥¬õì¡”¤€ôøì”¹ÍÑ½ÁAÉ½Á……Ñ¥½¸ ¤ì‘½İ¹±½…‘%µœ¡¥Ñ•´¹ÕÉ°¤ìõô(€€€€€€€€€€€€€€€€€€€½¹-•å½İ¸õì¡”¤€ôøì¥˜€¡”¹­•ä€ôôô€‰¹Ñ•Èˆ¤ì”¹ÍÑ½ÁAÉ½Á……Ñ¥½¸ ¤ì‘½İ¹±½…‘%µœ¡¥Ñ•´¹ÕÉ°¤ìôõô(€€€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰À´Ä¸ÔÉ½Õ¹‘•µ±œ‰œµİ¡¥Ñ”¼ÄÀ‰…­‘É½Àµ‰±ÕÈµÍ´‰½É‘•È‰½É‘•Èµİ¡¥Ñ”¼ÈÀÑ•áĞµİ¡¥Ñ”¡½Ù•Èé‰œµİ¡¥Ñ”¼ÈÀÑÉ…¹Í¥Ñ¥½¸µ…±°ÕÉÍ½ÈµÁ½¥¹Ñ•Èˆ(€€€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€€€€ñ½İ¹±½…‘%½¸€¼ø(€€€€€€€€€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€€€€€€€€ì¼¨%¹‘•à‰…‘”€¨½ô(€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰…‰Í½±ÕÑ”Ñ½À´Ä±•™Ğ´ÄÁà´Ä¸ÔÁä´À¸ÔÉ½Õ¹‘•µµ‰œµ‰±…¬¼ØÀ‰…­‘É½Àµ‰±ÕÈµÍ´Ñ•áĞµláÁátÑ•áĞµÉ…ä´ÌÀÀ™½¹Ğµ‰½±ˆø(€€€€€€€€€€€€€€€€€€í¡¥ÍÑ½Éä¹±•¹Ñ €´¥‘áô(€€€€€€€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€€€€€¤¤(€€€€€€€€€€¥ô(€€€€€€€€ğ½‘¥Øø(€€€€€€ğ½‘¥Øø(€€€€€€ñQ½…ÍÑ•ÈÁ½Í¥Ñ¥½¸ô‰Ñ½ÀµÉ¥¡Ğˆ½¹Ñ…¥¹•ÉMÑå±”õíìé%¹‘•àè€äääääõôÑ½…ÍÑ=ÁÑ¥½¹Ìõíì‘ÕÉ…Ñ¥½¸è€ÔÀÀÀ°ÍÑå±”èì‰…­É½Õ¹è€œŒÄàÄàÅˆœ°½±½Èè€œ™™™™™˜œ°‰½É‘•Èè€œÅÁàÍ½±¥É‰„ ÈÔÔ°ÈÔÔ°ÈÔÔ°À¸ÄÔ¤œ°™½¹ÑM¥é”è€œÄÍÁàœ°‰½É‘•ÉI…‘¥ÕÌè€œÄÉÁàœ°‰½áM¡…‘½Üè€œÀ€ÄÁÁà€ÌÁÁàÉ‰„ À°À°À°À¸Ø¤œ°µ…á]¥‘Ñ è€œĞĞÁÁàœ°İ½É‘	É•…¬è€‰É•…¬µİ½Éœ°İ¡¥Ñ•MÁ…”è€ÁÉ”µİÉ…Àœ°Á…‘‘¥¹œè€œÄÉÁà€ÄÙÁàœôõô€¼ø(€€€€ğ½‘¥Øø(€€¤ì)ô
+          { id: "left_arm_cute",       label: "Cute Prosthetic",img: `${CDN}/left_arm_make_left_arm_stylish_pink_prosthetic_wi.webp`, promptVal: "stylish pink prosthetic left arm with cute stickers" },
+          { id: "left_arm_robotic",    label: "Robotic",        img: `${CDN}/left_arm_left_arm_robotic.webp`,                         promptVal: "robotic left arm" },
+          { id: "left_arm_prosthetic", label: "Prosthetic",     img: `${CDN}/left_arm_left_arm_prosthetic.webp`,                      promptVal: "prosthetic left arm" },
+          { id: "left_arm_mechanical", label: "Mechanical",     img: `${CDN}/left_arm_left_arm_mechanical.webp`,                      promptVal: "mechanical left arm" },
+          { id: "left_arm_none",       label: "None",           img: `${CDN}/left_arm_left_arm_none.webp`,                            promptVal: "no left arm" },
+        ],
+      },
+      {
+        id: "right_arm",
+        label: "Right Arm",
+        options: [
+          { id: "right_arm_normal",     label: "Normal",         img: `${CDN}/right_arm_right_arm_normal.webp`,                          promptVal: "normal right arm" },
+          { id: "right_arm_cute",       label: "Cute Prosthetic",img: `${CDN}/right_arm_make_right_arm_stylish_pink_prosthetic_w.webp`, promptVal: "stylish pink prosthetic right arm with cute stickers" },
+          { id: "right_arm_robotic",    label: "Robotic",        img: `${CDN}/right_arm_right_arm_robotic.webp`,                         promptVal: "robotic right arm" },
+          { id: "right_arm_prosthetic", label: "Prosthetic",     img: `${CDN}/right_arm_right_arm_prosthetic.webp`,                      promptVal: "prosthetic right arm" },
+          { id: "right_arm_mechanical", label: "Mechanical",     img: `${CDN}/right_arm_right_arm_mechanical.webp`,                      promptVal: "mechanical right arm" },
+          { id: "right_arm_none",       label: "None",           img: `${CDN}/right_arm_right_arm_none.webp`,                            promptVal: "no right arm" },
+        ],
+      },
+      {
+        id: "left_leg",
+        label: "Left Leg",
+        options: [
+          { id: "left_leg_normal",     label: "Normal",         img: `${CDN}/left_leg_left_leg_normal.webp`,                          promptVal: "normal left leg" },
+          { id: "left_leg_cute",       label: "Cute Prosthetic",img: `${CDN}/left_leg_make_left_leg_stylish_pink_prosthetic_wi.webp`, promptVal: "stylish pink prosthetic left leg with cute stickers" },
+          { id: "left_leg_robotic",    label: "Robotic",        img: `${CDN}/left_leg_left_leg_robotic.webp`,                         promptVal: "robotic left leg" },
+          { id: "left_leg_prosthetic", label: "Prosthetic",     img: `${CDN}/left_leg_left_leg_prosthetic.webp`,                      promptVal: "prosthetic left leg" },
+          { id: "left_leg_mechanical", label: "Mechanical",     img: `${CDN}/left_leg_left_leg_mechanical.webp`,                      promptVal: "mechanical left leg" },
+          { id: "left_leg_none",       label: "None",           img: `${CDN}/left_leg_left_leg_none.webp`,                            promptVal: "no left leg" },
+        ],
+      },
+      {
+        id: "right_leg",
+        label: "Right Leg",
+        options: [
+          { id: "right_leg_normal",     label: "Normal",         img: `${CDN}/right_leg_right_leg_normal.webp`,                         promptVal: "normal right leg" },
+          { id: "right_leg_cute",       label: "Cute Prosthetic",img: `${CDN}/right_leg_make_right_leg_stylish_pink_prosthetic_w.webp`, promptVal: "stylish pink prosthetic right leg with cute stickers" },
+          { id: "right_leg_robotic",    label: "Robotic",        img: `${CDN}/right_leg_right_leg_robotic.webp`,                        promptVal: "robotic right leg" },
+          { id: "right_leg_prosthetic", label: "Prosthetic",     img: `${CDN}/right_leg_right_leg_prosthetic.webp`,                     promptVal: "prosthetic right leg" },
+          { id: "right_leg_mechanical", label: "Mechanical",     img: `${CDN}/right_leg_right_leg_mechanical.webp`,                     promptVal: "mechanical right leg" },
+          { id: "right_leg_none",       label: "None",           img: `${CDN}/right_leg_right_leg_none.webp`,                           promptVal: "no right leg" },
+        ],
+      },
+    ],
+  },
+  style: {
+    label: "Style",
+    subcategories: [
+      {
+        id: "hair",
+        label: "Hair / Head Growth",
+        options: [
+          { id: "hair_bald",      label: "Bald",       img: `${CDN}/hair_hair_bald.webp`,      promptVal: "bald head" },
+          { id: "hair_short",     label: "Short Hair", img: `${CDN}/hair_hair_short.webp`,     promptVal: "short hair" },
+          { id: "hair_long",      label: "Long Hair",  img: `${CDN}/hair_hair_long.webp`,      promptVal: "long flowing hair" },
+          { id: "hair_afro",      label: "Afro",       img: `${CDN}/hair_hair_afro.webp`,      promptVal: "afro hairstyle" },
+          { id: "hair_punk",      label: "Punk",       img: `${CDN}/hair_hair_punk.webp`,      promptVal: "punk mohawk hairstyle" },
+          { id: "hair_fur",       label: "Fur / Mane", img: `${CDN}/hair_hair_fur.webp`,       promptVal: "fur mane on head" },
+          { id: "hair_tentacles", label: "Tentacles",  img: `${CDN}/hair_hair_tentacles.webp`, promptVal: "tentacles as hair" },
+          { id: "hair_spines",    label: "Spines",     img: `${CDN}/hair_hair_spines.webp`,    promptVal: "spines as hair" },
+        ],
+      },
+      {
+        id: "accessories",
+        label: "Accessories & Markings",
+        options: [
+          { id: "accessory_tattoos",       label: "Tattoos",            img: `${CDN}/accessories_accessory_tattoos.webp`,       promptVal: "covered in tattoos" },
+          { id: "accessory_piercing",      label: "Piercings",          img: `${CDN}/accessories_accessory_piercing.webp`,      promptVal: "multiple piercings" },
+          { id: "accessory_scarification", label: "Scarification",      img: `${CDN}/accessories_accessory_scarification.webp`, promptVal: "ritual scarification marks" },
+          { id: "accessory_symbols",       label: "Symbols / Markings", img: `${CDN}/accessories_accessory_symbols.webp`,       promptVal: "symbolic tribal markings" },
+          { id: "accessory_cyber",         label: "Cyber Markings",     img: `${CDN}/accessories_accessory_cyber.webp`,         promptVal: "cyberpunk circuit markings" },
+        ],
+      },
+      {
+        id: "rendering_style",
+        label: "Rendering Style",
+        options: [
+          { id: "style_hyper_realistic", label: "Hyper-Realistic", img: `${CDN}/character_type_human.webp`,  promptVal: "hyper-realistic 8k photograph" },
+          { id: "style_anime",           label: "Anime",           img: `${CDN}/character_type_elf.webp`,    promptVal: "anime art style" },
+          { id: "style_cartoon",         label: "Cartoon",         img: `${CDN}/character_type_mantis.webp`, promptVal: "cartoon illustration style" },
+          { id: "style_2d",              label: "2D Illustration", img: `${CDN}/character_type_alien.webp`,  promptVal: "2D flat illustration style" },
+        ],
+      },
+    ],
+  },
+};
+
+// â”€â”€â”€ SVG Icon Components â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+const ShuffleIcon = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="16 3 21 3 21 8" /><line x1="4" y1="20" x2="21" y2="3" />
+    <polyline points="21 16 21 21 16 21" /><line x1="15" y1="15" x2="21" y2="21" />
+  </svg>
+);
+const BoltIcon = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M13 10V3L4 14h7v7l9-11h-7z" />
+  </svg>
+);
+const CheckIcon = () => (
+  <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="20 6 9 17 4 12" />
+  </svg>
+);
+const DownloadIcon = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
+  </svg>
+);
+
+// â”€â”€â”€ Hover Pill â€” shows label, reveals image on hover â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function HoverPill({ label, img, onClick }) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <div
+      className="relative shrink-0"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {/* Image tooltip */}
+      {hovered && img && (
+        <div
+          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 pointer-events-none"
+          style={{ filter: "drop-shadow(0 4px 16px rgba(0,0,0,0.6))" }}
+        >
+          <div className="w-[72px] h-[72px] rounded-xl overflow-hidden border border-white/20 bg-[#1a1a1a]"
+            style={{ transform: "rotate(-3deg)" }}>
+            <img src={img} alt={label} className="w-full h-full object-cover" />
+          </div>
+        </div>
+      )}
+      {/* Pill */}
+      <button
+        type="button"
+        onClick={onClick}
+        className="h-[22px] px-2 rounded-md bg-white/[0.07] hover:bg-white/[0.13] border border-white/[0.10] text-[11px] font-medium text-gray-200 whitespace-nowrap transition-all cursor-pointer"
+      >
+        {label}
+      </button>
+    </div>
+  );
+}
+
+// â”€â”€â”€ Main Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+export default function AiInfluencerStudio({
+  apiKey,
+  onGenerate,
+  onGenerationStart,
+  onGenerationEnd,
+  onGenerationComplete,
+  onGenerationError,
+  isGenerating: externalIsGenerating,
+}) {
+  const [activeTab, setActiveTab] = useState("face");
+
+  const [selectedOptions, setSelectedOptions] = useState(() => {
+    const init = {};
+    Object.values(TABS_CONFIG).forEach((tab) =>
+      tab.subcategories.forEach((sub) => {
+        if (sub.options?.length > 0) init[sub.id] = sub.options[0].id;
+      })
+    );
+    return init;
+  });
+
+  const [aspectRatio, setAspectRatio] = useState("3:4");
+  const [customPrompt, setCustomPrompt] = useState("");
+  const [isGeneratingInternal, setIsGeneratingInternal] = useState(false);
+  const [currentResult, setCurrentResult] = useState(null);   // latest generated image
+  const [history, setHistory] = useState([]);                  // all generated images
+  const [selectedHistoryIdx, setSelectedHistoryIdx] = useState(null);
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const isGenerating = externalIsGenerating || isGeneratingInternal;
+
+  // â”€â”€ Build prompt from selections â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  const buildPrompt = useCallback(() => {
+    const parts = [];
+    Object.values(TABS_CONFIG).forEach((tab) =>
+      tab.subcategories.forEach((sub) => {
+        const opt = sub.options.find((o) => o.id === selectedOptions[sub.id]);
+        if (opt?.promptVal) parts.push(opt.promptVal);
+      })
+    );
+    let prompt = "Ultra-realistic professional portrait photograph of an AI influencer character, 8k resolution, cinematic lighting, sharp detail";
+    if (parts.length) prompt += ", " + parts.join(", ");
+    if (customPrompt.trim()) prompt += ", " + customPrompt.trim();
+    return prompt;
+  }, [selectedOptions, customPrompt]);
+
+  // â”€â”€ Option selection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  const handleOptionSelect = (subcatId, optId) =>
+    setSelectedOptions((p) => ({ ...p, [subcatId]: optId }));
+
+  // â”€â”€ Shuffle all options randomly â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  const handleShuffle = () => {
+    const next = {};
+    Object.values(TABS_CONFIG).forEach((tab) =>
+      tab.subcategories.forEach((sub) => {
+        if (sub.options?.length > 0)
+          next[sub.id] = sub.options[Math.floor(Math.random() * sub.options.length)].id;
+      })
+    );
+    setSelectedOptions(next);
+  };
+
+  // â”€â”€ Generate â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  const handleGenerate = async () => {
+    if (isGenerating) return;
+    onGenerationStart?.();
+    setIsGeneratingInternal(true);
+    setErrorMsg("");
+
+    const prompt = buildPrompt();
+    try {
+      let res;
+      if (onGenerate) {
+        res = await onGenerate({ prompt, aspectRatio, selections: selectedOptions });
+      } else {
+        res = await generateImage(apiKey, {
+          model: INFLUENCER_MODEL,
+          prompt,
+          aspect_ratio: aspectRatio,
+        });
+      }
+      if (res?.url) {
+        setCurrentResult(res.url);
+        setHistory((prev) => [{ url: res.url, ts: Date.now() }, ...prev]);
+        setSelectedHistoryIdx(0);
+        onGenerationComplete?.({
+          url: res.url,
+          model: INFLUENCER_MODEL,
+          prompt,
+          type: "image",
+        });
+      }
+    } catch (err) {
+      const message = formatErrorMessage(err, "Generation failed. Please try again.");
+      if (onGenerationError) onGenerationError(message);
+      else toast.error(message);
+    } finally {
+      setIsGeneratingInternal(false);
+      onGenerationEnd?.();
+    }
+  };
+
+  // â”€â”€ Download helper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  const downloadImg = async (url) => {
+    try {
+      const res = await fetch(url);
+      const blob = await res.blob();
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `ai-influencer-${Date.now()}.webp`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    } catch {
+      window.open(url, "_blank");
+    }
+  };
+
+  // Preview image = selected history or current result
+  const previewUrl =
+    selectedHistoryIdx !== null && history[selectedHistoryIdx]
+      ? history[selectedHistoryIdx].url
+      : currentResult;
+
+  const arMap = { "3:4": "3/4", "1:1": "1/1", "9:16": "9/16", "16:9": "16/9" };
+
+  // â”€â”€ Collect all selected options as flat list for the pill tags bar â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  const selectedTags = [];
+  Object.keys(TABS_CONFIG).forEach((tabKey) => {
+    TABS_CONFIG[tabKey].subcategories.forEach((sub) => {
+      const selId = selectedOptions[sub.id];
+      const opt = sub.options.find((o) => o.id === selId);
+      if (opt) selectedTags.push({ subcatId: sub.id, label: opt.label, img: opt.img });
+    });
+  });
+
+  const [showAllTags, setShowAllTags] = useState(false);
+  const TAGS_VISIBLE = 7; // how many pills to show before "show more"
+
+  return (
+    <div className="flex h-full bg-[#0a0a0a] text-white overflow-hidden select-none font-sans">
+
+      {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+          LEFT â€” Builder / Options Panel
+      â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
+      <div className="flex flex-col w-[320px] shrink-0 border-r border-white/[0.07] bg-[#111111] overflow-hidden">
+
+        {/* Builder header */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.07] shrink-0">
+          <span className="text-[13px] font-bold text-white tracking-tight">Builder</span>
+          <button
+            onClick={() => setSelectedOptions((() => {
+              const init = {};
+              Object.values(TABS_CONFIG).forEach((tab) =>
+                tab.subcategories.forEach((sub) => {
+                  if (sub.options?.length > 0) init[sub.id] = sub.options[0].id;
+                })
+              );
+              return init;
+            })())}
+            className="text-[11px] text-gray-500 hover:text-white transition-colors font-medium"
+          >
+            Reset
+          </button>
+        </div>
+
+        {/* Tab pills */}
+        <div className="flex gap-1 px-3 py-2 border-b border-white/[0.07] shrink-0">
+          {Object.keys(TABS_CONFIG).map((key) => (
+            <button
+              key={key}
+              onClick={() => setActiveTab(key)}
+              className={`flex-1 py-1.5 rounded-lg text-[12px] font-semibold transition-all ${
+                activeTab === key
+                  ? "bg-white text-black shadow"
+                  : "text-gray-500 hover:text-white hover:bg-white/[0.06]"
+              }`}
+            >
+              {TABS_CONFIG[key].label}
+            </button>
+          ))}
+        </div>
+
+        {/* Subcategory options scroll area */}
+        <div className="flex-1 overflow-y-auto p-3 space-y-5">
+          {TABS_CONFIG[activeTab]?.subcategories?.map((subcat) => (
+            <div key={subcat.id}>
+              <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2 px-0.5">
+                {subcat.label}
+              </p>
+              <div className="grid grid-cols-3 gap-1.5">
+                {subcat.options?.map((opt) => {
+                  const sel = selectedOptions[subcat.id] === opt.id;
+                  return (
+                    <button
+                      key={opt.id}
+                      onClick={() => handleOptionSelect(subcat.id, opt.id)}
+                      className={`group relative aspect-square rounded-xl overflow-hidden border transition-all ${
+                        sel
+                          ? "border-white/80 ring-1 ring-white/30 shadow-lg"
+                          : "border-white/[0.08] hover:border-white/25"
+                      }`}
+                    >
+                      <img
+                        src={opt.img}
+                        alt={opt.label}
+                        loading="lazy"
+                        className="w-full h-full object-cover"
+                        onError={(e) => { e.target.onerror = null; e.target.src = `${CDN}/character_type_human.webp`; }}
+                      />
+                      {/* Label overlay */}
+                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent pt-4 pb-1 px-1">
+                        <span className="text-[9px] font-semibold text-white leading-none">{opt.label}</span>
+                      </div>
+                      {/* Selected check badge */}
+                      {sel && (
+                        <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-white text-black flex items-center justify-center">
+                          <CheckIcon />
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+          CENTER â€” Current Character Preview
+      â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
+      <div className="flex flex-col flex-1 min-w-0 overflow-hidden bg-[#0a0a0a]">
+
+        {/* Center top bar: aspect ratio + generate */}
+        <div className="flex items-center justify-between px-6 py-3 border-b border-white/[0.07] shrink-0">
+          {/* Aspect ratio */}
+          <div className="flex gap-0.5 bg-white/[0.05] border border-white/[0.08] rounded-xl p-1">
+            {["3:4", "1:1", "9:16", "16:9"].map((r) => (
+              <button
+                key={r}
+                onClick={() => setAspectRatio(r)}
+                className={`px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all ${
+                  aspectRatio === r
+                    ? "bg-violet-600 text-white shadow-md shadow-violet-600/40"
+                    : "text-gray-500 hover:text-white"
+                }`}
+              >
+                {r}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-2">
+            {/* Shuffle */}
+            <button
+              onClick={handleShuffle}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/[0.05] border border-white/[0.08] text-gray-400 hover:text-white hover:bg-white/10 text-[12px] font-semibold transition-all"
+            >
+              <ShuffleIcon />
+              Shuffle
+            </button>
+
+            {/* Generate */}
+            <button
+              onClick={handleGenerate}
+              disabled={isGenerating}
+              className={`flex items-center gap-2 px-5 py-2 rounded-xl text-[13px] font-bold transition-all shadow-lg ${
+                isGenerating
+                  ? "bg-violet-600/40 text-white/60 cursor-not-allowed"
+                  : "bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white shadow-violet-600/30 hover:shadow-violet-500/40"
+              }`}
+            >
+              {isGenerating ? (
+                <>
+                  <svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" strokeOpacity="0.3" />
+                    <path d="M21 12a9 9 0 00-9-9" />
+                  </svg>
+                  Generatingâ€¦
+                </>
+              ) : (
+                <><BoltIcon />Generate Character</>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Preview area */}
+        <div className="flex-1 flex items-center justify-center p-6 overflow-hidden">
+          <div
+            className="relative rounded-2xl overflow-hidden bg-[#141414] border border-white/[0.07] shadow-2xl flex items-center justify-center"
+            style={{ aspectRatio: arMap[aspectRatio] ?? "3/4", maxHeight: "100%", maxWidth: "100%" }}
+          >
+            {isGenerating ? (
+              <div className="flex flex-col items-center gap-4 text-center px-8 py-12">
+                <div className="w-12 h-12 border-[3px] border-violet-500/20 border-t-violet-500 rounded-full animate-spin" />
+                <p className="text-sm text-gray-400 font-medium">Generating your AI influencerâ€¦</p>
+              </div>
+            ) : previewUrl ? (
+              <>
+                <img src={previewUrl} alt="Generated AI Character" className="w-full h-full object-cover" />
+                {/* Download overlay button */}
+                <button
+                  onClick={() => downloadImg(previewUrl)}
+                  className="absolute bottom-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black/60 backdrop-blur-sm border border-white/10 text-white text-[11px] font-semibold hover:bg-black/80 transition-all"
+                >
+                  <DownloadIcon />
+                  Save
+                </button>
+              </>
+            ) : (
+              <div className="flex flex-col items-center gap-3 text-center px-8 py-12">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.8" className="text-gray-700">
+                  <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" />
+                </svg>
+                <p className="text-sm text-gray-600 font-medium">Your AI influencer lives here.</p>
+                <p className="text-xs text-gray-700">Design and build your AI influencer<br />from scratch</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* â”€â”€ Selected option pills â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {selectedTags.length > 0 && (
+          <div className="px-6 pb-3 shrink-0">
+            <div className="flex flex-wrap gap-1.5 items-center">
+              {(showAllTags ? selectedTags : selectedTags.slice(0, TAGS_VISIBLE)).map((tag) => (
+                <HoverPill
+                  key={tag.subcatId}
+                  label={tag.label}
+                  img={tag.img}
+                  onClick={() => {
+                    // Jump builder panel to the tab that owns this subcategory
+                    const ownerTab = Object.keys(TABS_CONFIG).find((tk) =>
+                      TABS_CONFIG[tk].subcategories.some((s) => s.id === tag.subcatId)
+                    );
+                    if (ownerTab) setActiveTab(ownerTab);
+                  }}
+                />
+              ))}
+              {selectedTags.length > TAGS_VISIBLE && (
+                <button
+                  type="button"
+                  onClick={() => setShowAllTags((v) => !v)}
+                  className="h-[22px] px-2 rounded-md bg-white/[0.04] hover:bg-white/[0.09] border border-white/[0.08] text-[11px] text-gray-500 hover:text-gray-300 whitespace-nowrap transition-all"
+                >
+                  {showAllTags ? "hide" : `show more`}
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Error */}
+        {errorMsg && (
+          <div className="mx-6 mb-4 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[12px] shrink-0">
+            {errorMsg}
+          </div>
+        )}
+
+        {/* Custom prompt bar at bottom */}
+        <div className="px-6 pb-4 shrink-0">
+          <input
+            type="text"
+            value={customPrompt}
+            onChange={(e) => setCustomPrompt(e.target.value)}
+            placeholder="Add extra detailsâ€¦ e.g. neon cyberpunk lighting, dramatic shadows"
+            className="w-full h-9 bg-[#161616] border border-white/[0.07] rounded-xl px-3 text-[12px] text-gray-200 placeholder-gray-600 outline-none focus:border-violet-500/40 transition-colors"
+          />
+        </div>
+      </div>
+
+      {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+          RIGHT â€” Generated Characters History Gallery
+      â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
+      <div className="flex flex-col w-[160px] shrink-0 border-l border-white/[0.07] bg-[#111111] overflow-hidden">
+
+        {/* Gallery header */}
+        <div className="px-3 py-3 border-b border-white/[0.07] shrink-0">
+          <p className="text-[11px] font-bold text-white tracking-tight">Generated</p>
+          <p className="text-[9px] text-gray-600 mt-0.5">{history.length} characters</p>
+        </div>
+
+        {/* Gallery scroll */}
+        <div className="flex-1 overflow-y-auto p-2 space-y-2">
+          {history.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-32 text-center px-2">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-gray-700 mb-2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" />
+              </svg>
+              <p className="text-[9px] text-gray-700 leading-relaxed">Generated characters<br />appear here</p>
+            </div>
+          ) : (
+            history.map((item, idx) => (
+              <div
+                key={item.ts}
+                role="button"
+                tabIndex={0}
+                onClick={() => setSelectedHistoryIdx(idx)}
+                onKeyDown={(e) => e.key === "Enter" && setSelectedHistoryIdx(idx)}
+                className={`group relative w-full aspect-[3/4] rounded-xl overflow-hidden border transition-all cursor-pointer ${
+                  selectedHistoryIdx === idx
+                    ? "border-violet-500 ring-1 ring-violet-500/40"
+                    : "border-white/[0.08] hover:border-white/20"
+                }`}
+              >
+                <img src={item.url} alt={`Character ${idx + 1}`} className="w-full h-full object-cover" />
+                {/* Download on hover */}
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-2">
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    onClick={(e) => { e.stopPropagation(); downloadImg(item.url); }}
+                    onKeyDown={(e) => { if (e.key === "Enter") { e.stopPropagation(); downloadImg(item.url); } }}
+                    className="p-1.5 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 transition-all cursor-pointer"
+                  >
+                    <DownloadIcon />
+                  </div>
+                </div>
+                {/* Index badge */}
+                <div className="absolute top-1 left-1 px-1.5 py-0.5 rounded-md bg-black/60 backdrop-blur-sm text-[8px] text-gray-300 font-bold">
+                  #{history.length - idx}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+      <Toaster position="top-right" containerStyle={{ zIndex: 99999 }} toastOptions={{ duration: 5000, style: { background: '#18181b', color: '#ffffff', border: '1px solid rgba(255,255,255,0.15)', fontSize: '13px', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.6)', maxWidth: '440px', wordBreak: 'break-word', whiteSpace: 'pre-wrap', padding: '12px 16px' } }} />
+    </div>
+  );
+}

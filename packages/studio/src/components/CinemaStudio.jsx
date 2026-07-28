@@ -426,5 +426,717 @@ function CameraControlsOverlay({
             type="button"
             onClick={onClose}
             aria-label="Close camera settings"
-            titlã½÷¶‰žËkºwµçQ½¸(€€€€€€€€€€€€€€€€€€€ÑåÁ”ô‰‰ÕÑÑ½¸ˆ(€€€€€€€€€€€€€€€€€€€Ñ¥Ñ±”ô‰•±•Ñ”ˆ(€€€€€€€€€€€€€€€€€€€½¹±¥¬õì¡”¤€ôøì(€€€€€€€€€€€€€€€€€€€€€”¹ÍÑ½ÁAÉ½Á……Ñ¥½¸ ¤ì(€€€€€€€€€€€€€€€€€€€€€¥˜€¡½¹™¥É´ ‰É”å½ÔÍÕÉ”å½ÔÝ…¹ÐÑ¼‘•±•Ñ”Ñ¡¥Ì•¹•É…Ñ•¥Ñ•´üˆ¤¤ì(€€€€€€€€€€€€€€€€€€€€€€€Í•Ñ%¹Ñ•É¹…±!¥ÍÑ½Éä¡ÁÉ•Ø€ôøÁÉ•Ø¹™¥±Ñ•È ¡|°¤¤€ôø¤€„ôô¥‘à¤¤ì(€€€€€€€€€€€€€€€€€€€€€ô(€€€€€€€€€€€€€€€€€€€õô(€€€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰À´È‰œµ‰±…¬¼ØÀ‰…­‘É½Àµ‰±ÕÈµµÉ½Õ¹‘•µ™Õ±°Ñ•áÐµÉ•´ÐÀÀ¡½Ù•Èé‰œµÉ•´ÔÀÀ¡½Ù•ÈéÑ•áÐµÝ¡¥Ñ”ÑÉ…¹Í¥Ñ¥½¸µ…±°‰½É‘•È‰½É‘•ÈµÝ¡¥Ñ”¼ÄÀˆ(€€€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€€€€ñÍÙœÝ¥‘Ñ ôˆÄÐˆ¡•¥¡ÐôˆÄÐˆÙ¥•Ý	½àôˆÀ€À€ÈÐ€ÈÐˆ™¥±°ô‰¹½¹”ˆÍÑÉ½­”ô‰ÕÉÉ•¹Ñ½±½ÈˆÍÑÉ½­•]¥‘Ñ ôˆÈ¸Ôˆø(€€€€€€€€€€€€€€€€€€€€€€ñÁ½±å±¥¹”Á½¥¹ÑÌôˆÌ€Ø€Ô€Ø€ÈÄ€Øˆ€¼ø(€€€€€€€€€€€€€€€€€€€€€€ñÁ…Ñ ô‰4Ää€ÙØÄÑ„È€È€À€ÀÄ´È€É Ý„È€È€À€ÀÄ´È´ÉXÙ´Ì€ÁXÑ„È€È€À€ÀÄÈ´É Ñ„È€È€À€ÀÄÈ€ÉØÈˆ€¼ø(€€€€€€€€€€€€€€€€€€€€€€ñ±¥¹”àÄôˆÄÀˆäÄôˆÄÄˆàÈôˆÄÀˆäÈôˆÄÜˆ€¼ø(€€€€€€€€€€€€€€€€€€€€€€ñ±¥¹”àÄôˆÄÐˆäÄôˆÄÄˆàÈôˆÄÐˆäÈôˆÄÜˆ€¼ø(€€€€€€€€€€€€€€€€€€€€ð½ÍÙœø(€€€€€€€€€€€€€€€€€€ð½‰ÕÑÑ½¸ø(€€€€€€€€€€€€€€€€ð½‘¥Øø((€€€€€€€€€€€€€€€ì¼¨•Ñ…¥±Ì€¨½ô(€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰À´Ì‰œµ‰±…¬¼àÀ‰…­‘É½Àµ‰±ÕÈµÍ´‰½É‘•ÈµÐ‰½É‘•ÈµÝ¡¥Ñ”¼Ô™±•à´Ä™±•à™±•àµ½°©ÕÍÑ¥™äµ‰•ÑÝ••¸…À´Èˆø(€€€€€€€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€€€€€ÑåÁ”ô‰‰ÕÑÑ½¸ˆ(€€€€€€€€€€€€€€€€€€€½¹±¥¬õì¡”¤€ôøì(€€€€€€€€€€€€€€€€€€€€€”¹ÍÑ½ÁAÉ½Á……Ñ¥½¸ ¤ì(€€€€€€€€€€€€€€€€€€€€€¡…¹‘±•½ÁåAÉ½µÁÐ¡•¹ÑÉä¹Í•ÑÑ¥¹Ìü¹ÁÉ½µÁÐ°¥‘à¤ì(€€€€€€€€€€€€€€€€€€€õô(€€€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”õíÜµ™Õ±°Ñ•áÐµ±•™ÐÑ•áÐµáÌ±¥¹”µ±…µÀ´Ì±•…‘¥¹œµÉ•±…á•ÑÉ…¹Í¥Ñ¥½¸µ½±½ÉÌÕÉÍ½Èµ½Áä€‘ì(€€€€€€€€€€€€€€€€€€€€€½Á¥•‘AÉ½µÁÑ%¹‘•à€ôôô¥‘à(€€€€€€€€€€€€€€€€€€€€€€€€ü€‰Ñ•áÐµlŒÈÉÍ••tˆ(€€€€€€€€€€€€€€€€€€€€€€€€è€‰Ñ•áÐµÝ¡¥Ñ”¼ÜÀ¡½Ù•ÈéÑ•áÐµÝ¡¥Ñ”ˆ(€€€€€€€€€€€€€€€€€€€õô(€€€€€€€€€€€€€€€€€€€Ñ¥Ñ±”õì(€€€€€€€€€€€€€€€€€€€€€½Á¥•‘AÉ½µÁÑ%¹‘•à€ôôô¥‘à(€€€€€€€€€€€€€€€€€€€€€€€€ü€‰AÉ½µÁÐ½Á¥•ˆ(€€€€€€€€€€€€€€€€€€€€€€€€è€‰½Áä™Õ±°ÁÉ½µÁÐˆ(€€€€€€€€€€€€€€€€€€€ô(€€€€€€€€€€€€€€€€€€€…É¥„µ±…‰•°õì(€€€€€€€€€€€€€€€€€€€€€½Á¥•‘AÉ½µÁÑ%¹‘•à€ôôô¥‘à(€€€€€€€€€€€€€€€€€€€€€€€€ü€‰AÉ½µÁÐ½Á¥•ˆ(€€€€€€€€€€€€€€€€€€€€€€€€è€‰½Áä™Õ±°ÁÉ½µÁÐˆ(€€€€€€€€€€€€€€€€€€€ô(€€€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€€€í•¹ÑÉä¹Í•ÑÑ¥¹Ìü¹ÁÉ½µÁÐñð€‰9¼ÁÉ½µÁÐ‰ô(€€€€€€€€€€€€€€€€€€ð½‰ÕÑÑ½¸ø(€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰ÍÈµ½¹±äˆ…É¥„µ±¥Ù”ô‰Á½±¥Ñ”ˆø(€€€€€€€€€€€€€€€€€€€í½Á¥•‘AÉ½µÁÑ%¹‘•à€ôôô¥‘à€ü€‰AÉ½µÁÐ½Á¥•ˆ€è€ˆ‰ô(€€€€€€€€€€€€€€€€€€ð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à¥Ñ•µÌµ•¹Ñ•ÈµÐ´Ä™±•àµÝÉ…À…À´Äˆø(€€€€€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à¥Ñ•µÌµ•¹Ñ•È…À´Èˆø(€€€€€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰Ñ•áÐµlÄÁÁát™½¹Ðµ‰½±Ñ•áÐµlŒÈÉÍ••tÁà´ÈÁä´À¸Ô‰œµlŒÈÉÍ••t¼ÄÀÉ½Õ¹‘•‰½É‘•È‰½É‘•ÈµlŒÈÉÍ••t¼ÈÀˆø(€€€€€€€€€€€€€€€€€€€€€€€¥¹•µ„MÑÕ‘¥¼(€€€€€€€€€€€€€€€€€€€€€€ð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€€€€€€í•¹ÑÉä¹Í•ÑÑ¥¹Ìü¹…µ•É„€˜˜€ (€€€€€€€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰Ñ•áÐµlÄÁÁátÑ•áÐµÝ¡¥Ñ”¼ÐÀˆùí•¹ÑÉä¹Í•ÑÑ¥¹Ì¹…µ•É…ôð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€¤¥ô(€€€€€€€€€€ð½‘¥Øø(€€€€€€€€¤€è€ (€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à™±•àµ½°¥Ñ•µÌµ•¹Ñ•È©ÕÍÑ¥™äµ•¹Ñ•È µ™Õ±°Ñ•áÐµ•¹Ñ•ÈÁà´Ð…¹¥µ…Ñ”µ™…‘”µ¥¸µÕÀÑÉ…¹Í¥Ñ¥½¸µ…±°‘ÕÉ…Ñ¥½¸´ÜÀÀµ¥¸µ µlÔÁÙ¡tˆø(€€€€€€€€€€€ì¼¨=Ù•É±…ÁÁ¥¹œ™±½…Ñ¥¹œ…É‘Ì€¨½ô(€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à¥Ñ•µÌµ•¹Ñ•È©ÕÍÑ¥™äµ•¹Ñ•È…À´Ä¸Ôµé…À´Ìµˆ´ÄÀÍ•±•Ðµ¹½¹”Í…±”´äÀÍ´éÍ…±”´ÄÀÀˆø(€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰Ü´Äà ´ÈÈÍ´éÜ´ÈÐÍ´é ´ÈàÉ½Õ¹‘•´Éá°‰½É‘•È‰½É‘•ÈµÝ¡¥Ñ”¼ÄÀÍ¡…‘½Ü´Éá°€µÉ½Ñ…Ñ”µlÄÉ‘•tÑÉ…¹Í™½É´¡½Ù•ÈéÉ½Ñ…Ñ”´À¡½Ù•ÈéÍ…±”´ÄÄÀ¡½Ù•Èéè´ÈÀÑÉ…¹Í¥Ñ¥½¸µ…±°‘ÕÉ…Ñ¥½¸´ÌÀÀ½Ù•É™±½Üµ¡¥‘‘•¸‰œµÝ¡¥Ñ”½lÀ¸ÀÅt™±•àµÍ¡É¥¹¬´Àˆø(€€€€€€€€€€€€€€€€ñ¥µœ(€€€€€€€€€€€€€€€€€ÍÉŒô‰¡ÑÑÁÌè¼½Í…‘Ý­‰å¡áåÉÑÄ¹±½Õ‘™É½¹Ð¹¹•Ð½Ý•‰…ÍÍ•ÑÌ½Ù¥‘•½µ½‘•±Ì½Í‘á°µ¥µ…”¹…Ù¥˜ˆ(€€€€€€€€€€€€€€€€€…±Ðô‰É•…Ñ¥Ù”…ÍÍ•Ð€Äˆ(€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰Üµ™Õ±° µ™Õ±°½‰©•Ðµ½Ù•Èˆ(€€€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰Ü´Äà ´ÈÈÍ´éÜ´ÈÐÍ´é ´ÈàÉ½Õ¹‘•´Éá°‰½É‘•È‰½É‘•ÈµÝ¡¥Ñ”¼ÄÀÍ¡…‘½Ü´Éá°€µÉ½Ñ…Ñ”µlÑ‘•tÑÉ…¹Í™½É´¡½Ù•ÈéÉ½Ñ…Ñ”´À¡½Ù•ÈéÍ…±”´ÄÄÀ¡½Ù•Èéè´ÈÀÑÉ…¹Í¥Ñ¥½¸µ…±°‘ÕÉ…Ñ¥½¸´ÌÀÀ½Ù•É™±½Üµ¡¥‘‘•¸‰œµÝ¡¥Ñ”½lÀ¸ÀÅt€µµ°´ÌÍ´èµµ°´Ð™±•àµÍ¡É¥¹¬´Àˆø(€€€€€€€€€€€€€€€€ñ¥µœ(€€€€€€€€€€€€€€€€€ÍÉŒô‰¡ÑÑÁÌè¼½Í…‘Ý­‰å¡áåÉÑÄ¹±½Õ‘™É½¹Ð¹¹•Ð½Ý•‰…ÍÍ•ÑÌ½Ù¥‘•½µ½‘•±Ì½¡É½µ„µ¥µ…”¹…Ù¥˜ˆ(€€€€€€€€€€€€€€€€€…±Ðô‰É•…Ñ¥Ù”…ÍÍ•Ð€Èˆ(€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰Üµ™Õ±° µ™Õ±°½‰©•Ðµ½Ù•Èˆ(€€€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰Ü´Äà ´ÄàÍ´éÜ´ÈÐÍ´é ´ÈÐÉ½Õ¹‘•µ™Õ±°‰½É‘•È‰½É‘•ÈµÝ¡¥Ñ”¼ÄÀÍ¡…‘½Ü´Éá°É½Ñ…Ñ”µlÙ‘•tÑÉ…¹Í™½É´¡½Ù•ÈéÉ½Ñ…Ñ”´À¡½Ù•ÈéÍ…±”´ÄÄÀ¡½Ù•Èéè´ÈÀÑÉ…¹Í¥Ñ¥½¸µ…±°‘ÕÉ…Ñ¥½¸´ÌÀÀ½Ù•É™±½Üµ¡¥‘‘•¸‰œµÝ¡¥Ñ”½lÀ¸ÀÅt€µµ°´ÌÍ´èµµ°´Ð™±•àµÍ¡É¥¹¬´Àˆø(€€€€€€€€€€€€€€€€ñ¥µœ(€€€€€€€€€€€€€€€€€ÍÉŒô‰¡ÑÑÁÌè¼½Í…‘Ý­‰å¡áåÉÑÄ¹±½Õ‘™É½¹Ð¹¹•Ð½Ý•‰…ÍÍ•ÑÌ½Ù¥‘•½µ½‘•±Ì½¹•Ñ„µ±Õµ¥¹„¹…Ù¥˜ˆ(€€€€€€€€€€€€€€€€€…±Ðô‰É•…Ñ¥Ù”…ÍÍ•Ð€Ìˆ(€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰Üµ™Õ±° µ™Õ±°½‰©•Ðµ½Ù•Èˆ(€€€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰Ü´Äà ´ÈÈÍ´éÜ´ÈÐÍ´é ´ÈàÉ½Õ¹‘•´Éá°‰½É‘•È‰½É‘•ÈµÝ¡¥Ñ”¼ÄÀÍ¡…‘½Ü´Éá°É½Ñ…Ñ”µlÄÉ‘•tÑÉ…¹Í™½É´¡½Ù•ÈéÉ½Ñ…Ñ”´À¡½Ù•ÈéÍ…±”´ÄÄÀ¡½Ù•Èéè´ÈÀÑÉ…¹Í¥Ñ¥½¸µ…±°‘ÕÉ…Ñ¥½¸´ÌÀÀ½Ù•É™±½Üµ¡¥‘‘•¸‰œµÝ¡¥Ñ”½lÀ¸ÀÅt€µµ°´ÌÍ´èµµ°´Ð™±•àµÍ¡É¥¹¬´Àˆø(€€€€€€€€€€€€€€€€ñ¥µœ(€€€€€€€€€€€€€€€€€ÍÉŒô‰¡ÑÑÁÌè¼½Í…‘Ý­‰å¡áåÉÑÄ¹±½Õ‘™É½¹Ð¹¹•Ð½Ý•‰…ÍÍ•ÑÌ½Ù¥‘•½µ½‘•±Ì½Á•É™•ÐµÁ½¹äµá°¹…Ù¥˜ˆ(€€€€€€€€€€€€€€€€€…±Ðô‰É•…Ñ¥Ù”…ÍÍ•Ð€Ðˆ(€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰Üµ™Õ±° µ™Õ±°½‰©•Ðµ½Ù•Èˆ(€€€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€ð½‘¥Øø((€€€€€€€€€€€€ñ Ä±…ÍÍ9…µ”ô‰Ñ•áÐ´Éá°Í´éÑ•áÐ´Ñá°µéÑ•áÐ´Õá°™½¹Ðµ•áÑÉ…‰½±ÑÉ…­¥¹œµÑ¥¡Ðµˆ´ÐÑ•áÐµ•¹Ñ•ÈÁà´Ð™±•à™±•àµ½°¥Ñ•µÌµ•¹Ñ•Èˆø(€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰Ñ•áÐµÝ¡¥Ñ”™½¹Ðµ‰±…¬ÕÁÁ•É…Í”Ñ•áÐµá°Í´éÑ•áÐ´Íá°ÑÉ…­¥¹œµÝ¥‘”µˆ´Ä½Á…¥Ñä´äÀˆùMQIPIQ%9]%Q ð½ÍÁ…¸ø(€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰Ñ•áÐµlŒÈÉÍ••t™½¹Ðµ‰±…¬ÕÁÁ•É…Í”Ñ•áÐ´Éá°Í´éÑ•áÐ´Ñá°Í´éµÐ´ÄÑÉ…­¥¹œµÑ¥¡Ðˆø(€€€€€€€€€€€€€€€%95MQU%<(€€€€€€€€€€€€€€ð½ÍÁ…¸ø(€€€€€€€€€€€€ð½ Äø(€€€€€€€€€€€€ñÀ±…ÍÍ9…µ”ô‰Ñ•áÐµÝ¡¥Ñ”¼ÐÀÑ•áÐµáÌÍ´éÑ•áÐµÍ´™½¹Ðµµ•‘¥Õ´ÑÉ…­¥¹œµÝ¥‘”Ñ•áÐµ•¹Ñ•Èµ…àµÜµ±œ±•…‘¥¹œµÉ•±…á•Áà´Ðˆø(€€€€€€€€€€€€€]¡…ÐÝ½Õ±å½ÔÍ¡½½ÐÝ¥Ñ ¥¹™¥¹¥Ñ”‰Õ‘•Ðü½¹ÑÉ½°…µ•É…Ì°±¥¡Ñ¥¹œ°±•¹Í•Ì°…¹ÁÉ½µÁÐ¡¥ µ•¹¥¹•µ…Ñ¥ŒÍ•¹•Ì¸(€€€€€€€€€€€€ð½Àø(€€€€€€€€€€ð½‘¥Øø(€€€€€€€€¥ô(€€€€€€ð½‘¥Øø((€€€€€ì¼¨ƒŠRŠR 	=QQ=4AI=5AP	HƒŠRŠR €¨½ô(€€€€€€ñAÉ½µÁÑ½µÁ½Í•È(€€€€€€€Á½Í¥Ñ¥½¹±…ÍÍ9…µ”ô‰…‰Í½±ÕÑ”‰½ÑÑ½´´Ð±•™Ð´ÐÉ¥¡Ð´Ðµé±•™Ð´ÀµéÉ¥¡Ð´Àµéµàµ…ÕÑ¼µéµ…àµÜµläÔ•t±œéµ…àµÜ´Ñá°è´ÌÀÑÉ…¹Í¥Ñ¥½¸µ…±°‘ÕÉ…Ñ¥½¸´ÜÀÀ…¹¥µ…Ñ”µ™…‘”µ¥¸µÕÀˆ(€€€€€€€ÍÑå±”õí¹Õ±±ô(€€€€€€ø(€€€€€€€€€ì¼¨UÁÁ•ÈI½Üè%µ…”UÁ±½…€˜Q•áÑ…É•„€¨½ô(€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à¥Ñ•µÌµÍÑ…ÉÐ…À´ÐÜµ™Õ±°Áà´Äˆø(€€€€€€€€€€€ì¼¨%µ…”UÁ±½…	ÕÑÑ½¸€¨½ô(€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰É•±…Ñ¥Ù”ÁÐ´À¸Ôˆø(€€€€€€€€€€€€€€ñ¥¹ÁÕÐ(€€€€€€€€€€€€€€€ÑåÁ”ô‰™¥±”ˆ(€€€€€€€€€€€€€€€É•˜õí¥µ…•%¹ÁÕÑI•™ô(€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰¡¥‘‘•¸ˆ(€€€€€€€€€€€€€€€…•ÁÐô‰¥µ…”¼¨ˆ(€€€€€€€€€€€€€€€½¹¡…¹”õí¡…¹‘±•%µ…•UÁ±½…‘ô(€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€€€(€€€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€½¹±¥¬õì ¤€ôø(€€€€€€€€€€€€€€€€€ÕÁ±½…‘•‘%µ…”(€€€€€€€€€€€€€€€€€€€€üÉ•µ½Ù•%µ…” ¤(€€€€€€€€€€€€€€€€€€€€è¥µ…•%¹ÁÕÑI•˜¹ÕÉÉ•¹Ðü¹±¥¬ ¤(€€€€€€€€€€€€€€€ô(€€€€€€€€€€€€€€€‘¥Í…‰±•õí¥ÍUÁ±½…‘¥¹%µ…•ô(€€€€€€€€€€€€€€€±…ÍÍ9…µ”õíÁÉ½µÁÑ5•‘¥…	ÕÑÑ½¹±…ÍÍ9…µ”¡ì(€€€€€€€€€€€€€€€€€…Ñ¥Ù”è	½½±•…¸¡ÕÁ±½…‘•‘%µ…”¤°(€€€€€€€€€€€€€€€ô¥ô(€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€í¥ÍUÁ±½…‘¥¹%µ…”€ü€ (€€€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à™±•àµ½°¥Ñ•µÌµ•¹Ñ•È©ÕÍÑ¥™äµ•¹Ñ•ÈÜµ™Õ±° µ™Õ±°…‰Í½±ÕÑ”¥¹Í•Ð´À‰œµ‰±…¬¼àÀè´ÈÀ‰…­‘É½Àµ‰±ÕÈµlÉÁátˆø(€€€€€€€€€€€€€€€€€€€€ñÍÙœ±…ÍÍ9…µ”ô‰Ü´à ´à€µÉ½Ñ…Ñ”´äÀˆø(€€€€€€€€€€€€€€€€€€€€€€ñ¥É±”(€€€€€€€€€€€€€€€€€€€€€€€àôˆÄØˆ(€€€€€€€€€€€€€€€€€€€€€€€äôˆÄØˆ(€€€€€€€€€€€€€€€€€€€€€€€ÈôˆÄÐˆ(€€€€€€€€€€€€€€€€€€€€€€€ÍÑÉ½­”ô‰ÕÉÉ•¹Ñ½±½Èˆ(€€€€€€€€€€€€€€€€€€€€€€€ÍÑÉ½­•]¥‘Ñ ôˆÈˆ(€€€€€€€€€€€€€€€€€€€€€€€™¥±°ô‰ÑÉ…¹ÍÁ…É•¹Ðˆ(€€€€€€€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰Ñ•áÐµÝ¡¥Ñ”¼ÄÀˆ(€€€€€€€€€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€€€€€€€€€€€ñ¥É±”(€€€€€€€€€€€€€€€€€€€€€€€àôˆÄØˆ(€€€€€€€€€€€€€€€€€€€€€€€äôˆÄØˆ(€€€€€€€€€€€€€€€€€€€€€€€ÈôˆÄÐˆ(€€€€€€€€€€€€€€€€€€€€€€€ÍÑÉ½­”ô‰ÕÉÉ•¹Ñ½±½Èˆ(€€€€€€€€€€€€€€€€€€€€€€€ÍÑÉ½­•]¥‘Ñ ôˆÈˆ(€€€€€€€€€€€€€€€€€€€€€€€™¥±°ô‰ÑÉ…¹ÍÁ…É•¹Ðˆ(€€€€€€€€€€€€€€€€€€€€€€€ÍÑÉ½­•…Í¡…ÉÉ…äõìàáô(€€€€€€€€€€€€€€€€€€€€€€€ÍÑÉ½­•…Í¡½™™Í•Ðõìàà€´€ àà€¨¥µ…•UÁ±½…‘AÉ½É•ÍÌ¤€¼€ÄÀÁô(€€€€€€€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰Ñ•áÐµÁÉ¥µ…ÉäÑÉ…¹Í¥Ñ¥½¸µ…±°‘ÕÉ…Ñ¥½¸´ÌÀÀˆ(€€€€€€€€€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€€€€€€€€€ð½ÍÙœø(€€€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰…‰Í½±ÕÑ”Ñ•áÐµláÁát™½¹Ðµ‰½±Ñ•áÐµÝ¡¥Ñ”ˆø(€€€€€€€€€€€€€€€€€€€€€í¥µ…•UÁ±½…‘AÉ½É•ÍÍô”(€€€€€€€€€€€€€€€€€€€€ð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€¤€èÕÁ±½…‘•‘%µ…”€ü€ (€€€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰É•±…Ñ¥Ù”Üµ™Õ±° µ™Õ±°É½ÕÀˆø(€€€€€€€€€€€€€€€€€€€€ñ¥µœ(€€€€€€€€€€€€€€€€€€€€€ÍÉŒõíÕÁ±½…‘•‘%µ…•ô(€€€€€€€€€€€€€€€€€€€€€…±Ðô‰I•™•É•¹”ˆ(€€€€€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰Üµ™Õ±° µ™Õ±°½‰©•Ðµ½Ù•È½Á…¥Ñä´àÀÉ½ÕÀµ¡½Ù•Èé½Á…¥Ñä´ÐÀÑÉ…¹Í¥Ñ¥½¸µ½Á…¥Ñäˆ(€€€€€€€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰…‰Í½±ÕÑ”¥¹Í•Ð´À™±•à¥Ñ•µÌµ•¹Ñ•È©ÕÍÑ¥™äµ•¹Ñ•È½Á…¥Ñä´ÀÉ½ÕÀµ¡½Ù•Èé½Á…¥Ñä´ÄÀÀÑÉ…¹Í¥Ñ¥½¸µ½Á…¥Ñäˆø(€€€€€€€€€€€€€€€€€€€€€€ñÍÙœÝ¥‘Ñ ôˆÄÐˆ¡•¥¡ÐôˆÄÐˆÙ¥•Ý	½àôˆÀ€À€ÈÐ€ÈÐˆ™¥±°ô‰¹½¹”ˆÍÑÉ½­”ô‰ÕÉÉ•¹Ñ½±½ÈˆÍÑÉ½­•]¥‘Ñ ôˆÌˆ±…ÍÍ9…µ”ô‰Ñ•áÐµÝ¡¥Ñ”ˆø(€€€€€€€€€€€€€€€€€€€€€€€€ñÁ…Ñ ô‰4Äà€Ù0Ø€Äá4Ø€Ù°ÄÈ€ÄÈˆ€¼ø(€€€€€€€€€€€€€€€€€€€€€€ð½ÍÙœø(€€€€€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€¤€è€ (€€€€€€€€€€€€€€€€€€ñÍÙœÝ¥‘Ñ ôˆÄØˆ¡•¥¡ÐôˆÄØˆÙ¥•Ý	½àôˆÀ€À€ÈÐ€ÈÐˆ™¥±°ô‰¹½¹”ˆÍÑÉ½­”ô‰ÕÉÉ•¹Ñ½±½ÈˆÍÑÉ½­•]¥‘Ñ ôˆÈ¸Ôˆ±…ÍÍ9…µ”ô‰Ñ•áÐµÝ¡¥Ñ”¼ÐÀÉ½ÕÀµ¡½Ù•ÈéÑ•áÐµlŒÈÉÍ••tÑÉ…¹Í¥Ñ¥½¸µ½±½ÉÌˆø(€€€€€€€€€€€€€€€€€€€€ñÉ•ÐàôˆÌˆäôˆÌˆÝ¥‘Ñ ôˆÄàˆ¡•¥¡ÐôˆÄàˆÉàôˆÈˆÉäôˆÈˆ€¼ø(€€€€€€€€€€€€€€€€€€€€ñ¥É±”àôˆà¸Ôˆäôˆà¸ÔˆÈôˆÄ¸Ôˆ€¼ø(€€€€€€€€€€€€€€€€€€€€ñÁ½±å±¥¹”Á½¥¹ÑÌôˆÈÄ€ÄÔ€ÄØ€ÄÀ€Ô€ÈÄˆ€¼ø(€€€€€€€€€€€€€€€€€€ð½ÍÙœø(€€€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€€€ð½‰ÕÑÑ½¸ø(€€€€€€€€€€€€ð½‘¥Øø((€€€€€€€€€€€€ñAÉ½µÁÑQ•áÑ…É•„(€€€€€€€€€€€€€É•˜õíÑ•áÑ…É•…I•™ô(€€€€€€€€€€€€€Ù…±Õ”õíÍ•ÑÑ¥¹Ì¹ÁÉ½µÁÑô(€€€€€€€€€€€€€½¹¡…¹”õì¡”¤€ôø(€€€€€€€€€€€€€€€Í•ÑM•ÑÑ¥¹Ì ¡ÁÉ•Ø¤€ôø€¡ì€¸¸¹ÁÉ•Ø°ÁÉ½µÁÐè”¹Ñ…É•Ð¹Ù…±Õ”ô¤¤(€€€€€€€€€€€€€ô(€€€€€€€€€€€€€Á±…•¡½±‘•Èô‰•ÍÉ¥‰”å½ÕÈ¥¹•µ„Í•¹”¸¸¸ˆ(€€€€€€€€€€€€¼ø(€€€€€€€€€€ð½‘¥Øø((€€€€€€€€€ì¼¨	½ÑÑ½´I½Üè½¹ÑÉ½±Ì€˜•¹•É…Ñ”€¨½ô(€€€€€€€€€€ñAÉ½µÁÑ½½Ñ•Èø(€€€€€€€€€€€€ñAÉ½µÁÑ½¹ÑÉ½±Ìø(€€€€€€€€€€€€€ì¼¨ÍÁ•ÐI…Ñ¥¼	ÕÑÑ½¸€¨½ô(€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰É•±…Ñ¥Ù”ˆø(€€€€€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€€€É•˜õí…É	Ñ¹I•™ô(€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”õíÁÉ½µÁÑ½¹ÑÉ½±±…ÍÍ9…µ”¡ì(€€€€€€€€€€€€€€€€€€€…Ñ¥Ù”è½Á•¹É½Á‘½Ý¸€ôôô€‰…Èˆ°(€€€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”è€‰Ñ•áÐµáÌ™½¹ÐµÍ•µ¥‰½±ˆ°(€€€€€€€€€€€€€€€€€ô¥ô(€€€€€€€€€€€€€€€€€½¹±¥¬õì ¤€ôø(€€€€€€€€€€€€€€€€€€€Í•Ñ=Á•¹É½Á‘½Ý¸ ¡¤€ôø€¡€ôôô€‰…Èˆ€ü¹Õ±°€è€‰…Èˆ¤¤(€€€€€€€€€€€€€€€€€ô(€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€€ñAÉ½µÁÑÍÁ•ÑI…Ñ¥½%½¸€¼ø(€€€€€€€€€€€€€€€€€íÍ•ÑÑ¥¹Ì¹…ÍÁ•Ñ}É…Ñ¥½ô(€€€€€€€€€€€€€€€€ð½‰ÕÑÑ½¸ø(€€€€€€€€€€€€€€€í½Á•¹É½Á‘½Ý¸€ôôô€‰…Èˆ€˜˜€ (€€€€€€€€€€€€€€€€€€ñÉ½Á‘½Ý¸(€€€€€€€€€€€€€€€€€€€Ñ¥Ñ±”ô‰ÍÁ•ÐI…Ñ¥¼ˆ(€€€€€€€€€€€€€€€€€€€¥Ñ•µÌõíMAQ}IQ%=Mô(€€€€€€€€€€€€€€€€€€€Í•±•Ñ•õíÍ•ÑÑ¥¹Ì¹…ÍÁ•Ñ}É…Ñ¥½ô(€€€€€€€€€€€€€€€€€€€½¹M•±•Ðõì¡Ù…°¤€ôø(€€€€€€€€€€€€€€€€€€€€€Í•ÑM•ÑÑ¥¹Ì ¡ÁÉ•Ø¤€ôø€¡ì€¸¸¹ÁÉ•Ø°…ÍÁ•Ñ}É…Ñ¥¼èÙ…°ô¤¤(€€€€€€€€€€€€€€€€€€€ô(€€€€€€€€€€€€€€€€€€€ÑÉ¥•ÉI•˜õí…É	Ñ¹I•™ô(€€€€€€€€€€€€€€€€€€€½¹±½Í”õì ¤€ôøÍ•Ñ=Á•¹É½Á‘½Ý¸¡¹Õ±°¥ô(€€€€€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€€€ð½‘¥Øø((€€€€€€€€€€€€€ì¼¨I•Í½±ÕÑ¥½¸	ÕÑÑ½¸€¨½ô(€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰É•±…Ñ¥Ù”ˆø(€€€€€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€€€É•˜õíÉ•Í	Ñ¹I•™ô(€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”õíÁÉ½µÁÑ½¹ÑÉ½±±…ÍÍ9…µ”¡ì(€€€€€€€€€€€€€€€€€€€…Ñ¥Ù”è½Á•¹É½Á‘½Ý¸€ôôô€‰É•Ìˆ°(€€€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”è€‰Ñ•áÐµáÌ™½¹ÐµÍ•µ¥‰½±ˆ°(€€€€€€€€€€€€€€€€€ô¥ô(€€€€€€€€€€€€€€€€€½¹±¥¬õì ¤€ôø(€€€€€€€€€€€€€€€€€€€Í•Ñ=Á•¹É½Á‘½Ý¸ ¡¤€ôø€¡€ôôô€‰É•Ìˆ€ü¹Õ±°€è€‰É•Ìˆ¤¤(€€€€€€€€€€€€€€€€€ô(€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€€ñAÉ½µÁÑEÕ…±¥Ñå%½¸€¼ø(€€€€€€€€€€€€€€€€€íÉ•Í½±ÕÑ¥½¹ô(€€€€€€€€€€€€€€€€ð½‰ÕÑÑ½¸ø(€€€€€€€€€€€€€€€í½Á•¹É½Á‘½Ý¸€ôôô€‰É•Ìˆ€˜˜€ (€€€€€€€€€€€€€€€€€€ñÉ½Á‘½Ý¸(€€€€€€€€€€€€€€€€€€€Ñ¥Ñ±”ô‰I•Í½±ÕÑ¥½¸ˆ(€€€€€€€€€€€€€€€€€€€¥Ñ•µÌõíIM=1UQ%=9Mô(€€€€€€€€€€€€€€€€€€€Í•±•Ñ•õíÉ•Í½±ÕÑ¥½¹ô(€€€€€€€€€€€€€€€€€€€½¹M•±•ÐõíÍ•ÑI•Í½±ÕÑ¥½¹ô(€€€€€€€€€€€€€€€€€€€ÑÉ¥•ÉI•˜õíÉ•Í	Ñ¹I•™ô(€€€€€€€€€€€€€€€€€€€½¹±½Í”õì ¤€ôøÍ•Ñ=Á•¹É½Á‘½Ý¸¡¹Õ±°¥ô(€€€€€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€€€ð½‘¥Øø((€€€€€€€€€€€€€ì¼¨MÕµµ…Éä…É€¡ÑÉ¥•ÉÌ½Ù•É±…ä¤€¨½ô(€€€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€±…ÍÍ9…µ”õíÁÉ½µÁÑ½¹ÑÉ½±±…ÍÍ9…µ”¡ì(€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”è€‰Ñ•áÐµ±•™Ð½Ù•É™±½Üµ¡¥‘‘•¸Ñ•áÐµáÌ™½¹ÐµÍ•µ¥‰½±Ñ•áÐµÝ¡¥Ñ”¼ÜÀ¡½Ù•ÈéÑ•áÐµÝ¡¥Ñ”ˆ°(€€€€€€€€€€€€€€€ô¥ô(€€€€€€€€€€€€€€€½¹±¥¬õì ¤€ôøÍ•Ñ%Í=Ù•É±…å=Á•¸¡ÑÉÕ”¥ô(€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰Ü´Ä¸Ô ´Ä¸Ô‰œµlŒÈÉÍ••tÉ½Õ¹‘•µ™Õ±°Í¡…‘½Üµ±œÍ¡…‘½ÜµlŒÈÉÍ••t¼ÈÀÍ¡É¥¹¬´Àˆ€¼ø(€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰µ…àµÜµlÄÈÁÁátÑÉÕ¹…Ñ”Ñ•áÐµáÌ™½¹ÐµÍ•µ¥‰½±Ñ•áÐµÝ¡¥Ñ”¼ÜÀÉ½ÕÀµ¡½Ù•ÈéÑ•áÐµlŒÈÉÍ••tÑÉ…¹Í¥Ñ¥½¸µ½±½ÉÌˆø(€€€€€€€€€€€€€€€€€íÍ•ÑÑ¥¹Ì¹…µ•É…ôƒ
-Üí™½Éµ…ÑMÕµµ…ÉåY…±Õ” ¥ô(€€€€€€€€€€€€€€€€ð½ÍÁ…¸ø(€€€€€€€€€€€€€€ð½‰ÕÑÑ½¸ø(€€€€€€€€€€€€ð½AÉ½µÁÑ½¹ÑÉ½±Ìø((€€€€€€€€€€€ì¼¨•¹•É…Ñ”	ÕÑÑ½¸€¨½ô(€€€€€€€€€€€€ñAÉ½µÁÑÑ¥½¸(€€€€€€€€€€€€€‘¥Í…‰±•õí¥Í•¹•É…Ñ¥¹œñð€…Í•ÑÑ¥¹Ì¹ÁÉ½µÁÐ¹ÑÉ¥´ ¥ô(€€€€€€€€€€€€€½¹±¥¬õí¡…¹‘±••¹•É…Ñ•ô(€€€€€€€€€€€€ø(€€€€€€€€€€€€€í¥Í•¹•É…Ñ¥¹œ€ü€ (€€€€€€€€€€€€€€€€ðø(€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰…¹¥µ…Ñ”µÍÁ¥¸¥¹±¥¹”µ‰±½¬Ñ•áÐµ‰±…¬ˆûŠ^0ð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€€€ñÍÁ…¸ù•¹•É…Ñ¥¹œ¸¸¸ð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€ð¼ø(€€€€€€€€€€€€€€¤€è€ (€€€€€€€€€€€€€€€€ðø(€€€€€€€€€€€€€€€€€€ñÍÁ…¸ùM¡½½ÐƒŠr˜€ÄÀð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€ð¼ø(€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€ð½AÉ½µÁÑÑ¥½¸ø(€€€€€€€€€€ð½AÉ½µÁÑ½½Ñ•Èø(€€€€€€ð½AÉ½µÁÑ½µÁ½Í•Èø(€€€€€í™Õ±±ÍÉ••¹UÉ°€˜˜€ (€€€€€€€€ñ‘¥Ø€(€€€€€€€€€±…ÍÍ9…µ”ô‰™¥á•¥¹Í•Ð´ÀèµlÄÀÁt™±•à¥Ñ•µÌµ•¹Ñ•È©ÕÍÑ¥™äµ•¹Ñ•È‰œµ‰±…¬¼äÔ‰…­‘É½Àµ‰±ÕÈµÍ´…¹¥µ…Ñ”µ™…‘”µ¥¸ˆ(€€€€€€€€€½¹±¥¬õì ¤€ôøÍ•ÑÕ±±ÍÉ••¹UÉ°¡¹Õ±°¥ô(€€€€€€€€ø(€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€ÑåÁ”ô‰‰ÕÑÑ½¸ˆ(€€€€€€€€€€€±…ÍÍ9…µ”ô‰…‰Í½±ÕÑ”Ñ½À´ØÉ¥¡Ð´ØÀ´Ì‰œµÝ¡¥Ñ”¼ÄÀ¡½Ù•Èé‰œµÝ¡¥Ñ”¼ÈÀÉ½Õ¹‘•µ™Õ±°Ñ•áÐµÝ¡¥Ñ”ÑÉ…¹Í¥Ñ¥½¸µ½±½ÉÌ‰½É‘•È‰½É‘•ÈµÝ¡¥Ñ”¼ÄÀˆ(€€€€€€€€€€€½¹±¥¬õì¡”¤€ôøì(€€€€€€€€€€€€€”¹ÍÑ½ÁAÉ½Á……Ñ¥½¸ ¤ì(€€€€€€€€€€€€€Í•ÑÕ±±ÍÉ••¹UÉ°¡¹Õ±°¤ì(€€€€€€€€€€€õô(€€€€€€€€€€ø(€€€€€€€€€€€€ñÍÙœÝ¥‘Ñ ôˆÈÐˆ¡•¥¡ÐôˆÈÐˆÙ¥•Ý	½àôˆÀ€À€ÈÐ€ÈÐˆ™¥±°ô‰¹½¹”ˆÍÑÉ½­”ô‰ÕÉÉ•¹Ñ½±½ÈˆÍÑÉ½­•]¥‘Ñ ôˆÈ¸ÔˆÍÑÉ½­•1¥¹•…Àô‰É½Õ¹ˆÍÑÉ½­•1¥¹•©½¥¸ô‰É½Õ¹ˆø(€€€€€€€€€€€€€€ñ±¥¹”àÄôˆÄàˆäÄôˆØˆàÈôˆØˆäÈôˆÄàˆ€¼ø(€€€€€€€€€€€€€€ñ±¥¹”àÄôˆØˆäÄôˆØˆàÈôˆÄàˆäÈôˆÄàˆ€¼ø(€€€€€€€€€€€€ð½ÍÙœø(€€€€€€€€€€ð½‰ÕÑÑ½¸ø(€€€€€€€€€€ñ¥µœ€(€€€€€€€€€€€ÍÉŒõí™Õ±±ÍÉ••¹UÉ±ô€(€€€€€€€€€€€…±Ðô‰Õ±±ÍÉ••¸AÉ•Ù¥•Üˆ€(€€€€€€€€€€€±…ÍÍ9…µ”ô‰µ…àµÜµläÕÙÝtµ…àµ µläÕÙ¡tÉ½Õ¹‘•´Éá°Í¡…‘½Ü´Éá°½‰©•Ðµ½¹Ñ…¥¸…¹¥µ…Ñ”µÍ…±”µÕÀˆ€(€€€€€€€€€€€½¹±¥¬õì¡”¤€ôø”¹ÍÑ½ÁAÉ½Á……Ñ¥½¸ ¥ô(€€€€€€€€€€¼ø(€€€€€€€€ð½‘¥Øø(€€€€€€¥ô€€(€€€€€ì¼¨ƒŠRŠR …µ•É„½¹ÑÉ½±Ì=Ù•É±…äƒŠRŠR €¨½ô(€€€€€€ñ…µ•É…½¹ÑÉ½±Í=Ù•É±…ä(€€€€€€€¥Í=Á•¸õí¥Í=Ù•É±…å=Á•¹ô(€€€€€€€½¹±½Í”õì ¤€ôøÍ•Ñ%Í=Ù•É±…å=Á•¸¡™…±Í”¥ô(€€€€€€€Í•ÑÑ¥¹ÌõíÍ•ÑÑ¥¹Íô(€€€€€€€½¹M•ÑÑ¥¹Í¡…¹”õíÍ•ÑM•ÑÑ¥¹Íô(€€€€€€¼ø(€€€€ð½‘¥Øø(€€¤ì)ô(
+            title="Close"
+            className="ml-4 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/[0.06] bg-white/[0.03] text-white/40 transition-all hover:border-white/15 hover:bg-white/[0.07] hover:text-white"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="overflow-x-auto px-5 py-6 no-scrollbar md:px-7 md:py-7">
+          <div className="mx-auto flex w-max min-w-full justify-start gap-3 sm:justify-center md:gap-5">
+            <ScrollColumn
+              title="Camera"
+              items={CAMERAS}
+              columnKey="camera"
+              value={settings.camera}
+              onChange={updateSetting("camera")}
+            />
+            <ScrollColumn
+              title="Lens"
+              items={LENSES}
+              columnKey="lens"
+              value={settings.lens}
+              onChange={updateSetting("lens")}
+            />
+            <ScrollColumn
+              title="Focal length"
+              items={FOCAL_LENGTHS}
+              columnKey="focal"
+              value={settings.focal}
+              onChange={updateSetting("focal")}
+            />
+            <ScrollColumn
+              title="Aperture"
+              items={APERTURES}
+              columnKey="aperture"
+              value={settings.aperture}
+              onChange={updateSetting("aperture")}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// â”€â”€â”€ Main Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+export default function CinemaStudio({
+  apiKey,
+  onGenerationStart,
+  onGenerationEnd,
+  onGenerationComplete,
+  onGenerationError,
+  historyItems,
+}) {
+  const LEGACY_PERSIST_KEY = "hg_cinema_studio_persistent";
+  const PERSIST_KEY = scopedPersistKey(LEGACY_PERSIST_KEY, apiKey);
+  useEffect(() => {
+    migrateLegacyPersistKey(LEGACY_PERSIST_KEY, PERSIST_KEY);
+  }, [PERSIST_KEY]);
+
+  // â”€â”€ Settings state â”€â”€
+  const [settings, setSettings] = useState({
+    prompt: "",
+    aspect_ratio: "16:9",
+    camera: CAMERAS[0],
+    lens: LENSES[0],
+    focal: 35,
+    aperture: "f/1.4",
+  });
+  const [resolution, setResolution] = useState("2K");
+
+  // â”€â”€ UI state â”€â”€
+  const [isOverlayOpen, setIsOverlayOpen] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [canvasUrl, setCanvasUrl] = useState(null); // null = prompt view
+  const [fullscreenUrl, setFullscreenUrl] = useState(null);
+  const [uploadedImage, setUploadedImage] = useState(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [imageUploadProgress, setImageUploadProgress] = useState(0);
+  const imageInputRef = useRef(null);
+  const [activeHistoryIndex, setactiveHistoryIndex] = useState(null);
+  const [copiedPromptIndex, setCopiedPromptIndex] = useState(null);
+
+  // â”€â”€ Internal history state (used when historyItems prop is not provided) â”€â”€
+  const [internalHistory, setInternalHistory] = useState([]);
+
+  // â”€â”€ Dropdown state â”€â”€
+  const [openDropdown, setOpenDropdown] = useState(null); // 'ar' | 'res' | null
+  const arBtnRef = useRef(null);
+  const resBtnRef = useRef(null);
+
+  // â”€â”€ Textarea auto-grow â”€â”€
+  const textareaRef = useRef(null);
+  const resultImgRef = useRef(null);
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingImage(true);
+    setImageUploadProgress(0);
+
+    try {
+      const url = await uploadFile(apiKey, file, (progress) => {
+        setImageUploadProgress(progress);
+      });
+      if (url) setUploadedImage(url);
+    } catch (err) {
+      console.error("Image upload failed:", err);
+    } finally {
+      setIsUploadingImage(false);
+      setImageUploadProgress(0);
+      if (imageInputRef.current) imageInputRef.current.value = "";
+    }
+  };
+
+  const removeImage = () => {
+    setUploadedImage(null);
+  };
+
+  // â”€â”€ Persistence: Load â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(PERSIST_KEY);
+      if (stored) {
+        const data = JSON.parse(stored);
+        if (data.settings) setSettings(data.settings);
+        if (data.resolution) setResolution(data.resolution);
+        if (data.internalHistory) setInternalHistory(data.internalHistory);
+        if (data.uploadedImage) setUploadedImage(data.uploadedImage);
+      }
+    } catch (err) {
+      console.warn("Failed to load CinemaStudio persistence:", err);
+    }
+  }, []);
+
+  // â”€â”€ Adjust height on load â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â”€â”€ Persistence: Save â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      try {
+        const state = {
+          settings,
+          resolution,
+          internalHistory,
+          uploadedImage,
+        };
+        localStorage.setItem(PERSIST_KEY, JSON.stringify(state));
+      } catch (err) {
+        console.warn("Failed to save CinemaStudio persistence:", err);
+      }
+    }, 500); // 500ms debounce
+    return () => clearTimeout(timer);
+  }, [settings, resolution, internalHistory, uploadedImage]);
+
+  // Derive effective history (prop wins over internal)
+  const history = historyItems != null ? historyItems : internalHistory;
+
+  useEffect(() => {
+    setCanvasUrl(history[0]?.url || null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [historyItems]);
+
+  const formatSummaryValue = () =>
+    `${settings.lens}, ${settings.focal}mm, ${settings.aperture}`;
+
+  // â”€â”€ Textarea auto-height â”€â”€
+  // â”€â”€ Generate â”€â”€
+  const handleGenerate = useCallback(async () => {
+    const basePrompt = settings.prompt.trim();
+    if (!basePrompt || isGenerating) return;
+
+    onGenerationStart?.();
+    setIsGenerating(true);
+
+    const finalPrompt = buildNanoBananaPrompt(
+      basePrompt,
+      settings.camera,
+      settings.lens,
+      settings.focal,
+      settings.aperture,
+    );
+
+    try {
+      const res = await generateImage(apiKey, {
+        model: uploadedImage ? "nano-banana-pro-edit" : "nano-banana-pro",
+        prompt: finalPrompt,
+        aspect_ratio: settings.aspect_ratio,
+        resolution: resolution.toLowerCase(),
+        negative_prompt: "blurry, low quality, distortion, bad composition",
+        images_list: uploadedImage ? [uploadedImage] : [],
+      });
+
+      if (res && res.url) {
+        const entry = {
+          url: res.url,
+          timestamp: Date.now(),
+          settings: {
+            prompt: basePrompt,
+            camera: settings.camera,
+            lens: settings.lens,
+            focal: settings.focal,
+            aperture: settings.aperture,
+            aspect_ratio: settings.aspect_ratio,
+            resolution,
+          },
+        };
+
+        // Only update internal history if not using prop-driven history
+        if (historyItems == null) {
+          setInternalHistory((prev) => [entry, ...prev].slice(0, 50));
+        }
+
+        setCanvasUrl(res.url);
+
+        if (onGenerationComplete) {
+          onGenerationComplete({
+            url: res.url,
+            model: "nano-banana-pro",
+            prompt: basePrompt,
+            type: "cinema",
+          });
+        }
+      } else {
+        throw new Error("No data returned");
+      }
+    } catch (e) {
+      console.error(e);
+      onGenerationError?.(e.message?.slice(0, 120) || "Cinema generation failed");
+    } finally {
+      setIsGenerating(false);
+      onGenerationEnd?.();
+    }
+  }, [
+    settings,
+    resolution,
+    apiKey,
+    isGenerating,
+    onGenerationComplete,
+    onGenerationEnd,
+    onGenerationError,
+    onGenerationStart,
+    historyItems,
+  ]);
+
+  // â”€â”€ Regenerate â”€â”€
+  const handleRegenerate = useCallback(() => {
+    setCanvasUrl(null);
+    // Small delay then generate
+    setTimeout(() => handleGenerate(), 300);
+  }, [handleGenerate]);
+
+  // â”€â”€ Download â”€â”€
+  const handleDownload = useCallback(async () => {
+    if (!canvasUrl) return;
+    try {
+      const response = await fetch(canvasUrl);
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = `cinema-shot-${Date.now()}.jpg`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
+    } catch {
+      window.open(canvasUrl, "_blank");
+    }
+  }, [canvasUrl]);
+
+  const handleCopyPrompt = useCallback(
+    async (prompt, index) => {
+      if (!prompt) return;
+
+      try {
+        await navigator.clipboard.writeText(prompt);
+        setCopiedPromptIndex(index);
+        window.setTimeout(() => {
+          setCopiedPromptIndex((current) => (current === index ? null : current));
+        }, 1600);
+      } catch (error) {
+        console.error("Failed to copy the prompt:", error);
+        onGenerationError?.("Could not copy the prompt to the clipboard.");
+      }
+    },
+    [onGenerationError],
+  );
+
+  // â”€â”€ Load history item â”€â”€
+  const loadHistoryItem = (entry, idx) => {
+    if (entry.settings) {
+      setSettings((prev) => ({
+        ...prev,
+        camera: entry.settings.camera ?? prev.camera,
+        lens: entry.settings.lens ?? prev.lens,
+        focal: entry.settings.focal ?? prev.focal,
+        aperture: entry.settings.aperture ?? prev.aperture,
+        aspect_ratio: entry.settings.aspect_ratio ?? prev.aspect_ratio,
+        prompt: entry.settings.prompt ?? prev.prompt,
+      }));
+      if (entry.settings.resolution) setResolution(entry.settings.resolution);
+
+    }
+    setCanvasUrl(entry.url);
+  };
+
+  const resetToPrompt = () => {
+    setCanvasUrl(null);
+    setSettings((prev) => ({ ...prev, prompt: "" }));
+    if (textareaRef.current) {
+      setTimeout(() => textareaRef.current?.focus(), 50);
+    }
+  };
+
+  // â”€â”€ Render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  return (
+    <div className="w-full h-full flex flex-col items-center justify-center bg-black relative overflow-hidden">
+      
+      {/* â”€â”€ CENTRAL GALLERY AREA â”€â”€ */}
+      <div className="flex-1 w-full max-w-7xl mx-auto overflow-y-auto custom-scrollbar pb-40 lg:pb-32 px-2">
+        {history.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full pt-4 animate-fade-in-up">
+            {history.map((entry, idx) => (
+              <div
+                key={entry.timestamp ?? idx}
+                className="relative group rounded-lg overflow-hidden border border-white/10 bg-[#0a0a0a] shadow-xl hover:border-[#22d3ee]/50 transition-all duration-300 flex flex-col cursor-pointer"
+                onClick={() => loadHistoryItem(entry, idx)}
+              >
+                <img
+                  src={entry.url}
+                  alt={`History item ${idx + 1}`}
+                  className="w-full aspect-[4/3] object-cover bg-black/40"
+                />
+                
+                {/* Overlay actions */}
+                <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    type="button"
+                    title="Fullscreen"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setFullscreenUrl(entry.url);
+                    }}
+                    className="p-2 bg-black/60 backdrop-blur-md rounded-full text-white hover:bg-[#22d3ee] hover:text-black transition-all border border-white/10"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <polyline points="15 3 21 3 21 9" />
+                      <polyline points="9 21 3 21 3 15" />
+                      <line x1="21" y1="3" x2="14" y2="10" />
+                      <line x1="3" y1="21" x2="10" y2="14" />
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    title="Download"
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      try {
+                        const response = await fetch(entry.url);
+                        const blob = await response.blob();
+                        const blobUrl = URL.createObjectURL(blob);
+                        const a = document.createElement("a");
+                        a.href = blobUrl;
+                        a.download = `cinema-shot-${entry.id || idx}.jpg`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(blobUrl);
+                      } catch {
+                        window.open(entry.url, "_blank");
+                      }
+                    }}
+                    className="p-2 bg-black/60 backdrop-blur-md rounded-full text-white hover:bg-[#22d3ee] hover:text-black transition-all border border-white/10"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" />
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    title="Delete"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (confirm("Are you sure you want to delete this generated item?")) {
+                        setInternalHistory(prev => prev.filter((_, i) => i !== idx));
+                      }
+                    }}
+                    className="p-2 bg-black/60 backdrop-blur-md rounded-full text-red-400 hover:bg-red-500 hover:text-white transition-all border border-white/10"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <polyline points="3 6 5 6 21 6" />
+                      <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                      <line x1="10" y1="11" x2="10" y2="17" />
+                      <line x1="14" y1="11" x2="14" y2="17" />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* Details */}
+                <div className="p-3 bg-black/80 backdrop-blur-sm border-t border-white/5 flex-1 flex flex-col justify-between gap-2">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleCopyPrompt(entry.settings?.prompt, idx);
+                    }}
+                    className={`w-full text-left text-xs line-clamp-3 leading-relaxed transition-colors cursor-copy ${
+                      copiedPromptIndex === idx
+                        ? "text-[#22d3ee]"
+                        : "text-white/70 hover:text-white"
+                    }`}
+                    title={
+                      copiedPromptIndex === idx
+                        ? "Prompt copied"
+                        : "Copy full prompt"
+                    }
+                    aria-label={
+                      copiedPromptIndex === idx
+                        ? "Prompt copied"
+                        : "Copy full prompt"
+                    }
+                  >
+                    {entry.settings?.prompt || "No prompt"}
+                  </button>
+                  <span className="sr-only" aria-live="polite">
+                    {copiedPromptIndex === idx ? "Prompt copied" : ""}
+                  </span>
+                  <div className="flex items-center mt-1 flex-wrap gap-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold text-[#22d3ee] px-2 py-0.5 bg-[#22d3ee]/10 rounded border border-[#22d3ee]/20">
+                        Cinema Studio
+                      </span>
+                      {entry.settings?.camera && (
+                        <span className="text-[10px] text-white/40">{entry.settings.camera}</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full text-center px-4 animate-fade-in-up transition-all duration-700 min-h-[50vh]">
+            {/* Overlapping floating cards */}
+            <div className="flex items-center justify-center gap-1.5 md:gap-3 mb-10 select-none scale-90 sm:scale-100">
+              <div className="w-18 h-22 sm:w-24 sm:h-28 rounded-2xl border border-white/10 shadow-2xl -rotate-[12deg] transform hover:rotate-0 hover:scale-110 hover:z-20 transition-all duration-300 overflow-hidden bg-white/[0.01] flex-shrink-0">
+                <img
+                  src="https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/sdxl-image.avif"
+                  alt="Creative asset 1"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="w-18 h-22 sm:w-24 sm:h-28 rounded-2xl border border-white/10 shadow-2xl -rotate-[4deg] transform hover:rotate-0 hover:scale-110 hover:z-20 transition-all duration-300 overflow-hidden bg-white/[0.01] -ml-3 sm:-ml-4 flex-shrink-0">
+                <img
+                  src="https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/chroma-image.avif"
+                  alt="Creative asset 2"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="w-18 h-18 sm:w-24 sm:h-24 rounded-full border border-white/10 shadow-2xl rotate-[6deg] transform hover:rotate-0 hover:scale-110 hover:z-20 transition-all duration-300 overflow-hidden bg-white/[0.01] -ml-3 sm:-ml-4 flex-shrink-0">
+                <img
+                  src="https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/neta-lumina.avif"
+                  alt="Creative asset 3"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="w-18 h-22 sm:w-24 sm:h-28 rounded-2xl border border-white/10 shadow-2xl rotate-[12deg] transform hover:rotate-0 hover:scale-110 hover:z-20 transition-all duration-300 overflow-hidden bg-white/[0.01] -ml-3 sm:-ml-4 flex-shrink-0">
+                <img
+                  src="https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/perfect-pony-xl.avif"
+                  alt="Creative asset 4"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+
+            <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-center px-4 flex flex-col items-center">
+              <span className="text-white font-black uppercase text-xl sm:text-3xl tracking-wide mb-1 opacity-90">START CREATING WITH</span>
+              <span className="text-[#22d3ee] font-black uppercase text-2xl sm:text-4xl sm:mt-1 tracking-tight">
+                CINEMA STUDIO
+              </span>
+            </h1>
+            <p className="text-white/40 text-xs sm:text-sm font-medium tracking-wide text-center max-w-lg leading-relaxed px-4">
+              What would you shoot with infinite budget? Control cameras, lighting, lenses, and prompt high-end cinematic scenes.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* â”€â”€ BOTTOM PROMPT BAR â”€â”€ */}
+      <PromptComposer
+        positionClassName="absolute bottom-4 left-4 right-4 md:left-0 md:right-0 md:mx-auto md:max-w-[95%] lg:max-w-4xl z-30 transition-all duration-700 animate-fade-in-up"
+        style={null}
+      >
+          {/* Upper Row: Image Upload & Textarea */}
+          <div className="flex items-start gap-4 w-full px-1">
+            {/* Image Upload Button */}
+            <div className="relative pt-0.5">
+              <input
+                type="file"
+                ref={imageInputRef}
+                className="hidden"
+                accept="image/*"
+                onChange={handleImageUpload}
+              />
+              
+              <button
+                onClick={() =>
+                  uploadedImage
+                    ? removeImage()
+                    : imageInputRef.current?.click()
+                }
+                disabled={isUploadingImage}
+                className={promptMediaButtonClassName({
+                  active: Boolean(uploadedImage),
+                })}
+              >
+                {isUploadingImage ? (
+                  <div className="flex flex-col items-center justify-center w-full h-full absolute inset-0 bg-black/80 z-20 backdrop-blur-[2px]">
+                    <svg className="w-8 h-8 -rotate-90">
+                      <circle
+                        cx="16"
+                        cy="16"
+                        r="14"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        fill="transparent"
+                        className="text-white/10"
+                      />
+                      <circle
+                        cx="16"
+                        cy="16"
+                        r="14"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        fill="transparent"
+                        strokeDasharray={88}
+                        strokeDashoffset={88 - (88 * imageUploadProgress) / 100}
+                        className="text-primary transition-all duration-300"
+                      />
+                    </svg>
+                    <span className="absolute text-[8px] font-bold text-white">
+                      {imageUploadProgress}%
+                    </span>
+                  </div>
+                ) : uploadedImage ? (
+                  <div className="relative w-full h-full group">
+                    <img
+                      src={uploadedImage}
+                      alt="Reference"
+                      className="w-full h-full object-cover opacity-80 group-hover:opacity-40 transition-opacity"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-white">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                      </svg>
+                    </div>
+                  </div>
+                ) : (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-white/40 group-hover:text-[#22d3ee] transition-colors">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                    <circle cx="8.5" cy="8.5" r="1.5" />
+                    <polyline points="21 15 16 10 5 21" />
+                  </svg>
+                )}
+              </button>
+            </div>
+
+            <PromptTextarea
+              ref={textareaRef}
+              value={settings.prompt}
+              onChange={(e) =>
+                setSettings((prev) => ({ ...prev, prompt: e.target.value }))
+              }
+              placeholder="Describe your cinema scene..."
+            />
+          </div>
+
+          {/* Bottom Row: Controls & Generate */}
+          <PromptFooter>
+            <PromptControls>
+              {/* Aspect Ratio Button */}
+              <div className="relative">
+                <button
+                  ref={arBtnRef}
+                  className={promptControlClassName({
+                    active: openDropdown === "ar",
+                    className: "text-xs font-semibold",
+                  })}
+                  onClick={() =>
+                    setOpenDropdown((d) => (d === "ar" ? null : "ar"))
+                  }
+                >
+                  <PromptAspectRatioIcon />
+                  {settings.aspect_ratio}
+                </button>
+                {openDropdown === "ar" && (
+                  <Dropdown
+                    title="Aspect Ratio"
+                    items={ASPECT_RATIOS}
+                    selected={settings.aspect_ratio}
+                    onSelect={(val) =>
+                      setSettings((prev) => ({ ...prev, aspect_ratio: val }))
+                    }
+                    triggerRef={arBtnRef}
+                    onClose={() => setOpenDropdown(null)}
+                  />
+                )}
+              </div>
+
+              {/* Resolution Button */}
+              <div className="relative">
+                <button
+                  ref={resBtnRef}
+                  className={promptControlClassName({
+                    active: openDropdown === "res",
+                    className: "text-xs font-semibold",
+                  })}
+                  onClick={() =>
+                    setOpenDropdown((d) => (d === "res" ? null : "res"))
+                  }
+                >
+                  <PromptQualityIcon />
+                  {resolution}
+                </button>
+                {openDropdown === "res" && (
+                  <Dropdown
+                    title="Resolution"
+                    items={RESOLUTIONS}
+                    selected={resolution}
+                    onSelect={setResolution}
+                    triggerRef={resBtnRef}
+                    onClose={() => setOpenDropdown(null)}
+                  />
+                )}
+              </div>
+
+              {/* Summary Card (triggers overlay) */}
+              <button
+                className={promptControlClassName({
+                  className: "text-left overflow-hidden text-xs font-semibold text-white/70 hover:text-white",
+                })}
+                onClick={() => setIsOverlayOpen(true)}
+              >
+                <div className="w-1.5 h-1.5 bg-[#22d3ee] rounded-full shadow-lg shadow-[#22d3ee]/20 shrink-0" />
+                <span className="max-w-[120px] truncate text-xs font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors">
+                  {settings.camera} Â· {formatSummaryValue()}
+                </span>
+              </button>
+            </PromptControls>
+
+            {/* Generate Button */}
+            <PromptAction
+              disabled={isGenerating || !settings.prompt.trim()}
+              onClick={handleGenerate}
+            >
+              {isGenerating ? (
+                <>
+                  <span className="animate-spin inline-block text-black">â—Œ</span>
+                  <span>Generating...</span>
+                </>
+              ) : (
+                <>
+                  <span>Shoot âœ¦ 10</span>
+                </>
+              )}
+            </PromptAction>
+          </PromptFooter>
+      </PromptComposer>
+      {fullscreenUrl && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-sm animate-fade-in"
+          onClick={() => setFullscreenUrl(null)}
+        >
+          <button
+            type="button"
+            className="absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors border border-white/10"
+            onClick={(e) => {
+              e.stopPropagation();
+              setFullscreenUrl(null);
+            }}
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+          <img 
+            src={fullscreenUrl} 
+            alt="Fullscreen Preview" 
+            className="max-w-[95vw] max-h-[95vh] rounded-2xl shadow-2xl object-contain animate-scale-up" 
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}  
+      {/* â”€â”€ Camera Controls Overlay â”€â”€ */}
+      <CameraControlsOverlay
+        isOpen={isOverlayOpen}
+        onClose={() => setIsOverlayOpen(false)}
+        settings={settings}
+        onSettingsChange={setSettings}
+      />
+    </div>
+  );
+}

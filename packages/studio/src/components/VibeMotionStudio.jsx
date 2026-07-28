@@ -328,5 +328,377 @@ export default function VibeMotionStudio({
                     ? "bg-[#22d3ee]/20 text-[#22d3ee] border-[#22d3ee]/30"
                     : "bg-violet-600/30 text-violet-300 border-violet-500/30"
                 }`}>
-                  {entry.mode === "edit" ? "âœ×¾ø¶‰žËkºwµçEÍÍ9…µ”ô‰™±•à¥Ñ•µÌµ•¹Ñ•È©ÕÍÑ¥™äµ‰•ÑÝ••¸µÐ´Ä™±•àµÝÉ…À…À´Äˆø(€€€€€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à¥Ñ•µÌµ•¹Ñ•È…À´Èˆø(€€€€€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰Ñ•áÐµlÄÁÁát™½¹Ðµ‰½±Ñ•áÐµÁÉ¥µ…ÉäÁà´ÈÁä´À¸Ô‰œµÁÉ¥µ…Éä¼ÄÀÉ½Õ¹‘•‰½É‘•È‰½É‘•ÈµÁÉ¥µ…Éä¼ÈÀÝ¡¥Ñ•ÍÁ…”µ¹½ÝÉ…Àˆø(€€€€€€€€€€€€€€€€€€€€€€€Y¥‰”5½Ñ¥½¸(€€€€€€€€€€€€€€€€€€€€€€ð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à…À´Èˆø(€€€€€€€€€€€€€€€€€€€€€€€í•¹ÑÉä¹…ÍÁ•ÑI…Ñ¥¼€˜˜€ (€€€€€€€€€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰Ñ•áÐµlÄÁÁátÑ•áÐµÝ¡¥Ñ”¼ÐÀˆùí•¹ÑÉä¹…ÍÁ•ÑI…Ñ¥½ôð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€€€€€€€€€€€€í•¹ÑÉä¹‘ÕÉ…Ñ¥½¸€˜˜€ (€€€€€€€€€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰Ñ•áÐµlÄÁÁátÑ•áÐµÝ¡¥Ñ”¼ÐÀˆùí•¹ÑÉä¹‘ÕÉ…Ñ¥½¹õÌð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€€€€í•¹ÑÉä¹ÁÉ½µÁÐ€˜˜€ (€€€€€€€€€€€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€€€€€€€€€ÑåÁ”ô‰‰ÕÑÑ½¸ˆ(€€€€€€€€€€€€€€€€€€€€€€€½¹±¥¬õì¡”¤€ôøì(€€€€€€€€€€€€€€€€€€€€€€€€€”¹ÍÑ½ÁAÉ½Á……Ñ¥½¸ ¤ì(€€€€€€€€€€€€€€€€€€€€€€€€€¹…Ù¥…Ñ½È¹±¥Á‰½…É¹ÝÉ¥Ñ•Q•áÐ¡•¹ÑÉä¹ÁÉ½µÁÐ¤ì(€€€€€€€€€€€€€€€€€€€€€€€€€½¹ÍÐ‰Ñ¸€ô”¹ÕÉÉ•¹ÑQ…É•Ðì(€€€€€€€€€€€€€€€€€€€€€€€€€‰Ñ¸¹¥¹¹•ÉQ•áÐ€ô€‰½Á¥•„ˆì(€€€€€€€€€€€€€€€€€€€€€€€€€Í•ÑQ¥µ•½ÕÐ  ¤€ôøì‰Ñ¸¹¥¹¹•ÉQ•áÐ€ô€‰½Áäˆìô°€ÈÀÀÀ¤ì(€€€€€€€€€€€€€€€€€€€€€€€õô(€€€€€€€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰Áà´ÈÁä´À¸Ô‰œµÝ¡¥Ñ”¼Ô¡½Ù•Èé‰œµÁÉ¥µ…Éä¼ÈÀ¡½Ù•ÈéÑ•áÐµÁÉ¥µ…ÉäÉ½Õ¹‘•Ñ•áÐµlÄÁÁát™½¹Ðµµ•‘¥Õ´Ñ•áÐµÝ¡¥Ñ”¼ÜÀÑÉ…¹Í¥Ñ¥½¸µ…±°‰½É‘•È‰½É‘•ÈµÝ¡¥Ñ”¼ÄÀˆ(€€€€€€€€€€€€€€€€€€€€€€€Ñ¥Ñ±”ô‰½ÁäÁÉ½µÁÐˆ(€€€€€€€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€€€€€€€½ÁäAÉ½µÁÐ(€€€€€€€€€€€€€€€€€€€€€€ð½‰ÕÑÑ½¸ø(€€€€€€€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€¤¥ô(€€€€€€€€€€ð½‘¥Øø(€€€€€€€€¤€è€…•¹•É…Ñ¥¹œ€ü€ (€€€€€€€€€€¼¨ƒŠRŠR µÁÑäMÑ…Ñ”ƒŠRŠR €¨¼(€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à™±•àµ½°¥Ñ•µÌµ•¹Ñ•È©ÕÍÑ¥™äµ•¹Ñ•È µ™Õ±°…¹¥µ…Ñ”µ™…‘”µ¥¸µÕÀÑÉ…¹Í¥Ñ¥½¸µ…±°‘ÕÉ…Ñ¥½¸´ÜÀÀµ¥¸µ µlÔÁÙ¡tˆø(€€€€€€€€€€€ì¼¨=Ù•É±…ÁÁ¥¹œ™±½…Ñ¥¹œ…É‘Ì€¨½ô(€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à¥Ñ•µÌµ•¹Ñ•È©ÕÍÑ¥™äµ•¹Ñ•È…À´Ä¸Ôµé…À´Ìµˆ´ÄÀÍ•±•Ðµ¹½¹”Í…±”´äÀÍ´éÍ…±”´ÄÀÀˆø(€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰Ü´Äà ´ÈÈÍ´éÜ´ÈÐÍ´é ´ÈàÉ½Õ¹‘•´Éá°‰½É‘•È‰½É‘•ÈµÝ¡¥Ñ”¼ÄÀÍ¡…‘½Ü´Éá°€µÉ½Ñ…Ñ”µlÄÉ‘•tÑÉ…¹Í™½É´¡½Ù•ÈéÉ½Ñ…Ñ”´À¡½Ù•ÈéÍ…±”´ÄÄÀ¡½Ù•Èéè´ÈÀÑÉ…¹Í¥Ñ¥½¸µ…±°‘ÕÉ…Ñ¥½¸´ÌÀÀ½Ù•É™±½Üµ¡¥‘‘•¸‰œµÝ¡¥Ñ”½lÀ¸ÀÅt™±•àµÍ¡É¥¹¬´Àˆø(€€€€€€€€€€€€€€€€ñ¥µœ(€€€€€€€€€€€€€€€€€ÍÉŒô‰¡ÑÑÁÌè¼½Í…‘Ý­‰å¡áåÉÑÄ¹±½Õ‘™É½¹Ð¹¹•Ð½Ý•‰…ÍÍ•ÑÌ½Ù¥‘•½µ½‘•±Ì½Í‘á°µ¥µ…”¹…Ù¥˜ˆ(€€€€€€€€€€€€€€€€€…±Ðô‰É•…Ñ¥Ù”…ÍÍ•Ð€Äˆ(€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰Üµ™Õ±° µ™Õ±°½‰©•Ðµ½Ù•Èˆ(€€€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰Ü´Äà ´ÈÈÍ´éÜ´ÈÐÍ´é ´ÈàÉ½Õ¹‘•´Éá°‰½É‘•È‰½É‘•ÈµÝ¡¥Ñ”¼ÄÀÍ¡…‘½Ü´Éá°€µÉ½Ñ…Ñ”µlÑ‘•tÑÉ…¹Í™½É´¡½Ù•ÈéÉ½Ñ…Ñ”´À¡½Ù•ÈéÍ…±”´ÄÄÀ¡½Ù•Èéè´ÈÀÑÉ…¹Í¥Ñ¥½¸µ…±°‘ÕÉ…Ñ¥½¸´ÌÀÀ½Ù•É™±½Üµ¡¥‘‘•¸‰œµÝ¡¥Ñ”½lÀ¸ÀÅt€µµ°´ÌÍ´èµµ°´Ð™±•àµÍ¡É¥¹¬´Àˆø(€€€€€€€€€€€€€€€€ñ¥µœ(€€€€€€€€€€€€€€€€€ÍÉŒô‰¡ÑÑÁÌè¼½Í…‘Ý­‰å¡áåÉÑÄ¹±½Õ‘™É½¹Ð¹¹•Ð½Ý•‰…ÍÍ•ÑÌ½Ù¥‘•½µ½‘•±Ì½¡É½µ„µ¥µ…”¹…Ù¥˜ˆ(€€€€€€€€€€€€€€€€€…±Ðô‰É•…Ñ¥Ù”…ÍÍ•Ð€Èˆ(€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰Üµ™Õ±° µ™Õ±°½‰©•Ðµ½Ù•Èˆ(€€€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰Ü´Äà ´ÄàÍ´éÜ´ÈÐÍ´é ´ÈÐÉ½Õ¹‘•µ™Õ±°‰½É‘•È‰½É‘•ÈµÝ¡¥Ñ”¼ÄÀÍ¡…‘½Ü´Éá°É½Ñ…Ñ”µlÙ‘•tÑÉ…¹Í™½É´¡½Ù•ÈéÉ½Ñ…Ñ”´À¡½Ù•ÈéÍ…±”´ÄÄÀ¡½Ù•Èéè´ÈÀÑÉ…¹Í¥Ñ¥½¸µ…±°‘ÕÉ…Ñ¥½¸´ÌÀÀ½Ù•É™±½Üµ¡¥‘‘•¸‰œµÝ¡¥Ñ”½lÀ¸ÀÅt€µµ°´ÌÍ´èµµ°´Ð™±•àµÍ¡É¥¹¬´Àˆø(€€€€€€€€€€€€€€€€ñ¥µœ(€€€€€€€€€€€€€€€€€ÍÉŒô‰¡ÑÑÁÌè¼½Í…‘Ý­‰å¡áåÉÑÄ¹±½Õ‘™É½¹Ð¹¹•Ð½Ý•‰…ÍÍ•ÑÌ½Ù¥‘•½µ½‘•±Ì½¹•Ñ„µ±Õµ¥¹„¹…Ù¥˜ˆ(€€€€€€€€€€€€€€€€€…±Ðô‰É•…Ñ¥Ù”…ÍÍ•Ð€Ìˆ(€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰Üµ™Õ±° µ™Õ±°½‰©•Ðµ½Ù•Èˆ(€€€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰Ü´Äà ´ÈÈÍ´éÜ´ÈÐÍ´é ´ÈàÉ½Õ¹‘•´Éá°‰½É‘•È‰½É‘•ÈµÝ¡¥Ñ”¼ÄÀÍ¡…‘½Ü´Éá°É½Ñ…Ñ”µlÄÉ‘•tÑÉ…¹Í™½É´¡½Ù•ÈéÉ½Ñ…Ñ”´À¡½Ù•ÈéÍ…±”´ÄÄÀ¡½Ù•Èéè´ÈÀÑÉ…¹Í¥Ñ¥½¸µ…±°‘ÕÉ…Ñ¥½¸´ÌÀÀ½Ù•É™±½Üµ¡¥‘‘•¸‰œµÝ¡¥Ñ”½lÀ¸ÀÅt€µµ°´ÌÍ´èµµ°´Ð™±•àµÍ¡É¥¹¬´Àˆø(€€€€€€€€€€€€€€€€ñ¥µœ(€€€€€€€€€€€€€€€€€ÍÉŒô‰¡ÑÑÁÌè¼½Í…‘Ý­‰å¡áåÉÑÄ¹±½Õ‘™É½¹Ð¹¹•Ð½Ý•‰…ÍÍ•ÑÌ½Ù¥‘•½µ½‘•±Ì½Á•É™•ÐµÁ½¹äµá°¹…Ù¥˜ˆ(€€€€€€€€€€€€€€€€€…±Ðô‰É•…Ñ¥Ù”…ÍÍ•Ð€Ðˆ(€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰Üµ™Õ±° µ™Õ±°½‰©•Ðµ½Ù•Èˆ(€€€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€ð½‘¥Øø((€€€€€€€€€€€€ñ Ä±…ÍÍ9…µ”ô‰Ñ•áÐ´Éá°Í´éÑ•áÐ´Ñá°µéÑ•áÐ´Õá°™½¹Ðµ•áÑÉ…‰½±ÑÉ…­¥¹œµÑ¥¡Ðµˆ´ÐÑ•áÐµ•¹Ñ•ÈÁà´Ð™±•à™±•àµ½°¥Ñ•µÌµ•¹Ñ•Èˆø(€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰Ñ•áÐµÝ¡¥Ñ”™½¹Ðµ‰±…¬ÕÁÁ•É…Í”Ñ•áÐµá°Í´éÑ•áÐ´Íá°ÑÉ…­¥¹œµÝ¥‘”µˆ´Ä½Á…¥Ñä´äÀˆùMQIPIQ%9]%Q ð½ÍÁ…¸ø(€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰Ñ•áÐµlŒÈÉÍ••t™½¹Ðµ‰±…¬ÕÁÁ•É…Í”Ñ•áÐ´Éá°Í´éÑ•áÐ´Ñá°Í´éµÐ´ÄÑÉ…­¥¹œµÑ¥¡Ðˆø(€€€€€€€€€€€€€€€Y%	5=Q%=8MQU%<(€€€€€€€€€€€€€€ð½ÍÁ…¸ø(€€€€€€€€€€€€ð½ Äø(€€€€€€€€€€€€ñÀ±…ÍÍ9…µ”ô‰Ñ•áÐµÝ¡¥Ñ”¼ÐÀÑ•áÐµáÌÍ´éÑ•áÐµÍ´™½¹Ðµµ•‘¥Õ´ÑÉ…­¥¹œµÝ¥‘”Ñ•áÐµ•¹Ñ•Èµ…àµÜµ±œ±•…‘¥¹œµÉ•±…á•Áà´Ðˆø(€€€€€€€€€€€€€•¹•É…Ñ”…¹¥µ…Ñ•µ½Ñ¥½¸É…Á¡¥Ì™É½´„Ñ•áÐÁÉ½µÁÐƒŠP­¥¹•Ñ¥ŒÑåÁ½É…Á¡ä°‘…Ñ„¡…ÉÑÌ°±½¼É•Ù•…±Ì°…¹µ½É”¸(€€€€€€€€€€€€ð½Àø(€€€€€€€€€€ð½‘¥Øø(€€€€€€€€¤€è¹Õ±±ô(€€€€€€ð½‘¥Øø((€€€€€ì¼¨ƒŠRŠR 	=QQ=4AI=5AP	HƒŠPµ…Ñ¡•ÌY¥‘•½MÑÕ‘¥¼•á…Ñ±äƒŠRŠR €¨½ô(€€€€€€ñAÉ½µÁÑ½µÁ½Í•Èø((€€€€€€€€€ì¼¨ƒŠRŠR Q½ÀI½Üè5½‘”Q½±”€˜‘¥ÐM½ÕÉ”	…¹¹•ÈƒŠRŠR €¨½ô(€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à¥Ñ•µÌµ•¹Ñ•È©ÕÍÑ¥™äµ‰•ÑÝ••¸…À´ÌÁà´Äˆø(€€€€€€€€€€€ì¼¨1•™Ðè5½‘”Ñ½±”Á¥±°€¨½ô(€€€€€€€€€€€€ñAÉ½µÁÑM•µ•¹Ñ•‘½¹ÑÉ½°±…ÍÍ9…µ”ô‰™±•àµÍ¡É¥¹¬´Àˆø(€€€€€€€€€€€€€€ñAÉ½µÁÑM•µ•¹Ñ=ÁÑ¥½¸(€€€€€€€€€€€€€€€ÑåÁ”ô‰‰ÕÑÑ½¸ˆ(€€€€€€€€€€€€€€€½¹±¥¬õì ¤€ôøìÍ•Ñ‘¥Ñ5½‘”¡™…±Í”¤ìÍ•Ñ‘¥ÑM½ÕÉ•%¡¹Õ±°¤ìõô(€€€€€€€€€€€€€€€Í•±•Ñ•õì…•‘¥Ñ5½‘•ô(€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€•¹•É…Ñ”(€€€€€€€€€€€€€€ð½AÉ½µÁÑM•µ•¹Ñ=ÁÑ¥½¸ø(€€€€€€€€€€€€€€ñAÉ½µÁÑM•µ•¹Ñ=ÁÑ¥½¸(€€€€€€€€€€€€€€€ÑåÁ”ô‰‰ÕÑÑ½¸ˆ(€€€€€€€€€€€€€€€½¹±¥¬õì ¤€ôøÍ•Ñ‘¥Ñ5½‘”¡ÑÉÕ”¥ô(€€€€€€€€€€€€€€€‘¥Í…‰±•õí•‘¥ÑM½ÕÉ•Ì¹±•¹Ñ €ôôô€Áô(€€€€€€€€€€€€€€€Í•±•Ñ•õí•‘¥Ñ5½‘•ô(€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰‘¥Í…‰±•é½Á…¥Ñä´ÌÀ‘¥Í…‰±•éÕÉÍ½Èµ¹½Ðµ…±±½Ý•ˆ(€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€‘¥Ð(€€€€€€€€€€€€€€ð½AÉ½µÁÑM•µ•¹Ñ=ÁÑ¥½¸ø(€€€€€€€€€€€€ð½AÉ½µÁÑM•µ•¹Ñ•‘½¹ÑÉ½°ø((€€€€€€€€€€€ì¼¨I¥¡Ðè‘¥Ðµ½‘”ÍÑ…ÑÕÌ‰…¹¹•È‰•Í¥‘”Ñ½±”‰ÕÑÑ½¹Ì€¨½ô(€€€€€€€€€€€í•‘¥Ñ5½‘”€˜˜€ (€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à¥Ñ•µÌµ•¹Ñ•È…À´ÈÁà´ÌÁä´Ä‰œµlŒÈÉÍ••t¼Ô‰½É‘•È‰½É‘•ÈµlŒÈÉÍ••t¼ÄÀÉ½Õ¹‘•µ™Õ±°Ñ•áÐµlÄÅÁátÑ•áÐµlŒÈÉÍ••t™½¹Ðµµ•‘¥Õ´ÑÉ…­¥¹œµÑ¥¡Ðµ¥¸µÜ´Àµ…àµÜµ™Õ±°½Ù•É™±½Üµ¡¥‘‘•¸ˆø(€€€€€€€€€€€€€€€€ñÍÙœÝ¥‘Ñ ôˆÄÈˆ¡•¥¡ÐôˆÄÈˆÙ¥•Ý	½àôˆÀ€À€ÈÐ€ÈÐˆ™¥±°ô‰¹½¹”ˆÍÑÉ½­”ô‰ÕÉÉ•¹Ñ½±½ÈˆÍÑÉ½­•]¥‘Ñ ôˆÈ¸Ôˆ±…ÍÍ9…µ”ô‰™±•àµÍ¡É¥¹¬´Àˆø(€€€€€€€€€€€€€€€€€€ñÁ…Ñ ô‰4ÄÄ€Ñ Ñ„È€È€À€À€À´È€ÉØÄÑ„È€È€À€À€À€È€É ÄÑ„È€È€À€À€À€È´ÉØ´Üˆ¼ø(€€€€€€€€€€€€€€€€€€ñÁ…Ñ ô‰4Äà¸Ô€È¸Õ„È¸ÄÈÄ€È¸ÄÈÄ€À€À€Ä€Ì€Í0ÄÈ€ÄÕ°´Ð€Ä€Ä´Ð€ä¸Ô´ä¸Õèˆ¼ø(€€€€€€€€€€€€€€€€ð½ÍÙœø(€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰ÑÉÕ¹…Ñ”ˆø(€€€€€€€€€€€€€€€€€íÍ½ÕÉ•¹ÑÉä(€€€€€€€€€€€€€€€€€€€€ü‘¥Ñ¥¹œè€ˆ‘íÍ½ÕÉ•¹ÑÉä¹ÁÉ½µÁÐü¹Í±¥” À°€ÐÔ¥ô‘íÍ½ÕÉ•¹ÑÉä¹ÁÉ½µÁÐü¹±•¹Ñ €ø€ÐÔ€ü€‹Š˜ˆ€è€ˆ‰ô‰€(€€€€€€€€€€€€€€€€€€€€è€‰M•±•Ð„Í½ÕÉ”•¹•É…Ñ¥½¸™É½´Ñ¡”…±±•Éä‰ô(€€€€€€€€€€€€€€€€ð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€€€½¹±¥¬õì ¤€ôøìÍ•Ñ‘¥Ñ5½‘”¡™…±Í”¤ìÍ•Ñ‘¥ÑM½ÕÉ•%¡¹Õ±°¤ìÍ•ÑAÉ½µÁÐ ˆˆ¤ìõô(€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰µ°µ…ÕÑ¼Ñ•áÐµlŒÈÉÍ••t¼ÐÀ¡½Ù•ÈéÑ•áÐµlŒÈÉÍ••tÑÉ…¹Í¥Ñ¥½¸µ½±½ÉÌÑ•áÐµÍ´±•…‘¥¹œµ¹½¹”™±•àµÍ¡É¥¹¬´Àˆ(€€€€€€€€€€€€€€€€€Ñ¥Ñ±”ô‰…¹•°‘¥Ð5½‘”ˆ(€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€ƒ\(€€€€€€€€€€€€€€€€ð½‰ÕÑÑ½¸ø(€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€¥ô(€€€€€€€€€€ð½‘¥Øø((€€€€€€€€€€€ì¼¨	½ÑÑ½´èQ•áÑ…É•„™Õ±°Ý¥‘Ñ €¨½ô(€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰Üµ™Õ±°ˆø(€€€€€€€€€€€€€€ñAÉ½µÁÑQ•áÑ…É•„(€€€€€€€€€€€€€€€É•˜õíÑ•áÑ…É•…I•™ô(€€€€€€€€€€€€€€€Ù…±Õ”õíÁÉ½µÁÑô(€€€€€€€€€€€€€€€½¹¡…¹”õì¡”¤€ôøÍ•ÑAÉ½µÁÐ¡”¹Ñ…É•Ð¹Ù…±Õ”¥ô(€€€€€€€€€€€€€€€½¹-•å½Ý¸õí¡…¹‘±•-•å½Ý¹ô(€€€€€€€€€€€€€€€Á±…•¡½±‘•Èõì(€€€€€€€€€€€€€€€€€•‘¥Ñ5½‘”(€€€€€€€€€€€€€€€€€€€€ü€‰•ÍÉ¥‰”Ý¡…ÐÑ¼¡…¹”ƒŠP€¡…¹”‰…­É½Õ¹Ñ¼‘…É¬¹…Ùä°µ…­”‰…ÉÌ½±°…‘Á…ÉÑ¥±•ÏŠ˜œˆ(€€€€€€€€€€€€€€€€€€€€è€‰•ÍÉ¥‰”Ñ¡”µ½Ñ¥½¸É…Á¡¥ŒƒŠP€¹¥µ…Ñ•Í…±•Ì‘…Í¡‰½…ÉÝ¥Ñ ±½Ý¥¹œ‰…È¡…ÉÑÌ…¹É¥Í¥¹œ¹Õµ‰•ÉÌœˆ(€€€€€€€€€€€€€€€ô(€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€ð½‘¥Øø((€€€€€€€€€ì¼¨ƒŠRŠR ÉÉ½È‰…¹¹•ÈƒŠRŠR €¨½ô(€€€€€€€€€í•¹•É…Ñ•ÉÉ½È€˜˜€ (€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à¥Ñ•µÌµ•¹Ñ•È…À´ÈÁà´ÌÁä´Ä¸Ô‰œµÉ•´ÔÀÀ¼ÄÀ‰½É‘•È‰½É‘•ÈµÉ•´ÔÀÀ¼ÈÀÉ½Õ¹‘•Ñ•áÐµÉ•´ÐÀÀÑ•áÐµáÌˆø(€€€€€€€€€€€€€€ñÍÙœÝ¥‘Ñ ôˆÄÈˆ¡•¥¡ÐôˆÄÈˆÙ¥•Ý	½àôˆÀ€À€ÈÐ€ÈÐˆ™¥±°ô‰¹½¹”ˆÍÑÉ½­”ô‰ÕÉÉ•¹Ñ½±½ÈˆÍÑÉ½­•]¥‘Ñ ôˆÈˆøñ¥É±”àôˆÄÈˆäôˆÄÈˆÈôˆÄÀˆ¼øñ±¥¹”àÄôˆÄÈˆäÄôˆàˆàÈôˆÄÈˆäÈôˆÄÈˆ¼øñ±¥¹”àÄôˆÄÈˆäÄôˆÄØˆàÈôˆÄÈ¸ÀÄˆäÈôˆÄØˆ¼øð½ÍÙœø(€€€€€€€€€€€€€í•¹•É…Ñ•ÉÉ½Éô(€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€¥ô((€€€€€€€€€ì¼¨ƒŠRŠR ½¹ÑÉ½±ÌÉ½Üè‘É½Á‘½Ý¹Ì€¬•¹•É…Ñ”‰ÕÑÑ½¸ƒŠRŠR €¨½ô(€€€€€€€€€€ñAÉ½µÁÑ½½Ñ•Èø(€€€€€€€€€€€€ñAÉ½µÁÑ½¹ÑÉ½±ÌÉ•˜õí½¹ÑÉ½±ÍI•™ôø((€€€€€€€€€€€€€ì¼¨ƒŠRŠR ÍÁ•ÐI…Ñ¥¼‘É½Á‘½Ý¸ƒŠRŠR €¨½ô(€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰É•±…Ñ¥Ù”ˆø(€€€€€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€€€ÑåÁ”ô‰‰ÕÑÑ½¸ˆ(€€€€€€€€€€€€€€€€€½¹±¥¬õíÑ½±•É½Á‘½Ý¸ ‰…Èˆ¥ô(€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”õíÁÉ½µÁÑ½¹ÑÉ½±±…ÍÍ9…µ”¡ì(€€€€€€€€€€€€€€€€€€€…Ñ¥Ù”è½Á•¹É½Á‘½Ý¸€ôôô€‰…Èˆ°(€€€€€€€€€€€€€€€€€ô¥ô(€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€€ñAÉ½µÁÑÍÁ•ÑI…Ñ¥½%½¸€¼ø(€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”õíAI=5AQ}=9QI=1}1	1}1MMôø(€€€€€€€€€€€€€€€€€€€í…ÍÁ•ÑI…Ñ¥½ô(€€€€€€€€€€€€€€€€€€ð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€ð½‰ÕÑÑ½¸ø(€€€€€€€€€€€€€€€í½Á•¹É½Á‘½Ý¸€ôôô€‰…Èˆ€˜˜€ (€€€€€€€€€€€€€€€€€€ñAÉ½µÁÑA½Á½Ù•Èø(€€€€€€€€€€€€€€€€€€€€ñAÉ½µÁÑA½Á½Ù•É!•…‘•ÈùÍÁ•ÐI…Ñ¥¼ð½AÉ½µÁÑA½Á½Ù•É!•…‘•Èø(€€€€€€€€€€€€€€€€€€€€ñAÉ½µÁÑ5•¹Õ1¥ÍÐø(€€€€€€€€€€€€€€€€€€€€€íMAQ}IQ%=L¹µ…À ¡…È¤€ôø€ (€€€€€€€€€€€€€€€€€€€€€€€€ñÉ½Á‘½Ý¹%Ñ•´(€€€€€€€€€€€€€€€€€€€€€€€€€­•äõí…Éô(€€€€€€€€€€€€€€€€€€€€€€€€€±…‰•°õí…Éô(€€€€€€€€€€€€€€€€€€€€€€€€€Í•±•Ñ•õí…ÍÁ•ÑI…Ñ¥¼€ôôô…Éô(€€€€€€€€€€€€€€€€€€€€€€€€€½¹±¥¬õì ¤€ôøìÍ•ÑÍÁ•ÑI…Ñ¥¼¡…È¤ìÍ•Ñ=Á•¹É½Á‘½Ý¸¡¹Õ±°¤ìõô(€€€€€€€€€€€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€€€€€€€€€€€¤¥ô(€€€€€€€€€€€€€€€€€€€€ð½AÉ½µÁÑ5•¹Õ1¥ÍÐø(€€€€€€€€€€€€€€€€€€ð½AÉ½µÁÑA½Á½Ù•Èø(€€€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€€€ð½‘¥Øø((€€€€€€€€€€€€€ì¼¨ƒŠRŠR ÕÉ…Ñ¥½¸‘É½Á‘½Ý¸ƒŠRŠR €¨½ô(€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰É•±…Ñ¥Ù”ˆø(€€€€€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€€€ÑåÁ”ô‰‰ÕÑÑ½¸ˆ(€€€€€€€€€€€€€€€€€½¹±¥¬õíÑ½±•É½Á‘½Ý¸ ‰‘ÕÈˆ¥ô(€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”õíÁÉ½µÁÑ½¹ÑÉ½±±…ÍÍ9…µ”¡ì(€€€€€€€€€€€€€€€€€€€…Ñ¥Ù”è½Á•¹É½Á‘½Ý¸€ôôô€‰‘ÕÈˆ°(€€€€€€€€€€€€€€€€€ô¥ô(€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€€ñAÉ½µÁÑÕÉ…Ñ¥½¹%½¸€¼ø(€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”õíAI=5AQ}=9QI=1}1	1}1MMôø(€€€€€€€€€€€€€€€€€€€í‘ÕÉ…Ñ¥½¹õÌ(€€€€€€€€€€€€€€€€€€ð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€ð½‰ÕÑÑ½¸ø(€€€€€€€€€€€€€€€í½Á•¹É½Á‘½Ý¸€ôôô€‰‘ÕÈˆ€˜˜€ (€€€€€€€€€€€€€€€€€€ñAÉ½µÁÑA½Á½Ù•Èø(€€€€€€€€€€€€€€€€€€€€ñAÉ½µÁÑA½Á½Ù•É!•…‘•ÈùÕÉ…Ñ¥½¸ð½AÉ½µÁÑA½Á½Ù•É!•…‘•Èø(€€€€€€€€€€€€€€€€€€€€ñAÉ½µÁÑ5•¹Õ1¥ÍÐø(€€€€€€€€€€€€€€€€€€€€€íUIQ%=9}=AQ%=9L¹µ…À ¡¤€ôø€ (€€€€€€€€€€€€€€€€€€€€€€€€ñÉ½Á‘½Ý¹%Ñ•´(€€€€€€€€€€€€€€€€€€€€€€€€€­•äõí‘ô(€€€€€€€€€€€€€€€€€€€€€€€€€±…‰•°õí€‘í‘õÍô(€€€€€€€€€€€€€€€€€€€€€€€€€Í•±•Ñ•õí‘ÕÉ…Ñ¥½¸€ôôô‘ô(€€€€€€€€€€€€€€€€€€€€€€€€€½¹±¥¬õì ¤€ôøìÍ•ÑÕÉ…Ñ¥½¸¡¤ìÍ•Ñ=Á•¹É½Á‘½Ý¸¡¹Õ±°¤ìõô(€€€€€€€€€€€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€€€€€€€€€€€¤¥ô(€€€€€€€€€€€€€€€€€€€€ð½AÉ½µÁÑ5•¹Õ1¥ÍÐø(€€€€€€€€€€€€€€€€€€ð½AÉ½µÁÑA½Á½Ù•Èø(€€€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€€€ð½‘¥Øø((€€€€€€€€€€€€€ì¼¨‘¥ÐÍ½ÕÉ”Á¥­•È‘É½Á‘½Ý¸ƒŠP½¹±äÍ¡½Ý¸¥¸•‘¥Ðµ½‘”€¨½ô(€€€€€€€€€€€€€í•‘¥Ñ5½‘”€˜˜•‘¥ÑM½ÕÉ•Ì¹±•¹Ñ €ø€À€˜˜€ (€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰É•±…Ñ¥Ù”ˆø(€€€€€€€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€€€€€ÑåÁ”ô‰‰ÕÑÑ½¸ˆ(€€€€€€€€€€€€€€€€€€€½¹±¥¬õíÑ½±•É½Á‘½Ý¸ ‰Í½ÕÉ”ˆ¥ô(€€€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”õíÁÉ½µÁÑ½¹ÑÉ½±±…ÍÍ9…µ”¡ì…Ñ¥Ù”èÑÉÕ”ô¥ô(€€€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰Ü´Ð ´Ð‰œµlŒÈÉÍ••t¼ÈÀÉ½Õ¹‘•™±•à¥Ñ•µÌµ•¹Ñ•È©ÕÍÑ¥™äµ•¹Ñ•È‰½É‘•È‰½É‘•ÈµlŒÈÉÍ••t¼ÌÀˆø(€€€€€€€€€€€€€€€€€€€€€€ñÍÙœÝ¥‘Ñ ôˆäˆ¡•¥¡ÐôˆäˆÙ¥•Ý	½àôˆÀ€À€ÈÐ€ÈÐˆ™¥±°ô‰¹½¹”ˆÍÑÉ½­”ôˆŒÈÉÍ•”ˆÍÑÉ½­•]¥‘Ñ ôˆÌˆÍÑÉ½­•1¥¹•…Àô‰É½Õ¹ˆÍÑÉ½­•1¥¹•©½¥¸ô‰É½Õ¹ˆø(€€€€€€€€€€€€€€€€€€€€€€€€ñÁ…Ñ ô‰4ÄÄ€Ñ Ñ„È€È€À€À€À´È€ÉØÄÑ„È€È€À€À€À€È€É ÄÑ„È€È€À€À€À€È´ÉØ´Üˆ¼ø(€€€€€€€€€€€€€€€€€€€€€€€€ñÁ…Ñ ô‰4Äà¸Ô€È¸Õ„È¸ÄÈÄ€È¸ÄÈÄ€À€À€Ä€Ì€Í0ÄÈ€ÄÕ°´Ð€Ä€Ä´Ð€ä¸Ô´ä¸Õèˆ¼ø(€€€€€€€€€€€€€€€€€€€€€€ð½ÍÙœø(€€€€€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”õí€‘íAI=5AQ}=9QI=1}1	1}1MMôÑ•áÐµlŒÈÉÍ••t¼ÜÀµ…àµÜµlÄÈÁÁátÑÉÕ¹…Ñ•ôø(€€€€€€€€€€€€€€€€€€€€€íÍ½ÕÉ•¹ÑÉä€üM½ÕÉ”è€‘íÍ½ÕÉ•¹ÑÉä¹ÁÉ½µÁÐü¹Í±¥” À°€ÈÀ¥÷Š™€€è€‰A¥¬Í½ÕÉ—Š˜‰ô(€€€€€€€€€€€€€€€€€€€€ð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€€€€€ñAÉ½µÁÑ¡•ÙÉ½¹%½¸€¼ø(€€€€€€€€€€€€€€€€€€ð½‰ÕÑÑ½¸ø(€€€€€€€€€€€€€€€€€í½Á•¹É½Á‘½Ý¸€ôôô€‰Í½ÕÉ”ˆ€˜˜€ (€€€€€€€€€€€€€€€€€€€€ñAÉ½µÁÑA½Á½Ù•È±…ÍÍ9…µ”ô‰Ü´ØÐˆø(€€€€€€€€€€€€€€€€€€€€€€ñAÉ½µÁÑA½Á½Ù•É!•…‘•ÈùM½ÕÉ”•¹•É…Ñ¥½¸ð½AÉ½µÁÑA½Á½Ù•É!•…‘•Èø(€€€€€€€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à™±•àµ½°…À´Äˆø(€€€€€€€€€€€€€€€€€€€€€€€í•‘¥ÑM½ÕÉ•Ì¹µ…À ¡ÍÉŒ¤€ôø€ (€€€€€€€€€€€€€€€€€€€€€€€€€€ñ‘¥Ø(€€€€€€€€€€€€€€€€€€€€€€€€€€€­•äõíÍÉŒ¹É•ÅÕ•ÍÑ%‘ô(€€€€€€€€€€€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰™±•à¥Ñ•µÌµ•¹Ñ•È…À´ÌÀ´È¡½Ù•Èé‰œµÝ¡¥Ñ”¼ÔÉ½Õ¹‘•ÕÉÍ½ÈµÁ½¥¹Ñ•ÈÑÉ…¹Í¥Ñ¥½¸µ…±°É½ÕÀ½½ÁÐˆ(€€€€€€€€€€€€€€€€€€€€€€€€€€€½¹±¥¬õì ¤€ôøìÍ•Ñ‘¥ÑM½ÕÉ•%¡ÍÉŒ¹É•ÅÕ•ÍÑ%¤ìÍ•Ñ=Á•¹É½Á‘½Ý¸¡¹Õ±°¤ìõô(€€€€€€€€€€€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰Ü´ÄÀ ´ÜÉ½Õ¹‘•½Ù•É™±½Üµ¡¥‘‘•¸‰œµ‰±…¬¼ÐÀ™±•àµÍ¡É¥¹¬´À‰½É‘•È‰½É‘•ÈµÝ¡¥Ñ”¼Ôˆø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€ñÙ¥‘•¼ÍÉŒõíÍÉŒ¹ÕÉ±ô±…ÍÍ9…µ”ô‰Üµ™Õ±° µ™Õ±°½‰©•Ðµ½Ù•ÈˆµÕÑ•Á±…åÍ%¹±¥¹”€¼ø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à´Äµ¥¸µÜ´Àˆø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€ñÀ±…ÍÍ9…µ”ô‰Ñ•áÐµlÄÅÁátÑ•áÐµÝ¡¥Ñ”¼ÜÀÑÉÕ¹…Ñ”±•…‘¥¹œµÑ¥¡ÐÉ½ÕÀµ¡½Ù•È½½ÁÐéÑ•áÐµÝ¡¥Ñ”ˆùíÍÉŒ¹ÁÉ½µÁÑôð½Àø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€ñÀ±…ÍÍ9…µ”ô‰Ñ•áÐµlåÁátÑ•áÐµÝ¡¥Ñ”¼ÌÀµÐ´À¸ÔˆùíÍÉŒ¹…ÍÁ•ÑI…Ñ¥½ôƒ
-ÜíÍÉŒ¹‘ÕÉ…Ñ¥½¹õÌð½Àø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€€€€€€€€€€€€í•‘¥ÑM½ÕÉ•%€ôôôÍÉŒ¹É•ÅÕ•ÍÑ%€˜˜€ñ¡•­MÙœ€¼ùô(€€€€€€€€€€€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€€€€€€€€€¤¥ô(€€€€€€€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€€€€€ð½AÉ½µÁÑA½Á½Ù•Èø(€€€€€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€¥ô((€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰Ñ•áÐµlÄÁÁátÑ•áÐµÝ¡¥Ñ”¼ÈÀ¡¥‘‘•¸Í´é‰±½¬µ°´ÈˆùÑÉ°­¹Ñ•ÈÑ¼ÉÕ¸ð½ÍÁ…¸ø(€€€€€€€€€€€€ð½AÉ½µÁÑ½¹ÑÉ½±Ìø((€€€€€€€€€€€ì¼¨ƒŠRŠR •¹•É…Ñ”	ÕÑÑ½¸ƒŠPµ…Ñ¡•ÌY¥‘•½MÑÕ‘¥¼•á…Ñ±äƒŠRŠR €¨½ô(€€€€€€€€€€€€ñAÉ½µÁÑÑ¥½¸(€€€€€€€€€€€€€½¹±¥¬õí¡…¹‘±••¹•É…Ñ•ô(€€€€€€€€€€€€€‘¥Í…‰±•õí•¹•É…Ñ¥¹œñð€…ÁÉ½µÁÐ¹ÑÉ¥´ ¤ñð€¡•‘¥Ñ5½‘”€˜˜€…•‘¥ÑM½ÕÉ•%¥ô(€€€€€€€€€€€€ø(€€€€€€€€€€€€€í•¹•É…Ñ¥¹œ€ü€ (€€€€€€€€€€€€€€€€ðø(€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰…¹¥µ…Ñ”µÍÁ¥¸¥¹±¥¹”µ‰±½¬Ñ•áÐµ‰±…¬ˆûŠ^0ð½ÍÁ…¸ùìˆ€‰ô(€€€€€€€€€€€€€€€€€í•‘¥Ñ5½‘”€ü€‰I•µ¥á¥¹œ¸¸¸ˆ€è€‰•¹•É…Ñ¥¹œ¸¸¸‰ô(€€€€€€€€€€€€€€€€ð¼ø(€€€€€€€€€€€€€€¤€è•‘¥Ñ5½‘”€ü€ (€€€€€€€€€€€€€€€€ñÍÁ…¸ùI•µ¥àð½ÍÁ…¸ø(€€€€€€€€€€€€€€¤€è€ (€€€€€€€€€€€€€€€€ñÍÁ…¸ù•¹•É…Ñ”ð½ÍÁ…¸ø(€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€ð½AÉ½µÁÑÑ¥½¸ø(€€€€€€€€€€ð½AÉ½µÁÑ½½Ñ•Èø(€€€€€€ð½AÉ½µÁÑ½µÁ½Í•Èø(€€€€€€ñQ½…ÍÑ•ÈÁ½Í¥Ñ¥½¸ô‰Ñ½ÀµÉ¥¡Ðˆ½¹Ñ…¥¹•ÉMÑå±”õíìé%¹‘•àè€äääääõôÑ½…ÍÑ=ÁÑ¥½¹Ìõíì‘ÕÉ…Ñ¥½¸è€ÔÀÀÀ°ÍÑå±”èì‰…­É½Õ¹è€œŒÄàÄàÅˆœ°½±½Èè€œ™™™™™˜œ°‰½É‘•Èè€œÅÁàÍ½±¥É‰„ ÈÔÔ°ÈÔÔ°ÈÔÔ°À¸ÄÔ¤œ°™½¹ÑM¥é”è€œÄÍÁàœ°‰½É‘•ÉI…‘¥ÕÌè€œÄÉÁàœ°‰½áM¡…‘½Üè€œÀ€ÄÁÁà€ÌÁÁàÉ‰„ À°À°À°À¸Ø¤œ°µ…á]¥‘Ñ è€œÐÐÁÁàœ°Ý½É‘	É•…¬è€‰É•…¬µÝ½Éœ°Ý¡¥Ñ•MÁ…”è€ÁÉ”µÝÉ…Àœ°Á…‘‘¥¹œè€œÄÉÁà€ÄÙÁàœôõô€¼ø(€€€€ð½‘¥Øø(€€¤ì)ô
+                  {entry.mode === "edit" ? "âœ Edit" : "âœ¦ Generated"}
+                </div>
+
+                {/* â”€â”€ Hover overlay actions â”€â”€ */}
+                <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    type="button"
+                    title="Fullscreen"
+                    onClick={(e) => { e.stopPropagation(); setFullscreenUrl(entry.url); }}
+                    className="p-2 bg-black/60 backdrop-blur-md rounded-full text-white hover:bg-primary hover:text-black transition-all border border-white/10"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <polyline points="15 3 21 3 21 9" />
+                      <polyline points="9 21 3 21 3 15" />
+                      <line x1="21" y1="3" x2="14" y2="10" />
+                      <line x1="3" y1="21" x2="10" y2="14" />
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    title="Download"
+                    onClick={(e) => { e.stopPropagation(); downloadFile(entry.url, `motion-${entry.id || idx}.mp4`); }}
+                    className="p-2 bg-black/60 backdrop-blur-md rounded-full text-white hover:bg-primary hover:text-black transition-all border border-white/10"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" />
+                    </svg>
+                  </button>
+                  {entry.requestId && entry.canEdit !== false ? (
+                    <button
+                      type="button"
+                      title="Remix this generation"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditMode(true);
+                        setEditSourceId(entry.requestId);
+                        setPrompt("");
+                        setTimeout(() => textareaRef.current?.focus(), 50);
+                      }}
+                      className="p-2 bg-black/60 backdrop-blur-md rounded-full text-white hover:bg-[#22d3ee] hover:text-black transition-all border border-white/10"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                      </svg>
+                    </button>
+                  ) : entry.requestId && entry.canEdit === false ? (
+                    /* Legacy generation â€” animation code not saved by API, remix not available */
+                    <div
+                      title="Legacy generation â€” remix not available. Generate a new motion graphic to enable editing."
+                      className="p-2 bg-black/60 backdrop-blur-md rounded-full text-white/20 border border-white/5 cursor-not-allowed"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-40">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                        <line x1="4" y1="4" x2="20" y2="20" stroke="currentColor" strokeWidth="2"/>
+                      </svg>
+                    </div>
+                  ) : null}
+                  <button
+                    type="button"
+                    title="Delete"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (confirm("Are you sure you want to delete this generated item?")) {
+                        setHistory(prev => prev.filter((_, i) => i !== idx));
+                      }
+                    }}
+                    className="p-2 bg-black/60 backdrop-blur-md rounded-full text-red-400 hover:bg-red-500 hover:text-white transition-all border border-white/10"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <polyline points="3 6 5 6 21 6" />
+                      <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                      <line x1="10" y1="11" x2="10" y2="17" />
+                      <line x1="14" y1="11" x2="14" y2="17" />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* â”€â”€ Card footer: prompt + metadata â”€â”€ */}
+                <div className="p-3 bg-black/80 backdrop-blur-sm border-t border-white/5 flex-1 flex flex-col justify-between gap-2">
+                  <p className="text-white/70 text-xs line-clamp-3 leading-relaxed" title={entry.prompt}>
+                    {entry.prompt || "No prompt"}
+                  </p>
+                  <div className="flex items-center justify-between mt-1 flex-wrap gap-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold text-primary px-2 py-0.5 bg-primary/10 rounded border border-primary/20 whitespace-nowrap">
+                        Vibe Motion
+                      </span>
+                      <div className="flex gap-2">
+                        {entry.aspectRatio && (
+                          <span className="text-[10px] text-white/40">{entry.aspectRatio}</span>
+                        )}
+                        {entry.duration && (
+                          <span className="text-[10px] text-white/40">{entry.duration}s</span>
+                        )}
+                      </div>
+                    </div>
+                    {entry.prompt && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigator.clipboard.writeText(entry.prompt);
+                          const btn = e.currentTarget;
+                          btn.innerText = "Copied!";
+                          setTimeout(() => { btn.innerText = "Copy"; }, 2000);
+                        }}
+                        className="px-2 py-0.5 bg-white/5 hover:bg-primary/20 hover:text-primary rounded text-[10px] font-medium text-white/70 transition-all border border-white/10"
+                        title="Copy prompt"
+                      >
+                        Copy Prompt
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : !generating ? (
+          /* â”€â”€ Empty State â”€â”€ */
+          <div className="flex flex-col items-center justify-center h-full animate-fade-in-up transition-all duration-700 min-h-[50vh]">
+            {/* Overlapping floating cards */}
+            <div className="flex items-center justify-center gap-1.5 md:gap-3 mb-10 select-none scale-90 sm:scale-100">
+              <div className="w-18 h-22 sm:w-24 sm:h-28 rounded-2xl border border-white/10 shadow-2xl -rotate-[12deg] transform hover:rotate-0 hover:scale-110 hover:z-20 transition-all duration-300 overflow-hidden bg-white/[0.01] flex-shrink-0">
+                <img
+                  src="https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/sdxl-image.avif"
+                  alt="Creative asset 1"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="w-18 h-22 sm:w-24 sm:h-28 rounded-2xl border border-white/10 shadow-2xl -rotate-[4deg] transform hover:rotate-0 hover:scale-110 hover:z-20 transition-all duration-300 overflow-hidden bg-white/[0.01] -ml-3 sm:-ml-4 flex-shrink-0">
+                <img
+                  src="https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/chroma-image.avif"
+                  alt="Creative asset 2"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="w-18 h-18 sm:w-24 sm:h-24 rounded-full border border-white/10 shadow-2xl rotate-[6deg] transform hover:rotate-0 hover:scale-110 hover:z-20 transition-all duration-300 overflow-hidden bg-white/[0.01] -ml-3 sm:-ml-4 flex-shrink-0">
+                <img
+                  src="https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/neta-lumina.avif"
+                  alt="Creative asset 3"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="w-18 h-22 sm:w-24 sm:h-28 rounded-2xl border border-white/10 shadow-2xl rotate-[12deg] transform hover:rotate-0 hover:scale-110 hover:z-20 transition-all duration-300 overflow-hidden bg-white/[0.01] -ml-3 sm:-ml-4 flex-shrink-0">
+                <img
+                  src="https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/perfect-pony-xl.avif"
+                  alt="Creative asset 4"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+
+            <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-center px-4 flex flex-col items-center">
+              <span className="text-white font-black uppercase text-xl sm:text-3xl tracking-wide mb-1 opacity-90">START CREATING WITH</span>
+              <span className="text-[#22d3ee] font-black uppercase text-2xl sm:text-4xl sm:mt-1 tracking-tight">
+                VIBE MOTION STUDIO
+              </span>
+            </h1>
+            <p className="text-white/40 text-xs sm:text-sm font-medium tracking-wide text-center max-w-lg leading-relaxed px-4">
+              Generate animated motion graphics from a text prompt â€” kinetic typography, data charts, logo reveals, and more.
+            </p>
+          </div>
+        ) : null}
+      </div>
+
+      {/* â”€â”€ BOTTOM PROMPT BAR â€” matches VideoStudio exactly â”€â”€ */}
+      <PromptComposer>
+
+          {/* â”€â”€ Top Row: Mode Toggle & Edit Source Banner â”€â”€ */}
+          <div className="flex items-center justify-between gap-3 px-1">
+            {/* Left: Mode toggle pill */}
+            <PromptSegmentedControl className="flex-shrink-0">
+              <PromptSegmentOption
+                type="button"
+                onClick={() => { setEditMode(false); setEditSourceId(null); }}
+                selected={!editMode}
+              >
+                Generate
+              </PromptSegmentOption>
+              <PromptSegmentOption
+                type="button"
+                onClick={() => setEditMode(true)}
+                disabled={editSources.length === 0}
+                selected={editMode}
+                className="disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                Edit
+              </PromptSegmentOption>
+            </PromptSegmentedControl>
+
+            {/* Right: Edit mode status banner beside toggle buttons */}
+            {editMode && (
+              <div className="flex items-center gap-2 px-3 py-1 bg-[#22d3ee]/5 border border-[#22d3ee]/10 rounded-full text-[11px] text-[#22d3ee] font-medium tracking-tight min-w-0 max-w-full overflow-hidden">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="flex-shrink-0">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+                <span className="truncate">
+                  {sourceEntry
+                    ? `Editing: "${sourceEntry.prompt?.slice(0, 45)}${sourceEntry.prompt?.length > 45 ? "â€¦" : ""}"`
+                    : "Select a source generation from the gallery"}
+                </span>
+                <button
+                  onClick={() => { setEditMode(false); setEditSourceId(null); setPrompt(""); }}
+                  className="ml-auto text-[#22d3ee]/40 hover:text-[#22d3ee] transition-colors text-sm leading-none flex-shrink-0"
+                  title="Cancel Edit Mode"
+                >
+                  Ã—
+                </button>
+              </div>
+            )}
+          </div>
+
+            {/* Bottom: Textarea full width */}
+            <div className="w-full">
+              <PromptTextarea
+                ref={textareaRef}
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder={
+                  editMode
+                    ? "Describe what to change â€” 'change background to dark navy, make bars gold, add particlesâ€¦'"
+                    : "Describe the motion graphic â€” 'Animated sales dashboard with glowing bar charts and rising numbers'"
+                }
+              />
+            </div>
+
+          {/* â”€â”€ Error banner â”€â”€ */}
+          {generateError && (
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-red-500/10 border border-red-500/20 rounded text-red-400 text-xs">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              {generateError}
+            </div>
+          )}
+
+          {/* â”€â”€ Controls row: dropdowns + generate button â”€â”€ */}
+          <PromptFooter>
+            <PromptControls ref={controlsRef}>
+
+              {/* â”€â”€ Aspect Ratio dropdown â”€â”€ */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={toggleDropdown("ar")}
+                  className={promptControlClassName({
+                    active: openDropdown === "ar",
+                  })}
+                >
+                  <PromptAspectRatioIcon />
+                  <span className={PROMPT_CONTROL_LABEL_CLASS}>
+                    {aspectRatio}
+                  </span>
+                </button>
+                {openDropdown === "ar" && (
+                  <PromptPopover>
+                    <PromptPopoverHeader>Aspect Ratio</PromptPopoverHeader>
+                    <PromptMenuList>
+                      {ASPECT_RATIOS.map((ar) => (
+                        <DropdownItem
+                          key={ar}
+                          label={ar}
+                          selected={aspectRatio === ar}
+                          onClick={() => { setAspectRatio(ar); setOpenDropdown(null); }}
+                        />
+                      ))}
+                    </PromptMenuList>
+                  </PromptPopover>
+                )}
+              </div>
+
+              {/* â”€â”€ Duration dropdown â”€â”€ */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={toggleDropdown("dur")}
+                  className={promptControlClassName({
+                    active: openDropdown === "dur",
+                  })}
+                >
+                  <PromptDurationIcon />
+                  <span className={PROMPT_CONTROL_LABEL_CLASS}>
+                    {duration}s
+                  </span>
+                </button>
+                {openDropdown === "dur" && (
+                  <PromptPopover>
+                    <PromptPopoverHeader>Duration</PromptPopoverHeader>
+                    <PromptMenuList>
+                      {DURATION_OPTIONS.map((d) => (
+                        <DropdownItem
+                          key={d}
+                          label={`${d}s`}
+                          selected={duration === d}
+                          onClick={() => { setDuration(d); setOpenDropdown(null); }}
+                        />
+                      ))}
+                    </PromptMenuList>
+                  </PromptPopover>
+                )}
+              </div>
+
+              {/* Edit source picker dropdown â€” only shown in edit mode */}
+              {editMode && editSources.length > 0 && (
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={toggleDropdown("source")}
+                    className={promptControlClassName({ active: true })}
+                  >
+                    <div className="w-4 h-4 bg-[#22d3ee]/20 rounded flex items-center justify-center border border-[#22d3ee]/30">
+                      <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                      </svg>
+                    </div>
+                    <span className={`${PROMPT_CONTROL_LABEL_CLASS} text-[#22d3ee]/70 max-w-[120px] truncate`}>
+                      {sourceEntry ? `Source: ${sourceEntry.prompt?.slice(0, 20)}â€¦` : "Pick sourceâ€¦"}
+                    </span>
+                    <PromptChevronIcon />
+                  </button>
+                  {openDropdown === "source" && (
+                    <PromptPopover className="w-64">
+                      <PromptPopoverHeader>Source Generation</PromptPopoverHeader>
+                      <div className="flex flex-col gap-1">
+                        {editSources.map((src) => (
+                          <div
+                            key={src.requestId}
+                            className="flex items-center gap-3 p-2 hover:bg-white/5 rounded cursor-pointer transition-all group/opt"
+                            onClick={() => { setEditSourceId(src.requestId); setOpenDropdown(null); }}
+                          >
+                            <div className="w-10 h-7 rounded overflow-hidden bg-black/40 flex-shrink-0 border border-white/5">
+                              <video src={src.url} className="w-full h-full object-cover" muted playsInline />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-[11px] text-white/70 truncate leading-tight group-hover/opt:text-white">{src.prompt}</p>
+                              <p className="text-[9px] text-white/30 mt-0.5">{src.aspectRatio} Â· {src.duration}s</p>
+                            </div>
+                            {editSourceId === src.requestId && <CheckSvg />}
+                          </div>
+                        ))}
+                      </div>
+                    </PromptPopover>
+                  )}
+                </div>
+              )}
+
+              <span className="text-[10px] text-white/20 hidden sm:block ml-2">Ctrl+Enter to run</span>
+            </PromptControls>
+
+            {/* â”€â”€ Generate Button â€” matches VideoStudio exactly â”€â”€ */}
+            <PromptAction
+              onClick={handleGenerate}
+              disabled={generating || !prompt.trim() || (editMode && !editSourceId)}
+            >
+              {generating ? (
+                <>
+                  <span className="animate-spin inline-block text-black">â—Œ</span>{" "}
+                  {editMode ? "Remixing..." : "Generating..."}
+                </>
+              ) : editMode ? (
+                <span>Remix</span>
+              ) : (
+                <span>Generate</span>
+              )}
+            </PromptAction>
+          </PromptFooter>
+      </PromptComposer>
+      <Toaster position="top-right" containerStyle={{ zIndex: 99999 }} toastOptions={{ duration: 5000, style: { background: '#18181b', color: '#ffffff', border: '1px solid rgba(255,255,255,0.15)', fontSize: '13px', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.6)', maxWidth: '440px', wordBreak: 'break-word', whiteSpace: 'pre-wrap', padding: '12px 16px' } }} />
+    </div>
+  );
+}

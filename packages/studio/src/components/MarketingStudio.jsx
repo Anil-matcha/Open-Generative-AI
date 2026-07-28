@@ -373,4 +373,584 @@ export default function MarketingStudio({
         if (target === 'product') setProductImage(url);
         else setAvatarImage(url);
       } catch (err) { alert(err.message); }
-    }ãnw¶‰žËkºwµç@€€€€€€€€€Í•Ñ‘‘¥Ñ¥½¹…±%µ…•Ì¡mt¤ì(€€€€€€€€€€€€€€€€€€€ô(€€€€€€€€€€€€€€€€€õô€(€€€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€€€ð½‘¥Øø((€€€€€€€€€€€€€ì¼¨½Éµ…Ð	ÕÑÑ½¸€¨½ô(€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰É•±…Ñ¥Ù”ˆø(€€€€€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€€€½¹±¥¬õì¡”¤€ôøì”¹ÍÑ½ÁAÉ½Á……Ñ¥½¸ ¤ìÍ•ÑÉ½Á‘½Ý¸¡‘É½Á‘½Ý¸€ôôô€™½Éµ…Ðœ€ü¹Õ±°€è€™½Éµ…Ðœ¤ìõô(€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”õíÁÉ½µÁÑ½¹ÑÉ½±±…ÍÍ9…µ”¡ì(€€€€€€€€€€€€€€€€€€€…Ñ¥Ù”è‘É½Á‘½Ý¸€ôôô€‰™½Éµ…Ðˆ°(€€€€€€€€€€€€€€€€€ô¥ô(€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰Ü´Ð ´Ð‰œµÁÉ¥µ…Éä¼ÄÀÉ½Õ¹‘•™±•à¥Ñ•µÌµ•¹Ñ•È©ÕÍÑ¥™äµ•¹Ñ•È‰½É‘•È‰½É‘•ÈµÁÉ¥µ…Éä¼ÈÀˆø(€€€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰Ñ•áÐµláÁát™½¹Ðµ‰±…¬Ñ•áÐµÁÉ¥µ…ÉäÕÁÁ•É…Í”ˆùTð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”õíAI=5AQ}=9QI=1}1	1}1MMôùíÁ…É…µÌ¹™½Éµ…Ñôð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€€€ñAÉ½µÁÑ¡•ÙÉ½¹%½¸€¼ø(€€€€€€€€€€€€€€€€ð½‰ÕÑÑ½¸ø(€€€€€€€€€€€€€€€€ñÉ½Á‘½Ý¸€(€€€€€€€€€€€€€€€€€¥Í=Á•¸õí‘É½Á‘½Ý¸€ôôô€™½Éµ…Ðô€(€€€€€€€€€€€€€€€€€Ñ¥Ñ±”ô‰Y¥‘•¼½Éµ…ÐAÉ•Í•ÑÌˆ(€€€€€€€€€€€€€€€€€¥Ñ•µÌõíMMQL¹Õô€(€€€€€€€€€€€€€€€€€Í•±•Ñ•‘%õíÁ…É…µÌ¹™½Éµ…Ñô(€€€€€€€€€€€€€€€€€½¹M•±•Ðõì¡¥Ñ•´¤€ôøÍ•ÑA…É…µÌ¡ì€¸¸¹Á…É…µÌ°™½Éµ…Ðè¥Ñ•´¹¹…µ”°Ù¥‘•½UÉ°è¥Ñ•´¹ÕÉ°ô¥ô(€€€€€€€€€€€€€€€€€½¹±½Í”õì ¤€ôøÍ•ÑÉ½Á‘½Ý¸¡¹Õ±°¥ô(€€€€€€€€€€€€€€€€€¥ÍY¥‘•¼(€€€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€€€ð½‘¥Øø((€€€€€€€€€€€€€ì¼¨Ù…Ñ…ÈAÉ•Í•Ð	ÕÑÑ½¸€¨½ô(€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰É•±…Ñ¥Ù”™±•à¥Ñ•µÌµ•¹Ñ•È…À´Ä¸Ôˆø(€€€€€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€€€½¹±¥¬õì¡”¤€ôøì”¹ÍÑ½ÁAÉ½Á……Ñ¥½¸ ¤ìÍ•ÑÉ½Á‘½Ý¸¡‘É½Á‘½Ý¸€ôôô€…Ù…Ñ…Èœ€ü¹Õ±°€è€…Ù…Ñ…Èœ¤ìõô(€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”õíÁÉ½µÁÑ½¹ÑÉ½±±…ÍÍ9…µ”¡ì(€€€€€€€€€€€€€€€€€€€…Ñ¥Ù”è‘É½Á‘½Ý¸€ôôô€‰…Ù…Ñ…Èˆ°(€€€€€€€€€€€€€€€€€ô¥ô(€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰Ü´Ð ´ÐÉ½Õ¹‘•µ™Õ±°½Ù•É™±½Üµ¡¥‘‘•¸‰½É‘•È‰½É‘•ÈµÝ¡¥Ñ”¼ÈÀÍ¡…‘½Üµ¥¹¹•Èˆø(€€€€€€€€€€€€€€€€€€€€ñ¥µœÍÉŒõí…Ù…Ñ…É%µ…”ñðMMQL¹…Ù…Ñ…ÉlÁt¹ÕÉ±ô±…ÍÍ9…µ”ô‰Üµ™Õ±° µ™Õ±°½‰©•Ðµ½Ù•Èˆ€¼ø(€€€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”õíAI=5AQ}=9QI=1}1	1}1MMôø(€€€€€€€€€€€€€€€€€€€íMMQL¹…Ù…Ñ…È¹™¥¹¡„€ôø„¹ÕÉ°€ôôô…Ù…Ñ…É%µ…”¤ü¹¹…µ”ñð€‰M•±•ÐÙ…Ñ…È‰ô(€€€€€€€€€€€€€€€€€€ð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€€€ñAÉ½µÁÑ¡•ÙÉ½¹%½¸€¼ø(€€€€€€€€€€€€€€€€ð½‰ÕÑÑ½¸ø((€€€€€€€€€€€€€€€í…Ù…Ñ…É%µ…”€˜˜€ (€€€€€€€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€€€€€ÑåÁ”ô‰‰ÕÑÑ½¸ˆ(€€€€€€€€€€€€€€€€€€€Ñ¥Ñ±”ô‰¹±…É”Í•±•Ñ•…Ù…Ñ…Èˆ(€€€€€€€€€€€€€€€€€€€½¹±¥¬õì¡”¤€ôøì(€€€€€€€€€€€€€€€€€€€€€”¹ÍÑ½ÁAÉ½Á……Ñ¥½¸ ¤ì(€€€€€€€€€€€€€€€€€€€€€½¹ÍÐÕÉÉ•¹ÑÙ…Ñ…È€ôMMQL¹…Ù…Ñ…È¹™¥¹¡„€ôø„¹ÕÉ°€ôôô…Ù…Ñ…É%µ…”¤ì(€€€€€€€€€€€€€€€€€€€€€¥˜€¡ÕÉÉ•¹ÑÙ…Ñ…È¤ì(€€€€€€€€€€€€€€€€€€€€€€€Í•ÑAÉ•Ù¥•ÝÙ…Ñ…È¡ÕÉÉ•¹ÑÙ…Ñ…È¤ì(€€€€€€€€€€€€€€€€€€€€€ô•±Í”ì(€€€€€€€€€€€€€€€€€€€€€€€Í•ÑAÉ•Ù¥•ÝÙ…Ñ…È¡ì¥è€‰ÕÍÑ½´ˆ°¹…µ”è€‰ÕÍÑ½´UÁ±½…‘•Ù…Ñ…Èˆ°ÕÉ°è…Ù…Ñ…É%µ…”ô¤ì(€€€€€€€€€€€€€€€€€€€€€ô(€€€€€€€€€€€€€€€€€€€õô(€€€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”õíÁÉ½µÁÑ½¹ÑÉ½±±…ÍÍ9…µ”¡ì(€€€€€€€€€€€€€€€€€€€€€¥½¹=¹±äèÑÉÕ”°(€€€€€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”è€‰Ñ•áÐµÝ¡¥Ñ”¼ÐÀ¡½Ù•ÈéÑ•áÐµlŒÈÉÍ••tˆ°(€€€€€€€€€€€€€€€€€€€ô¥ô(€€€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€€€€ñÍÙœÝ¥‘Ñ ôˆÄÐˆ¡•¥¡ÐôˆÄÐˆÙ¥•Ý	½àôˆÀ€À€ÈÐ€ÈÐˆ™¥±°ô‰¹½¹”ˆÍÑÉ½­”ô‰ÕÉÉ•¹Ñ½±½ÈˆÍÑÉ½­•]¥‘Ñ ôˆÈ¸Ôˆø(€€€€€€€€€€€€€€€€€€€€€€ñ¥É±”àôˆÄÄˆäôˆÄÄˆÈôˆàˆ€¼ø(€€€€€€€€€€€€€€€€€€€€€€ñ±¥¹”àÄôˆÈÄˆäÄôˆÈÄˆàÈôˆÄØ¸ØÔˆäÈôˆÄØ¸ØÔˆ€¼ø(€€€€€€€€€€€€€€€€€€€€€€ñ±¥¹”àÄôˆÄÄˆäÄôˆàˆàÈôˆÄÄˆäÈôˆÄÐˆ€¼ø(€€€€€€€€€€€€€€€€€€€€€€ñ±¥¹”àÄôˆàˆäÄôˆÄÄˆàÈôˆÄÐˆäÈôˆÄÄˆ€¼ø(€€€€€€€€€€€€€€€€€€€€ð½ÍÙœø(€€€€€€€€€€€€€€€€€€ð½‰ÕÑÑ½¸ø(€€€€€€€€€€€€€€€€¥ô((€€€€€€€€€€€€€€€€ñÉ½Á‘½Ý¸€(€€€€€€€€€€€€€€€€€¥Í=Á•¸õí‘É½Á‘½Ý¸€ôôô€…Ù…Ñ…Èô€(€€€€€€€€€€€€€€€€€Ñ¥Ñ±”ô‰Ù…Ñ…ÈAÉ•Í•ÑÌˆ(€€€€€€€€€€€€€€€€€¥Ñ•µÌõíMMQL¹…Ù…Ñ…Éô€(€€€€€€€€€€€€€€€€€Í•±•Ñ•‘%õí…Ù…Ñ…É%µ…•ô(€€€€€€€€€€€€€€€€€½¹M•±•Ðõì¡¥Ñ•´¤€ôøÍ•ÑÙ…Ñ…É%µ…”¡¥Ñ•´¹ÕÉ°¥ô(€€€€€€€€€€€€€€€€€½¹AÉ•Ù¥•Üõì¡¥Ñ•´¤€ôøÍ•ÑAÉ•Ù¥•ÝÙ…Ñ…È¡¥Ñ•´¥ô(€€€€€€€€€€€€€€€€€½¹±½Í”õì ¤€ôøÍ•ÑÉ½Á‘½Ý¸¡¹Õ±°¥ô(€€€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€€€ð½‘¥Øø((€€€€€€€€€€€€€ì¼¨M¥µÁ±”½¹ÑÉ½±Ì€¨½ô(€€€€€€€€€€€€€ílÉ…Ñ¥¼œ°€É•Ìœ°€‘ÕÉ…Ñ¥½¸t¹µ…À¡­•ä€ôø€ (€€€€€€€€€€€€€€€€ñ‘¥Ø­•äõí­•åô±…ÍÍ9…µ”ô‰É•±…Ñ¥Ù”ˆø(€€€€€€€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€€€€€½¹±¥¬õì¡”¤€ôøì”¹ÍÑ½ÁAÉ½Á……Ñ¥½¸ ¤ìÍ•ÑÉ½Á‘½Ý¸¡‘É½Á‘½Ý¸€ôôô­•ä€ü¹Õ±°€è­•ä¤ìõô(€€€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”õíÁÉ½µÁÑ½¹ÑÉ½±±…ÍÍ9…µ”¡ì(€€€€€€€€€€€€€€€€€€€€€…Ñ¥Ù”è‘É½Á‘½Ý¸€ôôô­•ä°(€€€€€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”è(€€€€€€€€€€€€€€€€€€€€€€€‘É½Á‘½Ý¸€ôôô­•ä(€€€€€€€€€€€€€€€€€€€€€€€€€€ü€‰Ñ•áÐµáÌ™½¹ÐµÍ•µ¥‰½±Ñ•áÐµlŒÈÉÍ••tˆ(€€€€€€€€€€€€€€€€€€€€€€€€€€è€‰Ñ•áÐµáÌ™½¹ÐµÍ•µ¥‰½±Ñ•áÐµÝ¡¥Ñ”¼ÜÀˆ°(€€€€€€€€€€€€€€€€€€€ô¥ô(€€€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€€€í­•ä€ôôô€‰É…Ñ¥¼ˆ€ü€ (€€€€€€€€€€€€€€€€€€€€€€ñAÉ½µÁÑÍÁ•ÑI…Ñ¥½%½¸€¼ø(€€€€€€€€€€€€€€€€€€€€¤€è­•ä€ôôô€‰É•Ìˆ€ü€ (€€€€€€€€€€€€€€€€€€€€€€ñAÉ½µÁÑEÕ…±¥Ñå%½¸€¼ø(€€€€€€€€€€€€€€€€€€€€¤€è€ (€€€€€€€€€€€€€€€€€€€€€€ñAÉ½µÁÑÕÉ…Ñ¥½¹%½¸€¼ø(€€€€€€€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”õíAI=5AQ}=9QI=1}1	1}1MMôø(€€€€€€€€€€€€€€€€€€€€€í­•ä€ôôô€‰‘ÕÉ…Ñ¥½¸ˆ€ü€‘íÁ…É…µÍm­•åuõÍ€€èÁ…É…µÍm­•åuô(€€€€€€€€€€€€€€€€€€€€ð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€€€ð½‰ÕÑÑ½¸ø(€€€€€€€€€€€€€€€€€€ñM¥µÁ±•É½Á‘½Ý¸€(€€€€€€€€€€€€€€€€€€€¥Í=Á•¸õí‘É½Á‘½Ý¸€ôôô­•åô€(€€€€€€€€€€€€€€€€€€€Ñ¥Ñ±”õì(€€€€€€€€€€€€€€€€€€€€€­•ä€ôôô€‰É…Ñ¥¼ˆ(€€€€€€€€€€€€€€€€€€€€€€€€ü€‰ÍÁ•ÐI…Ñ¥¼ˆ(€€€€€€€€€€€€€€€€€€€€€€€€è­•ä€ôôô€‰É•Ìˆ(€€€€€€€€€€€€€€€€€€€€€€€€€€ü€‰I•Í½±ÕÑ¥½¸ˆ(€€€€€€€€€€€€€€€€€€€€€€€€€€è€‰ÕÉ…Ñ¥½¸ˆ(€€€€€€€€€€€€€€€€€€€ô(€€€€€€€€€€€€€€€€€€€½ÁÑ¥½¹Ìõí=AQ%=9Mm­•åuô€(€€€€€€€€€€€€€€€€€€€Í•±•Ñ•õíÁ…É…µÍm­•åuô€(€€€€€€€€€€€€€€€€€€€½¹M•±•Ðõì¡Ù…°¤€ôøÍ•ÑA…É…µÌ¡ì€¸¸¹Á…É…µÌ°m­•åtèÙ…°ô¥ô€(€€€€€€€€€€€€€€€€€€€½¹±½Í”õì ¤€ôøÍ•ÑÉ½Á‘½Ý¸¡¹Õ±°¥ô€(€€€€€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€¤¥ô(€€€€€€€€€€€€ð½AÉ½µÁÑ½¹ÑÉ½±Ìø((€€€€€€€€€€€€ñAÉ½µÁÑÑ¥½¸(€€€€€€€€€€€€€½¹±¥¬õí¡…¹‘±••¹•É…Ñ•ô(€€€€€€€€€€€€€‘¥Í…‰±•õí¥Í•¹•É…Ñ¥¹ô(€€€€€€€€€€€€ø(€€€€€€€€€€€€€í¥Í•¹•É…Ñ¥¹œ€ü€ (€€€€€€€€€€€€€€€€ðø(€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰…¹¥µ…Ñ”µÍÁ¥¸¥¹±¥¹”µ‰±½¬Ñ•áÐµ‰±…¬ˆûŠ^0ð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€€•¹•É…Ñ¥¹œ¸¸¸(€€€€€€€€€€€€€€€€ð¼ø(€€€€€€€€€€€€€€¤€è€ (€€€€€€€€€€€€€€€€ñÍÁ…¸ù1…Õ¹ ð½ÍÁ…¸ø(€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€ð½AÉ½µÁÑÑ¥½¸ø(€€€€€€€€€€ð½AÉ½µÁÑ½½Ñ•Èø(€€€€€€ð½AÉ½µÁÑ½µÁ½Í•Èø((€€€€€ì¼¨Õ±±ÍÉ••¸AÉ•Ù¥•Ü€¨½ô(€€€€€í™Õ±±ÍÉ••¹UÉ°€˜˜€ (€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™¥á•¥¹Í•Ð´ÀèµlÄÀÁt™±•à¥Ñ•µÌµ•¹Ñ•È©ÕÍÑ¥™äµ•¹Ñ•È‰œµ‰±…¬¼äÔ‰…­‘É½Àµ‰±ÕÈµÍ´…¹¥µ…Ñ”µ™…‘”µ¥¸ˆ½¹±¥¬õì ¤€ôøÍ•ÑÕ±±ÍÉ••¹UÉ°¡¹Õ±°¥ôø(€€€€€€€€€€ñ‰ÕÑÑ½¸±…ÍÍ9…µ”ô‰…‰Í½±ÕÑ”Ñ½À´ØÉ¥¡Ð´ØÀ´Ì‰œµÝ¡¥Ñ”¼ÄÀ¡½Ù•Èé‰œµÝ¡¥Ñ”¼ÈÀÉ½Õ¹‘•µ™Õ±°Ñ•áÐµÝ¡¥Ñ”‰½É‘•È‰½É‘•ÈµÝ¡¥Ñ”¼ÄÀÑÉ…¹Í¥Ñ¥½¸µ½±½ÉÌÍ¡…‘½Ü´Éá°ˆøñ±½Í•MÙœ€¼øð½‰ÕÑÑ½¸ø(€€€€€€€€€€ñÙ¥‘•¼ÍÉŒõí™Õ±±ÍÉ••¹UÉ±ô½¹ÑÉ½±Ì…ÕÑ½A±…ä±…ÍÍ9…µ”ô‰µ…àµÜµläÕÙÝtµ…àµ µläÕÙ¡tÉ½Õ¹‘•µ±œÍ¡…‘½Ü´Ñá°…¹¥µ…Ñ”µÍ…±”µÕÀˆ½¹±¥¬õí”€ôø”¹ÍÑ½ÁAÉ½Á……Ñ¥½¸ ¥ô€¼ø(€€€€€€€€ð½‘¥Øø(€€€€€€¥ô((€€€€€ì¼¨ƒŠRŠR YQHU11MI8AIY%\5=0ƒŠRŠR €¨½ô(€€€€€íÁÉ•Ù¥•ÝÙ…Ñ…È€˜˜€ (€€€€€€€€ñ‘¥Ø(€€€€€€€€€±…ÍÍ9…µ”ô‰™¥á•¥¹Í•Ð´ÀèµlÄÀÁt™±•à¥Ñ•µÌµ•¹Ñ•È©ÕÍÑ¥™äµ•¹Ñ•È‰œµ‰±…¬¼ÐÀ‰…­‘É½Àµ‰±ÕÈµµ…¹¥µ…Ñ”µ™…‘”µ¥¸Í•±•Ðµ¹½¹”ˆ(€€€€€€€€€½¹±¥¬õì ¤€ôøÍ•ÑAÉ•Ù¥•ÝÙ…Ñ…È¡¹Õ±°¥ô(€€€€€€€€ø(€€€€€€€€€ì¼¨±½Í”‰ÕÑÑ½¸€¡É½ÍÌ¤¥¸Ñ¡”É¥¡Ð½É¹•È€¨½ô(€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€ÑåÁ”ô‰‰ÕÑÑ½¸ˆ(€€€€€€€€€€€±…ÍÍ9…µ”ô‰…‰Í½±ÕÑ”Ñ½À´ØÉ¥¡Ð´ØÀ´Ì‰œµÝ¡¥Ñ”¼ÄÀ¡½Ù•Èé‰œµÝ¡¥Ñ”¼ÈÀÉ½Õ¹‘•µ™Õ±°Ñ•áÐµÝ¡¥Ñ”ÑÉ…¹Í¥Ñ¥½¸µ½±½ÉÌ‰½É‘•È‰½É‘•ÈµÝ¡¥Ñ”¼ÄÀè´ÔÀ…¹¥µ…Ñ”µ™…‘”µ¥¸ˆ(€€€€€€€€€€€½¹±¥¬õì¡”¤€ôøì(€€€€€€€€€€€€€”¹ÍÑ½ÁAÉ½Á……Ñ¥½¸ ¤ì(€€€€€€€€€€€€€Í•ÑAÉ•Ù¥•ÝÙ…Ñ…È¡¹Õ±°¤ì(€€€€€€€€€€€õô(€€€€€€€€€€ø(€€€€€€€€€€€€ñ±½Í•MÙœ€¼ø(€€€€€€€€€€ð½‰ÕÑÑ½¸ø((€€€€€€€€€ì¼¨%¹©•Ð‘å¹…µ¥ŒML…¹¥µ…Ñ¥½¸­•å™É…µ•Ì€¨½ô(€€€€€€€€€€ñÍÑå±”ùí€(€€€€€€€€€€€­•å™É…µ•ÌÍ±¥‘”µ¥¸µ¹•áÐì(€€€€€€€€€€€€€€À”ì(€€€€€€€€€€€€€€€ÑÉ…¹Í™½É´èÑÉ…¹Í±…Ñ•` àÁÁà¤Í…±” À¸äÔ¤ì(€€€€€€€€€€€€€€€™¥±Ñ•Èè‰±ÕÈ ÑÁà¤ì(€€€€€€€€€€€€€€€½Á…¥Ñäè€À¸Ôì(€€€€€€€€€€€€€ô(€€€€€€€€€€€€€€ÄÀÀ”ì(€€€€€€€€€€€€€€€ÑÉ…¹Í™½É´èÑÉ…¹Í±…Ñ•` À¤Í…±” Ä¤ì(€€€€€€€€€€€€€€€™¥±Ñ•Èè‰±ÕÈ À¤ì(€€€€€€€€€€€€€€€½Á…¥Ñäè€Äì(€€€€€€€€€€€€€ô(€€€€€€€€€€€ô(€€€€€€€€€€€­•å™É…µ•ÌÍ±¥‘”µ¥¸µÁÉ•Øì(€€€€€€€€€€€€€€À”ì(€€€€€€€€€€€€€€€ÑÉ…¹Í™½É´èÑÉ…¹Í±…Ñ•` ´àÁÁà¤Í…±” À¸äÔ¤ì(€€€€€€€€€€€€€€€™¥±Ñ•Èè‰±ÕÈ ÑÁà¤ì(€€€€€€€€€€€€€€€½Á…¥Ñäè€À¸Ôì(€€€€€€€€€€€€€ô(€€€€€€€€€€€€€€ÄÀÀ”ì(€€€€€€€€€€€€€€€ÑÉ…¹Í™½É´èÑÉ…¹Í±…Ñ•` À¤Í…±” Ä¤ì(€€€€€€€€€€€€€€€™¥±Ñ•Èè‰±ÕÈ À¤ì(€€€€€€€€€€€€€€€½Á…¥Ñäè€Äì(€€€€€€€€€€€€€ô(€€€€€€€€€€€ô(€€€€€€€€€€€€¹…¹¥µ…Ñ”µÍ±¥‘”µ¹•áÐì(€€€€€€€€€€€€€…¹¥µ…Ñ¥½¸èÍ±¥‘”µ¥¸µ¹•áÐ€ÌÔÁµÌÕ‰¥Œµ‰•é¥•È À¸ÄØ°€Ä°€À¸Ì°€Ä¤™½ÉÝ…É‘Ìì(€€€€€€€€€€€ô(€€€€€€€€€€€€¹…¹¥µ…Ñ”µÍ±¥‘”µÁÉ•Øì(€€€€€€€€€€€€€…¹¥µ…Ñ¥½¸èÍ±¥‘”µ¥¸µÁÉ•Ø€ÌÔÁµÌÕ‰¥Œµ‰•é¥•È À¸ÄØ°€Ä°€À¸Ì°€Ä¤™½ÉÝ…É‘Ìì(€€€€€€€€€€€ô(€€€€€€€€€ôð½ÍÑå±”ø((€€€€€€€€€ì¼¨1•™ÐÉÉ½Ü	ÕÑÑ½¸€¨½ô(€€€€€€€€€íÁÉ•Ù¥•ÝÙ…Ñ…È¹¥€„ôô€‰ÕÍÑ½´ˆ€˜˜€ (€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€ÑåÁ”ô‰‰ÕÑÑ½¸ˆ(€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰…‰Í½±ÕÑ”±•™Ð´ØÀ´Ð‰œµÝ¡¥Ñ”¼Ô¡½Ù•Èé‰œµÝ¡¥Ñ”¼ÄÀ¡½Ù•ÈéÑ•áÐµÁÉ¥µ…ÉäÉ½Õ¹‘•µ™Õ±°Ñ•áÐµÝ¡¥Ñ”ÑÉ…¹Í¥Ñ¥½¸µ…±°‰½É‘•È‰½É‘•ÈµÝ¡¥Ñ”¼ÄÀè´ÔÀˆ(€€€€€€€€€€€€€½¹±¥¬õì¡”¤€ôøì(€€€€€€€€€€€€€€€”¹ÍÑ½ÁAÉ½Á……Ñ¥½¸ ¤ì(€€€€€€€€€€€€€€€½¹ÍÐÕÉÉ•¹Ñ%¹‘•à€ôMMQL¹…Ù…Ñ…È¹™¥¹‘%¹‘•à¡„€ôø„¹¥€ôôôÁÉ•Ù¥•ÝÙ…Ñ…È¹¥¤ì(€€€€€€€€€€€€€€€¥˜€¡ÕÉÉ•¹Ñ%¹‘•à€„ôô€´Ä¤ì(€€€€€€€€€€€€€€€€€½¹ÍÐÁÉ•ÙÙ…Ñ…È€ôMMQL¹…Ù…Ñ…Él¡ÕÉÉ•¹Ñ%¹‘•à€´€Ä€¬MMQL¹…Ù…Ñ…È¹±•¹Ñ ¤€”MMQL¹…Ù…Ñ…È¹±•¹Ñ¡tì(€€€€€€€€€€€€€€€€€Í•ÑM±¥‘•¥É•Ñ¥½¸ ‰ÁÉ•Øˆ¤ì(€€€€€€€€€€€€€€€€€Í•ÑAÉ•Ù¥•ÝÙ…Ñ…È¡ÁÉ•ÙÙ…Ñ…È¤ì(€€€€€€€€€€€€€€€ô(€€€€€€€€€€€€€õô(€€€€€€€€€€€€ø(€€€€€€€€€€€€€€ñÍÙœÝ¥‘Ñ ôˆÈÐˆ¡•¥¡ÐôˆÈÐˆÙ¥•Ý	½àôˆÀ€À€ÈÐ€ÈÐˆ™¥±°ô‰¹½¹”ˆÍÑÉ½­”ô‰ÕÉÉ•¹Ñ½±½ÈˆÍÑÉ½­•]¥‘Ñ ôˆÌˆÍÑÉ½­•1¥¹•…Àô‰É½Õ¹ˆÍÑÉ½­•1¥¹•©½¥¸ô‰É½Õ¹ˆø(€€€€€€€€€€€€€€€€ñÁ½±å±¥¹”Á½¥¹ÑÌôˆÄÔ€Äà€ä€ÄÈ€ÄÔ€Øˆ€¼ø(€€€€€€€€€€€€€€ð½ÍÙœø(€€€€€€€€€€€€ð½‰ÕÑÑ½¸ø(€€€€€€€€€€¥ô((€€€€€€€€€ì¼¨I¥¡ÐÉÉ½Ü	ÕÑÑ½¸€¨½ô(€€€€€€€€€íÁÉ•Ù¥•ÝÙ…Ñ…È¹¥€„ôô€‰ÕÍÑ½´ˆ€˜˜€ (€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€ÑåÁ”ô‰‰ÕÑÑ½¸ˆ(€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰…‰Í½±ÕÑ”É¥¡Ð´ØÀ´Ð‰œµÝ¡¥Ñ”¼Ô¡½Ù•Èé‰œµÝ¡¥Ñ”¼ÄÀ¡½Ù•ÈéÑ•áÐµÁÉ¥µ…ÉäÉ½Õ¹‘•µ™Õ±°Ñ•áÐµÝ¡¥Ñ”ÑÉ…¹Í¥Ñ¥½¸µ…±°‰½É‘•È‰½É‘•ÈµÝ¡¥Ñ”¼ÄÀè´ÔÀˆ(€€€€€€€€€€€€€½¹±¥¬õì¡”¤€ôøì(€€€€€€€€€€€€€€€”¹ÍÑ½ÁAÉ½Á……Ñ¥½¸ ¤ì(€€€€€€€€€€€€€€€½¹ÍÐÕÉÉ•¹Ñ%¹‘•à€ôMMQL¹…Ù…Ñ…È¹™¥¹‘%¹‘•à¡„€ôø„¹¥€ôôôÁÉ•Ù¥•ÝÙ…Ñ…È¹¥¤ì(€€€€€€€€€€€€€€€¥˜€¡ÕÉÉ•¹Ñ%¹‘•à€„ôô€´Ä¤ì(€€€€€€€€€€€€€€€€€½¹ÍÐ¹•áÑÙ…Ñ…È€ôMMQL¹…Ù…Ñ…Él¡ÕÉÉ•¹Ñ%¹‘•à€¬€Ä¤€”MMQL¹…Ù…Ñ…È¹±•¹Ñ¡tì(€€€€€€€€€€€€€€€€€Í•ÑM±¥‘•¥É•Ñ¥½¸ ‰¹•áÐˆ¤ì(€€€€€€€€€€€€€€€€€Í•ÑAÉ•Ù¥•ÝÙ…Ñ…È¡¹•áÑÙ…Ñ…È¤ì(€€€€€€€€€€€€€€€ô(€€€€€€€€€€€€€õô(€€€€€€€€€€€€ø(€€€€€€€€€€€€€€ñÍÙœÝ¥‘Ñ ôˆÈÐˆ¡•¥¡ÐôˆÈÐˆÙ¥•Ý	½àôˆÀ€À€ÈÐ€ÈÐˆ™¥±°ô‰¹½¹”ˆÍÑÉ½­”ô‰ÕÉÉ•¹Ñ½±½ÈˆÍÑÉ½­•]¥‘Ñ ôˆÌˆÍÑÉ½­•1¥¹•…Àô‰É½Õ¹ˆÍÑÉ½­•1¥¹•©½¥¸ô‰É½Õ¹ˆø(€€€€€€€€€€€€€€€€ñÁ½±å±¥¹”Á½¥¹ÑÌôˆä€Äà€ÄÔ€ÄÈ€ä€Øˆ€¼ø(€€€€€€€€€€€€€€ð½ÍÙœø(€€€€€€€€€€€€ð½‰ÕÑÑ½¸ø(€€€€€€€€€€¥ô((€€€€€€€€€ì¼¨¹±…É•%µ…”…É…¹Í¥‘”‘¥ÍÁ±…åÌ€¨½ô(€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à¥Ñ•µÌµ•¹Ñ•È…À´Øµé…À´ÄÈµ…àµÜµläÕÙÝt©ÕÍÑ¥™äµ•¹Ñ•ÈÉ•±…Ñ¥Ù”ˆø(€€€€€€€€€€€ì¼¨AÉ•Ù¥½ÕÌÙ…Ñ…È…É€¡1•™ÐÍ¥‘”¤€¨½ô(€€€€€€€€€€€íÁÉ•Ù¥•ÝÙ…Ñ…È¹¥€„ôô€‰ÕÍÑ½´ˆ€˜˜€ (€€€€€€€€€€€€€€ñ‘¥Ø(€€€€€€€€€€€€€€€½¹±¥¬õì¡”¤€ôøì(€€€€€€€€€€€€€€€€€”¹ÍÑ½ÁAÉ½Á……Ñ¥½¸ ¤ì(€€€€€€€€€€€€€€€€€½¹ÍÐÕÉÉ•¹Ñ%¹‘•à€ôMMQL¹…Ù…Ñ…È¹™¥¹‘%¹‘•à¡„€ôø„¹¥€ôôôÁÉ•Ù¥•ÝÙ…Ñ…È¹¥¤ì(€€€€€€€€€€€€€€€€€¥˜€¡ÕÉÉ•¹Ñ%¹‘•à€„ôô€´Ä¤ì(€€€€€€€€€€€€€€€€€€€½¹ÍÐÁÉ•ÙÙ…Ñ…È€ôMMQL¹…Ù…Ñ…Él¡ÕÉÉ•¹Ñ%¹‘•à€´€Ä€¬MMQL¹…Ù…Ñ…È¹±•¹Ñ ¤€”MMQL¹…Ù…Ñ…È¹±•¹Ñ¡tì(€€€€€€€€€€€€€€€€€€€Í•ÑM±¥‘•¥É•Ñ¥½¸ ‰ÁÉ•Øˆ¤ì(€€€€€€€€€€€€€€€€€€€Í•ÑAÉ•Ù¥•ÝÙ…Ñ…È¡ÁÉ•ÙÙ…Ñ…È¤ì(€€€€€€€€€€€€€€€€€ô(€€€€€€€€€€€€€€€õô(€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰¡¥‘‘•¸µé™±•à™±•àµ½°¥Ñ•µÌµ•¹Ñ•È½Á…¥Ñä´ÔÀ¡½Ù•Èé½Á…¥Ñä´ØÀÍ…±”´ÜÔ¡½Ù•ÈéÍ…±”´àÀÑÉ…¹Í¥Ñ¥½¸µ…±°‘ÕÉ…Ñ¥½¸´ÌÀÀÕÉÍ½ÈµÁ½¥¹Ñ•ÈÍ•±•Ðµ¹½¹”µ…àµÜµlÄÕÙÝtµ…àµ µlÔÁÙ¡tÉ½Õ¹‘•µá°½Ù•É™±½Üµ¡¥‘‘•¸‰½É‘•È‰½É‘•ÈµÝ¡¥Ñ”¼Ô‰œµlŒÁÁÁ™t¼ÔÀˆ(€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€ñ¥µœ(€€€€€€€€€€€€€€€€€ÍÉŒõíMMQL¹…Ù…Ñ…Él¡MMQL¹…Ù…Ñ…È¹™¥¹‘%¹‘•à¡„€ôø„¹¥€ôôôÁÉ•Ù¥•ÝÙ…Ñ…È¹¥¤€´€Ä€¬MMQL¹…Ù…Ñ…È¹±•¹Ñ ¤€”MMQL¹…Ù…Ñ…È¹±•¹Ñ¡t¹ÕÉ±ô(€€€€€€€€€€€€€€€€€…±Ðô‰AÉ•Ù¥½ÕÌÙ…Ñ…Èˆ(€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰Üµ™Õ±° µ™Õ±°½‰©•Ðµ½Ù•È…ÍÁ•ÐµlÌ¼Ñtˆ(€€€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€¥ô((€€€€€€€€€€€ì¼¨5…¥¸Ñ¥Ù”Ù…Ñ…È…É€¨½ô(€€€€€€€€€€€€ñ‘¥Ø(€€€€€€€€€€€€€­•äõíÁÉ•Ù¥•ÝÙ…Ñ…È¹¥‘ô(€€€€€€€€€€€€€±…ÍÍ9…µ”õíÉ•±…Ñ¥Ù”™±•à™±•àµ½°¥Ñ•µÌµ•¹Ñ•Èµ…àµÜµläÁÙÝtµéµ…àµÜµlÐÕÙÝtµ…àµ µlàÕÙ¡tè´ÄÀ€‘ì(€€€€€€€€€€€€€€€Í±¥‘•¥É•Ñ¥½¸€ôôô€‰¹•áÐˆ€ü€‰…¹¥µ…Ñ”µÍ±¥‘”µ¹•áÐˆ€è€‰…¹¥µ…Ñ”µÍ±¥‘”µÁÉ•Øˆ(€€€€€€€€€€€€€õô(€€€€€€€€€€€€€½¹±¥¬õì¡”¤€ôø”¹ÍÑ½ÁAÉ½Á……Ñ¥½¸ ¥ô(€€€€€€€€€€€€ø(€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰É•±…Ñ¥Ù”É½Õ¹‘•´Éá°½Ù•É™±½Üµ¡¥‘‘•¸‰½É‘•È‰½É‘•ÈµÝ¡¥Ñ”¼ÄÀ‰œµlŒÁÁÁ™tÍ¡…‘½Ü´Éá°ˆø(€€€€€€€€€€€€€€€€ñ¥µœ(€€€€€€€€€€€€€€€€€ÍÉŒõíÁÉ•Ù¥•ÝÙ…Ñ…È¹ÕÉ±ô(€€€€€€€€€€€€€€€€€…±ÐõíÁÉ•Ù¥•ÝÙ…Ñ…È¹¹…µ•ô(€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰µ…àµÜµlàÁÙÝtµéµ…àµÜµlÐÁÙÝtµ…àµ µlÜÁÙ¡tµéµ…àµ µlØÕÙ¡t½‰©•Ðµ½¹Ñ…¥¸ˆ(€€€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€€€€€(€€€€€€€€€€€€€€€ì¼¨=Ù•É±…äÝ¥Ñ 9…µ”½˜Ñ¡”Ù…Ñ…È€¨½ô(€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰…‰Í½±ÕÑ”‰½ÑÑ½´´À±•™Ð´ÀÉ¥¡Ð´À‰œµÉ…‘¥•¹ÐµÑ¼µÐ™É½´µ‰±…¬¼äÀÙ¥„µ‰±…¬¼ÔÀÑ¼µÑÉ…¹ÍÁ…É•¹ÐÀ´ÐÁÐ´ÄÀ™±•à™±•àµ½°¥Ñ•µÌµ•¹Ñ•È©ÕÍÑ¥™äµ•¹…À´Ìˆø(€€€€€€€€€€€€€€€€€€ñ È±…ÍÍ9…µ”ô‰Ñ•áÐµá°™½¹Ðµ‰±…¬Ñ•áÐµÝ¡¥Ñ”ÑÉ…­¥¹œµÝ¥‘”ÕÁÁ•É…Í”ˆø(€€€€€€€€€€€€€€€€€€€íÁÉ•Ù¥•ÝÙ…Ñ…È¹¹…µ•ô(€€€€€€€€€€€€€€€€€€ð½ Èø(€€€€€€€€€€€€€€€€€€(€€€€€€€€€€€€€€€€€ì¼¨M•±•Ð‰ÕÑÑ½¸½¸Ñ¡”•¹±…É•¥µ…”€¨½ô(€€€€€€€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€€€€€ÑåÁ”ô‰‰ÕÑÑ½¸ˆ(€€€€€€€€€€€€€€€€€€€½¹±¥¬õì ¤€ôøì(€€€€€€€€€€€€€€€€€€€€€Í•ÑÙ…Ñ…É%µ…”¡ÁÉ•Ù¥•ÝÙ…Ñ…È¹ÕÉ°¤ì(€€€€€€€€€€€€€€€€€€€€€Í•ÑAÉ•Ù¥•ÝÙ…Ñ…È¡¹Õ±°¤ì(€€€€€€€€€€€€€€€€€€€€€Í•ÑÉ½Á‘½Ý¸¡¹Õ±°¤ì(€€€€€€€€€€€€€€€€€€€õô(€€€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰‰œµlŒÈÉÍ••tÑ•áÐµ‰±…¬Áà´ØÁä´È¸ÔÉ½Õ¹‘•µ™Õ±°™½¹Ðµ‰½±Ñ•áÐµÍ´¡½Ù•Èé½Á…¥Ñä´äÔ¡½Ù•ÈéÍ…±”´ÄÀÔ…Ñ¥Ù”éÍ…±”´äÔÑÉ…¹Í¥Ñ¥½¸µ…±°™±•à¥Ñ•µÌµ•¹Ñ•È©ÕÍÑ¥™äµ•¹Ñ•È…À´Ä¸ÔÍ¡…‘½Üµ±œÍ¡…‘½ÜµlŒÈÉÍ••t¼ÈÀˆ(€€€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€€€€ñ¡•­MÙœ€¼ø(€€€€€€€€€€€€€€€€€€€M•±•ÐÙ…Ñ…È(€€€€€€€€€€€€€€€€€€ð½‰ÕÑÑ½¸ø(€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€ð½‘¥Øø((€€€€€€€€€€€ì¼¨9•áÐÙ…Ñ…È…É€¡I¥¡ÐÍ¥‘”¤€¨½ô(€€€€€€€€€€€íÁÉ•Ù¥•ÝÙ…Ñ…È¹¥€„ôô€‰ÕÍÑ½´ˆ€˜˜€ (€€€€€€€€€€€€€€ñ‘¥Ø(€€€€€€€€€€€€€€€½¹±¥¬õì¡”¤€ôøì(€€€€€€€€€€€€€€€€€”¹ÍÑ½ÁAÉ½Á……Ñ¥½¸ ¤ì(€€€€€€€€€€€€€€€€€½¹ÍÐÕÉÉ•¹Ñ%¹‘•à€ôMMQL¹…Ù…Ñ…È¹™¥¹‘%¹‘•à¡„€ôø„¹¥€ôôôÁÉ•Ù¥•ÝÙ…Ñ…È¹¥¤ì(€€€€€€€€€€€€€€€€€¥˜€¡ÕÉÉ•¹Ñ%¹‘•à€„ôô€´Ä¤ì(€€€€€€€€€€€€€€€€€€€½¹ÍÐ¹•áÑÙ…Ñ…È€ôMMQL¹…Ù…Ñ…Él¡ÕÉÉ•¹Ñ%¹‘•à€¬€Ä¤€”MMQL¹…Ù…Ñ…È¹±•¹Ñ¡tì(€€€€€€€€€€€€€€€€€€€Í•ÑM±¥‘•¥É•Ñ¥½¸ ‰¹•áÐˆ¤ì(€€€€€€€€€€€€€€€€€€€Í•ÑAÉ•Ù¥•ÝÙ…Ñ…È¡¹•áÑÙ…Ñ…È¤ì(€€€€€€€€€€€€€€€€€ô(€€€€€€€€€€€€€€€õô(€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰¡¥‘‘•¸µé™±•à™±•àµ½°¥Ñ•µÌµ•¹Ñ•È½Á…¥Ñä´ÔÀ¡½Ù•Èé½Á…¥Ñä´ØÀÍ…±”´ÜÔ¡½Ù•ÈéÍ…±”´àÀÑÉ…¹Í¥Ñ¥½¸µ…±°‘ÕÉ…Ñ¥½¸´ÌÀÀÕÉÍ½ÈµÁ½¥¹Ñ•ÈÍ•±•Ðµ¹½¹”µ…àµÜµlÄÕÙÝtµ…àµ µlÔÁÙ¡tÉ½Õ¹‘•µá°½Ù•É™±½Üµ¡¥‘‘•¸‰½É‘•È‰½É‘•ÈµÝ¡¥Ñ”¼Ô‰œµlŒÁÁÁ™t¼ÔÀˆ(€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€ñ¥µœ(€€€€€€€€€€€€€€€€€ÍÉŒõíMMQL¹…Ù…Ñ…Él¡MMQL¹…Ù…Ñ…È¹™¥¹‘%¹‘•à¡„€ôø„¹¥€ôôôÁÉ•Ù¥•ÝÙ…Ñ…È¹¥¤€¬€Ä¤€”MMQL¹…Ù…Ñ…È¹±•¹Ñ¡t¹ÕÉ±ô(€€€€€€€€€€€€€€€€€…±Ðô‰9•áÐÙ…Ñ…Èˆ(€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰Üµ™Õ±° µ™Õ±°½‰©•Ðµ½Ù•È…ÍÁ•ÐµlÌ¼Ñtˆ(€€€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€¥ô(€€€€€€€€€€ð½‘¥Øø(€€€€€€€€ð½‘¥Øø(€€€€€€¥ô(€€€€ð½‘¥Øø(€€¤ì)ô(
+    }
+    setUploadProgress(p => ({ ...p, [target]: 0 }));
+  };
+
+  const handleGenerate = async () => {
+    if (!prompt.trim()) return alert("Please enter an ad script.");
+    if (!productImage) return alert("Please upload a product image.");
+
+    onGenerationStart?.();
+    setIsGenerating(true);
+    try {
+      const result = await generateMarketingStudioAd(apiKey, {
+        prompt,
+        aspect_ratio: params.ratio,
+        duration: params.duration,
+        resolution: params.res,
+        images_list: [productImage, avatarImage, ...additionalImages].filter(Boolean),
+        video_files: params.videoUrl ? [params.videoUrl] : []
+      });
+
+      if (result?.url) {
+        const entry = {
+          id: Date.now(),
+          url: result.url,
+          prompt,
+          format: params.format,
+          timestamp: new Date().toISOString()
+        };
+        if (!historyItems) {
+          setLocalHistory(prev => [entry, ...prev]);
+        }
+        setFullscreenUrl(result.url);
+        onGenerationComplete?.({ url: result.url, type: "video" });
+      }
+    } catch (err) {
+      onGenerationError?.(err.message?.slice(0, 120) || "Marketing generation failed");
+    } finally {
+      setIsGenerating(false);
+      onGenerationEnd?.();
+    }
+  };
+
+  // â”€â”€ Render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+  return (
+    <div className="w-full h-full flex flex-col items-center justify-center bg-app-bg relative overflow-hidden">
+      <style>{SCROLLBAR_STYLE}</style>
+      
+      {/* â”€â”€ MAIN CONTENT AREA â”€â”€ */}
+      <div className="flex-1 w-full max-w-7xl mx-auto overflow-y-auto custom-scrollbar pb-40 lg:pb-32 px-2">
+        {history.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full pt-4 animate-fade-in-up">
+            {history.map(entry => (
+              <div key={entry.id} className="relative group rounded-lg overflow-hidden border border-white/10 bg-[#0a0a0a] shadow-xl hover:border-primary/50 transition-all duration-300 flex flex-col">
+                <video 
+                  src={entry.url} 
+                  className="w-full aspect-video object-cover cursor-pointer hover:opacity-80 transition-opacity" 
+                  onClick={() => setFullscreenUrl(entry.url)}
+                  muted loop onMouseOver={e => e.target.play()} onMouseOut={e => { e.target.pause(); e.target.currentTime = 0; }}
+                />
+                
+                {/* Actions Overlay */}
+                <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                   <button
+                    type="button"
+                    title="Fullscreen"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setFullscreenUrl(entry.url);
+                    }}
+                    className="p-2 bg-black/60 backdrop-blur-md rounded-full text-white hover:bg-primary hover:text-black transition-all border border-white/10"
+                   >
+                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                       <polyline points="15 3 21 3 21 9" />
+                       <polyline points="9 21 3 21 3 15" />
+                       <line x1="21" y1="3" x2="14" y2="10" />
+                       <line x1="3" y1="21" x2="10" y2="14" />
+                     </svg>
+                   </button>
+                   <button
+                    onClick={(e) => { e.stopPropagation(); downloadFile(entry.url, `marketing-ad-${entry.id}.mp4`); }}
+                    className="p-2 bg-black/60 backdrop-blur-md rounded-full text-white hover:bg-primary hover:text-black transition-all border border-white/10"
+                    title="Download"
+                   >
+                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                       <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" />
+                     </svg>
+                   </button>
+                   <button
+                    type="button"
+                    title="Delete"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (confirm("Are you sure you want to delete this generated item?")) {
+                        if (!historyItems) {
+                          setLocalHistory(prev => prev.filter(h => h.id !== entry.id));
+                        }
+                      }
+                    }}
+                    className="p-2 bg-black/60 backdrop-blur-md rounded-full text-red-400 hover:bg-red-500 hover:text-white transition-all border border-white/10"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <polyline points="3 6 5 6 21 6" />
+                      <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                      <line x1="10" y1="11" x2="10" y2="17" />
+                      <line x1="14" y1="11" x2="14" y2="17" />
+                    </svg>
+                  </button>
+                </div>
+
+                <div className="p-3 bg-black/80 backdrop-blur-sm border-t border-white/5 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[9px] font-black text-primary px-2 py-0.5 bg-primary/10 rounded border border-primary/20 uppercase tracking-tighter">
+                      Marketing Studio
+                    </span>
+                    {entry.format && (
+                      <span className="text-[9px] text-white/40 font-bold">{entry.format}</span>
+                    )}
+                  </div>
+                  {entry.prompt && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigator.clipboard.writeText(entry.prompt);
+                        const btn = e.currentTarget;
+                        btn.innerText = "Copied!";
+                        setTimeout(() => { btn.innerText = "Copy Prompt"; }, 2000);
+                      }}
+                      className="px-2 py-1 bg-white/5 hover:bg-primary/20 hover:text-primary rounded text-[10px] font-medium text-white/70 transition-all border border-white/10"
+                    >
+                      Copy Prompt
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full animate-fade-in-up transition-all duration-700 min-h-[50vh]">
+            {/* Overlapping floating cards */}
+            <div className="flex items-center justify-center gap-1.5 md:gap-3 mb-10 select-none scale-90 sm:scale-100">
+              <div className="w-18 h-22 sm:w-24 sm:h-28 rounded-2xl border border-white/10 shadow-2xl -rotate-[12deg] transform hover:rotate-0 hover:scale-110 hover:z-20 transition-all duration-300 overflow-hidden bg-white/[0.01] flex-shrink-0">
+                <img
+                  src="https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/sdxl-image.avif"
+                  alt="Creative asset 1"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="w-18 h-22 sm:w-24 sm:h-28 rounded-2xl border border-white/10 shadow-2xl -rotate-[4deg] transform hover:rotate-0 hover:scale-110 hover:z-20 transition-all duration-300 overflow-hidden bg-white/[0.01] -ml-3 sm:-ml-4 flex-shrink-0">
+                <img
+                  src="https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/chroma-image.avif"
+                  alt="Creative asset 2"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="w-18 h-18 sm:w-24 sm:h-24 rounded-full border border-white/10 shadow-2xl rotate-[6deg] transform hover:rotate-0 hover:scale-110 hover:z-20 transition-all duration-300 overflow-hidden bg-white/[0.01] -ml-3 sm:-ml-4 flex-shrink-0">
+                <img
+                  src="https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/neta-lumina.avif"
+                  alt="Creative asset 3"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="w-18 h-22 sm:w-24 sm:h-28 rounded-2xl border border-white/10 shadow-2xl rotate-[12deg] transform hover:rotate-0 hover:scale-110 hover:z-20 transition-all duration-300 overflow-hidden bg-white/[0.01] -ml-3 sm:-ml-4 flex-shrink-0">
+                <img
+                  src="https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/perfect-pony-xl.avif"
+                  alt="Creative asset 4"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+
+            <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-center px-4 flex flex-col items-center">
+              <span className="text-white font-black uppercase text-xl sm:text-3xl tracking-wide mb-1 opacity-90">START CREATING WITH</span>
+              <span className="text-[#22d3ee] font-black uppercase text-2xl sm:text-4xl sm:mt-1 tracking-tight">
+                MARKETING STUDIO
+              </span>
+            </h1>
+            <p className="text-white/40 text-xs sm:text-sm font-medium tracking-wide text-center max-w-lg leading-relaxed px-4">
+              Describe your scene, upload your product, and watch high-converting AI video ads come to life.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* â”€â”€ BOTTOM PROMPT BAR â”€â”€ */}
+      <PromptComposer>
+          {additionalImages.length > 0 && (
+            <div className="flex items-center gap-1.5">
+              {additionalImages.map((img, idx) => (
+                <div key={idx} className="relative group/img flex-shrink-0">
+                  <img src={img} className="w-9 h-9 rounded-full object-cover border border-white/10" />
+                  <button 
+                    onClick={() => setAdditionalImages(prev => prev.filter((_, i) => i !== idx))}
+                    className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-black/80 text-white rounded-full flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity border border-white/10"
+                  >
+                    <CloseSvg />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          {/* Top Row: Full-width Textarea */}
+          <div className="w-full relative">
+            <PromptTextarea
+              ref={textareaRef}
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              placeholder="Describe your ad script... Use @image1 for product, @image2 for avatar."
+            />
+          </div>
+
+          {/* Bottom Row: Uploads + Controls + Generate */}
+          <PromptFooter>
+            <PromptControls>
+              
+              {/* Asset Uploads Group */}
+              <div className="flex items-center gap-1.5 pr-3 border-r border-white/10">
+                <UploadSlot 
+                  label="Product" 
+                  icon={<ProductIcon />} 
+                  url={productImage} 
+                  progress={uploadProgress.product} 
+                  onUpload={(e) => handleUpload(e, 'product')} 
+                  onClear={() => setProductImage(null)} 
+                />
+                <UploadSlot 
+                  label="Avatar" 
+                  icon={<AvatarIcon />} 
+                  url={avatarImage} 
+                  progress={uploadProgress.avatar} 
+                  onUpload={(e) => handleUpload(e, 'avatar')} 
+                  onClear={() => setAvatarImage(null)} 
+                />
+                <UploadSlot 
+                  label="References" 
+                  icon={<RefIcon />} 
+                  url={additionalImages[0]} 
+                  progress={uploadProgress.additional} 
+                  multiple 
+                  images={additionalImages}
+                  onUpload={(e) => handleUpload(e, 'additional')} 
+                  onClear={(idx) => {
+                    if (idx !== undefined) {
+                      setAdditionalImages(prev => prev.filter((_, i) => i !== idx));
+                    } else {
+                      setAdditionalImages([]);
+                    }
+                  }} 
+                />
+              </div>
+
+              {/* Format Button */}
+              <div className="relative">
+                <button
+                  onClick={(e) => { e.stopPropagation(); setDropdown(dropdown === 'format' ? null : 'format'); }}
+                  className={promptControlClassName({
+                    active: dropdown === "format",
+                  })}
+                >
+                  <div className="w-4 h-4 bg-primary/10 rounded flex items-center justify-center border border-primary/20">
+                    <span className="text-[8px] font-black text-primary uppercase">U</span>
+                  </div>
+                  <span className={PROMPT_CONTROL_LABEL_CLASS}>{params.format}</span>
+                  <PromptChevronIcon />
+                </button>
+                <Dropdown 
+                  isOpen={dropdown === 'format'} 
+                  title="Video Format Presets"
+                  items={ASSETS.ugc} 
+                  selectedId={params.format}
+                  onSelect={(item) => setParams({ ...params, format: item.name, videoUrl: item.url })}
+                  onClose={() => setDropdown(null)}
+                  isVideo
+                />
+              </div>
+
+              {/* Avatar Preset Button */}
+              <div className="relative flex items-center gap-1.5">
+                <button
+                  onClick={(e) => { e.stopPropagation(); setDropdown(dropdown === 'avatar' ? null : 'avatar'); }}
+                  className={promptControlClassName({
+                    active: dropdown === "avatar",
+                  })}
+                >
+                  <div className="w-4 h-4 rounded-full overflow-hidden border border-white/20 shadow-inner">
+                    <img src={avatarImage || ASSETS.avatar[0].url} className="w-full h-full object-cover" />
+                  </div>
+                  <span className={PROMPT_CONTROL_LABEL_CLASS}>
+                    {ASSETS.avatar.find(a => a.url === avatarImage)?.name || "Select Avatar"}
+                  </span>
+                  <PromptChevronIcon />
+                </button>
+
+                {avatarImage && (
+                  <button
+                    type="button"
+                    title="Enlarge selected avatar"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const currentAvatar = ASSETS.avatar.find(a => a.url === avatarImage);
+                      if (currentAvatar) {
+                        setPreviewAvatar(currentAvatar);
+                      } else {
+                        setPreviewAvatar({ id: "custom", name: "Custom Uploaded Avatar", url: avatarImage });
+                      }
+                    }}
+                    className={promptControlClassName({
+                      iconOnly: true,
+                      className: "text-white/40 hover:text-[#22d3ee]",
+                    })}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <circle cx="11" cy="11" r="8" />
+                      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                      <line x1="11" y1="8" x2="11" y2="14" />
+                      <line x1="8" y1="11" x2="14" y2="11" />
+                    </svg>
+                  </button>
+                )}
+
+                <Dropdown 
+                  isOpen={dropdown === 'avatar'} 
+                  title="Avatar Presets"
+                  items={ASSETS.avatar} 
+                  selectedId={avatarImage}
+                  onSelect={(item) => setAvatarImage(item.url)}
+                  onPreview={(item) => setPreviewAvatar(item)}
+                  onClose={() => setDropdown(null)}
+                />
+              </div>
+
+              {/* Simple Controls */}
+              {['ratio', 'res', 'duration'].map(key => (
+                <div key={key} className="relative">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setDropdown(dropdown === key ? null : key); }}
+                    className={promptControlClassName({
+                      active: dropdown === key,
+                      className:
+                        dropdown === key
+                          ? "text-xs font-semibold text-[#22d3ee]"
+                          : "text-xs font-semibold text-white/70",
+                    })}
+                  >
+                    {key === "ratio" ? (
+                      <PromptAspectRatioIcon />
+                    ) : key === "res" ? (
+                      <PromptQualityIcon />
+                    ) : (
+                      <PromptDurationIcon />
+                    )}
+                    <span className={PROMPT_CONTROL_LABEL_CLASS}>
+                      {key === "duration" ? `${params[key]}s` : params[key]}
+                    </span>
+                  </button>
+                  <SimpleDropdown 
+                    isOpen={dropdown === key} 
+                    title={
+                      key === "ratio"
+                        ? "Aspect Ratio"
+                        : key === "res"
+                          ? "Resolution"
+                          : "Duration"
+                    }
+                    options={OPTIONS[key]} 
+                    selected={params[key]} 
+                    onSelect={(val) => setParams({ ...params, [key]: val })} 
+                    onClose={() => setDropdown(null)} 
+                  />
+                </div>
+              ))}
+            </PromptControls>
+
+            <PromptAction
+              onClick={handleGenerate}
+              disabled={isGenerating}
+            >
+              {isGenerating ? (
+                <>
+                  <span className="animate-spin inline-block text-black">â—Œ</span>
+                  Generating...
+                </>
+              ) : (
+                <span>Launch</span>
+              )}
+            </PromptAction>
+          </PromptFooter>
+      </PromptComposer>
+
+      {/* Fullscreen Preview */}
+      {fullscreenUrl && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-sm animate-fade-in" onClick={() => setFullscreenUrl(null)}>
+          <button className="absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white border border-white/10 transition-colors shadow-2xl"><CloseSvg /></button>
+          <video src={fullscreenUrl} controls autoPlay className="max-w-[95vw] max-h-[95vh] rounded-lg shadow-4xl animate-scale-up" onClick={e => e.stopPropagation()} />
+        </div>
+      )}
+
+      {/* â”€â”€ AVATAR FULLSCREEN PREVIEW MODAL â”€â”€ */}
+      {previewAvatar && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-md animate-fade-in select-none"
+          onClick={() => setPreviewAvatar(null)}
+        >
+          {/* Close button (cross) in the right corner */}
+          <button
+            type="button"
+            className="absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors border border-white/10 z-50 animate-fade-in"
+            onClick={(e) => {
+              e.stopPropagation();
+              setPreviewAvatar(null);
+            }}
+          >
+            <CloseSvg />
+          </button>
+
+          {/* Inject dynamic CSS animation keyframes */}
+          <style>{`
+            @keyframes slide-in-next {
+              0% {
+                transform: translateX(80px) scale(0.95);
+                filter: blur(4px);
+                opacity: 0.5;
+              }
+              100% {
+                transform: translateX(0) scale(1);
+                filter: blur(0);
+                opacity: 1;
+              }
+            }
+            @keyframes slide-in-prev {
+              0% {
+                transform: translateX(-80px) scale(0.95);
+                filter: blur(4px);
+                opacity: 0.5;
+              }
+              100% {
+                transform: translateX(0) scale(1);
+                filter: blur(0);
+                opacity: 1;
+              }
+            }
+            .animate-slide-next {
+              animation: slide-in-next 350ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            }
+            .animate-slide-prev {
+              animation: slide-in-prev 350ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            }
+          `}</style>
+
+          {/* Left Arrow Button */}
+          {previewAvatar.id !== "custom" && (
+            <button
+              type="button"
+              className="absolute left-6 p-4 bg-white/5 hover:bg-white/10 hover:text-primary rounded-full text-white transition-all border border-white/10 z-50"
+              onClick={(e) => {
+                e.stopPropagation();
+                const currentIndex = ASSETS.avatar.findIndex(a => a.id === previewAvatar.id);
+                if (currentIndex !== -1) {
+                  const prevAvatar = ASSETS.avatar[(currentIndex - 1 + ASSETS.avatar.length) % ASSETS.avatar.length];
+                  setSlideDirection("prev");
+                  setPreviewAvatar(prevAvatar);
+                }
+              }}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
+          )}
+
+          {/* Right Arrow Button */}
+          {previewAvatar.id !== "custom" && (
+            <button
+              type="button"
+              className="absolute right-6 p-4 bg-white/5 hover:bg-white/10 hover:text-primary rounded-full text-white transition-all border border-white/10 z-50"
+              onClick={(e) => {
+                e.stopPropagation();
+                const currentIndex = ASSETS.avatar.findIndex(a => a.id === previewAvatar.id);
+                if (currentIndex !== -1) {
+                  const nextAvatar = ASSETS.avatar[(currentIndex + 1) % ASSETS.avatar.length];
+                  setSlideDirection("next");
+                  setPreviewAvatar(nextAvatar);
+                }
+              }}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </button>
+          )}
+
+          {/* Enlarged Image Card and side displays */}
+          <div className="flex items-center gap-6 md:gap-12 max-w-[95vw] justify-center relative">
+            {/* Previous Avatar Card (Left side) */}
+            {previewAvatar.id !== "custom" && (
+              <div
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const currentIndex = ASSETS.avatar.findIndex(a => a.id === previewAvatar.id);
+                  if (currentIndex !== -1) {
+                    const prevAvatar = ASSETS.avatar[(currentIndex - 1 + ASSETS.avatar.length) % ASSETS.avatar.length];
+                    setSlideDirection("prev");
+                    setPreviewAvatar(prevAvatar);
+                  }
+                }}
+                className="hidden md:flex flex-col items-center opacity-50 hover:opacity-60 scale-75 hover:scale-80 transition-all duration-300 cursor-pointer select-none max-w-[15vw] max-h-[50vh] rounded-xl overflow-hidden border border-white/5 bg-[#0d0d0f]/50"
+              >
+                <img
+                  src={ASSETS.avatar[(ASSETS.avatar.findIndex(a => a.id === previewAvatar.id) - 1 + ASSETS.avatar.length) % ASSETS.avatar.length].url}
+                  alt="Previous Avatar"
+                  className="w-full h-full object-cover aspect-[3/4]"
+                />
+              </div>
+            )}
+
+            {/* Main Active Avatar Card */}
+            <div
+              key={previewAvatar.id}
+              className={`relative flex flex-col items-center max-w-[90vw] md:max-w-[45vw] max-h-[85vh] z-10 ${
+                slideDirection === "next" ? "animate-slide-next" : "animate-slide-prev"
+              }`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="relative rounded-2xl overflow-hidden border border-white/10 bg-[#0d0d0f] shadow-2xl">
+                <img
+                  src={previewAvatar.url}
+                  alt={previewAvatar.name}
+                  className="max-w-[80vw] md:max-w-[40vw] max-h-[70vh] md:max-h-[65vh] object-contain"
+                />
+                
+                {/* Overlay with Name of the Avatar */}
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-4 pt-10 flex flex-col items-center justify-end gap-3">
+                  <h2 className="text-xl font-black text-white tracking-wide uppercase">
+                    {previewAvatar.name}
+                  </h2>
+                  
+                  {/* Select button on the enlarged image */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAvatarImage(previewAvatar.url);
+                      setPreviewAvatar(null);
+                      setDropdown(null);
+                    }}
+                    className="bg-[#22d3ee] text-black px-6 py-2.5 rounded-full font-bold text-sm hover:opacity-95 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-1.5 shadow-lg shadow-[#22d3ee]/20"
+                  >
+                    <CheckSvg />
+                    Select Avatar
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Next Avatar Card (Right side) */}
+            {previewAvatar.id !== "custom" && (
+              <div
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const currentIndex = ASSETS.avatar.findIndex(a => a.id === previewAvatar.id);
+                  if (currentIndex !== -1) {
+                    const nextAvatar = ASSETS.avatar[(currentIndex + 1) % ASSETS.avatar.length];
+                    setSlideDirection("next");
+                    setPreviewAvatar(nextAvatar);
+                  }
+                }}
+                className="hidden md:flex flex-col items-center opacity-50 hover:opacity-60 scale-75 hover:scale-80 transition-all duration-300 cursor-pointer select-none max-w-[15vw] max-h-[50vh] rounded-xl overflow-hidden border border-white/5 bg-[#0d0d0f]/50"
+              >
+                <img
+                  src={ASSETS.avatar[(ASSETS.avatar.findIndex(a => a.id === previewAvatar.id) + 1) % ASSETS.avatar.length].url}
+                  alt="Next Avatar"
+                  className="w-full h-full object-cover aspect-[3/4]"
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

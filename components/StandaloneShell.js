@@ -423,4 +423,726 @@ export default function StandaloneShell() {
   }, [pushNotification]);
 
   const makeGenerationStartCallback = useCallback((tabId) => () => {
-    setGenerationCounts((previousëÎw¶‰žËkºwµç@€€€¤ì(€€€€€€€€€€€€€€€€€€€€€€€€€ô¥ô(€€€€€€€€€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€€€¤ì(€€€€€€€€€€€€€€€ô¥ô(€€€€€€€€€€€€€€ð½‘¥Øø((€€€€€€€€€€€€€íaA1=I}AAM}Q€˜˜€ (€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰µÐ´ÌÁÐ´Ì‰½É‘•ÈµÐ‰½É‘•ÈµÝ¡¥Ñ”½lÀ¸ÀÝtˆø(€€€€€€€€€€€€€€€€€€ñ„(€€€€€€€€€€€€€€€€€€€¡É•˜õí€½ÍÑÕ‘¥¼¼‘íaA1=I}AAM}Q¹¥‘õô(€€€€€€€€€€€€€€€€€€€½¹±¥¬õì¡•Ù•¹Ð¤€ôø¡…¹‘±•9…Ù¥…Ñ¥½¹%Ñ•µ±¥¬¡•Ù•¹Ð°aA1=I}AAM}Q¹¥¥ô(€€€€€€€€€€€€€€€€€€€…É¥„µÕÉÉ•¹Ðõí…Ñ¥Ù•Q…ˆ€ôôôaA1=I}AAM}Q¹¥€ü€Á…”œ€èÕ¹‘•™¥¹•‘ô(€€€€€€€€€€€€€€€€€€€…É¥„µ±…‰•°õíaA1=I}AAM}Q¹±…‰•±ô(€€€€€€€€€€€€€€€€€€€Ñ¥Ñ±”õí¥ÍM¥‘•‰…É½±±…ÁÍ•€˜˜€…¥Í5½‰¥±•=Á•¸€üaA1=I}AAM}Q¹±…‰•°€èÕ¹‘•™¥¹•‘ô(€€€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”õí€(€€€€€€€€€€€€€€€€€€€€€É½ÕÀÉ•±…Ñ¥Ù”™±•à¥Ñ•µÌµ•¹Ñ•ÈÉ½Õ¹‘•µá°ÑÉ…¹Í¥Ñ¥½¸µ…±°‘ÕÉ…Ñ¥½¸´ÄÔÀÑ•áÐµlÄÍÁát™½¹ÐµÍ•µ¥‰½±(€€€€€€€€€€€€€€€€€€€€€€‘í¥ÍM¥‘•‰…É½±±…ÁÍ•€˜˜€…¥Í5½‰¥±•=Á•¸€ü€ ´ÄÄÜ´ÄÄ©ÕÍÑ¥™äµ•¹Ñ•Èµàµ…ÕÑ¼œ€è€Áà´ÌÁä´È¸ÔÜµ™Õ±°…À´Ìô(€€€€€€€€€€€€€€€€€€€€€€‘í…Ñ¥Ù•Q…ˆ€ôôôaA1=I}AAM}Q¹¥(€€€€€€€€€€€€€€€€€€€€€€€€ü€‰œµÉ…‘¥•¹ÐµÑ¼µÈ™É½´µlŒÈÉÍ••t¼ÄÔÑ¼µÁÕÉÁ±”´ÔÀÀ¼ÄÀÑ•áÐµlŒÈÉÍ••t‰½É‘•È‰½É‘•ÈµlŒÈÉÍ••t¼ÈÀœ(€€€€€€€€€€€€€€€€€€€€€€€€è€Ñ•áÐµÝ¡¥Ñ”¼ØÀ¡½Ù•ÈéÑ•áÐµÝ¡¥Ñ”¡½Ù•Èé‰œµÝ¡¥Ñ”½lÀ¸ÀÑt‰½É‘•È‰½É‘•ÈµÑÉ…¹ÍÁ…É•¹Ðœ(€€€€€€€€€€€€€€€€€€€€€ô(€€€€€€€€€€€€€€€€€€€ô(€€€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€€€í…Ñ¥Ù•Q…ˆ€ôôôaA1=I}AAM}Q¹¥€˜˜€ (€€€€€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰…‰Í½±ÕÑ”±•™Ð´ÀÑ½À´È‰½ÑÑ½´´ÈÜ´Ä‰œµÉ…‘¥•¹ÐµÑ¼µˆ™É½´µlŒÈÉÍ••tÑ¼µl„àÔÕ˜ÝtÉ½Õ¹‘•µÈµ™Õ±°ˆ€¼ø(€€€€€€€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”õí™±•àµÍ¡É¥¹¬´À€‘í…Ñ¥Ù•Q…ˆ€ôôôaA1=I}AAM}Q¹¥€ü€Ñ•áÐµlŒÈÉÍ••tœ€è€Ñ•áÐµÝ¡¥Ñ”¼ÔÀÉ½ÕÀµ¡½Ù•ÈéÑ•áÐµÝ¡¥Ñ”õôø(€€€€€€€€€€€€€€€€€€€€€íaA1=I}AAM}Q¹¥½¹ô(€€€€€€€€€€€€€€€€€€€€ð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€€€€ì …¥ÍM¥‘•‰…É½±±…ÁÍ•ñð¥Í5½‰¥±•=Á•¸¤€˜˜€ (€€€€€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰ÑÉÕ¹…Ñ”ˆùíaA1=I}AAM}Q¹±…‰•±ôð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€€€€€€€ð½„ø(€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€ð½¹…Øø(€€€€€€€€€€ð½…Í¥‘”ø(€€€€€€€€¥ô((€€€€€€€ì¼¨MÑÕ‘¥¼½¹Ñ•¹Ð€¨½ô(€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à´Äµ¥¸µ ´À µ™Õ±°É•±…Ñ¥Ù”½Ù•É™±½Üµ¡¥‘‘•¸‰œµlŒÀÌÀÌÀÍtˆø(€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”õí…Ñ¥Ù•Q…ˆ€ôôô€¥µ…”œ€ü€‰ µ™Õ±°Üµ™Õ±°ˆ€è€‰¡¥‘‘•¸‰ôø(€€€€€€€€€€ñ%µ…•MÑÕ‘¥¼…Á¥-•äõí…Á¥-•åô‘É½ÁÁ•‘¥±•Ìõí‘É½ÁÁ•‘¥±•Íô½¹¥±•Í!…¹‘±•õí¡…¹‘±•¥±•Í!…¹‘±•‘ô½¹•¹•É…Ñ¥½¹MÑ…ÉÐõíµ…­••¹•É…Ñ¥½¹MÑ…ÉÑ…±±‰…¬ ¥µ…”œ¥ô½¹•¹•É…Ñ¥½¹¹õíµ…­••¹•É…Ñ¥½¹¹‘…±±‰…¬ ¥µ…”œ¥ô½¹•¹•É…Ñ¥½¹½µÁ±•Ñ”õíµ…­•MÕ•ÍÍ…±±‰…¬ ¥µ…”œ¥ô½¹•¹•É…Ñ¥½¹ÉÉ½Èõíµ…­•ÉÉ½É…±±‰…¬ ¥µ…”œ¥ô€¼ø(€€€€€€€€ð½‘¥Øø(€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”õí…Ñ¥Ù•Q…ˆ€ôôô€Ù¥‘•¼œ€ü€‰ µ™Õ±°Üµ™Õ±°ˆ€è€‰¡¥‘‘•¸‰ôø(€€€€€€€€€€ñY¥‘•½MÑÕ‘¥¼…Á¥-•äõí…Á¥-•åô‘É½ÁÁ•‘¥±•Ìõí‘É½ÁÁ•‘¥±•Íô½¹¥±•Í!…¹‘±•õí¡…¹‘±•¥±•Í!…¹‘±•‘ô½¹•¹•É…Ñ¥½¹MÑ…ÉÐõíµ…­••¹•É…Ñ¥½¹MÑ…ÉÑ…±±‰…¬ Ù¥‘•¼œ¥ô½¹•¹•É…Ñ¥½¹¹õíµ…­••¹•É…Ñ¥½¹¹‘…±±‰…¬ Ù¥‘•¼œ¥ô½¹•¹•É…Ñ¥½¹½µÁ±•Ñ”õíµ…­•MÕ•ÍÍ…±±‰…¬ Ù¥‘•¼œ¥ô½¹•¹•É…Ñ¥½¹ÉÉ½Èõíµ…­•ÉÉ½É…±±‰…¬ Ù¥‘•¼œ¥ô€¼ø(€€€€€€€€ð½‘¥Øø(€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”õí…Ñ¥Ù•Q…ˆ€ôôô€±¥ÁÁ¥¹œœ€ü€‰ µ™Õ±°Üµ™Õ±°ˆ€è€‰¡¥‘‘•¸‰ôø(€€€€€€€€€€ñ±¥ÁÁ¥¹MÑÕ‘¥¼…Á¥-•äõí…Á¥-•åô‘É½ÁÁ•‘¥±•Ìõí‘É½ÁÁ•‘¥±•Íô½¹¥±•Í!…¹‘±•õí¡…¹‘±•¥±•Í!…¹‘±•‘ô½¹•¹•É…Ñ¥½¹MÑ…ÉÐõíµ…­••¹•É…Ñ¥½¹MÑ…ÉÑ…±±‰…¬ ±¥ÁÁ¥¹œœ¥ô½¹•¹•É…Ñ¥½¹¹õíµ…­••¹•É…Ñ¥½¹¹‘…±±‰…¬ ±¥ÁÁ¥¹œœ¥ô½¹•¹•É…Ñ¥½¹½µÁ±•Ñ”õíµ…­•MÕ•ÍÍ…±±‰…¬ ±¥ÁÁ¥¹œœ¥ô½¹•¹•É…Ñ¥½¹ÉÉ½Èõíµ…­•ÉÉ½É…±±‰…¬ ±¥ÁÁ¥¹œœ¥ô€¼ø(€€€€€€€€ð½‘¥Øø(€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”õí…Ñ¥Ù•Q…ˆ€ôôô€Ù¥‰”µµ½Ñ¥½¸œ€ü€‰ µ™Õ±°Üµ™Õ±°ˆ€è€‰¡¥‘‘•¸‰ôø(€€€€€€€€€€ñY¥‰•5½Ñ¥½¹MÑÕ‘¥¼…Á¥-•äõí…Á¥-•åô½¹•¹•É…Ñ¥½¹MÑ…ÉÐõíµ…­••¹•É…Ñ¥½¹MÑ…ÉÑ…±±‰…¬ Ù¥‰”µµ½Ñ¥½¸œ¥ô½¹•¹•É…Ñ¥½¹¹õíµ…­••¹•É…Ñ¥½¹¹‘…±±‰…¬ Ù¥‰”µµ½Ñ¥½¸œ¥ô½¹•¹•É…Ñ¥½¹½µÁ±•Ñ”õíµ…­•MÕ•ÍÍ…±±‰…¬ Ù¥‰”µµ½Ñ¥½¸œ¥ô½¹•¹•É…Ñ¥½¹ÉÉ½Èõíµ…­•ÉÉ½É…±±‰…¬ Ù¥‰”µµ½Ñ¥½¸œ¥ô€¼ø(€€€€€€€€ð½‘¥Øø(€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”õí…Ñ¥Ù•Q…ˆ€ôôô€±¥ÁÍå¹Œœ€ü€‰ µ™Õ±°Üµ™Õ±°ˆ€è€‰¡¥‘‘•¸‰ôø(€€€€€€€€€€ñ1¥ÁMå¹MÑÕ‘¥¼…Á¥-•äõí…Á¥-•åô‘É½ÁÁ•‘¥±•Ìõí‘É½ÁÁ•‘¥±•Íô½¹¥±•Í!…¹‘±•õí¡…¹‘±•¥±•Í!…¹‘±•‘ô½¹•¹•É…Ñ¥½¹MÑ…ÉÐõíµ…­••¹•É…Ñ¥½¹MÑ…ÉÑ…±±‰…¬ ±¥ÁÍå¹Œœ¥ô½¹•¹•É…Ñ¥½¹¹õíµ…­••¹•É…Ñ¥½¹¹‘…±±‰…¬ ±¥ÁÍå¹Œœ¥ô½¹•¹•É…Ñ¥½¹½µÁ±•Ñ”õíµ…­•MÕ•ÍÍ…±±‰…¬ ±¥ÁÍå¹Œœ¥ô½¹•¹•É…Ñ¥½¹ÉÉ½Èõíµ…­•ÉÉ½É…±±‰…¬ ±¥ÁÍå¹Œœ¥ô€¼ø(€€€€€€€€ð½‘¥Øø(€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”õí…Ñ¥Ù•Q…ˆ€ôôô€‰½‘äµÍÝ…Àœ€ü€‰ µ™Õ±°Üµ™Õ±°ˆ€è€‰¡¥‘‘•¸‰ôø(€€€€€€€€€€ñI•…ÍÑMÑÕ‘¥¼…Á¥-•äõí…Á¥-•åô‘É½ÁÁ•‘¥±•Ìõí‘É½ÁÁ•‘¥±•Íô½¹¥±•Í!…¹‘±•õí¡…¹‘±•¥±•Í!…¹‘±•‘ô½¹•¹•É…Ñ¥½¹MÑ…ÉÐõíµ…­••¹•É…Ñ¥½¹MÑ…ÉÑ…±±‰…¬ ‰½‘äµÍÝ…Àœ¥ô½¹•¹•É…Ñ¥½¹¹õíµ…­••¹•É…Ñ¥½¹¹‘…±±‰…¬ ‰½‘äµÍÝ…Àœ¥ô½¹•¹•É…Ñ¥½¹½µÁ±•Ñ”õíµ…­•MÕ•ÍÍ…±±‰…¬ ‰½‘äµÍÝ…Àœ¥ô½¹•¹•É…Ñ¥½¹ÉÉ½Èõíµ…­•ÉÉ½É…±±‰…¬ ‰½‘äµÍÝ…Àœ¥ô€¼ø(€€€€€€€€ð½‘¥Øø(€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”õí…Ñ¥Ù•Q…ˆ€ôôô€¥¹•µ„œ€ü€‰ µ™Õ±°Üµ™Õ±°ˆ€è€‰¡¥‘‘•¸‰ôø(€€€€€€€€€€ñ¥¹•µ…MÑÕ‘¥¼…Á¥-•äõí…Á¥-•åô½¹•¹•É…Ñ¥½¹MÑ…ÉÐõíµ…­••¹•É…Ñ¥½¹MÑ…ÉÑ…±±‰…¬ ¥¹•µ„œ¥ô½¹•¹•É…Ñ¥½¹¹õíµ…­••¹•É…Ñ¥½¹¹‘…±±‰…¬ ¥¹•µ„œ¥ô½¹•¹•É…Ñ¥½¹½µÁ±•Ñ”õíµ…­•MÕ•ÍÍ…±±‰…¬ ¥¹•µ„œ¥ô½¹•¹•É…Ñ¥½¹ÉÉ½Èõíµ…­•ÉÉ½É…±±‰…¬ ¥¹•µ„œ¥ô€¼ø(€€€€€€€€ð½‘¥Øø(€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”õí…Ñ¥Ù•Q…ˆ€ôôô€…Õ‘¥¼œ€ü€‰ µ™Õ±°Üµ™Õ±°ˆ€è€‰¡¥‘‘•¸‰ôø(€€€€€€€€€€ñÕ‘¥½MÑÕ‘¥¼…Á¥-•äõí…Á¥-•åô‘É½ÁÁ•‘¥±•Ìõí‘É½ÁÁ•‘¥±•Íô½¹¥±•Í!…¹‘±•õí¡…¹‘±•¥±•Í!…¹‘±•‘ô½¹•¹•É…Ñ¥½¹MÑ…ÉÐõíµ…­••¹•É…Ñ¥½¹MÑ…ÉÑ…±±‰…¬ …Õ‘¥¼œ¥ô½¹•¹•É…Ñ¥½¹¹õíµ…­••¹•É…Ñ¥½¹¹‘…±±‰…¬ …Õ‘¥¼œ¥ô½¹•¹•É…Ñ¥½¹½µÁ±•Ñ”õíµ…­•MÕ•ÍÍ…±±‰…¬ …Õ‘¥¼œ¥ô½¹•¹•É…Ñ¥½¹ÉÉ½Èõíµ…­•ÉÉ½É…±±‰…¬ …Õ‘¥¼œ¥ô€¼ø(€€€€€€€€ð½‘¥Øø(€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”õí…Ñ¥Ù•Q…ˆ€ôôô€µ…É­•Ñ¥¹œœ€ü€‰ µ™Õ±°Üµ™Õ±°ˆ€è€‰¡¥‘‘•¸‰ôø(€€€€€€€€€€ñ5…É­•Ñ¥¹MÑÕ‘¥¼…Á¥-•äõí…Á¥-•åô‘É½ÁÁ•‘¥±•Ìõí‘É½ÁÁ•‘¥±•Íô½¹¥±•Í!…¹‘±•õí¡…¹‘±•¥±•Í!…¹‘±•‘ô½¹•¹•É…Ñ¥½¹MÑ…ÉÐõíµ…­••¹•É…Ñ¥½¹MÑ…ÉÑ…±±‰…¬ µ…É­•Ñ¥¹œœ¥ô½¹•¹•É…Ñ¥½¹¹õíµ…­••¹•É…Ñ¥½¹¹‘…±±‰…¬ µ…É­•Ñ¥¹œœ¥ô½¹•¹•É…Ñ¥½¹½µÁ±•Ñ”õíµ…­•MÕ•ÍÍ…±±‰…¬ µ…É­•Ñ¥¹œœ¥ô½¹•¹•É…Ñ¥½¹ÉÉ½Èõíµ…­•ÉÉ½É…±±‰…¬ µ…É­•Ñ¥¹œœ¥ô€¼ø(€€€€€€€€ð½‘¥Øø(€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”õí…Ñ¥Ù•Q…ˆ€ôôô€Ý½É­™±½ÝÌœ€ü€‰ µ™Õ±°Üµ™Õ±°ˆ€è€‰¡¥‘‘•¸‰ôø(€€€€€€€€€€ñ]½É­™±½ÝMÑÕ‘¥¼(€€€€€€€€€€€…Á¥-•äõí…Á¥-•åô(€€€€€€€€€€€¥Í!•…‘•ÉY¥Í¥‰±”õí¥Í!•…‘•ÉY¥Í¥‰±•ô(€€€€€€€€€€€½¹Q½±•!•…‘•ÈõíÍ•Ñ%Í!•…‘•ÉY¥Í¥‰±•ô(€€€€€€€€€€€½¹•¹•É…Ñ¥½¹MÑ…ÉÐõíµ…­••¹•É…Ñ¥½¹MÑ…ÉÑ…±±‰…¬ Ý½É­™±½ÝÌœ¥ô(€€€€€€€€€€€½¹•¹•É…Ñ¥½¹¹õíµ…­••¹•É…Ñ¥½¹¹‘…±±‰…¬ Ý½É­™±½ÝÌœ¥ô(€€€€€€€€€€€½¹•¹•É…Ñ¥½¹½µÁ±•Ñ”õíµ…­•MÕ•ÍÍ…±±‰…¬ Ý½É­™±½ÝÌœ¥ô(€€€€€€€€€€€½¹•¹•É…Ñ¥½¹ÉÉ½Èõíµ…­•ÉÉ½É…±±‰…¬ Ý½É­™±½ÝÌœ¥ô(€€€€€€€€€€¼ø(€€€€€€€€ð½‘¥Øø(€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”õí…Ñ¥Ù•Q…ˆ€ôôô€…•¹ÑÌœ€ü€‰ µ™Õ±°Üµ™Õ±°ˆ€è€‰¡¥‘‘•¸‰ôø(€€€€€€€€€€ñ•¹ÑMÑÕ‘¥¼…Á¥-•äõí…Á¥-•åô¥Í!•…‘•ÉY¥Í¥‰±”õí¥Í!•…‘•ÉY¥Í¥‰±•ô½¹Q½±•!•…‘•ÈõíÍ•Ñ%Í!•…‘•ÉY¥Í¥‰±•ô€¼ø(€€€€€€€€ð½‘¥Øø(€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”õí…Ñ¥Ù•Q…ˆ€ôôô€‘•Í¥¸µ…•¹Ðœ€ü€‰ µ™Õ±°Üµ™Õ±°ˆ€è€‰¡¥‘‘•¸‰ôø(€€€€€€€€€í…Ñ¥Ù•Q…ˆ€ôôô€‘•Í¥¸µ…•¹Ðœ€˜˜€ (€€€€€€€€€€€€ñ•Í¥¹•¹ÑMÑÕ‘¥¼(€€€€€€€€€€€€€…Á¥-•äõí…Á¥-•åô(€€€€€€€€€€€€€¥Í!•…‘•ÉY¥Í¥‰±”õí¥Í!•…‘•ÉY¥Í¥‰±•ô(€€€€€€€€€€€€€½¹Q½±•!•…‘•ÈõíÍ•Ñ%Í!•…‘•ÉY¥Í¥‰±•ô(€€€€€€€€€€€€€½¹•¹•É…Ñ¥½¹MÑ…ÉÐõíµ…­••¹•É…Ñ¥½¹MÑ…ÉÑ…±±‰…¬ ‘•Í¥¸µ…•¹Ðœ¥ô(€€€€€€€€€€€€€½¹•¹•É…Ñ¥½¹¹õíµ…­••¹•É…Ñ¥½¹¹‘…±±‰…¬ ‘•Í¥¸µ…•¹Ðœ¥ô(€€€€€€€€€€€€€½¹•¹•É…Ñ¥½¹½µÁ±•Ñ”õíµ…­•MÕ•ÍÍ…±±‰…¬ ‘•Í¥¸µ…•¹Ðœ¥ô(€€€€€€€€€€€€€½¹•¹•É…Ñ¥½¹ÉÉ½Èõíµ…­•ÉÉ½É…±±‰…¬ ‘•Í¥¸µ…•¹Ðœ¥ô(€€€€€€€€€€€€¼ø(€€€€€€€€€€¥ô(€€€€€€€€ð½‘¥Øø(€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”õí…Ñ¥Ù•Q…ˆ€ôôô€…ÁÁÌœ€ü€‰ µ™Õ±°Üµ™Õ±°ˆ€è€‰¡¥‘‘•¸‰ôø(€€€€€€€€€€ñÁÁÍMÑÕ‘¥¼…Á¥-•äõí…Á¥-•åô€¼ø(€€€€€€€€ð½‘¥Øø(€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”õí…Ñ¥Ù•Q…ˆ€ôôô€…¤µ¥¹™±Õ•¹•Èœ€ü€‰ µ™Õ±°Üµ™Õ±°ˆ€è€‰¡¥‘‘•¸‰ôø(€€€€€€€€€€ñ¥%¹™±Õ•¹•ÉMÑÕ‘¥¼(€€€€€€€€€€€…Á¥-•äõí…Á¥-•åô(€€€€€€€€€€€½¹•¹•É…Ñ¥½¹MÑ…ÉÐõíµ…­••¹•É…Ñ¥½¹MÑ…ÉÑ…±±‰…¬ …¤µ¥¹™±Õ•¹•Èœ¥ô(€€€€€€€€€€€½¹•¹•É…Ñ¥½¹¹õíµ…­••¹•É…Ñ¥½¹¹‘…±±‰…¬ …¤µ¥¹™±Õ•¹•Èœ¥ô(€€€€€€€€€€€½¹•¹•É…Ñ¥½¹½µÁ±•Ñ”õíµ…­•MÕ•ÍÍ…±±‰…¬ …¤µ¥¹™±Õ•¹•Èœ¥ô(€€€€€€€€€€€½¹•¹•É…Ñ¥½¹ÉÉ½Èõíµ…­•ÉÉ½É…±±‰…¬ …¤µ¥¹™±Õ•¹•Èœ¥ô(€€€€€€€€€€¼ø(€€€€€€€€ð½‘¥Øø(€€€€€€ð½‘¥Øø(€€€€ð½‘¥Øø((€€€€€ì¼¨±½‰…°•¹•É…Ñ¥½¸…Ñ¥Ù¥Ñä…¹¹½Ñ¥™¥…Ñ¥½¸ÍÑ…¬€¨½ô(€€€€€ì¡…Ñ¥Ù••¹•É…Ñ¥½¹Ì¹±•¹Ñ €ø€Àñð¹½Ñ¥™¥…Ñ¥½¹Ì¹±•¹Ñ €ø€À¤€˜˜€ (€€€€€€€€ñ‘¥Ø(€€€€€€€€€…É¥„µ±¥Ù”ô‰Á½±¥Ñ”ˆ(€€€€€€€€€…É¥„µ±…‰•°ô‰•¹•É…Ñ¥½¸…Ñ¥Ù¥Ñä…¹¹½Ñ¥™¥…Ñ¥½¹Ìˆ(€€€€€€€€€±…ÍÍ9…µ”ô‰™¥á•‰½ÑÑ½´´ÔÉ¥¡Ð´ÔèµlÈÀÁt™±•àµ…àµ µm…±Œ ÄÀÁÙ ´ÌÉÁà¥tÜµlÌÐÁÁátµ…àµÜµm…±Œ ÄÀÁÙÜ´ÌÉÁà¥t™±•àµ½°…À´È½Ù•É™±½Üµäµ…ÕÑ¼Á½¥¹Ñ•Èµ•Ù•¹ÑÌµ¹½¹”ˆ(€€€€€€€€€‘…Ñ„µÑ•ÍÑ¥ô‰±½‰…°µ¹½Ñ¥™¥…Ñ¥½¸µÍÑ…¬ˆ(€€€€€€€€ø(€€€€€€€€€í…Ñ¥Ù••¹•É…Ñ¥½¹Ì¹µ…À ¡•¹•É…Ñ¥½¸¤€ôø€ (€€€€€€€€€€€€ñ‘¥Ø(€€€€€€€€€€€€€­•äõí•¹•É…Ñ¥½¸¹Ñ…‰%‘ô(€€€€€€€€€€€€€É½±”ô‰ÍÑ…ÑÕÌˆ(€€€€€€€€€€€€€‘…Ñ„µ•¹•É…Ñ¥½¸µÑ…ˆõí•¹•É…Ñ¥½¸¹Ñ…‰%‘ô(€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰Á½¥¹Ñ•Èµ•Ù•¹ÑÌµ…ÕÑ¼™±•à¥Ñ•µÌµ•¹Ñ•È…À´ÌÉ½Õ¹‘•µá°‰½É‘•È‰½É‘•Èµå…¸´ÐÀÀ¼ÌÀ‰œµlŒÁÁÁ™tÁà´Ì¸ÔÁä´ÌÑ•áÐµlÄÍÁátÑ•áÐµé¥¹Œ´ÄÀÀÍ¡…‘½ÜµlÁ|ÄÙÁá|ÐáÁá}É‰„ À°À°À°À¸ØÔ¥tˆ(€€€€€€€€€€€€€‘…Ñ„µÑ•ÍÑ¥ô‰•¹•É…Ñ¥½¸µ…Ñ¥Ù¥Ñäˆ(€€€€€€€€€€€€ø(€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰™±•à ´àÜ´àÍ¡É¥¹¬´À¥Ñ•µÌµ•¹Ñ•È©ÕÍÑ¥™äµ•¹Ñ•ÈÉ½Õ¹‘•µ±œ‰½É‘•È‰½É‘•Èµå…¸´ÐÀÀ¼ÌÔ‰œµå…¸´ÐÀÀ¼ÄÀˆø(€€€€€€€€€€€€€€€€ñÍÁ…¸(€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰ ´Ì¸ÔÜ´Ì¸Ô…¹¥µ…Ñ”µÍÁ¥¸É½Õ¹‘•µ™Õ±°‰½É‘•È´È‰½É‘•Èµå…¸´ÌÀÀ¼ÈÔ‰½É‘•ÈµÐµå…¸´ÌÀÀˆ(€€€€€€€€€€€€€€€€€…É¥„µ¡¥‘‘•¸ô‰ÑÉÕ”ˆ(€€€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€€€ð½ÍÁ…¸ø(€€€€€€€€€€€€€€ñÀ±…ÍÍ9…µ”ô‰µ¥¸µÜ´À™±•à´Ä™½¹ÐµÍ•µ¥‰½±±•…‘¥¹œ´ÔÑ•áÐµé¥¹Œ´ÄÀÀˆø(€€€€€€€€€€€€€€€í•¹•É…Ñ¥½¸¹±…‰•±ô¥Ì•¹•É…Ñ¥¹œ(€€€€€€€€€€€€€€€í•¹•É…Ñ¥½¸¹½Õ¹Ð€ø€Ä€ü€€ ‘í•¹•É…Ñ¥½¸¹½Õ¹Ñô¥€€è€œô(€€€€€€€€€€€€€€ð½Àø(€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€¤¥ô((€€€€€€€€€í¹½Ñ¥™¥…Ñ¥½¹Ì¹µ…À ¡¹½Ñ¥˜¤€ôø€ (€€€€€€€€€€€€ñ‘¥Ø(€€€€€€€€€€€€€­•äõí¹½Ñ¥˜¹¥‘ô(€€€€€€€€€€€€€É½±”õí¹½Ñ¥˜¹ÑåÁ”€ôôô€•ÉÉ½Èœ€ü€…±•ÉÐœ€è€ÍÑ…ÑÕÌô(€€€€€€€€€€€€€‘…Ñ„µ¹½Ñ¥™¥…Ñ¥½¸µÑåÁ”õí¹½Ñ¥˜¹ÑåÁ•ô(€€€€€€€€€€€€€‘…Ñ„µ¹½Ñ¥™¥…Ñ¥½¸µÑ…ˆõí¹½Ñ¥˜¹Ñ…‰%‘ô(€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰Á½¥¹Ñ•Èµ•Ù•¹ÑÌµ…ÕÑ¼™±•à¥Ñ•µÌµÍÑ…ÉÐ…À´ÌÉ½Õ¹‘•µá°‰½É‘•È‰œµlŒÁÁÁ™tÁà´Ì¸ÔÁä´ÌÑ•áÐµlÄÍÁátÑ•áÐµé¥¹Œ´ÄÀÀÍ¡…‘½ÜµlÁ|ÄÙÁá|ÐáÁá}É‰„ À°À°À°À¸ØÔ¥tˆ(€€€€€€€€€€€€€ÍÑå±”õíì(€€€€€€€€€€€€€€€‰½É‘•É½±½Èè¹½Ñ¥˜¹ÑåÁ”€ôôô€ÍÕ•ÍÌœ€ü€É‰„ ÌÐ°ÈÄÄ°ÈÌà°À¸ÌÔ¤œ€è€É‰„ ÈÌä°Øà°Øà°À¸ÌÔ¤œ°(€€€€€€€€€€€€€€€…¹¥µ…Ñ¥½¸è€Í±¥‘•%¹I¥¡Ð€ÈàÁµÌÕ‰¥Œµ‰•é¥•È À¸ÄØ°Ä°À¸Ì°Ä¤™½ÉÝ…É‘Ìœ°(€€€€€€€€€€€€€õô(€€€€€€€€€€€€ø(€€€€€€€€€€€€€€ñÍÁ…¸(€€€€€€€€€€€€€€€±…ÍÍ9…µ”õíµÐ´À¸Ô™±•à ´àÜ´àÍ¡É¥¹¬´À¥Ñ•µÌµ•¹Ñ•È©ÕÍÑ¥™äµ•¹Ñ•ÈÉ½Õ¹‘•µ±œ‰½É‘•È€‘ì(€€€€€€€€€€€€€€€€€¹½Ñ¥˜¹ÑåÁ”€ôôô€ÍÕ•ÍÌœ(€€€€€€€€€€€€€€€€€€€€ü€‰½É‘•Èµå…¸´ÐÀÀ¼ÌÔ‰œµå…¸´ÐÀÀ¼ÄÀÑ•áÐµå…¸´ÌÀÀœ(€€€€€€€€€€€€€€€€€€€€è€‰½É‘•ÈµÉ•´ÔÀÀ¼ÌÔ‰œµÉ•´ÔÀÀ¼ÄÀÑ•áÐµÉ•´ÐÀÀœ(€€€€€€€€€€€€€€€õô(€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€í¹½Ñ¥˜¹ÑåÁ”€ôôô€ÍÕ•ÍÌœ€ü€ (€€€€€€€€€€€€€€€€€€ñÍÙœÝ¥‘Ñ ôˆÄÜˆ¡•¥¡ÐôˆÄÜˆÙ¥•Ý	½àôˆÀ€À€ÈÐ€ÈÐˆ™¥±°ô‰¹½¹”ˆÍÑÉ½­”ô‰ÕÉÉ•¹Ñ½±½ÈˆÍÑÉ½­•]¥‘Ñ ôˆÈ¸ÔˆÍÑÉ½­•1¥¹•…Àô‰É½Õ¹ˆÍÑÉ½­•1¥¹•©½¥¸ô‰É½Õ¹ˆ…É¥„µ¡¥‘‘•¸ô‰ÑÉÕ”ˆø(€€€€€€€€€€€€€€€€€€€€ñÁ…Ñ ô‰´Ô€ÄÈ€Ð€Ñ0Ää€Øˆ€¼ø(€€€€€€€€€€€€€€€€€€ð½ÍÙœø(€€€€€€€€€€€€€€€€¤€è€ (€€€€€€€€€€€€€€€€€€ñÍÙœÝ¥‘Ñ ôˆÄÜˆ¡•¥¡ÐôˆÄÜˆÙ¥•Ý	½àôˆÀ€À€ÈÐ€ÈÐˆ™¥±°ô‰¹½¹”ˆÍÑÉ½­”ô‰ÕÉÉ•¹Ñ½±½ÈˆÍÑÉ½­•]¥‘Ñ ôˆÈˆÍÑÉ½­•1¥¹•…Àô‰É½Õ¹ˆÍÑÉ½­•1¥¹•©½¥¸ô‰É½Õ¹ˆ…É¥„µ¡¥‘‘•¸ô‰ÑÉÕ”ˆø(€€€€€€€€€€€€€€€€€€€€ñ¥É±”àôˆÄÈˆäôˆÄÈˆÈôˆäˆ€¼ø(€€€€€€€€€€€€€€€€€€€€ñÁ…Ñ ô‰4ÄÈ€ÝØØˆ€¼ø(€€€€€€€€€€€€€€€€€€€€ñÁ…Ñ ô‰4ÄÈ€ÄÝ ¸ÀÄˆ€¼ø(€€€€€€€€€€€€€€€€€€ð½ÍÙœø(€€€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€€€ð½ÍÁ…¸ø((€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰µ¥¸µÜ´À™±•à´Äˆø(€€€€€€€€€€€€€€€€ñÀ±…ÍÍ9…µ”ô‰™½¹ÐµÍ•µ¥‰½±±•…‘¥¹œ´ÔÑ•áÐµé¥¹Œ´ÄÀÀˆø(€€€€€€€€€€€€€€€€€í¹½Ñ¥˜¹±…‰•±ô(€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰™½¹Ðµ¹½Éµ…°Ñ•áÐµé¥¹Œ´ÐÀÀˆø(€€€€€€€€€€€€€€€€€€€í¹½Ñ¥˜¹ÑåÁ”€ôôô€ÍÕ•ÍÌœ€ü€œ€´•¹•É…Ñ¥½¸½µÁ±•Ñ”œ€è€œ€´•¹•É…Ñ¥½¸™…¥±•ô(€€€€€€€€€€€€€€€€€€ð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€ð½Àø(€€€€€€€€€€€€€€€í¹½Ñ¥˜¹ÑåÁ”€ôôô€•ÉÉ½Èœ€˜˜¹½Ñ¥˜¹µ•ÍÍ…”€˜˜€ (€€€€€€€€€€€€€€€€€€ñÀ±…ÍÍ9…µ”ô‰µÐ´À¸Ô±¥¹”µ±…µÀ´ÈÑ•áÐµlÄÉÁát™½¹Ðµµ•‘¥Õ´±•…‘¥¹œ´ÐÑ•áÐµÉ•´ÌÀÀ¼àÔˆÑ¥Ñ±”õí¹½Ñ¥˜¹µ•ÍÍ…•ôø(€€€€€€€€€€€€€€€€€€€í¹½Ñ¥˜¹µ•ÍÍ…•ô(€€€€€€€€€€€€€€€€€€ð½Àø(€€€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€€€€í¹½Ñ¥˜¹ÑåÁ”€ôôô€ÍÕ•ÍÌœ€˜˜€ (€€€€€€€€€€€€€€€€€€ñÀ±…ÍÍ9…µ”ô‰µÐ´À¸ÔÑ•áÐµlÄÉÁát±•…‘¥¹œ´ÐÑ•áÐµé¥¹Œ´ÐÀÀˆø(€€€€€€€€€€€€€€€€€€€e½ÕÈÉ•ÍÕ±Ð¥ÌÉ•…‘ä¸(€€€€€€€€€€€€€€€€€€ð½Àø(€€€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€€€€í¹½Ñ¥˜¹ÑåÁ”€ôôô€ÍÕ•ÍÌœ€˜˜€ (€€€€€€€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€€€€€ÑåÁ”ô‰‰ÕÑÑ½¸ˆ(€€€€€€€€€€€€€€€€€€€½¹±¥¬õì ¤€ôø¡…¹‘±•=Á•¹9½Ñ¥™¥…Ñ¥½¸¡¹½Ñ¥˜¥ô(€€€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰µÐ´Ä¸ÔÑ•áÐµlÄÅÁát™½¹Ðµ‰½±Ñ•áÐµå…¸´ÌÀÀÑÉ…¹Í¥Ñ¥½¸µ½±½ÉÌ¡½Ù•ÈéÑ•áÐµå…¸´ÄÀÀˆ(€€€€€€€€€€€€€€€€€€€…É¥„µ±…‰•°õí=Á•¸€‘í¹½Ñ¥˜¹±…‰•±ôÉ•ÍÕ±Ñô(€€€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€€€=Á•¸(€€€€€€€€€€€€€€€€€€ð½‰ÕÑÑ½¸ø(€€€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€€€ð½‘¥Øø((€€€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€ÑåÁ”ô‰‰ÕÑÑ½¸ˆ(€€€€€€€€€€€€€€€½¹±¥¬õì ¤€ôø‘¥Íµ¥ÍÍ9½Ñ¥™¥…Ñ¥½¸¡¹½Ñ¥˜¹¥¥ô(€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰µÐ´À¸Ô™±•à ´ÜÜ´ÜÍ¡É¥¹¬´À¥Ñ•µÌµ•¹Ñ•È©ÕÍÑ¥™äµ•¹Ñ•ÈÉ½Õ¹‘•µµÑ•áÐµé¥¹Œ´ÔÀÀÑÉ…¹Í¥Ñ¥½¸µ½±½ÉÌ¡½Ù•Èé‰œµÝ¡¥Ñ”¼Ô¡½Ù•ÈéÑ•áÐµé¥¹Œ´ÈÀÀ™½ÕÌé½ÕÑ±¥¹”µ¹½¹”™½ÕÌéÉ¥¹œ´Ä™½ÕÌéÉ¥¹œµÝ¡¥Ñ”¼ÈÀˆ(€€€€€€€€€€€€€€€…É¥„µ±…‰•°ô‰¥Íµ¥ÍÌ¹½Ñ¥™¥…Ñ¥½¸ˆ(€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€ñÍÙœÝ¥‘Ñ ôˆÄÐˆ¡•¥¡ÐôˆÄÐˆÙ¥•Ý	½àôˆÀ€À€ÈÐ€ÈÐˆ™¥±°ô‰¹½¹”ˆÍÑÉ½­”ô‰ÕÉÉ•¹Ñ½±½ÈˆÍÑÉ½­•]¥‘Ñ ôˆÈˆÍÑÉ½­•1¥¹•…Àô‰É½Õ¹ˆ…É¥„µ¡¥‘‘•¸ô‰ÑÉÕ”ˆø(€€€€€€€€€€€€€€€€€€ñÁ…Ñ ô‰4Äà€Ø€Ø€Äá4Ø€Ù°ÄÈ€ÄÈˆ€¼ø(€€€€€€€€€€€€€€€€ð½ÍÙœø(€€€€€€€€€€€€€€ð½‰ÕÑÑ½¸ø(€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€¤¥ô(€€€€€€€€ð½‘¥Øø(€€€€€€¥ô((€€€€€ì¼¨-•å™É…µ”™½ÈÑ½…ÍÐÍ±¥‘”µ¥¸€¨½ô(€€€€€€ñÍÑå±”ùí€(€€€€€€€­•å™É…µ•ÌÍ±¥‘•%¹I¥¡Ðì(€€€€€€€€€™É½´ìÑÉ…¹Í™½É´èÑÉ…¹Í±…Ñ•` ÄÄÀ”¤ì½Á…¥Ñäè€Àìô(€€€€€€€€€Ñ¼€€ìÑÉ…¹Í™½É´èÑÉ…¹Í±…Ñ•` À¤ì€€€½Á…¥Ñäè€Äìô(€€€€€€€ô(€€€€€ôð½ÍÑå±”ø((€€€€€ì¼¨M•ÑÑ¥¹Ì5½‘…°€¨½ô(€€€€€íÍ¡½ÝM•ÑÑ¥¹Ì€˜˜€ (€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™¥á•¥¹Í•Ð´À‰œµ‰±…¬¼ØÀ‰…­‘É½Àµ‰±ÕÈµÍ´™±•à¥Ñ•µÌµ•¹Ñ•È©ÕÍÑ¥™äµ•¹Ñ•Èè´ÔÀ…¹¥µ…Ñ”µ™…‘”µ¥¸µÕÀˆø(€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰‰œµlŒÁ„Á„Á…t‰½É‘•È‰½É‘•ÈµÝ¡¥Ñ”¼ÄÀÉ½Õ¹‘•µá°À´àÜµ™Õ±°µ…àµÜµÍ´Í¡…‘½Ü´Éá°ˆø(€€€€€€€€€€€€ñ È±…ÍÍ9…µ”ô‰Ñ•áÐµÝ¡¥Ñ”™½¹Ðµ‰½±Ñ•áÐµ±œµˆ´ÈˆùM•ÑÑ¥¹Ìð½ Èø(€€€€€€€€€€€€ñÀ±…ÍÍ9…µ”ô‰Ñ•áÐµÝ¡¥Ñ”¼ÐÀÑ•áÐµlÄÍÁátµˆ´àˆø(€€€€€€€€€€€€€5…¹…”å½ÕÈ$ÍÑÕ‘¥¼ÁÉ•™•É•¹•Ì…¹…ÕÑ¡•¹Ñ¥…Ñ¥½¸¸(€€€€€€€€€€€€ð½Àø(€€€€€€€€€€€€(€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰ÍÁ…”µä´Ðµˆ´àˆø(€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰‰œµÝ¡¥Ñ”¼Ô‰½É‘•È‰½É‘•ÈµÝ¡¥Ñ”½lÀ¸ÀÍtÉ½Õ¹‘•µµÀ´Ðˆø(€€€€€€€€€€€€€€€€ñ±…‰•°±…ÍÍ9…µ”ô‰‰±½¬Ñ•áÐµáÌ™½¹Ðµ‰½±Ñ•áÐµÝ¡¥Ñ”¼ÌÀµˆ´Èˆø(€€€€€€€€€€€€€€€€€€Ñ¥Ù”A$-•ä(€€€€€€€€€€€€€€€€ð½±…‰•°ø(€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰Ñ•áÐµlÄÍÁát™½¹Ðµµ½¹¼Ñ•áÐµÝ¡¥Ñ”¼àÀˆø(€€€€€€€€€€€€€€€€€í…Á¥-•ä¹Í±¥” À°€à¥÷Š‹Š‹Š‹Š‹Š‹Š‹Š‹Š‹Š‹Š‹Š‹Š‹Š‹Š‹Š‹Šˆ(€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€ð½‘¥Øø((€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à…À´Ìˆø(€€€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€½¹±¥¬õí¡…¹‘±•-•å¡…¹•ô(€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰™±•à´Ä ´ÄÀÉ½Õ¹‘•µµ‰œµÉ•´ÔÀÀ¼ÄÀÑ•áÐµÉ•´ÐÀÀ¡½Ù•Èé‰œµÉ•´ÔÀÀ¼ÈÀÑ•áÐµáÌ™½¹ÐµÍ•µ¥‰½±ÑÉ…¹Í¥Ñ¥½¸µ…±°ˆ(€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€¡…¹”-•ä(€€€€€€€€€€€€€€ð½‰ÕÑÑ½¸ø(€€€€€€€€€€€€€€ñ‰ÕÑÑ½¸(€€€€€€€€€€€€€€€½¹±¥¬õì ¤€ôøÍ•ÑM¡½ÝM•ÑÑ¥¹Ì¡™…±Í”¥ô(€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰™±•à´Ä ´ÄÀÉ½Õ¹‘•µµ‰œµÝ¡¥Ñ”¼ÔÑ•áÐµÝ¡¥Ñ”¼àÀ¡½Ù•Èé‰œµÝ¡¥Ñ”¼ÄÀÑ•áÐµáÌ™½¹ÐµÍ•µ¥‰½±ÑÉ…¹Í¥Ñ¥½¸µ…±°‰½É‘•È‰½É‘•ÈµÝ¡¥Ñ”¼Ôˆ(€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€±½Í”(€€€€€€€€€€€€€€ð½‰ÕÑÑ½¸ø(€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€ð½‘¥Øø(€€€€€€€€ð½‘¥Øø(€€€€€€¥ô(€€€€ð½‘¥Øø(€€¤ì)ô(
+    setGenerationCounts((previous) => ({
+      ...previous,
+      [tabId]: (previous[tabId] || 0) + 1,
+    }));
+  }, []);
+
+  const makeGenerationEndCallback = useCallback((tabId) => () => {
+    setGenerationCounts((previous) => {
+      const currentCount = previous[tabId] || 0;
+      if (currentCount <= 1) {
+        const next = { ...previous };
+        delete next[tabId];
+        return next;
+      }
+
+      return {
+        ...previous,
+        [tabId]: currentCount - 1,
+      };
+    });
+  }, []);
+
+  const activeGenerations = TABS
+    .filter((tab) => generationCounts[tab.id] > 0)
+    .map((tab) => ({
+      tabId: tab.id,
+      label: tab.label,
+      count: generationCounts[tab.id],
+    }));
+
+  // Popstate event listener to sync tab state with URL on back/forward navigation
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname;
+      const segments = path.split('/').filter(Boolean);
+      const tabId = segments[1] || 'image';
+      if (TABS.find(t => t.id === tabId)) {
+        setActiveTab(tabId);
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const handleTabChange = useCallback((tabId) => {
+    window.history.pushState(null, '', `/studio/${tabId}`);
+    setActiveTab(tabId);
+  }, []);
+
+  const handleOpenNotification = useCallback((notification) => {
+    handleTabChange(notification.tabId);
+    dismissNotification(notification.id);
+  }, [dismissNotification, handleTabChange]);
+
+  const handleTabClick = (e, tabId) => {
+    if (e.button === 0 && !e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey) {
+      e.preventDefault();
+      handleTabChange(tabId);
+      return true;
+    }
+    return false;
+  };
+
+  const handleNavigationItemClick = (event, tabId) => {
+    if (handleTabClick(event, tabId)) {
+      setIsMobileOpen(false);
+    }
+  };
+
+  // Auto-hide header when inside a specific workflow view or design agent
+  useEffect(() => {
+    const isEditingWorkflow = (activeTab === 'workflows' || !!idFromParams) && urlWorkflowId;
+    const isDesignAgent = activeTab === 'design-agent';
+    
+    if (isEditingWorkflow || isDesignAgent) {
+      setIsHeaderVisible(false);
+    } else {
+      setIsHeaderVisible(true);
+    }
+  }, [activeTab, urlWorkflowId, idFromParams]);
+
+  // Global builder CSS cleanup when switching away from Workflows or Design Agent tabs
+  useEffect(() => {
+    const fromBuilder = sessionStorage.getItem("fromWorkflowBuilder");
+    const fromDesignAgent = sessionStorage.getItem("fromDesignAgent");
+    
+    if ((fromBuilder && activeTab !== 'workflows') || (fromDesignAgent && activeTab !== 'design-agent')) {
+      sessionStorage.removeItem("fromWorkflowBuilder");
+      sessionStorage.removeItem("fromDesignAgent");
+      window.location.reload();
+    }
+  }, [activeTab]);
+
+  const fetchBalance = useCallback(async (key) => {
+    try {
+      const data = await getUserBalance(key);
+      setBalance(data.balance);
+    } catch (err) {
+      console.error('Balance fetch failed:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    setHasMounted(true);
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      setApiKey(stored);
+      fetchBalance(stored);
+      // Sync cookie immediately on mount to establish identity for background requests
+      document.cookie = `muapi_key=${stored}; path=/; max-age=31536000; SameSite=Lax`;
+    }
+  }, [fetchBalance]);
+
+  const handleKeySave = useCallback((key) => {
+    localStorage.setItem(STORAGE_KEY, key);
+    setApiKey(key);
+    fetchBalance(key);
+    document.cookie = `muapi_key=${key}; path=/; max-age=31536000; SameSite=Lax`;
+  }, [fetchBalance]);
+
+  const handleKeyChange = useCallback(() => {
+    localStorage.removeItem(STORAGE_KEY);
+    setApiKey(null);
+    setBalance(null);
+    document.cookie = "muapi_key=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+  }, []);
+
+  // Inject API key into all outgoing Axios requests (prop-based approach)
+  // We use an interceptor to be selective and NOT send the key to external domains like S3
+  useEffect(() => {
+    // Safety: Clear any global defaults that might have been set previously
+    delete axios.defaults.headers.common['x-api-key'];
+
+    if (!apiKey) return;
+
+    const interceptorId = axios.interceptors.request.use((config) => {
+      // Check if URL is local/proxied
+      const isRelative = config.url.startsWith('/') || !config.url.startsWith('http');
+      const isInternalProxy = config.url.includes('/api/app') || config.url.includes('/api/workflow') || config.url.includes('/api/agents') || config.url.includes('/api/api') || config.url.includes('/api/v1');
+
+      if (isRelative || isInternalProxy) {
+        config.headers['x-api-key'] = apiKey;
+      }
+      
+      return config;
+    });
+
+    return () => {
+      axios.interceptors.request.eject(interceptorId);
+    };
+  }, [apiKey]);
+
+  // Poll for balance every 30 seconds if key is present
+  useEffect(() => {
+    if (!apiKey) return;
+    const interval = setInterval(() => fetchBalance(apiKey), 30000);
+    return () => clearInterval(interval);
+  }, [apiKey, fetchBalance]);
+
+  // Drag and Drop Handlers
+  const handleDragOver = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  }, []);
+
+  const handleDragEnter = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+      setIsDragging(true);
+    }
+  }, []);
+
+  const handleDragLeave = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Only set to false if we're leaving the container itself, not moving between children
+    if (e.currentTarget.contains(e.relatedTarget)) return;
+    setIsDragging(false);
+  }, []);
+
+  const handleDrop = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length > 0) {
+      setDroppedFiles(files);
+    }
+  }, []);
+
+  const handleFilesHandled = useCallback(() => {
+    setDroppedFiles(null);
+  }, []);
+
+  if (!hasMounted) return (
+    <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+      <div className="animate-spin text-[#22d3ee] text-3xl">â—Œ</div>
+    </div>
+  );
+
+  if (!apiKey) {
+    return <ApiKeyModal onSave={handleKeySave} />;
+  }
+
+  return (
+    <div 
+      className="h-screen bg-[#030303] flex flex-col overflow-hidden text-white relative"
+      onDragOver={handleDragOver}
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
+      {/* Drag Overlay */}
+      {isDragging && (
+        <div className="fixed inset-0 z-[100] bg-[#22d3ee]/10 backdrop-blur-md border-4 border-dashed border-[#22d3ee]/50 flex items-center justify-center pointer-events-none transition-all duration-300">
+          <div className="bg-[#0a0a0a] p-8 rounded-3xl border border-white/10 shadow-2xl flex flex-col items-center gap-4 scale-110 animate-pulse">
+            <div className="w-20 h-20 bg-[#22d3ee] rounded-2xl flex items-center justify-center">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="2.5">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+              </svg>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="text-xl font-bold text-white">Drop your media here</span>
+              <span className="text-sm text-white/40">Images, videos, or audio files</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Vadoo promo banner */}
+      {showVadooBanner && (
+        <div className="flex-shrink-0 w-full bg-indigo-600 flex items-center justify-center px-4 py-2 gap-3 relative z-50">
+          <a
+            href="https://vadoo.tv"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[13px] font-bold text-white hover:opacity-80 transition-opacity text-center"
+          >
+            Unrestricted AI Images &amp; Videos â†’ Auto-Publish as YouTube Shorts &amp; TikToks, Earn â†—
+          </a>
+          <button
+            onClick={() => {
+              setShowVadooBanner(false);
+              localStorage.setItem('vadoo_banner_dismissed', '1');
+            }}
+            className="absolute right-3 text-white/60 hover:text-white transition-colors text-lg leading-none"
+            aria-label="Dismiss"
+          >
+            âœ•
+          </button>
+        </div>
+      )}
+
+      {/* Header */}
+      {isHeaderVisible && (
+        <header className="flex-shrink-0 h-14 border-b border-white/[0.05] flex items-center justify-between px-4 bg-[#0a0a0b]/80 backdrop-blur-md z-50 gap-4">
+          {/* Left: Mobile menu toggle + Logo + Desktop Sidebar Toggle */}
+          <div className="flex items-center gap-3">
+            {/* Mobile drawer toggle */}
+            <button
+              onClick={() => setIsMobileOpen(!isMobileOpen)}
+              className="md:hidden p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors"
+              aria-label="Toggle Navigation Menu"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
+            </button>
+
+            {/* Desktop Sidebar Toggle Button (Single Toggle Button) */}
+            <div className="hidden md:block relative group">
+              <button
+                onClick={toggleSidebar}
+                className="flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors border border-white/5"
+                aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  className={`transition-transform duration-300 ${isSidebarCollapsed ? 'rotate-180' : ''}`}
+                >
+                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                  <path d="M9 3v18" />
+                  <path d="M14 9l-3 3 3 3" />
+                </svg>
+              </button>
+              {/* Custom Tooltip */}
+              <div className="absolute left-0 top-full mt-2 px-2.5 py-1 bg-[#121215]/95 backdrop-blur-md text-white text-[11px] font-medium rounded-md shadow-2xl border border-white/15 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 z-50 whitespace-nowrap">
+                {isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              </div>
+            </div>
+
+            {/* Logo & Title */}
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 bg-[#22d3ee] rounded-lg flex items-center justify-center shadow-lg shadow-[#22d3ee]/20">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+              </div>
+              <span className="text-sm font-bold tracking-tight hidden sm:block text-white">
+                OpenGenerativeAI
+              </span>
+            </div>
+          </div>
+
+          {/* Active Tab Breadcrumb Badge */}
+          <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.05] text-xs text-white/60">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#22d3ee]" />
+            <span className="font-medium text-white/80">
+              {TABS.find(t => t.id === activeTab)?.label || 'Studio'}
+            </span>
+          </div>
+
+          {/* Right: Actions */}
+          <div className="flex-shrink-0 flex items-center gap-3">
+            <div className="flex items-center gap-2.5 bg-white/5 px-3 py-1.5 rounded-full border border-white/5 transition-colors">
+              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              <span className="text-xs font-bold text-white/90">
+                ${balance !== null ? `${balance}` : '---'}
+              </span>
+            </div>
+
+            <button
+              onClick={() => setShowSettings(true)}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-white/10 bg-white/5 text-[13px] font-bold text-white/80 hover:text-white hover:bg-white/10 hover:border-white/20 transition-colors"
+              aria-label="Settings"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+              </svg>
+              <span className="hidden sm:inline">Settings</span>
+            </button>
+          </div>
+        </header>
+      )}
+
+      {/* Main Body Layout: Left Sidebar + Studio Content Area */}
+      <div className="flex-1 min-h-0 flex relative overflow-hidden">
+        {/* Mobile Backdrop Overlay */}
+        {isMobileOpen && (
+          <div 
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 md:hidden animate-fade-in"
+            onClick={() => setIsMobileOpen(false)}
+          />
+        )}
+
+        {/* Left Sidebar Navigation */}
+        {isHeaderVisible && (
+          <aside
+            className={`
+              fixed top-14 bottom-0 left-0 md:static md:h-full z-30 bg-[#0a0a0b]/95 backdrop-blur-md border-r border-white/[0.06] flex flex-col transition-all duration-300 ease-in-out flex-shrink-0 select-none
+              ${isMobileOpen ? 'translate-x-0 w-60 z-50' : '-translate-x-full md:translate-x-0'}
+              ${isSidebarCollapsed ? 'md:w-16' : 'md:w-52'}
+            `}
+          >
+            <nav aria-label="Studio navigation" className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-none py-2 px-2">
+              <div className="space-y-1">
+                {NAVIGATION_CATEGORIES.map((category) => {
+                  const isCategoryActive = activeCategory?.id === category.id;
+                  const isCollapsed = isSidebarCollapsed && !isMobileOpen;
+                  const isCategoryOpen = !isCollapsed && expandedCategoryId === category.id;
+                  const categoryPanelId = `navigation-category-${category.id}`;
+
+                  return (
+                    <div key={category.id} className="relative">
+                      <button
+                        type="button"
+                        onClick={() => handleCategoryToggle(category.id)}
+                        aria-label={category.label}
+                        aria-expanded={isCategoryOpen}
+                        aria-controls={isCollapsed ? undefined : categoryPanelId}
+                        title={isCollapsed ? category.label : undefined}
+                        className={`
+                          group relative flex items-center rounded-xl transition-all duration-150 font-semibold
+                          ${isCollapsed ? 'h-11 w-11 justify-center mx-auto' : 'px-3 py-2.5 w-full gap-3 text-left'}
+                          ${isCategoryActive
+                            ? 'bg-gradient-to-r from-[#22d3ee]/15 to-purple-500/10 text-[#22d3ee] border border-[#22d3ee]/20 shadow-[0_0_15px_rgba(34,211,238,0.08)]'
+                            : isCategoryOpen
+                              ? 'bg-white/[0.06] text-white border border-white/[0.08]'
+                              : 'text-white/60 hover:text-white hover:bg-white/[0.04] border border-transparent'
+                          }
+                        `}
+                      >
+                        {isCategoryActive && (
+                          <span className="absolute left-0 top-2 bottom-2 w-1 bg-gradient-to-b from-[#22d3ee] to-[#a855f7] rounded-r-full shadow-[0_0_8px_rgba(34,211,238,0.6)]" />
+                        )}
+
+                        <span className={`flex-shrink-0 transition-colors ${isCategoryActive ? 'text-[#22d3ee]' : 'text-white/55 group-hover:text-white'}`}>
+                          {category.icon}
+                        </span>
+
+                        {!isCollapsed && (
+                          <>
+                            <span className="flex-1 min-w-0 text-[12px] leading-4 tracking-tight">
+                              {category.label}
+                            </span>
+                            <svg
+                              width="15"
+                              height="15"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className={`flex-shrink-0 transition-transform duration-200 ${isCategoryOpen ? 'rotate-180' : ''}`}
+                              aria-hidden="true"
+                            >
+                              <path d="M6 9l6 6 6-6"/>
+                            </svg>
+                          </>
+                        )}
+                      </button>
+
+                      {!isCollapsed && isCategoryOpen && (
+                        <div
+                          id={categoryPanelId}
+                          role="group"
+                          aria-label={`${category.label} tools`}
+                          className="mt-1 ml-2 pl-2 border-l border-white/[0.08] space-y-1 max-h-64 overflow-y-auto scrollbar-none"
+                        >
+                          {category.tabIds.map((tabId) => {
+                            const tab = TABS.find((item) => item.id === tabId);
+                            if (!tab) return null;
+                            const isActive = activeTab === tab.id;
+
+                            return (
+                              <a
+                                key={tab.id}
+                                href={`/studio/${tab.id}`}
+                                onClick={(event) => handleNavigationItemClick(event, tab.id)}
+                                aria-current={isActive ? 'page' : undefined}
+                                className={`
+                                  group relative flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[12px] font-medium transition-all duration-150
+                                  ${isActive
+                                    ? 'bg-[#22d3ee]/12 text-[#22d3ee] border border-[#22d3ee]/20'
+                                    : 'text-white/55 hover:text-white hover:bg-white/[0.04] border border-transparent'
+                                  }
+                                `}
+                              >
+                                {isActive && (
+                                  <span className="absolute -left-[11px] top-2 bottom-2 w-0.5 rounded-full bg-[#22d3ee] shadow-[0_0_7px_rgba(34,211,238,0.7)]" />
+                                )}
+                                <span className={`flex-shrink-0 ${isActive ? 'text-[#22d3ee]' : 'text-white/45 group-hover:text-white/80'}`}>
+                                  {tab.icon}
+                                </span>
+                                <span className="truncate">{tab.label}</span>
+                              </a>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {EXPLORE_APPS_TAB && (
+                <div className="mt-3 pt-3 border-t border-white/[0.07]">
+                  <a
+                    href={`/studio/${EXPLORE_APPS_TAB.id}`}
+                    onClick={(event) => handleNavigationItemClick(event, EXPLORE_APPS_TAB.id)}
+                    aria-current={activeTab === EXPLORE_APPS_TAB.id ? 'page' : undefined}
+                    aria-label={EXPLORE_APPS_TAB.label}
+                    title={isSidebarCollapsed && !isMobileOpen ? EXPLORE_APPS_TAB.label : undefined}
+                    className={`
+                      group relative flex items-center rounded-xl transition-all duration-150 text-[13px] font-semibold
+                      ${isSidebarCollapsed && !isMobileOpen ? 'h-11 w-11 justify-center mx-auto' : 'px-3 py-2.5 w-full gap-3'}
+                      ${activeTab === EXPLORE_APPS_TAB.id
+                        ? 'bg-gradient-to-r from-[#22d3ee]/15 to-purple-500/10 text-[#22d3ee] border border-[#22d3ee]/20'
+                        : 'text-white/60 hover:text-white hover:bg-white/[0.04] border border-transparent'
+                      }
+                    `}
+                  >
+                    {activeTab === EXPLORE_APPS_TAB.id && (
+                      <span className="absolute left-0 top-2 bottom-2 w-1 bg-gradient-to-b from-[#22d3ee] to-[#a855f7] rounded-r-full" />
+                    )}
+                    <span className={`flex-shrink-0 ${activeTab === EXPLORE_APPS_TAB.id ? 'text-[#22d3ee]' : 'text-white/50 group-hover:text-white'}`}>
+                      {EXPLORE_APPS_TAB.icon}
+                    </span>
+                    {(!isSidebarCollapsed || isMobileOpen) && (
+                      <span className="truncate">{EXPLORE_APPS_TAB.label}</span>
+                    )}
+                  </a>
+                </div>
+              )}
+            </nav>
+          </aside>
+        )}
+
+        {/* Studio Content */}
+        <div className="flex-1 min-h-0 h-full relative overflow-hidden bg-[#030303]">
+        <div className={activeTab === 'image' ? "h-full w-full" : "hidden"}>
+          <ImageStudio apiKey={apiKey} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('image')} onGenerationEnd={makeGenerationEndCallback('image')} onGenerationComplete={makeSuccessCallback('image')} onGenerationError={makeErrorCallback('image')} />
+        </div>
+        <div className={activeTab === 'video' ? "h-full w-full" : "hidden"}>
+          <VideoStudio apiKey={apiKey} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('video')} onGenerationEnd={makeGenerationEndCallback('video')} onGenerationComplete={makeSuccessCallback('video')} onGenerationError={makeErrorCallback('video')} />
+        </div>
+        <div className={activeTab === 'clipping' ? "h-full w-full" : "hidden"}>
+          <ClippingStudio apiKey={apiKey} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('clipping')} onGenerationEnd={makeGenerationEndCallback('clipping')} onGenerationComplete={makeSuccessCallback('clipping')} onGenerationError={makeErrorCallback('clipping')} />
+        </div>
+        <div className={activeTab === 'vibe-motion' ? "h-full w-full" : "hidden"}>
+          <VibeMotionStudio apiKey={apiKey} onGenerationStart={makeGenerationStartCallback('vibe-motion')} onGenerationEnd={makeGenerationEndCallback('vibe-motion')} onGenerationComplete={makeSuccessCallback('vibe-motion')} onGenerationError={makeErrorCallback('vibe-motion')} />
+        </div>
+        <div className={activeTab === 'lipsync' ? "h-full w-full" : "hidden"}>
+          <LipSyncStudio apiKey={apiKey} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('lipsync')} onGenerationEnd={makeGenerationEndCallback('lipsync')} onGenerationComplete={makeSuccessCallback('lipsync')} onGenerationError={makeErrorCallback('lipsync')} />
+        </div>
+        <div className={activeTab === 'body-swap' ? "h-full w-full" : "hidden"}>
+          <RecastStudio apiKey={apiKey} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('body-swap')} onGenerationEnd={makeGenerationEndCallback('body-swap')} onGenerationComplete={makeSuccessCallback('body-swap')} onGenerationError={makeErrorCallback('body-swap')} />
+        </div>
+        <div className={activeTab === 'cinema' ? "h-full w-full" : "hidden"}>
+          <CinemaStudio apiKey={apiKey} onGenerationStart={makeGenerationStartCallback('cinema')} onGenerationEnd={makeGenerationEndCallback('cinema')} onGenerationComplete={makeSuccessCallback('cinema')} onGenerationError={makeErrorCallback('cinema')} />
+        </div>
+        <div className={activeTab === 'audio' ? "h-full w-full" : "hidden"}>
+          <AudioStudio apiKey={apiKey} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('audio')} onGenerationEnd={makeGenerationEndCallback('audio')} onGenerationComplete={makeSuccessCallback('audio')} onGenerationError={makeErrorCallback('audio')} />
+        </div>
+        <div className={activeTab === 'marketing' ? "h-full w-full" : "hidden"}>
+          <MarketingStudio apiKey={apiKey} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('marketing')} onGenerationEnd={makeGenerationEndCallback('marketing')} onGenerationComplete={makeSuccessCallback('marketing')} onGenerationError={makeErrorCallback('marketing')} />
+        </div>
+        <div className={activeTab === 'workflows' ? "h-full w-full" : "hidden"}>
+          <WorkflowStudio
+            apiKey={apiKey}
+            isHeaderVisible={isHeaderVisible}
+            onToggleHeader={setIsHeaderVisible}
+            onGenerationStart={makeGenerationStartCallback('workflows')}
+            onGenerationEnd={makeGenerationEndCallback('workflows')}
+            onGenerationComplete={makeSuccessCallback('workflows')}
+            onGenerationError={makeErrorCallback('workflows')}
+          />
+        </div>
+        <div className={activeTab === 'agents' ? "h-full w-full" : "hidden"}>
+          <AgentStudio apiKey={apiKey} isHeaderVisible={isHeaderVisible} onToggleHeader={setIsHeaderVisible} />
+        </div>
+        <div className={activeTab === 'design-agent' ? "h-full w-full" : "hidden"}>
+          {activeTab === 'design-agent' && (
+            <DesignAgentStudio
+              apiKey={apiKey}
+              isHeaderVisible={isHeaderVisible}
+              onToggleHeader={setIsHeaderVisible}
+              onGenerationStart={makeGenerationStartCallback('design-agent')}
+              onGenerationEnd={makeGenerationEndCallback('design-agent')}
+              onGenerationComplete={makeSuccessCallback('design-agent')}
+              onGenerationError={makeErrorCallback('design-agent')}
+            />
+          )}
+        </div>
+        <div className={activeTab === 'apps' ? "h-full w-full" : "hidden"}>
+          <AppsStudio apiKey={apiKey} />
+        </div>
+        <div className={activeTab === 'ai-influencer' ? "h-full w-full" : "hidden"}>
+          <AiInfluencerStudio
+            apiKey={apiKey}
+            onGenerationStart={makeGenerationStartCallback('ai-influencer')}
+            onGenerationEnd={makeGenerationEndCallback('ai-influencer')}
+            onGenerationComplete={makeSuccessCallback('ai-influencer')}
+            onGenerationError={makeErrorCallback('ai-influencer')}
+          />
+        </div>
+      </div>
+    </div>
+
+      {/* Global generation activity and notification stack */}
+      {(activeGenerations.length > 0 || notifications.length > 0) && (
+        <div
+          aria-live="polite"
+          aria-label="Generation activity and notifications"
+          className="fixed bottom-5 right-5 z-[200] flex max-h-[calc(100vh-32px)] w-[340px] max-w-[calc(100vw-32px)] flex-col gap-2 overflow-y-auto pointer-events-none"
+          data-testid="global-notification-stack"
+        >
+          {activeGenerations.map((generation) => (
+            <div
+              key={generation.tabId}
+              role="status"
+              data-generation-tab={generation.tabId}
+              className="pointer-events-auto flex items-center gap-3 rounded-xl border border-cyan-400/30 bg-[#0d0d0f] px-3.5 py-3 text-[13px] text-zinc-100 shadow-[0_16px_48px_rgba(0,0,0,0.65)]"
+              data-testid="generation-activity"
+            >
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-cyan-400/35 bg-cyan-400/10">
+                <span
+                  className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-cyan-300/25 border-t-cyan-300"
+                  aria-hidden="true"
+                />
+              </span>
+              <p className="min-w-0 flex-1 font-semibold leading-5 text-zinc-100">
+                {generation.label} is generating
+                {generation.count > 1 ? ` (${generation.count})` : ''}
+              </p>
+            </div>
+          ))}
+
+          {notifications.map((notif) => (
+            <div
+              key={notif.id}
+              role={notif.type === 'error' ? 'alert' : 'status'}
+              data-notification-type={notif.type}
+              data-notification-tab={notif.tabId}
+              className="pointer-events-auto flex items-start gap-3 rounded-xl border bg-[#0d0d0f] px-3.5 py-3 text-[13px] text-zinc-100 shadow-[0_16px_48px_rgba(0,0,0,0.65)]"
+              style={{
+                borderColor: notif.type === 'success' ? 'rgba(34,211,238,0.35)' : 'rgba(239,68,68,0.35)',
+                animation: 'slideInRight 280ms cubic-bezier(0.16,1,0.3,1) forwards',
+              }}
+            >
+              <span
+                className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border ${
+                  notif.type === 'success'
+                    ? 'border-cyan-400/35 bg-cyan-400/10 text-cyan-300'
+                    : 'border-red-500/35 bg-red-500/10 text-red-400'
+                }`}
+              >
+                {notif.type === 'success' ? (
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="m5 12 4 4L19 6" />
+                  </svg>
+                ) : (
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="M12 7v6" />
+                    <path d="M12 17h.01" />
+                  </svg>
+                )}
+              </span>
+
+              <div className="min-w-0 flex-1">
+                <p className="font-semibold leading-5 text-zinc-100">
+                  {notif.label}
+                  <span className="font-normal text-zinc-400">
+                    {notif.type === 'success' ? ' - Generation complete' : ' - Generation failed'}
+                  </span>
+                </p>
+                {notif.type === 'error' && notif.message && (
+                  <p className="mt-0.5 line-clamp-2 text-[12px] font-medium leading-4 text-red-300/85" title={notif.message}>
+                    {notif.message}
+                  </p>
+                )}
+                {notif.type === 'success' && (
+                  <p className="mt-0.5 text-[12px] leading-4 text-zinc-400">
+                    Your result is ready.
+                  </p>
+                )}
+                {notif.type === 'success' && (
+                  <button
+                    type="button"
+                    onClick={() => handleOpenNotification(notif)}
+                    className="mt-1.5 text-[11px] font-bold text-cyan-300 transition-colors hover:text-cyan-100"
+                    aria-label={`Open ${notif.label} result`}
+                  >
+                    Open
+                  </button>
+                )}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => dismissNotification(notif.id)}
+                className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-white/20"
+                aria-label="Dismiss notification"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                  <path d="M18 6 6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Keyframe for toast slide-in */}
+      <style>{`
+        @keyframes slideInRight {
+          from { transform: translateX(110%); opacity: 0; }
+          to   { transform: translateX(0);    opacity: 1; }
+        }
+      `}</style>
+
+      {/* Settings Modal */}
+      {showSettings && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in-up">
+          <div className="bg-[#0a0a0a] border border-white/10 rounded-xl p-8 w-full max-w-sm shadow-2xl">
+            <h2 className="text-white font-bold text-lg mb-2">Settings</h2>
+            <p className="text-white/40 text-[13px] mb-8">
+              Manage your AI studio preferences and authentication.
+            </p>
+            
+            <div className="space-y-4 mb-8">
+              <div className="bg-white/5 border border-white/[0.03] rounded-md p-4">
+                <label className="block text-xs font-bold text-white/30 mb-2">
+                   Active API Key
+                </label>
+                <div className="text-[13px] font-mono text-white/80">
+                  {apiKey.slice(0, 8)}â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={handleKeyChange}
+                className="flex-1 h-10 rounded-md bg-red-500/10 text-red-400 hover:bg-red-500/20 text-xs font-semibold transition-all"
+              >
+                Change Key
+              </button>
+              <button
+                onClick={() => setShowSettings(false)}
+                className="flex-1 h-10 rounded-md bg-white/5 text-white/80 hover:bg-white/10 text-xs font-semibold transition-all border border-white/5"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
