@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { generateImage } from "../muapi.js";
 import { formatErrorMessage } from "../utils/formatError.js";
+import MobileGenerationActions from "./MobileGenerationActions.jsx";
 
 const CDN = "https://cdn.muapi.ai/influencer";
 
@@ -740,7 +741,7 @@ export default function AiInfluencerStudio({
               >
                 <img src={item.url} alt={`Character ${idx + 1}`} className="w-full h-full object-cover" />
                 {/* Download on hover */}
-                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-2">
+                <div className="absolute inset-0 hidden md:flex bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity items-end justify-center pb-2">
                   <div
                     role="button"
                     tabIndex={0}
@@ -751,6 +752,15 @@ export default function AiInfluencerStudio({
                     <DownloadIcon />
                   </div>
                 </div>
+                <MobileGenerationActions
+                  actions={[
+                    {
+                      kind: "download",
+                      label: "Download",
+                      onSelect: () => downloadImg(item.url),
+                    },
+                  ]}
+                />
                 {/* Index badge */}
                 <div className="absolute top-1 left-1 px-1.5 py-0.5 rounded-md bg-black/60 backdrop-blur-sm text-[8px] text-gray-300 font-bold">
                   #{history.length - idx}

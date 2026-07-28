@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { generateImage, uploadFile } from "../muapi.js";
 import { scopedPersistKey, migrateLegacyPersistKey } from "../persistKey.js";
+import MobileGenerationActions from "./MobileGenerationActions.jsx";
 import {
   PromptAspectRatioIcon,
   PromptAction,
@@ -724,24 +725,6 @@ export default function CinemaStudio({
     [onGenerationError],
   );
 
-  // ── Load history item ──
-  const loadHistoryItem = (entry, idx) => {
-    if (entry.settings) {
-      setSettings((prev) => ({
-        ...prev,
-        camera: entry.settings.camera ?? prev.camera,
-        lens: entry.settings.lens ?? prev.lens,
-        focal: entry.settings.focal ?? prev.focal,
-        aperture: entry.settings.aperture ?? prev.aperture,
-        aspect_ratio: entry.settings.aspect_ratio ?? prev.aspect_ratio,
-        prompt: entry.settings.prompt ?? prev.prompt,
-      }));
-      if (entry.settings.resolution) setResolution(entry.settings.resolution);
-
-    }
-    setCanvasUrl(entry.url);
-  };
-
   const resetToPrompt = () => {
     setCanvasUrl(null);
     setSettings((prev) => ({ ...prev, prompt: "" }));
@@ -762,7 +745,7 @@ export default function CinemaStudio({
               <div
                 key={entry.timestamp ?? idx}
                 className="relative group rounded-lg overflow-hidden border border-white/10 bg-[#0a0a0a] shadow-xl hover:border-[#22d3ee]/50 transition-all duration-300 flex flex-col cursor-pointer"
-                onClick={() => loadHistoryItem(entry, idx)}
+                onClick={() => setFullscreenUrl(entry.url)}
               >
                 <img
                   src={entry.url}
@@ -771,23 +754,7 @@ export default function CinemaStudio({
                 />
                 
                 {/* Overlay actions */}
-                <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button
-                    type="button"
-                    title="Fullscreen"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setFullscreenUrl(entry.url);
-                    }}
-                    className="p-2 bg-black/60 backdrop-blur-md rounded-full text-white hover:bg-[#22d3ee] hover:text-black transition-all border border-white/10"
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <polyline points="15 3 21 3 21 9" />
-                      <polyline points="9 21 3 21 3 15" />
-                      <line x1="21" y1="3" x2="14" y2="10" />
-                      <line x1="3" y1="21" x2="10" y2="14" />
-                    </svg>
-                  </button>
+                <div className="absolute top-2 right-2 hidden md:flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     type="button"
                     title="Download"
@@ -833,6 +800,40 @@ export default function CinemaStudio({
                     </svg>
                   </button>
                 </div>
+                <MobileGenerationActions
+                  actions={[
+                    {
+                      kind: "download",
+                      label: "Download",
+                      onSelect: async () => {
+                        try {
+                          const response = await fetch(entry.url);
+                          const blob = await response.blob();
+                          const blobUrl = URL.createObjectURL(blob);
+                          const anchor = document.createElement("a");
+                          anchor.href = blobUrl;
+                          anchor.download = `cinema-shot-${entry.id || idx}.jpg`;
+                          document.body.appendChild(anchor);
+                          anchor.click();
+                          document.body.removeChild(anchor);
+                          URL.revokeObjectURL(blobUrl);
+                        } catch {
+                          window.open(entry.url, "_blank");
+                        }
+                      },
+                    },
+                    {
+                      kind: "delete",
+                      label: "Delete",
+                      danger: true,
+                      onSelect: () => {
+                        if (confirm("Are you sure you want to delete this generated item?")) {
+                          setInternalHistory((prev) => prev.filter((_, i) => i !== idx));
+                        }
+                      },
+                    },
+                  ]}
+                />
 
                 {/* Details */}
                 <div className="p-3 bg-black/80 backdrop-blur-sm border-t border-white/5 flex-1 flex flex-col justify-between gap-2">

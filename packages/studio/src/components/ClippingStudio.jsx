@@ -5,6 +5,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { runClipping, uploadFile } from "../muapi.js";
 import { formatErrorMessage } from "../utils/formatError.js";
 import { scopedPersistKey, migrateLegacyPersistKey } from "../persistKey.js";
+import MobileGenerationActions from "./MobileGenerationActions.jsx";
 import {
   PROMPT_CONTROL_LABEL_CLASS,
   PROMPT_MEDIA_PREVIEW_CLASS,
@@ -592,17 +593,17 @@ export default function ClippingStudio({
               {history.map((entry, idx) => (
                 <div
                   key={entry.id || idx}
-                  className="relative group rounded-lg overflow-hidden border border-white/10 bg-[#0a0a0a] shadow-xl hover:border-primary/50 transition-all duration-300 flex flex-col"
+                  onClick={() => handleSelectHistory(entry)}
+                  className="relative group rounded-lg overflow-hidden border border-white/10 bg-[#0a0a0a] shadow-xl hover:border-primary/50 transition-all duration-300 flex flex-col cursor-pointer"
                 >
                   <div className="aspect-video bg-zinc-950 flex items-center justify-center border-b border-white/5 relative overflow-hidden">
                     <video
                       src={entry.videoUrl}
-                      className="w-full h-full object-cover opacity-60 group-hover:opacity-85 transition-opacity cursor-pointer animate-fade-in"
+                      className="w-full h-full object-cover opacity-60 group-hover:opacity-85 transition-opacity animate-fade-in"
                       preload="metadata"
                       muted
                       loop
                       playsInline
-                      onClick={() => handleSelectHistory(entry)}
                       onMouseOver={(e) => e.target.play()}
                       onMouseOut={(e) => {
                         e.target.pause();
@@ -611,7 +612,7 @@ export default function ClippingStudio({
                     />
                     
                     {/* Overlay actions */}
-                    <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                    <div className="absolute top-2 right-2 z-10 hidden md:flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         type="button"
                         title="Delete from history"
@@ -624,11 +625,21 @@ export default function ClippingStudio({
                         <TrashIcon />
                       </button>
                     </div>
+                    <MobileGenerationActions
+                      actions={[
+                        {
+                          kind: "delete",
+                          label: "Delete",
+                          danger: true,
+                          onSelect: () =>
+                            setHistory((prev) =>
+                              prev.filter((historyEntry) => historyEntry.id !== entry.id),
+                            ),
+                        },
+                      ]}
+                    />
                   </div>
-                  <div 
-                    onClick={() => handleSelectHistory(entry)}
-                    className="p-3 bg-black/80 backdrop-blur-sm border-t border-white/5 flex-1 flex flex-col justify-between gap-2 cursor-pointer"
-                  >
+                  <div className="p-3 bg-black/80 backdrop-blur-sm border-t border-white/5 flex-1 flex flex-col justify-between gap-2">
                     <div className="flex flex-col gap-1">
                       <h4 className="text-xs font-bold text-white truncate" title={entry.videoUrl.split('/').pop()}>
                         {entry.videoUrl.split('/').pop() || "source_video.mp4"}
@@ -775,13 +786,13 @@ export default function ClippingStudio({
                     {result.clips.map((clipUrl, i) => (
                       <div
                         key={i}
-                        className="relative group rounded-lg overflow-hidden border border-white/10 bg-[#0a0a0a] shadow-xl hover:border-primary/50 transition-all duration-300 flex flex-col"
+                        onClick={() => setFullscreenUrl(clipUrl)}
+                        className="relative group rounded-lg overflow-hidden border border-white/10 bg-[#0a0a0a] shadow-xl hover:border-primary/50 transition-all duration-300 flex flex-col cursor-pointer"
                       >
                         <div className="relative group/vid border-b border-white/5 overflow-hidden bg-black/40">
                           <video
                             src={clipUrl}
-                            className={`w-full ${getAspectClass(result.aspectRatio)} object-cover bg-black/40 cursor-pointer hover:opacity-85 transition-opacity`}
-                            onClick={() => setFullscreenUrl(clipUrl)}
+                            className={`w-full ${getAspectClass(result.aspectRatio)} object-cover bg-black/40 hover:opacity-85 transition-opacity`}
                             controls={false}
                             loop
                             muted
@@ -794,23 +805,7 @@ export default function ClippingStudio({
                           />
                           
                           {/* Overlay actions */}
-                          <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover/vid:opacity-100 transition-opacity z-10">
-                            <button
-                              type="button"
-                              title="Fullscreen"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setFullscreenUrl(clipUrl);
-                              }}
-                              className="p-2 bg-black/60 backdrop-blur-md rounded-full text-white hover:bg-primary hover:text-black transition-all border border-white/10"
-                            >
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                <polyline points="15 3 21 3 21 9" />
-                                <polyline points="9 21 3 21 3 15" />
-                                <line x1="21" y1="3" x2="14" y2="10" />
-                                <line x1="3" y1="21" x2="10" y2="14" />
-                              </svg>
-                            </button>
+                          <div className="absolute top-2 right-2 z-10 hidden md:flex flex-col gap-2 opacity-0 group-hover/vid:opacity-100 transition-opacity">
                             <button
                               type="button"
                               title="Copy Link"
@@ -834,6 +829,21 @@ export default function ClippingStudio({
                               <DownloadIcon />
                             </button>
                           </div>
+                          <MobileGenerationActions
+                            actions={[
+                              {
+                                kind: "copy",
+                                label: "Copy link",
+                                onSelect: () => copyToClipboard(clipUrl),
+                              },
+                              {
+                                kind: "download",
+                                label: "Download",
+                                onSelect: () =>
+                                  downloadVideo(clipUrl, `clip-${i + 1}.mp4`),
+                              },
+                            ]}
+                          />
 
                           <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-md px-2 py-1 rounded border border-white/5 text-[9px] uppercase font-black tracking-wider text-primary">
                             Clip #{i + 1}
