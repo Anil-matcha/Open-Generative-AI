@@ -2,7 +2,216 @@
 
 import { useState } from "react";
 
+async function getClipboardPngBlob(url) {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Image request failed with status ${response.status}.`);
+  }
+
+  const sourceBlob = await response.blob();
+  if (sourceBlob.type === "image/png") return sourceBlob;
+
+  const objectUrl = URL.createObjectURL(sourceBlob);
+  try {
+    const image = await new Promise((resolve, reject) => {
+      const element = new Image();
+      element.onload = () => resolve(element);
+      element.onerror = () => reject(new Error("Could not decode the image."));
+      element.src = objectUrl;
+    });
+
+    const canvas = document.createElement("canvas");
+    canvas.width = image.naturalWidth;
+    canvas.height = image.naturalHeight;
+
+    const context = canvas.getContext("2d");
+    if (!context) {
+      throw new Error("Could not create an image clipboard canvas.");
+    }
+
+    context.drawImage(image, 0, 0);
+    return await new Promise((resolve, reject) => {
+      canvas.toBlob(
+        (blob) =>
+          blob
+            ? resolve(blob)
+            : reject(new Error("Could not convert the image to PNG.")),
+        "image/png",
+      );
+    });
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
+}
+
+async function copyPrompt(prompt) {
+  if (!prompt) return;
+  await navigator.clipboard.writeText(prompt);
+}
+
+async function copyImage(url) {
+  if (!url) return;
+  if (
+    !window.isSecureContext ||
+    !navigator.clipboard?.write ||
+    typeof window.ClipboardItem === "undefined"
+  ) {
+    throw new Error("Image clipboard access requires HTTPS or localhost.");
+  }
+
+  await navigator.clipboard.write([
+    new window.ClipboardItem({
+      "image/png": getClipboardPngBlob(url),
+    }),
+  ]);
+}
+
+export function CopyContentIcon({ kind, size = 19 }) {
+  const isText = kind === "text";
+
+  if (!isText) {
+    return (
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M6 5V4.5A2.5 2.5 0 018.5 2H19a3 3 0 013 3v10.5a2.5 2.5 0 01-2.5 2.5H19" opacity="0.65" />
+        <rect x="2" y="6" width="17" height="16" rx="2.5" strokeWidth="2.2" />
+        <circle cx="6.5" cy="10.5" r="1.25" />
+        <path d="M3.5 19l4.2-4.4 3.1 3.1 2.4-2.5 4.3 4.2" strokeWidth="2.2" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M2.5 3.5h13" strokeWidth="2.7" />
+      <path d="M9 3.5v14" strokeWidth="2.7" />
+      <path
+        d="M19 15.25V14.2A1.2 1.2 0 0017.8 13h-3.6a1.2 1.2 0 00-1.2 1.2v3.6a1.2 1.2 0 001.2 1.2h1.05"
+        strokeWidth="1.6"
+      />
+      <rect x="15.25" y="15.25" width="6.25" height="6.25" rx="1.15" strokeWidth="1.6" />
+    </svg>
+  );
+}
+
+function CopiedIcon({ size = 15 }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M5 12l4 4L19 6" />
+    </svg>
+  );
+}
+
+export function GenerationCopyButtons({
+  prompt,
+  imageUrl,
+  onCopyError,
+}) {
+  const [copiedKind, setCopiedKind] = useState(null);
+
+  const runCopy = async (event, kind) => {
+    event.stopPropagation();
+
+    try {
+      if (kind === "text") {
+        await copyPrompt(prompt);
+      } else {
+        await copyImage(imageUrl);
+      }
+
+      setCopiedKind(kind);
+      window.setTimeout(() => {
+        setCopiedKind((current) => (current === kind ? null : current));
+      }, 1600);
+    } catch (error) {
+      const contentLabel = kind === "text" ? "the prompt" : "the image";
+      console.error(`Failed to copy ${contentLabel}:`, error);
+      onCopyError?.(
+        kind === "text"
+          ? "Could not copy the prompt to the clipboard."
+          : "Could not copy the image. Image copy requires HTTPS or localhost.",
+      );
+    }
+  };
+
+  return (
+    <>
+      {prompt && (
+        <button
+          type="button"
+          title={copiedKind === "text" ? "Prompt copied" : "Copy prompt"}
+          aria-label={copiedKind === "text" ? "Prompt copied" : "Copy prompt"}
+          onClick={(event) => runCopy(event, "text")}
+          className={`flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-black/60 backdrop-blur-md transition-all hover:bg-[#22d3ee] hover:text-black ${
+            copiedKind === "text" ? "text-[#22d3ee]" : "text-white"
+          }`}
+        >
+          {copiedKind === "text" ? (
+            <CopiedIcon />
+          ) : (
+            <CopyContentIcon kind="text" size={17} />
+          )}
+        </button>
+      )}
+      {imageUrl && (
+        <button
+          type="button"
+          title={copiedKind === "image" ? "Image copied" : "Copy image"}
+          aria-label={copiedKind === "image" ? "Image copied" : "Copy image"}
+          onClick={(event) => runCopy(event, "image")}
+          className={`flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-black/60 backdrop-blur-md transition-all hover:bg-[#22d3ee] hover:text-black ${
+            copiedKind === "image" ? "text-[#22d3ee]" : "text-white"
+          }`}
+        >
+          {copiedKind === "image" ? (
+            <CopiedIcon />
+          ) : (
+            <CopyContentIcon kind="image" size={17} />
+          )}
+        </button>
+      )}
+    </>
+  );
+}
+
 function ActionIcon({ kind }) {
+  if (kind === "text") {
+    return <CopyContentIcon kind="text" />;
+  }
+
+  if (kind === "image") {
+    return <CopyContentIcon kind="image" />;
+  }
+
   if (kind === "download") {
     return (
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -56,9 +265,46 @@ function ActionIcon({ kind }) {
   );
 }
 
-export default function MobileGenerationActions({ actions = [] }) {
+export default function MobileGenerationActions({
+  actions = [],
+  prompt,
+  imageUrl,
+  onCopyError,
+}) {
   const [open, setOpen] = useState(false);
-  const availableActions = actions.filter(Boolean);
+  const copyActions = [
+    prompt
+      ? {
+          kind: "text",
+          label: "Copy prompt",
+          onSelect: async () => {
+            try {
+              await copyPrompt(prompt);
+            } catch (error) {
+              console.error("Failed to copy the prompt:", error);
+              onCopyError?.("Could not copy the prompt to the clipboard.");
+            }
+          },
+        }
+      : null,
+    imageUrl
+      ? {
+          kind: "image",
+          label: "Copy image",
+          onSelect: async () => {
+            try {
+              await copyImage(imageUrl);
+            } catch (error) {
+              console.error("Failed to copy the image:", error);
+              onCopyError?.(
+                "Could not copy the image. Image copy requires HTTPS or localhost.",
+              );
+            }
+          },
+        }
+      : null,
+  ];
+  const availableActions = [...copyActions, ...actions].filter(Boolean);
 
   if (availableActions.length === 0) return null;
 

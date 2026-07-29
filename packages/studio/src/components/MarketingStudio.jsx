@@ -3,7 +3,9 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { uploadFile, generateMarketingStudioAd } from "../muapi.js";
 import { scopedPersistKey, migrateLegacyPersistKey } from "../persistKey.js";
-import MobileGenerationActions from "./MobileGenerationActions.jsx";
+import MobileGenerationActions, {
+  GenerationCopyButtons,
+} from "./MobileGenerationActions.jsx";
 import {
   PROMPT_CONTROL_LABEL_CLASS,
   PromptAspectRatioIcon,
@@ -440,6 +442,10 @@ export default function MarketingStudio({
                 
                 {/* Actions Overlay */}
                 <div className="absolute top-2 right-2 hidden md:flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <GenerationCopyButtons
+                    prompt={entry.prompt}
+                    onCopyError={onGenerationError}
+                  />
                    <button
                     onClick={(e) => { e.stopPropagation(); downloadFile(entry.url, `marketing-ad-${entry.id}.mp4`); }}
                     className="p-2 bg-black/60 backdrop-blur-md rounded-full text-white hover:bg-primary hover:text-black transition-all border border-white/10"
@@ -471,6 +477,8 @@ export default function MarketingStudio({
                    </button>
                 </div>
                 <MobileGenerationActions
+                  prompt={entry.prompt}
+                  onCopyError={onGenerationError}
                   actions={[
                     {
                       kind: "download",
@@ -504,21 +512,6 @@ export default function MarketingStudio({
                       <span className="text-[9px] text-white/40 font-bold">{entry.format}</span>
                     )}
                   </div>
-                  {entry.prompt && (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigator.clipboard.writeText(entry.prompt);
-                        const btn = e.currentTarget;
-                        btn.innerText = "Copied!";
-                        setTimeout(() => { btn.innerText = "Copy Prompt"; }, 2000);
-                      }}
-                      className="px-2 py-1 bg-white/5 hover:bg-primary/20 hover:text-primary rounded text-[10px] font-medium text-white/70 transition-all border border-white/10"
-                    >
-                      Copy Prompt
-                    </button>
-                  )}
                 </div>
               </div>
             ))}

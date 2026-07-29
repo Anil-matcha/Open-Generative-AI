@@ -4,7 +4,9 @@ import { useState, useCallback } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { generateImage } from "../muapi.js";
 import { formatErrorMessage } from "../utils/formatError.js";
-import MobileGenerationActions from "./MobileGenerationActions.jsx";
+import MobileGenerationActions, {
+  GenerationCopyButtons,
+} from "./MobileGenerationActions.jsx";
 
 const CDN = "https://cdn.muapi.ai/influencer";
 
@@ -416,7 +418,7 @@ export default function AiInfluencerStudio({
       }
       if (res?.url) {
         setCurrentResult(res.url);
-        setHistory((prev) => [{ url: res.url, ts: Date.now() }, ...prev]);
+        setHistory((prev) => [{ url: res.url, prompt, ts: Date.now() }, ...prev]);
         setSelectedHistoryIdx(0);
         onGenerationComplete?.({
           url: res.url,
@@ -742,6 +744,13 @@ export default function AiInfluencerStudio({
                 <img src={item.url} alt={`Character ${idx + 1}`} className="w-full h-full object-cover" />
                 {/* Download on hover */}
                 <div className="absolute inset-0 hidden md:flex bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity items-end justify-center pb-2">
+                  <div className="absolute right-2 top-2 flex flex-col gap-2">
+                    <GenerationCopyButtons
+                      prompt={item.prompt}
+                      imageUrl={item.url}
+                      onCopyError={onGenerationError}
+                    />
+                  </div>
                   <div
                     role="button"
                     tabIndex={0}
@@ -753,6 +762,9 @@ export default function AiInfluencerStudio({
                   </div>
                 </div>
                 <MobileGenerationActions
+                  prompt={item.prompt}
+                  imageUrl={item.url}
+                  onCopyError={onGenerationError}
                   actions={[
                     {
                       kind: "download",

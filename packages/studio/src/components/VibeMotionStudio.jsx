@@ -5,7 +5,9 @@ import toast, { Toaster } from "react-hot-toast";
 import { runMotionGraphics, runMotionGraphicsEdit } from "../muapi.js";
 import { formatErrorMessage } from "../utils/formatError.js";
 import { scopedPersistKey, migrateLegacyPersistKey } from "../persistKey.js";
-import MobileGenerationActions from "./MobileGenerationActions.jsx";
+import MobileGenerationActions, {
+  GenerationCopyButtons,
+} from "./MobileGenerationActions.jsx";
 import {
   PROMPT_CONTROL_LABEL_CLASS,
   PromptAspectRatioIcon,
@@ -334,6 +336,10 @@ export default function VibeMotionStudio({
 
                 {/* ── Hover overlay actions ── */}
                 <div className="absolute top-2 right-2 hidden md:flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <GenerationCopyButtons
+                    prompt={entry.prompt}
+                    onCopyError={onGenerationError}
+                  />
                   <button
                     type="button"
                     title="Download"
@@ -395,6 +401,8 @@ export default function VibeMotionStudio({
                   </button>
                 </div>
                 <MobileGenerationActions
+                  prompt={entry.prompt}
+                  onCopyError={onGenerationError}
                   actions={[
                     {
                       kind: "download",
@@ -445,22 +453,6 @@ export default function VibeMotionStudio({
                         )}
                       </div>
                     </div>
-                    {entry.prompt && (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigator.clipboard.writeText(entry.prompt);
-                          const btn = e.currentTarget;
-                          btn.innerText = "Copied!";
-                          setTimeout(() => { btn.innerText = "Copy"; }, 2000);
-                        }}
-                        className="px-2 py-0.5 bg-white/5 hover:bg-primary/20 hover:text-primary rounded text-[10px] font-medium text-white/70 transition-all border border-white/10"
-                        title="Copy prompt"
-                      >
-                        Copy Prompt
-                      </button>
-                    )}
                   </div>
                 </div>
               </div>
