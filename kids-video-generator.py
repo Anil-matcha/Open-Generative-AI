@@ -4,9 +4,11 @@ Generate engaging, age-appropriate viral videos for children using AI
 """
 
 import json
+import os
 from datetime import datetime
 from typing import Dict, List, Optional
 from dataclasses import dataclass, asdict
+from trending import TrendingFetcher
 
 
 @dataclass
@@ -353,19 +355,66 @@ Create a vibrant, eye-catching thumbnail for kids video content:
     
     def generate_batch(
         self,
-        topics: List[str],
-        template_ids: Optional[List[str]] = None
+        topics: Optional[List[str]] = None,
+        template_ids: Optional[List[str]] = None,
+        use_trending: bool = False,
+        trending_source: Optional[str] = None,
+        max_topics: int = 10,
+        safe_filter: bool = True
     ) -> List[GeneratedVideo]:
-        """Generate multiple videos at once"""
+        """Generate multiple videos at once.
+
+        Parameters:
+        - topics: optional list of topic strings. If omitted and use_trending=True, topics
+          will be seeded from trending sources.
+        - template_ids: optional list of template keys to choose from.
+        - use_trending: when True and topics is None or empty, seed topics from trending.
+        - trending_source: path to a local JSON/CSV file or 'pytrends' to use pytrends (optional).
+        - max_topics: maximum number of topics to fetch from trending sources.
+        - safe_filter: basic safe-filtering to remove obviously adult/unsafe topics.
+        """
         if template_ids is None:
             template_ids = list(self.templates.keys())
-        
-        videos = []
+
+        # If no topics provided and trending requested, try to fetch
+        if (not topics or len(topics) == 0) and use_trending:
+            fetcher = TrendingFetcher()
+            fetched: List[str] = []
+            if trending_source == "pytrends":
+                fetched = fetcher.get_from_pytrends()
+            elif trending_source and os.path.exists(trending_source):
+                if trending_source.lower().endswith(".json"):
+                    fetched = fetcher.get_from_local_json(trending_source)
+                else:
+                    fetched = fetcher.get_from_local_csv(trending_source)
+            else:
+                # default fallback to local sample file
+                fetched = fetcher.get_from_local_json("trending_sample.json")
+
+            topics = fetched[:max_topics] if fetched else []
+
+        if not topics:
+            return []
+
+        # Basic safety filter
+        if safe_filter:
+            blacklist = [
+                "adult", "nsfw", "sex", "violence", "gambling", "drugs", "kill", "murder"
+            ]
+            filtered = []
+            for t in topics:
+                low = t.lower()
+                if any(b in low for b in blacklist):
+                    continue
+                filtered.append(t)
+            topics = filtered
+
+        videos: List[GeneratedVideo] = []
         for topic in topics:
             template_id = template_ids[hash(topic) % len(template_ids)]
             video = self.generate_video(template_id, topic)
             videos.append(video)
-        
+
         return videos
     
     def export_video_plan(self, videos: List[GeneratedVideo]) -> str:
