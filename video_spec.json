@@ -1,0 +1,86 @@
+{
+  "topic": "Amazing Animal Facts",
+  "category": "animals",
+  "platform": "tiktok",
+  "target_age": [
+    6,
+    12
+  ],
+  "script": {
+    "title": "Amazing Animal Facts - The CUTEST Thing Ever! \ud83e\udd70",
+    "hook": "This Amazing Animal Facts is the CUTEST thing ever!",
+    "body": "[Main content about Amazing Animal Facts - engaging and fast-paced]",
+    "cta": "Like, subscribe, and comment your thoughts!",
+    "timing": {
+      "hook": 3.0,
+      "body": 22.0,
+      "cta": 5.0
+    },
+    "emphasis_points": [
+      "Use all caps for key words",
+      "Add emojis strategically",
+      "Include surprising statistics",
+      "Show close-up reactions",
+      "Capture the cutest moment clearly",
+      "Include surprising behavior",
+      "Create emotional connection"
+    ],
+    "suggested_b_roll": [
+      "Cute behavioral shots",
+      "Close-ups of face",
+      "Playing footage",
+      "Funny moments"
+    ],
+    "viral_score": 0.91
+  },
+  "music": {
+    "tempo": 100,
+    "genre": "acoustic_pop",
+    "mood": "cute",
+    "energy_level": "medium",
+    "duration": 30,
+    "suggested_artists": [
+      "Dodie Clark",
+      "Boy Pablo",
+      "Chloe Moriondo",
+      "The Wombats"
+    ],
+    "keywords": [
+      "cute",
+      "playful",
+      "sweet",
+      "joyful"
+    ]
+  },
+  "thumbnail_prompt": "Create a viral YouTube/TikTok thumbnail:\n        - Topic: Amazing Animal Facts\n        - Style: vibrant\n        - Colors: #FFB6C1, #FFDAB9, #FFE4B5\n        - Text overlay: \"INSANE!\"\n        - Mood: cute, happy\n        - Target audience: Kids ages 6-12\n        - Must be: Attention-grabbing, high-contrast, professional\n        - Include: Surprised face expressions, bold text, vibrant colors\n        - Avoid: Scary content, violence, inappropriate imagery",
+  "platform_specs": {
+    "max_duration": 600,
+    "min_duration": 15,
+    "aspect_ratio": "9:16",
+    "recommended_duration": 30,
+    "max_hashtags": 30,
+    "optimal_posting_hours": [
+      14,
+      15,
+      16,
+      19,
+      20,
+      21
+    ],
+    "max_text_overlays": 12
+  },
+  "viral_score": 0.91,
+  "recommendations": [
+    "Post consistently 3-5 times per week",
+    "Reply to comments within the first hour",
+    "Use trending sounds and music",
+    "Create multiple variations of same content",
+    "Capture genuine cute moments",
+    "Include surprising facts",
+    "Encourage sharing and engagement",
+    "Use trending TikTok sounds in first 3 seconds",
+    "Keep under 30 seconds for maximum reach",
+    "Enable duets and stitches",
+    "Post at 2-4 PM or 7-9 PM"
+  ]
+}
