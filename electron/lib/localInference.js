@@ -230,6 +230,52 @@ const CUSTOM_BINARIES = {
     'darwin-arm64': 'https://github.com/Anil-matcha/Open-Generative-AI/releases/download/v1.0.3-binaries/sd-cli-metal-macos-arm64.zip',
 };
 
+// The Windows CUDA build ships ggml-cuda.dll but not the CUDA runtime it links
+// against. Without these DLLs next to the binary, ggml silently skips the CUDA
+// backend and falls back to CPU — orders of magnitude slower, with no error
+// surfaced anywhere. leejet publishes them as a separate asset in the same
+// release, so pull it whenever we installed a CUDA build that lacks them.
+const CUDA_RUNTIME_FILES = ['cudart64_12.dll', 'cublas64_12.dll', 'cublasLt64_12.dll'];
+
+function cudaRuntimeInstalled() {
+    return CUDA_RUNTIME_FILES.every((name) => fs.existsSync(path.join(BIN_DIR, name)));
+}
+
+async function ensureCudaRuntime(release, send) {
+    if (process.platform !== 'win32') return;
+    // Only CUDA builds ship ggml-cuda.dll; CPU/Vulkan/ROCm builds need nothing extra.
+    if (!fs.existsSync(path.join(BIN_DIR, 'ggml-cuda.dll'))) return;
+    if (cudaRuntimeInstalled()) return;
+
+    const asset = (release?.assets || []).find((a) => /^cudart-sd-bin-win-cu\d+-x64\.zip$/.test(a.name));
+    if (!asset) {
+        console.warn('[local-ai] Installed a CUDA build but found no cudart asset in the release — generation will fall back to CPU.');
+        return;
+    }
+
+    send({ phase: 'downloading', progress: 0 });
+    const zipPath = path.join(BIN_DIR, asset.name);
+    await downloadFile(asset.browser_download_url, zipPath, (p) => {
+        send({ phase: 'downloading', progress: p });
+    });
+
+    send({ phase: 'extracting', progress: 0.98 });
+    await extractZip(zipPath, BIN_DIR);
+    fs.unlinkSync(zipPath);
+
+    // The archive may extract into a subdirectory — flatten to BIN_DIR so the
+    // DLLs sit next to sd-cli.exe, which is where the loader looks for them.
+    for (const name of CUDA_RUNTIME_FILES) {
+        if (fs.existsSync(path.join(BIN_DIR, name))) continue;
+        const found = findFile(BIN_DIR, name);
+        if (found) fs.renameSync(found, path.join(BIN_DIR, name));
+    }
+
+    if (!cudaRuntimeInstalled()) {
+        console.warn('[local-ai] CUDA runtime install incomplete — generation may fall back to CPU.');
+    }
+}
+
 async function downloadBinary(mainWindow) {
     const send = (data) => mainWindow?.webContents.send('local-ai:download-progress', { id: '__binary__', ...data });
 
@@ -245,6 +291,7 @@ async function downloadBinary(mainWindow) {
         const customUrl = CUSTOM_BINARIES[platformKey];
 
         let downloadUrl, zipName;
+        let chosenRelease = null;
 
         if (customUrl) {
             downloadUrl = customUrl;
@@ -271,6 +318,7 @@ async function downloadBinary(mainWindow) {
                 });
                 if (pickedName) {
                     chosen = zips.find(a => a.name === pickedName);
+                    chosenRelease = release;
                     break;
                 }
             }
@@ -309,6 +357,9 @@ async function downloadBinary(mainWindow) {
         }
 
         ensureBinaryPermissions();
+
+        // Windows CUDA builds are useless without the CUDA runtime beside them
+        await ensureCudaRuntime(chosenRelease, send);
 
         // macOS: strip Gatekeeper quarantine so the downloaded binary can run
         if (process.platform === 'darwin') {
@@ -480,13 +531,11 @@ async function generate(params, mainWindow) {
         args.push('--llm', llmPath);
         args.push('--vae', vaePath);
         if (model.scheduler) args.push('--scheduler', model.scheduler);
-    } else if (model.type === 'sdxl') {
-        args.push('--sd-version', 'sdxl');
-    } else if (model.type === 'sd2') {
-        args.push('--sd-version', 'sd2');
-    } else if (model.type === 'flux') {
-        args.push('--flux');
     }
+    // sdxl/sd2/flux used to need an explicit architecture flag (--sd-version,
+    // --flux). Those flags were removed upstream — sd.cpp now detects the
+    // architecture from the checkpoint itself, and passing them aborts with
+    // "unknown argument" before any work starts. Nothing to add here.
 
     return new Promise((resolve, reject) => {
         const startupStartedAt = Date.now();
