@@ -14,6 +14,17 @@ function notifyAuthRequired(status, detail) {
     window.dispatchEvent(new CustomEvent('muapi:auth-required', { detail: { status, message: detail } }));
 }
 
+// Marks an error as terminal so a polling loop rethrows instead of retrying.
+// Without this, a `throw` inside the try is caught by that same loop's catch
+// and swallowed, so an out-of-credits or already-failed job keeps polling for
+// the full maxAttempts (30 minutes at the 900-attempt default) and looks
+// identical to one that is still running.
+function fatal(message) {
+    const error = new Error(message);
+    error.isFatal = true;
+    return error;
+}
+
 async function pollForResult(requestId, key, maxAttempts = 900, interval = 2000) {
     const pollUrl = `${BASE_URL}/api/v1/predictions/${requestId}/result`;
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
@@ -26,14 +37,14 @@ async function pollForResult(requestId, key, maxAttempts = 900, interval = 2000)
                 const errText = await response.text();
                 if (response.status >= 500) continue;
                 notifyAuthRequired(response.status, errText);
-                throw new Error(`Poll Failed: ${response.status} - ${errText.slice(0, 100)}`);
+                throw fatal(`Poll Failed: ${response.status} - ${errText.slice(0, 100)}`);
             }
             const data = await response.json();
             const status = data.status?.toLowerCase();
             if (status === 'completed' || status === 'succeeded' || status === 'success') return data;
-            if (status === 'failed' || status === 'error') throw new Error(`Generation failed: ${data.error || 'Unknown error'}`);
+            if (status === 'failed' || status === 'error') throw fatal(`Generation failed: ${data.error || 'Unknown error'}`);
         } catch (error) {
-            if (attempt === maxAttempts) throw error;
+            if (error.isFatal || attempt === maxAttempts) throw error;
         }
     }
     throw new Error('Generation timed out after polling.');
@@ -596,14 +607,14 @@ async function pollWorkflowResult(runId, apiKey, maxAttempts = 900, interval = 2
             });
             if (!response.ok) {
                 if (response.status >= 500) continue;
-                throw new Error(`Poll Failed: ${response.status}`);
+                throw fatal(`Poll Failed: ${response.status}`);
             }
             const data = await response.json();
             const status = data.status?.toLowerCase();
             if (status === 'completed' || status === 'succeeded' || status === 'success') return data;
-            if (status === 'failed' || status === 'error') throw new Error(`Workflow failed: ${data.error || 'Unknown error'}`);
+            if (status === 'failed' || status === 'error') throw fatal(`Workflow failed: ${data.error || 'Unknown error'}`);
         } catch (error) {
-            if (attempt === maxAttempts) throw error;
+            if (error.isFatal || attempt === maxAttempts) throw error;
         }
     }
     throw new Error('Workflow timed out after polling.');

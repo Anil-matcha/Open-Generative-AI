@@ -1,5 +1,12 @@
 import { getModelById, getVideoModelById, getI2IModelById, getI2VModelById, getV2VModelById, getLipSyncModelById } from './models.js';
 
+// Marks an error as terminal so the polling loop rethrows instead of retrying.
+function fatal(message) {
+    const error = new Error(message);
+    error.isFatal = true;
+    return error;
+}
+
 export class MuapiClient {
     constructor() {
         // Ideally user provides this in settings
@@ -140,9 +147,10 @@ export class MuapiClient {
                 if (!response.ok) {
                     const errText = await response.text();
                     console.warn(`[Muapi] Poll error (${response.status}):`, errText);
-                    // Continue polling on non-fatal errors
+                    // 5xx is transient — keep polling. Anything else (401, 402,
+                    // 404, 429) will not fix itself, so stop immediately.
                     if (response.status >= 500) continue;
-                    throw new Error(`Poll Failed: ${response.status} - ${errText.slice(0, 100)}`);
+                    throw fatal(`Poll Failed: ${response.status} - ${errText.slice(0, 100)}`);
                 }
 
                 const data = await response.json();
@@ -155,12 +163,17 @@ export class MuapiClient {
                 }
 
                 if (status === 'failed' || status === 'error') {
-                    throw new Error(`Generation failed: ${data.error || 'Unknown error'}`);
+                    throw fatal(`Generation failed: ${data.error || 'Unknown error'}`);
                 }
 
                 // Otherwise (processing, pending, etc.) keep polling
             } catch (error) {
-                if (attempt === maxAttempts) throw error;
+                // Terminal conditions must not be retried. Without this the
+                // throws above are caught right here and the loop grinds on for
+                // the full maxAttempts, so an out-of-credits or already-failed
+                // job is indistinguishable from one still generating — up to
+                // 30 minutes of spinner for video, which uses 900 attempts.
+                if (error.isFatal || attempt === maxAttempts) throw error;
                 console.warn('[Muapi] Poll attempt failed, retrying...', error.message);
             }
         }
