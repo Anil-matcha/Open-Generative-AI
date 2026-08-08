@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { validateApiKey } from './apiKeyValidation.mjs';
 
 export default function ApiKeyModal({ onSave, onClose, overlay = false, title, subtitle }) {
   const [key, setKey] = useState('');
@@ -8,9 +9,9 @@ export default function ApiKeyModal({ onSave, onClose, overlay = false, title, s
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const trimmed = key.trim();
-    if (!trimmed) { setError('Please enter your API key'); return; }
-    onSave(trimmed);
+    const result = validateApiKey(key);
+    if (result.error) { setError(result.error); return; }
+    onSave(result.value);
   };
 
   const wrapperClass = overlay
