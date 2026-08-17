@@ -7,8 +7,8 @@
 
 **Community:** Join [Discord](https://discord.gg/tANKJkHck) for discussions and support
 
-<p align="center"><a href="https://youtu.be/74dyT-EjsrM"><img src="https://i.ytimg.com/vi/74dyT-EjsrM/maxresdefault.jpg" width="720"></a></p>
-<p align="center"><a href="https://youtu.be/74dyT-EjsrM"><b>▶ Watch: Uncensored AI Video API — Wan 2.2 Spicy vs Wan 2.6 Spicy vs Wan 2.7 Spicy vs Wan 3.0 Spicy API </b></a></p>
+<p align="center"><a href="https://youtu.be/EBU3cAof0nM"><img src="https://i.ytimg.com/vi/EBU3cAof0nM/maxresdefault.jpg" width="720"></a></p>
+<p align="center"><a href="https://youtu.be/EBU3cAof0nM"><b>▶ Watch: How to access Seedance 2.5 1080p Unrestricted </b></a></p>
 
 <p align="center">
   <a href="https://github.com/Anil-matcha/awesome-generative-ai-apps">
