@@ -7,8 +7,8 @@
 
 **Community:** Join [Discord](https://discord.gg/tANKJkHck) for discussions and support
 
-<p align="center"><a href="https://youtu.be/EBU3cAof0nM"><img src="https://i.ytimg.com/vi/EBU3cAof0nM/maxresdefault.jpg" width="720"></a></p>
-<p align="center"><a href="https://youtu.be/EBU3cAof0nM"><b>▶ Watch: How to access Seedance 2.5 1080p Unrestricted </b></a></p>
+<p align="center"><a href="https://youtu.be/tiWhE0MoKsc"><img src="https://i.ytimg.com/vi/tiWhE0MoKsc/maxresdefault.jpg" width="720"></a></p>
+<p align="center"><a href="https://youtu.be/tiWhE0MoKsc"><b>▶ Watch: Awesome DSH Plugin — Top 10 DeepSeek Harness Plugins You Need </b></a></p>
 
 <p align="center">
   <a href="https://github.com/Anil-matcha/awesome-generative-ai-apps">
