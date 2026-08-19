@@ -7,8 +7,8 @@
 
 **Community:** Join [Discord](https://discord.gg/tANKJkHck) for discussions and support
 
-<p align="center"><a href="https://youtu.be/tiWhE0MoKsc"><img src="https://i.ytimg.com/vi/tiWhE0MoKsc/maxresdefault.jpg" width="720"></a></p>
-<p align="center"><a href="https://youtu.be/tiWhE0MoKsc"><b>▶ Watch: Awesome DSH Plugin — Top 10 DeepSeek Harness Plugins You Need </b></a></p>
+<p align="center"><a href="https://youtu.be/YhHHut-pDOY"><img src="https://i.ytimg.com/vi/YhHHut-pDOY/maxresdefault.jpg" width="720"></a></p>
+<p align="center"><a href="https://youtu.be/YhHHut-pDOY"><b>▶ Watch: Free Uncensored AI Image & Video Generator API — Open Source (500+ Models) </b></a></p>
 
 <p align="center">
   <a href="https://github.com/Anil-matcha/awesome-generative-ai-apps">
