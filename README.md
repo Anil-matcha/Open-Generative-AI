@@ -56,6 +56,11 @@ This is a curated set of high-value hubs, popular distribution tools, and model-
 - [Open-AI-Design-Agent](https://github.com/Anil-matcha/Open-AI-Design-Agent) — Ppen-source autonomous AI design agent.
 - [Generative-Media-Skills](https://github.com/SamurAIGPT/Generative-Media-Skills) — Agent-ready skills for driving generative-media workflows.
 - [Seedance-2.5-API](https://github.com/SamurAIGPT/Seedance-2.5-API) — Python SDK for Seedance 2.5 video generation.
+- [Text-to-Speech-API](https://github.com/Anil-matcha/Text-to-Speech-API) — compare Muapi narration and multi-speaker speech endpoints with copy-paste examples.
+- [Speech-to-Text-API](https://github.com/Anil-matcha/Speech-to-Text-API) — compare Whisper transcription and Gemini audio analysis workflows.
+- [Image-Enhancement-API](https://github.com/Anil-matcha/Image-Enhancement-API) — compare image upscaling and background-removal endpoints.
+- [Video-Utilities-API](https://github.com/Anil-matcha/Video-Utilities-API) — compare video upscaling and video-to-audio post-production utilities.
+- [AI-3D-Model-API](https://github.com/Anil-matcha/AI-3D-Model-API) — compare Tripo3D and Meshy text/image-to-3D examples.
 
 ## 🌐 Try it Online — No Install Required
 
