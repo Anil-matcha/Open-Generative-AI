@@ -7,8 +7,8 @@
 
 **Community:** Join [Discord](https://discord.gg/tANKJkHck) for discussions and support
 
-<p align="center"><a href="https://youtu.be/uhy7aRW4HUU"><img src="https://i.ytimg.com/vi/uhy7aRW4HUU/maxresdefault.jpg" width="720"></a></p>
-<p align="center"><a href="https://youtu.be/uhy7aRW4HUU"><b>▶ Watch: How to Access Midjourney API (V8, V7, Niji) </b></a></p>
+<p align="center"><a href="https://youtu.be/SOXsxqnQGlc"><img src="https://i.ytimg.com/vi/SOXsxqnQGlc/maxresdefault.jpg" width="720"></a></p>
+<p align="center"><a href="https://youtu.be/SOXsxqnQGlc"><b>▶ Watch: Best AI Video Generator (API) in 2026 (Quality, Price, Uncensored, Editing) </b></a></p>
 
 <p align="center">
   <a href="https://github.com/Anil-matcha/awesome-generative-ai-apps">
