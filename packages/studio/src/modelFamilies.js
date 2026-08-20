@@ -5,6 +5,7 @@ import {
   t2vModels,
   v2vModels,
 } from "./models.js";
+import { getModelMediaCapabilities } from "./modelCapabilities.js";
 
 const IMAGE_FAMILY_ALIASES = {
   "bytedance-seededit-v3": "bytedance-seedream-v3",
@@ -107,6 +108,43 @@ function videoVariantKey(model) {
     ? `${endpoint}\u0000${effectOptions.join("\u0000")}`
     : endpoint;
 }
+
+const PREFERRED_IMAGE_VARIANTS = {
+  "flux-2-klein": {
+    t2i: "flux-2-klein-4b",
+    i2i: "flux-2-klein-4b-edit",
+  },
+  "flux-dev": { t2i: "flux-dev" },
+  "google-imagen4": { t2i: "google-imagen4" },
+  gpt4o: { i2i: "gpt4o-image-to-image" },
+  "midjourney-v7": { i2i: "midjourney-v7-image-to-image" },
+  "nano-banana": { i2i: "nano-banana-edit" },
+  "qwen-image-2.0": {
+    t2i: "qwen-image-2.0",
+    i2i: "qwen-image-2.0-edit",
+  },
+  "qwen-plus": { i2i: "qwen-image-edit-plus" },
+  qwen3: {
+    t2i: "qwen3-text-to-image",
+    i2i: "qwen3-image-to-image",
+  },
+  "seedream-5.0": {
+    t2i: "bytedance-seedream-v5.0",
+    i2i: "bytedance-seedream-v5.0-edit",
+  },
+  "wan2.7": {
+    t2i: "wan2.7-text-to-image",
+    i2i: "wan2.7-image-edit",
+  },
+};
+
+const PREFERRED_VIDEO_VARIANTS = {
+  "kling-v3": {
+    t2v: "kling-v3.0-standard-text-to-video",
+    i2v: "kling-v3.0-standard-image-to-video",
+    v2v: "kling-v3.0-std-motion-control",
+  },
+};
 
 function normalizeVersion(value) {
   return value.replace(/^v/i, "").replace(/\.0$/, "");
@@ -406,7 +444,51 @@ function buildCatalog(modeLists, config) {
     familyById,
     familyByVariantId,
     variantById,
+    preferredVariants: config.preferredVariants || {},
   };
+}
+
+function getPickerEntryByVariantId(catalog, variantId) {
+  return catalog === imageModelCatalog
+    ? imageModelPickerEntryByVariantId.get(variantId)
+    : videoModelPickerEntryByVariantId.get(variantId);
+}
+
+export function getFamilyVariant(catalog, familyOrId, mode, currentVariantId = null) {
+  const family =
+    typeof familyOrId === "string" ? catalog.familyById.get(familyOrId) : familyOrId;
+  const variants = family?.variants[mode] || [];
+  if (variants.length === 0) return null;
+
+  const currentFamily = currentVariantId
+    ? catalog.familyByVariantId.get(currentVariantId)
+    : null;
+  if (currentFamily?.id === family.id) {
+    const currentVariant = catalog.variantById.get(currentVariantId);
+    if (currentVariant?.mode === mode) return currentVariant;
+    const currentEntry = getPickerEntryByVariantId(catalog, currentVariantId);
+    return currentEntry?.variantsByMode[mode] || null;
+  }
+
+  const preferredId = catalog.preferredVariants[family.id]?.[mode];
+  const preferred = preferredId ? catalog.variantById.get(preferredId) : null;
+  if (preferred) return preferred;
+
+  return variants[0];
+}
+
+export function getImageReferenceVariant(catalog, familyOrId, currentVariantId) {
+  const family =
+    typeof familyOrId === "string" ? catalog.familyById.get(familyOrId) : familyOrId;
+  const currentVariant = catalog.variantById.get(currentVariantId);
+  if (
+    family &&
+    catalog.familyByVariantId.get(currentVariantId)?.id === family.id &&
+    getModelMediaCapabilities(currentVariant?.model).image.maxItems > 0
+  ) {
+    return currentVariant;
+  }
+  return getFamilyVariant(catalog, family, "i2i", currentVariantId);
 }
 
 export const imageModelCatalog = buildCatalog(
@@ -418,6 +500,7 @@ export const imageModelCatalog = buildCatalog(
     familyId: imageFamilyId,
     familyName: (id, fallback) => IMAGE_FAMILY_NAMES[id] || cleanImageFamilyName(fallback),
     namingModes: ["t2i", "i2i"],
+    preferredVariants: PREFERRED_IMAGE_VARIANTS,
     seriesVersion: imageSeriesVersion,
   },
 );
@@ -432,6 +515,7 @@ export const videoModelCatalog = buildCatalog(
     familyId: videoFamilyId,
     familyName: videoFamilyName,
     namingModes: ["t2v", "i2v", "v2v"],
+    preferredVariants: PREFERRED_VIDEO_VARIANTS,
     seriesVersion: videoSeriesVersion,
     variantKey: videoVariantKey,
   },

@@ -6,12 +6,12 @@ import { generateImage, generateI2I, uploadFile } from "../muapi.js";
 import { formatErrorMessage } from "../utils/formatError.js";
 import { scopedPersistKey, migrateLegacyPersistKey } from "../persistKey.js";
 import DrawModal from "./DrawModal.jsx";
+import ModelParameterControls from "./ModelParameterControls.jsx";
 import MobileGenerationActions, {
   GenerationCopyButtons,
 } from "./MobileGenerationActions.jsx";
 import {
   t2iModels,
-  i2iModels,
   getAspectRatiosForModel,
   getResolutionsForModel,
   getQualityFieldForModel,
@@ -24,10 +24,21 @@ import {
   getI2IModelById,
 } from "../models.js";
 import {
+  getFamilyVariant,
+  getImageReferenceVariant,
   imageModelCatalog,
   imageModelPickerEntries,
   imageModelPickerEntryByVariantId,
 } from "../modelFamilies.js";
+import {
+  buildReferenceParams,
+  getModelMediaCapabilities,
+} from "../modelCapabilities.js";
+import {
+  buildSupplementalInputPayload,
+  createModelParameterValues,
+  getSupplementalModelInputs,
+} from "../modelParameters.js";
 import {
   PROMPT_CONTROL_LABEL_CLASS,
   PROMPT_MEDIA_PREVIEW_CLASS,
@@ -73,6 +84,8 @@ function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [], 
   const [uploading, setUploading] = useState(false);
   const [selectedEntries, setSelectedEntries] = useState([]); // [{url, thumbnail}]
   const [uploadHistory, setUploadHistory] = useState(persistedHistory || []); // [{id, name, url, thumbnail}]
+  const onSelectRef = useRef(onSelect);
+  onSelectRef.current = onSelect;
 
   // Notify parent whenever uploadHistory changes (for localStorage persistence)
   const onHistoryChangeRef = useRef(onHistoryChange);
@@ -117,24 +130,29 @@ function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [], 
 
   // Sync initialUrls from parent (e.g. restored from localStorage)
   useEffect(() => {
-    if (initialUrls && initialUrls.length > 0) {
-      // Avoid infinite loops by only updating if URLs actually changed
-      const currentUrls = selectedEntries.map(e => e.url);
-      const isSame = initialUrls.length === currentUrls.length && initialUrls.every(u => currentUrls.includes(u));
-      if (isSame) return;
+    const nextUrls = initialUrls || [];
+    const currentUrls = selectedEntries.map((entry) => entry.url);
+    const isSame =
+      nextUrls.length === currentUrls.length &&
+      nextUrls.every((url, index) => url === currentUrls[index]);
+    if (isSame) return;
 
-      const newEntries = initialUrls.map(url => ({ url }));
-      setSelectedEntries(newEntries);
-      
-      // Also ensure they are in the history panel
-      setUploadHistory(prev => {
-        const existingUrls = prev.map(h => h.url);
-        const missing = initialUrls
-          .filter(u => !existingUrls.includes(u))
-          .map(u => ({ id: `restored-${u}`, name: "Restored Image", url: u, progress: 100 }));
-        return [...missing, ...prev];
-      });
-    }
+    setSelectedEntries(nextUrls.map((url) => ({ url })));
+    if (nextUrls.length === 0) return;
+
+    // Also ensure restored selections are available in the history panel.
+    setUploadHistory((history) => {
+      const existingUrls = new Set(history.map((entry) => entry.url));
+      const missing = nextUrls
+        .filter((url) => !existingUrls.has(url))
+        .map((url) => ({
+          id: `restored-${url}`,
+          name: "Restored Image",
+          url,
+          progress: 100,
+        }));
+      return missing.length > 0 ? [...missing, ...history] : history;
+    });
   }, [initialUrls]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // When maxImages changes, trim excess selections
@@ -153,9 +171,9 @@ function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [], 
     (entries) => {
       if (!entries.length) return;
       const urls = entries.map((e) => e.url);
-      onSelect({ url: urls[0], urls, thumbnail: entries[0].url });
+      onSelectRef.current?.({ url: urls[0], urls, thumbnail: entries[0].url });
     },
-    [onSelect],
+    [],
   );
 
   const handleFileChange = async (e) => {
@@ -590,7 +608,6 @@ const invertLogos = ['openai', 'blackforest', 'runway', 'ideogram', 'lightricks'
 function ModelDropdown({ selectedModel, onSelect, onClose }) {
   const [search, setSearch] = useState("");
   const selectedEntry = imageModelPickerEntryByVariantId.get(selectedModel);
-  const selectedMode = imageModelCatalog.variantById.get(selectedModel)?.mode || "t2i";
   const modelCategories = [
     {
       id: "all",
@@ -806,11 +823,7 @@ function ModelDropdown({ selectedModel, onSelect, onClose }) {
                 ref={isSelected ? activeItemRef : null}
                 onClick={(e) => {
                   e.stopPropagation();
-                  const variant = activeCategory.id === "all"
-                    ? entry.variantsByMode[selectedMode] || entry.defaultVariant
-                    : entry.variantsByMode[activeCategory.id];
-                  if (!variant) return;
-                  onSelect(variant.model, variant.mode);
+                  onSelect(entry, activeCategory.id);
                   onClose();
                 }}
                 className={`flex items-center justify-between p-3 hover:bg-white/5 rounded-lg cursor-pointer transition-all border border-transparent hover:border-white/5 ${
@@ -918,12 +931,11 @@ export default function ImageStudio({
     migrateLegacyPersistKey(LEGACY_PERSIST_KEY, PERSIST_KEY);
   }, [PERSIST_KEY]);
 
-  // ── Model / mode state ──────────────────────────────────────────────────
+  // ── Model state ─────────────────────────────────────────────────────────
+  const initialFamily = imageModelCatalog.familyByVariantId.get(t2iModels[0].id);
   const [imageMode, setImageMode] = useState(false); // false=t2i, true=i2i
   const [selectedModelId, setSelectedModelId] = useState(t2iModels[0].id);
-  const [selectedModelName, setSelectedModelName] = useState(t2iModels[0].name);
-  const selectedModelDisplayName =
-    imageModelPickerEntryByVariantId.get(selectedModelId)?.name || selectedModelName;
+  const [selectedFamilyId, setSelectedFamilyId] = useState(initialFamily.id);
   const [selectedAr, setSelectedAr] = useState(
     t2iModels[0].inputs?.aspect_ratio?.default || "1:1",
   );
@@ -932,7 +944,9 @@ export default function ImageStudio({
     return resolutions[0] || null;
   });
   const [selectedEffect, setSelectedEffect] = useState("");
-  const [maxImages, setMaxImages] = useState(1);
+  const [modelParameterValues, setModelParameterValues] = useState(() =>
+    createModelParameterValues(t2iModels[0]),
+  );
 
   // ── Prompt / upload state ───────────────────────────────────────────────
   const [prompt, setPrompt] = useState("");
@@ -973,6 +987,8 @@ export default function ImageStudio({
   const textareaRef = useRef(null);
   const dropdownRef = useRef(null);
   const uploadPickerResetRef = useRef(null); // not used directly — managed via key
+  const selectionRef = useRef(null);
+  selectionRef.current = { imageMode, selectedFamilyId, selectedModelId };
 
   // ── Close dropdown on outside click ─────────────────────────────────────
   useEffect(() => {
@@ -993,12 +1009,23 @@ export default function ImageStudio({
       if (stored) {
         const data = JSON.parse(stored);
         if (data.imageMode !== undefined) setImageMode(data.imageMode);
-        if (data.selectedModelId) setSelectedModelId(data.selectedModelId);
-        if (data.selectedModelName) setSelectedModelName(data.selectedModelName);
+        if (data.selectedModelId) {
+          const restoredFamily = imageModelCatalog.familyByVariantId.get(data.selectedModelId);
+          const restoredVariant = imageModelCatalog.variantById.get(data.selectedModelId);
+          if (restoredFamily) {
+            setSelectedModelId(data.selectedModelId);
+            setSelectedFamilyId(restoredFamily.id);
+            setModelParameterValues(
+              createModelParameterValues(
+                restoredVariant?.model,
+                data.modelParameterValues || {},
+              ),
+            );
+          }
+        }
         if (data.selectedAr) setSelectedAr(data.selectedAr);
         if (data.selectedQuality) setSelectedQuality(data.selectedQuality);
         if (data.selectedEffect) setSelectedEffect(data.selectedEffect);
-        if (data.maxImages) setMaxImages(data.maxImages);
         if (data.prompt) setPrompt(data.prompt);
         if (data.uploadedImageUrls) setUploadedImageUrls(data.uploadedImageUrls);
         if (data.uploadHistory) setUploadHistory(data.uploadHistory);
@@ -1018,11 +1045,11 @@ export default function ImageStudio({
         const state = {
           imageMode,
           selectedModelId,
-          selectedModelName,
+          selectedFamilyId,
           selectedAr,
           selectedQuality,
           selectedEffect,
-          maxImages,
+          modelParameterValues,
           prompt,
           uploadedImageUrls,
           uploadHistory,
@@ -1038,11 +1065,11 @@ export default function ImageStudio({
   }, [
     imageMode,
     selectedModelId,
-    selectedModelName,
+    selectedFamilyId,
     selectedAr,
     selectedQuality,
     selectedEffect,
-    maxImages,
+    modelParameterValues,
     prompt,
     uploadedImageUrls,
     uploadHistory,
@@ -1060,10 +1087,25 @@ export default function ImageStudio({
       return;
     }
 
+    const family = imageModelCatalog.familyById.get(selectedFamilyId);
+    const editor = getFamilyVariant(
+      imageModelCatalog,
+      family,
+      "i2i",
+      selectedModelId,
+    );
+    if (!editor) {
+      toast.error(`${family.name} does not support image references.`);
+      return;
+    }
+
     setGenerating(true); // Show as generating/busy
     try {
+      const uploadLimit = getMaxImagesForI2IModel(editor.model.id);
       const toUpload =
-        maxImages === 1 ? files.slice(0, 1) : files.slice(0, maxImages);
+        uploadLimit === 1
+          ? files.slice(0, 1)
+          : files.slice(0, uploadLimit);
       const urls = await Promise.all(
         toUpload.map(async (file) => {
           try {
@@ -1099,7 +1141,6 @@ export default function ImageStudio({
   }, [droppedFiles, onFilesHandled, processDroppedImages]);
 
   // ── Derived: current model lists & helpers ───────────────────────────────
-  const currentModels = imageMode ? i2iModels : t2iModels;
   const currentAspectRatios = imageMode
     ? getAspectRatiosForI2IModel(selectedModelId)
     : getAspectRatiosForModel(selectedModelId);
@@ -1112,138 +1153,119 @@ export default function ImageStudio({
   const showQualityBtn = currentResolutions.length > 0;
   const currentEffects = imageMode ? getEffectsForI2IModel(selectedModelId) : [];
   const showEffectBtn = currentEffects.length > 0;
+  const selectedFamily = imageModelCatalog.familyById.get(selectedFamilyId) || initialFamily;
+  const selectedPickerEntry = imageModelPickerEntryByVariantId.get(selectedModelId);
+  const selectedModelDisplayName = selectedPickerEntry?.name || selectedFamily.name;
+  const currentMode = imageMode ? "i2i" : "t2i";
+  const selectedVariant = imageModelCatalog.variantById.get(selectedModelId);
+  const supplementalInputs = getSupplementalModelInputs(selectedVariant?.model);
+  const referenceVariant = getImageReferenceVariant(
+    imageModelCatalog,
+    selectedFamily,
+    selectedModelId,
+  );
+  const referenceImageLimit = referenceVariant
+    ? getModelMediaCapabilities(referenceVariant.model).image.maxItems
+    : 1;
+
+  const applySelectedVariant = useCallback((variant, mode, family) => {
+    const model = variant.model;
+    const nextImageMode = mode === "i2i";
+    const ars = nextImageMode
+      ? getAspectRatiosForI2IModel(model.id)
+      : getAspectRatiosForModel(model.id);
+    const resolutions = nextImageMode
+      ? getResolutionsForI2IModel(model.id)
+      : getResolutionsForModel(model.id);
+
+    selectionRef.current = {
+      imageMode: nextImageMode,
+      selectedFamilyId: family.id,
+      selectedModelId: model.id,
+    };
+    setImageMode(nextImageMode);
+    setSelectedFamilyId(family.id);
+    setSelectedModelId(model.id);
+    setModelParameterValues((values) =>
+      createModelParameterValues(model, values),
+    );
+    setSelectedAr(ars[0] || "1:1");
+    setSelectedQuality(resolutions[0] || null);
+
+    if (nextImageMode) {
+      const effects = getEffectsForI2IModel(model.id);
+      setSelectedEffect(
+        effects.length > 0
+          ? (getDefaultEffectForI2IModel(model.id) || effects[0])
+          : "",
+      );
+    } else {
+      setSelectedEffect("");
+    }
+  }, []);
+
+  const applyUserSelectedVariant = useCallback((variant, mode, family) => {
+    if (mode === "t2i") {
+      setUploadedImageUrls([]);
+    } else {
+      const maxImages = getMaxImagesForI2IModel(variant.model.id);
+      setUploadedImageUrls((urls) => urls.slice(0, maxImages));
+    }
+    setSwapImageUrl(null);
+    applySelectedVariant(variant, mode, family);
+  }, [applySelectedVariant]);
 
   // ── Textarea auto-resize ─────────────────────────────────────────────────
   // ── Upload picker callbacks ──────────────────────────────────────────────
   const handleUploadSelect = useCallback(
     ({ url, urls }) => {
       const newUrls = urls || [url];
-      setUploadedImageUrls(newUrls);
+      const selection = selectionRef.current;
+      const family = imageModelCatalog.familyById.get(selection.selectedFamilyId);
+      const target = getImageReferenceVariant(
+        imageModelCatalog,
+        family,
+        selection.selectedModelId,
+      );
+      if (!target) {
+        toast.error(`${family.name} does not support image references.`);
+        return;
+      }
 
-      if (!imageMode) {
-        // Find the i2i sibling of the currently selected t2i model.
-        // Many models follow conventions, but some have completely irregular names —
-        // those are handled via a hardcoded exceptions map.
-        const curId = selectedModelId;
-        const i2iIds = new Set(i2iModels.map((m) => m.id));
-
-        // Hardcoded exceptions for models with irregular t2i → i2i naming
-        const EXCEPTIONS = {
-          'reve-text-to-image':          'reve-image-edit',
-          'wan2.1-text-to-image':        'wan2.5-image-edit',   // no wan2.1 i2i — closest
-          'wan2.5-text-to-image':        'wan2.5-image-edit',
-          'wan2.6-text-to-image':        'wan2.6-image-edit',
-          'kling-o1-text-to-image':      'kling-o1-edit-image',
-          'vidu-q2-text-to-image':       'vidu-q2-reference-to-image',
-          'bytedance-seedream-v3':       'bytedance-seededit-v3',
-          'bytedance-seedream-v4':       'bytedance-seedream-edit-v4',
-          'ideogram-v3-t2i':             'ideogram-v3-reframe',
-        };
-
-        const findI2I = (id) => i2iModels.find((m) => m.id === id) ?? null;
-
-        const target =
-          // 0. Hardcoded exceptions for irregular names
-          findI2I(EXCEPTIONS[curId]) ||
-          // 1. Model exists directly in i2i list (e.g. qwen-text-to-image-2512, flux-pulid, flux-redux)
-          findI2I(curId) ||
-          // 2. {id}-edit suffix (e.g. nano-banana → nano-banana-edit, gpt-image-1.5 → gpt-image-1.5-edit)
-          findI2I(`${curId}-edit`) ||
-          // 3. -t2i → -i2i (e.g. flux-kontext-dev-t2i → flux-kontext-dev-i2i)
-          (curId.includes('-t2i') && findI2I(curId.replace('-t2i', '-i2i'))) ||
-          // 4. text-to-image → image-to-image (e.g. gpt4o-text-to-image, midjourney-v7, grok-imagine)
-          (curId.includes('text-to-image') && findI2I(curId.replace('text-to-image', 'image-to-image'))) ||
-          // 5. Prefix match fallback (e.g. minimax-image-01 → minimax-image-01-subject-reference)
-          i2iModels.find((m) => m.id.startsWith(curId)) ||
-          // 6. No sibling exists — use first i2i model
-          i2iModels[0];
-
-        const ars = getAspectRatiosForI2IModel(target.id);
-        const resolutions = getResolutionsForI2IModel(target.id);
-        const effects = getEffectsForI2IModel(target.id);
-        setImageMode(true);
-        setSelectedModelId(target.id);
-        setSelectedModelName(target.name);
-        setSelectedAr(ars[0] || "1:1");
-        setSelectedQuality(resolutions[0] || null);
-        setSelectedEffect(effects.length > 0 ? (getDefaultEffectForI2IModel(target.id) || effects[0]) : "");
-        setMaxImages(getMaxImagesForI2IModel(target.id));
+      const limit = getModelMediaCapabilities(target.model).image.maxItems;
+      setUploadedImageUrls(newUrls.slice(0, limit));
+      const currentMode = selection.imageMode ? "i2i" : "t2i";
+      if (target.model.id !== selection.selectedModelId || target.mode !== currentMode) {
+        applySelectedVariant(target, target.mode, family);
       }
     },
-    [imageMode, selectedModelId],
+    [applySelectedVariant],
   );
 
   const handleUploadClear = useCallback(() => {
     setUploadedImageUrls([]);
-    setImageMode(false);
-
-    // Find the t2i parent of the currently selected i2i model (reverse of upload logic)
-    const curId = selectedModelId;
-    const findT2I = (id) => id ? (t2iModels.find((m) => m.id === id) ?? null) : null;
-
-    // Reverse exceptions map (i2i → t2i for irregular names)
-    const REVERSE_EXCEPTIONS = {
-      'reve-image-edit':               'reve-text-to-image',
-      'wan2.5-image-edit':             'wan2.5-text-to-image',
-      'wan2.6-image-edit':             'wan2.6-text-to-image',
-      'kling-o1-edit-image':           'kling-o1-text-to-image',
-      'vidu-q2-reference-to-image':    'vidu-q2-text-to-image',
-      'bytedance-seededit-v3':         'bytedance-seedream-v3',
-      'bytedance-seedream-edit-v4':    'bytedance-seedream-v4',
-      'ideogram-v3-reframe':           'ideogram-v3-t2i',
-    };
-
-    const target =
-      // 0. Hardcoded reverse exceptions
-      findT2I(REVERSE_EXCEPTIONS[curId]) ||
-      // 1. Model exists directly in t2i list (e.g. qwen-text-to-image-2512, flux-pulid, flux-redux)
-      findT2I(curId) ||
-      // 2. Strip -edit suffix (e.g. nano-banana-edit → nano-banana, gpt-image-1.5-edit → gpt-image-1.5)
-      (curId.endsWith('-edit') && findT2I(curId.slice(0, -5))) ||
-      // 3. -i2i → -t2i (e.g. flux-kontext-dev-i2i → flux-kontext-dev-t2i)
-      (curId.includes('-i2i') && findT2I(curId.replace('-i2i', '-t2i'))) ||
-      // 4. image-to-image → text-to-image (e.g. gpt4o-image-to-image → gpt4o-text-to-image)
-      (curId.includes('image-to-image') && findT2I(curId.replace('image-to-image', 'text-to-image'))) ||
-      // 5. No parent found — use first t2i model
-      t2iModels[0];
-
-    const ars = getAspectRatiosForModel(target.id);
-    const resolutions = getResolutionsForModel(target.id);
-    setSelectedModelId(target.id);
-    setSelectedModelName(target.name);
-    setSelectedAr(ars[0] || "1:1");
-    setSelectedQuality(resolutions[0] || null);
-    setSelectedEffect("");
-    setMaxImages(1);
-  }, [selectedModelId]);
+    const selection = selectionRef.current;
+    const family = imageModelCatalog.familyById.get(selection.selectedFamilyId);
+    const target = getFamilyVariant(
+      imageModelCatalog,
+      family,
+      "t2i",
+      selection.selectedModelId,
+    );
+    if (target) applySelectedVariant(target, "t2i", family);
+  }, [applySelectedVariant]);
 
   // ── Model selection ──────────────────────────────────────────────────────
-  const handleModelSelect = (m, category = imageMode ? "i2i" : "t2i") => {
-    const nextImageMode = category === "i2i";
-    const ars = nextImageMode
-      ? getAspectRatiosForI2IModel(m.id)
-      : getAspectRatiosForModel(m.id);
-    const resolutions = nextImageMode
-      ? getResolutionsForI2IModel(m.id)
-      : getResolutionsForModel(m.id);
-    if (!nextImageMode && imageMode) {
-      setUploadedImageUrls([]);
-      setSwapImageUrl(null);
-    }
-    setImageMode(nextImageMode);
-    setSelectedModelId(m.id);
-    setSelectedModelName(m.name);
-    setSelectedAr(ars[0] || "1:1");
-    setSelectedQuality(resolutions[0] || null);
-    setSwapImageUrl(null);
-    if (nextImageMode) {
-      setMaxImages(getMaxImagesForI2IModel(m.id));
-      const effects = getEffectsForI2IModel(m.id);
-      setSelectedEffect(effects.length > 0 ? (getDefaultEffectForI2IModel(m.id) || effects[0]) : "");
-    } else {
-      setMaxImages(1);
-      setSelectedEffect("");
-    }
+  const handleModelSelect = (pickerEntry, category = "all") => {
+    const { family, variantsByMode, defaultVariant } = pickerEntry;
+    const target = category !== "all"
+      ? variantsByMode[category]
+      : uploadedImageUrls.length > 0 && variantsByMode.i2i
+        ? variantsByMode.i2i
+        : variantsByMode[currentMode] || defaultVariant;
+    if (!target) return;
+
+    applyUserSelectedVariant(target, target.mode, family);
   };
 
   // ── History helpers ──────────────────────────────────────────────────────
@@ -1268,12 +1290,13 @@ export default function ImageStudio({
     const firstT2I = t2iModels[0];
     const ars = getAspectRatiosForModel(firstT2I.id);
     const resolutions = getResolutionsForModel(firstT2I.id);
+    const family = imageModelCatalog.familyByVariantId.get(firstT2I.id);
     setSelectedModelId(firstT2I.id);
-    setSelectedModelName(firstT2I.name);
+    setSelectedFamilyId(family.id);
     setSelectedAr(ars[0] || "1:1");
     setSelectedQuality(resolutions[0] || null);
     setSelectedEffect("");
-    setMaxImages(1);
+    setModelParameterValues(createModelParameterValues(firstT2I));
   };
 
   // ── Generation ───────────────────────────────────────────────────────────
@@ -1291,6 +1314,11 @@ export default function ImageStudio({
         return;
       }
     } else {
+      const imageCapability = getModelMediaCapabilities(selectedVariant?.model).image;
+      if (uploadedImageUrls.length > 0 && imageCapability.maxItems === 0) {
+        alert(`${selectedModelDisplayName} does not support image references.`);
+        return;
+      }
       if (!prompt.trim()) {
         alert("Please enter a prompt to generate an image.");
         return;
@@ -1307,6 +1335,10 @@ export default function ImageStudio({
           if (imageMode) {
             const genParams = {
               model: selectedModelId,
+              ...buildSupplementalInputPayload(
+                selectedVariant?.model,
+                modelParameterValues,
+              ),
               images_list: uploadedImageUrls,
               image_url: uploadedImageUrls[0],
               aspect_ratio: selectedAr,
@@ -1319,8 +1351,16 @@ export default function ImageStudio({
             if (showEffectBtn && selectedEffect) genParams.name = selectedEffect;
             return await generateI2I(apiKey, genParams);
           } else {
+            const referenceParams = buildReferenceParams(selectedVariant?.model, {
+              imageUrls: uploadedImageUrls,
+            });
             const genParams = {
               model: selectedModelId,
+              ...buildSupplementalInputPayload(
+                selectedVariant?.model,
+                modelParameterValues,
+              ),
+              ...referenceParams,
               prompt: prompt.trim(),
               aspect_ratio: selectedAr,
             };
@@ -1544,10 +1584,10 @@ export default function ImageStudio({
               ))}
               
               {/* Main Upload Trigger */}
-              {uploadedImageUrls.length < maxImages && (
+              {referenceVariant && uploadedImageUrls.length < referenceImageLimit && (
                 <UploadButton
                   apiKey={apiKey}
-                  maxImages={maxImages}
+                  maxImages={referenceImageLimit}
                   onSelect={handleUploadSelect}
                   onClear={handleUploadClear}
                   initialUrls={uploadedImageUrls}
@@ -1596,8 +1636,7 @@ export default function ImageStudio({
                 >
                   <div className="w-4 h-4 rounded overflow-hidden shrink-0 flex items-center justify-center bg-white/5">
                     {(() => {
-                      const selectedModelObj = currentModels.find(m => m.id === selectedModelId);
-                      const selectedModelProvider = selectedModelObj?.provider || 'muapi';
+                      const selectedModelProvider = selectedFamily.provider || 'muapi';
                       return PROVIDER_LOGOS[selectedModelProvider] ? (
                         <img 
                           src={PROVIDER_LOGOS[selectedModelProvider]} 
@@ -1629,6 +1668,21 @@ export default function ImageStudio({
                   </PromptPopover>
                 )}
               </div>
+
+              <ModelParameterControls
+                inputs={supplementalInputs}
+                values={modelParameterValues}
+                onChange={(key, value) =>
+                  setModelParameterValues((values) => ({ ...values, [key]: value }))
+                }
+                open={dropdownOpen === "parameters"}
+                onToggle={(event) => {
+                  event.stopPropagation();
+                  setDropdownOpen((open) =>
+                    open === "parameters" ? null : "parameters",
+                  );
+                }}
+              />
 
               {/* Aspect ratio button */}
               <div className="relative">
