@@ -24,6 +24,11 @@ import {
   getI2IModelById,
 } from "../models.js";
 import {
+  imageModelCatalog,
+  imageModelPickerEntries,
+  imageModelPickerEntryByVariantId,
+} from "../modelFamilies.js";
+import {
   PROMPT_CONTROL_LABEL_CLASS,
   PROMPT_MEDIA_PREVIEW_CLASS,
   PromptAspectRatioIcon,
@@ -584,24 +589,23 @@ const invertLogos = ['openai', 'blackforest', 'runway', 'ideogram', 'lightricks'
 
 function ModelDropdown({ selectedModel, onSelect, onClose }) {
   const [search, setSearch] = useState("");
+  const selectedEntry = imageModelPickerEntryByVariantId.get(selectedModel);
+  const selectedMode = imageModelCatalog.variantById.get(selectedModel)?.mode || "t2i";
   const modelCategories = [
     {
       id: "all",
       label: "All",
-      entries: [
-        ...t2iModels.map((model) => ({ model, category: "t2i" })),
-        ...i2iModels.map((model) => ({ model, category: "i2i" })),
-      ],
+      entries: imageModelPickerEntries,
     },
     {
       id: "t2i",
       label: "Text to Image",
-      entries: t2iModels.map((model) => ({ model, category: "t2i" })),
+      entries: imageModelPickerEntries.filter((entry) => entry.variantsByMode.t2i),
     },
     {
       id: "i2i",
       label: "Image to Image",
-      entries: i2iModels.map((model) => ({ model, category: "i2i" })),
+      entries: imageModelPickerEntries.filter((entry) => entry.variantsByMode.i2i),
     },
   ];
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -658,30 +662,26 @@ function ModelDropdown({ selectedModel, onSelect, onClose }) {
   const availableProviders = [];
   const seenProviders = new Set();
   
-  modelEntries.forEach(({ model: m }) => {
-    const pId = m.provider || 'muapi';
-    const pName = m.provider_name || 'Muapi';
+  modelEntries.forEach(({ family }) => {
+    const pId = family.provider || 'muapi';
+    const pName = family.provider_name || 'Muapi';
     if (!seenProviders.has(pId)) {
       seenProviders.add(pId);
       availableProviders.push({ id: pId, name: pName });
     }
   });
 
-  const filtered = modelEntries.filter(({ model: m }) => {
+  const filtered = modelEntries.filter((entry) => {
+    const { family } = entry;
     // 1. Filter by provider tab
     if (selectedProvider !== "all") {
-      const pId = m.provider || 'muapi';
+      const pId = family.provider || 'muapi';
       if (pId !== selectedProvider) return false;
     }
     // 2. Filter by search query
     const query = search.toLowerCase();
-    return (
-      m.name.toLowerCase().includes(query) ||
-      m.id.toLowerCase().includes(query)
-    );
+    return entry.searchText.includes(query);
   });
-
-  const invertLogos = ['openai', 'blackforest', 'runway', 'ideogram', 'lightricks', 'grok'];
 
   return (
     <div className="flex gap-4 h-full max-h-[60vh] min-h-[350px] overflow-x-hidden">
@@ -710,9 +710,10 @@ function ModelDropdown({ selectedModel, onSelect, onClose }) {
               key={p.id}
               type="button"
               onClick={() => setSelectedProvider(p.id)}
-              className={`w-8 h-8 flex-shrink-0 rounded-full flex items-center justify-center font-black text-[10px] border transition-all flex-shrink-0 cursor-pointer overflow-hidden ${
+              aria-pressed={isSelected}
+              className={`w-8 h-8 flex-shrink-0 rounded-full flex items-center justify-center overflow-hidden font-black text-[10px] border transition-all cursor-pointer ${
                 isSelected
-                  ? `${style.bg} border-white/25 scale-105 shadow-md`
+                  ? `${style.bg} scale-105 shadow-md shadow-black/10`
                   : "bg-white/[0.02] text-white/40 border-white/[0.02] hover:bg-white/5 hover:text-white/80"
               }`}
               title={p.name}
@@ -771,7 +772,11 @@ function ModelDropdown({ selectedModel, onSelect, onClose }) {
               placeholder="Search models..."
               value={search}
               onClick={(e) => e.stopPropagation()}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                setSearch(value);
+                if (value.trim()) setSelectedProvider("all");
+              }}
               className="bg-transparent border-none text-xs text-white focus:ring-0 w-full p-0 focus:outline-none"
             />
           </div>
@@ -792,53 +797,62 @@ function ModelDropdown({ selectedModel, onSelect, onClose }) {
               No models found
             </div>
           ) : (
-            filtered.map(({ model: m, category }) => (
+            filtered.map((entry) => {
+              const { family } = entry;
+              const isSelected = selectedEntry === entry;
+              return (
               <div
-                key={`${category}:${m.id}`}
-                ref={selectedModel === m.id ? activeItemRef : null}
+                key={entry.id}
+                ref={isSelected ? activeItemRef : null}
                 onClick={(e) => {
                   e.stopPropagation();
-                  onSelect(m, category);
+                  const variant = activeCategory.id === "all"
+                    ? entry.variantsByMode[selectedMode] || entry.defaultVariant
+                    : entry.variantsByMode[activeCategory.id];
+                  if (!variant) return;
+                  onSelect(variant.model, variant.mode);
                   onClose();
                 }}
                 className={`flex items-center justify-between p-3 hover:bg-white/5 rounded-lg cursor-pointer transition-all border border-transparent hover:border-white/5 ${
-                  selectedModel === m.id ? "bg-white/5 border-white/5" : ""
+                  isSelected ? "bg-white/5 border-white/5" : ""
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  {PROVIDER_LOGOS[m.provider] ? (
+                  {PROVIDER_LOGOS[family.provider] ? (
                     <div className="w-8 h-8 rounded-full border border-white/5 overflow-hidden shrink-0 flex items-center justify-center bg-white/[0.02]">
                       <img
-                        src={PROVIDER_LOGOS[m.provider]}
-                        alt={m.provider_name}
-                        className={`w-full h-full object-contain p-1 ${invertLogos.includes(m.provider) ? "invert" : ""}`}
+                        src={PROVIDER_LOGOS[family.provider]}
+                        alt={family.provider_name}
+                        className={`w-full h-full object-contain p-1 ${invertLogos.includes(family.provider) ? "invert" : ""}`}
                       />
                     </div>
                   ) : (
                     <div
                       className={`w-8 h-8 ${
-                        m.family === "kontext"
+                        family.id.includes("kontext")
                           ? "bg-blue-500/10 text-blue-400 border-blue-500/10"
-                          : m.family === "effects"
+                          : family.id.includes("effects")
                             ? "bg-purple-500/10 text-purple-400 border-purple-500/10"
                             : "bg-primary/10 text-primary border-primary/10"
                       } border rounded-full flex items-center justify-center font-bold text-xs shadow-inner uppercase`}
                     >
-                      {m.name.charAt(0)}
+                      {entry.name.charAt(0)}
                     </div>
                   )}
                   <div className="flex flex-col gap-0.5 min-w-0">
                     <span className="text-xs font-bold text-white tracking-tight truncate">
-                      {m.name}
+                      {entry.name}
                     </span>
-                    {selectedProvider === "all" && m.provider_name && (
+                    <div className="flex items-center gap-1.5">
+                    {selectedProvider === "all" && family.provider_name && (
                       <span className="text-[9px] text-white/40">
-                        {m.provider_name}
+                        {family.provider_name}
                       </span>
                     )}
+                    </div>
                   </div>
                 </div>
-                {selectedModel === m.id && (
+                {isSelected && (
                   <svg
                     width="14"
                     height="14"
@@ -851,7 +865,8 @@ function ModelDropdown({ selectedModel, onSelect, onClose }) {
                   </svg>
                 )}
               </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>
@@ -907,6 +922,8 @@ export default function ImageStudio({
   const [imageMode, setImageMode] = useState(false); // false=t2i, true=i2i
   const [selectedModelId, setSelectedModelId] = useState(t2iModels[0].id);
   const [selectedModelName, setSelectedModelName] = useState(t2iModels[0].name);
+  const selectedModelDisplayName =
+    imageModelPickerEntryByVariantId.get(selectedModelId)?.name || selectedModelName;
   const [selectedAr, setSelectedAr] = useState(
     t2iModels[0].inputs?.aspect_ratio?.default || "1:1",
   );
@@ -1493,7 +1510,7 @@ export default function ImageStudio({
             <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-center px-4 flex flex-col items-center">
               <span className="text-white font-black uppercase text-xl sm:text-3xl tracking-wide mb-1 opacity-90">START CREATING WITH</span>
               <span className="text-[#22d3ee] font-black uppercase text-2xl sm:text-4xl sm:mt-1 tracking-tight">
-                {selectedModelName}
+                {selectedModelDisplayName}
               </span>
             </h1>
             <p className="text-white/40 text-xs sm:text-sm font-medium tracking-wide text-center max-w-lg leading-relaxed px-4">
@@ -1593,7 +1610,7 @@ export default function ImageStudio({
                     })()}
                   </div>
                   <span className={PROMPT_CONTROL_LABEL_CLASS}>
-                    {selectedModelName}
+                    {selectedModelDisplayName}
                   </span>
                   <PromptChevronIcon />
                 </button>

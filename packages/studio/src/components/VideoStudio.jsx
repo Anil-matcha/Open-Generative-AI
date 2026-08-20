@@ -25,6 +25,11 @@ import {
   getMaxImagesForI2VModel,
 } from "../models.js";
 import {
+  videoModelCatalog,
+  videoModelPickerEntries,
+  videoModelPickerEntryByVariantId,
+} from "../modelFamilies.js";
+import {
   PROMPT_CONTROL_LABEL_CLASS,
   PROMPT_MEDIA_PREVIEW_CLASS,
   PromptAspectRatioIcon,
@@ -148,34 +153,35 @@ const invertLogos = ['openai', 'blackforest', 'runway', 'ideogram', 'lightricks'
 
 function ModelDropdown({ selectedModel, onSelect, onClose }) {
   const [search, setSearch] = useState("");
+  const selectedEntry = videoModelPickerEntryByVariantId.get(selectedModel);
+  const selectedMode = videoModelCatalog.variantById.get(selectedModel)?.mode || "t2v";
+  const selectedModelProvider = selectedEntry?.family.provider || "all";
   const modelCategories = [
     {
       id: "all",
       label: "All",
-      entries: [
-        ...t2vModels.map((model) => ({ model, category: "t2v" })),
-        ...i2vModels.map((model) => ({ model, category: "i2v" })),
-        ...v2vModels.map((model) => ({ model, category: "v2v" })),
-      ],
+      entries: videoModelPickerEntries,
     },
     {
       id: "t2v",
       label: "Text to Video",
-      entries: t2vModels.map((model) => ({ model, category: "t2v" })),
+      entries: videoModelPickerEntries.filter((entry) => entry.variantsByMode.t2v),
     },
     {
       id: "i2v",
       label: "Image to Video",
-      entries: i2vModels.map((model) => ({ model, category: "i2v" })),
+      entries: videoModelPickerEntries.filter((entry) => entry.variantsByMode.i2v),
     },
     {
       id: "v2v",
       label: "Video Tools",
-      entries: v2vModels.map((model) => ({ model, category: "v2v" })),
+      entries: videoModelPickerEntries.filter((entry) => entry.variantsByMode.v2v),
     },
   ];
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [selectedProvider, setSelectedProvider] = useState("all");
+  const [selectedProvider, setSelectedProvider] = useState(
+    () => selectedModelProvider,
+  );
   const activeCategory = modelCategories.find((category) => category.id === selectedCategory) || modelCategories[0];
   const modelEntries = activeCategory.entries;
 
@@ -228,9 +234,9 @@ function ModelDropdown({ selectedModel, onSelect, onClose }) {
   const availableProviders = [];
   const seenProviders = new Set();
   
-  modelEntries.forEach(({ model: m }) => {
-    const pId = m.provider || 'muapi';
-    const pName = m.provider_name || 'Muapi';
+  modelEntries.forEach(({ family }) => {
+    const pId = family.provider || 'muapi';
+    const pName = family.provider_name || 'Muapi';
     if (!seenProviders.has(pId)) {
       seenProviders.add(pId);
       availableProviders.push({ id: pId, name: pName });
@@ -239,82 +245,75 @@ function ModelDropdown({ selectedModel, onSelect, onClose }) {
 
   const lf = search.toLowerCase();
 
-  const filterFn = ({ model: m }) => {
+  const filtered = modelEntries.filter((entry) => {
+    const { family } = entry;
     // 1. Filter by provider tab
     if (selectedProvider !== "all") {
-      const pId = m.provider || 'muapi';
+      const pId = family.provider || 'muapi';
       if (pId !== selectedProvider) return false;
     }
     // 2. Filter by search query
-    return (
-      m.name.toLowerCase().includes(lf) ||
-      m.id.toLowerCase().includes(lf)
-    );
-  };
+    return entry.searchText.includes(lf);
+  });
 
-  const filteredMain = modelEntries.filter(filterFn).filter(({ category }) => category !== "v2v");
-  const filteredV2V = modelEntries.filter(filterFn).filter(({ category }) => category === "v2v");
-
-  const getIconColor = (m, isV2V) => {
-    if (isV2V) return "bg-orange-500/10 text-orange-400 border-orange-500/10";
-    if (m.id.includes("kling")) return "bg-blue-500/10 text-blue-400 border-blue-500/10";
-    if (m.id.includes("veo")) return "bg-purple-500/10 text-purple-400 border-purple-500/10";
-    if (m.id.includes("sora")) return "bg-rose-500/10 text-rose-400 border-rose-500/10";
+  const getIconColor = (family) => {
+    if (family.id.includes("kling")) return "bg-blue-500/10 text-blue-400 border-blue-500/10";
+    if (family.id.includes("veo")) return "bg-purple-500/10 text-purple-400 border-purple-500/10";
+    if (family.id.includes("sora")) return "bg-rose-500/10 text-rose-400 border-rose-500/10";
     return "bg-primary/10 text-primary border-primary/10";
   };
 
-  const renderItem = ({ model: m, category }) => {
-    const isV2V = category === "v2v";
+  const renderItem = (entry) => {
+    const { family } = entry;
+    const isSelected = selectedEntry === entry;
     return (
     <div
-      key={`${category}:${m.id}`}
-      ref={selectedModel === m.id ? activeItemRef : null}
-      className={`flex items-center justify-between p-3.5 hover:bg-white/5 rounded-2xl cursor-pointer transition-all border border-transparent hover:border-white/5 ${selectedModel === m.id ? "bg-white/5 border-white/5" : ""}`}
+      key={entry.id}
+      ref={isSelected ? activeItemRef : null}
+      className={`flex items-center justify-between p-3.5 hover:bg-white/5 rounded-2xl cursor-pointer transition-all border border-transparent hover:border-white/5 ${isSelected ? "bg-white/5 border-white/5" : ""}`}
       onClick={(e) => {
         e.stopPropagation();
-        onSelect(m, category);
+        const variant = activeCategory.id === "all"
+          ? entry.variantsByMode[selectedMode] || entry.defaultVariant
+          : entry.variantsByMode[activeCategory.id];
+        if (!variant) return;
+        onSelect(variant.model, variant.mode);
         onClose();
       }}
     >
       <div className="flex items-center gap-3.5">
-        {PROVIDER_LOGOS[m.provider] ? (
+        {PROVIDER_LOGOS[family.provider] ? (
           <div className="w-8 h-8 rounded-xl border border-white/5 overflow-hidden shrink-0 flex items-center justify-center bg-white/[0.02]">
             <img
-              src={PROVIDER_LOGOS[m.provider]}
-              alt={m.provider_name}
-              className={`w-full h-full object-contain p-1 ${invertLogos.includes(m.provider) ? "invert" : ""}`}
+              src={PROVIDER_LOGOS[family.provider]}
+              alt={family.provider_name}
+              className={`w-full h-full object-contain p-1 ${invertLogos.includes(family.provider) ? "invert" : ""}`}
             />
           </div>
         ) : (
           <div
-            className={`w-9 h-9 ${getIconColor(m, isV2V)} border rounded-xl flex items-center justify-center font-black text-xs shadow-inner uppercase`}
+            className={`w-9 h-9 ${getIconColor(family)} border rounded-xl flex items-center justify-center font-black text-xs shadow-inner uppercase`}
           >
-            {m.name.charAt(0)}
+            {entry.name.charAt(0)}
           </div>
         )}
         <div className="flex flex-col gap-0.5 min-w-0">
           <span className="text-xs font-bold text-white tracking-tight truncate">
-            {m.name}
+            {entry.name}
           </span>
-          {isV2V ? (
-            <span className="text-[9px] text-orange-400/70">
-              {m.imageField ? "Upload a video and image" : "Upload a video to use"}
-            </span>
-          ) : (
-            selectedProvider === "all" && m.provider_name && (
+          <div className="flex items-center gap-1.5">
+            {selectedProvider === "all" && family.provider_name && (
               <span className="text-[9px] text-white/40">
-                {m.provider_name}
+                {family.provider_name}
               </span>
-            )
-          )}
+            )}
+          </div>
         </div>
       </div>
-      {selectedModel === m.id && <CheckSvg />}
+      {isSelected && <CheckSvg />}
     </div>
     );
   };
-
-  const invertLogos = ['openai', 'blackforest', 'runway', 'ideogram', 'lightricks', 'grok'];
 
   return (
     <div className="flex gap-4 h-full max-h-[70vh] min-h-[350px]">
@@ -343,9 +342,10 @@ function ModelDropdown({ selectedModel, onSelect, onClose }) {
               key={p.id}
               type="button"
               onClick={() => setSelectedProvider(p.id)}
-              className={`w-8 h-8 flex-shrink-0 rounded-full flex items-center justify-center font-black text-[10px] border transition-all flex-shrink-0 cursor-pointer overflow-hidden ${
+              aria-pressed={isSelected}
+              className={`w-8 h-8 flex-shrink-0 rounded-full flex items-center justify-center overflow-hidden font-black text-[10px] border transition-all cursor-pointer ${
                 isSelected
-                  ? `${style.bg} border-white/25 scale-105 shadow-md`
+                  ? `${style.bg} scale-105 shadow-md shadow-black/10`
                   : "bg-white/[0.02] text-white/40 border-white/[0.02] hover:bg-white/5 hover:text-white/80"
               }`}
               title={p.name}
@@ -403,7 +403,11 @@ function ModelDropdown({ selectedModel, onSelect, onClose }) {
               type="text"
               placeholder="Search models..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                setSearch(value);
+                if (value.trim()) setSelectedProvider("all");
+              }}
               onClick={(e) => e.stopPropagation()}
               className="bg-transparent border-none text-xs text-white focus:ring-0 w-full p-0 outline-none"
             />
@@ -420,22 +424,12 @@ function ModelDropdown({ selectedModel, onSelect, onClose }) {
         </div>
         
         <div className="flex flex-col gap-1.5 overflow-y-auto custom-scrollbar pr-1 pb-2 flex-1">
-          {filteredMain.length === 0 && filteredV2V.length === 0 ? (
+          {filtered.length === 0 ? (
             <div className="text-xs text-white/30 text-center py-6">
               No models found
             </div>
           ) : (
-            <>
-              {filteredMain.map((entry) => renderItem(entry))}
-              {filteredV2V.length > 0 && (
-                <>
-                  <div className="text-xs font-bold text-orange-400/70 px-3 py-2 mt-1 border-t border-white/5">
-                    Video Tools
-                  </div>
-                  {filteredV2V.map((entry) => renderItem(entry))}
-                </>
-              )}
-            </>
+            filtered.map((entry) => renderItem(entry))
           )}
         </div>
       </div>
@@ -475,6 +469,8 @@ export default function VideoStudio({
   const defaultModel = t2vModels[0];
   const [selectedModel, setSelectedModel] = useState(defaultModel.id);
   const [selectedModelName, setSelectedModelName] = useState(defaultModel.name);
+  const selectedModelDisplayName =
+    videoModelPickerEntryByVariantId.get(selectedModel)?.name || selectedModelName;
   const [selectedAr, setSelectedAr] = useState(
     defaultModel.inputs?.aspect_ratio?.default || "16:9",
   );
@@ -1605,7 +1601,7 @@ export default function VideoStudio({
             <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-center px-4 flex flex-col items-center">
               <span className="text-white font-black uppercase text-xl sm:text-3xl tracking-wide mb-1 opacity-90">START CREATING WITH</span>
               <span className="text-[#22d3ee] font-black uppercase text-2xl sm:text-4xl sm:mt-1 tracking-tight">
-                {selectedModelName}
+                {selectedModelDisplayName}
               </span>
             </h1>
             <p className="text-white/40 text-xs sm:text-sm font-medium tracking-wide text-center max-w-lg leading-relaxed px-4">
@@ -1940,7 +1936,7 @@ export default function VideoStudio({
                     })()}
                   </div>
                 <span className={PROMPT_CONTROL_LABEL_CLASS}>
-                    {selectedModelName}
+                    {selectedModelDisplayName}
                   </span>
                   <PromptChevronIcon />
                 </button>
