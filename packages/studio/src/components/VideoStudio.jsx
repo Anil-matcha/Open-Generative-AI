@@ -22,8 +22,13 @@ import {
   getEffectsForI2VModel,
   getDefaultEffectForI2VModel,
   getModesForModel,
-  getMaxImagesForI2VModel,
 } from "../models.js";
+import {
+  getImageAttachmentLabel,
+  getImageInputProfile,
+  normalizeImageAttachments,
+  reconcileImageAttachments,
+} from "../videoMediaInputs.js";
 import {
   PROMPT_CONTROL_LABEL_CLASS,
   PROMPT_MEDIA_PREVIEW_CLASS,
@@ -544,9 +549,29 @@ export default function VideoStudio({
   const videoFileInputRef = useRef(null);
   const resultVideoRef = useRef(null);
   const hasRestored = useRef(false);
+  const imageUploadVersionRef = useRef(0);
+  const endImageUploadVersionRef = useRef(0);
 
   // ── derived data ──
   const history = historyItems ?? localHistory;
+
+  const applyImageAttachments = useCallback((attachments) => {
+    setUploadedImageUrl(attachments.primaryUrl);
+    setUploadedImageUrls(attachments.listUrls);
+    setUploadedEndImageUrl(attachments.endUrl);
+  }, []);
+
+  const invalidateImageUpload = useCallback(() => {
+    imageUploadVersionRef.current += 1;
+    setImageUploading(false);
+    setImageProgress(0);
+  }, []);
+
+  const invalidateEndImageUpload = useCallback(() => {
+    endImageUploadVersionRef.current += 1;
+    setEndImageUploading(false);
+    setEndImageProgress(0);
+  }, []);
 
   // See ImageStudio's handleDeleteEntry: when historyItems is server-backed
   // (White Label / backfilled sessions), localHistory isn't what's rendered,
@@ -693,11 +718,21 @@ export default function VideoStudio({
         if (data.selectedQuality) setSelectedQuality(data.selectedQuality);
         if (data.selectedMode) setSelectedMode(data.selectedMode);
         if (data.selectedEffect) setSelectedEffect(data.selectedEffect);
-        if (data.uploadedImageUrl) setUploadedImageUrl(data.uploadedImageUrl);
-        if (data.uploadedImageUrls) {
-          setUploadedImageUrls(data.uploadedImageUrls);
-        } else if (data.uploadedImageUrl) {
-          setUploadedImageUrls([data.uploadedImageUrl]);
+        const restoredI2VModel = data.imageMode
+          ? i2vModels.find((model) => model.id === data.selectedModel)
+          : null;
+        if (restoredI2VModel) {
+          applyImageAttachments(
+            normalizeImageAttachments(getImageInputProfile(restoredI2VModel), {
+              primaryUrl: data.uploadedImageUrl || null,
+              listUrls: data.uploadedImageUrls || [],
+              endUrl: data.uploadedEndImageUrl || null,
+            }),
+          );
+        } else {
+          setUploadedImageUrl(data.uploadedImageUrl || null);
+          setUploadedImageUrls(data.uploadedImageUrls || []);
+          setUploadedEndImageUrl(data.uploadedEndImageUrl || null);
         }
         if (data.uploadedVideoUrl) setUploadedVideoUrl(data.uploadedVideoUrl);
         if (data.uploadedVideoName) setUploadedVideoName(data.uploadedVideoName);
@@ -716,7 +751,7 @@ export default function VideoStudio({
     } finally {
       hasRestored.current = true;
     }
-  }, [applyControlsForModel, defaultModel.id]);
+  }, [applyControlsForModel, applyImageAttachments, defaultModel.id]);
 
   // ── Persistence: Save ────────────────────────────────────────────────────
   useEffect(() => {
@@ -735,6 +770,7 @@ export default function VideoStudio({
           selectedEffect,
           uploadedImageUrl,
           uploadedImageUrls,
+          uploadedEndImageUrl,
           uploadedVideoUrl,
           uploadedVideoName,
           prompt,
@@ -759,6 +795,7 @@ export default function VideoStudio({
     selectedEffect,
     uploadedImageUrl,
     uploadedImageUrls,
+    uploadedEndImageUrl,
     uploadedVideoUrl,
     uploadedVideoName,
     prompt,
@@ -771,11 +808,13 @@ export default function VideoStudio({
     (url) => {
       if (!url) return;
 
-      setUploadedImageUrl(url);
-
       // Motion-control models use the image alongside the uploaded video.
       if (isMotionControlSelection(selectedModel, v2vMode)) {
-        setUploadedImageUrls([url]);
+        applyImageAttachments({
+          primaryUrl: url,
+          listUrls: [],
+          endUrl: null,
+        });
         setPromptDisabled(false);
         return;
       }
@@ -784,6 +823,7 @@ export default function VideoStudio({
 
       // Models with native image inputs stay in their current mode.
       if (currentT2V?.inputs?.images_list) {
+        setUploadedImageUrl(url);
         const maxImages = currentT2V.inputs.images_list.maxItems || 8;
         setUploadedImageUrls((previousUrls) => {
           if (previousUrls.includes(url)) return previousUrls;
@@ -813,19 +853,23 @@ export default function VideoStudio({
         applyControlsForModel(targetModel.id, true, false);
       }
 
-      const maxImages = getMaxImagesForI2VModel(targetModel.id);
-      if (maxImages > 2) {
+      const imageProfile = getImageInputProfile(targetModel);
+      if (imageProfile.kind === "references") {
+        setUploadedImageUrl(null);
+        setUploadedEndImageUrl(null);
         setUploadedImageUrls((previousUrls) => {
           if (previousUrls.includes(url)) return previousUrls;
-          return [...previousUrls, url].slice(0, maxImages);
+          return [...previousUrls, url].slice(0, imageProfile.maxImages);
         });
       } else {
-        setUploadedImageUrls([url]);
+        setUploadedImageUrl(url);
+        setUploadedImageUrls([]);
       }
       setPromptDisabled(false);
     },
     [
       applyControlsForModel,
+      applyImageAttachments,
       imageMode,
       isMotionControlSelection,
       selectedModel,
@@ -847,17 +891,27 @@ export default function VideoStudio({
         return;
       }
 
+      const uploadVersion = imageUploadVersionRef.current + 1;
+      imageUploadVersionRef.current = uploadVersion;
       setImageUploading(true);
       setImageProgress(0);
       try {
-        const url = await uploadFile(apiKey, file, setImageProgress);
+        const url = await uploadFile(apiKey, file, (progress) => {
+          if (imageUploadVersionRef.current === uploadVersion) {
+            setImageProgress(progress);
+          }
+        });
+        if (imageUploadVersionRef.current !== uploadVersion) return;
         applyImageReferenceUrl(url);
       } catch (err) {
+        if (imageUploadVersionRef.current !== uploadVersion) return;
         console.error("[VideoStudio] Image upload failed:", err);
         alert(`Image upload failed: ${err.message}`);
       } finally {
-        setImageUploading(false);
-        setImageProgress(0);
+        if (imageUploadVersionRef.current === uploadVersion) {
+          setImageUploading(false);
+          setImageProgress(0);
+        }
       }
     },
     [apiKey, applyImageReferenceUrl],
@@ -876,7 +930,13 @@ export default function VideoStudio({
         setUploadedVideoUrl(url);
         setUploadedVideoName(file.name);
         if (imageMode) {
-          setUploadedImageUrl(null);
+          invalidateImageUpload();
+          invalidateEndImageUpload();
+          applyImageAttachments({
+            primaryUrl: null,
+            listUrls: [],
+            endUrl: null,
+          });
           setImageMode(false);
         }
         setV2vMode(true);
@@ -893,7 +953,14 @@ export default function VideoStudio({
         setVideoProgress(0);
       }
     },
-    [apiKey, applyControlsForModel, imageMode],
+    [
+      apiKey,
+      applyControlsForModel,
+      applyImageAttachments,
+      imageMode,
+      invalidateEndImageUpload,
+      invalidateImageUpload,
+    ],
   );
 
   // ── Handle Dropped Files ────────────────────────────────────────────────
@@ -946,37 +1013,13 @@ export default function VideoStudio({
   };
 
   const clearImageUpload = () => {
+    invalidateImageUpload();
     setUploadedImageUrl(null);
-    setUploadedImageUrls([]);
-    setUploadedEndImageUrl(null);
-    // Motion-control v2v or model with inputs.images_list: keep model, just drop the image
-    if (isMotionControlSelection(selectedModel, v2vMode)) return;
-    const currentT2V = t2vModels.find((m) => m.id === selectedModel);
-    if (currentT2V?.inputs?.images_list) return;
-    setImageMode(false);
-    const first = t2vModels[0];
-    setSelectedModel(first.id);
-    setSelectedModelName(first.name);
-    applyControlsForModel(first.id, false, false);
-    setPromptDisabled(false);
+    if (!imageMode) setUploadedImageUrls([]);
   };
 
   const removeImageAtIndex = (idx) => {
-    const nextUrls = uploadedImageUrls.filter((_, i) => i !== idx);
-    setUploadedImageUrls(nextUrls);
-    if (nextUrls.length === 0) {
-      setUploadedImageUrl(null);
-      // Reset to text-to-video if empty list
-      if (isMotionControlSelection(selectedModel, v2vMode)) return;
-      setImageMode(false);
-      const first = t2vModels[0];
-      setSelectedModel(first.id);
-      setSelectedModelName(first.name);
-      applyControlsForModel(first.id, false, false);
-      setPromptDisabled(false);
-    } else {
-      setUploadedImageUrl(nextUrls[0]);
-    }
+    setUploadedImageUrls((urls) => urls.filter((_, i) => i !== idx));
   };
 
   // ── end-frame upload (FLF i2v models) ──────────────────────────────────────
@@ -987,23 +1030,34 @@ export default function VideoStudio({
       alert("Image exceeds 10MB limit.");
       return;
     }
+    const uploadVersion = endImageUploadVersionRef.current + 1;
+    endImageUploadVersionRef.current = uploadVersion;
     setEndImageUploading(true);
     setEndImageProgress(0);
     try {
       const url = await uploadFile(apiKey, file, (pct) => {
-        setEndImageProgress(pct);
+        if (endImageUploadVersionRef.current === uploadVersion) {
+          setEndImageProgress(pct);
+        }
       });
+      if (endImageUploadVersionRef.current !== uploadVersion) return;
       setUploadedEndImageUrl(url);
     } catch (err) {
+      if (endImageUploadVersionRef.current !== uploadVersion) return;
       alert(`End frame upload failed: ${err.message}`);
     } finally {
-      setEndImageUploading(false);
-      setEndImageProgress(0);
+      if (endImageUploadVersionRef.current === uploadVersion) {
+        setEndImageUploading(false);
+        setEndImageProgress(0);
+      }
       if (endImageFileInputRef.current) endImageFileInputRef.current.value = "";
     }
   };
 
-  const clearEndImage = () => setUploadedEndImageUrl(null);
+  const clearEndImage = () => {
+    invalidateEndImageUpload();
+    setUploadedEndImageUrl(null);
+  };
 
   // ── video upload ─────────────────────────────────────────────────────────
   const handleVideoFileChange = async (e) => {
@@ -1034,7 +1088,13 @@ export default function VideoStudio({
         } else {
           // Default v2v flow (e.g. watermark remover) — auto-pick the first v2v model
           if (imageMode) {
-            setUploadedImageUrl(null);
+            invalidateImageUpload();
+            invalidateEndImageUpload();
+            applyImageAttachments({
+              primaryUrl: null,
+              listUrls: [],
+              endUrl: null,
+            });
             setImageMode(false);
           }
           setV2vMode(true);
@@ -1071,13 +1131,48 @@ export default function VideoStudio({
   const handleModelSelect = useCallback(
     (m, category = imageMode ? "i2v" : "t2v") => {
       const isV2V = category === "v2v";
+      const nextImageMode = !isV2V && category === "i2v";
+      let imageTransition = null;
+
+      if (imageMode && nextImageMode) {
+        const previousModel = i2vModels.find(
+          (model) => model.id === selectedModel,
+        );
+        const previousProfile = getImageInputProfile(previousModel);
+        const nextProfile = getImageInputProfile(m);
+        imageTransition = reconcileImageAttachments(
+          previousProfile,
+          nextProfile,
+          {
+            primaryUrl: uploadedImageUrl,
+            listUrls: uploadedImageUrls,
+            endUrl: uploadedEndImageUrl,
+          },
+        );
+
+        if (
+          previousProfile.kind !== nextProfile.kind &&
+          imageTransition.discardedCount > 0 &&
+          !window.confirm(
+            "This model uses different image roles. Remove the current image attachments and switch models?",
+          )
+        ) {
+          return;
+        }
+      }
+
+      invalidateImageUpload();
+      invalidateEndImageUpload();
       if (isV2V) {
         setV2vMode(true);
         setImageMode(false);
         const isMC = !!m.imageField;
-        if (!isMC) {
-          // Single-input v2v (watermark remover etc.) — drop any image
-          setUploadedImageUrl(null);
+        if (imageMode || !isMC) {
+          applyImageAttachments({
+            primaryUrl: null,
+            listUrls: [],
+            endUrl: null,
+          });
         }
         setSelectedModel(m.id);
         setSelectedModelName(m.name);
@@ -1096,11 +1191,26 @@ export default function VideoStudio({
           setUploadedVideoName(null);
           setPromptDisabled(false);
         }
-        const nextImageMode = category === "i2v";
-        if (!nextImageMode && imageMode) {
-          setUploadedImageUrl(null);
-          setUploadedImageUrls([]);
-          setUploadedEndImageUrl(null);
+
+        if (imageMode && nextImageMode) {
+          applyImageAttachments(imageTransition.attachments);
+          if (imageTransition.discardedCount > 0) {
+            toast("Incompatible image attachments were removed for this model.");
+          }
+        } else if (imageMode !== nextImageMode) {
+          const hadImages = Boolean(
+            uploadedImageUrl ||
+            uploadedImageUrls.length > 0 ||
+            uploadedEndImageUrl,
+          );
+          applyImageAttachments({
+            primaryUrl: null,
+            listUrls: [],
+            endUrl: null,
+          });
+          if (nextImageMode && hadImages) {
+            toast("Image attachments from the previous task were removed.");
+          }
         }
         setImageMode(nextImageMode);
         setSelectedModel(m.id);
@@ -1108,7 +1218,18 @@ export default function VideoStudio({
         applyControlsForModel(m.id, nextImageMode, false);
       }
     },
-    [v2vMode, imageMode, applyControlsForModel],
+    [
+      applyControlsForModel,
+      applyImageAttachments,
+      imageMode,
+      invalidateEndImageUpload,
+      invalidateImageUpload,
+      selectedModel,
+      uploadedEndImageUrl,
+      uploadedImageUrl,
+      uploadedImageUrls,
+      v2vMode,
+    ],
   );
 
   // ── add to local history ──────────────────────────────────────────────────
@@ -1151,8 +1272,8 @@ export default function VideoStudio({
         return;
       }
     } else if (imageMode) {
-      const maxImgs = getMaxImagesForI2VModel(selectedModel);
-      if (maxImgs > 2) {
+      const imageProfile = getImageInputProfile(currentModel);
+      if (imageProfile.kind === "references") {
         if (uploadedImageUrls.length === 0) {
           alert("Please upload at least one reference image first.");
           return;
@@ -1160,6 +1281,10 @@ export default function VideoStudio({
       } else {
         if (!uploadedImageUrl) {
           alert("Please upload a start frame image first.");
+          return;
+        }
+        if (imageProfile.requiresEndFrame && !uploadedEndImageUrl) {
+          alert("Please upload an end frame image first.");
           return;
         }
       }
@@ -1215,17 +1340,16 @@ export default function VideoStudio({
             type: "video",
           });
       } else if (imageMode) {
-        const maxImgs = getMaxImagesForI2VModel(selectedModel);
+        const imageProfile = getImageInputProfile(currentModel);
         const i2vParams = { model: selectedModel };
-        if (maxImgs > 2) {
+        if (imageProfile.kind === "references") {
           i2vParams.images_list = uploadedImageUrls;
         } else {
           i2vParams.image_url = uploadedImageUrl;
         }
         if (trimmedPrompt) i2vParams.prompt = trimmedPrompt;
         i2vParams.aspect_ratio = selectedAr;
-        const i2vModel = i2vModels.find((m) => m.id === selectedModel);
-        if (uploadedEndImageUrl && i2vModel?.lastImageField) {
+        if (uploadedEndImageUrl && imageProfile.supportsEndFrame) {
           i2vParams.last_image = uploadedEndImageUrl;
         }
         const durations = getDurationsForI2VModel(selectedModel);
@@ -1349,6 +1473,7 @@ export default function VideoStudio({
     showEffect,
     uploadedImageUrl,
     uploadedImageUrls,
+    uploadedEndImageUrl,
     uploadedVideoUrl,
     lastGenerationId,
     getCurrentModel,
@@ -1368,8 +1493,13 @@ export default function VideoStudio({
   const handleNewPrompt = useCallback(() => {
     resetToPromptBar();
     setPrompt("");
-    setUploadedImageUrl(null);
-    setUploadedImageUrls([]);
+    invalidateImageUpload();
+    invalidateEndImageUpload();
+    applyImageAttachments({
+      primaryUrl: null,
+      listUrls: [],
+      endUrl: null,
+    });
     setImageMode(false);
     setUploadedVideoUrl(null);
     setUploadedVideoName(null);
@@ -1380,26 +1510,51 @@ export default function VideoStudio({
     applyControlsForModel(first.id, false, false);
     setPromptDisabled(false);
     setTimeout(() => textareaRef.current?.focus(), 50);
-  }, [resetToPromptBar, applyControlsForModel]);
+  }, [
+    applyControlsForModel,
+    applyImageAttachments,
+    invalidateEndImageUpload,
+    invalidateImageUpload,
+    resetToPromptBar,
+  ]);
 
   const handleExtend = useCallback(() => {
     if (!lastGenerationId) return;
     resetToPromptBar();
     setPrompt("");
-    setUploadedImageUrl(null);
-    setUploadedImageUrls([]);
+    invalidateImageUpload();
+    invalidateEndImageUpload();
+    applyImageAttachments({
+      primaryUrl: null,
+      listUrls: [],
+      endUrl: null,
+    });
     setImageMode(false);
     setSelectedModel("seedance-v2.0-extend");
     setSelectedModelName("Seedance 2.0 Extend");
     applyControlsForModel("seedance-v2.0-extend", false, false);
     setPromptDisabled(false);
     setTimeout(() => textareaRef.current?.focus(), 50);
-  }, [lastGenerationId, resetToPromptBar, applyControlsForModel]);
+  }, [
+    applyControlsForModel,
+    applyImageAttachments,
+    invalidateEndImageUpload,
+    invalidateImageUpload,
+    lastGenerationId,
+    resetToPromptBar,
+  ]);
 
   // ── derived UI values ────────────────────────────────────────────────────
   const isSeedance2Canvas =
     canvasModel === "seedance-v2.0-t2v" || canvasModel === "seedance-v2.0-i2v";
   const currentModelObj = getCurrentModel();
+  const currentImageProfile = imageMode
+    ? getImageInputProfile(currentModelObj)
+    : null;
+  const usesReferenceImages = currentImageProfile?.kind === "references";
+  const imageAttachmentCount = usesReferenceImages
+    ? uploadedImageUrls.length
+    : Number(Boolean(uploadedImageUrl)) + Number(Boolean(uploadedEndImageUrl));
   const isExtendMode = currentModelObj?.requiresRequestId;
   const canUploadImageReference =
     (!v2vMode || isMotionControlSelection(selectedModel, v2vMode)) &&
@@ -1621,7 +1776,7 @@ export default function VideoStudio({
             {/* Inline list of uploaded media files */}
             <div className="flex items-center gap-2.5 flex-wrap">
               {/* Main image preview */}
-              {uploadedImageUrl && (
+              {uploadedImageUrl && (!imageMode || !usesReferenceImages) && (
                 <div className={PROMPT_MEDIA_PREVIEW_CLASS}>
                   <img src={uploadedImageUrl} alt="" className="w-full h-full object-cover" />
                   <button
@@ -1631,6 +1786,11 @@ export default function VideoStudio({
                   >
                     ×
                   </button>
+                  {imageMode && currentImageProfile && (
+                    <span className="absolute bottom-0.5 left-0.5 px-1 h-3.5 bg-black/60 rounded-md text-[7px] font-black text-[#22d3ee] leading-none flex items-center justify-center pointer-events-none">
+                      {getImageAttachmentLabel(currentImageProfile, 0)}
+                    </span>
+                  )}
                 </div>
               )}
 
@@ -1646,7 +1806,9 @@ export default function VideoStudio({
                     ×
                   </button>
                   <span className="absolute bottom-0.5 left-0.5 px-1 h-3.5 bg-black/60 rounded-md text-[7px] font-black text-[#22d3ee] leading-none flex items-center justify-center pointer-events-none">
-                    END
+                    {currentImageProfile
+                      ? getImageAttachmentLabel(currentImageProfile, 1)
+                      : "END FRAME"}
                   </span>
                 </div>
               )}
@@ -1666,7 +1828,7 @@ export default function VideoStudio({
               )}
 
               {/* Multiple images layout if supported */}
-              {imageMode && getMaxImagesForI2VModel(selectedModel) > 2 && (
+              {imageMode && usesReferenceImages && (
                 <>
                   {uploadedImageUrls.map((url, idx) => (
                     <div key={url} className={PROMPT_MEDIA_PREVIEW_CLASS}>
@@ -1679,7 +1841,7 @@ export default function VideoStudio({
                         ×
                       </button>
                       <span className="absolute bottom-0.5 right-0.5 px-1 h-3.5 bg-black/60 rounded-full text-[8px] font-black text-[#22d3ee] leading-none flex items-center justify-center pointer-events-none">
-                        {idx + 1}
+                        {getImageAttachmentLabel(currentImageProfile, idx)}
                       </span>
                     </div>
                   ))}
@@ -1694,9 +1856,19 @@ export default function VideoStudio({
                   • T2V with inputs.images_list: optional reference images (e.g. Seedance 2.0 Extend)
                   • Hidden in regular V2V mode (watermark remover etc. needs no image)
                   • Hidden for extend-type models without inputs.images_list */}
+              {imageMode && imageAttachmentCount > 0 && currentImageProfile && (
+                <span className="text-[9px] font-bold tracking-wide text-white/45">
+                  {usesReferenceImages
+                    ? `${imageAttachmentCount} / ${currentImageProfile.maxImages} REFERENCES`
+                    : currentImageProfile.supportsEndFrame
+                      ? `${imageAttachmentCount} / 2 FRAMES`
+                      : "1 START FRAME"}
+                </span>
+              )}
+
               {canUploadImageReference && (
-                getMaxImagesForI2VModel(selectedModel) > 2 ? (
-                  uploadedImageUrls.length < getMaxImagesForI2VModel(selectedModel) && (
+                imageMode && usesReferenceImages ? (
+                  uploadedImageUrls.length < currentImageProfile.maxImages && (
                     <div className="relative">
                       <input
                         ref={imageFileInputRef}
@@ -1707,7 +1879,8 @@ export default function VideoStudio({
                       />
                       <button
                         type="button"
-                        title="Upload reference image"
+                        title={`Upload reference ${uploadedImageUrls.length + 1}`}
+                        aria-label={`Upload reference ${uploadedImageUrls.length + 1}`}
                         onClick={() => imageFileInputRef.current?.click()}
                         className={promptMediaButtonClassName()}
                       >
@@ -1734,6 +1907,11 @@ export default function VideoStudio({
                             <line x1="12" y1="5" x2="12" y2="19" />
                             <line x1="5" y1="12" x2="19" y2="12" />
                           </svg>
+                        )}
+                        {!imageUploading && (
+                          <span className="absolute bottom-0.5 text-[6px] font-black text-white/55 leading-none">
+                            REF {uploadedImageUrls.length + 1}
+                          </span>
                         )}
                       </button>
                     </div>
@@ -1750,7 +1928,8 @@ export default function VideoStudio({
                       />
                       <button
                         type="button"
-                        title="Upload reference image"
+                        title={imageMode ? "Upload start frame" : "Upload reference image"}
+                        aria-label={imageMode ? "Upload start frame" : "Upload reference image"}
                         onClick={() => imageFileInputRef.current?.click()}
                         className={promptMediaButtonClassName()}
                       >
@@ -1778,6 +1957,11 @@ export default function VideoStudio({
                             <line x1="5" y1="12" x2="19" y2="12" />
                           </svg>
                         )}
+                        {!imageUploading && imageMode && (
+                          <span className="absolute bottom-0.5 text-[6px] font-black text-white/55 leading-none">
+                            START
+                          </span>
+                        )}
                       </button>
                     </div>
                   )
@@ -1785,7 +1969,7 @@ export default function VideoStudio({
               )}
 
               {/* End frame image button */}
-              {imageMode && i2vModels.find((m) => m.id === selectedModel)?.lastImageField && !uploadedEndImageUrl && (
+              {imageMode && currentImageProfile?.supportsEndFrame && !uploadedEndImageUrl && (
                 <div className="relative">
                   <input
                     ref={endImageFileInputRef}
@@ -1796,7 +1980,12 @@ export default function VideoStudio({
                   />
                   <button
                     type="button"
-                    title="Upload end frame (optional)"
+                    title={currentImageProfile.requiresEndFrame
+                      ? "Upload end frame (required)"
+                      : "Upload end frame (optional)"}
+                    aria-label={currentImageProfile.requiresEndFrame
+                      ? "Upload end frame (required)"
+                      : "Upload end frame (optional)"}
                     onClick={() => endImageFileInputRef.current?.click()}
                     className={promptMediaButtonClassName()}
                   >
@@ -1823,6 +2012,11 @@ export default function VideoStudio({
                         <line x1="12" y1="5" x2="12" y2="19" />
                         <line x1="5" y1="12" x2="19" y2="12" />
                       </svg>
+                    )}
+                    {!endImageUploading && (
+                      <span className="absolute bottom-0.5 text-[6px] font-black text-white/55 leading-none">
+                        END
+                      </span>
                     )}
                   </button>
                 </div>
