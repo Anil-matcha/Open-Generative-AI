@@ -88,55 +88,104 @@ function isAllowedS3Host(hostname) {
     return false;
 }
 
-export function getApiKeyFromRequest(request) {
-    if (!request || !request.headers) return null;
-    const authHeader = request.headers.get('Authorization');
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-        const token = authHeader.substring(7).trim();
-        if (token) return token;
-    }
-    const headerKey = request.headers.get('x-api-key');
-    if (headerKey && headerKey.trim()) {
-        return headerKey.trim();
-    }
-    return null;
+const FILE_TYPES = new Map([
+    ['jpg', new Set(['image/jpeg'])],
+    ['jpeg', new Set(['image/jpeg'])],
+    ['png', new Set(['image/png'])],
+    ['webp', new Set(['image/webp'])],
+    ['gif', new Set(['image/gif'])],
+    ['avif', new Set(['image/avif'])],
+    ['mp4', new Set(['video/mp4', 'audio/mp4'])],
+    ['webm', new Set(['video/webm', 'audio/webm'])],
+    ['mov', new Set(['video/quicktime'])],
+    ['mp3', new Set(['audio/mpeg'])],
+    ['wav', new Set(['audio/wav', 'audio/x-wav'])],
+    ['ogg', new Set(['audio/ogg'])],
+    ['flac', new Set(['audio/flac'])],
+    ['txt', new Set(['text/plain'])],
+]);
+
+function normalizeMime(value) {
+    const mime = String(value || '').toLowerCase().split(';')[0].trim();
+    return mime === 'audio/mp3' ? 'audio/mpeg' : mime;
 }
 
-const BLOCKED_EXTENSIONS = new Set([
-    'html', 'htm', 'xhtml', 'svg', 'php', 'phtml', 'php3', 'php4', 'php5', 'phps',
-    'exe', 'bat', 'cmd', 'sh', 'bash', 'js', 'cgi', 'pl', 'py', 'jar', 'vbs', 'scr', 'msi'
-]);
+function extensionOf(filename) {
+    const match = String(filename || '').toLowerCase().match(/\.([a-z0-9]+)$/);
+    return match?.[1] || '';
+}
 
-const BLOCKED_MIME_TYPES = new Set([
-    'text/html',
-    'image/svg+xml',
-    'application/xhtml+xml',
-    'application/x-httpd-php',
-    'application/x-msdownload',
-    'application/x-executable',
-    'application/x-sh',
-    'application/x-shellscript',
-    'application/javascript',
-    'text/javascript'
-]);
+function startsWith(bytes, signature) {
+    return signature.every((value, index) => bytes[index] === value);
+}
 
-export function isBlockedFileType(filename = '', contentType = '') {
-    if (contentType) {
-        const normalizedMime = contentType.toLowerCase().split(';')[0].trim();
-        if (BLOCKED_MIME_TYPES.has(normalizedMime)) {
-            return true;
-        }
+function ascii(bytes, start, end) {
+    return String.fromCharCode(...bytes.slice(start, end));
+}
+
+function matchesMagicBytes(mime, bytes) {
+    if (mime === 'image/jpeg') return startsWith(bytes, [0xff, 0xd8, 0xff]);
+    if (mime === 'image/png') return startsWith(bytes, [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+    if (mime === 'image/gif') return ['GIF87a', 'GIF89a'].includes(ascii(bytes, 0, 6));
+    if (mime === 'image/webp') return ascii(bytes, 0, 4) === 'RIFF' && ascii(bytes, 8, 12) === 'WEBP';
+    if (mime === 'image/avif') {
+        return ascii(bytes, 4, 8) === 'ftyp' && ['avif', 'avis'].includes(ascii(bytes, 8, 12));
     }
-    if (filename) {
-        const parts = filename.toLowerCase().split('.');
-        if (parts.length > 1) {
-            const ext = parts[parts.length - 1].trim();
-            if (BLOCKED_EXTENSIONS.has(ext)) {
-                return true;
-            }
+    if (mime === 'video/mp4' || mime === 'audio/mp4' || mime === 'video/quicktime') {
+        return ascii(bytes, 4, 8) === 'ftyp';
+    }
+    if (mime === 'video/webm' || mime === 'audio/webm') return startsWith(bytes, [0x1a, 0x45, 0xdf, 0xa3]);
+    if (mime === 'audio/mpeg') {
+        return ascii(bytes, 0, 3) === 'ID3' || (bytes[0] === 0xff && (bytes[1] & 0xe0) === 0xe0);
+    }
+    if (mime === 'audio/wav' || mime === 'audio/x-wav') {
+        return ascii(bytes, 0, 4) === 'RIFF' && ascii(bytes, 8, 12) === 'WAVE';
+    }
+    if (mime === 'audio/ogg') return ascii(bytes, 0, 4) === 'OggS';
+    if (mime === 'audio/flac') return ascii(bytes, 0, 4) === 'fLaC';
+    if (mime === 'text/plain') {
+        if (bytes.includes(0)) return false;
+        try {
+            new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+            return true;
+        } catch {
+            return false;
         }
     }
     return false;
+}
+
+export function getUploadMaxBytes(env = process.env) {
+    const parsed = Number(env.UPLOAD_PROXY_MAX_BYTES || 50 * 1024 * 1024);
+    if (!Number.isFinite(parsed) || parsed <= 0) return 50 * 1024 * 1024;
+    return Math.min(parsed, 100 * 1024 * 1024);
+}
+
+export function isBlockedFileType(filename = '', contentType = '') {
+    const extension = extensionOf(filename);
+    const mime = normalizeMime(contentType);
+    return !extension || !mime || !FILE_TYPES.get(extension)?.has(mime);
+}
+
+export async function validateUploadedFile(file, {
+    signedFilename = '',
+    signedContentType = '',
+    env = process.env,
+} = {}) {
+    if (!file || typeof file.arrayBuffer !== 'function') return { ok: false, reason: 'missing_file' };
+    if (!Number.isFinite(file.size) || file.size <= 0) return { ok: false, reason: 'empty_file' };
+    if (file.size > getUploadMaxBytes(env)) return { ok: false, reason: 'file_too_large' };
+
+    const filename = signedFilename || file.name;
+    const mime = normalizeMime(signedContentType || file.type);
+    if (isBlockedFileType(filename, mime)) return { ok: false, reason: 'file_type_not_allowed' };
+
+    const browserMime = normalizeMime(file.type);
+    if (browserMime && browserMime !== mime) return { ok: false, reason: 'content_type_mismatch' };
+
+    const bytes = new Uint8Array(await file.slice(0, 64).arrayBuffer());
+    if (!matchesMagicBytes(mime, bytes)) return { ok: false, reason: 'content_signature_mismatch' };
+    return { ok: true, mime };
 }
 
 export function validateUploadProxyTarget(rawTarget, { env = process.env } = {}) {
@@ -155,6 +204,10 @@ export function validateUploadProxyTarget(rawTarget, { env = process.env } = {})
         return { ok: false, reason: 'unsafe_protocol' };
     }
 
+    if (url.username || url.password || (url.port && url.port !== '443') || url.hash) {
+        return { ok: false, reason: 'unsafe_url_components' };
+    }
+
     const hostname = normalizeHostname(url.hostname);
     if (isBlockedHost(hostname)) {
         return { ok: false, reason: 'host_not_allowed' };
@@ -167,4 +220,3 @@ export function validateUploadProxyTarget(rawTarget, { env = process.env } = {})
 
     return { ok: true, url: url.toString() };
 }
-

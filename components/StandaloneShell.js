@@ -541,27 +541,36 @@ export default function StandaloneShell() {
 
   useEffect(() => {
     setHasMounted(true);
-    const stored = localStorage.getItem(STORAGE_KEY);
+    // Remove the legacy JavaScript-readable auth cookie. Authentication is header-only.
+    document.cookie = 'muapi_key=; path=/; max-age=0; SameSite=Lax';
+    const legacyStored = localStorage.getItem(STORAGE_KEY);
+    const stored = sessionStorage.getItem(STORAGE_KEY) || legacyStored;
     if (stored) {
+      sessionStorage.setItem(STORAGE_KEY, stored);
+      if (legacyStored) localStorage.removeItem(STORAGE_KEY);
       setApiKey(stored);
       fetchBalance(stored);
-      // Sync cookie immediately on mount to establish identity for background requests
-      document.cookie = `muapi_key=${stored}; path=/; max-age=31536000; SameSite=Lax`;
     }
   }, [fetchBalance]);
 
+  useEffect(() => {
+    if (activeTab !== 'design-agent') localStorage.removeItem('token');
+  }, [activeTab]);
+
   const handleKeySave = useCallback((key) => {
-    localStorage.setItem(STORAGE_KEY, key);
+    sessionStorage.setItem(STORAGE_KEY, key);
+    localStorage.removeItem(STORAGE_KEY);
     setApiKey(key);
     fetchBalance(key);
-    document.cookie = `muapi_key=${key}; path=/; max-age=31536000; SameSite=Lax`;
   }, [fetchBalance]);
 
   const handleKeyChange = useCallback(() => {
+    sessionStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem('token');
     setApiKey(null);
     setBalance(null);
-    document.cookie = "muapi_key=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    document.cookie = 'muapi_key=; path=/; max-age=0; SameSite=Lax';
   }, []);
 
   // Inject API key into all outgoing Axios requests (prop-based approach)
@@ -573,11 +582,16 @@ export default function StandaloneShell() {
     if (!apiKey) return;
 
     const interceptorId = axios.interceptors.request.use((config) => {
-      // Check if URL is local/proxied
-      const isRelative = config.url.startsWith('/') || !config.url.startsWith('http');
-      const isInternalProxy = config.url.includes('/api/app') || config.url.includes('/api/workflow') || config.url.includes('/api/agents') || config.url.includes('/api/api') || config.url.includes('/api/v1');
+      let isInternalProxy = false;
+      try {
+        const target = new URL(String(config.url || ''), window.location.origin);
+        isInternalProxy = target.origin === window.location.origin && target.pathname.startsWith('/api/');
+      } catch {
+        isInternalProxy = false;
+      }
 
-      if (isRelative || isInternalProxy) {
+      if (isInternalProxy) {
+        config.headers = config.headers || {};
         config.headers['x-api-key'] = apiKey;
       }
       

@@ -1,4 +1,6 @@
 import { getModelById, getVideoModelById, getI2IModelById, getI2VModelById, getV2VModelById, getLipSyncModelById } from './models.js';
+import { serializeSafePayload } from './clientContentSafety.js';
+import { validateUploadedFile } from './uploadProxyTarget.js';
 
 export class MuapiClient {
     constructor() {
@@ -76,7 +78,7 @@ export class MuapiClient {
                     'Content-Type': 'application/json',
                     'x-api-key': key
                 },
-                body: JSON.stringify(finalPayload)
+                body: serializeSafePayload(finalPayload)
             });
 
             if (!response.ok) {
@@ -196,7 +198,7 @@ export class MuapiClient {
                     'Content-Type': 'application/json',
                     'x-api-key': key
                 },
-                body: JSON.stringify(finalPayload)
+                body: serializeSafePayload(finalPayload)
             });
 
             if (!response.ok) {
@@ -269,7 +271,7 @@ export class MuapiClient {
             const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'x-api-key': key },
-                body: JSON.stringify(finalPayload)
+                body: serializeSafePayload(finalPayload)
             });
 
             if (!response.ok) {
@@ -360,7 +362,7 @@ export class MuapiClient {
             const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'x-api-key': key },
-                body: JSON.stringify(finalPayload)
+                body: serializeSafePayload(finalPayload)
             });
 
             if (!response.ok) {
@@ -394,6 +396,11 @@ export class MuapiClient {
     async uploadFile(file) {
         const key = this.getKey();
         const url = `${this.baseUrl}/api/v1/upload_file`;
+
+        const validation = await validateUploadedFile(file, {
+            env: { UPLOAD_PROXY_MAX_BYTES: import.meta.env?.VITE_UPLOAD_PROXY_MAX_BYTES },
+        });
+        if (!validation.ok) throw new Error(`File upload rejected (${validation.reason})`);
 
         const formData = new FormData();
         formData.append('file', file);
@@ -452,7 +459,7 @@ export class MuapiClient {
             const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'x-api-key': key },
-                body: JSON.stringify(finalPayload)
+                body: serializeSafePayload(finalPayload)
             });
 
             if (!response.ok) {
@@ -513,7 +520,7 @@ export class MuapiClient {
             const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'x-api-key': key },
-                body: JSON.stringify(finalPayload)
+                body: serializeSafePayload(finalPayload)
             });
 
             if (!response.ok) {

@@ -18,14 +18,17 @@ export default function DesignAgentStudio({
 }) {
   const [userData, setUserData] = useState(null);
 
-  // Written synchronously during render (not inside an effect below) so it's already in
-  // localStorage before CreativeCanvas's own mount effects read it — passive effects run
-  // child-before-parent within a commit, so setting this from *our* useEffect ran after
-  // CreativeCanvas's first sessions/agent-skills fetch had already gone out unauthenticated.
+  // CreativeCanvas currently reads this compatibility key during its first render.
+  // Remove it immediately whenever the design agent is not active or the user signs out.
   if (typeof window !== 'undefined' && apiKey) {
     sessionStorage.setItem("fromDesignAgent", "true");
     localStorage.setItem("token", apiKey);
   }
+
+  useEffect(() => {
+    if (!apiKey) localStorage.removeItem('token');
+    return () => localStorage.removeItem('token');
+  }, [apiKey]);
 
   useEffect(() => {
     if (!apiKey) return;

@@ -1,4 +1,4 @@
-import { proxyMuapi } from '../../../../../src/lib/muapiProxy.js';
+import { proxyMuapi } from '../../../../src/lib/muapiProxy.js';
 
 async function proxy(request, { params }, method) {
     const { path = [] } = await params;

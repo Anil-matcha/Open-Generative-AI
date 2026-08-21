@@ -7,7 +7,7 @@ export default defineConfig({
             '/api': {
                 target: 'https://api.muapi.ai',
                 changeOrigin: true,
-                secure: false
+                secure: true
             }
         }
     }

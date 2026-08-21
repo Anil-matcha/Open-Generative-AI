@@ -1,48 +1,54 @@
 import { NextResponse } from 'next/server';
 
-function addSecurityHeaders(response) {
+function buildContentSecurityPolicy(nonce) {
+    const developmentEval = process.env.NODE_ENV === 'development' ? " 'unsafe-eval'" : '';
+    return [
+        "default-src 'self'",
+        `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${developmentEval}`,
+        "script-src-attr 'none'",
+        "style-src 'self' 'unsafe-inline'",
+        "img-src 'self' data: blob: https:",
+        "media-src 'self' data: blob: https:",
+        "connect-src 'self' https://muapi.ai https://*.muapi.ai",
+        "font-src 'self' data:",
+        "object-src 'none'",
+        "base-uri 'self'",
+        "frame-ancestors 'none'",
+        "form-action 'self'",
+    ].join('; ');
+}
+
+function addSecurityHeaders(response, contentSecurityPolicy) {
     // Prevent MIME type sniffing (CWE-693)
     response.headers.set('X-Content-Type-Options', 'nosniff');
     // Prevent clickjacking (CWE-1021)
     response.headers.set('X-Frame-Options', 'DENY');
-    // Enable XSS filter in legacy browsers
-    response.headers.set('X-XSS-Protection', '1; mode=block');
     // Referrer policy
     response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+    response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=()');
+    response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
     // Content Security Policy - restricts script sources to prevent XSS (CWE-79).
     // connect-src covers *.muapi.ai (not just api.muapi.ai) because generated
     // media, model thumbnails, and other assets are served from cdn.muapi.ai
     // and other muapi subdomains that the renderer fetches directly.
-    response.headers.set(
-        'Content-Security-Policy',
-        "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; media-src 'self' data: blob: https:; connect-src 'self' https://muapi.ai https://*.muapi.ai; font-src 'self' data:;"
-    );
+    response.headers.set('Content-Security-Policy', contentSecurityPolicy);
+
+    if (process.env.NODE_ENV === 'production') {
+        response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    }
     return response;
 }
 
 export function middleware(request) {
-    const url = request.nextUrl;
-
-    // Catch requests to /api/workflow, /api/app, and /api/v1
-    const isMuApi = url.pathname.startsWith('/api/workflow') ||
-                    url.pathname.startsWith('/api/app') ||
-                    url.pathname.startsWith('/api/v1');
-
-    if (isMuApi) {
-        // Exclude paths that have their own dedicated route handlers with custom logic
-        const isHandledByRoute = url.pathname.startsWith('/api/v1/creative-agent') ||
-                                url.pathname.startsWith('/api/v1/get_upload_url') ||
-                                url.pathname.startsWith('/api/v1/upload-binary');
-
-        if (url.pathname.startsWith('/api/v1') && !isHandledByRoute) {
-            const targetUrl = new URL(url.pathname + url.search, 'https://api.muapi.ai');
-            const rewriteResponse = NextResponse.rewrite(targetUrl);
-            return addSecurityHeaders(rewriteResponse);
-        }
-    }
-
-    // Add security headers to all responses
-    return addSecurityHeaders(NextResponse.next());
+    // All MuAPI traffic now passes through route handlers that enforce authentication
+    // and sanitize forwarded headers. Middleware only adds browser security headers.
+    const nonce = crypto.randomUUID().replaceAll('-', '');
+    const contentSecurityPolicy = buildContentSecurityPolicy(nonce);
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('x-nonce', nonce);
+    requestHeaders.set('Content-Security-Policy', contentSecurityPolicy);
+    const response = NextResponse.next({ request: { headers: requestHeaders } });
+    return addSecurityHeaders(response, contentSecurityPolicy);
 }
 
 // Match all paths for security headers. Exclude Next.js internal paths.

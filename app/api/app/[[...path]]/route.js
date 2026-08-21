@@ -1,150 +1,27 @@
-import { NextResponse } from 'next/server';
+import { proxyMuapi } from '../../../../src/lib/muapiProxy.js';
+import { proxyUploadCredentials } from '../../../../src/lib/uploadCredentialProxy.js';
 
-const MUAPI_BASE = 'https://api.muapi.ai';
-
-function getApiKey(request) {
-    const authHeader = request.headers.get('Authorization');
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-        const token = authHeader.substring(7).trim();
-        if (token) return token;
-    }
-    const headerKey = request.headers.get('x-api-key');
-    return (headerKey && headerKey.trim()) || null;
+function effectivePath(path) {
+    return path.length === 1 && path[0] === 'get_upload_file'
+        ? ['get_file_upload_url']
+        : path;
 }
 
-function cleanHeaders(request) {
-    const headers = new Headers(request.headers);
-    headers.delete('host');
-    headers.delete('connection');
-    headers.delete('cookie'); // CRITICAL: Stop forwarding browser cookies to MuAPI to avoid auth conflicts
-    headers.delete('authorization');
-    return headers;
-}
-
-export async function GET(request, { params }) {
-    const slug = await params;
-    const pathSegments = slug.path || [];
-    const path = pathSegments.join('/');
-    
-    // Handle alias: get_upload_file -> get_file_upload_url
-    const effectivePath = path === 'get_upload_file' ? 'get_file_upload_url' : path;
-    
-    const apiKey = getApiKey(request);
-    if (effectivePath === 'get_file_upload_url' && !apiKey) {
-        return NextResponse.json({ error: 'Unauthorized: Missing API key' }, { status: 401 });
-    }
-
-    const { search } = new URL(request.url);
-    const targetUrl = `${MUAPI_BASE}/app/${effectivePath}${search}`;
-
-    const headers = cleanHeaders(request);
-
-    if (apiKey) headers.set('x-api-key', apiKey);
-
-    try {
-        const response = await fetch(targetUrl, {
-            headers,
-            method: 'GET',
+async function proxy(request, { params }, method) {
+    const { path = [] } = await params;
+    const normalizedPath = effectivePath(path);
+    if (method === 'GET' && normalizedPath.length === 1 && normalizedPath[0] === 'get_file_upload_url') {
+        return proxyUploadCredentials(request, {
+            prefix: 'app',
+            pathSegments: normalizedPath,
+            proxyUrl: '/api/upload-binary',
         });
-
-        const data = await response.json();
-
-        // SPECIAL CASE: Intercept upload URL and redirect to local binary proxy
-        if (effectivePath === 'get_file_upload_url' && data.url) {
-            const originalS3Url = data.url;
-            // We pass the real S3 URL as a header to our proxy
-            data.url = `/api/upload-binary`;
-            
-            // Store target in a temporary way? 
-            // Better: Return the target URL as an extra field that our proxy will look for
-            data.fields = {
-                ...data.fields,
-                'x-proxy-target-url': originalS3Url
-            };
-        }
-
-        return NextResponse.json(data, { status: response.status });
-    } catch (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
     }
+    return proxyMuapi(request, { prefix: 'app', pathSegments: normalizedPath, method });
 }
 
-export async function POST(request, { params }) {
-    const slug = await params;
-    const pathSegments = slug.path || [];
-    const path = pathSegments.join('/');
-    
-    const { search } = new URL(request.url);
-    const targetUrl = `${MUAPI_BASE}/app/${path}${search}`;
-
-    const headers = cleanHeaders(request);
-
-    const apiKey = getApiKey(request);
-    if (apiKey) headers.set('x-api-key', apiKey);
-
-    try {
-        const body = await request.arrayBuffer();
-        const response = await fetch(targetUrl, {
-            method: 'POST',
-            headers,
-            body
-        });
-
-        const data = await response.json();
-        return NextResponse.json(data, { status: response.status });
-    } catch (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-}
-
-export async function DELETE(request, { params }) {
-    const slug = await params;
-    const pathSegments = slug.path || [];
-    const path = pathSegments.join('/');
-    
-    const { search } = new URL(request.url);
-    const targetUrl = `${MUAPI_BASE}/app/${path}${search}`;
-
-    const headers = cleanHeaders(request);
-
-    const apiKey = getApiKey(request);
-    if (apiKey) headers.set('x-api-key', apiKey);
-
-    try {
-        const response = await fetch(targetUrl, {
-            method: 'DELETE',
-            headers
-        });
-        const data = await response.json();
-        return NextResponse.json(data, { status: response.status });
-    } catch (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-}
-
-export async function PUT(request, { params }) {
-    const slug = await params;
-    const pathSegments = slug.path || [];
-    const path = pathSegments.join('/');
-    
-    const { search } = new URL(request.url);
-    const targetUrl = `${MUAPI_BASE}/app/${path}${search}`;
-
-    const headers = cleanHeaders(request);
-
-    const apiKey = getApiKey(request);
-    if (apiKey) headers.set('x-api-key', apiKey);
-
-    try {
-        const body = await request.arrayBuffer();
-        const response = await fetch(targetUrl, {
-            method: 'PUT',
-            headers,
-            body
-        });
-        const data = await response.json();
-        return NextResponse.json(data, { status: response.status });
-    } catch (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-}
+export function GET(request, context) { return proxy(request, context, 'GET'); }
+export function POST(request, context) { return proxy(request, context, 'POST'); }
+export function PUT(request, context) { return proxy(request, context, 'PUT'); }
+export function PATCH(request, context) { return proxy(request, context, 'PATCH'); }
+export function DELETE(request, context) { return proxy(request, context, 'DELETE'); }

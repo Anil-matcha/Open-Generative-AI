@@ -55,8 +55,7 @@ export function SettingsModal(onClose) {
                 <label style="display:block;font-size:0.75rem;color:rgba(255,255,255,0.5);margin-bottom:0.4rem;font-weight:600;">${t('settings.muapiKeyLabel')}</label>
                 <input id="settings-api-key" type="password"
                     style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:0.75rem;padding:0.6rem 0.9rem;color:#fff;font-size:0.875rem;outline:none;"
-                    placeholder="${t('settings.keyPlaceholder')}"
-                    value="${localStorage.getItem('muapi_key') || ''}">
+                    placeholder="${t('settings.keyPlaceholder')}">
             </div>
             <p style="font-size:0.7rem;color:rgba(255,255,255,0.3);margin:0;">
                 ${t('settings.keyNote')}
@@ -67,6 +66,8 @@ export function SettingsModal(onClose) {
             </div>
         </div>
     `;
+    // Assign the stored value as a DOM property so key contents are never parsed as HTML.
+    apiPanel.querySelector('#settings-api-key').value = localStorage.getItem('muapi_key') || '';
 
     // ── Tab: Local Models ─────────────────────────────────────────────────────
     const localPanel = LocalModelManager();
