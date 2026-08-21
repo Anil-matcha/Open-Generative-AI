@@ -51,6 +51,22 @@ function getQualitiesForModel(modelList, modelId) {
   return model?.inputs?.quality?.enum || [];
 }
 
+function resolveSupportedValue(selectedValue, availableValues, fallbackValue) {
+  if (availableValues.includes(selectedValue)) return selectedValue;
+  if (availableValues.includes(fallbackValue)) return fallbackValue;
+  return availableValues[availableValues.length - 1];
+}
+
+function getVideoHistoryParameters(requestParams) {
+  const historyParams = {};
+  for (const field of ["aspect_ratio", "duration", "resolution"]) {
+    if (requestParams[field] !== undefined) {
+      historyParams[field] = requestParams[field];
+    }
+  }
+  return historyParams;
+}
+
 async function downloadFile(url, filename) {
   try {
     const response = await fetch(url);
@@ -582,9 +598,9 @@ export default function VideoStudio({
   const getCurrentResolutions = useCallback(
     (id) =>
       imageMode
-        ? getResolutionsForI2VModel(id)
-        : getResolutionsForVideoModel(id),
-    [imageMode],
+        ? getResolutionsForI2VModel(id, { duration: selectedDuration })
+        : getResolutionsForVideoModel(id, { duration: selectedDuration }),
+    [imageMode, selectedDuration],
   );
 
   const getCurrentModel = useCallback(
@@ -676,6 +692,25 @@ export default function VideoStudio({
     },
     [],
   );
+
+  useEffect(() => {
+    if (v2vMode) return;
+    const availableResolutions = imageMode
+      ? getResolutionsForI2VModel(selectedModel, { duration: selectedDuration })
+      : getResolutionsForVideoModel(selectedModel, { duration: selectedDuration });
+    if (
+      availableResolutions.length > 0 &&
+      !availableResolutions.includes(selectedResolution)
+    ) {
+      setSelectedResolution(availableResolutions[availableResolutions.length - 1]);
+    }
+  }, [
+    imageMode,
+    selectedDuration,
+    selectedModel,
+    selectedResolution,
+    v2vMode,
+  ]);
 
   // ── Persistence: Load ────────────────────────────────────────────────────
   useEffect(() => {
@@ -1162,6 +1197,10 @@ export default function VideoStudio({
           alert("Please upload a start frame image first.");
           return;
         }
+        if (currentModel?.endImageRequired && !uploadedEndImageUrl) {
+          alert("Please upload an end frame image first.");
+          return;
+        }
       }
     } else {
       if (!trimmedPrompt) {
@@ -1223,15 +1262,36 @@ export default function VideoStudio({
           i2vParams.image_url = uploadedImageUrl;
         }
         if (trimmedPrompt) i2vParams.prompt = trimmedPrompt;
-        i2vParams.aspect_ratio = selectedAr;
         const i2vModel = i2vModels.find((m) => m.id === selectedModel);
+        const aspectRatios = getAspectRatiosForI2VModel(selectedModel);
+        if (aspectRatios.length > 0) {
+          i2vParams.aspect_ratio = resolveSupportedValue(
+            selectedAr,
+            aspectRatios,
+            i2vModel?.inputs?.aspect_ratio?.default,
+          );
+        }
         if (uploadedEndImageUrl && i2vModel?.lastImageField) {
           i2vParams.last_image = uploadedEndImageUrl;
         }
         const durations = getDurationsForI2VModel(selectedModel);
-        if (durations.length > 0) i2vParams.duration = selectedDuration;
-        const resolutions = getResolutionsForI2VModel(selectedModel);
-        if (resolutions.length > 0) i2vParams.resolution = selectedResolution;
+        if (durations.length > 0) {
+          i2vParams.duration = resolveSupportedValue(
+            selectedDuration,
+            durations,
+            i2vModel?.inputs?.duration?.default,
+          );
+        }
+        const resolutions = getResolutionsForI2VModel(selectedModel, {
+          duration: i2vParams.duration,
+        });
+        if (resolutions.length > 0) {
+          i2vParams.resolution = resolveSupportedValue(
+            selectedResolution,
+            resolutions,
+            resolutions[resolutions.length - 1],
+          );
+        }
         if (selectedQuality) i2vParams.quality = selectedQuality;
         if (selectedMode) i2vParams.mode = selectedMode;
         if (showEffect && selectedEffect) i2vParams.name = selectedEffect;
@@ -1252,8 +1312,7 @@ export default function VideoStudio({
           url: res.url,
           prompt: trimmedPrompt,
           model: selectedModel,
-          aspect_ratio: selectedAr,
-          duration: selectedDuration,
+          ...getVideoHistoryParameters(i2vParams),
           timestamp: new Date().toISOString(),
         };
         addToLocalHistory(entry);
@@ -1285,9 +1344,23 @@ export default function VideoStudio({
         }
 
         const durations = getDurationsForModel(selectedModel);
-        if (durations.length > 0) params.duration = selectedDuration;
-        const resolutions = getResolutionsForVideoModel(selectedModel);
-        if (resolutions.length > 0) params.resolution = selectedResolution;
+        if (durations.length > 0) {
+          params.duration = resolveSupportedValue(
+            selectedDuration,
+            durations,
+            currentModel?.inputs?.duration?.default,
+          );
+        }
+        const resolutions = getResolutionsForVideoModel(selectedModel, {
+          duration: params.duration,
+        });
+        if (resolutions.length > 0) {
+          params.resolution = resolveSupportedValue(
+            selectedResolution,
+            resolutions,
+            resolutions[resolutions.length - 1],
+          );
+        }
         if (selectedQuality) params.quality = selectedQuality;
         if (selectedMode) params.mode = selectedMode;
 
@@ -1310,8 +1383,7 @@ export default function VideoStudio({
           url: res.url,
           prompt: trimmedPrompt,
           model: selectedModel,
-          aspect_ratio: selectedAr,
-          duration: selectedDuration,
+          ...getVideoHistoryParameters(params),
           timestamp: new Date().toISOString(),
         };
         addToLocalHistory(entry);
@@ -1349,6 +1421,7 @@ export default function VideoStudio({
     showEffect,
     uploadedImageUrl,
     uploadedImageUrls,
+    uploadedEndImageUrl,
     uploadedVideoUrl,
     lastGenerationId,
     getCurrentModel,
@@ -1796,7 +1869,9 @@ export default function VideoStudio({
                   />
                   <button
                     type="button"
-                    title="Upload end frame (optional)"
+                    title={currentModelObj?.endImageRequired
+                      ? "Upload required end frame"
+                      : "Upload end frame (optional)"}
                     onClick={() => endImageFileInputRef.current?.click()}
                     className={promptMediaButtonClassName()}
                   >
@@ -1908,6 +1983,12 @@ export default function VideoStudio({
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
               <span>Extending previous Seedance 2.0 generation</span>
+            </div>
+          )}
+
+          {currentModelObj?.parameterNotice && (
+            <div className="px-3 py-1.5 mx-3 bg-white/[0.03] border border-white/[0.06] rounded-lg text-[10px] text-white/55 font-medium tracking-tight">
+              {currentModelObj.parameterNotice}
             </div>
           )}
 
