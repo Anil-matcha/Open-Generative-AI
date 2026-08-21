@@ -2,7 +2,13 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import toast, { Toaster } from "react-hot-toast";
-import { generateVideo, generateI2V, processV2V, uploadFile } from "../muapi.js";
+import {
+  estimateV2VCost,
+  generateVideo,
+  generateI2V,
+  processV2V,
+  uploadFile,
+} from "../muapi.js";
 import { formatErrorMessage } from "../utils/formatError.js";
 import { scopedPersistKey, migrateLegacyPersistKey } from "../persistKey.js";
 import {
@@ -57,6 +63,89 @@ import {
 function getQualitiesForModel(modelList, modelId) {
   const model = modelList.find((m) => m.id === modelId);
   return model?.inputs?.quality?.enum || [];
+}
+
+function formatCost({ cost, currency }) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency,
+    maximumFractionDigits: 4,
+  }).format(cost);
+}
+
+const DEFAULT_VIDEO_MAX_BYTES = 50 * 1024 * 1024;
+
+function getVideoFileError(file, constraints) {
+  const maxBytes = constraints?.maxBytes || DEFAULT_VIDEO_MAX_BYTES;
+  if (file.size > maxBytes) {
+    return `Video exceeds the ${Math.round(maxBytes / 1024 / 1024)}MB limit.`;
+  }
+  if (!constraints) return null;
+
+  const mimeType = file.type.toLowerCase();
+  const extension = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
+  const hasAllowedType = constraints.allowedMimeTypes.includes(mimeType);
+  const hasAllowedExtension = constraints.allowedExtensions.includes(extension);
+  return hasAllowedType || hasAllowedExtension
+    ? null
+    : `Unsupported video format. ${constraints.requirements}`;
+}
+
+function readVideoMetadata(file) {
+  return new Promise((resolve, reject) => {
+    const objectUrl = URL.createObjectURL(file);
+    const video = document.createElement("video");
+    let timeoutId;
+    const cleanup = () => {
+      clearTimeout(timeoutId);
+      video.onloadedmetadata = null;
+      video.onerror = null;
+      video.removeAttribute("src");
+      video.load();
+      URL.revokeObjectURL(objectUrl);
+    };
+
+    video.preload = "metadata";
+    video.onloadedmetadata = () => {
+      const metadata = {
+        duration: video.duration,
+        width: video.videoWidth,
+        height: video.videoHeight,
+      };
+      cleanup();
+      resolve(metadata);
+    };
+    video.onerror = () => {
+      cleanup();
+      reject(new Error("The selected video's metadata could not be read."));
+    };
+    timeoutId = setTimeout(() => {
+      cleanup();
+      reject(new Error("The selected video's metadata could not be read."));
+    }, 10000);
+    video.src = objectUrl;
+  });
+}
+
+function getVideoMetadataError(metadata, constraints) {
+  if (!constraints) return null;
+  if (
+    !Number.isFinite(metadata.duration) ||
+    metadata.duration < constraints.minDurationSeconds ||
+    metadata.duration > constraints.maxDurationSeconds
+  ) {
+    return `Video duration must be between ${constraints.minDurationSeconds} and ${constraints.maxDurationSeconds} seconds.`;
+  }
+
+  const shortSide = Math.min(metadata.width, metadata.height);
+  const longSide = Math.max(metadata.width, metadata.height);
+  if (
+    shortSide < constraints.minShortSide ||
+    longSide > constraints.maxLongSide
+  ) {
+    return `Video dimensions must have a shorter side of at least ${constraints.minShortSide}px and a longer side of at most ${constraints.maxLongSide}px.`;
+  }
+  return null;
 }
 
 async function downloadFile(url, filename) {
@@ -480,8 +569,48 @@ function VideoToolOptionControls({
     }
 
     const dropdownId = `video-option:${definition.key}`;
+    if (definition.type === "string" && !definition.enum) {
+      return (
+        <div key={definition.key} className="relative">
+          <button
+            type="button"
+            onClick={toggleDropdown(dropdownId)}
+            className={promptControlClassName({
+              active: openDropdown === dropdownId || Boolean(value),
+            })}
+            title={definition.title}
+          >
+            <PromptQualityIcon />
+            <span className={`${PROMPT_CONTROL_LABEL_CLASS} max-w-[140px] truncate`}>
+              {value || definition.title}
+            </span>
+            <PromptChevronIcon />
+          </button>
+          {openDropdown === dropdownId && (
+            <PromptPopover
+              onClick={(event) => event.stopPropagation()}
+              className="min-w-[280px]"
+            >
+              <PromptPopoverHeader>{definition.title}</PromptPopoverHeader>
+              <input
+                type="text"
+                value={value || ""}
+                onChange={(event) => onChange(definition.key, event.target.value)}
+                placeholder={definition.title}
+                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-white placeholder:text-white/25 outline-none focus:border-primary/50"
+              />
+            </PromptPopover>
+          )}
+        </div>
+      );
+    }
+
     const valueLabel =
-      definition.key === "upscale_factor" ? `${value}×` : String(value ?? "");
+      definition.key === "upscale_factor"
+        ? `${value}×`
+        : definition.key === "duration" || definition.key === "extend_times"
+          ? `${value}s`
+          : String(value ?? definition.title);
 
     return (
       <div key={definition.key} className="relative">
@@ -504,6 +633,18 @@ function VideoToolOptionControls({
           >
             <PromptPopoverHeader>{definition.title}</PromptPopoverHeader>
             <PromptMenuList>
+              {definition.optional && (
+                <PromptMenuItem
+                  selected={value === undefined}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onChange(definition.key, undefined);
+                    setOpenDropdown(null);
+                  }}
+                >
+                  Default
+                </PromptMenuItem>
+              )}
               {(definition.enum || []).map((option) => (
                 <PromptMenuItem
                   key={option}
@@ -596,10 +737,14 @@ export default function VideoStudio({
   const [uploadedVideoUrl, setUploadedVideoUrl] = useState(null);
   const [videoUploading, setVideoUploading] = useState(false);
   const [uploadedVideoName, setUploadedVideoName] = useState(null);
+  const [uploadedVideoValidationKey, setUploadedVideoValidationKey] =
+    useState(null);
 
   // ── generation / canvas ──
   const [generating, setGenerating] = useState(false);
   const [generateError, setGenerateError] = useState(null);
+  const [costEstimate, setCostEstimate] = useState({ status: "idle" });
+  const [costEstimateRetry, setCostEstimateRetry] = useState(0);
   const [fullscreenUrl, setFullscreenUrl] = useState(null);
   const [canvasUrl, setCanvasUrl] = useState(null);
   const [showCanvas, setShowCanvas] = useState(false);
@@ -624,6 +769,18 @@ export default function VideoStudio({
   const videoFileInputRef = useRef(null);
   const resultVideoRef = useRef(null);
   const hasRestored = useRef(false);
+  const costEstimateRequestRef = useRef(0);
+  const videoUploadRequestRef = useRef(0);
+  const activeVideoUploadContextRef = useRef(null);
+
+  const currentVideoUploadContext = `${v2vMode ? "v2v" : imageMode ? "i2v" : "t2v"}:${selectedModel}`;
+  activeVideoUploadContextRef.current = currentVideoUploadContext;
+
+  const cancelPendingVideoUpload = useCallback(() => {
+    videoUploadRequestRef.current += 1;
+    setVideoUploading(false);
+    setVideoProgress(0);
+  }, []);
 
   // ── derived data ──
   const history = historyItems ?? localHistory;
@@ -677,6 +834,11 @@ export default function VideoStudio({
     () => getVideoToolPresentation(currentModelObj),
     [currentModelObj],
   );
+  const currentVideoValidationKey =
+    currentToolPresentation.videoConstraints?.key || null;
+  const uploadedVideoIsValidated =
+    !currentVideoValidationKey ||
+    uploadedVideoValidationKey === currentVideoValidationKey;
   const continuationConfig = useMemo(
     () => getContinuationConfig(currentModelObj),
     [currentModelObj],
@@ -691,7 +853,7 @@ export default function VideoStudio({
     return (
       compatibleContinuationSources.find(
         (entry) => entry.requestId === selectedRequestId,
-      ) || compatibleContinuationSources[0] || null
+      ) || null
     );
   }, [
     compatibleContinuationSources,
@@ -702,6 +864,101 @@ export default function VideoStudio({
     () => getVideoToolOptionDefinitions(currentModelObj),
     [currentModelObj],
   );
+  const v2vRequestParams = useMemo(() => {
+    if (!v2vMode || !currentModelObj) return null;
+
+    const params = {
+      model: selectedModel,
+      video_url: uploadedVideoUrl,
+      options: videoToolOptions,
+    };
+    if (currentModelObj.imageField && uploadedImageUrl) {
+      params.image_url = uploadedImageUrl;
+    }
+
+    const trimmedPrompt = prompt.trim();
+    if (currentToolPresentation.showPrompt && trimmedPrompt) {
+      params.prompt = trimmedPrompt;
+    }
+    return params;
+  }, [
+    currentModelObj,
+    currentToolPresentation.showPrompt,
+    prompt,
+    selectedModel,
+    uploadedImageUrl,
+    uploadedVideoUrl,
+    v2vMode,
+    videoToolOptions,
+  ]);
+  const costEstimateKey = useMemo(
+    () =>
+      currentToolPresentation.estimateCost && v2vRequestParams
+        ? JSON.stringify(v2vRequestParams)
+        : null,
+    [currentToolPresentation.estimateCost, v2vRequestParams],
+  );
+  const hasCompleteCostInputs = Boolean(
+    costEstimateKey &&
+      uploadedVideoUrl &&
+      uploadedVideoIsValidated &&
+      (!currentModelObj?.imageField || uploadedImageUrl) &&
+      (!currentToolPresentation.promptRequired || v2vRequestParams?.prompt),
+  );
+
+  useEffect(() => {
+    const requestVersion = ++costEstimateRequestRef.current;
+    if (!costEstimateKey) {
+      setCostEstimate({ status: "idle" });
+      return undefined;
+    }
+    if (!hasCompleteCostInputs) {
+      setCostEstimate({ status: "waiting", key: costEstimateKey });
+      return undefined;
+    }
+
+    const controller = new AbortController();
+    setCostEstimate({ status: "loading", key: costEstimateKey });
+    const timer = setTimeout(() => {
+      estimateV2VCost(v2vRequestParams, controller.signal)
+        .then((estimate) => {
+          if (costEstimateRequestRef.current !== requestVersion) return;
+          setCostEstimate({ status: "ready", key: costEstimateKey, ...estimate });
+        })
+        .catch((error) => {
+          if (
+            error.name === "AbortError" ||
+            costEstimateRequestRef.current !== requestVersion
+          ) {
+            return;
+          }
+          setCostEstimate({
+            status: "error",
+            key: costEstimateKey,
+          });
+        });
+    }, 300);
+
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [
+    costEstimateKey,
+    costEstimateRetry,
+    hasCompleteCostInputs,
+    v2vRequestParams,
+  ]);
+
+  useEffect(() => {
+    if (!uploadedVideoUrl || uploadedVideoIsValidated) return;
+    setUploadedVideoUrl(null);
+    setUploadedVideoName(null);
+    setUploadedVideoValidationKey(null);
+    toast.error(
+      "Re-upload the source video so its requirements can be validated for this tool.",
+    );
+  }, [uploadedVideoIsValidated, uploadedVideoUrl]);
 
   const isMotionControlSelection = useCallback(
     (modelId, isV2v) => {
@@ -806,13 +1063,14 @@ export default function VideoStudio({
         if (data.selectedQuality) setSelectedQuality(data.selectedQuality);
         if (data.selectedMode) setSelectedMode(data.selectedMode);
         if (data.selectedEffect) setSelectedEffect(data.selectedEffect);
-        if (data.videoToolOptions) {
-          setVideoToolOptions(data.videoToolOptions);
-        } else if (data.selectedModel) {
+        if (data.selectedModel) {
           const restoredModel = [...t2vModels, ...i2vModels, ...v2vModels].find(
             (model) => model.id === data.selectedModel,
           );
-          setVideoToolOptions(getDefaultVideoToolOptions(restoredModel));
+          setVideoToolOptions({
+            ...getDefaultVideoToolOptions(restoredModel),
+            ...(data.videoToolOptions || {}),
+          });
         }
         if (data.continuationSourceIds) {
           setContinuationSourceIds(data.continuationSourceIds);
@@ -825,6 +1083,9 @@ export default function VideoStudio({
         }
         if (data.uploadedVideoUrl) setUploadedVideoUrl(data.uploadedVideoUrl);
         if (data.uploadedVideoName) setUploadedVideoName(data.uploadedVideoName);
+        if (data.uploadedVideoValidationKey) {
+          setUploadedVideoValidationKey(data.uploadedVideoValidationKey);
+        }
         if (data.prompt) setPrompt(data.prompt);
         if (data.localHistory) setLocalHistory(data.localHistory);
 
@@ -863,6 +1124,7 @@ export default function VideoStudio({
           uploadedImageUrls,
           uploadedVideoUrl,
           uploadedVideoName,
+          uploadedVideoValidationKey,
           prompt,
           localHistory,
         };
@@ -889,6 +1151,7 @@ export default function VideoStudio({
     uploadedImageUrls,
     uploadedVideoUrl,
     uploadedVideoName,
+    uploadedVideoValidationKey,
     prompt,
     localHistory,
   ]);
@@ -919,8 +1182,10 @@ export default function VideoStudio({
         return;
       }
 
+      cancelPendingVideoUpload();
       setUploadedVideoUrl(null);
       setUploadedVideoName(null);
+      setUploadedVideoValidationKey(null);
       setV2vMode(false);
 
       const sibling = currentT2V?.family
@@ -951,6 +1216,7 @@ export default function VideoStudio({
     },
     [
       applyControlsForModel,
+      cancelPendingVideoUpload,
       imageMode,
       isMotionControlSelection,
       selectedModel,
@@ -989,7 +1255,7 @@ export default function VideoStudio({
   );
 
   const applyUploadedVideo = useCallback(
-    (url, name) => {
+    (url, name, validationKey = null) => {
       const mode = v2vMode ? "v2v" : imageMode ? "i2v" : "t2v";
       const transition = resolveVideoUploadTransition({
         mode,
@@ -999,6 +1265,7 @@ export default function VideoStudio({
 
       setUploadedVideoUrl(url);
       setUploadedVideoName(name);
+      setUploadedVideoValidationKey(validationKey);
 
       if (transition.clearImage) {
         setUploadedImageUrl(null);
@@ -1027,25 +1294,63 @@ export default function VideoStudio({
     ],
   );
 
-  const processDroppedVideo = useCallback(
+  const uploadVideo = useCallback(
     async (file) => {
-      if (file.size > 50 * 1024 * 1024) {
-        alert("Video exceeds 50MB limit.");
+      const constraints = currentToolPresentation.videoConstraints;
+      const fileError = getVideoFileError(file, constraints);
+      if (fileError) {
+        alert(fileError);
         return;
       }
+
+      const requestVersion = ++videoUploadRequestRef.current;
+      const uploadContext = currentVideoUploadContext;
+      const isCurrentUpload = () =>
+        videoUploadRequestRef.current === requestVersion &&
+        activeVideoUploadContextRef.current === uploadContext;
+
       setVideoUploading(true);
       setVideoProgress(0);
       try {
-        const url = await uploadFile(apiKey, file, setVideoProgress);
-        applyUploadedVideo(url, file.name);
+        if (constraints) {
+          let metadata;
+          try {
+            metadata = await readVideoMetadata(file);
+          } catch (error) {
+            if (isCurrentUpload()) alert(error.message);
+            return;
+          }
+          if (!isCurrentUpload()) return;
+          const metadataError = getVideoMetadataError(metadata, constraints);
+          if (metadataError) {
+            alert(metadataError);
+            return;
+          }
+        }
+
+        if (!isCurrentUpload()) return;
+        const url = await uploadFile(apiKey, file, (progress) => {
+          if (isCurrentUpload()) setVideoProgress(progress);
+        });
+        if (!isCurrentUpload()) return;
+        applyUploadedVideo(url, file.name, constraints?.key || null);
       } catch (err) {
-        alert(`Video upload failed: ${err.message}`);
+        if (isCurrentUpload()) {
+          alert(`Video upload failed: ${err.message}`);
+        }
       } finally {
-        setVideoUploading(false);
-        setVideoProgress(0);
+        if (videoUploadRequestRef.current === requestVersion) {
+          setVideoUploading(false);
+          setVideoProgress(0);
+        }
       }
     },
-    [apiKey, applyUploadedVideo],
+    [
+      apiKey,
+      applyUploadedVideo,
+      currentToolPresentation.videoConstraints,
+      currentVideoUploadContext,
+    ],
   );
 
   // ── Handle Dropped Files ────────────────────────────────────────────────
@@ -1055,13 +1360,13 @@ export default function VideoStudio({
       const videoFiles = droppedFiles.filter(f => f.type.startsWith('video/'));
       
       if (videoFiles.length > 0) {
-        processDroppedVideo(videoFiles[0]);
+        uploadVideo(videoFiles[0]);
       } else if (imageFiles.length > 0) {
         uploadImageReference(imageFiles[0]);
       }
       onFilesHandled?.();
     }
-  }, [droppedFiles, onFilesHandled, processDroppedVideo, uploadImageReference]);
+  }, [droppedFiles, onFilesHandled, uploadImageReference, uploadVideo]);
 
   // Initialise controls for default model on mount
   useEffect(() => {
@@ -1105,6 +1410,7 @@ export default function VideoStudio({
     if (isMotionControlSelection(selectedModel, v2vMode)) return;
     const currentT2V = t2vModels.find((m) => m.id === selectedModel);
     if (currentT2V?.inputs?.images_list) return;
+    cancelPendingVideoUpload();
     setImageMode(false);
     const first = t2vModels[0];
     setSelectedModel(first.id);
@@ -1119,6 +1425,7 @@ export default function VideoStudio({
       setUploadedImageUrl(null);
       // Reset to text-to-video if empty list
       if (isMotionControlSelection(selectedModel, v2vMode)) return;
+      cancelPendingVideoUpload();
       setImageMode(false);
       const first = t2vModels[0];
       setSelectedModel(first.id);
@@ -1159,35 +1466,24 @@ export default function VideoStudio({
   const handleVideoFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    if (file.size > 50 * 1024 * 1024) {
-      alert("Video exceeds 50MB limit.");
-      return;
-    }
-    setVideoUploading(true);
-    setVideoProgress(0);
     try {
-      const url = await uploadFile(apiKey, file, (pct) => {
-        setVideoProgress(pct);
-      });
-      applyUploadedVideo(url, file.name);
-    } catch (err) {
-      console.error("[VideoStudio] Video upload failed:", err);
-      alert(`Video upload failed: ${err.message}`);
+      await uploadVideo(file);
     } finally {
-      setVideoUploading(false);
-      setVideoProgress(0);
       if (videoFileInputRef.current) videoFileInputRef.current.value = "";
     }
   };
 
   const clearVideoUpload = () => {
+    cancelPendingVideoUpload();
     setUploadedVideoUrl(null);
     setUploadedVideoName(null);
+    setUploadedVideoValidationKey(null);
   };
 
   // ── model selection from dropdown ─────────────────────────────────────────
   const handleModelSelect = useCallback(
     (m, category = imageMode ? "i2v" : "t2v") => {
+      cancelPendingVideoUpload();
       const isV2V = category === "v2v";
       if (isV2V) {
         setV2vMode(true);
@@ -1206,6 +1502,7 @@ export default function VideoStudio({
           setV2vMode(false);
           setUploadedVideoUrl(null);
           setUploadedVideoName(null);
+          setUploadedVideoValidationKey(null);
         }
         const nextImageMode = category === "i2v";
         if (!nextImageMode && imageMode) {
@@ -1220,7 +1517,7 @@ export default function VideoStudio({
         applyControlsForModel(m.id, nextImageMode, false);
       }
     },
-    [v2vMode, imageMode, applyControlsForModel],
+    [v2vMode, imageMode, applyControlsForModel, cancelPendingVideoUpload],
   );
 
   // ── add to local history ──────────────────────────────────────────────────
@@ -1243,6 +1540,10 @@ export default function VideoStudio({
     if (v2vMode) {
       if (!uploadedVideoUrl) {
         alert("Please upload a video first.");
+        return;
+      }
+      if (!uploadedVideoIsValidated) {
+        alert("Please re-upload the video so its requirements can be validated.");
         return;
       }
       if (currentModel?.imageField && !uploadedImageUrl) {
@@ -1282,6 +1583,14 @@ export default function VideoStudio({
       }
     }
 
+    if (
+      currentToolPresentation.estimateCost &&
+      (costEstimate.status !== "ready" || costEstimate.key !== costEstimateKey)
+    ) {
+      alert("Wait for the current cost estimate before starting this operation.");
+      return;
+    }
+
     onGenerationStart?.();
     setGenerating(true);
     setGenerateError(null);
@@ -1292,18 +1601,7 @@ export default function VideoStudio({
       if (v2vMode) {
         // V2V: dedicated processV2V handles single-input tools (e.g. watermark
         // remover) and motion-control models (which take video + image + prompt)
-        const v2vParams = {
-          model: selectedModel,
-          video_url: uploadedVideoUrl,
-          options: videoToolOptions,
-        };
-        if (currentModel?.imageField && uploadedImageUrl) {
-          v2vParams.image_url = uploadedImageUrl;
-        }
-        if (currentToolPresentation.showPrompt && trimmedPrompt) {
-          v2vParams.prompt = trimmedPrompt;
-        }
-        res = await processV2V(apiKey, v2vParams);
+        res = await processV2V(apiKey, v2vRequestParams);
         if (!res?.url) throw new Error("No video URL returned by API");
 
         const requestId = res.request_id || null;
@@ -1318,7 +1616,7 @@ export default function VideoStudio({
           timestamp: new Date().toISOString(),
         };
         addToLocalHistory(entry);
-        showVideoInCanvas(res.url, selectedModel);
+        showVideoInCanvas(res.url);
         if (onGenerationComplete)
           onGenerationComplete({
             url: res.url,
@@ -1344,7 +1642,9 @@ export default function VideoStudio({
         const durations = getDurationsForI2VModel(selectedModel);
         if (durations.length > 0) i2vParams.duration = selectedDuration;
         const resolutions = getResolutionsForI2VModel(selectedModel);
-        if (resolutions.length > 0) i2vParams.resolution = selectedResolution;
+        const resolution =
+          resolutions.length > 0 ? selectedResolution : undefined;
+        if (resolution) i2vParams.resolution = resolution;
         if (selectedQuality) i2vParams.quality = selectedQuality;
         if (selectedMode) i2vParams.mode = selectedMode;
         if (showEffect && selectedEffect) i2vParams.name = selectedEffect;
@@ -1363,16 +1663,18 @@ export default function VideoStudio({
           modelName: selectedModelName,
           aspect_ratio: selectedAr,
           duration: selectedDuration,
+          resolution,
           timestamp: new Date().toISOString(),
         };
         addToLocalHistory(entry);
-        showVideoInCanvas(res.url, selectedModel);
+        showVideoInCanvas(res.url);
         if (onGenerationComplete)
           onGenerationComplete({
             url: res.url,
             model: selectedModel,
             prompt: trimmedPrompt,
             requestId,
+            resolution,
             type: "video",
           });
       } else {
@@ -1401,7 +1703,9 @@ export default function VideoStudio({
         const durations = getDurationsForModel(selectedModel);
         if (durations.length > 0) params.duration = selectedDuration;
         const resolutions = getResolutionsForVideoModel(selectedModel);
-        if (resolutions.length > 0) params.resolution = selectedResolution;
+        const resolution =
+          resolutions.length > 0 ? selectedResolution : undefined;
+        if (resolution) params.resolution = resolution;
         if (selectedQuality) params.quality = selectedQuality;
         if (selectedMode) params.mode = selectedMode;
 
@@ -1422,16 +1726,18 @@ export default function VideoStudio({
             getDurationsForModel(selectedModel).length > 0
               ? selectedDuration
               : undefined,
+          resolution,
           timestamp: new Date().toISOString(),
         };
         addToLocalHistory(entry);
-        showVideoInCanvas(res.url, selectedModel);
+        showVideoInCanvas(res.url);
         if (onGenerationComplete)
           onGenerationComplete({
             url: res.url,
             model: selectedModel,
             prompt: submittedPrompt,
             requestId,
+            resolution,
             type: "video",
           });
       }
@@ -1462,10 +1768,14 @@ export default function VideoStudio({
     uploadedImageUrl,
     uploadedImageUrls,
     uploadedVideoUrl,
+    uploadedVideoIsValidated,
     continuationConfig,
     currentModelObj,
     currentToolPresentation,
+    costEstimate,
+    costEstimateKey,
     selectedContinuationSource,
+    v2vRequestParams,
     addToLocalHistory,
     showVideoInCanvas,
     onGenerationComplete,
@@ -1480,6 +1790,7 @@ export default function VideoStudio({
   }, []);
 
   const handleNewPrompt = useCallback(() => {
+    cancelPendingVideoUpload();
     resetToPromptBar();
     setPrompt("");
     setUploadedImageUrl(null);
@@ -1487,6 +1798,7 @@ export default function VideoStudio({
     setImageMode(false);
     setUploadedVideoUrl(null);
     setUploadedVideoName(null);
+    setUploadedVideoValidationKey(null);
     setV2vMode(false);
     const first = t2vModels[0];
     setSelectedModel(first.id);
@@ -1494,23 +1806,26 @@ export default function VideoStudio({
     setVideoToolOptions(getDefaultVideoToolOptions(first));
     applyControlsForModel(first.id, false, false);
     setTimeout(() => textareaRef.current?.focus(), 50);
-  }, [resetToPromptBar, applyControlsForModel]);
+  }, [resetToPromptBar, applyControlsForModel, cancelPendingVideoUpload]);
 
   const handleExtend = useCallback(
     (entry) => {
-      if (!entry?.requestId) return;
       const targetModel = t2vModels.find(
         (model) => model.id === "seedance-v2.0-extend",
       );
       const targetConfig = getContinuationConfig(targetModel);
       if (!targetModel || !targetConfig) return;
+      const source = getCompatibleContinuationSources(targetModel, [entry])[0];
+      if (!source) return;
 
+      cancelPendingVideoUpload();
       resetToPromptBar();
       setPrompt("");
       setUploadedImageUrl(null);
       setUploadedImageUrls([]);
       setUploadedVideoUrl(null);
       setUploadedVideoName(null);
+      setUploadedVideoValidationKey(null);
       setImageMode(false);
       setV2vMode(false);
       setSelectedModel(targetModel.id);
@@ -1518,12 +1833,12 @@ export default function VideoStudio({
       setVideoToolOptions(getDefaultVideoToolOptions(targetModel));
       setContinuationSourceIds((previous) => ({
         ...previous,
-        [targetConfig.family]: entry.requestId,
+        [targetConfig.family]: source.requestId,
       }));
       applyControlsForModel(targetModel.id, false, false);
       setTimeout(() => textareaRef.current?.focus(), 50);
     },
-    [resetToPromptBar, applyControlsForModel],
+    [resetToPromptBar, applyControlsForModel, cancelPendingVideoUpload],
   );
 
   // ── derived UI values ────────────────────────────────────────────────────
@@ -1549,9 +1864,20 @@ export default function VideoStudio({
     v2vMode || isContinuationMode
       ? currentToolPresentation.actionLabel
       : "Generate";
+  const currentCostEstimate =
+    costEstimate.key === costEstimateKey ? costEstimate : { status: "idle" };
+  const costEstimateReady =
+    !currentToolPresentation.estimateCost ||
+    currentCostEstimate.status === "ready";
   const videoUploadTitle = v2vMode
     ? currentToolPresentation.uploadTitle
     : `Upload reference video for ${currentModelObj?.name || "this model"}`;
+  const videoFileAccept = currentToolPresentation.videoConstraints
+    ? [
+        ...currentToolPresentation.videoConstraints.allowedMimeTypes,
+        ...currentToolPresentation.videoConstraints.allowedExtensions,
+      ].join(",")
+    : "video/*";
 
   const toggleDropdown = (type) => (e) => {
     e.stopPropagation();
@@ -1569,10 +1895,12 @@ export default function VideoStudio({
         {history.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full pt-4 animate-fade-in-up">
             {history.map((entry, idx) => {
-              const canExtendWithSeedance =
-                Boolean(entry.requestId) &&
-                (entry.model === "seedance-v2.0-t2v" ||
-                  entry.model === "seedance-v2.0-i2v");
+              const canExtendWithSeedance = Boolean(
+                getCompatibleContinuationSources(
+                  "seedance-v2.0-extend",
+                  [entry],
+                ).length,
+              );
               return (
                 <div
                   key={entry.id || idx}
@@ -1970,7 +2298,7 @@ export default function VideoStudio({
                   <input
                     ref={videoFileInputRef}
                     type="file"
-                    accept="video/*"
+                    accept={videoFileAccept}
                     className="hidden"
                     onChange={handleVideoFileChange}
                   />
@@ -2029,6 +2357,16 @@ export default function VideoStudio({
               ) : (
                 <div className="min-h-[58px] flex items-center px-3 text-xs leading-relaxed text-white/55">
                   {currentToolPresentation.summary}
+                </div>
+              )}
+              {showPromptField && currentToolPresentation.guidance && (
+                <div className="px-3 text-[10px] leading-relaxed text-white/40">
+                  {currentToolPresentation.guidance}
+                </div>
+              )}
+              {currentToolPresentation.videoConstraints?.requirements && (
+                <div className="px-3 text-[10px] leading-relaxed text-white/40">
+                  Video requirements: {currentToolPresentation.videoConstraints.requirements}
                 </div>
               )}
             </div>
@@ -2397,24 +2735,50 @@ export default function VideoStudio({
               )}
             </PromptControls>
 
-            {/* Generate button */}
-            <PromptAction
-              onClick={handleGenerate}
-              disabled={generating}
-            >
-              {generating ? (
-                <>
-                  <span className="animate-spin inline-block text-black">
-                    ◌
-                  </span>{" "}
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <span>{generateActionLabel}</span>
-                </>
+            <div className="flex flex-col items-stretch sm:items-end gap-1.5 shrink-0">
+              {currentToolPresentation.estimateCost && (
+                <div className="text-[10px] text-white/55 sm:text-right px-1">
+                  {currentCostEstimate.status === "ready" ? (
+                    <span>
+                      Estimated cost: {formatCost(currentCostEstimate)}{" "}
+                      {currentCostEstimate.currency}
+                    </span>
+                  ) : currentCostEstimate.status === "loading" ? (
+                    <span>Calculating exact cost…</span>
+                  ) : currentCostEstimate.status === "error" ? (
+                    <span>
+                      Cost unavailable.{" "}
+                      <button
+                        type="button"
+                        className="text-primary hover:underline"
+                        onClick={() => setCostEstimateRetry((value) => value + 1)}
+                      >
+                        Retry
+                      </button>
+                    </span>
+                  ) : (
+                    <span>Add the required inputs to calculate cost.</span>
+                  )}
+                </div>
               )}
-            </PromptAction>
+
+              {/* Generate button */}
+              <PromptAction
+                onClick={handleGenerate}
+                disabled={generating || !costEstimateReady}
+              >
+                {generating ? (
+                  <>
+                    <span className="animate-spin inline-block text-black">
+                      ◌
+                    </span>{" "}
+                    Generating...
+                  </>
+                ) : (
+                  <span>{generateActionLabel}</span>
+                )}
+              </PromptAction>
+            </div>
           </PromptFooter>
       </PromptComposer>
 

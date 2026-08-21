@@ -43,7 +43,7 @@ async function pollForResult(requestId, key, maxAttempts = 900, interval = 2000)
     throw new Error('Generation timed out after polling.');
 }
 
-export function normalizePredictionResult(submitData, result, outputUrl) {
+function normalizePredictionResult(submitData, result, outputUrl) {
     const requestId = submitData?.request_id || submitData?.id || result?.request_id || result?.id;
     return {
         ...result,
@@ -204,6 +204,46 @@ export async function processV2V(apiKey, params) {
     const endpoint = modelInfo?.endpoint || params.model;
     const payload = buildVideoToolPayload(modelInfo, params);
     return submitAndPoll(endpoint, payload, apiKey, params.onRequestId, 900);
+}
+
+export async function estimateV2VCost(params, signal) {
+    const modelInfo = getV2VModelById(params?.model);
+    const endpoint = modelInfo?.endpoint || params?.model;
+    if (!endpoint) {
+        throw new Error('A V2V model is required to estimate cost.');
+    }
+
+    const payload = buildVideoToolPayload(modelInfo, params);
+    const response = await fetch(`${BASE_URL}/api/v1/models/${endpoint}/estimate-cost`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal,
+    });
+
+    if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`Cost estimate failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+    }
+
+    let data;
+    try {
+        data = await response.json();
+    } catch {
+        throw new Error('Cost estimate returned invalid JSON.');
+    }
+
+    if (typeof data?.cost !== 'number' || !Number.isFinite(data.cost) || data.cost < 0) {
+        throw new Error('Cost estimate returned an invalid cost.');
+    }
+    if (typeof data.currency !== 'string' || !/^[A-Za-z]{3}$/.test(data.currency.trim())) {
+        throw new Error('Cost estimate returned an invalid currency.');
+    }
+
+    return {
+        cost: data.cost,
+        currency: data.currency.trim().toUpperCase(),
+    };
 }
 
 export async function processRecast(apiKey, params) {
