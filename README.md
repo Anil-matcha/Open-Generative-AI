@@ -159,10 +159,10 @@ echo 'kernel.apparmor_restrict_unprivileged_userns=0' | sudo tee /etc/sysctl.d/9
 
 ---
 
-Open Generative AI is a free, open-source AI image, video, cinema, and lip sync studio that brings creative workflows to everyone. No content filters, no prompt rejections, no guardrails — just full creative freedom. Powered by [Muapi.ai](https://muapi.ai?utm_source=github&utm_medium=readme&utm_campaign=open-generative-ai), it supports text-to-image, image-to-image, text-to-video, image-to-video, and audio-driven lip sync generation across models like Flux, Nano Banana, Midjourney, Kling, Sora, Veo, Seedream, Infinite Talk, LTX Lipsync, Wan 2.2, and more — all from a sleek, modern interface you can self-host and customize.
+Open Generative AI is a free, open-source AI image, video, cinema, and lip sync studio that brings creative workflows to everyone. Content-safety enforcement is enabled by default for high-risk inputs, with explicit audit and off modes available to self-hosting operators. Powered by [Muapi.ai](https://muapi.ai?utm_source=github&utm_medium=readme&utm_campaign=open-generative-ai), it supports text-to-image, image-to-image, text-to-video, image-to-video, and audio-driven lip sync generation across models like Flux, Nano Banana, Midjourney, Kling, Sora, Veo, Seedream, Infinite Talk, LTX Lipsync, Wan 2.2, and more — all from a sleek, modern interface you can self-host and customize.
 
 **Why Open Generative AI instead of other AI Video Platforms?**
-- **No filters** — no content filters, no nanny guardrails, no prompt rejections
+- **Operator-controlled safety** — high-risk content rules are enforced by default and can be extended through deployment configuration
 - **Free & open-source** — no subscription, no vendor lock-in
 - **Self-hosted** — your data stays on your machine, full creative control
 - **200+ models** — text-to-image, image-to-image, text-to-video, image-to-video, lip sync
