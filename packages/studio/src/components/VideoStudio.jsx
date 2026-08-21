@@ -1,10 +1,18 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { generateVideo, generateI2V, processV2V, uploadFile } from "../muapi.js";
 import { formatErrorMessage } from "../utils/formatError.js";
 import { scopedPersistKey, migrateLegacyPersistKey } from "../persistKey.js";
+import {
+  getCompatibleContinuationSources,
+  getContinuationConfig,
+  getDefaultVideoToolOptions,
+  getVideoToolOptionDefinitions,
+  getVideoToolPresentation,
+  resolveVideoUploadTransition,
+} from "../videoToolCapabilities.js";
 import DrawModal from "./DrawModal.jsx";
 import MobileGenerationActions, {
   GenerationCopyButtons,
@@ -443,6 +451,80 @@ function ModelDropdown({ selectedModel, onSelect, onClose }) {
   );
 }
 
+function VideoToolOptionControls({
+  definitions,
+  values,
+  onChange,
+  openDropdown,
+  setOpenDropdown,
+  toggleDropdown,
+}) {
+  return definitions.map((definition) => {
+    const value = values[definition.key];
+
+    if (definition.type === "boolean") {
+      return (
+        <button
+          key={definition.key}
+          type="button"
+          onClick={() => onChange(definition.key, !value)}
+          className={promptControlClassName({ active: Boolean(value) })}
+          title={definition.title}
+        >
+          <PromptQualityIcon />
+          <span className={PROMPT_CONTROL_LABEL_CLASS}>
+            {definition.title}: {value ? "On" : "Off"}
+          </span>
+        </button>
+      );
+    }
+
+    const dropdownId = `video-option:${definition.key}`;
+    const valueLabel =
+      definition.key === "upscale_factor" ? `${value}×` : String(value ?? "");
+
+    return (
+      <div key={definition.key} className="relative">
+        <button
+          type="button"
+          onClick={toggleDropdown(dropdownId)}
+          className={promptControlClassName({
+            active: openDropdown === dropdownId,
+          })}
+          title={definition.title}
+        >
+          <PromptQualityIcon />
+          <span className={PROMPT_CONTROL_LABEL_CLASS}>{valueLabel}</span>
+          <PromptChevronIcon />
+        </button>
+        {openDropdown === dropdownId && (
+          <PromptPopover
+            onClick={(event) => event.stopPropagation()}
+            className="min-w-[240px] max-h-[320px]"
+          >
+            <PromptPopoverHeader>{definition.title}</PromptPopoverHeader>
+            <PromptMenuList>
+              {(definition.enum || []).map((option) => (
+                <PromptMenuItem
+                  key={option}
+                  selected={value === option}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onChange(definition.key, option);
+                    setOpenDropdown(null);
+                  }}
+                >
+                  {definition.key === "upscale_factor" ? `${option}×` : option}
+                </PromptMenuItem>
+              ))}
+            </PromptMenuList>
+          </PromptPopover>
+        )}
+      </div>
+    );
+  });
+}
+
 // ── Control button ────────────────────────────────────────────────────────────
 
 // ── Dropdown panel ─────────────────────────────────────────────────────────────
@@ -489,6 +571,8 @@ export default function VideoStudio({
   );
   const [selectedMode, setSelectedMode] = useState("");
   const [selectedEffect, setSelectedEffect] = useState("");
+  const [videoToolOptions, setVideoToolOptions] = useState({});
+  const [continuationSourceIds, setContinuationSourceIds] = useState({});
 
   // ── upload progress ──
   const [imageProgress, setImageProgress] = useState(0);
@@ -518,11 +602,8 @@ export default function VideoStudio({
   const [generateError, setGenerateError] = useState(null);
   const [fullscreenUrl, setFullscreenUrl] = useState(null);
   const [canvasUrl, setCanvasUrl] = useState(null);
-  const [canvasModel, setCanvasModel] = useState(null);
   const [showCanvas, setShowCanvas] = useState(false);
   const [isDrawModalOpen, setIsDrawModalOpen] = useState(false);
-  const [lastGenerationId, setLastGenerationId] = useState(null);
-  const [lastGenerationModel, setLastGenerationModel] = useState(null);
 
   // ── history ──
   const [localHistory, setLocalHistory] = useState([]);
@@ -533,7 +614,6 @@ export default function VideoStudio({
 
   // ── prompt ──
   const [prompt, setPrompt] = useState("");
-  const [promptDisabled, setPromptDisabled] = useState(false);
 
   // ── refs ──
   const containerRef = useRef(null);
@@ -592,6 +672,37 @@ export default function VideoStudio({
     [getCurrentModels, selectedModel],
   );
 
+  const currentModelObj = getCurrentModel();
+  const currentToolPresentation = useMemo(
+    () => getVideoToolPresentation(currentModelObj),
+    [currentModelObj],
+  );
+  const continuationConfig = useMemo(
+    () => getContinuationConfig(currentModelObj),
+    [currentModelObj],
+  );
+  const compatibleContinuationSources = useMemo(
+    () => getCompatibleContinuationSources(currentModelObj, history),
+    [currentModelObj, history],
+  );
+  const selectedContinuationSource = useMemo(() => {
+    if (!continuationConfig) return null;
+    const selectedRequestId = continuationSourceIds[continuationConfig.family];
+    return (
+      compatibleContinuationSources.find(
+        (entry) => entry.requestId === selectedRequestId,
+      ) || compatibleContinuationSources[0] || null
+    );
+  }, [
+    compatibleContinuationSources,
+    continuationConfig,
+    continuationSourceIds,
+  ]);
+  const videoToolOptionDefinitions = useMemo(
+    () => getVideoToolOptionDefinitions(currentModelObj),
+    [currentModelObj],
+  );
+
   const isMotionControlSelection = useCallback(
     (modelId, isV2v) => {
       if (!isV2v) return false;
@@ -620,7 +731,9 @@ export default function VideoStudio({
       const ars = isImageMode
         ? getAspectRatiosForI2VModel(modelId)
         : getAspectRatiosForVideoModel(modelId);
-      if (ars.length > 0) {
+      const hasApplicableAspectRatio =
+        !model?.requiresRequestId || Boolean(model.inputs?.aspect_ratio);
+      if (ars.length > 0 && hasApplicableAspectRatio) {
         setSelectedAr(ars[0]);
         setShowAr(true);
       } else {
@@ -693,6 +806,17 @@ export default function VideoStudio({
         if (data.selectedQuality) setSelectedQuality(data.selectedQuality);
         if (data.selectedMode) setSelectedMode(data.selectedMode);
         if (data.selectedEffect) setSelectedEffect(data.selectedEffect);
+        if (data.videoToolOptions) {
+          setVideoToolOptions(data.videoToolOptions);
+        } else if (data.selectedModel) {
+          const restoredModel = [...t2vModels, ...i2vModels, ...v2vModels].find(
+            (model) => model.id === data.selectedModel,
+          );
+          setVideoToolOptions(getDefaultVideoToolOptions(restoredModel));
+        }
+        if (data.continuationSourceIds) {
+          setContinuationSourceIds(data.continuationSourceIds);
+        }
         if (data.uploadedImageUrl) setUploadedImageUrl(data.uploadedImageUrl);
         if (data.uploadedImageUrls) {
           setUploadedImageUrls(data.uploadedImageUrls);
@@ -733,6 +857,8 @@ export default function VideoStudio({
           selectedQuality,
           selectedMode,
           selectedEffect,
+          videoToolOptions,
+          continuationSourceIds,
           uploadedImageUrl,
           uploadedImageUrls,
           uploadedVideoUrl,
@@ -757,6 +883,8 @@ export default function VideoStudio({
     selectedQuality,
     selectedMode,
     selectedEffect,
+    videoToolOptions,
+    continuationSourceIds,
     uploadedImageUrl,
     uploadedImageUrls,
     uploadedVideoUrl,
@@ -776,7 +904,6 @@ export default function VideoStudio({
       // Motion-control models use the image alongside the uploaded video.
       if (isMotionControlSelection(selectedModel, v2vMode)) {
         setUploadedImageUrls([url]);
-        setPromptDisabled(false);
         return;
       }
 
@@ -789,7 +916,6 @@ export default function VideoStudio({
           if (previousUrls.includes(url)) return previousUrls;
           return [...previousUrls, url].slice(0, maxImages);
         });
-        setPromptDisabled(false);
         return;
       }
 
@@ -822,7 +948,6 @@ export default function VideoStudio({
       } else {
         setUploadedImageUrls([url]);
       }
-      setPromptDisabled(false);
     },
     [
       applyControlsForModel,
@@ -863,6 +988,45 @@ export default function VideoStudio({
     [apiKey, applyImageReferenceUrl],
   );
 
+  const applyUploadedVideo = useCallback(
+    (url, name) => {
+      const mode = v2vMode ? "v2v" : imageMode ? "i2v" : "t2v";
+      const transition = resolveVideoUploadTransition({
+        mode,
+        currentModel: getCurrentModel(),
+        defaultModel: v2vModels[0],
+      });
+
+      setUploadedVideoUrl(url);
+      setUploadedVideoName(name);
+
+      if (transition.clearImage) {
+        setUploadedImageUrl(null);
+        setUploadedImageUrls([]);
+        setUploadedEndImageUrl(null);
+      }
+      if (transition.clearPrompt) setPrompt("");
+
+      if (transition.mode === "v2v" && transition.model) {
+        setImageMode(false);
+        setV2vMode(true);
+        if (transition.model.id !== selectedModel) {
+          setSelectedModel(transition.model.id);
+          setSelectedModelName(transition.model.name);
+          setVideoToolOptions(getDefaultVideoToolOptions(transition.model));
+          applyControlsForModel(transition.model.id, false, true);
+        }
+      }
+    },
+    [
+      applyControlsForModel,
+      getCurrentModel,
+      imageMode,
+      selectedModel,
+      v2vMode,
+    ],
+  );
+
   const processDroppedVideo = useCallback(
     async (file) => {
       if (file.size > 50 * 1024 * 1024) {
@@ -873,19 +1037,7 @@ export default function VideoStudio({
       setVideoProgress(0);
       try {
         const url = await uploadFile(apiKey, file, setVideoProgress);
-        setUploadedVideoUrl(url);
-        setUploadedVideoName(file.name);
-        if (imageMode) {
-          setUploadedImageUrl(null);
-          setImageMode(false);
-        }
-        setV2vMode(true);
-        const firstV2V = v2vModels[0];
-        setSelectedModel(firstV2V.id);
-        setSelectedModelName(firstV2V.name);
-        applyControlsForModel(firstV2V.id, false, true);
-        setPrompt("");
-        setPromptDisabled(true);
+        applyUploadedVideo(url, file.name);
       } catch (err) {
         alert(`Video upload failed: ${err.message}`);
       } finally {
@@ -893,7 +1045,7 @@ export default function VideoStudio({
         setVideoProgress(0);
       }
     },
-    [apiKey, applyControlsForModel, imageMode],
+    [apiKey, applyUploadedVideo],
   );
 
   // ── Handle Dropped Files ────────────────────────────────────────────────
@@ -958,7 +1110,6 @@ export default function VideoStudio({
     setSelectedModel(first.id);
     setSelectedModelName(first.name);
     applyControlsForModel(first.id, false, false);
-    setPromptDisabled(false);
   };
 
   const removeImageAtIndex = (idx) => {
@@ -973,7 +1124,6 @@ export default function VideoStudio({
       setSelectedModel(first.id);
       setSelectedModelName(first.name);
       applyControlsForModel(first.id, false, false);
-      setPromptDisabled(false);
     } else {
       setUploadedImageUrl(nextUrls[0]);
     }
@@ -1019,33 +1169,7 @@ export default function VideoStudio({
       const url = await uploadFile(apiKey, file, (pct) => {
         setVideoProgress(pct);
       });
-      setUploadedVideoUrl(url);
-      setUploadedVideoName(file.name);
-
-      if (isMotionControlSelection(selectedModel, v2vMode)) {
-        // Already in motion-control mode — keep model and image, allow prompt
-        setPromptDisabled(false);
-      } else {
-        // Model-native video reference (e.g. Seedance 2.0 Extend with inputs.video_files):
-        // keep the current model & mode; just store the video URL as a reference
-        const currentT2VOrExtend = t2vModels.find((m) => m.id === selectedModel);
-        if (currentT2VOrExtend?.inputs?.video_files) {
-          setPromptDisabled(false);
-        } else {
-          // Default v2v flow (e.g. watermark remover) — auto-pick the first v2v model
-          if (imageMode) {
-            setUploadedImageUrl(null);
-            setImageMode(false);
-          }
-          setV2vMode(true);
-          const firstV2V = v2vModels[0];
-          setSelectedModel(firstV2V.id);
-          setSelectedModelName(firstV2V.name);
-          applyControlsForModel(firstV2V.id, false, true);
-          setPrompt("");
-          setPromptDisabled(true);
-        }
-      }
+      applyUploadedVideo(url, file.name);
     } catch (err) {
       console.error("[VideoStudio] Video upload failed:", err);
       alert(`Video upload failed: ${err.message}`);
@@ -1059,12 +1183,6 @@ export default function VideoStudio({
   const clearVideoUpload = () => {
     setUploadedVideoUrl(null);
     setUploadedVideoName(null);
-    setV2vMode(false);
-    const first = t2vModels[0];
-    setSelectedModel(first.id);
-    setSelectedModelName(first.name);
-    applyControlsForModel(first.id, false, false);
-    setPromptDisabled(false);
   };
 
   // ── model selection from dropdown ─────────────────────────────────────────
@@ -1081,20 +1199,13 @@ export default function VideoStudio({
         }
         setSelectedModel(m.id);
         setSelectedModelName(m.name);
+        setVideoToolOptions(getDefaultVideoToolOptions(m));
         applyControlsForModel(m.id, false, true);
-        if (isMC) {
-          // Motion-control: prompt is editable, video+image are needed
-          setPromptDisabled(false);
-        } else {
-          setPrompt("");
-          setPromptDisabled(true);
-        }
       } else {
         if (v2vMode) {
           setV2vMode(false);
           setUploadedVideoUrl(null);
           setUploadedVideoName(null);
-          setPromptDisabled(false);
         }
         const nextImageMode = category === "i2v";
         if (!nextImageMode && imageMode) {
@@ -1105,6 +1216,7 @@ export default function VideoStudio({
         setImageMode(nextImageMode);
         setSelectedModel(m.id);
         setSelectedModelName(m.name);
+        setVideoToolOptions(getDefaultVideoToolOptions(m));
         applyControlsForModel(m.id, nextImageMode, false);
       }
     },
@@ -1118,16 +1230,14 @@ export default function VideoStudio({
   }, []);
 
   // ── show result in canvas ─────────────────────────────────────────────────
-  const showVideoInCanvas = useCallback((url, model) => {
+  const showVideoInCanvas = useCallback((url) => {
     setCanvasUrl(url);
-    setCanvasModel(model);
     setShowCanvas(true);
   }, []);
 
   // ── generate ──────────────────────────────────────────────────────────────
   const handleGenerate = useCallback(async () => {
-    const currentModel = getCurrentModel();
-    const isExtendMode = currentModel?.requiresRequestId;
+    const currentModel = currentModelObj;
     const trimmedPrompt = prompt.trim();
 
     if (v2vMode) {
@@ -1136,18 +1246,20 @@ export default function VideoStudio({
         return;
       }
       if (currentModel?.imageField && !uploadedImageUrl) {
-        alert("Please upload a reference image for motion control.");
+        alert(`Please upload the required image for ${currentModel.name}.`);
         return;
       }
-      if (currentModel?.promptRequired && !trimmedPrompt) {
-        alert("Please describe the motion you want.");
+      if (currentToolPresentation.promptRequired && !trimmedPrompt) {
+        alert(`Please enter instructions for ${currentModel.name}.`);
         return;
       }
-    } else if (isExtendMode) {
-      if (!lastGenerationId) {
-        alert(
-          "No Seedance 2.0 generation found to extend. Generate a video first.",
-        );
+    } else if (continuationConfig) {
+      if (!selectedContinuationSource) {
+        alert(continuationConfig.emptySourceMessage);
+        return;
+      }
+      if (continuationConfig.promptRequired && !trimmedPrompt) {
+        alert(`Please enter instructions for ${currentModel.name}.`);
         return;
       }
     } else if (imageMode) {
@@ -1174,8 +1286,6 @@ export default function VideoStudio({
     setGenerating(true);
     setGenerateError(null);
 
-    let hadError = false;
-
     try {
       let res;
 
@@ -1185,24 +1295,26 @@ export default function VideoStudio({
         const v2vParams = {
           model: selectedModel,
           video_url: uploadedVideoUrl,
+          options: videoToolOptions,
         };
         if (currentModel?.imageField && uploadedImageUrl) {
           v2vParams.image_url = uploadedImageUrl;
         }
-        if (currentModel?.hasPrompt && trimmedPrompt) {
+        if (currentToolPresentation.showPrompt && trimmedPrompt) {
           v2vParams.prompt = trimmedPrompt;
         }
         res = await processV2V(apiKey, v2vParams);
         if (!res?.url) throw new Error("No video URL returned by API");
 
-        const genId = res.id || Date.now().toString();
-        setLastGenerationId(null);
-        setLastGenerationModel(null);
+        const requestId = res.request_id || null;
+        const genId = requestId || res.id || Date.now().toString();
         const entry = {
           id: genId,
+          requestId,
           url: res.url,
-          prompt: currentModel?.hasPrompt ? trimmedPrompt : "",
+          prompt: currentToolPresentation.showPrompt ? trimmedPrompt : "",
           model: selectedModel,
+          modelName: selectedModelName,
           timestamp: new Date().toISOString(),
         };
         addToLocalHistory(entry);
@@ -1211,7 +1323,8 @@ export default function VideoStudio({
           onGenerationComplete({
             url: res.url,
             model: selectedModel,
-            prompt: currentModel?.hasPrompt ? trimmedPrompt : "",
+            prompt: currentToolPresentation.showPrompt ? trimmedPrompt : "",
+            requestId,
             type: "video",
           });
       } else if (imageMode) {
@@ -1239,19 +1352,15 @@ export default function VideoStudio({
         res = await generateI2V(apiKey, i2vParams);
         if (!res?.url) throw new Error("No video URL returned by API");
 
-        const genId = res.id || Date.now().toString();
-        if (selectedModel === "seedance-v2.0-i2v") {
-          setLastGenerationId(genId);
-          setLastGenerationModel(selectedModel);
-        } else {
-          setLastGenerationId(null);
-          setLastGenerationModel(null);
-        }
+        const requestId = res.request_id || null;
+        const genId = requestId || res.id || Date.now().toString();
         const entry = {
           id: genId,
+          requestId,
           url: res.url,
           prompt: trimmedPrompt,
           model: selectedModel,
+          modelName: selectedModelName,
           aspect_ratio: selectedAr,
           duration: selectedDuration,
           timestamp: new Date().toISOString(),
@@ -1263,26 +1372,31 @@ export default function VideoStudio({
             url: res.url,
             model: selectedModel,
             prompt: trimmedPrompt,
+            requestId,
             type: "video",
           });
       } else {
-        // T2V (including extend mode)
+        // T2V, including operations based on a compatible prior request.
         const params = { model: selectedModel };
-        if (trimmedPrompt) params.prompt = trimmedPrompt;
+        const submittedPrompt =
+          continuationConfig && !currentToolPresentation.showPrompt
+            ? ""
+            : trimmedPrompt;
+        if (submittedPrompt) params.prompt = submittedPrompt;
 
-        if (isExtendMode) {
-          params.request_id = lastGenerationId;
-          // Optional reference media for Seedance 2.0 Extend:
-          // images map to @image2…@image9 and videos map to @video1…@video3 in the prompt
-          if (uploadedImageUrls.length > 0) {
+        if (continuationConfig) {
+          params.request_id = selectedContinuationSource.requestId;
+          if (currentModel?.inputs?.images_list && uploadedImageUrls.length > 0) {
             params.images_list = uploadedImageUrls;
           }
-          if (uploadedVideoUrl) {
-            params.videos_list = [uploadedVideoUrl];
+          if (currentModel?.inputs?.video_files && uploadedVideoUrl) {
+            params.video_files = [uploadedVideoUrl];
           }
         } else {
           params.aspect_ratio = selectedAr;
         }
+
+        params.options = videoToolOptions;
 
         const durations = getDurationsForModel(selectedModel);
         if (durations.length > 0) params.duration = selectedDuration;
@@ -1294,24 +1408,20 @@ export default function VideoStudio({
         res = await generateVideo(apiKey, params);
         if (!res?.url) throw new Error("No video URL returned by API");
 
-        const genId = res.id || Date.now().toString();
-        if (
-          selectedModel === "seedance-v2.0-t2v" ||
-          selectedModel === "seedance-v2.0-i2v"
-        ) {
-          setLastGenerationId(genId);
-          setLastGenerationModel(selectedModel);
-        } else {
-          setLastGenerationId(null);
-          setLastGenerationModel(null);
-        }
+        const requestId = res.request_id || null;
+        const genId = requestId || res.id || Date.now().toString();
         const entry = {
           id: genId,
+          requestId,
           url: res.url,
-          prompt: trimmedPrompt,
+          prompt: submittedPrompt,
           model: selectedModel,
-          aspect_ratio: selectedAr,
-          duration: selectedDuration,
+          modelName: selectedModelName,
+          aspect_ratio: continuationConfig ? undefined : selectedAr,
+          duration:
+            getDurationsForModel(selectedModel).length > 0
+              ? selectedDuration
+              : undefined,
           timestamp: new Date().toISOString(),
         };
         addToLocalHistory(entry);
@@ -1320,12 +1430,12 @@ export default function VideoStudio({
           onGenerationComplete({
             url: res.url,
             model: selectedModel,
-            prompt: trimmedPrompt,
+            prompt: submittedPrompt,
+            requestId,
             type: "video",
           });
       }
     } catch (e) {
-      hadError = true;
       console.error("[VideoStudio]", e);
       const errMsg = formatErrorMessage(e, "Video generation failed");
       if (onGenerationError) onGenerationError(errMsg);
@@ -1346,12 +1456,16 @@ export default function VideoStudio({
     selectedQuality,
     selectedMode,
     selectedEffect,
+    selectedModelName,
     showEffect,
+    videoToolOptions,
     uploadedImageUrl,
     uploadedImageUrls,
     uploadedVideoUrl,
-    lastGenerationId,
-    getCurrentModel,
+    continuationConfig,
+    currentModelObj,
+    currentToolPresentation,
+    selectedContinuationSource,
     addToLocalHistory,
     showVideoInCanvas,
     onGenerationComplete,
@@ -1377,45 +1491,67 @@ export default function VideoStudio({
     const first = t2vModels[0];
     setSelectedModel(first.id);
     setSelectedModelName(first.name);
+    setVideoToolOptions(getDefaultVideoToolOptions(first));
     applyControlsForModel(first.id, false, false);
-    setPromptDisabled(false);
     setTimeout(() => textareaRef.current?.focus(), 50);
   }, [resetToPromptBar, applyControlsForModel]);
 
-  const handleExtend = useCallback(() => {
-    if (!lastGenerationId) return;
-    resetToPromptBar();
-    setPrompt("");
-    setUploadedImageUrl(null);
-    setUploadedImageUrls([]);
-    setImageMode(false);
-    setSelectedModel("seedance-v2.0-extend");
-    setSelectedModelName("Seedance 2.0 Extend");
-    applyControlsForModel("seedance-v2.0-extend", false, false);
-    setPromptDisabled(false);
-    setTimeout(() => textareaRef.current?.focus(), 50);
-  }, [lastGenerationId, resetToPromptBar, applyControlsForModel]);
+  const handleExtend = useCallback(
+    (entry) => {
+      if (!entry?.requestId) return;
+      const targetModel = t2vModels.find(
+        (model) => model.id === "seedance-v2.0-extend",
+      );
+      const targetConfig = getContinuationConfig(targetModel);
+      if (!targetModel || !targetConfig) return;
+
+      resetToPromptBar();
+      setPrompt("");
+      setUploadedImageUrl(null);
+      setUploadedImageUrls([]);
+      setUploadedVideoUrl(null);
+      setUploadedVideoName(null);
+      setImageMode(false);
+      setV2vMode(false);
+      setSelectedModel(targetModel.id);
+      setSelectedModelName(targetModel.name);
+      setVideoToolOptions(getDefaultVideoToolOptions(targetModel));
+      setContinuationSourceIds((previous) => ({
+        ...previous,
+        [targetConfig.family]: entry.requestId,
+      }));
+      applyControlsForModel(targetModel.id, false, false);
+      setTimeout(() => textareaRef.current?.focus(), 50);
+    },
+    [resetToPromptBar, applyControlsForModel],
+  );
 
   // ── derived UI values ────────────────────────────────────────────────────
-  const isSeedance2Canvas =
-    canvasModel === "seedance-v2.0-t2v" || canvasModel === "seedance-v2.0-i2v";
-  const currentModelObj = getCurrentModel();
-  const isExtendMode = currentModelObj?.requiresRequestId;
+  const isContinuationMode = Boolean(continuationConfig);
   const canUploadImageReference =
     (!v2vMode || isMotionControlSelection(selectedModel, v2vMode)) &&
-    (!isExtendMode || currentModelObj?.inputs?.images_list);
+    (!isContinuationMode || currentModelObj?.inputs?.images_list);
+
+  const showPromptField =
+    v2vMode || isContinuationMode
+      ? currentToolPresentation.showPrompt
+      : true;
 
   const promptPlaceholder = v2vMode
-    ? currentModelObj?.imageField
-      ? currentModelObj?.promptRequired
-        ? "Describe the motion"
-        : "Describe the motion (optional)"
-      : "Video ready — click Generate to remove watermark"
+    ? currentToolPresentation.promptPlaceholder
     : imageMode
       ? "Describe the motion or effect (optional)"
-      : isExtendMode
-        ? "Optional: describe how to continue the video..."
+      : isContinuationMode
+        ? currentToolPresentation.promptPlaceholder
         : "Describe the video you want to create";
+
+  const generateActionLabel =
+    v2vMode || isContinuationMode
+      ? currentToolPresentation.actionLabel
+      : "Generate";
+  const videoUploadTitle = v2vMode
+    ? currentToolPresentation.uploadTitle
+    : `Upload reference video for ${currentModelObj?.name || "this model"}`;
 
   const toggleDropdown = (type) => (e) => {
     e.stopPropagation();
@@ -1433,7 +1569,10 @@ export default function VideoStudio({
         {history.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full pt-4 animate-fade-in-up">
             {history.map((entry, idx) => {
-              const isSeedance2 = entry.model === "seedance-v2.0-t2v" || entry.model === "seedance-v2.0-i2v";
+              const canExtendWithSeedance =
+                Boolean(entry.requestId) &&
+                (entry.model === "seedance-v2.0-t2v" ||
+                  entry.model === "seedance-v2.0-i2v");
               return (
                 <div
                   key={entry.id || idx}
@@ -1473,14 +1612,13 @@ export default function VideoStudio({
                         <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" />
                       </svg>
                     </button>
-                    {isSeedance2 && (
+                    {canExtendWithSeedance && (
                       <button
                         type="button"
                         title="Extend this video using Seedance 2.0 Extend"
                         onClick={(e) => {
                           e.stopPropagation();
-                          setLastGenerationId(entry.id);
-                          handleExtend();
+                          handleExtend(entry);
                         }}
                         className="p-2 bg-black/60 backdrop-blur-md rounded-full text-white hover:bg-primary hover:text-black transition-all border border-white/10"
                       >
@@ -1520,13 +1658,10 @@ export default function VideoStudio({
                         onSelect: () =>
                           downloadFile(entry.url, `video-${entry.id || idx}.mp4`),
                       },
-                      isSeedance2 && {
+                      canExtendWithSeedance && {
                         kind: "extend",
                         label: "Extend",
-                        onSelect: () => {
-                          setLastGenerationId(entry.id);
-                          handleExtend();
-                        },
+                        onSelect: () => handleExtend(entry),
                       },
                       {
                         kind: "delete",
@@ -1841,7 +1976,7 @@ export default function VideoStudio({
                   />
                   <button
                     type="button"
-                    title="Upload video to remove watermark"
+                    title={videoUploadTitle}
                     onClick={() => videoFileInputRef.current?.click()}
                     className={promptMediaButtonClassName()}
                   >
@@ -1882,20 +2017,25 @@ export default function VideoStudio({
               )}
             </div>
 
-            {/* Prompt textarea */}
+            {/* Prompt or operation summary */}
             <div className="flex-1 flex flex-col gap-1">
-              <PromptTextarea
-                ref={textareaRef}
-                value={prompt}
-                onChange={handlePromptInput}
-                placeholder={promptPlaceholder}
-                disabled={promptDisabled}
-              />
+              {showPromptField ? (
+                <PromptTextarea
+                  ref={textareaRef}
+                  value={prompt}
+                  onChange={handlePromptInput}
+                  placeholder={promptPlaceholder}
+                />
+              ) : (
+                <div className="min-h-[58px] flex items-center px-3 text-xs leading-relaxed text-white/55">
+                  {currentToolPresentation.summary}
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Extend banner */}
-          {isExtendMode && (
+          {/* Compatible source status */}
+          {isContinuationMode && (
             <div className="flex items-center gap-2 px-3 py-1.5 mx-3 bg-primary/5 border border-primary/10 rounded-lg text-[10px] text-primary/80 font-medium tracking-tight">
               <svg
                 width="13"
@@ -1907,7 +2047,11 @@ export default function VideoStudio({
               >
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
-              <span>Extending previous Seedance 2.0 generation</span>
+              <span>
+                {selectedContinuationSource
+                  ? `Using ${selectedContinuationSource.modelName || selectedContinuationSource.model} as source`
+                  : continuationConfig.emptySourceMessage}
+              </span>
             </div>
           )}
 
@@ -1958,6 +2102,98 @@ export default function VideoStudio({
                   </PromptPopover>
                 )}
               </div>
+
+              {isContinuationMode && (
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={toggleDropdown("continuation-source")}
+                    className={promptControlClassName({
+                      active: openDropdown === "continuation-source",
+                    })}
+                    title={continuationConfig.sourceLabel}
+                  >
+                    {selectedContinuationSource ? (
+                      <video
+                        src={selectedContinuationSource.url}
+                        muted
+                        playsInline
+                        preload="metadata"
+                        className="w-5 h-5 rounded object-cover bg-black/50"
+                      />
+                    ) : (
+                      <VideoIconSvg className="w-4 h-4 opacity-40" />
+                    )}
+                    <span className={`${PROMPT_CONTROL_LABEL_CLASS} max-w-[150px] truncate`}>
+                      {selectedContinuationSource?.modelName || "Select source video"}
+                    </span>
+                    <PromptChevronIcon />
+                  </button>
+                  {openDropdown === "continuation-source" && (
+                    <PromptPopover
+                      onClick={(event) => event.stopPropagation()}
+                      className="min-w-[300px] max-h-[360px]"
+                    >
+                      <PromptPopoverHeader>
+                        {continuationConfig.sourceLabel}
+                      </PromptPopoverHeader>
+                      <PromptMenuList>
+                        {compatibleContinuationSources.length > 0 ? (
+                          compatibleContinuationSources.map((entry) => (
+                            <button
+                              key={entry.requestId}
+                              type="button"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                setContinuationSourceIds((previous) => ({
+                                  ...previous,
+                                  [continuationConfig.family]: entry.requestId,
+                                }));
+                                setOpenDropdown(null);
+                              }}
+                              className="w-full flex items-center gap-3 rounded-xl px-2 py-2 text-left hover:bg-white/5 transition-colors"
+                            >
+                              <video
+                                src={entry.url}
+                                muted
+                                playsInline
+                                preload="metadata"
+                                className="w-16 h-10 rounded-lg object-cover bg-black/50 shrink-0"
+                              />
+                              <span className="min-w-0 flex-1">
+                                <span className="block text-xs font-bold text-white truncate">
+                                  {entry.modelName || entry.model}
+                                </span>
+                                <span className="block text-[9px] text-white/35 truncate">
+                                  {entry.requestId}
+                                </span>
+                              </span>
+                              {selectedContinuationSource?.requestId === entry.requestId && (
+                                <CheckSvg />
+                              )}
+                            </button>
+                          ))
+                        ) : (
+                          <div className="px-3 py-4 text-xs leading-relaxed text-white/45">
+                            {continuationConfig.emptySourceMessage}
+                          </div>
+                        )}
+                      </PromptMenuList>
+                    </PromptPopover>
+                  )}
+                </div>
+              )}
+
+              <VideoToolOptionControls
+                definitions={videoToolOptionDefinitions}
+                values={videoToolOptions}
+                onChange={(key, value) =>
+                  setVideoToolOptions((previous) => ({ ...previous, [key]: value }))
+                }
+                openDropdown={openDropdown}
+                setOpenDropdown={setOpenDropdown}
+                toggleDropdown={toggleDropdown}
+              />
 
               {/* Aspect ratio btn */}
               {showAr && (
@@ -2175,7 +2411,7 @@ export default function VideoStudio({
                 </>
               ) : (
                 <>
-                  <span>Generate</span>
+                  <span>{generateActionLabel}</span>
                 </>
               )}
             </PromptAction>
