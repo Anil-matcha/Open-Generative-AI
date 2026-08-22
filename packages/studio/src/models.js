@@ -4791,6 +4791,44 @@ export const t2vModels = [
     "provider_name": "Minimax"
   },
   {
+    "id": "openai-sora",
+    "name": "Sora",
+    "inputs": {
+      "prompt": {
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "description": "Text prompt describing the video."
+      },
+      "aspect_ratio": {
+        "enum": [
+          "16:9",
+          "9:16",
+          "1:1"
+        ],
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "type": "string",
+        "description": "Aspect ratio of the output video.",
+        "default": "16:9"
+      },
+      "resolution": {
+        "enum": [
+          "480p",
+          "720p",
+          "1080p"
+        ],
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "The resolution of the generated video.",
+        "default": "480p"
+      }
+    },
+    "provider": "openai",
+    "provider_name": "OpenAI"
+  },
+  {
     "id": "openai-sora-2-text-to-video",
     "name": "Sora 2",
     "inputs": {
@@ -5981,6 +6019,46 @@ export const t2vModels = [
     "provider_name": "Happy Horse"
   },
   {
+    "id": "veo-4-text-to-video",
+    "name": "Veo 4",
+    "endpoint": "veo-4-text-to-video",
+    "inputs": {
+      "prompt": {
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "description": "Text description of the desired video content.",
+        "examples": [
+          "A cinematic aerial shot of a city at dusk, golden hour lighting, slow dolly forward."
+        ]
+      },
+      "aspect_ratio": {
+        "enum": [
+          "16:9",
+          "9:16",
+          "1:1"
+        ],
+        "type": "string",
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "description": "Output video aspect ratio.",
+        "default": "16:9"
+      },
+      "duration": {
+        "type": "int",
+        "title": "Duration (seconds)",
+        "name": "duration",
+        "description": "Video duration in seconds.",
+        "default": 8,
+        "minValue": 5,
+        "maxValue": 30,
+        "step": 1
+      }
+    },
+    "provider": "google",
+    "provider_name": "Google"
+  },
+  {
     "id": "seedance-2-vip-text-to-video-1080p",
     "name": "Seedance 2 VIP Text to Video 1080P",
     "endpoint": "sd-2-vip-text-to-video-1080p",
@@ -6913,6 +6991,75 @@ export const t2vModels = [
     },
     "provider": "kling",
     "provider_name": "Kling AI"
+  },
+  {
+    "id": "seedance-2.1-text-to-video",
+    "name": "Seedance 2.1",
+    "endpoint": "seedance-2.1-text-to-video",
+    "inputs": {
+      "prompt": {
+        "examples": [
+          "A colossal floating city drifts above luminous clouds at dusk, golden energy streams flowing between its towers, cinematic wide shot with subtle camera push, epic atmospheric lighting."
+        ],
+        "description": "Text prompt describing the video scene and motion.",
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt"
+      },
+      "aspect_ratio": {
+        "enum": [
+          "16:9",
+          "9:16",
+          "1:1",
+          "3:4",
+          "4:3",
+          "21:9"
+        ],
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "type": "string",
+        "description": "Aspect ratio of the output video.",
+        "default": "16:9"
+      },
+      "resolution": {
+        "enum": [
+          "480p",
+          "720p",
+          "1080p"
+        ],
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output video resolution.",
+        "default": "720p"
+      },
+      "duration": {
+        "title": "Duration",
+        "name": "duration",
+        "type": "int",
+        "description": "The duration of the generated video in seconds.",
+        "default": 5,
+        "minValue": 4,
+        "maxValue": 12,
+        "step": 1
+      },
+      "generate_audio": {
+        "type": "boolean",
+        "title": "Generate Audio",
+        "name": "generate_audio",
+        "description": "Whether to generate audio for the video.",
+        "default": true
+      },
+      "camera_fixed": {
+        "type": "boolean",
+        "title": "Camera Fixed",
+        "name": "camera_fixed",
+        "description": "Whether to fix the camera position.",
+        "default": false
+      }
+    },
+    "provider": "bytedance",
+    "provider_name": "ByteDance"
   },
   {
     "id": "seedance-2.5-text-to-video",
@@ -16260,6 +16407,63 @@ export const i2vModels = [
     "provider_name": "Happy Horse"
   },
   {
+    "id": "veo-4-image-to-video",
+    "name": "Veo 4",
+    "endpoint": "veo-4-image-to-video",
+    "family": "veo-4",
+    "imageField": "images_list",
+    "hasPrompt": true,
+    "inputs": {
+      "images_list": {
+        "examples": [
+          "https://d3adwkbyhxyrtq.cloudfront.net/ai-images/186/712345784292/4a8c5c70-abcc-4920-873e-b0e219986453.jpg"
+        ],
+        "description": "Upload or provide the image to animate.",
+        "field": "images_list",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "title": "Image",
+        "name": "images_list",
+        "maxItems": 1
+      },
+      "prompt": {
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "description": "Optional text description guiding the motion and camera movement.",
+        "examples": [
+          "Camera slowly pans left, parallax depth, cinematic lighting."
+        ]
+      },
+      "aspect_ratio": {
+        "enum": [
+          "16:9",
+          "9:16",
+          "1:1"
+        ],
+        "type": "string",
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "description": "Output video aspect ratio.",
+        "default": "16:9"
+      },
+      "duration": {
+        "type": "int",
+        "title": "Duration (seconds)",
+        "name": "duration",
+        "description": "Video duration in seconds.",
+        "default": 8,
+        "minValue": 5,
+        "maxValue": 30,
+        "step": 1
+      }
+    },
+    "provider": "google",
+    "provider_name": "Google"
+  },
+  {
     "id": "seedance-2-vip-image-to-video-1080p",
     "name": "Seedance 2 VIP Image to Video 1080P",
     "endpoint": "sd-2-vip-image-to-video-1080p",
@@ -17551,6 +17755,99 @@ export const i2vModels = [
     },
     "provider": "kling",
     "provider_name": "Kling AI"
+  },
+  {
+    "id": "seedance-2.1-image-to-video",
+    "name": "Seedance 2.1",
+    "endpoint": "seedance-2.1-image-to-video",
+    "family": "seedance-2.1",
+    "imageField": "image_url",
+    "lastImageField": "last_image",
+    "hasPrompt": true,
+    "inputs": {
+      "prompt": {
+        "examples": [
+          "Add a slow cinematic orbit around the subject, gentle parallax depth, fog drifting naturally, sky colors shifting while preserving original lighting and mood."
+        ],
+        "description": "Text prompt describing the video motion and style.",
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt"
+      },
+      "image_url": {
+        "examples": [
+          "https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/seedance-v1.5-pro-i2v.jpg"
+        ],
+        "description": "URL of the input image to animate into video.",
+        "field": "image",
+        "type": "string",
+        "title": "Image URL",
+        "name": "image_url"
+      },
+      "last_image": {
+        "examples": [
+          null
+        ],
+        "description": "Optional URL of the last frame image for first-last frame control.",
+        "field": "image",
+        "type": "string",
+        "title": "Last Image",
+        "name": "last_image"
+      },
+      "aspect_ratio": {
+        "enum": [
+          "16:9",
+          "9:16",
+          "1:1",
+          "3:4",
+          "4:3",
+          "21:9"
+        ],
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "type": "string",
+        "description": "Aspect ratio of the output video.",
+        "default": "16:9"
+      },
+      "resolution": {
+        "enum": [
+          "480p",
+          "720p",
+          "1080p"
+        ],
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output video resolution.",
+        "default": "720p"
+      },
+      "duration": {
+        "title": "Duration",
+        "name": "duration",
+        "type": "int",
+        "description": "The duration of the generated video in seconds.",
+        "default": 5,
+        "minValue": 4,
+        "maxValue": 12,
+        "step": 1
+      },
+      "generate_audio": {
+        "type": "boolean",
+        "title": "Generate Audio",
+        "name": "generate_audio",
+        "description": "Whether to generate audio for the video.",
+        "default": true
+      },
+      "camera_fixed": {
+        "type": "boolean",
+        "title": "Camera Fixed",
+        "name": "camera_fixed",
+        "description": "Whether to fix the camera position.",
+        "default": false
+      }
+    },
+    "provider": "bytedance",
+    "provider_name": "ByteDance"
   },
   {
     "id": "seedance-2.5-image-to-video",
