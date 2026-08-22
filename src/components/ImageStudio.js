@@ -12,6 +12,7 @@ import { t } from '../lib/i18n.js';
 import { createUploadPicker } from './UploadPicker.js';
 import { savePendingJob, removePendingJob, getPendingJobs } from '../lib/pendingJobs.js';
 import { downloadImage } from '../../packages/studio/src/utils/downloadImage.js';
+import { appendGenerationRefundNotice } from '../../packages/studio/src/utils/generationLifecycle.js';
 
 function createInlineInstructions(type) {
     const el = document.createElement('div');
@@ -1289,7 +1290,8 @@ export function ImageStudio() {
             console.error(e);
             // Restore hero so the page doesn't look broken after a failed generation
             hero.classList.remove('opacity-0', 'scale-95', '-translate-y-10', 'pointer-events-none');
-            generateBtn.innerHTML = `Error: ${e.message.slice(0, 60)}`;
+            const errorMessage = appendGenerationRefundNotice(e.message, e);
+            generateBtn.textContent = `Error: ${errorMessage.slice(0, 100)}`;
             setTimeout(() => {
                 generateBtn.innerHTML = t('common.generate');
             }, 4000);

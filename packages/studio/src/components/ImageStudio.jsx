@@ -5,6 +5,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { generateImage, generateI2I, uploadFile } from "../muapi.js";
 import { formatErrorMessage } from "../utils/formatError.js";
 import { downloadImage } from "../utils/downloadImage.js";
+import { appendGenerationRefundNotice } from "../utils/generationLifecycle.js";
 import { scopedPersistKey, migrateLegacyPersistKey } from "../persistKey.js";
 import DrawModal from "./DrawModal.jsx";
 import MobileGenerationActions, {
@@ -1318,7 +1319,10 @@ export default function ImageStudio({
       });
     } catch (e) {
       console.error("[ImageStudio] Generation failed:", e);
-      const errMsg = formatErrorMessage(e, "Image generation failed");
+      const errMsg = appendGenerationRefundNotice(
+        formatErrorMessage(e, "Image generation failed"),
+        e,
+      );
       if (onGenerationError) onGenerationError(errMsg);
       else toast.error(errMsg);
     } finally {

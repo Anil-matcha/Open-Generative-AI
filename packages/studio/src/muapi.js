@@ -1,4 +1,5 @@
 import { getModelById, getVideoModelById, getI2IModelById, getI2VModelById, getV2VModelById, getRecastModelById, getLipSyncModelById, getAudioModelById } from './models.js';
+import { pollForGenerationResult } from './utils/generationLifecycle.js';
 
 // In an http(s) browser we route through the host app's proxy (Next.js routes
 // under /api/* re-issue the call server-side) so api.muapi.ai CORS is bypassed.
@@ -17,28 +18,14 @@ function notifyAuthRequired(status, detail) {
 }
 
 async function pollForResult(requestId, key, maxAttempts = 900, interval = 2000) {
-    const pollUrl = `${BASE_URL}/api/v1/predictions/${requestId}/result`;
-    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-        await new Promise(resolve => setTimeout(resolve, interval));
-        try {
-            const response = await fetch(pollUrl, {
-                headers: { 'Content-Type': 'application/json', 'x-api-key': key }
-            });
-            if (!response.ok) {
-                const errText = await response.text();
-                if (response.status >= 500) continue;
-                notifyAuthRequired(response.status, errText);
-                throw new Error(`Poll Failed: ${response.status} - ${errText.slice(0, 100)}`);
-            }
-            const data = await response.json();
-            const status = data.status?.toLowerCase();
-            if (status === 'completed' || status === 'succeeded' || status === 'success') return data;
-            if (status === 'failed' || status === 'error') throw new Error(`Generation failed: ${data.error || 'Unknown error'}`);
-        } catch (error) {
-            if (attempt === maxAttempts) throw error;
-        }
-    }
-    throw new Error('Generation timed out after polling.');
+    return pollForGenerationResult({
+        baseUrl: BASE_URL,
+        requestId,
+        apiKey: key,
+        maxAttempts,
+        interval,
+        onAuthRequired: notifyAuthRequired,
+    });
 }
 
 async function submitAndPoll(endpoint, payload, key, onRequestId, maxAttempts = 60) {
@@ -924,5 +911,4 @@ export async function expandImage(apiKey, { image_url, onRequestId }) {
     const payload = { image_url };
     return submitAndPoll(endpoint, payload, apiKey, onRequestId, 90);
 }
-
 
