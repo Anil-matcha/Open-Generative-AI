@@ -4913,6 +4913,50 @@ export const t2vModels = [
     "provider_name": "OpenAI"
   },
   {
+    "id": "vidu-v2.0-t2v",
+    "name": "Vidu v2.0",
+    "inputs": {
+      "prompt": {
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "description": "The prompt to generate the video"
+      },
+      "aspect_ratio": {
+        "enum": [
+          "9:16"
+        ],
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "type": "string",
+        "description": "Aspect ratio of the output video.",
+        "default": "9:16"
+      },
+      "duration": {
+        "enum": [
+          4
+        ],
+        "title": "Duration",
+        "name": "duration",
+        "type": "int",
+        "description": "The duration of the generated video in seconds.",
+        "default": 4
+      },
+      "resolution": {
+        "enum": [
+          "1080p"
+        ],
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "The resolution of the generated video.",
+        "default": "1080p"
+      }
+    },
+    "provider": "vidu",
+    "provider_name": "Vidu"
+  },
+  {
     "id": "ovi-text-to-video",
     "name": "OVI",
     "inputs": {
