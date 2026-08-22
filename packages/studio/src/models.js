@@ -1,4 +1,10 @@
 // Auto-generated from models_dump.json
+import {
+  getAspectRatioOptions,
+  I2I_DIMENSION_RATIOS,
+  T2I_DIMENSION_RATIOS,
+} from './imageSizing.js';
+
 export const t2iModels = [
   {
     "id": "nano-banana",
@@ -3338,15 +3344,17 @@ export const t2iModels = [
 
 export const getModelById = (id) => t2iModels.find(m => m.id === id);
 
+export const getSelectableAspectRatiosForModel = (modelId) => {
+  const model = getModelById(modelId);
+  return getAspectRatioOptions(model, T2I_DIMENSION_RATIOS);
+};
+
 export const getAspectRatiosForModel = (modelId) => {
   const model = getModelById(modelId);
   if (!model) return ['1:1'];
 
   const arInput = model.inputs?.aspect_ratio;
-  if (arInput && arInput.enum) {
-    return arInput.enum;
-  }
-
+  if (arInput && arInput.enum) return arInput.enum;
   return ['1:1', '16:9', '9:16', '4:3', '3:2', '21:9'];
 };
 
@@ -19423,6 +19431,11 @@ export const getMaxImagesForI2VModel = (modelId) => {
     if (imageInput?.type === 'array') return imageInput.maxItems || 1;
     if (model.lastImageField) return 2;
     return 1;
+};
+
+export const getSelectableAspectRatiosForI2IModel = (modelId) => {
+    const model = getI2IModelById(modelId);
+    return getAspectRatioOptions(model, I2I_DIMENSION_RATIOS);
 };
 
 export const getAspectRatiosForI2IModel = (modelId) => {
