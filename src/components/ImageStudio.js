@@ -11,6 +11,7 @@ import { AuthModal } from './AuthModal.js';
 import { t } from '../lib/i18n.js';
 import { createUploadPicker } from './UploadPicker.js';
 import { savePendingJob, removePendingJob, getPendingJobs } from '../lib/pendingJobs.js';
+import { downloadImage } from '../../packages/studio/src/utils/downloadImage.js';
 
 function createInlineInstructions(type) {
     const el = document.createElement('div');
@@ -1045,25 +1046,6 @@ export function ImageStudio() {
 
             historyList.appendChild(thumb);
         });
-    };
-
-    // --- Helper: Download image ---
-    const downloadImage = async (url, filename) => {
-        try {
-            const response = await fetch(url);
-            const blob = await response.blob();
-            const blobUrl = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = blobUrl;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(blobUrl);
-        } catch (err) {
-            // Fallback: open in new tab
-            window.open(url, '_blank');
-        }
     };
 
     // --- Load history from localStorage ---
