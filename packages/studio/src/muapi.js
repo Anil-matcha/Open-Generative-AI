@@ -1,4 +1,5 @@
 import { getModelById, getVideoModelById, getI2IModelById, getI2VModelById, getV2VModelById, getRecastModelById, getLipSyncModelById, getAudioModelById } from './models.js';
+import { buildImageInputPayload, getImageInputValidationError, normalizePrimaryImageUrls } from './imageInputContracts.js';
 
 // In an http(s) browser we route through the host app's proxy (Next.js routes
 // under /api/* re-issue the call server-side) so api.muapi.ai CORS is bypassed.
@@ -82,16 +83,18 @@ export async function generateImage(apiKey, params) {
 export async function generateI2I(apiKey, params) {
     const modelInfo = getI2IModelById(params.model);
     const endpoint = modelInfo?.endpoint || params.model;
-    const payload = {};
-    if (params.prompt) payload.prompt = params.prompt;
     const imageField = modelInfo?.imageField || 'image_url';
-    const imagesList = params.images_list?.length > 0 ? params.images_list : (params.image_url ? [params.image_url] : null);
-    if (imagesList) {
+    const imagesList = normalizePrimaryImageUrls(params.images_list, params.image_url);
+    const inputError = getImageInputValidationError(modelInfo, 'i2i', {
+        prompt: params.prompt,
+        primaryImageUrls: imagesList,
+        auxiliaryImageUrls: params,
+    });
+    if (inputError) throw new Error(inputError);
+    const payload = buildImageInputPayload(modelInfo, 'i2i', params);
+    if (imagesList.length > 0) {
         if (imageField === 'images_list') payload.images_list = imagesList;
         else payload[imageField] = imagesList[0];
-    }
-    if (modelInfo?.swapField && params.swap_url) {
-        payload[modelInfo.swapField] = params.swap_url;
     }
     if (params.aspect_ratio) payload.aspect_ratio = params.aspect_ratio;
     if (params.resolution) payload.resolution = params.resolution;
@@ -916,5 +919,3 @@ export async function expandImage(apiKey, { image_url, onRequestId }) {
     const payload = { image_url };
     return submitAndPoll(endpoint, payload, apiKey, onRequestId, 90);
 }
-
-

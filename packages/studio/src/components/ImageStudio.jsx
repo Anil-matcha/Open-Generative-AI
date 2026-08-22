@@ -5,6 +5,11 @@ import toast, { Toaster } from "react-hot-toast";
 import { generateImage, generateI2I, uploadFile } from "../muapi.js";
 import { formatErrorMessage } from "../utils/formatError.js";
 import { scopedPersistKey, migrateLegacyPersistKey } from "../persistKey.js";
+import {
+  getAuxiliaryImageInputs,
+  getImageInputContract,
+  getImageInputValidationError,
+} from "../imageInputContracts.js";
 import DrawModal from "./DrawModal.jsx";
 import MobileGenerationActions, {
   GenerationCopyButtons,
@@ -21,7 +26,6 @@ import {
   getMaxImagesForI2IModel,
   getEffectsForI2IModel,
   getDefaultEffectForI2IModel,
-  getI2IModelById,
 } from "../models.js";
 import {
   PROMPT_CONTROL_LABEL_CLASS,
@@ -112,7 +116,11 @@ function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [], 
 
   // Sync initialUrls from parent (e.g. restored from localStorage)
   useEffect(() => {
-    if (initialUrls && initialUrls.length > 0) {
+    if (!initialUrls?.length) {
+      if (selectedEntries.length > 0) setSelectedEntries([]);
+      return;
+    }
+    if (initialUrls.length > 0) {
       // Avoid infinite loops by only updating if URLs actually changed
       const currentUrls = selectedEntries.map(e => e.url);
       const isSame = initialUrls.length === currentUrls.length && initialUrls.every(u => currentUrls.includes(u));
@@ -311,11 +319,13 @@ function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [], 
         {lastUploadProgress}%
       </span>
     </div>
-  ) : label === "Swap Face" ? (
+  ) : label ? (
     hasSelection ? (
       <img src={selectedEntries[0].url} alt="" className="w-full h-full object-cover" />
     ) : (
-      <span className="text-[10px] font-bold text-white/50">Face</span>
+      <span className="px-1 text-center text-[8px] font-bold leading-tight text-white/50">
+        {label.replace(/\s+image$/i, "")}
+      </span>
     )
   ) : (
     <svg
@@ -358,6 +368,7 @@ function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [], 
         ref={triggerRef}
         type="button"
         title={triggerTitle}
+        aria-label={triggerTitle}
         onClick={(e) => {
           e.stopPropagation();
           setPanelOpen((o) => !o);
@@ -380,7 +391,7 @@ function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [], 
           <div className="flex items-center justify-between px-1 pb-3 mb-2 border-b border-white/5">
             <div className="flex flex-col gap-0.5">
               <span className="text-xs font-bold text-secondary">
-                Reference Images
+                {label || "Reference Images"}
               </span>
               {isMulti && (
                 <span className="text-[9px] text-muted">
@@ -920,7 +931,7 @@ export default function ImageStudio({
   // ── Prompt / upload state ───────────────────────────────────────────────
   const [prompt, setPrompt] = useState("");
   const [uploadedImageUrls, setUploadedImageUrls] = useState([]);
-  const [swapImageUrl, setSwapImageUrl] = useState(null);
+  const [auxiliaryImageUrls, setAuxiliaryImageUrls] = useState({});
   const [uploadHistory, setUploadHistory] = useState([]); // persisted reference images history
 
   // ── UI state ────────────────────────────────────────────────────────────
@@ -1083,6 +1094,10 @@ export default function ImageStudio({
 
   // ── Derived: current model lists & helpers ───────────────────────────────
   const currentModels = imageMode ? i2iModels : t2iModels;
+  const currentMode = imageMode ? "i2i" : "t2i";
+  const currentModel = currentModels.find(({ id }) => id === selectedModelId);
+  const currentInputContract = getImageInputContract(currentModel, currentMode);
+  const auxiliaryImageInputs = getAuxiliaryImageInputs(currentModel, currentMode);
   const currentAspectRatios = imageMode
     ? getAspectRatiosForI2IModel(selectedModelId)
     : getAspectRatiosForModel(selectedModelId);
@@ -1104,11 +1119,11 @@ export default function ImageStudio({
       setUploadedImageUrls(newUrls);
 
       if (!imageMode) {
+        setAuxiliaryImageUrls({});
         // Find the i2i sibling of the currently selected t2i model.
         // Many models follow conventions, but some have completely irregular names —
         // those are handled via a hardcoded exceptions map.
         const curId = selectedModelId;
-        const i2iIds = new Set(i2iModels.map((m) => m.id));
 
         // Hardcoded exceptions for models with irregular t2i → i2i naming
         const EXCEPTIONS = {
@@ -1158,6 +1173,7 @@ export default function ImageStudio({
 
   const handleUploadClear = useCallback(() => {
     setUploadedImageUrls([]);
+    setAuxiliaryImageUrls({});
     setImageMode(false);
 
     // Find the t2i parent of the currently selected i2i model (reverse of upload logic)
@@ -1211,14 +1227,13 @@ export default function ImageStudio({
       : getResolutionsForModel(m.id);
     if (!nextImageMode && imageMode) {
       setUploadedImageUrls([]);
-      setSwapImageUrl(null);
     }
     setImageMode(nextImageMode);
     setSelectedModelId(m.id);
     setSelectedModelName(m.name);
     setSelectedAr(ars[0] || "1:1");
     setSelectedQuality(resolutions[0] || null);
-    setSwapImageUrl(null);
+    setAuxiliaryImageUrls({});
     if (nextImageMode) {
       setMaxImages(getMaxImagesForI2IModel(m.id));
       const effects = getEffectsForI2IModel(m.id);
@@ -1247,6 +1262,7 @@ export default function ImageStudio({
     setCurrentImageUrl(null);
     setPrompt("");
     setUploadedImageUrls([]);
+    setAuxiliaryImageUrls({});
     setImageMode(false);
     const firstT2I = t2iModels[0];
     const ars = getAspectRatiosForModel(firstT2I.id);
@@ -1263,21 +1279,14 @@ export default function ImageStudio({
   const handleGenerate = async () => {
     if (generating) return;
 
-    if (imageMode) {
-      if (uploadedImageUrls.length === 0) {
-        alert("Please upload a reference image first.");
-        return;
-      }
-      const modelInfo = getI2IModelById(selectedModelId);
-      if (modelInfo?.swapField && !swapImageUrl) {
-        alert("Please upload a swap face image.");
-        return;
-      }
-    } else {
-      if (!prompt.trim()) {
-        alert("Please enter a prompt to generate an image.");
-        return;
-      }
+    const inputError = getImageInputValidationError(currentModel, currentMode, {
+      prompt,
+      primaryImageUrls: uploadedImageUrls,
+      auxiliaryImageUrls,
+    });
+    if (inputError) {
+      alert(inputError);
+      return;
     }
 
     onGenerationStart?.();
@@ -1293,8 +1302,8 @@ export default function ImageStudio({
               images_list: uploadedImageUrls,
               image_url: uploadedImageUrls[0],
               aspect_ratio: selectedAr,
+              ...auxiliaryImageUrls,
             };
-            if (swapImageUrl) genParams.swap_url = swapImageUrl;
             if (prompt.trim()) genParams.prompt = prompt.trim();
             if (currentQualityField && selectedQuality) {
               genParams[currentQualityField] = selectedQuality;
@@ -1346,11 +1355,9 @@ export default function ImageStudio({
   };
 
   const placeholderText =
-    uploadedImageUrls.length > 1
+    uploadedImageUrls.length > 1 && !currentInputContract.promptRequired
       ? `${uploadedImageUrls.length} images selected — describe the transformation (optional)`
-      : imageMode
-        ? "Describe how to transform this image (optional)"
-        : "Describe the image you want to create";
+      : currentInputContract.promptPlaceholder;
 
   // ── Render ───────────────────────────────────────────────────────────────
   return (
@@ -1536,20 +1543,38 @@ export default function ImageStudio({
                   initialUrls={uploadedImageUrls}
                   persistedHistory={uploadHistory}
                   onHistoryChange={setUploadHistory}
+                  label={
+                    currentInputContract.primaryImageLabel === "Reference image"
+                      ? null
+                      : currentInputContract.primaryImageLabel
+                  }
                 />
               )}
 
-              {/* Swap Image Upload Trigger */}
-              {imageMode && getI2IModelById(selectedModelId)?.swapField && (
+              {/* Role-specific image inputs */}
+              {auxiliaryImageInputs.map(({ field, label }) => (
                 <UploadButton
+                  key={`${selectedModelId}:${field}`}
                   apiKey={apiKey}
                   maxImages={1}
-                  onSelect={({ urls }) => setSwapImageUrl(urls[0] || null)}
-                  onClear={() => setSwapImageUrl(null)}
-                  initialUrls={swapImageUrl ? [swapImageUrl] : []}
-                  label="Swap Face"
+                  onSelect={({ urls }) => {
+                    setAuxiliaryImageUrls((current) => ({
+                      ...current,
+                      [field]: urls[0],
+                    }));
+                  }}
+                  onClear={() => {
+                    setAuxiliaryImageUrls((current) => {
+                      if (!Object.hasOwn(current, field)) return current;
+                      const next = { ...current };
+                      delete next[field];
+                      return next;
+                    });
+                  }}
+                  initialUrls={auxiliaryImageUrls[field] ? [auxiliaryImageUrls[field]] : []}
+                  label={label}
                 />
-              )}
+              ))}
             </div>
 
             {/* Input prompt text area */}
