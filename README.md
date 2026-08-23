@@ -5,6 +5,8 @@
 
 > **The free, open-source alternative to AI Video Platforms.** Generate AI images and videos using 400+ state-of-the-art models across 14 studios — no content filters, no closed ecosystem, no subscription fees.
 
+The web app also includes a private **Creator Studio** that combines Anthropic planning, OpenAI image generation, ElevenLabs voice, HeyGen avatar video, and Runway cinematic video in one canvas. See [Creator Studio provider setup](docs/CREATOR_STUDIO.md) before adding deployment secrets.
+
 **Community:** Join [Discord](https://discord.gg/tANKJkHck) for discussions and support
 
 <p align="center"><a href="https://youtu.be/uhy7aRW4HUU"><img src="https://i.ytimg.com/vi/uhy7aRW4HUU/maxresdefault.jpg" width="720"></a></p>

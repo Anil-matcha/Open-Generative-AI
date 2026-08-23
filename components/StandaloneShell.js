@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { ImageStudio, VideoStudio, ClippingStudio, VibeMotionStudio, LipSyncStudio, RecastStudio, CinemaStudio, AudioStudio, MarketingStudio, WorkflowStudio, AgentStudio, AppsStudio, AiInfluencerStudio, LayersStudio, getUserBalance } from 'studio';
+import { CreatorStudio, ImageStudio, VideoStudio, ClippingStudio, VibeMotionStudio, LipSyncStudio, RecastStudio, CinemaStudio, AudioStudio, MarketingStudio, WorkflowStudio, AgentStudio, AppsStudio, AiInfluencerStudio, LayersStudio, getUserBalance } from 'studio';
 
 const DesignAgentStudio = dynamic(() => import('studio').then(mod => mod.DesignAgentStudio), {
   ssr: false,
@@ -13,6 +13,17 @@ import axios from 'axios';
 import ApiKeyModal from './ApiKeyModal';
 
 const TABS = [
+  {
+    id: 'creator',
+    label: 'Creator Studio',
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6L12 3z"/>
+        <path d="M5 15l.8 2.2L8 18l-2.2.8L5 21l-.8-2.2L2 18l2.2-.8L5 15z"/>
+        <path d="M19 13l.8 2.2L22 16l-2.2.8L19 19l-.8-2.2L16 16l2.2-.8L19 13z"/>
+      </svg>
+    )
+  },
   {
     id: 'image',
     label: 'Image Studio',
@@ -191,6 +202,17 @@ const TABS = [
 
 const NAVIGATION_CATEGORIES = [
   {
+    id: 'creator-workspace',
+    label: 'Creator Workspace',
+    tabIds: ['creator'],
+    icon: (
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6L12 3z"/>
+        <path d="M5 15l.8 2.2L8 18l-2.2.8L5 21l-.8-2.2L2 18l2.2-.8L5 15z"/>
+      </svg>
+    )
+  },
+  {
     id: 'images',
     label: 'Images',
     tabIds: ['image', 'layers', 'cinema', 'design-agent', 'ai-influencer'],
@@ -301,7 +323,7 @@ export default function StandaloneShell() {
 
   const { id: urlWorkflowId } = getWorkflowInfo();
 
-  // Initialize activeTab from URL slug/params or default to 'image'
+  // Initialize activeTab from URL slug/params or default to the unified creator workspace.
   const getInitialTab = () => {
     if (idFromParams || slug.includes('workflow')) return 'workflows';
     if (slug.includes('agents')) return 'agents';
@@ -309,7 +331,7 @@ export default function StandaloneShell() {
     if (slug.includes('apps')) return 'apps';
     const firstSegment = slug[0];
     if (firstSegment && TABS.find(t => t.id === firstSegment)) return firstSegment;
-    return 'image';
+    return 'creator';
   };
   
   const [apiKey, setApiKey] = useState(null);
@@ -654,7 +676,7 @@ export default function StandaloneShell() {
     </div>
   );
 
-  if (!apiKey) {
+  if (!apiKey && activeTab !== 'creator') {
     return <ApiKeyModal onSave={handleKeySave} />;
   }
 
@@ -667,7 +689,7 @@ export default function StandaloneShell() {
       onDrop={handleDrop}
     >
       {/* Drag Overlay */}
-      {isDragging && (
+      {activeTab !== 'creator' && isDragging && (
         <div className="fixed inset-0 z-[100] bg-[#22d3ee]/10 backdrop-blur-md border-4 border-dashed border-[#22d3ee]/50 flex items-center justify-center pointer-events-none transition-all duration-300">
           <div className="bg-[#0a0a0a] p-8 rounded-3xl border border-white/10 shadow-2xl flex flex-col items-center gap-4 scale-110 animate-pulse">
             <div className="w-20 h-20 bg-[#22d3ee] rounded-2xl flex items-center justify-center">
@@ -684,7 +706,7 @@ export default function StandaloneShell() {
       )}
 
       {/* Vadoo promo banner */}
-      {showVadooBanner && (
+      {activeTab !== 'creator' && showVadooBanner && (
         <div className="flex-shrink-0 w-full bg-indigo-600 flex items-center justify-center px-4 py-2 gap-3 relative z-50">
           <a
             href="https://vadoo.tv"
@@ -775,6 +797,8 @@ export default function StandaloneShell() {
 
           {/* Right: Actions */}
           <div className="flex-shrink-0 flex items-center gap-3">
+            {activeTab !== 'creator' && (
+              <>
             <div className="flex items-center gap-2.5 bg-white/5 px-3 py-1.5 rounded-full border border-white/5 transition-colors">
               <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
               <span className="text-xs font-bold text-white/90">
@@ -793,6 +817,8 @@ export default function StandaloneShell() {
               </svg>
               <span className="hidden sm:inline">Settings</span>
             </button>
+              </>
+            )}
           </div>
         </header>
       )}
@@ -953,6 +979,14 @@ export default function StandaloneShell() {
 
         {/* Studio Content */}
         <div className="flex-1 min-h-0 h-full relative overflow-hidden bg-[#030303]">
+        <div className={activeTab === 'creator' ? "h-full w-full" : "hidden"}>
+          <CreatorStudio
+            onGenerationStart={makeGenerationStartCallback('creator')}
+            onGenerationEnd={makeGenerationEndCallback('creator')}
+            onGenerationComplete={makeSuccessCallback('creator')}
+            onGenerationError={makeErrorCallback('creator')}
+          />
+        </div>
         <div className={activeTab === 'image' ? "h-full w-full" : "hidden"}>
           <ImageStudio apiKey={apiKey} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('image')} onGenerationEnd={makeGenerationEndCallback('image')} onGenerationComplete={makeSuccessCallback('image')} onGenerationError={makeErrorCallback('image')} />
         </div>

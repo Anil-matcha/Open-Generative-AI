@@ -4,7 +4,17 @@
 
 The web app uses bring-your-own-key authentication. Browser requests send the key only in an `x-api-key` or `Authorization: Bearer` header to same-origin `/api/` routes. The legacy `muapi_key` cookie is deleted during migration and is not accepted by server routes.
 
-The Next.js web shell stores API keys in per-tab session storage and migrates/removes its legacy persistent local-storage value. Preventing script injection remains important because any script running in the page can access session storage. The Design Agent's pinned compatibility `token` entry exists only while that studio is mounted and is removed on logout, tab change, or unmount. The Electron app retains its existing local desktop storage until an operating-system credential-vault migration is designed.
+The Next.js web shell stores MuAPI bring-your-own keys in per-tab session storage and migrates/removes its legacy persistent local-storage value. Preventing script injection remains important because any script running in the page can access session storage. The Design Agent's pinned compatibility `token` entry exists only while that studio is mounted and is removed on logout, tab change, or unmount. The Electron app retains its existing local desktop storage until an operating-system credential-vault migration is designed.
+
+Creator Studio does not use that browser-readable key flow. It uses GitHub OAuth with state and PKCE, verifies an owner allowlist, then issues a signed, short-lived, HTTP-only session cookie. This is an identity-session cookie—not an API-key cookie. GitHub access tokens and provider credentials are never stored in browser storage or returned to the client.
+
+## Creator Studio provider gateway
+
+The Anthropic, OpenAI, ElevenLabs, HeyGen, and Runway integrations are server-side only. Configure their credentials as deployment environment variables. Protect `/api/creator/*` with a separate GitHub OAuth application, `CREATOR_SESSION_SECRET`, and the `CREATOR_GITHUB_ALLOWED_USER_IDS` and/or `CREATOR_GITHUB_ALLOWED_LOGINS` allowlist.
+
+Creator routes validate the signed session, reject cross-origin paid mutations, apply per-identity action limits, and use fixed upstream hosts, input and output-size limits, provider timeouts, strict ID/URL validation, sanitized error responses, and the content-safety policy below. The provider-status response exposes configuration booleans and model labels only. The default limiter is a per-process backstop; use an external shared limiter before scaling to multiple application instances.
+
+The current allowlist is appropriate for a private owner deployment. It is not a substitute for durable user records, roles, quotas, audit logs, or centralized session revocation in a public or multi-user product. See [Creator Studio provider setup](CREATOR_STUDIO.md) for the complete variable list.
 
 ## Upload proxy
 

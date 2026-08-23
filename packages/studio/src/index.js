@@ -16,4 +16,5 @@ export { default as AppsStudio } from './components/AppsStudio';
 export { default as McpCliStudio } from './components/McpCliStudio';
 export { default as AiInfluencerStudio } from './components/AiInfluencerStudio';
 export { default as LayersStudio } from './components/LayersStudio';
+export { default as CreatorStudio } from './components/CreatorStudio';
 export * from './muapi';
