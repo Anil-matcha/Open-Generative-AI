@@ -9700,7 +9700,6 @@ export const i2iModels = [
     "name": "Qwen Text To Image 2512",
     "endpoint": "qwen-text-to-image-2512",
     "family": "qwen",
-    "imageField": "image_url",
     "hasPrompt": true,
     "inputs": {
       "prompt": {
