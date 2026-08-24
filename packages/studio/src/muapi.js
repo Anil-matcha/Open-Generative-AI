@@ -3,6 +3,7 @@ import {
     buildVideoToolPayload,
     serializeVideoToolOptions,
 } from './videoToolCapabilities.js';
+import { buildImageSizePayload } from './imageSizing.js';
 
 // In an http(s) browser we route through the host app's proxy (Next.js routes
 // under /api/* re-issue the call server-side) so api.muapi.ai CORS is bypassed.
@@ -77,7 +78,8 @@ export async function generateImage(apiKey, params) {
     const modelInfo = getModelById(params.model);
     const endpoint = modelInfo?.endpoint || params.model;
     const payload = { prompt: params.prompt };
-    if (params.aspect_ratio) payload.aspect_ratio = params.aspect_ratio;
+    if (modelInfo) Object.assign(payload, buildImageSizePayload(modelInfo, params.aspect_ratio));
+    else if (params.aspect_ratio) payload.aspect_ratio = params.aspect_ratio;
     if (params.resolution) payload.resolution = params.resolution;
     if (params.quality) payload.quality = params.quality;
     if (params.image_url) { 
@@ -106,7 +108,8 @@ export async function generateI2I(apiKey, params) {
     if (modelInfo?.swapField && params.swap_url) {
         payload[modelInfo.swapField] = params.swap_url;
     }
-    if (params.aspect_ratio) payload.aspect_ratio = params.aspect_ratio;
+    if (modelInfo) Object.assign(payload, buildImageSizePayload(modelInfo, params.aspect_ratio));
+    else if (params.aspect_ratio) payload.aspect_ratio = params.aspect_ratio;
     if (params.resolution) payload.resolution = params.resolution;
     if (params.quality) payload.quality = params.quality;
     if (modelInfo?.inputs?.name) {

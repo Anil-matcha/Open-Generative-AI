@@ -12,10 +12,10 @@ import MobileGenerationActions, {
 import {
   t2iModels,
   i2iModels,
-  getAspectRatiosForModel,
+  getSelectableAspectRatiosForModel as getAspectRatiosForModel,
   getResolutionsForModel,
   getQualityFieldForModel,
-  getAspectRatiosForI2IModel,
+  getSelectableAspectRatiosForI2IModel as getAspectRatiosForI2IModel,
   getResolutionsForI2IModel,
   getQualityFieldForI2IModel,
   getMaxImagesForI2IModel,
@@ -975,10 +975,20 @@ export default function ImageStudio({
       const stored = localStorage.getItem(PERSIST_KEY);
       if (stored) {
         const data = JSON.parse(stored);
-        if (data.imageMode !== undefined) setImageMode(data.imageMode);
-        if (data.selectedModelId) setSelectedModelId(data.selectedModelId);
-        if (data.selectedModelName) setSelectedModelName(data.selectedModelName);
-        if (data.selectedAr) setSelectedAr(data.selectedAr);
+        const restoredImageMode = data.imageMode === true;
+        const restoredModels = restoredImageMode ? i2iModels : t2iModels;
+        const restoredModel = restoredModels.find((model) => model.id === data.selectedModelId);
+        if (restoredModel) {
+          const ratios = restoredImageMode
+            ? getAspectRatiosForI2IModel(restoredModel.id)
+            : getAspectRatiosForModel(restoredModel.id);
+          setImageMode(restoredImageMode);
+          setSelectedModelId(restoredModel.id);
+          setSelectedModelName(restoredModel.name);
+          setSelectedAr(
+            ratios.includes(data.selectedAr) ? data.selectedAr : (ratios[0] || null),
+          );
+        }
         if (data.selectedQuality) setSelectedQuality(data.selectedQuality);
         if (data.selectedEffect) setSelectedEffect(data.selectedEffect);
         if (data.maxImages) setMaxImages(data.maxImages);
@@ -1147,7 +1157,7 @@ export default function ImageStudio({
         setImageMode(true);
         setSelectedModelId(target.id);
         setSelectedModelName(target.name);
-        setSelectedAr(ars[0] || "1:1");
+        setSelectedAr(ars[0] || null);
         setSelectedQuality(resolutions[0] || null);
         setSelectedEffect(effects.length > 0 ? (getDefaultEffectForI2IModel(target.id) || effects[0]) : "");
         setMaxImages(getMaxImagesForI2IModel(target.id));
@@ -1194,7 +1204,7 @@ export default function ImageStudio({
     const resolutions = getResolutionsForModel(target.id);
     setSelectedModelId(target.id);
     setSelectedModelName(target.name);
-    setSelectedAr(ars[0] || "1:1");
+    setSelectedAr(ars[0] || null);
     setSelectedQuality(resolutions[0] || null);
     setSelectedEffect("");
     setMaxImages(1);
@@ -1216,7 +1226,7 @@ export default function ImageStudio({
     setImageMode(nextImageMode);
     setSelectedModelId(m.id);
     setSelectedModelName(m.name);
-    setSelectedAr(ars[0] || "1:1");
+    setSelectedAr(ars[0] || null);
     setSelectedQuality(resolutions[0] || null);
     setSwapImageUrl(null);
     if (nextImageMode) {
@@ -1253,7 +1263,7 @@ export default function ImageStudio({
     const resolutions = getResolutionsForModel(firstT2I.id);
     setSelectedModelId(firstT2I.id);
     setSelectedModelName(firstT2I.name);
-    setSelectedAr(ars[0] || "1:1");
+    setSelectedAr(ars[0] || null);
     setSelectedQuality(resolutions[0] || null);
     setSelectedEffect("");
     setMaxImages(1);
@@ -1614,37 +1624,39 @@ export default function ImageStudio({
               </div>
 
               {/* Aspect ratio button */}
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setDropdownOpen((o) => (o === "ar" ? null : "ar"));
-                  }}
-                  className={promptControlClassName({
-                    active: dropdownOpen === "ar",
-                  })}
-                >
-                  <PromptAspectRatioIcon />
-                  <span className={PROMPT_CONTROL_LABEL_CLASS}>
-                    {selectedAr}
-                  </span>
-                </button>
-
-                {dropdownOpen === "ar" && (
-                  <PromptPopover
-                    onClick={(e) => e.stopPropagation()}
+              {currentAspectRatios.length > 0 && (
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDropdownOpen((o) => (o === "ar" ? null : "ar"));
+                    }}
+                    className={promptControlClassName({
+                      active: dropdownOpen === "ar",
+                    })}
                   >
-                    <SimpleDropdown
-                      title="Aspect Ratio"
-                      options={currentAspectRatios}
-                      selected={selectedAr}
-                      onSelect={(val) => setSelectedAr(val)}
-                      onClose={() => setDropdownOpen(null)}
-                    />
-                  </PromptPopover>
-                )}
-              </div>
+                    <PromptAspectRatioIcon />
+                    <span className={PROMPT_CONTROL_LABEL_CLASS}>
+                      {selectedAr}
+                    </span>
+                  </button>
+
+                  {dropdownOpen === "ar" && (
+                    <PromptPopover
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <SimpleDropdown
+                        title="Aspect Ratio"
+                        options={currentAspectRatios}
+                        selected={selectedAr}
+                        onSelect={(val) => setSelectedAr(val)}
+                        onClose={() => setDropdownOpen(null)}
+                      />
+                    </PromptPopover>
+                  )}
+                </div>
+              )}
 
               {/* Quality/resolution button (represented as Diamond icon) */}
               {showQualityBtn && (
