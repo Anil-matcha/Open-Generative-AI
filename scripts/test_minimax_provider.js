@@ -21,14 +21,14 @@ const ROOT = join(__dirname, "..");
 // ── 1. Model registration check ──────────────────────────────────────────────
 
 const modelsContent = readFileSync(
-  join(ROOT, "src", "lib", "models.js"),
+  join(ROOT, "packages", "studio", "src", "models.js"),
   "utf-8"
 );
 
 // Extract the t2iModels JSON array via a simple regex
 const t2iMatch = modelsContent.match(/export const t2iModels = (\[[\s\S]*?\]);/);
 if (!t2iMatch) {
-  console.error("FAIL: Could not parse t2iModels from src/lib/models.js");
+  console.error("FAIL: Could not parse t2iModels from packages/studio/src/models.js");
   process.exit(1);
 }
 
@@ -45,7 +45,7 @@ const minimaxModel = t2iModels.find((m) => m.id === "minimax-image-01");
 if (!minimaxModel) {
   console.error(
     'FAIL: "minimax-image-01" not found in t2iModels.\n' +
-      "Expected it to be registered in src/lib/models.js."
+      "Expected it to be registered in packages/studio/src/models.js."
   );
   process.exit(1);
 }
