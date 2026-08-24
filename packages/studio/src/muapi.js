@@ -5,6 +5,7 @@ import {
 } from './videoToolCapabilities.js';
 import { buildImageSizePayload } from './imageSizing.js';
 import { buildImageInputPayload, getImageInputValidationError, normalizePrimaryImageUrls } from './imageInputContracts.js';
+import { pollForGenerationResult } from './utils/generationLifecycle.js';
 
 // In an http(s) browser we route through the host app's proxy (Next.js routes
 // under /api/* re-issue the call server-side) so api.muapi.ai CORS is bypassed.
@@ -13,6 +14,8 @@ const BASE_URL = (typeof window !== 'undefined' && window.location?.protocol?.st
     ? '/api'
     : 'https://api.muapi.ai';
 const PROXY_WF_BASE = '/api/workflow';
+const FILE_UPLOAD_TIMEOUT_MS = 300_000;
+const FILE_UPLOAD_PENDING_PROGRESS = 99;
 
 function notifyAuthRequired(status, detail) {
     if (typeof window === 'undefined') return;
@@ -21,28 +24,14 @@ function notifyAuthRequired(status, detail) {
 }
 
 async function pollForResult(requestId, key, maxAttempts = 900, interval = 2000) {
-    const pollUrl = `${BASE_URL}/api/v1/predictions/${requestId}/result`;
-    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-        await new Promise(resolve => setTimeout(resolve, interval));
-        try {
-            const response = await fetch(pollUrl, {
-                headers: { 'Content-Type': 'application/json', 'x-api-key': key }
-            });
-            if (!response.ok) {
-                const errText = await response.text();
-                if (response.status >= 500) continue;
-                notifyAuthRequired(response.status, errText);
-                throw new Error(`Poll Failed: ${response.status} - ${errText.slice(0, 100)}`);
-            }
-            const data = await response.json();
-            const status = data.status?.toLowerCase();
-            if (status === 'completed' || status === 'succeeded' || status === 'success') return data;
-            if (status === 'failed' || status === 'error') throw new Error(`Generation failed: ${data.error || 'Unknown error'}`);
-        } catch (error) {
-            if (attempt === maxAttempts) throw error;
-        }
-    }
-    throw new Error('Generation timed out after polling.');
+    return pollForGenerationResult({
+        baseUrl: BASE_URL,
+        requestId,
+        apiKey: key,
+        maxAttempts,
+        interval,
+        onAuthRequired: notifyAuthRequired,
+    });
 }
 
 function normalizePredictionResult(submitData, result, outputUrl) {
@@ -308,11 +297,15 @@ export function uploadFile(apiKey, file, onProgress) {
         const xhr = new XMLHttpRequest();
         xhr.open('POST', url);
         xhr.setRequestHeader('x-api-key', apiKey);
+        xhr.timeout = FILE_UPLOAD_TIMEOUT_MS;
 
         if (onProgress) {
             xhr.upload.onprogress = (event) => {
                 if (event.lengthComputable) {
-                    const percentComplete = Math.round((event.loaded / event.total) * 100);
+                    const percentComplete = Math.min(
+                        Math.round((event.loaded / event.total) * 100),
+                        FILE_UPLOAD_PENDING_PROGRESS
+                    );
                     onProgress(percentComplete);
                 }
             };
@@ -326,6 +319,7 @@ export function uploadFile(apiKey, file, onProgress) {
                     if (!fileUrl) {
                         reject(new Error('No URL returned from file upload'));
                     } else {
+                        onProgress?.(100);
                         resolve(fileUrl);
                     }
                 } catch (e) {
@@ -345,6 +339,7 @@ export function uploadFile(apiKey, file, onProgress) {
         };
 
         xhr.onerror = () => reject(new Error('Network error during file upload'));
+        xhr.ontimeout = () => reject(new Error('File upload timed out. Please try again.'));
         xhr.send(formData);
     });
 }

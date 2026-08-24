@@ -1,4 +1,5 @@
 import { getModelById, getVideoModelById, getI2IModelById, getI2VModelById, getV2VModelById, getLipSyncModelById } from './models.js';
+import { pollForGenerationResult } from '../../packages/studio/src/utils/generationLifecycle.js';
 
 export class MuapiClient {
     constructor() {
@@ -121,51 +122,13 @@ export class MuapiClient {
      * @param {number} interval - Polling interval in ms (default 2000)
      */
     async pollForResult(requestId, key, maxAttempts = 60, interval = 2000) {
-        const pollUrl = `${this.baseUrl}/api/v1/predictions/${requestId}/result`;
-
-        for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-            await new Promise(resolve => setTimeout(resolve, interval));
-
-            console.log(`[Muapi] Polling attempt ${attempt}/${maxAttempts}...`);
-
-            try {
-                const response = await fetch(pollUrl, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-api-key': key
-                    }
-                });
-
-                if (!response.ok) {
-                    const errText = await response.text();
-                    console.warn(`[Muapi] Poll error (${response.status}):`, errText);
-                    // Continue polling on non-fatal errors
-                    if (response.status >= 500) continue;
-                    throw new Error(`Poll Failed: ${response.status} - ${errText.slice(0, 100)}`);
-                }
-
-                const data = await response.json();
-                console.log('[Muapi] Poll Response:', data);
-
-                const status = data.status?.toLowerCase();
-
-                if (status === 'completed' || status === 'succeeded' || status === 'success') {
-                    return data;
-                }
-
-                if (status === 'failed' || status === 'error') {
-                    throw new Error(`Generation failed: ${data.error || 'Unknown error'}`);
-                }
-
-                // Otherwise (processing, pending, etc.) keep polling
-            } catch (error) {
-                if (attempt === maxAttempts) throw error;
-                console.warn('[Muapi] Poll attempt failed, retrying...', error.message);
-            }
-        }
-
-        throw new Error('Generation timed out after polling.');
+        return pollForGenerationResult({
+            baseUrl: this.baseUrl,
+            requestId,
+            apiKey: key,
+            maxAttempts,
+            interval,
+        });
     }
 
     async generateVideo(params) {

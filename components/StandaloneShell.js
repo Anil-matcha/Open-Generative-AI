@@ -418,6 +418,15 @@ export default function StandaloneShell() {
     return () => window.clearTimeout(timer);
   }, [notifications]);
 
+  const fetchBalance = useCallback(async (key) => {
+    try {
+      const data = await getUserBalance(key);
+      setBalance(data.balance);
+    } catch (err) {
+      console.error('Balance fetch failed:', err);
+    }
+  }, []);
+
   const makeSuccessCallback = useCallback((tabId) => (data) => {
     const tab = TABS.find(t => t.id === tabId);
     pushNotification({
@@ -434,7 +443,8 @@ export default function StandaloneShell() {
       ? errorOrMessage
       : (errorOrMessage?.message || errorOrMessage?.error || String(errorOrMessage || 'Generation failed'));
     pushNotification({ type: 'error', tabId, label: tab?.label || tabId, message });
-  }, [pushNotification]);
+    if (apiKey) void fetchBalance(apiKey);
+  }, [apiKey, fetchBalance, pushNotification]);
 
   const makeGenerationStartCallback = useCallback((tabId) => () => {
     setGenerationCounts((previous) => ({
@@ -529,15 +539,6 @@ export default function StandaloneShell() {
       window.location.reload();
     }
   }, [activeTab]);
-
-  const fetchBalance = useCallback(async (key) => {
-    try {
-      const data = await getUserBalance(key);
-      setBalance(data.balance);
-    } catch (err) {
-      console.error('Balance fetch failed:', err);
-    }
-  }, []);
 
   useEffect(() => {
     setHasMounted(true);

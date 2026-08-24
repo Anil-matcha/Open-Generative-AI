@@ -4,6 +4,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { generateImage, generateI2I, uploadFile } from "../muapi.js";
 import { formatErrorMessage } from "../utils/formatError.js";
+import { downloadImage } from "../utils/downloadImage.js";
+import { appendGenerationRefundNotice } from "../utils/generationLifecycle.js";
 import { scopedPersistKey, migrateLegacyPersistKey } from "../persistKey.js";
 import {
   getAuxiliaryImageInputs,
@@ -45,25 +47,6 @@ import {
   promptControlClassName,
   promptMediaButtonClassName,
 } from "./prompt/PromptComposer.jsx";
-
-// ─── helpers ────────────────────────────────────────────────────────────────
-
-async function downloadImage(url, filename) {
-  try {
-    const response = await fetch(url);
-    const blob = await response.blob();
-    const blobUrl = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = blobUrl;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(blobUrl);
-  } catch {
-    window.open(url, "_blank");
-  }
-}
 
 // ─── UploadButton (inline picker) ───────────────────────────────────────────
 
@@ -1355,7 +1338,10 @@ export default function ImageStudio({
       });
     } catch (e) {
       console.error("[ImageStudio] Generation failed:", e);
-      const errMsg = formatErrorMessage(e, "Image generation failed");
+      const errMsg = appendGenerationRefundNotice(
+        formatErrorMessage(e, "Image generation failed"),
+        e,
+      );
       if (onGenerationError) onGenerationError(errMsg);
       else toast.error(errMsg);
     } finally {

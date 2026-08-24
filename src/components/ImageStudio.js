@@ -11,6 +11,8 @@ import { AuthModal } from './AuthModal.js';
 import { t } from '../lib/i18n.js';
 import { createUploadPicker } from './UploadPicker.js';
 import { savePendingJob, removePendingJob, getPendingJobs } from '../lib/pendingJobs.js';
+import { downloadImage } from '../../packages/studio/src/utils/downloadImage.js';
+import { appendGenerationRefundNotice } from '../../packages/studio/src/utils/generationLifecycle.js';
 
 function createInlineInstructions(type) {
     const el = document.createElement('div');
@@ -1047,25 +1049,6 @@ export function ImageStudio() {
         });
     };
 
-    // --- Helper: Download image ---
-    const downloadImage = async (url, filename) => {
-        try {
-            const response = await fetch(url);
-            const blob = await response.blob();
-            const blobUrl = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = blobUrl;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(blobUrl);
-        } catch (err) {
-            // Fallback: open in new tab
-            window.open(url, '_blank');
-        }
-    };
-
     // --- Load history from localStorage ---
     try {
         const saved = JSON.parse(localStorage.getItem('muapi_history') || '[]');
@@ -1307,7 +1290,8 @@ export function ImageStudio() {
             console.error(e);
             // Restore hero so the page doesn't look broken after a failed generation
             hero.classList.remove('opacity-0', 'scale-95', '-translate-y-10', 'pointer-events-none');
-            generateBtn.innerHTML = `Error: ${e.message.slice(0, 60)}`;
+            const errorMessage = appendGenerationRefundNotice(e.message, e);
+            generateBtn.textContent = `Error: ${errorMessage.slice(0, 100)}`;
             setTimeout(() => {
                 generateBtn.innerHTML = t('common.generate');
             }, 4000);
