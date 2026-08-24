@@ -65,6 +65,11 @@ function getQualitiesForModel(modelList, modelId) {
   return model?.inputs?.quality?.enum || [];
 }
 
+function getVideoModelsForMode(imageMode, v2vMode) {
+  if (v2vMode) return v2vModels;
+  return imageMode ? i2vModels : t2vModels;
+}
+
 function formatCost({ cost, currency }) {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -798,8 +803,7 @@ export default function VideoStudio({
   }, [historyItems, onDeleteHistoryItem]);
 
   const getCurrentModels = useCallback(() => {
-    if (v2vMode) return v2vModels;
-    return imageMode ? i2vModels : t2vModels;
+    return getVideoModelsForMode(imageMode, v2vMode);
   }, [imageMode, v2vMode]);
 
   const getCurrentAspectRatios = useCallback(
@@ -1053,25 +1057,37 @@ export default function VideoStudio({
       const stored = localStorage.getItem(PERSIST_KEY);
       if (stored) {
         const data = JSON.parse(stored);
-        if (data.imageMode !== undefined) setImageMode(data.imageMode);
-        if (data.v2vMode !== undefined) setV2vMode(data.v2vMode);
-        if (data.selectedModel) setSelectedModel(data.selectedModel);
-        if (data.selectedModelName) setSelectedModelName(data.selectedModelName);
-        if (data.selectedAr) setSelectedAr(data.selectedAr);
-        if (data.selectedDuration) setSelectedDuration(data.selectedDuration);
-        if (data.selectedResolution) setSelectedResolution(data.selectedResolution);
-        if (data.selectedQuality) setSelectedQuality(data.selectedQuality);
-        if (data.selectedMode) setSelectedMode(data.selectedMode);
-        if (data.selectedEffect) setSelectedEffect(data.selectedEffect);
-        if (data.selectedModel) {
-          const restoredModel = [...t2vModels, ...i2vModels, ...v2vModels].find(
-            (model) => model.id === data.selectedModel,
-          );
-          setVideoToolOptions({
-            ...getDefaultVideoToolOptions(restoredModel),
-            ...(data.videoToolOptions || {}),
-          });
+        const restoredImageMode = !!data.imageMode;
+        const restoredV2vMode = !!data.v2vMode;
+        const availableModels = getVideoModelsForMode(
+          restoredImageMode,
+          restoredV2vMode,
+        );
+        const persistedModel = availableModels.find(
+          (model) => model.id === data.selectedModel,
+        );
+        const restoredModel =
+          persistedModel || availableModels[0] || defaultModel;
+
+        setImageMode(restoredImageMode);
+        setV2vMode(restoredV2vMode);
+        setSelectedModel(restoredModel.id);
+        setSelectedModelName(restoredModel.name);
+
+        if (persistedModel) {
+          if (data.selectedAr) setSelectedAr(data.selectedAr);
+          if (data.selectedDuration) setSelectedDuration(data.selectedDuration);
+          if (data.selectedResolution) {
+            setSelectedResolution(data.selectedResolution);
+          }
+          if (data.selectedQuality) setSelectedQuality(data.selectedQuality);
+          if (data.selectedMode) setSelectedMode(data.selectedMode);
+          if (data.selectedEffect) setSelectedEffect(data.selectedEffect);
         }
+        setVideoToolOptions({
+          ...getDefaultVideoToolOptions(restoredModel),
+          ...(data.videoToolOptions || {}),
+        });
         if (data.continuationSourceIds) {
           setContinuationSourceIds(data.continuationSourceIds);
         }
@@ -1091,9 +1107,9 @@ export default function VideoStudio({
 
         // Update control visibility based on restored model/mode
         applyControlsForModel(
-          data.selectedModel || defaultModel.id,
-          !!data.imageMode,
-          !!data.v2vMode
+          restoredModel.id,
+          restoredImageMode,
+          restoredV2vMode,
         );
       }
     } catch (err) {
