@@ -15652,6 +15652,8 @@ export const i2vModels = [
     "endpoint": "seedance-2-first-last-frame-fast",
     "family": "sd-2",
     "imageField": "images_list",
+    "lastImageField": "images_list",
+    "endImageRequired": true,
     "hasPrompt": true,
     "inputs": {
       "prompt": {
@@ -15989,6 +15991,8 @@ export const i2vModels = [
     "endpoint": "seedance-2-vip-first-last-frame",
     "family": "sd-2",
     "imageField": "images_list",
+    "lastImageField": "images_list",
+    "endImageRequired": true,
     "hasPrompt": true,
     "inputs": {
       "prompt": {
@@ -16057,6 +16061,8 @@ export const i2vModels = [
     "endpoint": "seedance-2-vip-first-last-frame-fast",
     "family": "sd-2",
     "imageField": "images_list",
+    "lastImageField": "images_list",
+    "endImageRequired": true,
     "hasPrompt": true,
     "inputs": {
       "prompt": {
