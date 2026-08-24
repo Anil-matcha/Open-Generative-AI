@@ -6,6 +6,8 @@ import {
 import { buildImageSizePayload } from './imageSizing.js';
 import { buildImageInputPayload, getImageInputValidationError, normalizePrimaryImageUrls } from './imageInputContracts.js';
 import { pollForGenerationResult } from './utils/generationLifecycle.js';
+import { mapReferenceParams } from './modelCapabilities.js';
+import { buildSupplementalInputPayload } from './modelParameters.js';
 
 // In an http(s) browser we route through the host app's proxy (Next.js routes
 // under /api/* re-issue the call server-side) so api.muapi.ai CORS is bypassed.
@@ -21,6 +23,21 @@ function notifyAuthRequired(status, detail) {
     if (typeof window === 'undefined') return;
     if (status !== 401 && status !== 403) return;
     window.dispatchEvent(new CustomEvent('muapi:auth-required', { detail: { status, message: detail } }));
+}
+
+function assertRequiredPrompt(model, params) {
+    if (model?.promptRequired && !String(params.prompt || '').trim()) {
+        throw new Error('Prompt is required for this model.');
+    }
+}
+
+function includeRequiredArrayDefaults(model, payload) {
+    const defaults = {};
+    for (const field of model?.required || []) {
+        if (payload[field] !== undefined || model?.inputs?.[field]?.type !== 'array') continue;
+        defaults[field] = [];
+    }
+    return Object.keys(defaults).length > 0 ? { ...defaults, ...payload } : payload;
 }
 
 async function pollForResult(requestId, key, maxAttempts = 900, interval = 2000) {
@@ -67,7 +84,10 @@ async function submitAndPoll(endpoint, payload, key, onRequestId, maxAttempts = 
 export async function generateImage(apiKey, params) {
     const modelInfo = getModelById(params.model);
     const endpoint = modelInfo?.endpoint || params.model;
-    const payload = { prompt: params.prompt };
+    const payload = {
+        ...buildSupplementalInputPayload(modelInfo, params),
+        prompt: params.prompt
+    };
     if (modelInfo) Object.assign(payload, buildImageSizePayload(modelInfo, params.aspect_ratio));
     else if (params.aspect_ratio) payload.aspect_ratio = params.aspect_ratio;
     if (params.resolution) payload.resolution = params.resolution;
@@ -95,7 +115,11 @@ export async function generateI2I(apiKey, params) {
         auxiliaryImageUrls: params,
     });
     if (inputError) throw new Error(inputError);
-    const payload = buildImageInputPayload(modelInfo, 'i2i', params);
+    const payload = {
+        ...mapReferenceParams(modelInfo, params),
+        ...buildSupplementalInputPayload(modelInfo, params),
+        ...buildImageInputPayload(modelInfo, 'i2i', params)
+    };
     if (imagesList.length > 0) {
         if (imageField === 'images_list') payload.images_list = imagesList;
         else payload[imageField] = imagesList[0];
@@ -127,7 +151,11 @@ export async function decomposeLayers(apiKey, params) {
 export async function generateVideo(apiKey, params) {
     const modelInfo = getVideoModelById(params.model);
     const endpoint = modelInfo?.endpoint || params.model;
-    const payload = {};
+    assertRequiredPrompt(modelInfo, params);
+    let payload = {
+        ...mapReferenceParams(modelInfo, params),
+        ...buildSupplementalInputPayload(modelInfo, params)
+    };
     if (params.prompt) payload.prompt = params.prompt;
     if (params.request_id) payload.request_id = params.request_id;
     if (params.aspect_ratio) payload.aspect_ratio = params.aspect_ratio;
@@ -140,37 +168,19 @@ export async function generateVideo(apiKey, params) {
     if (params.videos_list?.length > 0) payload.videos_list = params.videos_list;
     if (params.video_files?.length > 0) payload.video_files = params.video_files;
     Object.assign(payload, serializeVideoToolOptions(modelInfo, params.options));
+    payload = includeRequiredArrayDefaults(modelInfo, payload);
     return submitAndPoll(endpoint, payload, apiKey, params.onRequestId, 900);
 }
 
 export async function generateI2V(apiKey, params) {
     const modelInfo = getI2VModelById(params.model);
     const endpoint = modelInfo?.endpoint || params.model;
-    const payload = {};
+    assertRequiredPrompt(modelInfo, params);
+    let payload = {
+        ...mapReferenceParams(modelInfo, params),
+        ...buildSupplementalInputPayload(modelInfo, params)
+    };
     if (params.prompt) payload.prompt = params.prompt;
-    const imageField = modelInfo?.imageField || 'image_url';
-    const imageInput = modelInfo?.inputs?.[imageField];
-    const imageUrls = params.images_list?.length > 0
-        ? params.images_list
-        : (params.image_url ? [params.image_url] : []);
-    if (imageUrls.length > 0) {
-        if (imageInput?.type === 'array' || imageField === 'images_list') {
-            payload[imageField] = imageUrls;
-        } else {
-            payload[imageField] = imageUrls[0];
-        }
-    }
-    const lastImageField = modelInfo?.lastImageField;
-    if (lastImageField && params.last_image) {
-        if (lastImageField === 'images_list') {
-            if (!payload.images_list) payload.images_list = [];
-            if (payload.images_list.indexOf(params.last_image) === -1) {
-                payload.images_list.push(params.last_image);
-            }
-        } else {
-            payload[lastImageField] = params.last_image;
-        }
-    }
     if (params.aspect_ratio) payload.aspect_ratio = params.aspect_ratio;
     if (params.duration) payload.duration = params.duration;
     if (params.resolution) payload.resolution = params.resolution;
@@ -179,6 +189,7 @@ export async function generateI2V(apiKey, params) {
     if (modelInfo?.inputs?.name) {
         payload.name = params.name || modelInfo.inputs.name.default;
     }
+    payload = includeRequiredArrayDefaults(modelInfo, payload);
     return submitAndPoll(endpoint, payload, apiKey, params.onRequestId, 900);
 }
 
@@ -197,7 +208,16 @@ export async function generateMarketingStudioAd(apiKey, params) {
 export async function processV2V(apiKey, params) {
     const modelInfo = getV2VModelById(params.model);
     const endpoint = modelInfo?.endpoint || params.model;
-    const payload = buildVideoToolPayload(modelInfo, params);
+    const toolPayload = buildVideoToolPayload(modelInfo, params);
+    let payload = {
+        ...mapReferenceParams(modelInfo, params),
+        ...buildSupplementalInputPayload(modelInfo, params),
+        ...toolPayload,
+    };
+    if (modelInfo?.hasPrompt && params.prompt) {
+        payload.prompt = params.prompt;
+    }
+    payload = includeRequiredArrayDefaults(modelInfo, payload);
     return submitAndPoll(endpoint, payload, apiKey, params.onRequestId, 900);
 }
 

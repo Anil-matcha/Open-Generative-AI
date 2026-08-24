@@ -1,5 +1,5 @@
 import { muapi } from '../lib/muapi.js';
-import { t2vModels, getAspectRatiosForVideoModel, getDurationsForModel, getResolutionsForVideoModel, i2vModels, getAspectRatiosForI2VModel, getDurationsForI2VModel, getResolutionsForI2VModel, v2vModels, getModesForModel } from '../lib/models.js';
+import { t2vModels, getAspectRatiosForVideoModel, getDurationsForModel, getResolutionsForVideoModel, i2vModels, getAspectRatiosForI2VModel, getDurationsForI2VModel, getResolutionsForI2VModel, v2vModels } from '../lib/models.js';
 import { AuthModal } from './AuthModal.js';
 import { t } from '../lib/i18n.js';
 import { createUploadPicker } from './UploadPicker.js';
@@ -67,7 +67,7 @@ export function VideoStudio() {
         if (getLocalModelById(id)) return [];
         return imageMode ? getResolutionsForI2VModel(id) : getResolutionsForVideoModel(id);
     };
-    const getCurrentModes = (id) => getModesForModel(id);
+    const getCurrentModes = (id) => getCurrentModels().find(m => m.id === id)?.inputs?.mode?.enum || [];
     const getCurrentModel = () => getCurrentModels().find(m => m.id === selectedModel);
     const isMotionControlV2V = () => v2vMode && !!getCurrentModel()?.imageField;
     const getQualitiesForModel = (id) => {
@@ -432,7 +432,7 @@ export function VideoStudio() {
     const initResolutions = getResolutionsForVideoModel(defaultModel.id);
     resolutionBtn.style.display = initResolutions.length > 0 ? 'flex' : 'none';
     qualityBtn.style.display = 'none';
-    modeBtn.style.display = getModesForModel(defaultModel.id).length > 0 ? 'flex' : 'none';
+    modeBtn.style.display = getCurrentModes(defaultModel.id).length > 0 ? 'flex' : 'none';
     effectNameBtn.style.display = 'none';
 
     const generateBtn = document.createElement('button');
