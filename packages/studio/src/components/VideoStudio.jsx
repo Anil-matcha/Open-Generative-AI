@@ -1873,7 +1873,7 @@ export default function VideoStudio({
             model: selectedModel,
             prompt: trimmedPrompt,
             requestId,
-            resolution,
+            resolution: i2vParams.resolution,
             type: "video",
           });
       } else {
