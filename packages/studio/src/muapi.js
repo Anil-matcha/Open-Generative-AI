@@ -1,4 +1,8 @@
 import { getModelById, getVideoModelById, getI2IModelById, getI2VModelById, getV2VModelById, getRecastModelById, getLipSyncModelById, getAudioModelById } from './models.js';
+import {
+    buildVideoToolPayload,
+    serializeVideoToolOptions,
+} from './videoToolCapabilities.js';
 
 // In an http(s) browser we route through the host app's proxy (Next.js routes
 // under /api/* re-issue the call server-side) so api.muapi.ai CORS is bypassed.
@@ -39,6 +43,15 @@ async function pollForResult(requestId, key, maxAttempts = 900, interval = 2000)
     throw new Error('Generation timed out after polling.');
 }
 
+function normalizePredictionResult(submitData, result, outputUrl) {
+    const requestId = submitData?.request_id || submitData?.id || result?.request_id || result?.id;
+    return {
+        ...result,
+        ...(requestId ? { request_id: requestId } : {}),
+        url: outputUrl,
+    };
+}
+
 async function submitAndPoll(endpoint, payload, key, onRequestId, maxAttempts = 60) {
     const url = `${BASE_URL}/api/v1/${endpoint}`;
     const response = await fetch(url, {
@@ -57,7 +70,7 @@ async function submitAndPoll(endpoint, payload, key, onRequestId, maxAttempts = 
     if (onRequestId) onRequestId(requestId);
     const result = await pollForResult(requestId, key, maxAttempts);
     const outputUrl = result.outputs?.[0] || result.url || result.output?.url;
-    return { ...result, url: outputUrl };
+    return normalizePredictionResult(submitData, result, outputUrl);
 }
 
 export async function generateImage(apiKey, params) {
@@ -130,6 +143,8 @@ export async function generateVideo(apiKey, params) {
     if (params.image_url) payload.image_url = params.image_url;
     if (params.images_list?.length > 0) payload.images_list = params.images_list;
     if (params.videos_list?.length > 0) payload.videos_list = params.videos_list;
+    if (params.video_files?.length > 0) payload.video_files = params.video_files;
+    Object.assign(payload, serializeVideoToolOptions(modelInfo, params.options));
     return submitAndPoll(endpoint, payload, apiKey, params.onRequestId, 900);
 }
 
@@ -187,15 +202,48 @@ export async function generateMarketingStudioAd(apiKey, params) {
 export async function processV2V(apiKey, params) {
     const modelInfo = getV2VModelById(params.model);
     const endpoint = modelInfo?.endpoint || params.model;
-    const videoField = modelInfo?.videoField || 'video_url';
-    const payload = { [videoField]: params.video_url };
-    if (modelInfo?.imageField && params.image_url) {
-        payload[modelInfo.imageField] = params.image_url;
-    }
-    if (modelInfo?.hasPrompt && params.prompt) {
-        payload.prompt = params.prompt;
-    }
+    const payload = buildVideoToolPayload(modelInfo, params);
     return submitAndPoll(endpoint, payload, apiKey, params.onRequestId, 900);
+}
+
+export async function estimateV2VCost(params, signal) {
+    const modelInfo = getV2VModelById(params?.model);
+    const endpoint = modelInfo?.endpoint || params?.model;
+    if (!endpoint) {
+        throw new Error('A V2V model is required to estimate cost.');
+    }
+
+    const payload = buildVideoToolPayload(modelInfo, params);
+    const response = await fetch(`${BASE_URL}/api/v1/models/${endpoint}/estimate-cost`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal,
+    });
+
+    if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`Cost estimate failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+    }
+
+    let data;
+    try {
+        data = await response.json();
+    } catch {
+        throw new Error('Cost estimate returned invalid JSON.');
+    }
+
+    if (typeof data?.cost !== 'number' || !Number.isFinite(data.cost) || data.cost < 0) {
+        throw new Error('Cost estimate returned an invalid cost.');
+    }
+    if (typeof data.currency !== 'string' || !/^[A-Za-z]{3}$/.test(data.currency.trim())) {
+        throw new Error('Cost estimate returned an invalid currency.');
+    }
+
+    return {
+        cost: data.cost,
+        currency: data.currency.trim().toUpperCase(),
+    };
 }
 
 export async function processRecast(apiKey, params) {
@@ -916,5 +964,3 @@ export async function expandImage(apiKey, { image_url, onRequestId }) {
     const payload = { image_url };
     return submitAndPoll(endpoint, payload, apiKey, onRequestId, 90);
 }
-
-
