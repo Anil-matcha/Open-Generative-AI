@@ -68,3 +68,27 @@ test('Creator Studio uses GitHub identity sessions instead of a browser-readable
   assert.equal(oauthCallback.includes('response.cookies.set'), true);
   assert.equal(workflowStudio.includes('wl_workflow_token'), false);
 });
+
+test('YouTube publishing keeps OAuth credentials server-side and requires private approved uploads', async () => {
+  const creator = await source('packages/studio/src/components/CreatorStudio.jsx');
+  const youtube = await source('src/lib/youtubePublishing.js');
+  const route = await source('app/api/social/youtube/[[...path]]/route.js');
+  const middleware = await source('middleware.js');
+
+  assert.equal(creator.includes('@vercel/blob/client'), true);
+  assert.equal(creator.includes('access: "private"'), true);
+  assert.equal(creator.includes('approved: false'), true);
+  assert.equal(creator.includes('localStorage'), false);
+  assert.equal(creator.includes('sessionStorage'), false);
+  assert.equal(creator.includes('access_token'), false);
+  assert.equal(creator.includes('refresh_token'), false);
+  assert.equal(youtube.includes("createCipheriv('aes-256-gcm'"), true);
+  assert.equal(youtube.includes("privacyStatus: 'private'"), true);
+  assert.equal(youtube.includes("value.approved !== true"), true);
+  assert.equal(youtube.includes('https://www.googleapis.com/auth/youtube.upload'), true);
+  assert.equal(youtube.includes('youtube.force-ssl'), false);
+  assert.equal(route.includes('authorizeCreatorRequest'), true);
+  assert.equal(route.includes('handleUpload'), true);
+  assert.equal(route.includes('isYoutubeStagingPath'), true);
+  assert.equal(middleware.includes('https://*.blob.vercel-storage.com'), true);
+});

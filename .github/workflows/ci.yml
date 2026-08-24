@@ -37,14 +37,14 @@ jobs:
           node-version: 22
           package-manager-cache: false
 
+      - name: Install dependencies from lockfile
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
       - name: Run security regression tests
         run: node --test tests/security/*.test.js
 
       - name: Run existing tests
         run: node --test tests/*.test.js
-
-      - name: Install dependencies from lockfile
-        run: npm ci --ignore-scripts --no-audit --no-fund
 
       - name: Build production application
         run: npm run build

@@ -117,9 +117,10 @@
     }
   },
   "dependencies": {
+    "@vercel/blob": "2.8.0",
     "ai-agent": "file:./packages/Open-Poe-AI/packages/agents",
-    "axios": "^1.7.0",
-    "next": "^15.0.0",
+    "axios": "^1.19.0",
+    "next": "^15.5.23",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.4.1",

@@ -9,7 +9,7 @@ function buildContentSecurityPolicy(nonce) {
         "style-src 'self' 'unsafe-inline'",
         "img-src 'self' data: blob: https:",
         "media-src 'self' data: blob: https:",
-        "connect-src 'self' https://muapi.ai https://*.muapi.ai",
+        "connect-src 'self' https://muapi.ai https://*.muapi.ai https://*.blob.vercel-storage.com",
         "font-src 'self' data:",
         "object-src 'none'",
         "base-uri 'self'",
@@ -30,7 +30,8 @@ function addSecurityHeaders(response, contentSecurityPolicy) {
     // Content Security Policy - restricts script sources to prevent XSS (CWE-79).
     // connect-src covers *.muapi.ai (not just api.muapi.ai) because generated
     // media, model thumbnails, and other assets are served from cdn.muapi.ai
-    // and other muapi subdomains that the renderer fetches directly.
+    // and other muapi subdomains that the renderer fetches directly. Private
+    // Vercel Blob is allowed only for authenticated Creator Studio uploads.
     response.headers.set('Content-Security-Policy', contentSecurityPolicy);
 
     if (process.env.NODE_ENV === 'production') {
