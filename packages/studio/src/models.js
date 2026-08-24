@@ -4550,14 +4550,15 @@ export const t2vModels = [
         "default": "16:9"
       },
       "duration": {
+        "enum": [
+          5,
+          8
+        ],
         "title": "Duration",
         "name": "duration",
         "type": "int",
         "description": "The duration of the generated video in seconds. 8s not supported for 1080p resolution.",
-        "default": 5,
-        "minValue": 5,
-        "maxValue": 8,
-        "step": 3
+        "default": 5
       },
       "resolution": {
         "enum": [
@@ -4566,6 +4567,15 @@ export const t2vModels = [
           "720p",
           "1080p"
         ],
+        "enum_dependencies": {
+          "duration": {
+            "8": [
+              "360p",
+              "540p",
+              "720p"
+            ]
+          }
+        },
         "title": "Resolution",
         "name": "resolution",
         "type": "string",
@@ -4670,6 +4680,15 @@ export const t2vModels = [
           "720p",
           "1080p"
         ],
+        "enum_dependencies": {
+          "duration": {
+            "10": [
+              "360p",
+              "540p",
+              "720p"
+            ]
+          }
+        },
         "title": "Resolution",
         "name": "resolution",
         "type": "string",
@@ -4859,14 +4878,17 @@ export const t2vModels = [
       },
       "duration": {
         "enum": [
-          10,
-          15
+          4,
+          8,
+          12,
+          16,
+          20
         ],
         "title": "Duration",
         "name": "duration",
         "type": "int",
         "description": "The duration of the generated video in seconds",
-        "default": 10
+        "default": 8
       }
     },
     "provider": "openai",
@@ -4895,15 +4917,17 @@ export const t2vModels = [
       },
       "duration": {
         "enum": [
-          10,
-          15,
-          25
+          4,
+          8,
+          12,
+          16,
+          20
         ],
         "title": "Duration",
         "name": "duration",
         "type": "int",
-        "description": "The duration of the generated video in seconds. Currently 25 seconds supports 720p only.",
-        "default": 10
+        "description": "The duration of the generated video in seconds.",
+        "default": 8
       },
       "resolution": {
         "enum": [
@@ -7815,6 +7839,20 @@ export const t2vModels = [
 
 export const getVideoModelById = (id) => t2vModels.find(m => m.id === id);
 
+const getDependentEnumValues = (input, selections = {}) => {
+  const values = input?.enum || [];
+  const dependencies = input?.enum_dependencies;
+  if (!dependencies) return values;
+
+  return Object.entries(dependencies).reduce((available, [field, rules]) => {
+    const selectedValue = selections[field];
+    const allowedValues = rules?.[String(selectedValue)];
+    if (!allowedValues) return available;
+    const allowed = new Set(allowedValues);
+    return available.filter(value => allowed.has(value));
+  }, values);
+};
+
 export const getAspectRatiosForVideoModel = (modelId) => {
   const model = getVideoModelById(modelId);
   if (!model) return ['16:9'];
@@ -7832,11 +7870,11 @@ export const getDurationsForModel = (modelId) => {
   return [];
 };
 
-export const getResolutionsForVideoModel = (modelId) => {
+export const getResolutionsForVideoModel = (modelId, selections = {}) => {
   const model = getVideoModelById(modelId);
   if (!model) return [];
   const resInput = model.inputs?.resolution;
-  if (resInput && resInput.enum) return resInput.enum;
+  if (resInput?.enum) return getDependentEnumValues(resInput, selections);
   return [];
 };
 // Auto-generated from schema_data.json — Image to Image models
@@ -12062,6 +12100,15 @@ export const i2vModels = [
           "720p",
           "1080p"
         ],
+        "enum_dependencies": {
+          "duration": {
+            "8": [
+              "360p",
+              "540p",
+              "720p"
+            ]
+          }
+        },
         "default": "720p"
       },
       "duration": {
@@ -12069,10 +12116,11 @@ export const i2vModels = [
         "title": "Duration",
         "name": "duration",
         "description": "The duration of the generated video in seconds. 8s not supported for 1080p resolution.",
-        "default": 5,
-        "minValue": 5,
-        "maxValue": 8,
-        "step": 3
+        "enum": [
+          5,
+          8
+        ],
+        "default": 5
       }
     },
     "provider": "pixverse",
@@ -12722,10 +12770,13 @@ export const i2vModels = [
         "name": "duration",
         "description": "The duration of the generated video in seconds",
         "enum": [
-          10,
-          15
+          4,
+          8,
+          12,
+          16,
+          20
         ],
-        "default": 10
+        "default": 8
       },
       "remove_watermark": {
         "type": "boolean",
@@ -12791,13 +12842,15 @@ export const i2vModels = [
         "type": "int",
         "title": "Duration",
         "name": "duration",
-        "description": "The duration of the generated video in seconds. Currently 25 seconds supports 720p only.",
+        "description": "The duration of the generated video in seconds.",
         "enum": [
-          10,
-          15,
-          25
+          4,
+          8,
+          12,
+          16,
+          20
         ],
-        "default": 10
+        "default": 8
       },
       "resolution": {
         "type": "string",
@@ -13674,6 +13727,7 @@ export const i2vModels = [
     "family": "kling-v2.6",
     "imageField": "image_url",
     "hasPrompt": true,
+    "parameterNotice": "This integration supports 5 or 10 seconds.",
     "inputs": {
       "prompt": {
         "type": "string",
@@ -13776,6 +13830,15 @@ export const i2vModels = [
           "720p",
           "1080p"
         ],
+        "enum_dependencies": {
+          "duration": {
+            "10": [
+              "360p",
+              "540p",
+              "720p"
+            ]
+          }
+        },
         "default": "360p"
       },
       "duration": {
@@ -13992,6 +14055,8 @@ export const i2vModels = [
     "imageField": "image_url",
     "lastImageField": "last_image",
     "hasPrompt": true,
+    "aspectRatioMode": "inherited",
+    "parameterNotice": "Aspect ratio is inherited from the input image.",
     "inputs": {
       "prompt": {
         "type": "string",
@@ -14065,6 +14130,8 @@ export const i2vModels = [
     "imageField": "image_url",
     "lastImageField": "last_image",
     "hasPrompt": true,
+    "aspectRatioMode": "inherited",
+    "parameterNotice": "Aspect ratio is inherited from the input image.",
     "inputs": {
       "prompt": {
         "type": "string",
@@ -15037,7 +15104,10 @@ export const i2vModels = [
     "family": "pixverse-v6",
     "imageField": "image_url",
     "lastImageField": "last_image",
+    "endImageRequired": true,
     "hasPrompt": true,
+    "aspectRatioMode": "inherited",
+    "parameterNotice": "Start and end frames are required. Aspect ratio is determined by the input frames.",
     "inputs": {
       "prompt": {
         "type": "string",
@@ -15062,7 +15132,7 @@ export const i2vModels = [
         "type": "string",
         "title": "Ending Image",
         "name": "last_image",
-        "description": "Upload ending image (optional).",
+        "description": "Upload ending image.",
         "field": "image",
         "examples": [
           "https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/pixverse-v6-transition-1.jpg"
@@ -16999,7 +17069,6 @@ export const i2vModels = [
       },
       "resolution": {
         "enum": [
-          "360p",
           "540p",
           "720p",
           "1080p"
@@ -17621,6 +17690,8 @@ export const i2vModels = [
     "family": "video-generation",
     "imageField": "images_list",
     "hasPrompt": true,
+    "aspectRatioMode": "inherited",
+    "parameterNotice": "Aspect ratio is inherited from the input image.",
     "inputs": {
       "prompt": {
         "type": "string",
@@ -19453,6 +19524,7 @@ export const getAspectRatiosForI2IModel = (modelId) => {
 export const getAspectRatiosForI2VModel = (modelId) => {
     const model = getI2VModelById(modelId);
     if (!model) return ['16:9'];
+    if (model.aspectRatioMode === 'inherited') return [];
     if (model.inputs && model.inputs.aspect_ratio && model.inputs.aspect_ratio.enum) return model.inputs.aspect_ratio.enum;
     return ['16:9', '9:16', '1:1'];
 };
@@ -19472,11 +19544,11 @@ export const getDurationsForI2VModel = (modelId) => {
     return [];
 };
 
-export const getResolutionsForI2VModel = (modelId) => {
+export const getResolutionsForI2VModel = (modelId, selections = {}) => {
     const model = getI2VModelById(modelId);
     if (!model) return [];
     const res = model.inputs && model.inputs.resolution;
-    if (res && res.enum) return res.enum;
+    if (res?.enum) return getDependentEnumValues(res, selections);
     return [];
 };
 
