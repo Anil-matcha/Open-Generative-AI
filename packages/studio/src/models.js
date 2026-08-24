@@ -12237,9 +12237,9 @@ export const i2vModels = [
         "name": "resolution",
         "description": "The resolution of the generated video.",
         "enum": [
-          "1080p"
+          "1080P"
         ],
-        "default": "1080p"
+        "default": "1080P"
       }
     },
     "provider": "minimax",
