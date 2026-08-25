@@ -32,9 +32,9 @@ const TOOLS = [
   {
     id: "assistant",
     label: "Assistant",
-    provider: "anthropic",
+    provider: "brain",
     eyebrow: "Think",
-    description: "Turn a rough idea into a production plan, script, or optimized prompt.",
+    description: "Ask Selena's provider-neutral brain for a production plan, script, or optimized prompt.",
     icon: Bot,
     accent: "from-violet-500 to-fuchsia-400",
   },
@@ -103,7 +103,9 @@ const INITIAL_DRAFTS = {
   avatar: {
     script: "",
     title: "G.FURY Creator Studio",
-    aspectRatio: "16:9",
+    aspectRatio: "9:16",
+    resolution: "1080p",
+    captions: true,
   },
   video: {
     prompt: "",
@@ -189,6 +191,9 @@ function ToolButton({ tool, active, provider, onClick }) {
 
 function ProviderChip({ provider }) {
   const ready = provider?.configured === true && provider?.connected !== false;
+  const detail = provider?.identity
+    ? `${provider.identity.name} · ${provider.identity.type} · ${provider.status || (ready ? "Ready" : "Setup Required")}`
+    : provider?.status || provider?.model || "setup required";
   return (
     <div className="flex min-w-0 items-center gap-2 rounded-full border border-white/[0.08] bg-black/30 px-3 py-1.5">
       <span className={cx("h-2 w-2 shrink-0 rounded-full", ready ? "bg-emerald-400" : "bg-amber-400")} />
@@ -196,7 +201,7 @@ function ProviderChip({ provider }) {
         {provider?.label || "Provider"}
       </span>
       <span className="hidden truncate text-[10px] text-white/30 sm:inline">
-        {provider?.model || "setup required"}
+        {detail}
       </span>
     </div>
   );
@@ -292,7 +297,9 @@ function ResultCanvas({ output, tool }) {
         <article className="relative max-h-full w-full max-w-3xl overflow-y-auto rounded-2xl border border-white/[0.08] bg-black/35 p-6 text-sm leading-7 text-white/75 custom-scrollbar sm:p-9">
           <div className="mb-5 flex items-center justify-between gap-3 border-b border-white/[0.07] pb-4">
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-violet-300">Anthropic response</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-violet-300">
+                {output.provider ? `${output.provider} response` : "Selena response"}
+              </p>
               <p className="mt-1 text-xs text-white/30">{output.model}</p>
             </div>
             <Check size={18} className="text-emerald-400" />
@@ -530,7 +537,7 @@ function YoutubeControls({
   );
 }
 
-function InspectorFields({ activeTool, draft, updateDraft, youtube }) {
+function InspectorFields({ activeTool, draft, updateDraft, provider, youtube }) {
   if (activeTool.id === "publish") {
     return <YoutubeControls draft={draft} updateDraft={updateDraft} {...youtube} />;
   }
@@ -608,6 +615,22 @@ function InspectorFields({ activeTool, draft, updateDraft, youtube }) {
   if (activeTool.id === "avatar") {
     return (
       <>
+        <div className="grid grid-cols-3 gap-2 rounded-2xl border border-sky-400/15 bg-sky-400/[0.06] p-3">
+          <div>
+            <p className="text-[9px] font-black uppercase tracking-wider text-white/25">Avatar</p>
+            <p className="mt-1 truncate text-xs font-semibold text-white/75">{provider?.identity?.name || "Greg"}</p>
+          </div>
+          <div>
+            <p className="text-[9px] font-black uppercase tracking-wider text-white/25">Type</p>
+            <p className="mt-1 truncate text-xs font-semibold text-white/75">{provider?.identity?.type || "Digital Twin"}</p>
+          </div>
+          <div>
+            <p className="text-[9px] font-black uppercase tracking-wider text-white/25">Status</p>
+            <p className={cx("mt-1 truncate text-xs font-semibold", provider?.configured ? "text-emerald-300" : "text-amber-300")}>
+              {provider?.status || (provider?.configured ? "Ready" : "Setup Required")}
+            </p>
+          </div>
+        </div>
         <div>
           <FieldLabel hint={`${draft.script.length}/5000`}>Avatar script</FieldLabel>
           <PromptTextarea value={draft.script} onChange={(value) => updateDraft("script", value)} placeholder="Write exactly what your HeyGen avatar should say…" maxLength={5000} />
@@ -616,14 +639,31 @@ function InspectorFields({ activeTool, draft, updateDraft, youtube }) {
           <FieldLabel>Project title</FieldLabel>
           <input value={draft.title} onChange={(event) => updateDraft("title", event.target.value)} maxLength={100} className={inputClass} />
         </div>
-        <div>
-          <FieldLabel>Aspect ratio</FieldLabel>
-          <select value={draft.aspectRatio} onChange={(event) => updateDraft("aspectRatio", event.target.value)} className={selectClass}>
-            <option value="16:9">Landscape 16:9</option>
-            <option value="9:16">Vertical 9:16</option>
-            <option value="1:1">Square 1:1</option>
-          </select>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <FieldLabel>Aspect ratio</FieldLabel>
+            <select value={draft.aspectRatio} onChange={(event) => updateDraft("aspectRatio", event.target.value)} className={selectClass}>
+              <option value="9:16">Vertical 9:16</option>
+              <option value="16:9">Landscape 16:9</option>
+              <option value="1:1">Square 1:1</option>
+              <option value="4:5">Social 4:5</option>
+            </select>
+          </div>
+          <div>
+            <FieldLabel>Resolution</FieldLabel>
+            <select value={draft.resolution} onChange={(event) => updateDraft("resolution", event.target.value)} className={selectClass}>
+              <option value="1080p">1080p</option>
+              <option value="720p">720p</option>
+            </select>
+          </div>
         </div>
+        <label className="flex items-start gap-3 rounded-2xl border border-white/[0.07] bg-black/20 p-4">
+          <input type="checkbox" checked={draft.captions === true} onChange={(event) => updateDraft("captions", event.target.checked)} className="mt-0.5 h-4 w-4 accent-sky-400" />
+          <span>
+            <span className="block text-xs font-semibold text-white/75">Add social captions</span>
+            <span className="mt-1 block text-[10px] leading-4 text-white/30">Burn default captions into the HeyGen render for vertical social video.</span>
+          </span>
+        </label>
       </>
     );
   }
@@ -923,10 +963,10 @@ export default function CreatorStudio({ onGenerationStart, onGenerationEnd, onGe
       if (terminalSuccess.includes(terminalStatus)) {
         const url = provider === "runway" ? data.output?.[0] : data.videoUrl;
         if (!url) throw new Error(`${provider} completed without a video URL.`);
-        return { type: "video", provider, id, url, thumbnailUrl: data.thumbnailUrl || null };
+        return { type: "video", provider, id, url, thumbnailUrl: data.thumbnailUrl || null, duration: data.duration || null };
       }
       if (terminalFailure.includes(terminalStatus)) {
-        throw new Error(data.failure || `${provider} generation failed.`);
+        throw new Error(data.error?.message || data.failure || `${provider} generation failed.`);
       }
     }
     throw new Error(`${provider} generation is still running. Reopen the provider dashboard with the task ID to check it.`);
@@ -957,7 +997,7 @@ export default function CreatorStudio({ onGenerationStart, onGenerationEnd, onGe
         const response = await request("assistant", { method: "POST", body: draft });
         if (!response.ok) throw new Error(await responseError(response));
         const data = await response.json();
-        output = { type: "text", text: data.text, model: data.model };
+        output = { type: "text", text: data.text, model: data.model, provider: data.provider };
       } else if (toolId === "image") {
         const response = await request("image", { method: "POST", body: draft });
         if (!response.ok) throw new Error(await responseError(response));
@@ -970,8 +1010,10 @@ export default function CreatorStudio({ onGenerationStart, onGenerationEnd, onGe
         const response = await request("heygen", { method: "POST", body: draft });
         if (!response.ok) throw new Error(await responseError(response));
         const data = await response.json();
-        setOutputs((previous) => ({ ...previous, avatar: { type: "pending", provider: "heygen", id: data.id, status: data.status } }));
-        output = await pollTask("heygen", data.id, token, toolId);
+        const jobId = data.jobId || data.id;
+        if (!jobId) throw new Error("HeyGen returned no video job ID.");
+        setOutputs((previous) => ({ ...previous, avatar: { type: "pending", provider: "heygen", id: jobId, status: data.status } }));
+        output = await pollTask("heygen", jobId, token, toolId);
       } else if (toolId === "video") {
         const response = await request("runway", { method: "POST", body: draft });
         if (!response.ok) throw new Error(await responseError(response));
@@ -1096,7 +1138,7 @@ export default function CreatorStudio({ onGenerationStart, onGenerationEnd, onGe
               <h1 className="truncate text-sm font-bold tracking-tight">Creator Studio</h1>
               <span className="rounded-full border border-violet-400/20 bg-violet-400/10 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-violet-200">Private</span>
             </div>
-            <p className="truncate text-[10px] text-white/30">One canvas · six specialist providers</p>
+            <p className="truncate text-[10px] text-white/30">One brain router · five production tools</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -1169,6 +1211,7 @@ export default function CreatorStudio({ onGenerationStart, onGenerationEnd, onGe
                 activeTool={activeTool}
                 draft={activeDraft}
                 updateDraft={updateDraft}
+                provider={activeProvider}
                 youtube={{
                   status: youtubeStatus,
                   file: youtubeFile,
@@ -1199,7 +1242,7 @@ export default function CreatorStudio({ onGenerationStart, onGenerationEnd, onGe
               )}
             >
               {working ? <LoaderCircle size={17} className="animate-spin" /> : activeTool.id === "assistant" ? <Send size={16} /> : activeTool.id === "publish" ? <YoutubeMark size={17} /> : <Play size={16} fill="currentColor" />}
-              {working ? "Working…" : activeTool.id === "assistant" ? "Ask Anthropic" : activeTool.id === "publish" ? "Upload privately to YouTube" : `Generate ${activeTool.label}`}
+              {working ? "Working…" : activeTool.id === "assistant" ? "Ask Selena" : activeTool.id === "publish" ? "Upload privately to YouTube" : `Generate ${activeTool.label}`}
             </button>
 
             <div className="mt-5 flex items-center justify-center gap-2 text-[10px] text-white/22">

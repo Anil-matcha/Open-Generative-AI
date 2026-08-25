@@ -9,6 +9,7 @@ import { del as deleteBlob, get as getBlob, list as listBlobs, put as putBlob } 
 
 import { evaluateJsonSafety } from './contentSafety.js';
 import { authorizeCreatorRequest, creatorJson } from './creatorProviderGateway.js';
+import { YOUTUBE_PUBLISH_TOOL_ID } from './creatorToolRegistry.js';
 
 export const YOUTUBE_UPLOAD_SCOPE = 'https://www.googleapis.com/auth/youtube.upload';
 export const YOUTUBE_ALLOWED_VIDEO_MIME_TYPES = Object.freeze([
@@ -825,6 +826,8 @@ export async function getYoutubeConnectionStatus(user, {
     const configuration = youtubeConfiguration(env);
     if (!configuration.configured) {
         return {
+            provider: 'youtube',
+            toolId: YOUTUBE_PUBLISH_TOOL_ID,
             configured: false,
             connected: false,
             missing: configuration.missing,
@@ -838,6 +841,8 @@ export async function getYoutubeConnectionStatus(user, {
         cleanupExpiredYoutubeStaging(user, { env, blobStore, now }).catch(() => ({ deleted: 0 })),
     ]);
     return {
+        provider: 'youtube',
+        toolId: YOUTUBE_PUBLISH_TOOL_ID,
         configured: true,
         connected: Boolean(credential),
         connectedAt: credential?.connectedAt || null,
@@ -1036,6 +1041,8 @@ export async function handleYoutubePublish(request, {
         }
 
         return creatorJson({
+            provider: 'youtube',
+            toolId: YOUTUBE_PUBLISH_TOOL_ID,
             ...record,
             url: `https://www.youtube.com/watch?v=${videoId}`,
             studioUrl: `https://studio.youtube.com/video/${videoId}/edit`,

@@ -2,11 +2,13 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { createCreatorSession, creatorCookieSettings } from '../../src/lib/creatorAuth.js';
+import { YOUTUBE_PUBLISH_TOOL_ID } from '../../src/lib/creatorToolRegistry.js';
 import { resetRateLimitStore } from '../../src/lib/rateLimit.js';
 import {
     YOUTUBE_UPLOAD_SCOPE,
     disconnectYoutube,
     exchangeYoutubeAuthorizationCode,
+    getYoutubeConnectionStatus,
     handleYoutubePublish,
     loadYoutubeCredential,
     saveYoutubeCredential,
@@ -151,6 +153,17 @@ test('YouTube configuration fails closed and OAuth requests upload-only offline 
     assert.equal(url.searchParams.get('code_challenge_method'), 'S256');
     assert.equal(url.toString().includes('youtube.force-ssl'), false);
     assert.equal(url.toString().includes('youtube.readonly'), false);
+});
+
+test('YouTube status maps to the reusable publish tool without exposing configuration values', async () => {
+    const status = await getYoutubeConnectionStatus(user, { env: {} });
+    assert.equal(status.provider, 'youtube');
+    assert.equal(status.toolId, YOUTUBE_PUBLISH_TOOL_ID);
+    assert.equal(status.configured, false);
+    const serialized = JSON.stringify(status);
+    for (const value of Object.values(baseEnv)) {
+        assert.equal(serialized.includes(String(value)), false);
+    }
 });
 
 test('YouTube refresh tokens are authenticated-encrypted in private Blob storage', async () => {

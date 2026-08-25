@@ -1,6 +1,6 @@
 import {
     creatorNotFound,
-    handleAnthropicAssistant,
+    handleBrainAssistant,
     handleCreatorProviders,
     handleElevenLabsSpeech,
     handleHeyGenStatus,
@@ -21,7 +21,7 @@ async function dispatch(request, context, method) {
         case 'GET:providers':
             return handleCreatorProviders(request);
         case 'POST:assistant':
-            return handleAnthropicAssistant(request);
+            return handleBrainAssistant(request);
         case 'POST:image':
             return handleOpenAiImage(request);
         case 'POST:speech':

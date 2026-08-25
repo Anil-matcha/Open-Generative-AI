@@ -1,7 +1,23 @@
-import { randomUUID } from 'node:crypto';
-
 import { evaluateJsonSafety } from './contentSafety.js';
 import { authenticateCreatorRequest, isSameOriginMutation } from './creatorAuth.js';
+import {
+    brainErrorResponse,
+    brainProviderStatuses,
+    brainRouterStatus,
+    reasonWithBrain,
+} from './brainRouter.js';
+import {
+    ANTHROPIC_ASSISTANT_TOOL_ID,
+    BRAIN_REASONING_TOOL_ID,
+    ELEVENLABS_VOICE_TOOL_ID,
+    OPENAI_IMAGE_TOOL_ID,
+    RUNWAY_VIDEO_TOOL_ID,
+} from './creatorToolRegistry.js';
+import {
+    createHeyGenAvatarVideoJob,
+    getHeyGenAvatarVideoJob,
+    heyGenProviderStatus,
+} from './heygenProvider.js';
 import { checkRateLimit } from './rateLimit.js';
 
 const DEFAULT_REQUEST_LIMIT = 30;
@@ -11,15 +27,12 @@ const MAX_JSON_BODY_BYTES = 64 * 1024;
 const MAX_PROVIDER_JSON_BYTES = 32 * 1024 * 1024;
 const MAX_BINARY_BYTES = 32 * 1024 * 1024;
 
-const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
 const OPENAI_IMAGE_URL = 'https://api.openai.com/v1/images/generations';
 const ELEVENLABS_API_BASE = 'https://api.elevenlabs.io/v1';
-const HEYGEN_API_BASE = 'https://api.heygen.com/v3';
 const RUNWAY_API_BASE = 'https://api.dev.runwayml.com/v1';
 
 const IMAGE_SIZES = new Set(['1024x1024', '1024x1536', '1536x1024']);
 const IMAGE_QUALITIES = new Set(['low', 'medium', 'high']);
-const HEYGEN_ASPECT_RATIOS = new Set(['16:9', '9:16', '1:1']);
 const RUNWAY_RATIOS = new Set([
     '1280:720',
     '720:1280',
@@ -256,43 +269,59 @@ function networkFailure(provider, result) {
     }, result.networkError === 'timeout' ? 504 : 502);
 }
 
-function configuredProviders(env) {
+function heyGenResultResponse(result, successStatus = 200) {
+    if (result.ok) return creatorJson(result.job, successStatus);
+    return creatorJson({
+        error: result.error,
+        ...(Array.isArray(result.missing) ? { missing: result.missing } : {}),
+        ...(result.detail ? { detail: result.detail } : {}),
+    }, result.status || 502);
+}
+
+function generationProviderStatuses(env) {
+    const heyGen = heyGenProviderStatus(env);
     return [
-        {
-            id: 'anthropic',
-            label: 'Anthropic',
-            capability: 'Creative assistant',
-            configured: configuredSecret(env.ANTHROPIC_API_KEY),
-            model: env.ANTHROPIC_MODEL || 'claude-sonnet-5',
-        },
         {
             id: 'openai',
             label: 'OpenAI',
+            category: 'generation',
             capability: 'Image generation',
+            toolId: OPENAI_IMAGE_TOOL_ID,
+            built: true,
             configured: configuredSecret(env.OPENAI_API_KEY),
+            tested: false,
+            productionReady: false,
             model: env.OPENAI_IMAGE_MODEL || 'gpt-image-2',
         },
         {
             id: 'elevenlabs',
             label: 'ElevenLabs',
+            category: 'generation',
             capability: 'Voice generation',
+            toolId: ELEVENLABS_VOICE_TOOL_ID,
+            built: true,
             configured: configuredSecret(env.ELEVENLABS_API_KEY) && configuredSecret(env.ELEVENLABS_VOICE_ID),
+            tested: false,
+            productionReady: false,
             model: env.ELEVENLABS_MODEL || 'eleven_multilingual_v2',
         },
         {
-            id: 'heygen',
-            label: 'HeyGen',
-            capability: 'Avatar video',
-            configured: configuredSecret(env.HEYGEN_API_KEY) &&
-                configuredSecret(env.HEYGEN_AVATAR_ID) &&
-                configuredSecret(env.HEYGEN_VOICE_ID),
-            model: env.HEYGEN_VIDEO_ENGINE || 'Avatar IV',
+            ...heyGen,
+            category: 'generation',
+            built: true,
+            tested: false,
+            productionReady: false,
         },
         {
             id: 'runway',
             label: 'Runway',
+            category: 'generation',
             capability: 'Cinematic video',
+            toolId: RUNWAY_VIDEO_TOOL_ID,
+            built: true,
             configured: configuredSecret(env.RUNWAY_API_KEY),
+            tested: false,
+            productionReady: false,
             model: env.RUNWAY_VIDEO_MODEL || 'gen4.5',
         },
     ];
@@ -301,74 +330,78 @@ function configuredProviders(env) {
 export async function handleCreatorProviders(request, { env = process.env } = {}) {
     const auth = authorizeCreatorRequest(request, { env, action: 'providers', statusRequest: true });
     if (auth.response) return auth.response;
-    return creatorJson({ providers: configuredProviders(env) });
+    const brain = {
+        ...brainRouterStatus(env),
+        toolId: BRAIN_REASONING_TOOL_ID,
+    };
+    const brainProviders = brainProviderStatuses(env);
+    const generationProviders = generationProviderStatuses(env);
+    return creatorJson({
+        providers: [brain, ...generationProviders],
+        brain,
+        brainProviders,
+        generationProviders,
+    });
+}
+
+async function handleBrainReasoning(request, {
+    env,
+    fetchImpl,
+    providerOverride = null,
+    action = 'brain',
+} = {}) {
+    const auth = authorizeCreatorRequest(request, { env, action });
+    if (auth.response) return auth.response;
+
+    const parsed = await parseCreatorJson(request, { env });
+    if (parsed.response) return parsed.response;
+    try {
+        const result = await reasonWithBrain({
+            task: parsed.value.task ?? parsed.value.prompt,
+            instructions: parsed.value.instructions,
+            context: parsed.value.context,
+            mode: parsed.value.mode,
+            tools: parsed.value.tools,
+            sensitivity: parsed.value.sensitivity,
+            desiredOutput: parsed.value.desiredOutput,
+            agent: parsed.value.agent,
+            allowFallback: parsed.value.allowFallback,
+            requiresExplicitApproval: parsed.value.requiresExplicitApproval,
+            sideEffect: parsed.value.sideEffect,
+        }, { env, fetchImpl, providerOverride });
+        return creatorJson({
+            ...result,
+            toolId: providerOverride === 'anthropic'
+                ? ANTHROPIC_ASSISTANT_TOOL_ID
+                : BRAIN_REASONING_TOOL_ID,
+            // Keep the legacy field while clients migrate to finishReason.
+            stopReason: result.finishReason,
+        });
+    } catch (error) {
+        const failure = brainErrorResponse(error);
+        return creatorJson(failure.body, failure.status);
+    }
+}
+
+export async function handleBrainAssistant(request, {
+    env = process.env,
+    fetchImpl = fetch,
+} = {}) {
+    return handleBrainReasoning(request, { env, fetchImpl, action: 'brain' });
 }
 
 export async function handleAnthropicAssistant(request, {
     env = process.env,
     fetchImpl = fetch,
 } = {}) {
-    const auth = authorizeCreatorRequest(request, { env, action: 'anthropic' });
-    if (auth.response) return auth.response;
-    if (!configuredSecret(env.ANTHROPIC_API_KEY)) {
-        return missingProviderConfiguration('Anthropic', ['ANTHROPIC_API_KEY']);
-    }
-
-    const parsed = await parseCreatorJson(request, { env });
-    if (parsed.response) return parsed.response;
-    const prompt = stringField(parsed.value.prompt, 'Prompt', { maximum: 20_000 });
-    if (prompt.error) return creatorJson({ error: prompt.error }, 400);
-    const mode = ['plan', 'script', 'prompt', 'strategy'].includes(parsed.value.mode)
-        ? parsed.value.mode
-        : 'strategy';
-
-    const modeInstruction = {
-        plan: 'Return a concise, executable production plan with ordered steps and provider recommendations.',
-        script: 'Return production-ready narration or dialogue plus a brief shot plan.',
-        prompt: 'Return polished generation prompts tailored separately for image, avatar video, and cinematic video.',
-        strategy: 'Act as the creative director: clarify the goal, recommend a workflow, and provide the strongest next action.',
-    }[mode];
-
-    const result = await fetchWithTimeout(fetchImpl, ANTHROPIC_API_URL, {
-        method: 'POST',
-        headers: {
-            'content-type': 'application/json',
-            'x-api-key': normalizedSecret(env.ANTHROPIC_API_KEY),
-            'anthropic-version': env.ANTHROPIC_API_VERSION || '2023-06-01',
+    return handleBrainReasoning(request, {
+        env: {
+            ...env,
+            BRAIN_SYSTEM_PROMPT: env.BRAIN_SYSTEM_PROMPT || env.ANTHROPIC_ASSISTANT_SYSTEM_PROMPT,
         },
-        body: JSON.stringify({
-            model: env.ANTHROPIC_MODEL || 'claude-sonnet-5',
-            max_tokens: Math.round(boundedNumber(env.ANTHROPIC_MAX_TOKENS, 6000, 512, 16_000)),
-            system: [
-                env.ANTHROPIC_ASSISTANT_SYSTEM_PROMPT ||
-                    'You are the private creative director inside G.FURY Creator Studio. Help turn ideas into practical multimedia productions while respecting consent, copyright, provider policies, and the stated budget.',
-                modeInstruction,
-                'Do not claim an asset has been generated until a generation provider actually returns it.',
-            ].join('\n\n'),
-            messages: [{ role: 'user', content: prompt.value }],
-        }),
-    }, 90_000);
-    if (result.networkError) return networkFailure('Anthropic', result);
-
-    const decoded = await readProviderJson(result);
-    if (decoded.error) return creatorJson({ error: 'Anthropic returned an invalid response.' }, 502);
-    if (!result.ok) return providerFailure('Anthropic', result, decoded.value);
-
-    const text = Array.isArray(decoded.value?.content)
-        ? decoded.value.content
-            .filter((block) => block?.type === 'text' && typeof block.text === 'string')
-            .map((block) => block.text)
-            .join('\n')
-            .trim()
-        : '';
-    if (!text) return creatorJson({ error: 'Anthropic returned no assistant text.' }, 502);
-
-    return creatorJson({
-        provider: 'anthropic',
-        model: decoded.value.model || env.ANTHROPIC_MODEL || 'claude-sonnet-5',
-        text,
-        stopReason: decoded.value.stop_reason || null,
-        usage: decoded.value.usage || null,
+        fetchImpl,
+        providerOverride: 'anthropic',
+        action: 'anthropic',
     });
 }
 
@@ -427,6 +460,7 @@ export async function handleOpenAiImage(request, {
             'content-type': 'image/png',
             'content-disposition': 'inline; filename="creator-studio-image.png"',
             'x-generation-provider': 'openai',
+            'x-creator-tool-id': OPENAI_IMAGE_TOOL_ID,
         }),
     });
 }
@@ -488,6 +522,7 @@ export async function handleElevenLabsSpeech(request, {
             'content-type': result.headers.get('content-type') || 'audio/mpeg',
             'content-disposition': 'inline; filename="creator-studio-voice.mp3"',
             'x-generation-provider': 'elevenlabs',
+            'x-creator-tool-id': ELEVENLABS_VOICE_TOOL_ID,
         }),
     });
 }
@@ -498,53 +533,11 @@ export async function handleHeyGenVideo(request, {
 } = {}) {
     const auth = authorizeCreatorRequest(request, { env, action: 'heygen-create' });
     if (auth.response) return auth.response;
-    const missing = [];
-    if (!configuredSecret(env.HEYGEN_API_KEY)) missing.push('HEYGEN_API_KEY');
-    if (!configuredSecret(env.HEYGEN_AVATAR_ID)) missing.push('HEYGEN_AVATAR_ID');
-    if (!configuredSecret(env.HEYGEN_VOICE_ID)) missing.push('HEYGEN_VOICE_ID');
-    if (missing.length) return missingProviderConfiguration('HeyGen', missing);
 
     const parsed = await parseCreatorJson(request, { env });
     if (parsed.response) return parsed.response;
-    const script = stringField(parsed.value.script, 'Avatar script', { maximum: 5000 });
-    if (script.error) return creatorJson({ error: script.error }, 400);
-    const title = stringField(parsed.value.title, 'Title', { maximum: 100, optional: true });
-    if (title.error) return creatorJson({ error: title.error }, 400);
-    const aspectRatio = HEYGEN_ASPECT_RATIOS.has(parsed.value.aspectRatio)
-        ? parsed.value.aspectRatio
-        : '16:9';
-
-    const result = await fetchWithTimeout(fetchImpl, `${HEYGEN_API_BASE}/videos`, {
-        method: 'POST',
-        headers: {
-            'content-type': 'application/json',
-            'x-api-key': normalizedSecret(env.HEYGEN_API_KEY),
-            'idempotency-key': randomUUID(),
-        },
-        body: JSON.stringify({
-            type: 'avatar',
-            avatar_id: normalizedSecret(env.HEYGEN_AVATAR_ID),
-            voice_id: normalizedSecret(env.HEYGEN_VOICE_ID),
-            title: title.value || 'G.FURY Creator Studio',
-            aspect_ratio: aspectRatio,
-            output_format: 'mp4',
-            script: script.value,
-        }),
-    }, 60_000);
-    if (result.networkError) return networkFailure('HeyGen', result);
-
-    const decoded = await readProviderJson(result);
-    if (decoded.error) return creatorJson({ error: 'HeyGen returned an invalid response.' }, 502);
-    if (!result.ok) return providerFailure('HeyGen', result, decoded.value);
-    const videoId = decoded.value?.data?.video_id;
-    if (typeof videoId !== 'string' || !OPAQUE_ID_PATTERN.test(videoId)) {
-        return creatorJson({ error: 'HeyGen returned no valid video ID.' }, 502);
-    }
-    return creatorJson({
-        provider: 'heygen',
-        id: videoId,
-        status: decoded.value?.data?.status || 'waiting',
-    }, 202);
+    const result = await createHeyGenAvatarVideoJob(parsed.value, { env, fetchImpl });
+    return heyGenResultResponse(result, 202);
 }
 
 export async function handleHeyGenStatus(request, {
@@ -553,30 +546,9 @@ export async function handleHeyGenStatus(request, {
 } = {}) {
     const auth = authorizeCreatorRequest(request, { env, action: 'heygen-status', statusRequest: true });
     if (auth.response) return auth.response;
-    if (!configuredSecret(env.HEYGEN_API_KEY)) {
-        return missingProviderConfiguration('HeyGen', ['HEYGEN_API_KEY']);
-    }
     const videoId = new URL(request.url).searchParams.get('id') || '';
-    if (!OPAQUE_ID_PATTERN.test(videoId)) return creatorJson({ error: 'A valid HeyGen video ID is required.' }, 400);
-
-    const result = await fetchWithTimeout(fetchImpl, `${HEYGEN_API_BASE}/videos/${encodeURIComponent(videoId)}`, {
-        headers: { 'x-api-key': normalizedSecret(env.HEYGEN_API_KEY) },
-    }, 30_000);
-    if (result.networkError) return networkFailure('HeyGen', result);
-    const decoded = await readProviderJson(result);
-    if (decoded.error) return creatorJson({ error: 'HeyGen returned an invalid response.' }, 502);
-    if (!result.ok) return providerFailure('HeyGen', result, decoded.value);
-    const data = decoded.value?.data || {};
-    const videoUrl = safeHttpsUrl(data.video_url, 'HeyGen video URL');
-    const thumbnailUrl = safeHttpsUrl(data.thumbnail_url, 'HeyGen thumbnail URL');
-    return creatorJson({
-        provider: 'heygen',
-        id: videoId,
-        status: typeof data.status === 'string' ? data.status : 'unknown',
-        videoUrl: videoUrl.value || null,
-        thumbnailUrl: thumbnailUrl.value || null,
-        failure: safeProviderMessage(data.failure_message) || null,
-    });
+    const result = await getHeyGenAvatarVideoJob(videoId, { env, fetchImpl });
+    return heyGenResultResponse(result);
 }
 
 export async function handleRunwayVideo(request, {
@@ -623,7 +595,12 @@ export async function handleRunwayVideo(request, {
     if (typeof taskId !== 'string' || !OPAQUE_ID_PATTERN.test(taskId)) {
         return creatorJson({ error: 'Runway returned no valid task ID.' }, 502);
     }
-    return creatorJson({ provider: 'runway', id: taskId, status: decoded.value.status || 'PENDING' }, 202);
+    return creatorJson({
+        provider: 'runway',
+        toolId: RUNWAY_VIDEO_TOOL_ID,
+        id: taskId,
+        status: decoded.value.status || 'PENDING',
+    }, 202);
 }
 
 export async function handleRunwayStatus(request, {
@@ -657,6 +634,7 @@ export async function handleRunwayStatus(request, {
         : [];
     return creatorJson({
         provider: 'runway',
+        toolId: RUNWAY_VIDEO_TOOL_ID,
         id: taskId,
         status: typeof decoded.value?.status === 'string' ? decoded.value.status : 'UNKNOWN',
         output,

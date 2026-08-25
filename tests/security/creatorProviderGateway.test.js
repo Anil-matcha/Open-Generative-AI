@@ -3,10 +3,18 @@ import test from 'node:test';
 
 import {
     handleAnthropicAssistant,
+    handleBrainAssistant,
     handleCreatorProviders,
     handleOpenAiImage,
 } from '../../src/lib/creatorProviderGateway.js';
 import { createCreatorSession, creatorCookieSettings } from '../../src/lib/creatorAuth.js';
+import {
+    BRAIN_REASONING_TOOL_ID,
+    ELEVENLABS_VOICE_TOOL_ID,
+    HEYGEN_AVATAR_VIDEO_TOOL_ID,
+    OPENAI_IMAGE_TOOL_ID,
+    RUNWAY_VIDEO_TOOL_ID,
+} from '../../src/lib/creatorToolRegistry.js';
 import { resetRateLimitStore } from '../../src/lib/rateLimit.js';
 
 const baseEnv = {
@@ -72,9 +80,78 @@ test('creator gateway rejects cross-origin paid mutations even with a valid sess
     assert.equal(response.status, 403);
 });
 
+test('provider-neutral assistant route preserves Creator Studio authentication', async () => {
+    resetRateLimitStore();
+    const response = await handleBrainAssistant(
+        creatorRequest('assistant', { prompt: 'Build a short launch plan.', mode: 'plan' }, ''),
+        { env: { ...baseEnv, GEMINI_API_KEY: 'gemini-provider-secret' } },
+    );
+    assert.equal(response.status, 401);
+});
+
+test('provider-neutral assistant route rejects cross-origin mutations before provider access', async () => {
+    resetRateLimitStore();
+    let called = false;
+    const response = await handleBrainAssistant(
+        creatorRequest(
+            'assistant',
+            { prompt: 'Build a short launch plan.', mode: 'plan' },
+            session,
+            { origin: 'https://attacker.test', 'sec-fetch-site': 'cross-site' },
+        ),
+        {
+            env: { ...baseEnv, GEMINI_API_KEY: 'gemini-provider-secret' },
+            fetchImpl: async () => { called = true; return new Response('{}'); },
+        },
+    );
+    assert.equal(response.status, 403);
+    assert.equal(called, false);
+});
+
+test('provider-neutral assistant returns a normalized Gemini response without secrets', async () => {
+    resetRateLimitStore();
+    const providerKey = 'gemini-provider-secret';
+    let captured;
+    const response = await handleBrainAssistant(
+        creatorRequest('assistant', { prompt: 'Build a short launch plan.', mode: 'plan' }),
+        {
+            env: {
+                ...baseEnv,
+                GEMINI_API_KEY: providerKey,
+                BRAIN_PROVIDER: 'gemini',
+                BRAIN_ENABLE_AUTOMATIC_FALLBACK: 'false',
+            },
+            fetchImpl: async (url, options) => {
+                captured = { url, options };
+                return new Response(JSON.stringify({
+                    modelVersion: 'gemini-3.7-flash',
+                    candidates: [{
+                        content: { parts: [{ text: '1. Draft the hook.\n2. Build the assets.' }] },
+                        finishReason: 'STOP',
+                    }],
+                    usageMetadata: { promptTokenCount: 12, candidatesTokenCount: 18, totalTokenCount: 30 },
+                }), { status: 200 });
+            },
+        },
+    );
+
+    assert.equal(response.status, 200);
+    assert.equal(captured.options.headers['x-goog-api-key'], providerKey);
+    const text = await response.text();
+    const body = JSON.parse(text);
+    assert.equal(body.provider, 'gemini');
+    assert.equal(body.toolId, BRAIN_REASONING_TOOL_ID);
+    assert.equal(body.text.includes('Draft the hook'), true);
+    assert.equal(text.includes(providerKey), false);
+    assert.equal(text.includes(session), false);
+});
+
 test('provider status reports readiness without disclosing provider credentials', async () => {
     resetRateLimitStore();
     const secrets = {
+        GEMINI_API_KEY: 'gemini-provider-secret',
+        GROQ_API_KEY: 'groq-provider-secret',
+        OPENROUTER_API_KEY: 'openrouter-provider-secret',
         ANTHROPIC_API_KEY: 'anthropic-provider-secret',
         OPENAI_API_KEY: 'openai-provider-secret',
         ELEVENLABS_API_KEY: 'elevenlabs-provider-secret',
@@ -85,13 +162,38 @@ test('provider status reports readiness without disclosing provider credentials'
         RUNWAY_API_KEY: 'runway-provider-secret',
     };
     const response = await handleCreatorProviders(creatorRequest('providers'), {
-        env: { ...baseEnv, ...secrets },
+        env: {
+            ...baseEnv,
+            ...secrets,
+            BRAIN_PROVIDER: 'gemini',
+            BRAIN_FALLBACK_ORDER: 'gemini,groq,openrouter',
+        },
     });
 
     assert.equal(response.status, 200);
     const text = await response.text();
     const body = JSON.parse(text);
     assert.deepEqual(body.providers.map((provider) => provider.configured), [true, true, true, true, true]);
+    assert.deepEqual(body.providers.map((provider) => provider.toolId), [
+        BRAIN_REASONING_TOOL_ID,
+        OPENAI_IMAGE_TOOL_ID,
+        ELEVENLABS_VOICE_TOOL_ID,
+        HEYGEN_AVATAR_VIDEO_TOOL_ID,
+        RUNWAY_VIDEO_TOOL_ID,
+    ]);
+    assert.deepEqual(body.brainProviders.map((provider) => provider.id), [
+        'gemini',
+        'groq',
+        'openrouter',
+        'anthropic',
+    ]);
+    assert.deepEqual(body.generationProviders.map((provider) => provider.id), [
+        'openai',
+        'elevenlabs',
+        'heygen',
+        'runway',
+    ]);
+    assert.equal(body.brain.selectedProvider, 'gemini');
     for (const secret of Object.values(secrets)) assert.equal(text.includes(secret), false);
     assert.equal(text.includes(session), false);
 });
@@ -143,7 +245,7 @@ test('Anthropic assistant keeps both access and provider secrets server-side', a
     assert.equal(captured.options.headers['x-api-key'], providerKey);
     assert.equal(captured.options.headers.cookie, undefined);
     const upstreamBody = JSON.parse(captured.options.body);
-    assert.equal(upstreamBody.messages[0].content, 'Build a short launch plan.');
+    assert.equal(upstreamBody.messages[0].content, 'Task:\nBuild a short launch plan.');
 
     const text = await response.text();
     assert.equal(text.includes(providerKey), false);

@@ -1,6 +1,6 @@
 const DEFAULT_MODE = 'enforce';
 const VALID_MODES = new Set(['enforce', 'audit', 'off']);
-const TEXT_FIELD_PATTERN = /(prompt|message|instruction|description|caption|text|query|content|script|input|system)/i;
+const TEXT_FIELD_PATTERN = /(prompt|message|instruction|description|caption|text|query|content|script|input|system|task)/i;
 
 const MINOR_TERMS = /\b(child|children|kid|kids|minor|underage|preteen|teenager|schoolgirl|schoolboy)\b/i;
 const SEXUAL_TERMS = /\b(sex|sexual|nude|nudity|porn|pornographic|explicit|erotic|fetish|rape)\b/i;
