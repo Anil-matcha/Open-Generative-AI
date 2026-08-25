@@ -1,6 +1,6 @@
 # G.FURY Creator Studio v1 — Phase 1 Status
 
-Authoritative reconciliation snapshot for `lalambert1982-eng/Open-Generative-AI`. Deployment evidence was last reconciled on 2026-08-25, including the approved Brain Router Preview deployment.
+Authoritative reconciliation snapshot for `lalambert1982-eng/Open-Generative-AI`. Deployment evidence was last reconciled on 2026-08-25, including the approved Brain Router and Greg Digital Twin Production deployment.
 
 This document distinguishes four independent states:
 
@@ -11,20 +11,20 @@ This document distinguishes four independent states:
 
 Configuration is not implementation. A provider with a missing API key remains **Built — configuration required**.
 
-## Brain Router branch update — Preview deployed
+## Brain Router release — Production deployed
 
-Commit `29d950edf4be2e3a5b4025eda573262c7eca2f85` on `feature/heygen-digital-twin` adds a provider-neutral Selena reasoning boundary without recreating the existing agents or changing the deployed Production environment. The commit is pushed and Vercel reports its Preview deployment as Ready. It has not been merged into `main`, Production-deployed, or real-provider tested.
+PR #6 merged the provider-neutral Selena reasoning boundary and Greg Digital Twin hardening into `main` without recreating the existing agents. Vercel reports Production commit `3d6ea7882e8033b374dd9b9d65a51a2dcc30f1ff` as Ready. The release passed mocked/local and CI verification, but no real external-provider generation was run as part of deployment.
 
 | Brain provider | Code Built | Preview Configured | Production Configured | Test Passed | Production Ready |
 |---|---|---|---|---|---|
-| Gemini | Built (Preview branch) | Not re-verified | Not modified | Mock test passed | No |
-| Groq | Built (Preview branch) | Not re-verified | Not modified | Mock test passed | No |
-| OpenRouter | Built (Preview branch) | Not re-verified | Not modified | Mock test passed | No |
-| Anthropic | Built (existing + router compatibility) | Not re-verified | Not modified | Mock test passed | No |
+| Gemini | Built (Production) | Not re-verified | Not re-verified | Mock test passed | No |
+| Groq | Built (Production) | Not re-verified | Not re-verified | Mock test passed | No |
+| OpenRouter | Built (Production) | Not re-verified | Not re-verified | Mock test passed | No |
+| Anthropic | Built (existing + router compatibility) | Not re-verified | Not re-verified | Mock test passed | No |
 
 Initial routing is Gemini → Groq → OpenRouter with at most three attempts. Anthropic remains selectable but is not included in the initial free/developer fallback order. “Free/developer” describes the intended account tier, not a guarantee of zero cost; provider limits and billing still apply.
 
-Preview requires three provider-specific Secret values (`GEMINI_API_KEY`, `GROQ_API_KEY`, `OPENROUTER_API_KEY`) plus the seven non-secret values documented in `CREATOR_STUDIO.md`. Production was deliberately left untouched. No real API request was made during this implementation.
+Provider availability still depends on the exact Preview and Production variables documented in `CREATOR_STUDIO.md`. The deployment did not copy credentials between environments or reveal saved Secret values. No real provider request was made during this release.
 
 ## Current Git and deployment state
 
@@ -32,17 +32,17 @@ Preview requires three provider-specific Secret values (`GEMINI_API_KEY`, `GROQ_
 |---|---|
 | Repository | `lalambert1982-eng/Open-Generative-AI` |
 | Default branch | `main` |
-| Current `main` commit | `b7a1722c43f4d3b85de1929e4202c9fd18085e8b` |
+| Current `main` state | Contains the PR #6 Production implementation release |
 | `main` branch protection | Not enabled |
-| Current production commit | `b7a1722c43f4d3b85de1929e4202c9fd18085e8b` |
-| Production deployment | Ready |
+| Production implementation commit | `3d6ea7882e8033b374dd9b9d65a51a2dcc30f1ff` |
+| Production deployment | Ready (Vercel) |
 | Production URL | `https://open-generative-ai-lemon.vercel.app` |
-| Current reconciliation branch | `feature/heygen-digital-twin` |
-| Reconciliation implementation commit | `29d950edf4be2e3a5b4025eda573262c7eca2f85` |
-| Reconciliation deployment | Ready (Preview) |
+| Release pull request | #6 (merged) |
+| Release-candidate commit | `143e0d36aec1cde8fc369065ccb872c3ec4a8c4a` |
+| Preview deployment | Ready |
 | Stable Preview URL | `https://open-generative-ai-git-feat-84fb6c-lalambert1982-7239s-projects.vercel.app` |
 
-The production commit contains private YouTube publishing from PR #5. The reconciliation branch also contains the completed Greg Digital Twin adapter, its tests, and the full Phase 1 tool registry; those branch changes must still be reviewed, merged, and deployed before they become production state.
+The Production commit contains private YouTube publishing from PR #5 plus the completed Greg Digital Twin adapter, provider-neutral Brain Router, full Phase 1 tool registry, and tests from PR #6.
 
 ### Merged pull requests
 
@@ -53,6 +53,7 @@ The production commit contains private YouTube publishing from PR #5. The reconc
 | #3 | Build workspaces before the production app | `fe20c6607245ab226f4e2b2646080c62bb7a06a3` | Merged |
 | #4 | Secure multi-provider Creator Studio | `4853f9e76632ea48f07f805ea1b325762f22906d` | Merged |
 | #5 | Secure private YouTube publishing | `b7a1722c43f4d3b85de1929e4202c9fd18085e8b` | Merged |
+| #6 | Brain Router and Greg Digital Twin Production release | `3d6ea7882e8033b374dd9b9d65a51a2dcc30f1ff` | Merged |
 
 Vercel shows both the current Production deployment and the current `feature/heygen-digital-twin` Preview deployment as Ready. The stable Preview alias uses the branch-specific GitHub OAuth callback and the current reconciliation commit.
 
@@ -60,11 +61,11 @@ Vercel shows both the current Production deployment and the current `feature/hey
 
 - GitHub OAuth owner authentication with state, PKCE, a signed short-lived session, immutable user-ID allowlisting, login allowlisting, logout, and same-origin mutation checks.
 - Authenticated Creator Studio provider-status reporting that exposes readiness, model labels, and safe provider identity labels without credential values.
-- A Preview-deployed provider-neutral Brain Router for Gemini, Groq, OpenRouter, and the preserved Anthropic implementation, with normalized requests/results, bounded safe fallback, and fail-closed sensitivity routing.
+- A Production-deployed provider-neutral Brain Router for Gemini, Groq, OpenRouter, and the preserved Anthropic implementation, with normalized requests/results, bounded safe fallback, and fail-closed sensitivity routing.
 - Anthropic creative assistant for strategy, planning, prompts, and scripts.
 - OpenAI image generation with configurable size/quality and a low-cost default.
 - ElevenLabs speech generation using a server-configured reusable voice.
-- HeyGen text-to-avatar submission and asynchronous polling. The reconciliation branch adds Greg's default Digital Twin identity, portrait `9:16` / `1080p` defaults, normalized responses, stricter validation, safe errors, and a future audio-input boundary.
+- HeyGen text-to-avatar submission and asynchronous polling with Greg's default Digital Twin identity, portrait `9:16` / `1080p` defaults, normalized responses, stricter validation, safe errors, and a future audio-input boundary.
 - Runway text-to-video and image-to-video submission with asynchronous polling and provider-reachable HTTPS first-frame validation.
 - Private YouTube OAuth, private Vercel Blob staging, encrypted refresh-token/history storage, short-lived constrained browser upload tokens, duplicate-publish claims, explicit approval, and forced private uploads.
 - Per-user/per-action rate limits, body/output limits, fixed provider hosts, request timeouts, no-store responses, content-safety enforcement, and sanitized provider errors.
@@ -158,7 +159,7 @@ The Vercel entries named `ANTHPOC`, `runway`, `Elevenlabs`, `myvocie`, and `open
 ### Anthropic
 
 - Compatibility handler/tool: `handleAnthropicAssistant` / `anthropic_assistant`
-- Creator Studio route on the current working tree: `POST /api/creator/assistant` through the provider-neutral Brain Router
+- Production Creator Studio route: `POST /api/creator/assistant` through the provider-neutral Brain Router
 - Default model: `claude-sonnet-5`
 - Credential use: server-side `ANTHROPIC_API_KEY` only
 - Source/UI: existing implementation preserved; optional brain provider
@@ -194,7 +195,7 @@ The existing production voice ID was not revealed or overwritten during this aud
 - Credential use: server-side `HEYGEN_API_KEY`, `HEYGEN_AVATAR_ID`, and `HEYGEN_VOICE_ID`
 - Asynchronous job polling: built
 - Source/UI: built
-- Greg Digital Twin hardening: complete and deployed to the reconciliation Preview; not yet merged to Production
+- Greg Digital Twin hardening: complete and deployed to Production through PR #6
 - Preview: approved avatar and voice IDs configured; `HEYGEN_API_KEY` still required
 - Production: configuration required
 - Real avatar generation: pending
@@ -226,7 +227,7 @@ The existing production voice ID was not revealed or overwritten during this aud
 
 ## Known safe production identifiers
 
-These identifiers are safe configuration metadata, not credentials. The HeyGen values are approved defaults but are not yet present in the current Vercel Production environment.
+These identifiers are safe configuration metadata, not credentials. They are the approved application defaults; saved Vercel Secret values were not exposed or copied during deployment, and exact Production environment presence still requires a settings-level recheck.
 
 | Identifier | Value |
 |---|---|
@@ -238,7 +239,7 @@ The Avatar Group ID must never replace `HEYGEN_AVATAR_ID`; HeyGen video generati
 
 ## Phase 1 tool registry
 
-The reconciliation branch exposes the existing implementations through one metadata registry without duplicating provider logic:
+The Production release exposes the existing implementations through one metadata registry without duplicating provider logic:
 
 | Tool ID | Existing implementation |
 |---|---|
@@ -276,13 +277,13 @@ The Brain Router is a reusable reasoning boundary for the existing agents. It do
 | Design Agent compilation | 4 files compiled |
 | Studio compilation | 26 files compiled |
 | Next.js production build | Passed |
-| Brain Router merge-candidate strong-secret scan | 0 matches |
+| Brain Router release-candidate strong-secret scan | 0 matches |
 | Brain Router committed-tree strong-secret scan | 0 matches |
 | Tracked non-example `.env` files | 0 |
 
 The generic credential-assignment scan matched only synthetic test fixtures in `tests/security`; it found no deployment credential file or production credential value. The build emitted an existing outdated Browserslist database warning, which is non-blocking.
 
-GitHub contains CI and CodeQL workflow definitions. No GitHub Actions/check-run result was attached to the current `main` commit through the available GitHub status APIs, so the local pass and Vercel Ready deployment are the current execution evidence. Confirm Actions are enabled before freezing Phase 1.
+The PR #6 release candidate passed GitHub CI, CodeQL, Vercel Preview, 99 local tests, and the local production build before merge. Vercel then reported the matching `main` Production deployment as Ready.
 
 ## Remaining real tests
 
@@ -299,31 +300,24 @@ Use the shortest, lowest-cost safe artifacts possible. Do not make a YouTube tes
 
 ## Genuine remaining blockers
 
-1. The Greg Digital Twin reconciliation and full tool registry are Preview-deployed but not merged into `main` or deployed to Production.
-2. Preview still needs `ANTHROPIC_API_KEY`, `ELEVENLABS_API_KEY`, `HEYGEN_API_KEY`, `RUNWAY_API_KEY`, `YOUTUBE_OAUTH_CLIENT_ID`, `YOUTUBE_OAUTH_CLIENT_SECRET`, and `YOUTUBE_TOKEN_ENCRYPTION_KEY` under those exact names.
-3. Production is missing `ANTHROPIC_API_KEY`, `HEYGEN_API_KEY`, `HEYGEN_AVATAR_ID`, `HEYGEN_VOICE_ID`, and `RUNWAY_API_KEY`.
-4. No successful real external-provider generation is documented yet.
-5. The Production YouTube OAuth/Blob flow has not completed a real PRIVATE upload, and the exact Google redirect registration was not independently visible during this audit.
-6. GitHub Actions/check-run execution on the current `main` commit has not been independently confirmed.
-7. The `main` branch is not protected, so merge review and CI are not enforced by a branch rule.
-8. Provider API credits/quota must be sufficient for the minimal live tests.
+1. Exact Preview and Production provider-variable presence was not re-verified after deployment; the earlier configuration evidence above remains the last settings-level audit.
+2. No successful real external-provider generation is documented yet.
+3. The Production YouTube OAuth/Blob flow has not completed a real PRIVATE upload, and the exact Google redirect registration was not independently visible during this audit.
+4. The `main` branch is not protected, so merge review and CI are not enforced by a branch rule.
+5. Provider API credits/quota must be sufficient for the minimal live tests.
 
 ## Manual actions still required
 
-1. Review, merge, and deploy the reconciliation branch after its PR checks pass.
-2. Add the five missing Production variables listed above. Use the approved HeyGen look and voice IDs from this document; add `HEYGEN_API_KEY` only through Vercel.
-3. Re-enter the seven missing Preview variables listed above under their exact names. Do not delete the misspelled Secret entries until their replacement values have been verified.
-4. In the Google OAuth web client, add the exact Preview redirect `https://open-generative-ai-git-feat-84fb6c-lalambert1982-7239s-projects.vercel.app/api/social/youtube/callback` before testing YouTube Preview OAuth.
-5. In Google Cloud, confirm the Production web client redirect is exactly `https://open-generative-ai-lemon.vercel.app/api/social/youtube/callback` and that the publishing account is allowed while the app is in testing mode.
-6. Complete the minimal real-test sequence above and record successful job/video IDs without recording credentials.
-7. Confirm GitHub Actions are enabled and produce CI/CodeQL results for the reconciliation PR.
-8. Add a GitHub branch ruleset for `main` that requires pull requests and the passing CI/security checks before merge.
+1. Re-verify every required Preview and Production variable under its exact application name. Do not delete a misspelled Secret entry until its correctly named replacement has been verified.
+2. In the Google OAuth web client, confirm the Preview and Production redirects exactly match the URLs documented above and that the publishing account is allowed while the app is in testing mode.
+3. Complete the minimal real-test sequence above and record successful job/video IDs without recording credentials.
+4. Add a GitHub branch ruleset for `main` that requires pull requests and passing CI/security checks before merge.
 
 ## Phase 1 completion criteria
 
 Phase 1 can be frozen as **G.FURY Creator Studio v1** only after all of the following are true:
 
-- The reconciliation changes are merged to `main` and the matching production commit is Ready.
+- The release changes remain merged to `main` and the matching Production commit remains Ready.
 - Required Production variables are configured without exposing their values.
 - GitHub owner authentication completes successfully in Production.
 - Anthropic, OpenAI Images, ElevenLabs, HeyGen, and Runway each complete the agreed minimal real test; Runway may be explicitly deferred only if Greg accepts provider credits as the sole remaining limitation.
