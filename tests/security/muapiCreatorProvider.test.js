@@ -31,14 +31,43 @@ test('MuAPI configuration requires an explicit key mode and fails closed for pai
             MUAPI_API_KEY: 'production-provider-secret',
             MUAPI_KEY_MODE: 'production',
         }).missing,
-        ['MUAPI_ALLOW_PAID_GENERATION=true'],
+        ['MUAPI_PRODUCTION_API_KEY', 'MUAPI_ALLOW_PAID_GENERATION=true'],
     );
     assert.equal(muapiConfiguration(sandboxEnv).configured, true);
     assert.equal(muapiConfiguration({
         ...sandboxEnv,
+        MUAPI_PRODUCTION_API_KEY: 'production-provider-secret',
         MUAPI_KEY_MODE: 'production',
         MUAPI_ALLOW_PAID_GENERATION: 'true',
     }).configured, true);
+});
+
+test('MuAPI selects separate credentials for Sandbox and paid Production requests', async () => {
+    const productionKey = 'production-provider-secret';
+    let capturedKey;
+    const result = await createMuapiImageJob({
+        prompt: 'A dramatic track stadium at sunset.',
+        aspectRatio: '16:9',
+    }, {
+        env: {
+            ...sandboxEnv,
+            MUAPI_PRODUCTION_API_KEY: productionKey,
+            MUAPI_KEY_MODE: 'production',
+            MUAPI_ALLOW_PAID_GENERATION: 'true',
+        },
+        fetchImpl: async (_url, options) => {
+            capturedKey = options.headers['x-api-key'];
+            return new Response(JSON.stringify({ request_id: 'production-image-job-123', status: 'pending' }), {
+                status: 200,
+                headers: { 'content-type': 'application/json' },
+            });
+        },
+    });
+
+    assert.equal(result.ok, true);
+    assert.equal(result.job.keyMode, 'production');
+    assert.equal(capturedKey, productionKey);
+    assert.notEqual(capturedKey, sandboxEnv.MUAPI_API_KEY);
 });
 
 test('MuAPI status exposes safe mode and model metadata without the API key', () => {

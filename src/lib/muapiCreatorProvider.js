@@ -227,11 +227,12 @@ function publicJob({ kind, model, keyMode, value }) {
 }
 
 export function muapiConfiguration(env = process.env) {
-    const apiKey = normalizedString(env.MUAPI_API_KEY);
     const keyMode = normalizedString(env.MUAPI_KEY_MODE).toLowerCase();
     const paidGenerationAllowed = normalizedString(env.MUAPI_ALLOW_PAID_GENERATION).toLowerCase() === 'true';
+    const apiKeyVariable = keyMode === 'production' ? 'MUAPI_PRODUCTION_API_KEY' : 'MUAPI_API_KEY';
+    const apiKey = normalizedString(env[apiKeyVariable]);
     const missing = [];
-    if (!configuredApiKey(apiKey)) missing.push('MUAPI_API_KEY');
+    if (!configuredApiKey(apiKey)) missing.push(apiKeyVariable);
     if (!['sandbox', 'production'].includes(keyMode)) missing.push('MUAPI_KEY_MODE');
     if (keyMode === 'production' && !paidGenerationAllowed) {
         missing.push('MUAPI_ALLOW_PAID_GENERATION=true');
