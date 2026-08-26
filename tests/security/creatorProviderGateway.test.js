@@ -5,6 +5,9 @@ import {
     handleAnthropicAssistant,
     handleBrainAssistant,
     handleCreatorProviders,
+    handleMuapiImage,
+    handleMuapiStatus,
+    handleMuapiVideo,
     handleOpenAiImage,
 } from '../../src/lib/creatorProviderGateway.js';
 import { createCreatorSession, creatorCookieSettings } from '../../src/lib/creatorAuth.js';
@@ -12,8 +15,8 @@ import {
     BRAIN_REASONING_TOOL_ID,
     ELEVENLABS_VOICE_TOOL_ID,
     HEYGEN_AVATAR_VIDEO_TOOL_ID,
-    OPENAI_IMAGE_TOOL_ID,
-    RUNWAY_VIDEO_TOOL_ID,
+    MUAPI_IMAGE_TOOL_ID,
+    MUAPI_VIDEO_TOOL_ID,
 } from '../../src/lib/creatorToolRegistry.js';
 import { resetRateLimitStore } from '../../src/lib/rateLimit.js';
 
@@ -160,6 +163,7 @@ test('provider status reports readiness without disclosing provider credentials'
         HEYGEN_AVATAR_ID: 'heygen-avatar-id',
         HEYGEN_VOICE_ID: 'heygen-voice-id',
         RUNWAY_API_KEY: 'runway-provider-secret',
+        MUAPI_API_KEY: 'muapi-sandbox-provider-secret',
     };
     const response = await handleCreatorProviders(creatorRequest('providers'), {
         env: {
@@ -167,20 +171,22 @@ test('provider status reports readiness without disclosing provider credentials'
             ...secrets,
             BRAIN_PROVIDER: 'gemini',
             BRAIN_FALLBACK_ORDER: 'gemini,groq,openrouter',
+            MUAPI_KEY_MODE: 'sandbox',
+            MUAPI_ALLOW_PAID_GENERATION: 'false',
         },
     });
 
     assert.equal(response.status, 200);
     const text = await response.text();
     const body = JSON.parse(text);
-    assert.deepEqual(body.providers.map((provider) => provider.configured), [true, true, true, true, true]);
+    assert.deepEqual(body.providers.map((provider) => provider.configured), [true, true, true, true]);
     assert.deepEqual(body.providers.map((provider) => provider.toolId), [
         BRAIN_REASONING_TOOL_ID,
-        OPENAI_IMAGE_TOOL_ID,
+        undefined,
         ELEVENLABS_VOICE_TOOL_ID,
         HEYGEN_AVATAR_VIDEO_TOOL_ID,
-        RUNWAY_VIDEO_TOOL_ID,
     ]);
+    assert.deepEqual(body.providers[1].toolIds, [MUAPI_IMAGE_TOOL_ID, MUAPI_VIDEO_TOOL_ID]);
     assert.deepEqual(body.brainProviders.map((provider) => provider.id), [
         'gemini',
         'groq',
@@ -188,14 +194,83 @@ test('provider status reports readiness without disclosing provider credentials'
         'anthropic',
     ]);
     assert.deepEqual(body.generationProviders.map((provider) => provider.id), [
-        'openai',
+        'muapi',
         'elevenlabs',
         'heygen',
-        'runway',
     ]);
+    assert.deepEqual(body.deferredGenerationProviders.map((provider) => provider.id), ['openai', 'runway']);
     assert.equal(body.brain.selectedProvider, 'gemini');
     for (const secret of Object.values(secrets)) assert.equal(text.includes(secret), false);
     assert.equal(text.includes(session), false);
+});
+
+test('MuAPI image and video routes preserve auth, safety, fixed host routing, and server-only keys', async () => {
+    resetRateLimitStore();
+    const providerKey = 'muapi-sandbox-provider-secret';
+    const env = {
+        ...baseEnv,
+        MUAPI_API_KEY: providerKey,
+        MUAPI_KEY_MODE: 'sandbox',
+        MUAPI_ALLOW_PAID_GENERATION: 'false',
+    };
+    const captured = [];
+    const fetchImpl = async (url, options) => {
+        captured.push({ url, options });
+        return new Response(JSON.stringify({ request_id: `job-${captured.length}23`, status: 'pending' }), {
+            status: 200,
+            headers: { 'content-type': 'application/json' },
+        });
+    };
+
+    const image = await handleMuapiImage(
+        creatorRequest('image', { prompt: 'A dramatic track stadium.', aspectRatio: '1:1' }),
+        { env, fetchImpl },
+    );
+    const video = await handleMuapiVideo(
+        creatorRequest('video', { prompt: 'A sprinter accelerates.', aspectRatio: '16:9', duration: 5 }),
+        { env, fetchImpl },
+    );
+
+    assert.equal(image.status, 202);
+    assert.equal(video.status, 202);
+    assert.equal(captured[0].url, 'https://api.muapi.ai/api/v1/nano-banana');
+    assert.equal(captured[1].url, 'https://api.muapi.ai/api/v1/seedance-lite-t2v');
+    assert.equal(captured[0].options.headers['x-api-key'], providerKey);
+    assert.equal(captured[0].options.headers.cookie, undefined);
+    assert.equal((await image.text()).includes(providerKey), false);
+    assert.equal((await video.text()).includes(providerKey), false);
+
+    let unsafeCalled = false;
+    const unsafe = await handleMuapiImage(
+        creatorRequest('image', { prompt: 'Create explicit sexual content involving a child.' }),
+        { env, fetchImpl: async () => { unsafeCalled = true; return new Response('{}'); } },
+    );
+    assert.equal(unsafe.status, 422);
+    assert.equal(unsafeCalled, false);
+});
+
+test('MuAPI status polling is authenticated, rate limited, and returns no server secret', async () => {
+    resetRateLimitStore();
+    const providerKey = 'muapi-sandbox-provider-secret';
+    const env = {
+        ...baseEnv,
+        MUAPI_API_KEY: providerKey,
+        MUAPI_KEY_MODE: 'sandbox',
+    };
+    const response = await handleMuapiStatus(
+        creatorRequest('muapi/status?id=image-job-123&kind=image'),
+        {
+            env,
+            fetchImpl: async () => new Response(JSON.stringify({
+                status: 'completed',
+                outputs: ['https://cdn.muapi.ai/mock/image.png'],
+            }), { status: 200 }),
+        },
+    );
+    assert.equal(response.status, 200);
+    const text = await response.text();
+    assert.equal(JSON.parse(text).url, 'https://cdn.muapi.ai/mock/image.png');
+    assert.equal(text.includes(providerKey), false);
 });
 
 test('creator gateway blocks unsafe prompts before any provider call', async () => {

@@ -5,9 +5,9 @@ import {
     handleElevenLabsSpeech,
     handleHeyGenStatus,
     handleHeyGenVideo,
-    handleOpenAiImage,
-    handleRunwayStatus,
-    handleRunwayVideo,
+    handleMuapiImage,
+    handleMuapiStatus,
+    handleMuapiVideo,
 } from '../../../../src/lib/creatorProviderGateway.js';
 
 export const runtime = 'nodejs';
@@ -23,17 +23,17 @@ async function dispatch(request, context, method) {
         case 'POST:assistant':
             return handleBrainAssistant(request);
         case 'POST:image':
-            return handleOpenAiImage(request);
+            return handleMuapiImage(request);
+        case 'POST:video':
+            return handleMuapiVideo(request);
+        case 'GET:muapi/status':
+            return handleMuapiStatus(request);
         case 'POST:speech':
             return handleElevenLabsSpeech(request);
         case 'POST:heygen':
             return handleHeyGenVideo(request);
         case 'GET:heygen/status':
             return handleHeyGenStatus(request);
-        case 'POST:runway':
-            return handleRunwayVideo(request);
-        case 'GET:runway/status':
-            return handleRunwayStatus(request);
         default:
             return creatorNotFound();
     }
