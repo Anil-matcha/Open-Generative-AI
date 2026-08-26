@@ -10,11 +10,13 @@ Creator Studio does not use that browser-readable key flow. It uses GitHub OAuth
 
 ## Creator Studio provider gateway
 
-The Gemini, Groq, OpenRouter, Anthropic, OpenAI, ElevenLabs, HeyGen, and Runway integrations used by Creator Studio are server-side only. Configure their credentials as deployment environment variables. Protect `/api/creator/*` with a separate GitHub OAuth application, `CREATOR_SESSION_SECRET`, and the `CREATOR_GITHUB_ALLOWED_USER_IDS` and/or `CREATOR_GITHUB_ALLOWED_LOGINS` allowlist.
+The Gemini, Groq, OpenRouter, Anthropic, MuAPI, ElevenLabs, and HeyGen integrations used by Creator Studio are server-side only. Configure their credentials as deployment environment variables. The preserved direct OpenAI and Runway adapters are deferred and are not reachable through the active private Creator Studio dispatch or UI. Protect `/api/creator/*` with a separate GitHub OAuth application, `CREATOR_SESSION_SECRET`, and the `CREATOR_GITHUB_ALLOWED_USER_IDS` and/or `CREATOR_GITHUB_ALLOWED_LOGINS` allowlist.
 
 The Selena Brain Router separates reasoning from generation. `GEMINI_API_KEY`, `GROQ_API_KEY`, `OPENROUTER_API_KEY`, and `ANTHROPIC_API_KEY` are read only inside the server adapters and are never placed in `NEXT_PUBLIC_*`, browser storage, URLs, response bodies, or provider-status payloads. API keys are sent only as authorization headers to fixed official provider hosts. Model names and routing order are normal configuration values, not credentials.
 
 Fallback is bounded and is allowed only for transient availability/capacity failures, provider timeouts, malformed responses, or unsupported required capabilities. Invalid input, missing/invalid credentials, and safety rejection stop immediately. Requests classified as paid generation, publishing, another external mutation, or requiring explicit approval also disable fallback. The router returns tool calls but does not execute them, preventing a reasoning retry from duplicating an external side effect.
+
+Private Creator Studio image and cinematic-video requests use `MUAPI_API_KEY` only on the server and only against the fixed `https://api.muapi.ai` host. `MUAPI_KEY_MODE=sandbox` is the zero-cost mock path. Production mode fails closed unless `MUAPI_ALLOW_PAID_GENERATION=true` is also explicitly configured. Model identifiers come from server configuration (`MUAPI_IMAGE_MODEL`, `MUAPI_VIDEO_MODEL`, and `MUAPI_IMAGE_TO_VIDEO_MODEL`); client input cannot select an arbitrary model or upstream host. The general Image Studio and Workflow Builder retain their separate per-tab bring-your-own-key proxy.
 
 `PRIVATE` and `CLIENT_CONFIDENTIAL` requests fail closed unless the operator explicitly configures reviewed eligible providers. Empty eligibility lists make no privacy claim and send the material nowhere. Eligibility must be revisited when provider terms, account controls, or deployment policy change.
 

@@ -6,6 +6,8 @@ import {
     BRAIN_REASONING_TOOL_ID,
     ELEVENLABS_VOICE_TOOL_ID,
     HEYGEN_AVATAR_VIDEO_TOOL_ID,
+    MUAPI_IMAGE_TOOL_ID,
+    MUAPI_VIDEO_TOOL_ID,
     OPENAI_IMAGE_TOOL_ID,
     RUNWAY_VIDEO_TOOL_ID,
     YOUTUBE_PUBLISH_TOOL_ID,
@@ -16,6 +18,8 @@ import {
 const EXPECTED_TOOLS = [
     [BRAIN_REASONING_TOOL_ID, 'brain-router'],
     [ANTHROPIC_ASSISTANT_TOOL_ID, 'anthropic'],
+    [MUAPI_IMAGE_TOOL_ID, 'muapi'],
+    [MUAPI_VIDEO_TOOL_ID, 'muapi'],
     [OPENAI_IMAGE_TOOL_ID, 'openai'],
     [ELEVENLABS_VOICE_TOOL_ID, 'elevenlabs'],
     [HEYGEN_AVATAR_VIDEO_TOOL_ID, 'heygen'],
@@ -41,8 +45,12 @@ test('Creator Studio registry exposes the brain boundary and each existing Phase
 });
 
 test('registry preserves asynchronous jobs and private YouTube approval constraints', () => {
+    assert.equal(getCreatorToolDefinition(MUAPI_IMAGE_TOOL_ID).asynchronous, true);
+    assert.equal(getCreatorToolDefinition(MUAPI_VIDEO_TOOL_ID).asynchronous, true);
     assert.equal(getCreatorToolDefinition(HEYGEN_AVATAR_VIDEO_TOOL_ID).asynchronous, true);
     assert.equal(getCreatorToolDefinition(RUNWAY_VIDEO_TOOL_ID).asynchronous, true);
+    assert.equal(getCreatorToolDefinition(OPENAI_IMAGE_TOOL_ID).deferred, true);
+    assert.equal(getCreatorToolDefinition(RUNWAY_VIDEO_TOOL_ID).deferred, true);
 
     const youtube = getCreatorToolDefinition(YOUTUBE_PUBLISH_TOOL_ID);
     assert.equal(youtube.asynchronous, true);

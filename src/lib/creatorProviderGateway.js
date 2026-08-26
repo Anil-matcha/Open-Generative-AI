@@ -18,6 +18,12 @@ import {
     getHeyGenAvatarVideoJob,
     heyGenProviderStatus,
 } from './heygenProvider.js';
+import {
+    createMuapiImageJob,
+    createMuapiVideoJob,
+    getMuapiGenerationJob,
+    muapiProviderStatus,
+} from './muapiCreatorProvider.js';
 import { checkRateLimit } from './rateLimit.js';
 
 const DEFAULT_REQUEST_LIMIT = 30;
@@ -278,20 +284,25 @@ function heyGenResultResponse(result, successStatus = 200) {
     }, result.status || 502);
 }
 
+function muapiResultResponse(result) {
+    if (result.ok) return creatorJson(result.job, result.status || 200);
+    return creatorJson({
+        error: result.error,
+        ...(Array.isArray(result.missing) ? { missing: result.missing } : {}),
+        ...(result.detail ? { detail: result.detail } : {}),
+    }, result.status || 502);
+}
+
 function generationProviderStatuses(env) {
     const heyGen = heyGenProviderStatus(env);
+    const muapi = muapiProviderStatus(env);
     return [
         {
-            id: 'openai',
-            label: 'OpenAI',
+            ...muapi,
             category: 'generation',
-            capability: 'Image generation',
-            toolId: OPENAI_IMAGE_TOOL_ID,
             built: true,
-            configured: configuredSecret(env.OPENAI_API_KEY),
             tested: false,
             productionReady: false,
-            model: env.OPENAI_IMAGE_MODEL || 'gpt-image-2',
         },
         {
             id: 'elevenlabs',
@@ -312,6 +323,24 @@ function generationProviderStatuses(env) {
             tested: false,
             productionReady: false,
         },
+    ];
+}
+
+function deferredGenerationProviderStatuses(env) {
+    return [
+        {
+            id: 'openai',
+            label: 'OpenAI',
+            category: 'generation',
+            capability: 'Image generation',
+            toolId: OPENAI_IMAGE_TOOL_ID,
+            built: true,
+            configured: configuredSecret(env.OPENAI_API_KEY),
+            tested: false,
+            productionReady: false,
+            deferred: true,
+            model: env.OPENAI_IMAGE_MODEL || 'gpt-image-2',
+        },
         {
             id: 'runway',
             label: 'Runway',
@@ -322,6 +351,7 @@ function generationProviderStatuses(env) {
             configured: configuredSecret(env.RUNWAY_API_KEY),
             tested: false,
             productionReady: false,
+            deferred: true,
             model: env.RUNWAY_VIDEO_MODEL || 'gen4.5',
         },
     ];
@@ -336,11 +366,13 @@ export async function handleCreatorProviders(request, { env = process.env } = {}
     };
     const brainProviders = brainProviderStatuses(env);
     const generationProviders = generationProviderStatuses(env);
+    const deferredGenerationProviders = deferredGenerationProviderStatuses(env);
     return creatorJson({
         providers: [brain, ...generationProviders],
         brain,
         brainProviders,
         generationProviders,
+        deferredGenerationProviders,
     });
 }
 
@@ -463,6 +495,40 @@ export async function handleOpenAiImage(request, {
             'x-creator-tool-id': OPENAI_IMAGE_TOOL_ID,
         }),
     });
+}
+
+export async function handleMuapiImage(request, {
+    env = process.env,
+    fetchImpl = fetch,
+} = {}) {
+    const auth = authorizeCreatorRequest(request, { env, action: 'muapi-image' });
+    if (auth.response) return auth.response;
+    const parsed = await parseCreatorJson(request, { env });
+    if (parsed.response) return parsed.response;
+    return muapiResultResponse(await createMuapiImageJob(parsed.value, { env, fetchImpl }));
+}
+
+export async function handleMuapiVideo(request, {
+    env = process.env,
+    fetchImpl = fetch,
+} = {}) {
+    const auth = authorizeCreatorRequest(request, { env, action: 'muapi-video' });
+    if (auth.response) return auth.response;
+    const parsed = await parseCreatorJson(request, { env });
+    if (parsed.response) return parsed.response;
+    return muapiResultResponse(await createMuapiVideoJob(parsed.value, { env, fetchImpl }));
+}
+
+export async function handleMuapiStatus(request, {
+    env = process.env,
+    fetchImpl = fetch,
+} = {}) {
+    const auth = authorizeCreatorRequest(request, { env, action: 'muapi-status', statusRequest: true });
+    if (auth.response) return auth.response;
+    const url = new URL(request.url);
+    const jobId = url.searchParams.get('id') || '';
+    const kind = url.searchParams.get('kind') || '';
+    return muapiResultResponse(await getMuapiGenerationJob(jobId, kind, { env, fetchImpl }));
 }
 
 export async function handleElevenLabsSpeech(request, {

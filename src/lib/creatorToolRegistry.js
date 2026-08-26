@@ -1,5 +1,7 @@
 export const BRAIN_REASONING_TOOL_ID = 'brain_reasoning';
 export const ANTHROPIC_ASSISTANT_TOOL_ID = 'anthropic_assistant';
+export const MUAPI_IMAGE_TOOL_ID = 'muapi_image';
+export const MUAPI_VIDEO_TOOL_ID = 'muapi_video';
 export const OPENAI_IMAGE_TOOL_ID = 'openai_image';
 export const ELEVENLABS_VOICE_TOOL_ID = 'elevenlabs_voice';
 export const HEYGEN_AVATAR_VIDEO_TOOL_ID = 'heygen_avatar_video';
@@ -44,12 +46,33 @@ export const ANTHROPIC_ASSISTANT_TOOL = Object.freeze({
     returns: Object.freeze(['provider', 'toolId', 'model', 'text', 'stopReason', 'usage', 'error']),
 });
 
+export const MUAPI_IMAGE_TOOL = Object.freeze({
+    id: MUAPI_IMAGE_TOOL_ID,
+    provider: 'muapi',
+    label: 'MuAPI Image Generation',
+    purpose: 'Generate one approved image through the server-owned MuAPI media backbone.',
+    asynchronous: true,
+    accepts: Object.freeze(['prompt', 'aspectRatio']),
+    returns: Object.freeze(['provider', 'toolId', 'jobId', 'status', 'url', 'model', 'keyMode', 'error']),
+});
+
+export const MUAPI_VIDEO_TOOL = Object.freeze({
+    id: MUAPI_VIDEO_TOOL_ID,
+    provider: 'muapi',
+    label: 'MuAPI Video Generation',
+    purpose: 'Create an approved text-to-video or image-to-video job through MuAPI.',
+    asynchronous: true,
+    accepts: Object.freeze(['prompt', 'firstFrameUrl', 'aspectRatio', 'duration']),
+    returns: Object.freeze(['provider', 'toolId', 'jobId', 'status', 'url', 'model', 'keyMode', 'error']),
+});
+
 export const OPENAI_IMAGE_TOOL = Object.freeze({
     id: OPENAI_IMAGE_TOOL_ID,
     provider: 'openai',
     label: 'OpenAI Image Generation',
     purpose: 'Generate one approved image asset from a validated prompt.',
     asynchronous: false,
+    deferred: true,
     accepts: Object.freeze(['prompt', 'size', 'quality']),
     returns: Object.freeze(['provider', 'toolId', 'contentType', 'image', 'error']),
 });
@@ -108,6 +131,7 @@ export const RUNWAY_VIDEO_TOOL = Object.freeze({
     label: 'Runway Video',
     purpose: 'Create a cinematic video job from text and an optional first-frame image.',
     asynchronous: true,
+    deferred: true,
     accepts: Object.freeze(['prompt', 'firstFrameUrl', 'ratio', 'duration']),
     returns: Object.freeze(['provider', 'toolId', 'jobId', 'status', 'output', 'failure', 'error']),
 });
@@ -145,6 +169,8 @@ export const YOUTUBE_PUBLISH_TOOL = Object.freeze({
 const CREATOR_TOOL_REGISTRY = Object.freeze({
     [BRAIN_REASONING_TOOL_ID]: BRAIN_REASONING_TOOL,
     [ANTHROPIC_ASSISTANT_TOOL_ID]: ANTHROPIC_ASSISTANT_TOOL,
+    [MUAPI_IMAGE_TOOL_ID]: MUAPI_IMAGE_TOOL,
+    [MUAPI_VIDEO_TOOL_ID]: MUAPI_VIDEO_TOOL,
     [OPENAI_IMAGE_TOOL_ID]: OPENAI_IMAGE_TOOL,
     [ELEVENLABS_VOICE_TOOL_ID]: ELEVENLABS_VOICE_TOOL,
     [HEYGEN_AVATAR_VIDEO_TOOL_ID]: HEYGEN_AVATAR_VIDEO_TOOL,

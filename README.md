@@ -5,7 +5,7 @@
 
 > **The free, open-source alternative to AI Video Platforms.** Generate AI images and videos using 400+ state-of-the-art models across 14 studios — no content filters, no closed ecosystem, no subscription fees.
 
-The web app also includes a private **Creator Studio** with a provider-neutral Selena Brain Router (Gemini, Groq, OpenRouter, and optional Anthropic), plus OpenAI image generation, ElevenLabs voice, HeyGen avatar video, Runway cinematic video, and manual private YouTube publishing in one canvas. See [Creator Studio provider setup](docs/CREATOR_STUDIO.md) before adding deployment secrets.
+The web app also includes a private **Creator Studio** with a provider-neutral Selena Brain Router (Gemini, Groq, OpenRouter, and optional Anthropic), MuAPI image and cinematic-video generation, ElevenLabs voice, HeyGen avatar video, and manual private YouTube publishing in one canvas. Direct OpenAI image and Runway video adapters remain preserved but deferred. See [Creator Studio provider setup](docs/CREATOR_STUDIO.md) before adding deployment secrets.
 
 **Community:** Join [Discord](https://discord.gg/tANKJkHck) for discussions and support
 

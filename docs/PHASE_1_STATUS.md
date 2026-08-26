@@ -1,6 +1,6 @@
 # G.FURY Creator Studio v1 — Phase 1 Status
 
-Authoritative reconciliation snapshot for `lalambert1982-eng/Open-Generative-AI`. Deployment evidence was last reconciled on 2026-08-25, including the approved Brain Router and Greg Digital Twin Production deployment.
+Authoritative reconciliation snapshot for `lalambert1982-eng/Open-Generative-AI`. Deployment evidence was last reconciled on 2026-08-26, including the approved Brain Router and Greg Digital Twin Production deployment plus the MuAPI Creator Studio release candidate.
 
 This document distinguishes four independent states:
 
@@ -25,6 +25,14 @@ PR #6 merged the provider-neutral Selena reasoning boundary and Greg Digital Twi
 Initial routing is Gemini → Groq → OpenRouter with at most three attempts. Anthropic remains selectable but is not included in the initial free/developer fallback order. “Free/developer” describes the intended account tier, not a guarantee of zero cost; provider limits and billing still apply.
 
 Provider availability still depends on the exact Preview and Production variables documented in `CREATOR_STUDIO.md`. The deployment did not copy credentials between environments or reveal saved Secret values. No real provider request was made during this release.
+
+## MuAPI media-backbone cutover — release candidate
+
+The private Creator Studio image and cinematic-video tools now use one server-owned MuAPI adapter. Direct OpenAI image and Runway video implementations remain in source and in the tool registry as deferred compatibility boundaries, but they are absent from the active private dispatch and UI.
+
+The adapter pins server-selected image, text-to-video, and image-to-video models; calls only `https://api.muapi.ai`; authenticates through the existing GitHub owner session; enforces same-origin mutations, content safety, rate limits, strict inputs, timeouts, bounded output handling, and sanitized errors; and never returns the API key. Sandbox is the default. Production mode fails closed unless the separate paid-generation flag is explicitly enabled.
+
+A live `$0` MuAPI Sandbox mock request completed through the existing general Image Studio on 2026-08-26. The private Creator Studio server-owned path has passed 91 security tests, 17 repository tests, Studio compilation, and the optimized Next.js production build. Production environment configuration, merge, deployment, and a private Creator Studio live Sandbox completion are still pending in this release-candidate snapshot.
 
 ## Current Git and deployment state
 
@@ -63,10 +71,11 @@ Vercel shows both the current Production deployment and the current `feature/hey
 - Authenticated Creator Studio provider-status reporting that exposes readiness, model labels, and safe provider identity labels without credential values.
 - A Production-deployed provider-neutral Brain Router for Gemini, Groq, OpenRouter, and the preserved Anthropic implementation, with normalized requests/results, bounded safe fallback, and fail-closed sensitivity routing.
 - Anthropic creative assistant for strategy, planning, prompts, and scripts.
-- OpenAI image generation with configurable size/quality and a low-cost default.
+- MuAPI image generation through a server-owned Sandbox-first adapter with a fixed model and normalized immediate/asynchronous results.
 - ElevenLabs speech generation using a server-configured reusable voice.
 - HeyGen text-to-avatar submission and asynchronous polling with Greg's default Digital Twin identity, portrait `9:16` / `1080p` defaults, normalized responses, stricter validation, safe errors, and a future audio-input boundary.
-- Runway text-to-video and image-to-video submission with asynchronous polling and provider-reachable HTTPS first-frame validation.
+- MuAPI text-to-video and image-to-video submission with asynchronous polling, fixed server-selected models, and provider-reachable HTTPS first-frame validation.
+- Preserved but deferred direct OpenAI image and Runway video adapters.
 - Private YouTube OAuth, private Vercel Blob staging, encrypted refresh-token/history storage, short-lived constrained browser upload tokens, duplicate-publish claims, explicit approval, and forced private uploads.
 - Per-user/per-action rate limits, body/output limits, fixed provider hosts, request timeouts, no-store responses, content-safety enforcement, and sanitized provider errors.
 - Security regression tests, repository tests, GitHub CI definitions, and CodeQL definitions.
@@ -78,6 +87,7 @@ Vercel shows both the current Production deployment and the current `feature/hey
 | GitHub authentication | `src/lib/creatorAuth.js`, `app/api/auth/github/start/route.js`, `app/api/auth/github/callback/route.js`, `app/api/auth/session/route.js`, `app/api/auth/logout/route.js` |
 | Provider gateway | `src/lib/creatorProviderGateway.js`, `app/api/creator/[[...path]]/route.js` |
 | Brain Router | `src/lib/brainRouter.js` |
+| MuAPI media adapter | `src/lib/muapiCreatorProvider.js` |
 | HeyGen adapter | `src/lib/heygenProvider.js` |
 | Tool registry | `src/lib/creatorToolRegistry.js` |
 | YouTube and Blob | `src/lib/youtubePublishing.js`, `app/api/social/youtube/[[...path]]/route.js` |
@@ -93,10 +103,11 @@ Vercel shows both the current Production deployment and the current `feature/hey
 |---|---|---|---|---|---|
 | GitHub Auth | Built | Configured | Configured | Test passed (Preview) | No |
 | Anthropic | Built | Missing | Missing | Test pending | No |
-| OpenAI Images | Built | Configured | Configured | Test pending | No |
+| MuAPI Image + Video | Built (release candidate) | Pending recheck | Pending configuration | General Studio Sandbox passed; private path pending | No |
+| OpenAI Images (deferred) | Preserved; inactive | Configured | Configured | Not required for active cutover | No |
 | ElevenLabs | Built | Missing | Configured | Test pending | No |
 | HeyGen | Built | Missing | Missing | Test pending | No |
-| Runway | Built | Missing | Missing | Test pending | No |
+| Runway (deferred) | Preserved; inactive | Missing | Missing | Not required for active cutover | No |
 | YouTube OAuth | Built | Missing | Configured | Test pending | No |
 | Vercel Blob | Built | Configured | Configured | Test pending | No |
 
@@ -116,6 +127,8 @@ Only variable names and configuration state are recorded here. No credential val
 
 #### Production missing
 
+- `MUAPI_API_KEY`
+- `MUAPI_KEY_MODE`
 - `ANTHROPIC_API_KEY`
 - `HEYGEN_API_KEY`
 - `HEYGEN_AVATAR_ID`
@@ -168,13 +181,26 @@ The Vercel entries named `ANTHPOC`, `runway`, `Elevenlabs`, `myvocie`, and `open
 
 ### OpenAI Images
 
-- Route: `POST /api/creator/image`
+- Active route: none; the private `POST /api/creator/image` route is assigned to MuAPI
 - Default model: `gpt-image-2`
 - Default quality: `low`
 - Credential use: server-side `OPENAI_API_KEY` only
-- Source/UI: built
+- Source/tool registry: preserved and marked deferred
+- Private Creator Studio UI/dispatch: inactive
 - Production and Preview: configured
-- Real request: pending
+- Real request: not required for the active MuAPI cutover
+
+### MuAPI Image and Video
+
+- Routes: `POST /api/creator/image`, `POST /api/creator/video`, and `GET /api/creator/muapi/status`
+- Default image model: `nano-banana`
+- Default text-to-video model: `seedance-lite-t2v`
+- Default image-to-video model: `kling-v2.1-master-i2v`
+- Credential use: server-side `MUAPI_API_KEY` only
+- Cost gate: `MUAPI_KEY_MODE=sandbox`; production mode also requires `MUAPI_ALLOW_PAID_GENERATION=true`
+- Source/UI: built in the release candidate
+- General Studio live Sandbox mock: passed at `$0` on 2026-08-26
+- Private Creator Studio live Sandbox mock: pending Production configuration and deployment
 
 ### ElevenLabs
 
@@ -202,14 +228,15 @@ The existing production voice ID was not revealed or overwritten during this aud
 
 ### Runway
 
-- Routes: `POST /api/creator/runway`, `GET /api/creator/runway/status`
+- Active routes: none; the private `POST /api/creator/video` and MuAPI status routes replace the old dispatch
 - Default model: `gen4.5`
 - API version: `2024-11-06`
 - First-frame rule: optional provider-reachable HTTPS URL; local file paths are rejected
 - Credential use: server-side `RUNWAY_API_KEY` only
-- Source/UI and polling: built
+- Source/tool registry and polling: preserved and marked deferred
+- Private Creator Studio UI/dispatch: inactive
 - Production and Preview: configuration required
-- Real video generation: pending
+- Real video generation: not required for the active MuAPI cutover
 
 ### YouTube and Vercel Blob
 
@@ -245,10 +272,12 @@ The Production release exposes the existing implementations through one metadata
 |---|---|
 | `brain_reasoning` | Provider-neutral Gemini/Groq/OpenRouter/Anthropic reasoning boundary |
 | `anthropic_assistant` | Anthropic assistant handler |
-| `openai_image` | OpenAI image handler |
+| `muapi_image` | Active MuAPI image job adapter and poller |
+| `muapi_video` | Active MuAPI text/image-to-video job adapter and poller |
+| `openai_image` | Preserved, deferred OpenAI image handler |
 | `elevenlabs_voice` | ElevenLabs speech handler |
 | `heygen_avatar_video` | HeyGen job adapter and poller |
-| `runway_video` | Runway job handler and poller |
+| `runway_video` | Preserved, deferred Runway job handler and poller |
 | `youtube_publish` | Authenticated private YouTube publisher |
 
 The Brain Router is a reusable reasoning boundary for the existing agents. It does not add Phase 2 company memory, project memory, workflow state, approval queues, autonomous tool execution, or Selena-specific business logic.
@@ -262,6 +291,7 @@ The Brain Router is a reusable reasoning boundary for the existing agents. It do
 - The owner gate supports immutable GitHub user IDs and optional matching logins; when both are configured, both must match.
 - Content safety defaults to `enforce`. `audit` and `off` require an explicit operator configuration and are not the default.
 - Provider requests have fixed destinations, strict inputs, timeouts, size caps, sanitized errors, and per-user/per-action rate limits.
+- MuAPI paid generation fails closed: Sandbox is the default, and a production key also requires an explicit paid-generation enable flag.
 - YouTube refresh tokens and history remain encrypted; browser responses do not include provider keys, GitHub tokens, Google access tokens, or Google refresh tokens.
 - YouTube publication cannot become public automatically.
 
@@ -269,9 +299,9 @@ The Brain Router is a reusable reasoning boundary for the existing agents. It do
 
 | Verification | Result |
 |---|---|
-| Security/auth/brain/provider/YouTube tests | 82 passed, 0 failed |
+| Security/auth/brain/provider/YouTube tests | 91 passed, 0 failed |
 | Existing repository tests | 17 passed, 0 failed |
-| Total automated tests | 99 passed, 0 failed |
+| Total automated tests | 108 passed, 0 failed |
 | Workflow Builder compilation | 22 files compiled |
 | AI Agent compilation | 11 files compiled |
 | Design Agent compilation | 4 files compiled |
@@ -283,16 +313,16 @@ The Brain Router is a reusable reasoning boundary for the existing agents. It do
 
 The generic credential-assignment scan matched only synthetic test fixtures in `tests/security`; it found no deployment credential file or production credential value. The build emitted an existing outdated Browserslist database warning, which is non-blocking.
 
-The PR #6 release candidate passed GitHub CI, CodeQL, Vercel Preview, 99 local tests, and the local production build before merge. Vercel then reported the matching `main` Production deployment as Ready.
+The PR #6 release candidate passed GitHub CI, CodeQL, Vercel Preview, 99 local tests, and the local production build before merge. Vercel then reported the matching `main` Production deployment as Ready. The MuAPI release candidate separately passed 108 local tests and the production build; CI, merge, and Production deployment evidence are pending.
 
 ## Remaining real tests
 
 1. Complete Production GitHub authorization, callback, signed-session, session-expiry, and logout testing with the allowlisted account.
 2. Generate one short Anthropic concept/script after adding its key.
-3. Generate one low-cost OpenAI image after adding its key.
+3. Configure the server-owned MuAPI Sandbox key and complete one `$0` image mock through the private Creator Studio.
 4. Generate one short ElevenLabs clip with the configured canonical Greg/G.FURY voice.
 5. Generate one short Greg HeyGen Digital Twin video and poll it to completion after all three HeyGen variables are present in the test environment.
-6. Submit and poll one minimal Runway job if credits are available.
+6. Keep paid MuAPI generation disabled until a separate budget, credits, and artifact-specific approval are recorded; no paid video test is required for this Sandbox cutover.
 7. Complete YouTube connect, private Blob staging, explicit approval, PRIVATE upload, history, and disconnect/revoke testing.
 8. Confirm the exact Production YouTube callback in both Vercel and the Google OAuth web client during the connect test.
 
@@ -301,10 +331,10 @@ Use the shortest, lowest-cost safe artifacts possible. Do not make a YouTube tes
 ## Genuine remaining blockers
 
 1. Exact Preview and Production provider-variable presence was not re-verified after deployment; the earlier configuration evidence above remains the last settings-level audit.
-2. No successful real external-provider generation is documented yet.
+2. A general Studio MuAPI Sandbox mock completed, but the private server-owned Creator Studio path is not live-tested until its Production environment is configured and deployed.
 3. The Production YouTube OAuth/Blob flow has not completed a real PRIVATE upload, and the exact Google redirect registration was not independently visible during this audit.
 4. The `main` branch is not protected, so merge review and CI are not enforced by a branch rule.
-5. Provider API credits/quota must be sufficient for the minimal live tests.
+5. Provider API credits/quota must be sufficient for the remaining non-MuAPI live tests; this MuAPI cutover remains in `$0` Sandbox mode.
 
 ## Manual actions still required
 
@@ -320,7 +350,7 @@ Phase 1 can be frozen as **G.FURY Creator Studio v1** only after all of the foll
 - The release changes remain merged to `main` and the matching Production commit remains Ready.
 - Required Production variables are configured without exposing their values.
 - GitHub owner authentication completes successfully in Production.
-- Anthropic, OpenAI Images, ElevenLabs, HeyGen, and Runway each complete the agreed minimal real test; Runway may be explicitly deferred only if Greg accepts provider credits as the sole remaining limitation.
+- MuAPI completes the approved `$0` private Creator Studio Sandbox test; Anthropic, ElevenLabs, and HeyGen each complete any separately agreed minimal real test. Deferred OpenAI/Runway adapters are not Phase 1 active-path requirements.
 - YouTube connects, stages privately, uploads one approved test video as PRIVATE, records safe history, and disconnects/revokes correctly.
 - Security tests, provider tests, authentication tests, YouTube tests, committed-secret scan, CI/CodeQL, and the production build pass on the merge candidate.
 - A `main` branch rule requires pull-request review and the passing CI/security checks.

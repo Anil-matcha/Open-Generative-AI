@@ -15,13 +15,15 @@ Creator Studio is a private, Runway-inspired workspace with one provider-neutral
 
 ### Generation and publishing providers
 
-| Tool | Provider | Required deployment variables |
+| Tool | Active provider | Required deployment variables |
 |---|---|---|
-| Image generation | OpenAI | `OPENAI_API_KEY` |
+| Image generation | MuAPI | `MUAPI_API_KEY`, `MUAPI_KEY_MODE` |
 | Voice generation | ElevenLabs | `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID` |
 | Avatar video | HeyGen | `HEYGEN_API_KEY`, `HEYGEN_AVATAR_ID`, `HEYGEN_VOICE_ID` |
-| Cinematic video | Runway | `RUNWAY_API_KEY` |
+| Cinematic video | MuAPI | `MUAPI_API_KEY`, `MUAPI_KEY_MODE` |
 | Manual private publishing | YouTube + Vercel Blob | `YOUTUBE_OAUTH_CLIENT_ID`, `YOUTUBE_OAUTH_CLIENT_SECRET`, `YOUTUBE_OAUTH_CALLBACK_URL`, `YOUTUBE_TOKEN_ENCRYPTION_KEY`, `BLOB_READ_WRITE_TOKEN` |
+
+The direct OpenAI image and Runway video adapters remain in the repository as deferred compatibility boundaries. They are not reachable from the active private Creator Studio dispatch or UI.
 
 All provider credentials are read only by the Next.js server. They are never sent to the browser, returned by the provider-status endpoint, or committed to the repository.
 
@@ -85,7 +87,7 @@ HEYGEN_VOICE_ID=aecf8d74f6b8467b84d24e9dc541b19a
 
 Creator Studio submits text-to-avatar jobs to HeyGen asynchronously and polls the fixed HeyGen video-status endpoint. The default canvas is portrait `9:16` at `1080p`, with social captions enabled in the UI. The authenticated browser receives only a normalized job ID, status, HTTPS video and thumbnail URLs, duration, and sanitized error information.
 
-The reusable server-side tool registry exposes provider-neutral reasoning as `brain_reasoning` and preserves the existing `anthropic_assistant`, `openai_image`, `elevenlabs_voice`, `heygen_avatar_video`, `runway_video`, and `youtube_publish` boundaries. These definitions are metadata boundaries for later orchestration; they do not recreate agents or duplicate generation-provider adapters.
+The reusable server-side tool registry exposes provider-neutral reasoning as `brain_reasoning`, active `muapi_image` and `muapi_video` boundaries, and the existing `elevenlabs_voice`, `heygen_avatar_video`, and `youtube_publish` boundaries. The preserved `anthropic_assistant`, `openai_image`, and `runway_video` definitions remain available as compatibility metadata; OpenAI and Runway are explicitly marked deferred. These definitions do not recreate agents or duplicate generation-provider adapters.
 
 The `heygen_avatar_video` boundary resolves the default avatar and voice from `HEYGEN_AVATAR_ID` and `HEYGEN_VOICE_ID`, never from browser input or a client-readable environment variable. It accepts validated optional avatar/voice overrides, background configuration, captions, and supported motion settings. The payload builder already separates script input from media input so a later `ElevenLabs → audio URL/asset → HeyGen lip-sync` path can be added without replacing the current HeyGen voice workflow.
 
@@ -160,7 +162,10 @@ The defaults are listed in `.env.example`:
 - `BRAIN_ENABLE_AUTOMATIC_FALLBACK=true` enables only the safe fallback cases described above.
 - `BRAIN_PRIVATE_ELIGIBLE_PROVIDERS` and `BRAIN_CLIENT_CONFIDENTIAL_ELIGIBLE_PROVIDERS` are empty by default so sensitive work fails closed.
 - `CONTENT_SAFETY_MODE=enforce` blocks the built-in high-risk content classes before any paid provider call. `audit` and `off` remain explicit operator choices.
-- `OPENAI_IMAGE_DEFAULT_QUALITY=low` keeps exploratory image calls less expensive; the UI can request medium or high quality.
+- `MUAPI_KEY_MODE=sandbox` keeps the private Creator Studio on MuAPI's zero-cost mock path.
+- `MUAPI_ALLOW_PAID_GENERATION=false` is the fail-closed default. A production-mode key is rejected unless this variable is deliberately changed to `true`.
+- `MUAPI_IMAGE_MODEL`, `MUAPI_VIDEO_MODEL`, and `MUAPI_IMAGE_TO_VIDEO_MODEL` pin server-selected models; browser input cannot override them.
+- `OPENAI_IMAGE_DEFAULT_QUALITY=low` remains available only to the deferred direct OpenAI adapter.
 - `YOUTUBE_UPLOAD_MAX_BYTES=524288000` caps each private staged video at 500 MiB by default.
 - `YOUTUBE_UPLOAD_TIMEOUT_MS=285000` gives the server 285 seconds to stream the staged file to YouTube while preserving a small margin inside the route's 300-second Hobby limit.
 - Provider model/version variables can be pinned without changing source code.
@@ -173,17 +178,33 @@ Rate limiting is an abuse guard, not a billing budget. Set spending limits and a
 - ElevenLabs requires a reusable voice ID in addition to the API key.
 - HeyGen requires the API key, Greg Digital Twin look ID, and Greg voice ID shown above. Its API billing can be separate from the HeyGen web-app plan.
 - HeyGen generation is asynchronous. Creator Studio polls no more frequently than every five seconds and stops after about ten minutes, while retaining the job ID for provider-side follow-up.
-- Runway video jobs are asynchronous. Creator Studio polls the task endpoint no more frequently than every five seconds and stops after about ten minutes.
-- A Runway first-frame image must use a provider-reachable HTTPS URL. Direct local-file handoff is not part of this first version.
+- MuAPI image and video jobs may complete immediately or asynchronously. Creator Studio polls the fixed prediction-result endpoint no more frequently than every five seconds and stops after about ten minutes.
+- A MuAPI video first-frame image must use a provider-reachable HTTPS URL. Direct local-file handoff is not part of this first version.
+- Direct OpenAI and Runway adapters are preserved but deferred; active image and cinematic-video actions do not call them.
 - YouTube publishing requires a private Vercel Blob store and a Google OAuth web client. A normal YouTube Premium or Google subscription does not replace YouTube Data API OAuth.
 
-## MuAPI and generation-cost controls
+## MuAPI media backbone and generation-cost controls
 
-MuAPI remains the existing general media backend. Its current web routes use the repository's secured bring-your-own-key proxy: the browser sends a per-tab MuAPI key to a same-origin route, the route strips unsafe headers, and the server attaches `x-api-key` only to the fixed `https://api.muapi.ai` host. This Brain Router change does not replace MuAPI or any direct OpenAI, ElevenLabs, HeyGen, or Runway integration.
+The authenticated private Creator Studio uses a server-owned MuAPI credential for both image and cinematic-video generation:
 
-The existing Workflow Builder already calls MuAPI's live `calculate_dynamic_cost` endpoint, displays the selected node's estimate, and totals estimated workflow cost. Generations still require an explicit user click. The Brain Router may recommend a model or budget strategy, but it never calls a generation endpoint and cannot authorize spending.
+```dotenv
+MUAPI_API_KEY=<add securely in Vercel; never commit this value>
+MUAPI_KEY_MODE=sandbox
+MUAPI_ALLOW_PAID_GENERATION=false
+MUAPI_IMAGE_MODEL=nano-banana
+MUAPI_VIDEO_MODEL=seedance-lite-t2v
+MUAPI_IMAGE_TO_VIDEO_MODEL=kling-v2.1-master-i2v
+```
 
-Project revenue/margin budgets, persisted amount-spent ledgers, DRAFT/STANDARD/PREMIUM policy, configurable warning/strong-approval thresholds, and a server-owned `MUAPI_API_KEY` path for the authenticated Creator Studio are **not yet implemented end to end**. Do not describe those controls as complete. Until they are added, rely on live MuAPI estimates where shown, explicit user action, and provider-account spending limits; never allow an agent to initiate paid generation autonomously.
+Active routes are `POST /api/creator/image`, `POST /api/creator/video`, and `GET /api/creator/muapi/status`. The browser sends prompts and supported rendering options only. The server selects the model, attaches `x-api-key` only to the fixed `https://api.muapi.ai` host, normalizes job responses, validates HTTPS outputs, and returns no credential value. All routes retain the Creator Studio GitHub identity gate, same-origin mutation checks, content safety, request limits, timeouts, rate limits, and sanitized errors.
+
+Sandbox mode is deliberately fail closed. `MUAPI_KEY_MODE=sandbox` enables MuAPI's `$0` mock-data path. Changing the mode to `production` does not enable paid calls by itself: `MUAPI_ALLOW_PAID_GENERATION=true` must also be set explicitly. The Brain Router never changes either value and cannot initiate a generation.
+
+The existing general Image Studio and Workflow Builder keep their secured per-tab bring-your-own-key proxy. That browser-scoped flow is separate from the private Creator Studio server-owned credential. Workflow Builder continues to display MuAPI's live cost estimate where supported and still requires an explicit user click.
+
+A live MuAPI Sandbox mock request completed through the existing general Studio on 2026-08-26 with a `$0` balance. The private Creator Studio adapter passed mocked security and regression tests and the production build; its live server-owned Sandbox verification is performed only after the release is configured and deployed.
+
+Project revenue/margin budgets, persisted amount-spent ledgers, DRAFT/STANDARD/PREMIUM policy, and configurable warning/strong-approval thresholds remain future controls. Until they are implemented, keep Sandbox mode enabled, require explicit user action, and retain provider-account spending limits before any separately approved paid rollout.
 
 ## Security model
 

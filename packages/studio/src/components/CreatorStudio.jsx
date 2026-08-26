@@ -41,9 +41,9 @@ const TOOLS = [
   {
     id: "image",
     label: "Image",
-    provider: "openai",
+    provider: "muapi",
     eyebrow: "Create",
-    description: "Generate an original campaign image or first frame with OpenAI.",
+    description: "Generate an original campaign image through the MuAPI media backbone.",
     icon: ImageIcon,
     accent: "from-emerald-400 to-cyan-400",
   },
@@ -68,9 +68,9 @@ const TOOLS = [
   {
     id: "video",
     label: "Video",
-    provider: "runway",
+    provider: "muapi",
     eyebrow: "Direct",
-    description: "Generate a cinematic clip from text or an optional first-frame image.",
+    description: "Generate a cinematic clip through MuAPI from text or an optional first-frame image.",
     icon: Film,
     accent: "from-pink-500 to-rose-500",
   },
@@ -92,8 +92,7 @@ const INITIAL_DRAFTS = {
   },
   image: {
     prompt: "",
-    size: "1024x1024",
-    quality: "low",
+    aspectRatio: "1:1",
   },
   voice: {
     text: "",
@@ -110,7 +109,7 @@ const INITIAL_DRAFTS = {
   video: {
     prompt: "",
     firstFrameUrl: "",
-    ratio: "1280:720",
+    aspectRatio: "16:9",
     duration: 5,
   },
   publish: {
@@ -569,23 +568,14 @@ function InspectorFields({ activeTool, draft, updateDraft, provider, youtube }) 
           <FieldLabel hint={`${draft.prompt.length}/4000`}>Image prompt</FieldLabel>
           <PromptTextarea value={draft.prompt} onChange={(value) => updateDraft("prompt", value)} placeholder="Describe the subject, setting, camera, light, color, and composition…" />
         </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <FieldLabel>Canvas</FieldLabel>
-            <select value={draft.size} onChange={(event) => updateDraft("size", event.target.value)} className={selectClass}>
-              <option value="1024x1024">Square</option>
-              <option value="1536x1024">Landscape</option>
-              <option value="1024x1536">Portrait</option>
-            </select>
-          </div>
-          <div>
-            <FieldLabel>Quality</FieldLabel>
-            <select value={draft.quality} onChange={(event) => updateDraft("quality", event.target.value)} className={selectClass}>
-              <option value="low">Low — test</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
-          </div>
+        <div>
+          <FieldLabel>Canvas</FieldLabel>
+          <select value={draft.aspectRatio} onChange={(event) => updateDraft("aspectRatio", event.target.value)} className={selectClass}>
+            <option value="1:1">Square 1:1</option>
+            <option value="16:9">Landscape 16:9</option>
+            <option value="9:16">Vertical 9:16</option>
+            <option value="4:5">Social 4:5</option>
+          </select>
         </div>
       </>
     );
@@ -681,17 +671,16 @@ function InspectorFields({ activeTool, draft, updateDraft, provider, youtube }) 
       <div className="grid grid-cols-2 gap-3">
         <div>
           <FieldLabel>Frame</FieldLabel>
-          <select value={draft.ratio} onChange={(event) => updateDraft("ratio", event.target.value)} className={selectClass}>
-            <option value="1280:720">Landscape</option>
-            <option value="720:1280">Vertical</option>
-            <option value="1280:768">Cinema wide</option>
-            <option value="768:1280">Portrait</option>
+          <select value={draft.aspectRatio} onChange={(event) => updateDraft("aspectRatio", event.target.value)} className={selectClass}>
+            <option value="16:9">Landscape 16:9</option>
+            <option value="9:16">Vertical 9:16</option>
+            <option value="1:1">Square 1:1</option>
           </select>
         </div>
         <div>
           <FieldLabel>Duration</FieldLabel>
           <select value={draft.duration} onChange={(event) => updateDraft("duration", Number(event.target.value))} className={selectClass}>
-            {[2, 3, 4, 5, 6, 7, 8, 9, 10].map((seconds) => <option key={seconds} value={seconds}>{seconds} sec</option>)}
+            {[3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((seconds) => <option key={seconds} value={seconds}>{seconds} sec</option>)}
           </select>
         </div>
       </div>
@@ -951,7 +940,10 @@ export default function CreatorStudio({ onGenerationStart, onGenerationEnd, onGe
     for (let attempt = 0; attempt < 120; attempt += 1) {
       await sleep(5000 + Math.floor(Math.random() * 700));
       if (generationTokenRef.current !== token) throw new Error("Generation was stopped.");
-      const response = await request(`${provider}/status?id=${encodeURIComponent(id)}`);
+      const statusPath = provider === "muapi"
+        ? `muapi/status?id=${encodeURIComponent(id)}&kind=${encodeURIComponent(toolId)}`
+        : `${provider}/status?id=${encodeURIComponent(id)}`;
+      const response = await request(statusPath);
       if (!response.ok) throw new Error(await responseError(response));
       const data = await response.json();
       const status = String(data.status || "unknown");
@@ -961,9 +953,18 @@ export default function CreatorStudio({ onGenerationStart, onGenerationEnd, onGe
         [toolId]: { type: "pending", provider, id, status },
       }));
       if (terminalSuccess.includes(terminalStatus)) {
-        const url = provider === "runway" ? data.output?.[0] : data.videoUrl;
-        if (!url) throw new Error(`${provider} completed without a video URL.`);
-        return { type: "video", provider, id, url, thumbnailUrl: data.thumbnailUrl || null, duration: data.duration || null };
+        const url = provider === "runway" ? data.output?.[0] : provider === "muapi" ? data.url : data.videoUrl;
+        if (!url) throw new Error(`${provider} completed without an output URL.`);
+        return {
+          type: toolId === "image" ? "image" : "video",
+          provider,
+          id,
+          url,
+          model: data.model || null,
+          keyMode: data.keyMode || null,
+          thumbnailUrl: data.thumbnailUrl || null,
+          duration: data.duration || null,
+        };
       }
       if (terminalFailure.includes(terminalStatus)) {
         throw new Error(data.error?.message || data.failure || `${provider} generation failed.`);
@@ -1001,7 +1002,15 @@ export default function CreatorStudio({ onGenerationStart, onGenerationEnd, onGe
       } else if (toolId === "image") {
         const response = await request("image", { method: "POST", body: draft });
         if (!response.ok) throw new Error(await responseError(response));
-        output = { type: "image", url: rememberObjectUrl(await response.blob()) };
+        const data = await response.json();
+        if (data.status === "completed" && data.url) {
+          output = { type: "image", provider: "muapi", url: data.url, model: data.model, keyMode: data.keyMode };
+        } else {
+          const jobId = data.jobId || data.id;
+          if (!jobId) throw new Error("MuAPI returned no image job ID.");
+          setOutputs((previous) => ({ ...previous, image: { type: "pending", provider: "muapi", id: jobId, status: data.status } }));
+          output = await pollTask("muapi", jobId, token, toolId);
+        }
       } else if (toolId === "voice") {
         const response = await request("speech", { method: "POST", body: draft });
         if (!response.ok) throw new Error(await responseError(response));
@@ -1015,11 +1024,17 @@ export default function CreatorStudio({ onGenerationStart, onGenerationEnd, onGe
         setOutputs((previous) => ({ ...previous, avatar: { type: "pending", provider: "heygen", id: jobId, status: data.status } }));
         output = await pollTask("heygen", jobId, token, toolId);
       } else if (toolId === "video") {
-        const response = await request("runway", { method: "POST", body: draft });
+        const response = await request("video", { method: "POST", body: draft });
         if (!response.ok) throw new Error(await responseError(response));
         const data = await response.json();
-        setOutputs((previous) => ({ ...previous, video: { type: "pending", provider: "runway", id: data.id, status: data.status } }));
-        output = await pollTask("runway", data.id, token, toolId);
+        if (data.status === "completed" && data.url) {
+          output = { type: "video", provider: "muapi", url: data.url, model: data.model, keyMode: data.keyMode };
+        } else {
+          const jobId = data.jobId || data.id;
+          if (!jobId) throw new Error("MuAPI returned no video job ID.");
+          setOutputs((previous) => ({ ...previous, video: { type: "pending", provider: "muapi", id: jobId, status: data.status } }));
+          output = await pollTask("muapi", jobId, token, toolId);
+        }
       } else {
         let pathname = youtubeStagedPath;
         if (!pathname) {
