@@ -202,7 +202,7 @@ Sandbox mode is deliberately fail closed. `MUAPI_KEY_MODE=sandbox` enables MuAPI
 
 The existing general Image Studio and Workflow Builder keep their secured per-tab bring-your-own-key proxy. That browser-scoped flow is separate from the private Creator Studio server-owned credential. Workflow Builder continues to display MuAPI's live cost estimate where supported and still requires an explicit user click.
 
-A live MuAPI Sandbox mock request completed through the existing general Studio on 2026-08-26 with a `$0` balance. The private Creator Studio adapter passed mocked security and regression tests and the production build; its live server-owned Sandbox verification is performed only after the release is configured and deployed.
+Live MuAPI Sandbox mock requests completed through both the existing general Studio and the private Production Creator Studio on 2026-08-26 at `$0`. The private server-owned test used deployed commit `3f18f446cb24d88c3b0b1b59ec53d944896d24c8` and completed task `8c3dc22a-f59a-4c74-abbd-587ad4c84730`. Paid generation remained disabled throughout.
 
 Project revenue/margin budgets, persisted amount-spent ledgers, DRAFT/STANDARD/PREMIUM policy, and configurable warning/strong-approval thresholds remain future controls. Until they are implemented, keep Sandbox mode enabled, require explicit user action, and retain provider-account spending limits before any separately approved paid rollout.
 

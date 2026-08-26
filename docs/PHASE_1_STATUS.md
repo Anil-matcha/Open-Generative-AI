@@ -1,6 +1,6 @@
 # G.FURY Creator Studio v1 — Phase 1 Status
 
-Authoritative reconciliation snapshot for `lalambert1982-eng/Open-Generative-AI`. Deployment evidence was last reconciled on 2026-08-26, including the approved Brain Router and Greg Digital Twin Production deployment plus the MuAPI Creator Studio release candidate.
+Authoritative reconciliation snapshot for `lalambert1982-eng/Open-Generative-AI`. Deployment evidence was last reconciled on 2026-08-26, including the approved Brain Router, Greg Digital Twin release, and MuAPI Creator Studio Production deployment.
 
 This document distinguishes four independent states:
 
@@ -26,13 +26,13 @@ Initial routing is Gemini → Groq → OpenRouter with at most three attempts. A
 
 Provider availability still depends on the exact Preview and Production variables documented in `CREATOR_STUDIO.md`. The deployment did not copy credentials between environments or reveal saved Secret values. No real provider request was made during this release.
 
-## MuAPI media-backbone cutover — release candidate
+## MuAPI media-backbone cutover — Production deployed
 
 The private Creator Studio image and cinematic-video tools now use one server-owned MuAPI adapter. Direct OpenAI image and Runway video implementations remain in source and in the tool registry as deferred compatibility boundaries, but they are absent from the active private dispatch and UI.
 
 The adapter pins server-selected image, text-to-video, and image-to-video models; calls only `https://api.muapi.ai`; authenticates through the existing GitHub owner session; enforces same-origin mutations, content safety, rate limits, strict inputs, timeouts, bounded output handling, and sanitized errors; and never returns the API key. Sandbox is the default. Production mode fails closed unless the separate paid-generation flag is explicitly enabled.
 
-A live `$0` MuAPI Sandbox mock request completed through the existing general Image Studio on 2026-08-26. The private Creator Studio server-owned path has passed 91 security tests, 17 repository tests, Studio compilation, and the optimized Next.js production build. Production environment configuration, merge, deployment, and a private Creator Studio live Sandbox completion are still pending in this release-candidate snapshot.
+A live `$0` MuAPI Sandbox mock request completed through the existing general Image Studio on 2026-08-26. PR #8 then passed CI, CodeQL, Vercel Preview, 91 security tests, 17 repository tests, Studio compilation, and the optimized Next.js production build. It merged as `3f18f446cb24d88c3b0b1b59ec53d944896d24c8`, Vercel reported the matching Production deployment Ready, and the signed-in private Creator Studio completed Sandbox image task `8c3dc22a-f59a-4c74-abbd-587ad4c84730`. The active MuAPI image/video backbone is therefore Production ready within the explicitly limited `$0` Sandbox scope; paid generation remains disabled and untested.
 
 ## Current Git and deployment state
 
@@ -40,17 +40,17 @@ A live `$0` MuAPI Sandbox mock request completed through the existing general Im
 |---|---|
 | Repository | `lalambert1982-eng/Open-Generative-AI` |
 | Default branch | `main` |
-| Current `main` state | Contains the PR #6 Production implementation release |
+| Current `main` state | Contains the PR #8 MuAPI media-backbone release |
 | `main` branch protection | Not enabled |
-| Production implementation commit | `3d6ea7882e8033b374dd9b9d65a51a2dcc30f1ff` |
+| Production implementation commit | `3f18f446cb24d88c3b0b1b59ec53d944896d24c8` |
 | Production deployment | Ready (Vercel) |
 | Production URL | `https://open-generative-ai-lemon.vercel.app` |
-| Release pull request | #6 (merged) |
-| Release-candidate commit | `143e0d36aec1cde8fc369065ccb872c3ec4a8c4a` |
+| Release pull request | #8 (merged) |
+| Release-candidate commit | `efcee5ff85bb360c870e86be40733ece361e8aa3` |
 | Preview deployment | Ready |
-| Stable Preview URL | `https://open-generative-ai-git-feat-84fb6c-lalambert1982-7239s-projects.vercel.app` |
+| Release Preview URL | `https://open-generative-ai-git-feat-03ac60-lalambert1982-7239s-projects.vercel.app` |
 
-The Production commit contains private YouTube publishing from PR #5 plus the completed Greg Digital Twin adapter, provider-neutral Brain Router, full Phase 1 tool registry, and tests from PR #6.
+The Production commit contains private YouTube publishing, the Greg Digital Twin adapter, the provider-neutral Brain Router, and the MuAPI Sandbox-first private Creator Studio image/video cutover. Direct OpenAI and Runway implementations are preserved but deferred.
 
 ### Merged pull requests
 
@@ -62,8 +62,10 @@ The Production commit contains private YouTube publishing from PR #5 plus the co
 | #4 | Secure multi-provider Creator Studio | `4853f9e76632ea48f07f805ea1b325762f22906d` | Merged |
 | #5 | Secure private YouTube publishing | `b7a1722c43f4d3b85de1929e4202c9fd18085e8b` | Merged |
 | #6 | Brain Router and Greg Digital Twin Production release | `3d6ea7882e8033b374dd9b9d65a51a2dcc30f1ff` | Merged |
+| #7 | Record Creator Studio Production deployment | `2e6ab01e88f03057cf0a5f01295a4dc0b4d609d2` | Merged |
+| #8 | MuAPI private Creator Studio media backbone | `3f18f446cb24d88c3b0b1b59ec53d944896d24c8` | Merged |
 
-Vercel shows both the current Production deployment and the current `feature/heygen-digital-twin` Preview deployment as Ready. The stable Preview alias uses the branch-specific GitHub OAuth callback and the current reconciliation commit.
+Vercel shows the PR #8 Preview and matching `main` Production deployment as Ready. The live owner-authenticated Creator Studio reports `MuAPI · Sandbox · $0 mock data` for both Image and Video.
 
 ## Existing capabilities
 
@@ -103,7 +105,7 @@ Vercel shows both the current Production deployment and the current `feature/hey
 |---|---|---|---|---|---|
 | GitHub Auth | Built | Configured | Configured | Test passed (Preview) | No |
 | Anthropic | Built | Missing | Missing | Test pending | No |
-| MuAPI Image + Video | Built (release candidate) | Pending recheck | Pending configuration | General Studio Sandbox passed; private path pending | No |
+| MuAPI Image + Video | Built (Production) | Missing | Configured (Sandbox only) | General + private Production Sandbox passed | Yes — Sandbox scope |
 | OpenAI Images (deferred) | Preserved; inactive | Configured | Configured | Not required for active cutover | No |
 | ElevenLabs | Built | Missing | Configured | Test pending | No |
 | HeyGen | Built | Missing | Missing | Test pending | No |
@@ -120,6 +122,7 @@ Only variable names and configuration state are recorded here. No credential val
 #### Production configured
 
 - GitHub Auth: `GITHUB_OAUTH_CLIENT_ID`, `GITHUB_OAUTH_CLIENT_SECRET`, `GITHUB_OAUTH_CALLBACK_URL`, `CREATOR_GITHUB_ALLOWED_LOGINS`, `CREATOR_GITHUB_ALLOWED_USER_IDS`, `CREATOR_SESSION_SECRET`
+- MuAPI Sandbox: `MUAPI_API_KEY`, `MUAPI_KEY_MODE`, `MUAPI_ALLOW_PAID_GENERATION`, `MUAPI_IMAGE_MODEL`, `MUAPI_VIDEO_MODEL`, `MUAPI_IMAGE_TO_VIDEO_MODEL`
 - OpenAI Images: `OPENAI_API_KEY`
 - ElevenLabs: `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID`
 - YouTube OAuth: `YOUTUBE_OAUTH_CLIENT_ID`, `YOUTUBE_OAUTH_CLIENT_SECRET`, `YOUTUBE_OAUTH_CALLBACK_URL`, `YOUTUBE_TOKEN_ENCRYPTION_KEY`
@@ -127,8 +130,6 @@ Only variable names and configuration state are recorded here. No credential val
 
 #### Production missing
 
-- `MUAPI_API_KEY`
-- `MUAPI_KEY_MODE`
 - `ANTHROPIC_API_KEY`
 - `HEYGEN_API_KEY`
 - `HEYGEN_AVATAR_ID`
@@ -145,12 +146,13 @@ Only variable names and configuration state are recorded here. No credential val
 
 #### Preview missing for a full Phase 1 test
 
+- `MUAPI_API_KEY`
+- `MUAPI_KEY_MODE`
 - `ANTHROPIC_API_KEY`
 - `ELEVENLABS_API_KEY`
 - `HEYGEN_API_KEY`
 - `RUNWAY_API_KEY`
 - `YOUTUBE_OAUTH_CLIENT_ID`
-- `YOUTUBE_OAUTH_CLIENT_SECRET`
 - `YOUTUBE_TOKEN_ENCRYPTION_KEY`
 
 The Vercel entries named `ANTHPOC`, `runway`, `Elevenlabs`, `myvocie`, and `openai` do not satisfy the exact server-side names expected by the application. Vercel does not reveal saved Secret values, so API-key values stored under those misspelled names must be re-entered under the correct names. The lowercase `openai` entry is redundant because `OPENAI_API_KEY` is already configured.
@@ -198,9 +200,10 @@ The Vercel entries named `ANTHPOC`, `runway`, `Elevenlabs`, `myvocie`, and `open
 - Default image-to-video model: `kling-v2.1-master-i2v`
 - Credential use: server-side `MUAPI_API_KEY` only
 - Cost gate: `MUAPI_KEY_MODE=sandbox`; production mode also requires `MUAPI_ALLOW_PAID_GENERATION=true`
-- Source/UI: built in the release candidate
+- Source/UI: built, merged, and deployed through PR #8
 - General Studio live Sandbox mock: passed at `$0` on 2026-08-26
-- Private Creator Studio live Sandbox mock: pending Production configuration and deployment
+- Private Creator Studio live Sandbox mock: passed task `8c3dc22a-f59a-4c74-abbd-587ad4c84730` on Production on 2026-08-26
+- Paid generation: disabled by `MUAPI_ALLOW_PAID_GENERATION=false`; not tested or approved
 
 ### ElevenLabs
 
@@ -307,38 +310,40 @@ The Brain Router is a reusable reasoning boundary for the existing agents. It do
 | Design Agent compilation | 4 files compiled |
 | Studio compilation | 26 files compiled |
 | Next.js production build | Passed |
-| Brain Router release-candidate strong-secret scan | 0 matches |
-| Brain Router committed-tree strong-secret scan | 0 matches |
+| MuAPI release-candidate strong-secret scan | 0 matches |
+| GitHub CI | Passed |
+| GitHub CodeQL | Passed |
+| Vercel Preview | Ready |
+| Vercel Production commit `3f18f44` | Ready |
+| Private Creator Studio MuAPI Sandbox task | Completed at `$0` |
 | Tracked non-example `.env` files | 0 |
 
 The generic credential-assignment scan matched only synthetic test fixtures in `tests/security`; it found no deployment credential file or production credential value. The build emitted an existing outdated Browserslist database warning, which is non-blocking.
 
-The PR #6 release candidate passed GitHub CI, CodeQL, Vercel Preview, 99 local tests, and the local production build before merge. Vercel then reported the matching `main` Production deployment as Ready. The MuAPI release candidate separately passed 108 local tests and the production build; CI, merge, and Production deployment evidence are pending.
+The PR #6 release candidate passed GitHub CI, CodeQL, Vercel Preview, 99 local tests, and the local production build before merge. The MuAPI PR #8 release separately passed 108 local tests, the production build, CI, CodeQL, and Vercel Preview. Vercel reported merge commit `3f18f446cb24d88c3b0b1b59ec53d944896d24c8` Ready in Production before the authenticated `$0` Sandbox completion test.
 
 ## Remaining real tests
 
 1. Complete Production GitHub authorization, callback, signed-session, session-expiry, and logout testing with the allowlisted account.
 2. Generate one short Anthropic concept/script after adding its key.
-3. Configure the server-owned MuAPI Sandbox key and complete one `$0` image mock through the private Creator Studio.
-4. Generate one short ElevenLabs clip with the configured canonical Greg/G.FURY voice.
-5. Generate one short Greg HeyGen Digital Twin video and poll it to completion after all three HeyGen variables are present in the test environment.
-6. Keep paid MuAPI generation disabled until a separate budget, credits, and artifact-specific approval are recorded; no paid video test is required for this Sandbox cutover.
-7. Complete YouTube connect, private Blob staging, explicit approval, PRIVATE upload, history, and disconnect/revoke testing.
-8. Confirm the exact Production YouTube callback in both Vercel and the Google OAuth web client during the connect test.
+3. Generate one short ElevenLabs clip with the configured canonical Greg/G.FURY voice.
+4. Generate one short Greg HeyGen Digital Twin video and poll it to completion after all three HeyGen variables are present in the test environment.
+5. Keep paid MuAPI generation disabled until a separate budget, credits, and artifact-specific approval are recorded; no paid video test is required for this Sandbox cutover.
+6. Complete YouTube connect, private Blob staging, explicit approval, PRIVATE upload, history, and disconnect/revoke testing.
+7. Confirm the exact Production YouTube callback in both Vercel and the Google OAuth web client during the connect test.
 
 Use the shortest, lowest-cost safe artifacts possible. Do not make a YouTube test video public.
 
 ## Genuine remaining blockers
 
-1. Exact Preview and Production provider-variable presence was not re-verified after deployment; the earlier configuration evidence above remains the last settings-level audit.
-2. A general Studio MuAPI Sandbox mock completed, but the private server-owned Creator Studio path is not live-tested until its Production environment is configured and deployed.
-3. The Production YouTube OAuth/Blob flow has not completed a real PRIVATE upload, and the exact Google redirect registration was not independently visible during this audit.
-4. The `main` branch is not protected, so merge review and CI are not enforced by a branch rule.
-5. Provider API credits/quota must be sufficient for the remaining non-MuAPI live tests; this MuAPI cutover remains in `$0` Sandbox mode.
+1. Preview does not contain the server-owned MuAPI configuration; the verified deployment scope is Production Sandbox only.
+2. The Production YouTube OAuth/Blob flow has not completed a real PRIVATE upload, and the exact Google redirect registration was not independently visible during this audit.
+3. The `main` branch is not protected, so merge review and CI are not enforced by a branch rule.
+4. Provider API credits/quota must be sufficient for the remaining non-MuAPI live tests; the active MuAPI cutover remains in `$0` Sandbox mode.
 
 ## Manual actions still required
 
-1. Re-verify every required Preview and Production variable under its exact application name. Do not delete a misspelled Secret entry until its correctly named replacement has been verified.
+1. Re-verify every remaining non-MuAPI Preview and Production variable under its exact application name. Do not delete a misspelled Secret entry until its correctly named replacement has been verified.
 2. In the Google OAuth web client, confirm the Preview and Production redirects exactly match the URLs documented above and that the publishing account is allowed while the app is in testing mode.
 3. Complete the minimal real-test sequence above and record successful job/video IDs without recording credentials.
 4. Add a GitHub branch ruleset for `main` that requires pull requests and passing CI/security checks before merge.
