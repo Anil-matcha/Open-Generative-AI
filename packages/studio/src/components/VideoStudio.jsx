@@ -1716,7 +1716,7 @@ export default function VideoStudio({
         alert("Please upload a video first.");
         return;
       }
-      if (currentModel?.imageField && !uploadedImageUrl) {
+      if (currentModel?.imageField && !currentModel?.imageOptional && !uploadedImageUrl) {
         alert("Please upload a reference image for motion control.");
         return;
       }
