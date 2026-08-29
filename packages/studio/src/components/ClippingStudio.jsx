@@ -238,6 +238,8 @@ export default function ClippingStudio({
   const [videoUploading, setVideoUploading] = useState(false);
   const [videoProgress, setVideoProgress] = useState(0);
   const videoFileInputRef = useRef(null);
+  const [isVideoDragging, setIsVideoDragging] = useState(false);
+  const videoDragCounterRef = useRef(0);
 
   // ── Generation State ─────────────────────────────────────────────────────
   const [isGenerating, setIsGenerating] = useState(false);
@@ -412,8 +414,8 @@ export default function ClippingStudio({
   };
 
   // ── Video File Handlers ──
-  const handleVideoFileChange = async (e) => {
-    const file = e.target.files[0];
+  const processVideoFiles = async (files) => {
+    const file = files && files[0];
     if (!file) return;
     if (file.size > MAX_VIDEO_SIZE_BYTES) {
       showVideoSizeLimitToast();
@@ -434,6 +436,48 @@ export default function ClippingStudio({
       setVideoUploading(false);
       setVideoProgress(0);
       if (videoFileInputRef.current) videoFileInputRef.current.value = "";
+    }
+  };
+
+  const handleVideoFileChange = async (e) => {
+    const files = Array.from(e.target.files || []);
+    await processVideoFiles(files);
+  };
+
+  const handleVideoDragEnter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    videoDragCounterRef.current += 1;
+    if (e.dataTransfer?.items && e.dataTransfer.items.length > 0) {
+      setIsVideoDragging(true);
+    }
+  };
+
+  const handleVideoDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    videoDragCounterRef.current -= 1;
+    if (videoDragCounterRef.current <= 0) {
+      videoDragCounterRef.current = 0;
+      setIsVideoDragging(false);
+    }
+  };
+
+  const handleVideoDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleVideoDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    videoDragCounterRef.current = 0;
+    setIsVideoDragging(false);
+    const files = Array.from(e.dataTransfer?.files || []).filter((f) =>
+      f.type.startsWith("video/"),
+    );
+    if (files.length > 0) {
+      processVideoFiles(files);
     }
   };
 
@@ -932,9 +976,13 @@ export default function ClippingStudio({
                 type="button"
                 title="Upload source video"
                 onClick={() => videoFileInputRef.current?.click()}
-                className={promptMediaButtonClassName({
+                onDragEnter={handleVideoDragEnter}
+                onDragLeave={handleVideoDragLeave}
+                onDragOver={handleVideoDragOver}
+                onDrop={handleVideoDrop}
+                className={`${promptMediaButtonClassName({
                   active: Boolean(videoUrl),
-                })}
+                })}${isVideoDragging ? " ring-2 ring-primary border-primary bg-primary/10" : ""}`}
               >
                 {videoUploading ? (
                   <div className="flex flex-col items-center justify-center w-full h-full absolute inset-0 bg-black/85 z-20 backdrop-blur-[1px]">

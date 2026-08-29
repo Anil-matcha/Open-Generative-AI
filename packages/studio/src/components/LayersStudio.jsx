@@ -183,6 +183,10 @@ export default function LayersStudio({
   const imageWrapperRef = useRef(null);
   const canvasContainerRef = useRef(null);
 
+  // Drag & Drop Upload State
+  const [isDropzoneDragging, setIsDropzoneDragging] = useState(false);
+  const dropzoneDragCounterRef = useRef(0);
+
   // Drawing History Stack
   const [historyStack, setHistoryStack] = useState([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
@@ -292,9 +296,64 @@ export default function LayersStudio({
     }
   };
 
+  // Shared entry point for both click-to-browse and drag-and-drop uploads
+  const handleFiles = (files) => {
+    const fileList = Array.from(files || []);
+    if (fileList.length === 0) return;
+
+    const MAX_IMAGE_SIZE = 20 * 1024 * 1024; // 20MB
+    const file = fileList.find((f) => f.type.startsWith("image/")) || fileList[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload an image file.");
+      return;
+    }
+    if (file.size > MAX_IMAGE_SIZE) {
+      toast.error(`File too large (max 20MB): ${file.name}`);
+      return;
+    }
+
+    handleUploadFile(file);
+  };
+
   const handleFileInputChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      handleUploadFile(e.target.files[0]);
+    handleFiles(e.target.files);
+    e.target.value = "";
+  };
+
+  const handleDropzoneDragEnter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dropzoneDragCounterRef.current += 1;
+    if (e.dataTransfer?.items && e.dataTransfer.items.length > 0) {
+      setIsDropzoneDragging(true);
+    }
+  };
+
+  const handleDropzoneDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dropzoneDragCounterRef.current -= 1;
+    if (dropzoneDragCounterRef.current <= 0) {
+      dropzoneDragCounterRef.current = 0;
+      setIsDropzoneDragging(false);
+    }
+  };
+
+  const handleDropzoneDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDropzoneDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dropzoneDragCounterRef.current = 0;
+    setIsDropzoneDragging(false);
+    const files = e.dataTransfer?.files;
+    if (files && files.length > 0) {
+      handleFiles(files);
     }
   };
 
@@ -1547,7 +1606,15 @@ export default function LayersStudio({
           ) : (
             <div
               onClick={() => fileInputRef.current?.click()}
-              className="flex flex-col items-center justify-center p-16 border-2 border-dashed border-white/20 hover:border-[#84cc16]/60 rounded-3xl cursor-pointer transition-all duration-200 bg-[#16181f]/50 hover:bg-[#16181f]/80"
+              onDragEnter={handleDropzoneDragEnter}
+              onDragLeave={handleDropzoneDragLeave}
+              onDragOver={handleDropzoneDragOver}
+              onDrop={handleDropzoneDrop}
+              className={`flex flex-col items-center justify-center p-16 border-2 border-dashed rounded-3xl cursor-pointer transition-all duration-200 ${
+                isDropzoneDragging
+                  ? "border-[#84cc16] bg-[#84cc16]/10 scale-[1.02]"
+                  : "border-white/20 hover:border-[#84cc16]/60 bg-[#16181f]/50 hover:bg-[#16181f]/80"
+              }`}
             >
               <div className="w-16 h-16 rounded-2xl bg-[#84cc16]/10 text-[#84cc16] flex items-center justify-center mb-4">
                 <svg

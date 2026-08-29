@@ -107,6 +107,8 @@ function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [], 
   }, [persistedHistory]);
   
   const [lastUploadProgress, setLastUploadProgress] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragCounterRef = useRef(0);
   const fileInputRef = useRef(null);
   const panelRef = useRef(null);
   const triggerRef = useRef(null);
@@ -178,8 +180,12 @@ function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [], 
 
   const handleFileChange = async (e) => {
     const files = Array.from(e.target.files);
-    if (!files.length) return;
     e.target.value = "";
+    await processFiles(files);
+  };
+
+  const processFiles = async (files) => {
+    if (!files.length) return;
 
     const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
     const tooLarge = files.filter((f) => f.size > MAX_IMAGE_SIZE);
@@ -245,6 +251,43 @@ function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [], 
     } finally {
       setUploading(false);
       setLastUploadProgress(0);
+    }
+  };
+
+  const handleTriggerDragEnter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounterRef.current += 1;
+    if (e.dataTransfer?.items && e.dataTransfer.items.length > 0) {
+      setIsDragging(true);
+    }
+  };
+
+  const handleTriggerDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounterRef.current -= 1;
+    if (dragCounterRef.current <= 0) {
+      dragCounterRef.current = 0;
+      setIsDragging(false);
+    }
+  };
+
+  const handleTriggerDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleTriggerDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounterRef.current = 0;
+    setIsDragging(false);
+    const files = Array.from(e.dataTransfer?.files || []).filter((f) =>
+      f.type.startsWith("image/"),
+    );
+    if (files.length > 0) {
+      processFiles(files);
     }
   };
 
@@ -385,9 +428,13 @@ function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [], 
           e.stopPropagation();
           setPanelOpen((o) => !o);
         }}
-        className={promptMediaButtonClassName({
+        onDragEnter={handleTriggerDragEnter}
+        onDragLeave={handleTriggerDragLeave}
+        onDragOver={handleTriggerDragOver}
+        onDrop={handleTriggerDrop}
+        className={`${promptMediaButtonClassName({
           active: hasSelection,
-        })}
+        })}${isDragging ? " ring-2 ring-primary border-primary bg-primary/10" : ""}`}
       >
         {triggerContent}
       </button>

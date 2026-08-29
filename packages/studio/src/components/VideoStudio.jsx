@@ -191,6 +191,65 @@ function ReferenceUploadButton({
     100,
     Math.max(0, Math.floor(progress / 10) * 10),
   );
+  const [isUploadDragging, setIsUploadDragging] = useState(false);
+  const uploadDragCounterRef = useRef(0);
+
+  const acceptPrefixes = (accept || "")
+    .split(",")
+    .map((token) => token.trim())
+    .filter(Boolean);
+  const fileMatchesAccept = (file) => {
+    if (acceptPrefixes.length === 0) return true;
+    return acceptPrefixes.some((token) => {
+      if (token.endsWith("/*")) {
+        return file.type?.startsWith(token.slice(0, -1));
+      }
+      if (token.startsWith(".")) {
+        return file.name?.toLowerCase().endsWith(token.toLowerCase());
+      }
+      return file.type === token;
+    });
+  };
+
+  const handleUploadDragEnter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (disabled || uploading) return;
+    uploadDragCounterRef.current += 1;
+    if (e.dataTransfer?.items && e.dataTransfer.items.length > 0) {
+      setIsUploadDragging(true);
+    }
+  };
+
+  const handleUploadDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    uploadDragCounterRef.current -= 1;
+    if (uploadDragCounterRef.current <= 0) {
+      uploadDragCounterRef.current = 0;
+      setIsUploadDragging(false);
+    }
+  };
+
+  const handleUploadDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleUploadDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    uploadDragCounterRef.current = 0;
+    setIsUploadDragging(false);
+    if (disabled || uploading) return;
+    const droppedFiles = Array.from(e.dataTransfer?.files || []).filter(
+      fileMatchesAccept,
+    );
+    if (droppedFiles.length === 0) return;
+    const filesToUse = multiple ? droppedFiles : [droppedFiles[0]];
+    onChange?.({ target: { files: filesToUse, value: "" } });
+  };
+
   return (
     <div
       className={
@@ -214,7 +273,13 @@ function ReferenceUploadButton({
         aria-busy={uploading || undefined}
         disabled={disabled}
         onClick={onClick || (() => resolvedInputRef.current?.click())}
-        className={`${promptMediaButtonClassName()} disabled:cursor-not-allowed disabled:opacity-50`}
+        onDragEnter={handleUploadDragEnter}
+        onDragLeave={handleUploadDragLeave}
+        onDragOver={handleUploadDragOver}
+        onDrop={handleUploadDrop}
+        className={`${promptMediaButtonClassName()} disabled:cursor-not-allowed disabled:opacity-50${
+          isUploadDragging ? " ring-2 ring-primary border-primary bg-primary/10" : ""
+        }`}
       >
         {uploading ? (
           <div className="flex flex-col items-center justify-center w-full h-full absolute inset-0 bg-black/80 z-20 backdrop-blur-[2px]">

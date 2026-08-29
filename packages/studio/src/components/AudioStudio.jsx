@@ -71,7 +71,9 @@ function AudioFileUploader({ label, value, onChange, apiKey }) {
   const [uploadState, setUploadState] = useState(value ? UPLOAD_STATE.READY : UPLOAD_STATE.IDLE);
   const [progress, setProgress] = useState(0);
   const [fileName, setFileName] = useState(value ? value.split('/').pop().slice(-30) : "");
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
+  const dragCounterRef = useRef(0);
 
   useEffect(() => {
     if (!value) {
@@ -84,8 +86,8 @@ function AudioFileUploader({ label, value, onChange, apiKey }) {
     }
   }, [value]);
 
-  const handleUpload = async (e) => {
-    const file = e.target.files?.[0];
+  const handleUpload = async (files) => {
+    const file = files?.[0];
     if (!file) return;
 
     if (file.size > 20 * 1024 * 1024) {
@@ -111,9 +113,51 @@ function AudioFileUploader({ label, value, onChange, apiKey }) {
     }
   };
 
+  const handleInputChange = (e) => {
+    handleUpload(Array.from(e.target.files || []));
+  };
+
   const clearFile = (e) => {
     e.stopPropagation();
     onChange(null);
+  };
+
+  const handleDragEnter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (uploadState !== UPLOAD_STATE.IDLE) return;
+    dragCounterRef.current += 1;
+    if (e.dataTransfer?.items && e.dataTransfer.items.length > 0) {
+      setIsDragging(true);
+    }
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (uploadState !== UPLOAD_STATE.IDLE) return;
+    dragCounterRef.current -= 1;
+    if (dragCounterRef.current <= 0) {
+      dragCounterRef.current = 0;
+      setIsDragging(false);
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounterRef.current = 0;
+    setIsDragging(false);
+    if (uploadState !== UPLOAD_STATE.IDLE) return;
+    const files = e.dataTransfer?.files;
+    if (files && files.length > 0) {
+      handleUpload(Array.from(files));
+    }
   };
 
   return (
@@ -133,20 +177,26 @@ function AudioFileUploader({ label, value, onChange, apiKey }) {
         )}
       </div>
 
-      <div 
+      <div
         onClick={() => uploadState === UPLOAD_STATE.IDLE && fileInputRef.current?.click()}
+        onDragEnter={handleDragEnter}
+        onDragLeave={handleDragLeave}
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
         className={`relative border rounded p-4 transition-all duration-300 flex items-center gap-3.5 cursor-pointer ${
-          uploadState === UPLOAD_STATE.READY 
-            ? "border-primary/60 bg-primary/10 shadow-[0_0_15px_rgba(34,211,238,0.05)]" 
+          isDragging
+            ? "border-primary bg-primary/15 shadow-[0_0_15px_rgba(34,211,238,0.15)]"
+            : uploadState === UPLOAD_STATE.READY
+            ? "border-primary/60 bg-primary/10 shadow-[0_0_15px_rgba(34,211,238,0.05)]"
             : "border-zinc-700 bg-zinc-900 hover:bg-zinc-850 hover:border-primary/50"
         }`}
       >
-        <input 
-          ref={fileInputRef} 
-          type="file" 
-          accept="audio/*" 
-          className="hidden" 
-          onChange={handleUpload} 
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="audio/*"
+          className="hidden"
+          onChange={handleInputChange}
         />
 
         {uploadState === UPLOAD_STATE.IDLE && (

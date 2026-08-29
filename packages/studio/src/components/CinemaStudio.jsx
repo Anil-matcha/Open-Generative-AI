@@ -576,8 +576,8 @@ export default function CinemaStudio({
   const textareaRef = useRef(null);
   const resultImgRef = useRef(null);
 
-  const handleImageUpload = async (e) => {
-    const file = e.target.files?.[0];
+  const handleImageFiles = async (files) => {
+    const file = files?.[0];
     if (!file) return;
 
     setIsUploadingImage(true);
@@ -597,8 +597,52 @@ export default function CinemaStudio({
     }
   };
 
+  const handleImageUpload = async (e) => {
+    await handleImageFiles(Array.from(e.target.files || []));
+  };
+
   const removeImage = () => {
     setUploadedImage(null);
+  };
+
+  // ── Image drag-and-drop ─────────────────────────────────────────────────
+  const [isImageDragging, setIsImageDragging] = useState(false);
+  const imageDragCounterRef = useRef(0);
+
+  const handleImageDragEnter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    imageDragCounterRef.current += 1;
+    if (e.dataTransfer?.items && e.dataTransfer.items.length > 0) {
+      setIsImageDragging(true);
+    }
+  };
+
+  const handleImageDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    imageDragCounterRef.current -= 1;
+    if (imageDragCounterRef.current <= 0) {
+      imageDragCounterRef.current = 0;
+      setIsImageDragging(false);
+    }
+  };
+
+  const handleImageDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleImageDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    imageDragCounterRef.current = 0;
+    setIsImageDragging(false);
+    if (isUploadingImage) return;
+    const files = e.dataTransfer?.files;
+    if (files && files.length > 0) {
+      handleImageFiles(Array.from(files));
+    }
   };
 
   // ── Persistence: Load ────────────────────────────────────────────────────
@@ -1047,7 +1091,13 @@ export default function CinemaStudio({
           {/* Upper Row: Image Upload & Textarea */}
           <div className="flex items-start gap-4 w-full px-1">
             {/* Image Upload Button */}
-            <div className="relative pt-0.5">
+            <div
+              className="relative pt-0.5"
+              onDragEnter={handleImageDragEnter}
+              onDragLeave={handleImageDragLeave}
+              onDragOver={handleImageDragOver}
+              onDrop={handleImageDrop}
+            >
               <input
                 type="file"
                 ref={imageInputRef}
@@ -1055,7 +1105,7 @@ export default function CinemaStudio({
                 accept="image/*"
                 onChange={handleImageUpload}
               />
-              
+
               <button
                 onClick={() =>
                   uploadedImage
@@ -1064,8 +1114,8 @@ export default function CinemaStudio({
                 }
                 disabled={isUploadingImage}
                 className={promptMediaButtonClassName({
-                  active: Boolean(uploadedImage),
-                })}
+                  active: Boolean(uploadedImage) || isImageDragging,
+                }) + (isImageDragging ? " ring-2 ring-[#22d3ee] ring-offset-1 ring-offset-black scale-105" : "")}
               >
                 {isUploadingImage ? (
                   <div className="flex flex-col items-center justify-center w-full h-full absolute inset-0 bg-black/80 z-20 backdrop-blur-[2px]">

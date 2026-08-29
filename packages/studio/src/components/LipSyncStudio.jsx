@@ -57,6 +57,9 @@ function MediaPickerButton({
   apiKey,
 }) {
   const inputRef = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragCounterRef = useRef(0);
+  const acceptPrefix = accept?.split("/")[0];
 
   const handleClick = (e) => {
     e.stopPropagation();
@@ -68,10 +71,49 @@ function MediaPickerButton({
   };
 
   const handleChange = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
     e.target.value = "";
-    await onUpload(file);
+    await onUpload(Array.from(files));
+  };
+
+  const handleDragEnter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounterRef.current += 1;
+    if (e.dataTransfer?.items && e.dataTransfer.items.length > 0) {
+      setIsDragging(true);
+    }
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounterRef.current -= 1;
+    if (dragCounterRef.current <= 0) {
+      dragCounterRef.current = 0;
+      setIsDragging(false);
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounterRef.current = 0;
+    setIsDragging(false);
+    if (uploadState === UPLOAD_STATE.UPLOADING) return;
+    const files = e.dataTransfer?.files;
+    if (!files || files.length === 0) return;
+    const matched = acceptPrefix
+      ? Array.from(files).filter((f) => f.type.startsWith(`${acceptPrefix}/`))
+      : Array.from(files);
+    if (matched.length === 0) return;
+    await onUpload(matched);
   };
 
   return (
@@ -83,8 +125,15 @@ function MediaPickerButton({
           : `Upload ${label.toLowerCase()} file`
       }
       onClick={handleClick}
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
       className={promptMediaButtonClassName({
         active: uploadState === UPLOAD_STATE.READY,
+        className: isDragging
+          ? "ring-2 ring-[#22d3ee] ring-offset-1 ring-offset-black scale-105"
+          : "",
       })}
     >
       <input
@@ -479,7 +528,9 @@ export default function LipSyncStudio({
 
   // ── Upload handlers ─────────────────────────────────────────────────────
   const handleImageUpload = useCallback(
-    async (file) => {
+    async (files) => {
+      const file = Array.isArray(files) ? files[0] : files;
+      if (!file) return;
       if (file.size > 10 * 1024 * 1024) {
         alert("Image exceeds 10MB limit.");
         return;
@@ -504,7 +555,9 @@ export default function LipSyncStudio({
   );
 
   const handleVideoPick = useCallback(
-    async (file) => {
+    async (files) => {
+      const file = Array.isArray(files) ? files[0] : files;
+      if (!file) return;
       if (file.size > 50 * 1024 * 1024) {
         alert("Video exceeds 50MB limit.");
         return;
@@ -533,7 +586,9 @@ export default function LipSyncStudio({
   };
 
   const handleAudioPick = useCallback(
-    async (file) => {
+    async (files) => {
+      const file = Array.isArray(files) ? files[0] : files;
+      if (!file) return;
       if (file.size > 10 * 1024 * 1024) {
         alert("Audio file exceeds 10MB limit.");
         return;

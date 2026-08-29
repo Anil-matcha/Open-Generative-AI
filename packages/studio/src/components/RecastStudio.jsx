@@ -52,6 +52,8 @@ function MediaPickerButton({
   isVideo,
 }) {
   const inputRef = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragCounterRef = useRef(0);
 
   const handleClick = (e) => {
     e.stopPropagation();
@@ -62,11 +64,67 @@ function MediaPickerButton({
     inputRef.current?.click();
   };
 
-  const handleChange = async (e) => {
-    const file = e.target.files?.[0];
+  const fileMatchesAccept = (file) => {
+    if (!accept) return true;
+    const patterns = accept.split(",").map((p) => p.trim()).filter(Boolean);
+    if (patterns.length === 0) return true;
+    return patterns.some((pattern) => {
+      if (pattern === "*" || pattern === "*/*") return true;
+      if (pattern.endsWith("/*")) {
+        return file.type.startsWith(pattern.slice(0, -1));
+      }
+      return file.type === pattern;
+    });
+  };
+
+  const handleFiles = async (files) => {
+    const fileList = Array.from(files || []);
+    const file = fileList.find(fileMatchesAccept) ?? fileList[0];
     if (!file) return;
-    e.target.value = "";
     await onUpload(file);
+  };
+
+  const handleChange = async (e) => {
+    const files = Array.from(e.target.files || []);
+    e.target.value = "";
+    await handleFiles(files);
+  };
+
+  const handleDragEnter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (uploadState === UPLOAD_STATE.UPLOADING) return;
+    dragCounterRef.current += 1;
+    if (e.dataTransfer?.items && e.dataTransfer.items.length > 0) {
+      setIsDragging(true);
+    }
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounterRef.current -= 1;
+    if (dragCounterRef.current <= 0) {
+      dragCounterRef.current = 0;
+      setIsDragging(false);
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounterRef.current = 0;
+    setIsDragging(false);
+    if (uploadState === UPLOAD_STATE.UPLOADING) return;
+    const files = e.dataTransfer?.files;
+    if (files && files.length > 0) {
+      handleFiles(files);
+    }
   };
 
   return (
@@ -75,11 +133,18 @@ function MediaPickerButton({
       title={
         uploadState === UPLOAD_STATE.READY
           ? `${fileName} — click to clear`
-          : `Upload ${label.toLowerCase()} file`
+          : `Upload ${label.toLowerCase()} file, or drag and drop`
       }
       onClick={handleClick}
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
       className={promptMediaButtonClassName({
         active: uploadState === UPLOAD_STATE.READY,
+        className: isDragging
+          ? "border-[#22d3ee] bg-[#22d3ee]/10 ring-2 ring-[#22d3ee]/50 scale-105"
+          : "",
       })}
     >
       <input

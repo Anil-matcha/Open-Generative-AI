@@ -119,26 +119,67 @@ const OPTIONS = {
 
 function UploadSlot({ icon, url, progress, label, onUpload, onClear, multiple = false, images = [] }) {
   const inputRef = useRef(null);
-  
+  const [isDraggingSlot, setIsDraggingSlot] = useState(false);
+  const dragCounterRef = useRef(0);
+
+  const handleSlotDragEnter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounterRef.current += 1;
+    if (e.dataTransfer?.items && e.dataTransfer.items.length > 0) {
+      setIsDraggingSlot(true);
+    }
+  };
+
+  const handleSlotDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounterRef.current -= 1;
+    if (dragCounterRef.current <= 0) {
+      dragCounterRef.current = 0;
+      setIsDraggingSlot(false);
+    }
+  };
+
+  const handleSlotDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleSlotDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounterRef.current = 0;
+    setIsDraggingSlot(false);
+    const files = e.dataTransfer?.files;
+    if (files && files.length > 0) {
+      onUpload(Array.from(files));
+    }
+  };
+
   return (
     <div className="relative group/slot flex items-center">
-      <div 
+      <div
         onClick={() => inputRef.current?.click()}
+        onDragEnter={handleSlotDragEnter}
+        onDragLeave={handleSlotDragLeave}
+        onDragOver={handleSlotDragOver}
+        onDrop={handleSlotDrop}
         title={`Upload ${label}`}
         className={promptMediaButtonClassName({
-          active: Boolean(url),
-          className: "cursor-pointer",
+          active: Boolean(url) || isDraggingSlot,
+          className: `cursor-pointer${isDraggingSlot ? " ring-2 ring-primary ring-offset-1 ring-offset-black/40" : ""}`,
         })}
       >
-        <input 
-          ref={inputRef} 
-          type="file" 
+        <input
+          ref={inputRef}
+          type="file"
           accept="image/*"
-          className="hidden" 
+          className="hidden"
           multiple={multiple}
-          onChange={(e) => onUpload(e)} 
+          onChange={(e) => onUpload(Array.from(e.target.files))}
         />
-        
+
         {progress > 0 && progress < 100 ? (
           <div className="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center z-10">
             <span className="text-[8px] font-black text-primary">{progress}%</span>
@@ -356,9 +397,8 @@ export default function MarketingStudio({
     }
   };
 
-  const handleUpload = async (e, target) => {
-    const files = Array.from(e.target.files);
-    if (!files.length) return;
+  const handleUpload = async (files, target) => {
+    if (!files || !files.length) return;
     
     if (target === 'additional') {
       const remaining = 6 - additionalImages.length;
@@ -601,25 +641,25 @@ export default function MarketingStudio({
                   icon={<ProductIcon />} 
                   url={productImage} 
                   progress={uploadProgress.product} 
-                  onUpload={(e) => handleUpload(e, 'product')} 
-                  onClear={() => setProductImage(null)} 
+                  onUpload={(files) => handleUpload(files, 'product')}
+                  onClear={() => setProductImage(null)}
                 />
-                <UploadSlot 
-                  label="Avatar" 
-                  icon={<AvatarIcon />} 
-                  url={avatarImage} 
-                  progress={uploadProgress.avatar} 
-                  onUpload={(e) => handleUpload(e, 'avatar')} 
-                  onClear={() => setAvatarImage(null)} 
+                <UploadSlot
+                  label="Avatar"
+                  icon={<AvatarIcon />}
+                  url={avatarImage}
+                  progress={uploadProgress.avatar}
+                  onUpload={(files) => handleUpload(files, 'avatar')}
+                  onClear={() => setAvatarImage(null)}
                 />
-                <UploadSlot 
-                  label="References" 
-                  icon={<RefIcon />} 
-                  url={additionalImages[0]} 
-                  progress={uploadProgress.additional} 
-                  multiple 
+                <UploadSlot
+                  label="References"
+                  icon={<RefIcon />}
+                  url={additionalImages[0]}
+                  progress={uploadProgress.additional}
+                  multiple
                   images={additionalImages}
-                  onUpload={(e) => handleUpload(e, 'additional')} 
+                  onUpload={(files) => handleUpload(files, 'additional')}
                   onClear={(idx) => {
                     if (idx !== undefined) {
                       setAdditionalImages(prev => prev.filter((_, i) => i !== idx));
