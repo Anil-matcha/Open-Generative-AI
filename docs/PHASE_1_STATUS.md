@@ -132,11 +132,11 @@ Vercel shows the PR #12 Preview and matching `main` Production deployment as Rea
 
 | Integration | Code Built | Preview Configured | Production Configured | Real Test Passed | Production Ready |
 |---|---|---|---|---|---|
-| GitHub Auth | Built | Configured | Configured | Test passed (Preview) | No |
+| GitHub Auth | Built | Configured | Configured | Test passed (Preview and Production, 2026-09-01) | No |
 | Anthropic | Built | Missing | Missing | Test pending | No |
 | MuAPI Image + Video | Built (Production) | Missing | Configured (Sandbox only) | General + private Production Sandbox passed | Yes — Sandbox scope |
 | OpenAI Images (deferred) | Preserved; inactive | Configured | Configured | Not required for active cutover | No |
-| ElevenLabs | Built | Missing | Configured | Test pending | No |
+| ElevenLabs | Built | Missing | Configured | Test passed (Production, 2026-09-01) | No |
 | HeyGen | Built | Missing | Missing | Test pending | No |
 | Runway (deferred) | Preserved; inactive | Missing | Missing | Not required for active cutover | No |
 | YouTube OAuth | Built | Missing | Configured | Test pending | No |
@@ -198,7 +198,7 @@ The Vercel entries named `ANTHPOC`, `runway`, `Elevenlabs`, `myvocie`, and `open
 - Signed Production session: HttpOnly, Secure, SameSite=Lax, eight-hour default expiration
 - Preview OAuth application, exact callback, owner allowlists, and branch-scoped secrets: configured
 - Preview authorization callback and signed-session test: passed for `@lalambert1982-eng` on 2026-08-24
-- Production callback/session, expiration, and logout test: pending
+- Production callback, session persistence across refresh, and logout test: **passed 2026-09-01** against the live Production deployment
 
 ### Anthropic
 
@@ -242,9 +242,9 @@ The Vercel entries named `ANTHPOC`, `runway`, `Elevenlabs`, `myvocie`, and `open
 - Source/UI: built
 - Production: configured
 - Preview: voice ID configured; `ELEVENLABS_API_KEY` still required
-- Real speech generation: pending
+- Real speech generation: **passed 2026-09-01** — a short test clip was generated and played back successfully through the live, owner-authenticated Production Creator Studio shell
 
-The existing production voice ID was not revealed or overwritten during this audit.
+The existing production voice ID was not revealed or overwritten during this audit. The original Production `ELEVENLABS_API_KEY` returned a `401`/`403` during this test session; the key was rotated in the ElevenLabs dashboard and the new value was set in Vercel Production, after which generation succeeded. The prior key should be treated as retired.
 
 The currently reported ElevenLabs `401`/`403` remains a credential/permission blocker. The Storyboard candidate preserves the Voice UI and secure server route and does not change this provider configuration.
 
@@ -392,10 +392,10 @@ The PR #6 release candidate passed GitHub CI, CodeQL, Vercel Preview, 99 local t
 
 ## Remaining real tests
 
-1. Complete Production GitHub authorization, callback, signed-session, session-expiry, and logout testing with the allowlisted account.
-2. Generate one short Anthropic concept/script after adding its key.
-3. Generate one short ElevenLabs clip with the configured canonical Greg/G.FURY voice.
-4. Generate one short Greg HeyGen Digital Twin video and poll it to completion after all three HeyGen variables are present in the test environment.
+1. ~~Complete Production GitHub authorization, callback, signed-session, session-expiry, and logout testing with the allowlisted account.~~ **Passed 2026-09-01.**
+2. Generate one short Anthropic concept/script after adding its key (`ANTHROPIC_API_KEY` still missing in Production).
+3. ~~Generate one short ElevenLabs clip with the configured canonical Greg/G.FURY voice.~~ **Passed 2026-09-01**, after rotating the Production `ELEVENLABS_API_KEY`.
+4. Generate one short Greg HeyGen Digital Twin video and poll it to completion after `HEYGEN_API_KEY`, `HEYGEN_AVATAR_ID`, and `HEYGEN_VOICE_ID` are added to Production (currently only present in the `feature/heygen-digital-twin` Preview scope).
 5. Keep paid MuAPI generation disabled until a separate budget, credits, and artifact-specific approval are recorded; no paid video test is required for this Sandbox cutover.
 6. Complete YouTube connect, private Blob staging, explicit approval, PRIVATE upload, history, and disconnect/revoke testing.
 7. Confirm the exact Production YouTube callback in both Vercel and the Google OAuth web client during the connect test.
