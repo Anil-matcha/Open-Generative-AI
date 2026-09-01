@@ -4,6 +4,8 @@ Authoritative reconciliation snapshot for `lalambert1982-eng/Open-Generative-AI`
 
 **Re-verified 2026-08-31** at HEAD `640590c0f7383ec9cf6e1c9a35699bfc9d972a29` (three commits ahead of the 2026-08-30 audit: `37157f4`, `520d97b`, `640590c`), with three additional narrowly-scoped client-side fixes applied on top (Selena missing-asset handling, a stale-asset session cache guard, and a Publish double-submit guard). `npm run test:security` still passed 112/112, `node --test tests/*.test.js` still passed 38/38, `npm run test:creator-shell` still passed 21/21, and the full workspace/Next production build still passed. No credential, environment, Production, or paid-provider state was available or exercised in this pass; the determination below is unchanged.
 
+**Merged 2026-09-01**: PR #12 ("Integrate Creator Studio operating system shell") was squash-merged into `main` as `82392ae3a379b7f96d3e0f8f1a17c8aae64810b8`, following an additional accessibility pass, a second security review, an added Selena/asset/publish regression-test suite (commit `5eca857`), and a rebase onto a concurrent owner commit (`f78a686`, "Fix Preview Creator Asset uploads"). Before merge: `npm run test:security` passed 114/114, `node --test tests/*.test.js` passed 41/41, `npm run test:creator-shell` passed 24/24, CI and the CodeQL analyze workflow passed, and the Vercel Preview build succeeded. The PR-level CodeQL check reported 4 "new" high-severity alerts; each was individually confirmed via the repository's code-scanning alerts API to be a pre-existing open finding already present on `main` before this PR (clear-text API-key storage in `useAgentAuth.js`/`StandaloneShell.js`, and SHA-256 used as an API-key digest in `handleUploadProxy.js`/`uploadTicket.js`), not a new regression. The merge triggered Vercel's standard auto-deploy of `main` to Production; a read-only post-merge smoke check confirmed `https://open-generative-ai-lemon.vercel.app/` redirects to `/studio`, which returns `200 OK`. No owner-authenticated session, real provider call, or paid generation was exercised as part of this merge. The merged branch `feature/integrated-creator-shell` was deleted after merge.
+
 This document distinguishes four independent states:
 
 - **Built**: the source implementation, authenticated server route, and Creator Studio connection exist.
@@ -13,9 +15,9 @@ This document distinguishes four independent states:
 
 Configuration is not implementation. A provider with a missing API key remains **Built — configuration required**.
 
-## Integrated completion candidate — Built locally, not deployed
+## Integrated completion candidate — Merged and deployed to Production (2026-09-01)
 
-The current `feature/integrated-creator-shell` candidate completes the smallest secure integration slice without rebuilding the providers or creative tools:
+PR #12 completes the smallest secure integration slice without rebuilding the providers or creative tools:
 
 - Selena returns an allowlisted structured plan with server-derived approval and side-effect metadata.
 - Owner-authenticated Projects and Assets persist through private Vercel Blob manifests when `BLOB_READ_WRITE_TOKEN` is configured.
@@ -26,14 +28,14 @@ The current `feature/integrated-creator-shell` candidate completes the smallest 
 
 | Candidate area | Built | Configured | Tested | Production Ready |
 |---|---|---|---|---|
-| Integrated Creator shell | Yes — local candidate | Existing Preview only; completion candidate not deployed | 21 shell tests and production build | No |
+| Integrated Creator shell | Yes — merged (`82392ae3`) | Existing Preview/Production variables only; no new variables added by this PR | 24 shell tests and production build; unauthenticated smoke check of live Production | No — real owner-authenticated session not yet exercised in Production |
 | Selena structured orchestration | Yes | Brain credentials not re-verified | Allowlist/approval tests; no real Brain request | No |
 | Durable Projects and Assets | Yes | Requires target `BLOB_READ_WRITE_TOKEN`; not re-verified through owner session | Ownership/persistence tests only | No |
 | Graphic Studio secure canvas bridge | Yes | Inherits server MuAPI configuration | Proxy/security tests only | No |
 | Storyboard and timeline manifest | Yes | Inherits Project/Blob and MuAPI status | Scene/request/manifest tests only | No |
 | Transition rendering / final compositor | No — manifest boundary only | Not applicable | Not tested | No |
 
-Final local verification: `npm run test:security` passed 112/112, `node --test tests/*.test.js` passed 38/38, `npm run test:creator-shell` passed 21/21, and the complete workspace/Next production build passed. The existing deployed Preview loaded the public integrated Home shell, but owner authentication could not be completed because the secure browser transport reset. No completion code was pushed or deployed, no environment was changed, and no paid/provider side effect occurred.
+Final pre-merge verification: `npm run test:security` passed 114/114, `node --test tests/*.test.js` passed 41/41, `npm run test:creator-shell` passed 24/24, and the complete workspace/Next production build passed. The merge was pushed to `main` and Vercel auto-deployed it to Production; a read-only smoke check confirmed the live site serves `200 OK` at `/studio`. Owner-authenticated Production testing (GitHub login, Selena live requests, real Project/Asset persistence) was not performed in this pass because no owner session/credentials were available to the agent.
 
 See [`CREATOR_STUDIO_OS.md`](./CREATOR_STUDIO_OS.md) and [`STORYBOARD_WORKSPACE.md`](./STORYBOARD_WORKSPACE.md) for current architecture and exact boundaries. Preview promotion still requires explicit approval.
 
@@ -66,15 +68,15 @@ A live `$0` MuAPI Sandbox mock request completed through the existing general Im
 |---|---|
 | Repository | `lalambert1982-eng/Open-Generative-AI` |
 | Default branch | `main` |
-| Current `main` state | Contains the PR #8 MuAPI media-backbone release |
+| Current `main` state | Contains the PR #12 integrated Creator Studio shell release |
 | `main` branch protection | Not enabled |
-| Production implementation commit | `3f18f446cb24d88c3b0b1b59ec53d944896d24c8` |
-| Production deployment | Ready (Vercel) |
+| Production implementation commit | `82392ae3a379b7f96d3e0f8f1a17c8aae64810b8` |
+| Production deployment | Ready (Vercel); auto-deployed on merge, smoke-checked `200 OK` at `/studio` |
 | Production URL | `https://open-generative-ai-lemon.vercel.app` |
-| Release pull request | #8 (merged) |
-| Release-candidate commit | `efcee5ff85bb360c870e86be40733ece361e8aa3` |
+| Release pull request | #12 (merged) |
 | Preview deployment | Ready |
-| Release Preview URL | `https://open-generative-ai-git-feat-03ac60-lalambert1982-7239s-projects.vercel.app` |
+
+Prior release-candidate/Preview URLs referenced below (`efcee5ff8...`, the `feat-03ac60` Preview) correspond to the earlier PR #8 release and are retained here only as historical record.
 
 The Production commit contains private YouTube publishing, the Greg Digital Twin adapter, the provider-neutral Brain Router, and the MuAPI Sandbox-first private Creator Studio image/video cutover. Direct OpenAI and Runway implementations are preserved but deferred.
 
@@ -90,8 +92,9 @@ The Production commit contains private YouTube publishing, the Greg Digital Twin
 | #6 | Brain Router and Greg Digital Twin Production release | `3d6ea7882e8033b374dd9b9d65a51a2dcc30f1ff` | Merged |
 | #7 | Record Creator Studio Production deployment | `2e6ab01e88f03057cf0a5f01295a4dc0b4d609d2` | Merged |
 | #8 | MuAPI private Creator Studio media backbone | `3f18f446cb24d88c3b0b1b59ec53d944896d24c8` | Merged |
+| #12 | Integrated Creator Studio operating system shell | `82392ae3a379b7f96d3e0f8f1a17c8aae64810b8` | Merged |
 
-Vercel shows the PR #8 Preview and matching `main` Production deployment as Ready. The live owner-authenticated Creator Studio reports `MuAPI · Sandbox · $0 mock data` for both Image and Video.
+Vercel shows the PR #12 Preview and matching `main` Production deployment as Ready. Owner-authenticated live verification of the deployed shell (Selena, Projects/Assets, `MuAPI · Sandbox` status) has not been repeated against Production since this merge.
 
 ## Existing capabilities
 
@@ -328,6 +331,22 @@ The Brain Router is a reusable reasoning boundary for the existing agents. It do
 
 ## Verification results
 
+### PR #12 merge — 2026-09-01
+
+| Verification | Result |
+|---|---|
+| `npm run test:security` | 114 passed, 0 failed |
+| `node --test tests/*.test.js` | 41 passed, 0 failed |
+| `npm run test:creator-shell` | 24 passed, 0 failed |
+| Next.js production build | Passed |
+| GitHub CI | Passed |
+| GitHub CodeQL analyze workflow | Passed |
+| GitHub CodeQL check (PR-level alert diff) | Reported failure; all 4 flagged alerts confirmed pre-existing on `main` via the code-scanning alerts API, not new |
+| Vercel Preview | Ready |
+| Vercel Production (auto-deployed on merge) | Ready; smoke-checked `200 OK` at `/studio` |
+| Owner-authenticated Production session | Not tested (no credentials available to the agent) |
+| Real provider/paid generation | Not run |
+
 ### Local Storyboard candidate — 2026-08-27
 
 | Verification | Result |
@@ -413,3 +432,5 @@ Phase 1 can be frozen as **G.FURY Creator Studio v1** only after all of the foll
 ## Determination
 
 **PHASE 1 NOT COMPLETE**
+
+PR #12 merging and auto-deploying to Production (2026-09-01) advances the integrated Creator shell from "built, not deployed" to "deployed, not yet owner-verified in Production." It does not by itself satisfy any of the completion criteria above, all of which still require real owner-authenticated and provider-level testing that has not been performed.
