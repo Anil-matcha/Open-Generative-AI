@@ -159,7 +159,7 @@ function ChatBubble({ message }) {
 // ─── Main Component ──────────────────────────────────────────────────────────
 const TABS = ["templates", "my-agents", "my-chats"];
 
-export default function AgentStudio({ apiKey }) {
+export default function AgentStudio({ apiKey, basePath = "/agents" }) {
   const router = useRouter();
   const params = useParams();
 
@@ -175,7 +175,9 @@ export default function AgentStudio({ apiKey }) {
   // transparently rewritten by middleware.js back to this same catch-all shell route, so
   // reading it back out via useParams() here drives an inline view instead of navigating
   // anywhere — see docs/whitelabel_plan.md for the full routing writeup.
-  const tabSegments = Array.isArray(params?.tab) ? params.tab : [];
+  const tabSegments = Array.isArray(params?.slug)
+    ? params.slug
+    : (Array.isArray(params?.tab) ? params.tab : []);
   const agentsIdx = tabSegments.indexOf("agents");
   const urlAgentSlug = agentsIdx === -1 ? null : tabSegments[agentsIdx + 1] || null;
   const urlConversationId = agentsIdx === -1 ? null : tabSegments[agentsIdx + 2] || null;
@@ -198,28 +200,28 @@ export default function AgentStudio({ apiKey }) {
   const handleSelectAgent = useCallback(
     (agent) => {
       const id = agent.agent_id || agent.id;
-      router.push(`/agents/${id}`);
+      router.push(`${basePath}/${id}`);
     },
-    [router]
+    [basePath, router]
   );
 
   const handleEditAgent = useCallback(
     (agent) => {
       const id = agent.agent_id || agent.id;
-      router.push(`/agents/edit/${id}`);
+      router.push(`${basePath}/edit/${id}`);
     },
-    [router]
+    [basePath, router]
   );
 
   const handleCreateAgent = useCallback(() => {
-    router.push("/agents/create");
-  }, [router]);
+    router.push(`${basePath}/create`);
+  }, [basePath, router]);
 
   const handleOpenConversation = useCallback(
     (agentSlug, convId) => {
-      router.push(`/agents/${agentSlug}/${convId}`);
+      router.push(`${basePath}/${agentSlug}/${convId}`);
     },
-    [router]
+    [basePath, router]
   );
 
   // Resolve the inline view from the URL. 'edit' isn't built inline yet (only used
@@ -290,14 +292,14 @@ export default function AgentStudio({ apiKey }) {
       ]);
       if (result.conversation_id && result.conversation_id !== conversationId) {
         setConversationId(result.conversation_id);
-        router.replace(`/agents/${agentSlug}/${result.conversation_id}`, { scroll: false });
+        router.replace(`${basePath}/${agentSlug}/${result.conversation_id}`, { scroll: false });
       }
     } catch (err) {
       setChatError(err.message || "Failed to send message");
     } finally {
       setSending(false);
     }
-  }, [apiKey, activeAgent, conversationId, chatInput, sending, router]);
+  }, [apiKey, activeAgent, basePath, conversationId, chatInput, sending, router]);
 
   const handleCreateSubmit = useCallback(
     async (e) => {
@@ -313,14 +315,14 @@ export default function AgentStudio({ apiKey }) {
           welcome_message: createForm.welcome_message.trim() || null,
           skill_ids: [],
         });
-        router.push(`/agents/${created.agent_id}`);
+        router.push(`${basePath}/${created.agent_id}`);
       } catch (err) {
         setCreateError(err.message || "Failed to create agent");
       } finally {
         setCreating(false);
       }
     },
-    [apiKey, createForm, creating, router]
+    [apiKey, basePath, createForm, creating, router]
   );
 
   useEffect(() => {
@@ -361,7 +363,7 @@ export default function AgentStudio({ apiKey }) {
       <div className="h-full flex flex-col bg-[#030303] text-white overflow-y-auto custom-scrollbar">
         <div className="flex-shrink-0 h-16 border-b border-white/5 flex items-center gap-6 px-8 bg-black/40">
           <button
-            onClick={() => router.push("/agents")}
+            onClick={() => router.push(basePath)}
             className="flex items-center gap-2 text-xs font-bold text-white/50 hover:text-white transition-colors"
             type="button"
           >
@@ -448,7 +450,7 @@ export default function AgentStudio({ apiKey }) {
       <div className="h-full flex flex-col bg-[#030303] text-white">
         <div className="flex-shrink-0 h-16 border-b border-white/5 flex items-center gap-4 px-8 bg-black/40">
           <button
-            onClick={() => router.push("/agents")}
+            onClick={() => router.push(basePath)}
             className="flex items-center gap-2 text-xs font-bold text-white/50 hover:text-white transition-colors"
             type="button"
           >

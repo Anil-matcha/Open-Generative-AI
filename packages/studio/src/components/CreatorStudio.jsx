@@ -5,20 +5,25 @@ import { upload as uploadBlob } from "@vercel/blob/client";
 import {
   Bot,
   Check,
+  ChevronRight,
   CircleAlert,
   Download,
   ExternalLink,
   Film,
   Image as ImageIcon,
+  Layers3,
   LoaderCircle,
   LockKeyhole,
   LogOut,
   Mic2,
   Play,
   Send,
+  ShieldCheck,
   UserRound,
   WandSparkles,
 } from "lucide-react";
+import StoryboardWorkspace from "./StoryboardWorkspace";
+import { buildProjectMediaRequest } from "./storyboardWorkspaceModel";
 
 const YOUTUBE_VIDEO_TYPES = new Set([
   "video/mp4",
@@ -30,8 +35,17 @@ const YOUTUBE_VIDEO_TYPES = new Set([
 
 const TOOLS = [
   {
+    id: "storyboard",
+    label: "Storyboard",
+    provider: "muapi",
+    eyebrow: "Create",
+    description: "Build connected image and video scenes in a project workspace.",
+    icon: Layers3,
+    accent: "from-cyan-300 to-violet-400",
+  },
+  {
     id: "assistant",
-    label: "Assistant",
+    label: "Selena",
     provider: "brain",
     eyebrow: "Think",
     description: "Ask Selena's provider-neutral brain for a production plan, script, or optimized prompt.",
@@ -43,7 +57,7 @@ const TOOLS = [
     label: "Image",
     provider: "muapi",
     eyebrow: "Create",
-    description: "Generate an original campaign image through the MuAPI media backbone.",
+    description: "Generate an image through the secure Creator gateway with AI Engine set to Auto.",
     icon: ImageIcon,
     accent: "from-emerald-400 to-cyan-400",
   },
@@ -70,7 +84,7 @@ const TOOLS = [
     label: "Video",
     provider: "muapi",
     eyebrow: "Direct",
-    description: "Generate a cinematic clip through MuAPI from text or an optional first-frame image.",
+    description: "Generate from text or automatically animate a supplied first-frame image.",
     icon: Film,
     accent: "from-pink-500 to-rose-500",
   },
@@ -179,6 +193,7 @@ function ToolButton({ tool, active, provider, onClick }) {
       )}
       <Icon size={21} strokeWidth={1.8} />
       <span
+        aria-hidden="true"
         className={cx(
           "absolute right-2 top-2 h-1.5 w-1.5 rounded-full",
           configured ? "bg-emerald-400" : "bg-amber-400",
@@ -577,6 +592,7 @@ function InspectorFields({ activeTool, draft, updateDraft, provider, youtube }) 
             <option value="4:5">Social 4:5</option>
           </select>
         </div>
+        <div className="rounded-xl border border-white/[0.07] bg-black/20 px-3 py-2.5 text-[10px] text-white/35">AI Engine: Auto · secure server route</div>
       </>
     );
   }
@@ -658,37 +674,45 @@ function InspectorFields({ activeTool, draft, updateDraft, provider, youtube }) 
     );
   }
 
-  return (
-    <>
-      <div>
-        <FieldLabel hint={`${draft.prompt.length}/4000`}>Direction</FieldLabel>
-        <PromptTextarea value={draft.prompt} onChange={(value) => updateDraft("prompt", value)} placeholder="Describe the shot, subject motion, camera movement, lighting, and mood…" />
-      </div>
-      <div>
-        <FieldLabel>First-frame image URL <span className="normal-case tracking-normal text-white/20">optional</span></FieldLabel>
-        <input type="url" value={draft.firstFrameUrl} onChange={(event) => updateDraft("firstFrameUrl", event.target.value)} placeholder="https://…" className={inputClass} />
-      </div>
-      <div className="grid grid-cols-2 gap-3">
+  if (activeTool.id === "video") {
+    return (
+      <>
         <div>
-          <FieldLabel>Frame</FieldLabel>
-          <select value={draft.aspectRatio} onChange={(event) => updateDraft("aspectRatio", event.target.value)} className={selectClass}>
-            <option value="16:9">Landscape 16:9</option>
-            <option value="9:16">Vertical 9:16</option>
-            <option value="1:1">Square 1:1</option>
-          </select>
+          <FieldLabel hint={`${draft.prompt.length}/4000`}>Direction</FieldLabel>
+          <PromptTextarea value={draft.prompt} onChange={(value) => updateDraft("prompt", value)} placeholder="Describe the shot, subject motion, camera movement, lighting, and mood…" />
         </div>
         <div>
-          <FieldLabel>Duration</FieldLabel>
-          <select value={draft.duration} onChange={(event) => updateDraft("duration", Number(event.target.value))} className={selectClass}>
-            {[3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((seconds) => <option key={seconds} value={seconds}>{seconds} sec</option>)}
-          </select>
+          <FieldLabel>First-frame image URL <span className="normal-case tracking-normal text-white/20">optional</span></FieldLabel>
+          <input type="url" value={draft.firstFrameUrl} onChange={(event) => updateDraft("firstFrameUrl", event.target.value)} placeholder="Selected assets populate this automatically" className={inputClass} />
         </div>
-      </div>
-    </>
-  );
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <FieldLabel>Frame</FieldLabel>
+            <select value={draft.aspectRatio} onChange={(event) => updateDraft("aspectRatio", event.target.value)} className={selectClass}>
+              <option value="16:9">Landscape 16:9</option>
+              <option value="9:16">Vertical 9:16</option>
+              <option value="1:1">Square 1:1</option>
+            </select>
+          </div>
+          <div>
+            <FieldLabel>Duration</FieldLabel>
+            <select value={draft.duration} onChange={(event) => updateDraft("duration", Number(event.target.value))} className={selectClass}>
+              {[3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((seconds) => <option key={seconds} value={seconds}>{seconds} sec</option>)}
+            </select>
+          </div>
+        </div>
+        <div className="rounded-xl border border-white/[0.07] bg-black/20 px-3 py-2.5 text-[10px] text-white/35">
+          {draft.firstFrameUrl ? "AI Engine: Auto · Image → Video" : "AI Engine: Auto · Text → Video"}
+        </div>
+      </>
+    );
+  }
+
+  return null;
 }
 
 function hasRequiredInput(toolId, draft) {
+  if (!draft) return false;
   if (toolId === "publish") {
     return Boolean(draft.title.trim()) && typeof draft.madeForKids === "boolean" && draft.approved === true;
   }
@@ -697,13 +721,52 @@ function hasRequiredInput(toolId, draft) {
   return Boolean(draft.prompt.trim());
 }
 
-export default function CreatorStudio({ onGenerationStart, onGenerationEnd, onGenerationComplete, onGenerationError }) {
+function SelenaActionCard({ action, onOpen, onDismiss }) {
+  return (
+    <div className="mt-3 rounded-xl border border-violet-300/15 bg-violet-300/[0.045] p-3">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.16em] text-violet-200/60">
+            {action.requiresApproval && <ShieldCheck size={12} />} Prepared action
+          </div>
+          <p className="mt-1 text-xs font-bold text-white/80">{action.label}</p>
+          {action.rationale && <p className="mt-1 text-[10px] leading-4 text-white/35">{action.rationale}</p>}
+          {action.sideEffect && <p className="mt-2 text-[9px] leading-4 text-amber-100/55">{action.sideEffect}</p>}
+        </div>
+      </div>
+      <div className="mt-3 flex gap-2">
+        <button type="button" onClick={onDismiss} className="rounded-lg border border-white/[0.08] px-3 py-2 text-[9px] font-bold text-white/40">Cancel</button>
+        <button type="button" onClick={() => onOpen?.(action)} disabled={!action.available} className="flex items-center gap-1 rounded-lg bg-violet-200 px-3 py-2 text-[9px] font-black text-black disabled:cursor-not-allowed disabled:opacity-30">{action.available ? action.requiresApproval ? 'Review action' : 'Open workspace' : 'Unavailable'} <ChevronRight size={11} /></button>
+      </div>
+    </div>
+  );
+}
+
+export default function CreatorStudio({
+  onGenerationStart,
+  onGenerationEnd,
+  onGenerationComplete,
+  onGenerationError,
+  initialToolId = "storyboard",
+  allowedToolIds = null,
+  initialPrompt = "",
+  initialAsset = null,
+  initialAction = null,
+  project = null,
+  selectedAsset = null,
+  onSelenaAction,
+  onConversationChange,
+  onStoryboardChange,
+  onProjectNameChange,
+  workspaceLabel = "Creator Studio",
+}) {
   const [session, setSession] = useState(null);
   const [authState, setAuthState] = useState("checking");
   const [providers, setProviders] = useState([]);
-  const [activeToolId, setActiveToolId] = useState("assistant");
+  const [activeToolId, setActiveToolId] = useState(initialToolId);
   const [drafts, setDrafts] = useState(INITIAL_DRAFTS);
   const [outputs, setOutputs] = useState({});
+  const [assistantHistory, setAssistantHistory] = useState([]);
   const [working, setWorking] = useState(false);
   const [error, setError] = useState("");
   const [youtubeStatus, setYoutubeStatus] = useState(null);
@@ -713,8 +776,16 @@ export default function CreatorStudio({ onGenerationStart, onGenerationEnd, onGe
   const [youtubeUploadProgress, setYoutubeUploadProgress] = useState(0);
   const objectUrlsRef = useRef(new Set());
   const generationTokenRef = useRef(0);
+  const loadedConversationProjectRef = useRef(null);
+  const consumedActionRef = useRef(null);
+  const conversationSaveTimerRef = useRef(null);
 
-  const activeTool = TOOLS.find((tool) => tool.id === activeToolId) || TOOLS[0];
+  const visibleTools = useMemo(() => (
+    Array.isArray(allowedToolIds) && allowedToolIds.length
+      ? TOOLS.filter((tool) => allowedToolIds.includes(tool.id))
+      : TOOLS
+  ), [allowedToolIds]);
+  const activeTool = visibleTools.find((tool) => tool.id === activeToolId) || visibleTools[0] || TOOLS[0];
   const activeDraft = drafts[activeTool.id];
   const activeOutput = outputs[activeTool.id] || null;
   const youtubeProvider = useMemo(() => ({
@@ -733,6 +804,102 @@ export default function CreatorStudio({ onGenerationStart, onGenerationEnd, onGe
     [providers, youtubeProvider],
   );
   const activeProvider = providerMap[activeTool.provider];
+
+  useEffect(() => {
+    if (visibleTools.some((tool) => tool.id === initialToolId)) setActiveToolId(initialToolId);
+  }, [initialToolId, visibleTools]);
+
+  useEffect(() => {
+    const prompt = typeof initialPrompt === "string" ? initialPrompt.trim() : "";
+    if (!prompt) return;
+    setDrafts((previous) => ({
+      ...previous,
+      assistant: { ...previous.assistant, prompt },
+    }));
+  }, [initialPrompt]);
+
+  useEffect(() => {
+    if (initialAsset?.type !== "image" || typeof initialAsset.url !== "string") return;
+    setDrafts((previous) => ({
+      ...previous,
+      video: { ...previous.video, firstFrameUrl: initialAsset.url },
+    }));
+  }, [initialAsset]);
+
+  useEffect(() => {
+    const actionKey = initialAction?.id || '';
+    if (!actionKey || consumedActionRef.current === actionKey) return;
+    const parameters = initialAction.parameters || {};
+    if (initialAction.action === 'image.generate') {
+      consumedActionRef.current = actionKey;
+      setActiveToolId('image');
+      setDrafts((previous) => ({
+        ...previous,
+        image: {
+          ...previous.image,
+          prompt: parameters.prompt || previous.image.prompt,
+          aspectRatio: parameters.aspectRatio || previous.image.aspectRatio,
+        },
+      }));
+    } else if (['video.generate', 'video.animate'].includes(initialAction.action)) {
+      consumedActionRef.current = actionKey;
+      setActiveToolId('video');
+      setDrafts((previous) => ({
+        ...previous,
+        video: {
+          ...previous.video,
+          prompt: parameters.prompt || previous.video.prompt,
+          aspectRatio: parameters.aspectRatio || previous.video.aspectRatio,
+          duration: parameters.duration || previous.video.duration,
+          firstFrameUrl: initialAction.action === 'video.animate' && initialAsset?.type === 'image'
+            ? initialAsset.url
+            : previous.video.firstFrameUrl,
+        },
+      }));
+    }
+  }, [initialAction, initialAsset]);
+
+  useEffect(() => {
+    if (!project?.id || loadedConversationProjectRef.current === project.id) return;
+    loadedConversationProjectRef.current = project.id;
+    const messages = Array.isArray(project.conversation?.messages)
+      ? project.conversation.messages.map((message) => ({
+          ...message,
+          actions: Array.isArray(message.actions) ? message.actions : [],
+          suggestedActions: [],
+        }))
+      : [];
+    setAssistantHistory(messages);
+  }, [project?.id, project?.conversation?.messages]);
+
+  useEffect(() => {
+    if (!project?.id || typeof onConversationChange !== 'function') return undefined;
+    const messages = assistantHistory.slice(-50).map((message) => ({
+      id: message.id,
+      role: message.role,
+      text: message.text,
+      provider: message.provider || null,
+      actions: Array.isArray(message.suggestedActions) && message.suggestedActions.length > 0
+        ? message.suggestedActions.map((action) => action.action)
+        : (Array.isArray(message.actions) ? message.actions : []),
+      createdAt: message.createdAt || null,
+    }));
+    const stored = Array.isArray(project.conversation?.messages) ? project.conversation.messages : [];
+    const comparable = (items) => items.map((message) => ({
+      id: message.id,
+      role: message.role,
+      text: message.text,
+      provider: message.provider || null,
+      actions: Array.isArray(message.actions) ? message.actions : [],
+      createdAt: message.createdAt || null,
+    }));
+    if (JSON.stringify(comparable(messages)) === JSON.stringify(comparable(stored))) return undefined;
+    window.clearTimeout(conversationSaveTimerRef.current);
+    conversationSaveTimerRef.current = window.setTimeout(() => {
+      onConversationChange({ version: 1, messages });
+    }, 700);
+    return () => window.clearTimeout(conversationSaveTimerRef.current);
+  }, [assistantHistory, onConversationChange, project?.conversation?.messages, project?.id]);
 
   const request = useCallback(async (path, options = {}) => {
     const headers = new Headers(options.headers || {});
@@ -836,6 +1003,7 @@ export default function CreatorStudio({ onGenerationStart, onGenerationEnd, onGe
 
   useEffect(() => () => {
     generationTokenRef.current += 1;
+    window.clearTimeout(conversationSaveTimerRef.current);
     objectUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
     objectUrlsRef.current.clear();
   }, []);
@@ -933,7 +1101,7 @@ export default function CreatorStudio({ onGenerationStart, onGenerationEnd, onGe
     return url;
   };
 
-  const pollTask = async (provider, id, token, toolId) => {
+  const pollTask = async (provider, id, token, toolId, { trackOutput = true, onStatus } = {}) => {
     const terminalSuccess = provider === "runway" ? ["SUCCEEDED"] : ["completed"];
     const terminalFailure = provider === "runway" ? ["FAILED", "CANCELED"] : ["failed", "error"];
 
@@ -948,10 +1116,13 @@ export default function CreatorStudio({ onGenerationStart, onGenerationEnd, onGe
       const data = await response.json();
       const status = String(data.status || "unknown");
       const terminalStatus = provider === "runway" ? status.toUpperCase() : status.toLowerCase();
-      setOutputs((previous) => ({
-        ...previous,
-        [toolId]: { type: "pending", provider, id, status },
-      }));
+      onStatus?.({ id, provider, status });
+      if (trackOutput) {
+        setOutputs((previous) => ({
+          ...previous,
+          [toolId]: { type: "pending", provider, id, status },
+        }));
+      }
       if (terminalSuccess.includes(terminalStatus)) {
         const url = provider === "runway" ? data.output?.[0] : provider === "muapi" ? data.url : data.videoUrl;
         if (!url) throw new Error(`${provider} completed without an output URL.`);
@@ -971,6 +1142,68 @@ export default function CreatorStudio({ onGenerationStart, onGenerationEnd, onGe
       }
     }
     throw new Error(`${provider} generation is still running. Reopen the provider dashboard with the task ID to check it.`);
+  };
+
+  const submitProjectMedia = async ({ kind, prompt, aspectRatio, duration = 5, firstFrameUrl = "" }, token, { trackOutput = false } = {}) => {
+    const { toolId, body } = buildProjectMediaRequest({
+      kind,
+      prompt,
+      aspectRatio,
+      duration,
+      firstFrameUrl,
+    });
+    if (!body.prompt) throw new Error(`Add a ${kind} prompt before generating.`);
+    const response = await request(toolId, { method: "POST", body });
+    if (!response.ok) throw new Error(await responseError(response));
+    const data = await response.json();
+    if (data.status === "completed" && data.url) {
+      return {
+        type: kind,
+        provider: "muapi",
+        id: data.jobId || data.id || null,
+        url: data.url,
+        model: data.model || null,
+        keyMode: data.keyMode || null,
+      };
+    }
+    const jobId = data.jobId || data.id;
+    if (!jobId) throw new Error(`MuAPI returned no ${kind} generation job ID.`);
+    const polledOutput = await pollTask("muapi", jobId, token, toolId, { trackOutput });
+    return {
+      ...polledOutput,
+      type: kind,
+      model: data.model || polledOutput.model || null,
+      keyMode: data.keyMode || polledOutput.keyMode || null,
+    };
+  };
+
+  const runProjectMedia = async (input) => {
+    const muapiProvider = providerMap.muapi;
+    if (working) throw new Error("Another Creator Studio generation is already running.");
+    if (muapiProvider?.configured !== true || muapiProvider?.connected === false) {
+      throw new Error("MuAPI setup is required before scene generation.");
+    }
+    const token = generationTokenRef.current + 1;
+    generationTokenRef.current = token;
+    setWorking(true);
+    setError("");
+    onGenerationStart?.();
+    try {
+      const output = await submitProjectMedia(input, token);
+      if (generationTokenRef.current !== token) throw new Error("Generation was stopped.");
+      onGenerationComplete?.({ url: output.url, provider: "muapi", type: output.type, model: output.model || null, title: "Scene asset" });
+      return output;
+    } catch (generationError) {
+      const message = generationError.message || "Generation failed.";
+      if (generationTokenRef.current === token) {
+        setError(message);
+        onGenerationError?.(message);
+      }
+      throw generationError;
+    } finally {
+      if (generationTokenRef.current === token) setWorking(false);
+      onGenerationEnd?.();
+    }
   };
 
   const generate = async () => {
@@ -995,26 +1228,47 @@ export default function CreatorStudio({ onGenerationStart, onGenerationEnd, onGe
     try {
       let output;
       if (toolId === "assistant") {
-        const response = await request("assistant", { method: "POST", body: draft });
+        const timestamp = new Date().toISOString();
+        setAssistantHistory((previous) => [...previous, { id: window.crypto.randomUUID(), role: "user", text: draft.prompt, createdAt: timestamp }]);
+        const response = await request("assistant", {
+          method: "POST",
+          body: {
+            ...draft,
+            workspace: workspaceLabel,
+            projectId: project?.id || null,
+            selectedAssetId: selectedAsset?.id || initialAsset?.id || null,
+          },
+        });
         if (!response.ok) throw new Error(await responseError(response));
         const data = await response.json();
-        output = { type: "text", text: data.text, model: data.model, provider: data.provider };
-      } else if (toolId === "image") {
-        const response = await request("image", { method: "POST", body: draft });
-        if (!response.ok) throw new Error(await responseError(response));
-        const data = await response.json();
-        if (data.status === "completed" && data.url) {
-          output = { type: "image", provider: "muapi", url: data.url, model: data.model, keyMode: data.keyMode };
-        } else {
-          const jobId = data.jobId || data.id;
-          if (!jobId) throw new Error("MuAPI returned no image job ID.");
-          setOutputs((previous) => ({ ...previous, image: { type: "pending", provider: "muapi", id: jobId, status: data.status } }));
-          output = await pollTask("muapi", jobId, token, toolId);
-        }
+        output = {
+          type: "text",
+          text: data.message || data.text,
+          model: data.model,
+          provider: data.provider,
+          plan: data.plan || [],
+          suggestedActions: data.suggestedActions || [],
+          requiresApproval: data.requiresApproval === true,
+          estimatedSideEffects: data.estimatedSideEffects || [],
+        };
+        setAssistantHistory((previous) => [...previous, {
+          id: window.crypto.randomUUID(),
+          role: "assistant",
+          text: output.text,
+          provider: data.provider,
+          plan: output.plan,
+          suggestedActions: output.suggestedActions,
+          requiresApproval: output.requiresApproval,
+          estimatedSideEffects: output.estimatedSideEffects,
+          createdAt: new Date().toISOString(),
+        }]);
+      } else if (toolId === "image" || toolId === "video") {
+        output = await submitProjectMedia({ kind: toolId, ...draft }, token, { trackOutput: true });
       } else if (toolId === "voice") {
         const response = await request("speech", { method: "POST", body: draft });
         if (!response.ok) throw new Error(await responseError(response));
-        output = { type: "audio", url: rememberObjectUrl(await response.blob()) };
+        const blob = await response.blob();
+        output = { type: "audio", url: rememberObjectUrl(blob), blob, mimeType: blob.type || "audio/mpeg" };
       } else if (toolId === "avatar") {
         const response = await request("heygen", { method: "POST", body: draft });
         if (!response.ok) throw new Error(await responseError(response));
@@ -1023,19 +1277,7 @@ export default function CreatorStudio({ onGenerationStart, onGenerationEnd, onGe
         if (!jobId) throw new Error("HeyGen returned no video job ID.");
         setOutputs((previous) => ({ ...previous, avatar: { type: "pending", provider: "heygen", id: jobId, status: data.status } }));
         output = await pollTask("heygen", jobId, token, toolId);
-      } else if (toolId === "video") {
-        const response = await request("video", { method: "POST", body: draft });
-        if (!response.ok) throw new Error(await responseError(response));
-        const data = await response.json();
-        if (data.status === "completed" && data.url) {
-          output = { type: "video", provider: "muapi", url: data.url, model: data.model, keyMode: data.keyMode };
-        } else {
-          const jobId = data.jobId || data.id;
-          if (!jobId) throw new Error("MuAPI returned no video job ID.");
-          setOutputs((previous) => ({ ...previous, video: { type: "pending", provider: "muapi", id: jobId, status: data.status } }));
-          output = await pollTask("muapi", jobId, token, toolId);
-        }
-      } else {
+      } else if (toolId === "publish") {
         let pathname = youtubeStagedPath;
         if (!pathname) {
           if (!youtubeFile) throw new Error("Choose a finished video first.");
@@ -1105,11 +1347,23 @@ export default function CreatorStudio({ onGenerationStart, onGenerationEnd, onGe
           publish: { ...previous.publish, approved: false },
         }));
         await loadYoutubeStatus().catch(() => {});
+      } else {
+        throw new Error("That Creator Studio tool is not available.");
       }
 
       if (generationTokenRef.current !== token) return;
       setOutputs((previous) => ({ ...previous, [toolId]: output }));
-      onGenerationComplete?.({ url: output.url || null, provider: providerId });
+      onGenerationComplete?.({
+        url: output.url || null,
+        provider: providerId,
+        type: output.type || toolId,
+        model: output.model || null,
+        requestId: output.id || output.jobId || null,
+        keyMode: output.keyMode || null,
+        blob: output.blob || null,
+        mimeType: output.mimeType || null,
+        title: `${activeTool.label} output`,
+      });
     } catch (generationError) {
       if (generationTokenRef.current !== token) return;
       const message = generationError.message || "Generation failed.";
@@ -1121,6 +1375,14 @@ export default function CreatorStudio({ onGenerationStart, onGenerationEnd, onGe
       }
       onGenerationEnd?.();
     }
+  };
+
+  const dismissAssistantAction = (messageId, actionId) => {
+    setAssistantHistory((previous) => previous.map((message) => (
+      message.id === messageId
+        ? { ...message, suggestedActions: (message.suggestedActions || []).filter((action) => action.id !== actionId) }
+        : message
+    )));
   };
 
   const activeReady = activeProvider?.configured === true && (
@@ -1150,10 +1412,10 @@ export default function CreatorStudio({ onGenerationStart, onGenerationEnd, onGe
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <h1 className="truncate text-sm font-bold tracking-tight">Creator Studio</h1>
+              <h1 className="truncate text-sm font-bold tracking-tight">{workspaceLabel}</h1>
               <span className="rounded-full border border-violet-400/20 bg-violet-400/10 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-violet-200">Private</span>
             </div>
-            <p className="truncate text-[10px] text-white/30">One brain router · five production tools</p>
+            <p className="truncate text-[10px] text-white/30">Project workspace · secure provider routes</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -1170,7 +1432,7 @@ export default function CreatorStudio({ onGenerationStart, onGenerationEnd, onGe
 
       <div className="flex min-h-0 flex-1 flex-col md:flex-row">
         <aside className="flex shrink-0 items-center gap-2 overflow-x-auto border-b border-white/[0.06] bg-[#09090b] px-3 py-2 md:w-[76px] md:flex-col md:border-b-0 md:border-r md:px-2 md:py-4">
-          {TOOLS.map((tool) => (
+          {visibleTools.map((tool) => (
             <ToolButton
               key={tool.id}
               tool={tool}
@@ -1181,6 +1443,22 @@ export default function CreatorStudio({ onGenerationStart, onGenerationEnd, onGe
           ))}
         </aside>
 
+        <main className={cx("min-h-0 min-w-0 flex-1 overflow-hidden", activeTool.id !== "storyboard" && "hidden")}>
+          <StoryboardWorkspace
+            provider={providerMap.muapi}
+            busy={working}
+            error={error}
+            onGenerateMedia={runProjectMedia}
+            initialAsset={initialAsset}
+            initialAction={initialAction}
+            project={project}
+            onStoryboardChange={onStoryboardChange}
+            onProjectNameChange={onProjectNameChange}
+          />
+        </main>
+
+        {activeTool.id !== "storyboard" && (
+          <>
         <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
           <div className="flex shrink-0 items-center justify-between border-b border-white/[0.05] px-5 py-3">
             <div className="min-w-0">
@@ -1195,7 +1473,35 @@ export default function CreatorStudio({ onGenerationStart, onGenerationEnd, onGe
 
           <div className="min-h-0 flex-1 overflow-y-auto p-4 custom-scrollbar sm:p-6">
             <div className="mx-auto h-full min-h-[360px] w-full max-w-6xl">
-              {activeOutput ? <ResultCanvas output={activeOutput} tool={activeTool} /> : <EmptyCanvas tool={activeTool} configured={activeProvider?.configured} />}
+              {activeTool.id === "assistant" && assistantHistory.length > 0 ? (
+                <div className="mx-auto flex max-w-3xl flex-col gap-4 pb-8">
+                  {assistantHistory.map((message) => (
+                    <article key={message.id} className={cx(
+                      "rounded-2xl border px-4 py-3 text-sm leading-6",
+                      message.role === "user"
+                        ? "ml-8 border-cyan-300/15 bg-cyan-300/[0.06] text-white/80"
+                        : "mr-8 border-white/[0.07] bg-white/[0.025] text-white/68",
+                    )}>
+                      <p className="mb-1 text-[9px] font-black uppercase tracking-[0.18em] text-white/25">{message.role === "user" ? "You" : "Selena"}</p>
+                      <p className="whitespace-pre-wrap">{message.text}</p>
+                      {message.role === "assistant" && Array.isArray(message.plan) && message.plan.length > 0 && (
+                        <ol className="mt-3 space-y-1 border-t border-white/[0.06] pt-3 text-xs text-white/48">
+                          {message.plan.map((step, index) => <li key={`${message.id}-step-${index}`} className="flex gap-2"><span className="text-cyan-200/45">{index + 1}.</span><span>{step}</span></li>)}
+                        </ol>
+                      )}
+                      {message.role === "assistant" && Array.isArray(message.suggestedActions) && message.suggestedActions.map((action) => (
+                        <SelenaActionCard
+                          key={action.id}
+                          action={action}
+                          onOpen={onSelenaAction}
+                          onDismiss={() => dismissAssistantAction(message.id, action.id)}
+                        />
+                      ))}
+                    </article>
+                  ))}
+                  {working && <div className="mr-8 flex items-center gap-2 rounded-2xl border border-white/[0.07] bg-white/[0.025] px-4 py-3 text-xs text-white/35"><LoaderCircle size={14} className="animate-spin" /> Selena is reasoning…</div>}
+                </div>
+              ) : activeOutput ? <ResultCanvas output={activeOutput} tool={activeTool} /> : <EmptyCanvas tool={activeTool} configured={activeProvider?.configured} />}
             </div>
           </div>
         </main>
@@ -1265,6 +1571,8 @@ export default function CreatorStudio({ onGenerationStart, onGenerationEnd, onGe
             </div>
           </div>
         </aside>
+          </>
+        )}
       </div>
     </div>
   );

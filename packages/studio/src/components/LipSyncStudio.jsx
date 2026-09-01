@@ -326,6 +326,7 @@ export default function LipSyncStudio({
   historyItems,
   droppedFiles,
   onFilesHandled,
+  initialAsset,
 }) {
   const LEGACY_PERSIST_KEY = "hg_lipsync_studio_persistent";
   const PERSIST_KEY = scopedPersistKey(LEGACY_PERSIST_KEY, apiKey);
@@ -388,6 +389,24 @@ export default function LipSyncStudio({
   // ── Video ref for result ────────────────────────────────────────────────
   const resultVideoRef = useRef(null);
   const hasRestored = useRef(false);
+  const consumedAssetIdRef = useRef(null);
+
+  useEffect(() => {
+    if (!initialAsset?.id || consumedAssetIdRef.current === initialAsset.id) return;
+    if (typeof initialAsset.url !== 'string') return;
+    consumedAssetIdRef.current = initialAsset.id;
+    if (initialAsset.type === 'video') {
+      setInputMode('video');
+      setVideoUrl(initialAsset.url);
+      setVideoName(initialAsset.title || 'Studio video asset');
+      setVideoState(UPLOAD_STATE.READY);
+    } else if (initialAsset.type === 'image') {
+      setInputMode('image');
+      setImageUrl(initialAsset.url);
+      setImageName(initialAsset.title || 'Studio image asset');
+      setImageState(UPLOAD_STATE.READY);
+    }
+  }, [initialAsset]);
 
   // ── Persistence: Load ────────────────────────────────────────────────────
   useEffect(() => {

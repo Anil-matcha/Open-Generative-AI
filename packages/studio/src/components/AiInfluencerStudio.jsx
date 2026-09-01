@@ -734,7 +734,12 @@ export default function AiInfluencerStudio({
                 role="button"
                 tabIndex={0}
                 onClick={() => setSelectedHistoryIdx(idx)}
-                onKeyDown={(e) => e.key === "Enter" && setSelectedHistoryIdx(idx)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setSelectedHistoryIdx(idx);
+                  }
+                }}
                 className={`group relative w-full aspect-[3/4] rounded-xl overflow-hidden border transition-all cursor-pointer ${
                   selectedHistoryIdx === idx
                     ? "border-violet-500 ring-1 ring-violet-500/40"

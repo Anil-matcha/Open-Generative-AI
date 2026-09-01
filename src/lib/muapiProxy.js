@@ -121,9 +121,11 @@ export async function fetchMuapi(request, {
     pathSegments = [],
     method = request.method,
     requireApiKey = true,
+    apiKeyOverride = null,
     env = process.env,
+    fetchImpl = fetch,
 } = {}) {
-    const apiKey = getApiKeyFromRequest(request);
+    const apiKey = normalizeKey(apiKeyOverride) || getApiKeyFromRequest(request);
     if (requireApiKey && !apiKey) return { response: unauthorizedResponse() };
 
     let targetUrl;
@@ -156,7 +158,7 @@ export async function fetchMuapi(request, {
     }
 
     try {
-        const upstream = await fetch(targetUrl, {
+        const upstream = await fetchImpl(targetUrl, {
             method: upperMethod,
             headers: sanitizeUpstreamHeaders(request, apiKey),
             body,

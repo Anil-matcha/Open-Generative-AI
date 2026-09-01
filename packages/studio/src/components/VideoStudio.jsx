@@ -1623,9 +1623,10 @@ export default function VideoStudio({
               {/* Main image preview */}
               {uploadedImageUrl && (
                 <div className={PROMPT_MEDIA_PREVIEW_CLASS}>
-                  <img src={uploadedImageUrl} alt="" className="w-full h-full object-cover" />
+                  <img src={uploadedImageUrl} alt="Start frame image preview" className="w-full h-full object-cover" />
                   <button
                     type="button"
+                    aria-label="Remove start frame image"
                     onClick={clearImageUpload}
                     className="absolute top-0.5 right-0.5 w-4 h-4 bg-black/60 hover:bg-black rounded-full flex items-center justify-center text-white/85 hover:text-white text-[8px] border border-white/5"
                   >
@@ -1637,9 +1638,10 @@ export default function VideoStudio({
               {/* End frame image preview */}
               {uploadedEndImageUrl && (
                 <div className={PROMPT_MEDIA_PREVIEW_CLASS}>
-                  <img src={uploadedEndImageUrl} alt="" className="w-full h-full object-cover" />
+                  <img src={uploadedEndImageUrl} alt="End frame image preview" className="w-full h-full object-cover" />
                   <button
                     type="button"
+                    aria-label="Remove end frame image"
                     onClick={clearEndImage}
                     className="absolute top-0.5 right-0.5 w-4 h-4 bg-black/60 hover:bg-black rounded-full flex items-center justify-center text-white/85 hover:text-white text-[8px] border border-white/5"
                   >
@@ -1657,6 +1659,7 @@ export default function VideoStudio({
                   <video src={uploadedVideoUrl} className="w-full h-full object-cover" muted />
                   <button
                     type="button"
+                    aria-label="Remove uploaded video"
                     onClick={clearVideoUpload}
                     className="absolute top-0.5 right-0.5 w-4 h-4 bg-black/60 hover:bg-black rounded-full flex items-center justify-center text-white/85 hover:text-white text-[8px] border border-white/5"
                   >
@@ -1670,9 +1673,10 @@ export default function VideoStudio({
                 <>
                   {uploadedImageUrls.map((url, idx) => (
                     <div key={url} className={PROMPT_MEDIA_PREVIEW_CLASS}>
-                      <img src={url} alt="" className="w-full h-full object-cover" />
+                      <img src={url} alt={`Prompt reference image ${idx + 1}`} className="w-full h-full object-cover" />
                       <button
                         type="button"
+                        aria-label={`Remove reference image ${idx + 1}`}
                         onClick={() => removeImageAtIndex(idx)}
                         className="absolute top-0.5 right-0.5 w-4 h-4 bg-black/60 hover:bg-black rounded-full flex items-center justify-center text-white/85 hover:text-white text-[8px] border border-white/5"
                       >

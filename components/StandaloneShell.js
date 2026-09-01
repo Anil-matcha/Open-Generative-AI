@@ -1,1221 +1,576 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
-import { CreatorStudio, ImageStudio, VideoStudio, ClippingStudio, VibeMotionStudio, LipSyncStudio, RecastStudio, CinemaStudio, AudioStudio, MarketingStudio, WorkflowStudio, AgentStudio, AppsStudio, AiInfluencerStudio, LayersStudio, getUserBalance } from 'studio';
-
-const DesignAgentStudio = dynamic(() => import('studio').then(mod => mod.DesignAgentStudio), {
-  ssr: false,
-  loading: () => <div className="h-full w-full bg-black flex items-center justify-center text-white/20">Loading Design Studio...</div>
-});
-import axios from 'axios';
-import ApiKeyModal from './ApiKeyModal';
-
-const TABS = [
-  {
-    id: 'creator',
-    label: 'Creator Studio',
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6L12 3z"/>
-        <path d="M5 15l.8 2.2L8 18l-2.2.8L5 21l-.8-2.2L2 18l2.2-.8L5 15z"/>
-        <path d="M19 13l.8 2.2L22 16l-2.2.8L19 19l-.8-2.2L16 16l2.2-.8L19 13z"/>
-      </svg>
-    )
-  },
-  {
-    id: 'image',
-    label: 'Image Studio',
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-        <circle cx="8.5" cy="8.5" r="1.5"/>
-        <polyline points="21 15 16 10 5 21"/>
-      </svg>
-    )
-  },
-  {
-    id: 'layers',
-    label: 'Layers Studio',
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <polygon points="12 2 2 7 12 12 22 7 12 2"/>
-        <polyline points="2 17 12 22 22 17"/>
-        <polyline points="2 12 12 17 22 12"/>
-      </svg>
-    )
-  },
-  {
-    id: 'video',
-    label: 'Video Studio',
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <polygon points="23 7 16 12 23 17 23 7"/>
-        <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
-      </svg>
-    )
-  },
-  {
-    id: 'audio',
-    label: 'Audio Studio',
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M9 18V5l12-2v13"/>
-        <circle cx="6" cy="18" r="3"/>
-        <circle cx="18" cy="16" r="3"/>
-      </svg>
-    )
-  },
-  {
-    id: 'clipping',
-    label: 'AI Clipping',
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="6" cy="6" r="3"/>
-        <circle cx="6" cy="18" r="3"/>
-        <line x1="20" y1="4" x2="8.12" y2="15.88"/>
-        <line x1="14.47" y1="14.47" x2="20" y2="20"/>
-        <line x1="8.12" y1="8.12" x2="12" y2="12"/>
-      </svg>
-    )
-  },
-  {
-    id: 'vibe-motion',
-    label: 'Vibe Motion',
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-      </svg>
-    )
-  },
-  {
-    id: 'lipsync',
-    label: 'Lip Sync',
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
-        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-        <line x1="12" y1="19" x2="12" y2="22"/>
-      </svg>
-    )
-  },
-  {
-    id: 'body-swap',
-    label: 'Body Swap',
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-        <circle cx="8.5" cy="7" r="4"/>
-        <polyline points="17 11 19 13 23 9"/>
-        <path d="M23 13v-2"/>
-      </svg>
-    )
-  },
-  {
-    id: 'cinema',
-    label: 'Cinema Studio',
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/>
-        <line x1="7" y1="2" x2="7" y2="22"/>
-        <line x1="17" y1="2" x2="17" y2="22"/>
-        <line x1="2" y1="12" x2="22" y2="12"/>
-        <line x1="2" y1="7" x2="7" y2="7"/>
-        <line x1="2" y1="17" x2="7" y2="17"/>
-        <line x1="17" y1="17" x2="22" y2="17"/>
-        <line x1="17" y1="7" x2="22" y2="7"/>
-      </svg>
-    )
-  },
-  {
-    id: 'marketing',
-    label: 'Marketing Studio',
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-        <line x1="8" y1="9" x2="16" y2="9"/>
-        <line x1="8" y1="13" x2="14" y2="13"/>
-      </svg>
-    )
-  },
-  {
-    id: 'workflows',
-    label: 'Workflows',
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="3" width="6" height="6" rx="1"/>
-        <rect x="15" y="3" width="6" height="6" rx="1"/>
-        <rect x="9" y="15" width="6" height="6" rx="1"/>
-        <path d="M6 9v3a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V9"/>
-        <path d="M12 13v2"/>
-      </svg>
-    )
-  },
-  {
-    id: 'agents',
-    label: 'Agents',
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="11" width="18" height="10" rx="2"/>
-        <circle cx="12" cy="5" r="2"/>
-        <path d="M12 7v4"/>
-        <line x1="8" y1="16" x2="8.01" y2="16"/>
-        <line x1="16" y1="16" x2="16.01" y2="16"/>
-      </svg>
-    )
-  },
-  {
-    id: 'design-agent',
-    label: 'Design Agent',
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 19l7-7 3 3-7 7-3-3z"/>
-        <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
-        <path d="M2 2l7.586 7.586"/>
-        <circle cx="11" cy="11" r="2"/>
-      </svg>
-    )
-  },
-  {
-    id: 'apps',
-    label: 'Explore Apps',
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="3" width="7" height="7"/>
-        <rect x="14" y="3" width="7" height="7"/>
-        <rect x="14" y="14" width="7" height="7"/>
-        <rect x="3" y="14" width="7" height="7"/>
-      </svg>
-    )
-  },
-  {
-    id: 'ai-influencer',
-    label: 'AI Influencer Studio',
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-      </svg>
-    )
-  }
-];
-
-const NAVIGATION_CATEGORIES = [
-  {
-    id: 'creator-workspace',
-    label: 'Creator Workspace',
-    tabIds: ['creator'],
-    icon: (
-      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6L12 3z"/>
-        <path d="M5 15l.8 2.2L8 18l-2.2.8L5 21l-.8-2.2L2 18l2.2-.8L5 15z"/>
-      </svg>
-    )
-  },
-  {
-    id: 'images',
-    label: 'Images',
-    tabIds: ['image', 'layers', 'cinema', 'design-agent', 'ai-influencer'],
-    icon: (
-      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="3" width="18" height="18" rx="2"/>
-        <circle cx="8.5" cy="8.5" r="1.5"/>
-        <path d="M21 15l-5-5L5 21"/>
-      </svg>
-    )
-  },
-  {
-    id: 'video',
-    label: 'Video',
-    tabIds: ['video', 'clipping', 'vibe-motion', 'lipsync', 'body-swap', 'marketing'],
-    icon: (
-      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="2" y="4" width="15" height="16" rx="2"/>
-        <path d="M17 9l5-3v12l-5-3"/>
-        <path d="M8 9l4 3-4 3z"/>
-      </svg>
-    )
-  },
-  {
-    id: 'audio',
-    label: 'Audio',
-    tabIds: ['audio'],
-    icon: (
-      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M9 18V5l12-2v13"/>
-        <circle cx="6" cy="18" r="3"/>
-        <circle cx="18" cy="16" r="3"/>
-      </svg>
-    )
-  },
-  {
-    id: 'agents-automation',
-    label: 'Agents & Automation',
-    tabIds: ['agents', 'workflows'],
-    icon: (
-      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="3" width="6" height="6" rx="1"/>
-        <rect x="15" y="3" width="6" height="6" rx="1"/>
-        <rect x="9" y="15" width="6" height="6" rx="1"/>
-        <path d="M6 9v2a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V9"/>
-        <path d="M12 13v2"/>
-      </svg>
-    )
-  }
-];
-
-const EXPLORE_APPS_TAB = TABS.find((tab) => tab.id === 'apps');
-
-const getNavigationCategory = (tabId) => (
-  NAVIGATION_CATEGORIES.find((category) => category.tabIds.includes(tabId))
-);
+import { upload as uploadBlob } from '@vercel/blob/client';
+import {
+  AgentStudio, AiInfluencerStudio, AppsStudio, AudioStudio, CinemaStudio,
+  ClippingStudio, CreatorStudio, GraphicStudio, LipSyncStudio, MarketingStudio,
+  RecastStudio, SocialPublishStudio, VibeMotionStudio, VideoStudio, WorkflowStudio, getUserBalance,
+} from 'studio';
+import {
+  Blocks, Bot, Boxes, ChevronDown, Clapperboard, Film, FolderOpen, Home, Image,
+  LayoutGrid, Menu, Mic2, Music2, PanelLeftClose, PanelLeftOpen, Send, Settings2, Share2,
+  Sparkles, UserRound, WandSparkles, Workflow, X, Zap,
+} from 'lucide-react';
+import CreatorHome from './CreatorHome';
+import LegacyProviderSettings from './LegacyProviderSettings';
+import ProjectsStudio from './ProjectsStudio';
+import StudioAssets from './StudioAssets';
+import { resolveStudioDestination, studioDestination } from '@/src/lib/studioNavigation.js';
 
 const STORAGE_KEY = 'muapi_key';
-const NOTIFICATIONS_STORAGE_KEY = 'open_gen_notifications_v1';
-const MAX_VISIBLE_NOTIFICATIONS = 3;
+const ASSET_STORAGE_KEY = 'gfury_creator_assets_v1';
+const CURRENT_PROJECT_STORAGE_KEY = 'gfury_creator_project_v1';
+const NAV_GROUPS = [
+  { label: '', items: ['home'] },
+  { label: 'Agent', items: ['selena'] },
+  { label: 'Tools', items: ['image', 'video', 'audio', 'graphics', 'avatar', 'music', 'video-advanced', 'lipsync', 'motion', 'transform', 'smart-clip'] },
+  { label: 'Apps', items: ['generator', 'influencer', 'graphic-studio', 'scene-builder', 'music-video', 'marketing', 'edit-studio'] },
+  { label: '', items: ['workflows', 'projects', 'assets', 'publish'] },
+  { label: 'Advanced', items: ['agent-blueprints', 'marketplace', 'provider-settings'] },
+];
+const ICONS = {
+  home: Home, selena: Bot, image: Image, video: Film, audio: Mic2, graphics: LayoutGrid,
+  avatar: UserRound, music: Mic2, 'video-advanced': Film,
+  lipsync: Mic2, motion: Zap, transform: Sparkles, 'smart-clip': Clapperboard,
+  generator: WandSparkles, influencer: UserRound, 'graphic-studio': LayoutGrid,
+  'scene-builder': Boxes, 'music-video': Music2, marketing: Send, 'edit-studio': Clapperboard,
+  workflows: Workflow, projects: FolderOpen, assets: Boxes, publish: Share2, 'agent-blueprints': Blocks,
+  marketplace: Boxes, 'provider-settings': Settings2,
+};
+const LEGACY_DESTINATIONS = new Set([
+  'music', 'video-advanced', 'lipsync', 'motion', 'transform', 'smart-clip', 'influencer',
+  'marketing', 'edit-studio', 'workflows', 'agent-blueprints', 'marketplace',
+]);
 
-const loadStoredNotifications = () => {
+function loadAssets() {
   if (typeof window === 'undefined') return [];
-
   try {
-    const stored = JSON.parse(window.sessionStorage.getItem(NOTIFICATIONS_STORAGE_KEY) || '[]');
-    const now = Date.now();
-    return Array.isArray(stored)
-      ? stored.filter((notification) => notification.expiresAt > now).slice(0, MAX_VISIBLE_NOTIFICATIONS)
-      : [];
-  } catch {
-    return [];
-  }
-};
+    const value = JSON.parse(window.sessionStorage.getItem(ASSET_STORAGE_KEY) || '[]');
+    return Array.isArray(value) ? value.filter((asset) => asset?.url?.startsWith('https://')).slice(0, 100) : [];
+  } catch { return []; }
+}
 
-const persistNotifications = (notifications) => {
-  if (typeof window === 'undefined') return;
+function inferAssetType(value, source) {
+  if (['image', 'video', 'audio', 'voice', 'music', 'avatar', 'graphic', 'upload'].includes(value?.type)) return value.type;
+  if (['video', 'lipsync', 'motion', 'transform', 'smart-clip', 'edit-studio', 'scene-builder'].includes(source)) return 'video';
+  if (source === 'audio') return 'audio';
+  return 'image';
+}
 
-  try {
-    window.sessionStorage.setItem(
-      NOTIFICATIONS_STORAGE_KEY,
-      JSON.stringify(notifications),
-    );
-  } catch {
-    // Notification persistence is optional; rendering still works without storage.
+async function projectRequest(path = '', { method = 'GET', body } = {}) {
+  const response = await fetch(`/api/creator/projects${path}`, {
+    method,
+    credentials: 'same-origin',
+    cache: 'no-store',
+    headers: body ? { 'content-type': 'application/json' } : undefined,
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const value = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const error = new Error(value.error || `Project request failed (${response.status}).`);
+    error.status = response.status;
+    error.code = value.code;
+    throw error;
   }
-};
+  return value;
+}
+
+function safeAssetFilename(value) {
+  const cleaned = String(value || 'creator-asset')
+    .normalize('NFKC')
+    .replace(/[^A-Za-z0-9._-]+/g, '-')
+    .replace(/^[^A-Za-z0-9]+/, '')
+    .slice(0, 120);
+  return cleaned || 'creator-asset';
+}
+
+function uploadAssetType(file) {
+  if (file?.type?.startsWith('image/')) return 'image';
+  if (file?.type?.startsWith('video/')) return 'video';
+  if (file?.type?.startsWith('audio/')) return 'audio';
+  return 'upload';
+}
 
 export default function StandaloneShell() {
   const params = useParams();
   const router = useRouter();
-  const slug = params?.slug || []; 
-  const idFromParams = params?.id;
-  const tabFromParams = params?.tab;
+  const slug = Array.isArray(params?.slug) ? params.slug : [];
+  const destinationId = params?.id ? 'workflows' : resolveStudioDestination(slug);
+  const destination = studioDestination(destinationId);
 
-  // Helper to extract workflow details precisely from either route structure
-  const getWorkflowInfo = useCallback(() => {
-    if (idFromParams) {
-        return { id: idFromParams, tab: tabFromParams || null };
-    }
-    const wfIndex = slug.findIndex(s => s === 'workflows' || s === 'workflow');
-    if (wfIndex === -1) return { id: null, tab: null };
-    return {
-      id: slug[wfIndex + 1] || null,
-      tab: slug[wfIndex + 2] || null
-    };
-  }, [slug, idFromParams, tabFromParams]);
-
-  const { id: urlWorkflowId } = getWorkflowInfo();
-
-  // Initialize activeTab from URL slug/params or default to the unified creator workspace.
-  const getInitialTab = () => {
-    if (idFromParams || slug.includes('workflow')) return 'workflows';
-    if (slug.includes('agents')) return 'agents';
-    if (slug.includes('design-agent')) return 'design-agent';
-    if (slug.includes('apps')) return 'apps';
-    const firstSegment = slug[0];
-    if (firstSegment && TABS.find(t => t.id === firstSegment)) return firstSegment;
-    return 'creator';
-  };
-  
   const [apiKey, setApiKey] = useState(null);
-  const [activeTab, setActiveTab] = useState(getInitialTab());
-
   const [balance, setBalance] = useState(null);
-  const [showSettings, setShowSettings] = useState(false);
-  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
-  const [hasMounted, setHasMounted] = useState(false);
-  const [showVadooBanner, setShowVadooBanner] = useState(() => {
-    if (typeof window !== 'undefined') return localStorage.getItem('vadoo_banner_dismissed') !== '1';
-    return true;
-  });
-
-  // Sidebar Collapsed & Mobile Drawer State
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
-    if (typeof window !== 'undefined') return localStorage.getItem('sidebar_collapsed') === 'true';
-    return false;
-  });
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [expandedCategoryId, setExpandedCategoryId] = useState(() => (
-    getNavigationCategory(getInitialTab())?.id || NAVIGATION_CATEGORIES[0].id
-  ));
-  const activeCategory = getNavigationCategory(activeTab);
-
-  const toggleSidebar = useCallback(() => {
-    setIsSidebarCollapsed(prev => {
-      const next = !prev;
-      localStorage.setItem('sidebar_collapsed', next ? 'true' : 'false');
-      return next;
-    });
-  }, []);
-
-  const handleCategoryToggle = useCallback((categoryId) => {
-    const isCollapsedNavigation = isSidebarCollapsed && !isMobileOpen;
-
-    if (!isCollapsedNavigation) {
-      setExpandedCategoryId((currentId) => (
-        currentId === categoryId ? null : categoryId
-      ));
-      return;
-    }
-
-    setExpandedCategoryId(categoryId);
-    toggleSidebar();
-  }, [isMobileOpen, isSidebarCollapsed, toggleSidebar]);
-
-  useEffect(() => {
-    if (activeCategory?.id) {
-      setExpandedCategoryId(activeCategory.id);
-    }
-  }, [activeCategory?.id]);
-
-  // Drag and Drop State
-  const [isDragging, setIsDragging] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [openGroups, setOpenGroups] = useState(() => new Set(['Agent', 'Tools', 'Apps']));
   const [droppedFiles, setDroppedFiles] = useState(null);
-
-  // Global generation notifications remain mounted while users switch studios.
+  const [isDragging, setIsDragging] = useState(false);
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const [selenaPrompt, setSelenaPrompt] = useState('');
+  const [assets, setAssets] = useState([]);
+  const [handoffAsset, setHandoffAsset] = useState(null);
   const [notifications, setNotifications] = useState([]);
-  const [notificationsHydrated, setNotificationsHydrated] = useState(false);
   const [generationCounts, setGenerationCounts] = useState({});
+  const [projectSummaries, setProjectSummaries] = useState([]);
+  const [currentProject, setCurrentProject] = useState(null);
+  const [projectsLoading, setProjectsLoading] = useState(false);
+  const [projectError, setProjectError] = useState('');
+  const [assetUploading, setAssetUploading] = useState(false);
+  const [selenaAction, setSelenaAction] = useState(null);
+  const projectMutationRef = useRef(Promise.resolve());
 
-  useEffect(() => {
-    setNotifications(loadStoredNotifications());
-    setNotificationsHydrated(true);
-  }, []);
+  const navigate = useCallback((path) => {
+    router.push(path, { scroll: false });
+    setSidebarOpen(false);
+  }, [router]);
 
-  const pushNotification = useCallback((notif) => {
-    const now = Date.now();
-    const id = `notif-${Date.now()}-${Math.random()}`;
-    const ttl = 12000;
-    const entry = { ...notif, id, expiresAt: now + ttl };
-    setNotifications((previous) => {
-      const next = [
-        ...previous.filter((notification) => notification.expiresAt > now),
-        entry,
-      ].slice(-MAX_VISIBLE_NOTIFICATIONS);
-      persistNotifications(next);
-      return next;
-    });
-  }, []);
-
-  const dismissNotification = useCallback((id) => {
-    setNotifications((previous) => {
-      const next = previous.filter((notification) => notification.id !== id);
-      persistNotifications(next);
-      return next;
-    });
-  }, []);
-
-  useEffect(() => {
-    if (!notificationsHydrated) return;
-
-    persistNotifications(notifications);
-  }, [notifications, notificationsHydrated]);
-
-  useEffect(() => {
-    if (notifications.length === 0) return undefined;
-
-    const nextExpiry = Math.min(...notifications.map((notification) => notification.expiresAt));
-    const timer = window.setTimeout(() => {
-      const now = Date.now();
-      setNotifications((previous) => previous.filter((notification) => notification.expiresAt > now));
-    }, Math.max(0, nextExpiry - Date.now()));
-
-    return () => window.clearTimeout(timer);
-  }, [notifications]);
-
-  const makeSuccessCallback = useCallback((tabId) => (data) => {
-    const tab = TABS.find(t => t.id === tabId);
-    pushNotification({
-      type: 'success',
-      tabId,
-      label: tab?.label || tabId,
-      resultUrl: data?.url || null,
-    });
-  }, [pushNotification]);
-
-  const makeErrorCallback = useCallback((tabId) => (errorOrMessage) => {
-    const tab = TABS.find(t => t.id === tabId);
-    const message = typeof errorOrMessage === 'string'
-      ? errorOrMessage
-      : (errorOrMessage?.message || errorOrMessage?.error || String(errorOrMessage || 'Generation failed'));
-    pushNotification({ type: 'error', tabId, label: tab?.label || tabId, message });
-  }, [pushNotification]);
-
-  const makeGenerationStartCallback = useCallback((tabId) => () => {
-    setGenerationCounts((previous) => ({
-      ...previous,
-      [tabId]: (previous[tabId] || 0) + 1,
-    }));
-  }, []);
-
-  const makeGenerationEndCallback = useCallback((tabId) => () => {
-    setGenerationCounts((previous) => {
-      const currentCount = previous[tabId] || 0;
-      if (currentCount <= 1) {
-        const next = { ...previous };
-        delete next[tabId];
-        return next;
-      }
-
-      return {
-        ...previous,
-        [tabId]: currentCount - 1,
+  const applyCurrentProject = useCallback((project) => {
+    if (!project?.id) return;
+    setCurrentProject(project);
+    setAssets(Array.isArray(project.assets) ? project.assets : []);
+    setProjectSummaries((previous) => {
+      const summary = {
+        id: project.id,
+        name: project.name,
+        createdAt: project.createdAt,
+        updatedAt: project.updatedAt,
+        revision: project.revision,
+        assetCount: project.assets?.length || 0,
+        sceneCount: project.storyboard?.scenes?.length || 0,
       };
+      return [summary, ...previous.filter((item) => item.id !== project.id)]
+        .sort((left, right) => String(right.updatedAt).localeCompare(String(left.updatedAt)));
     });
+    try { window.localStorage.setItem(CURRENT_PROJECT_STORAGE_KEY, project.id); } catch {}
   }, []);
 
-  const activeGenerations = TABS
-    .filter((tab) => generationCounts[tab.id] > 0)
-    .map((tab) => ({
-      tabId: tab.id,
-      label: tab.label,
-      count: generationCounts[tab.id],
-    }));
-
-  // Popstate event listener to sync tab state with URL on back/forward navigation
-  useEffect(() => {
-    const handlePopState = () => {
-      const path = window.location.pathname;
-      const segments = path.split('/').filter(Boolean);
-      const tabId = segments[1] || 'image';
-      if (TABS.find(t => t.id === tabId)) {
-        setActiveTab(tabId);
-      }
-    };
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
-
-  const handleTabChange = useCallback((tabId) => {
-    window.history.pushState(null, '', `/studio/${tabId}`);
-    setActiveTab(tabId);
-  }, []);
-
-  const handleOpenNotification = useCallback((notification) => {
-    handleTabChange(notification.tabId);
-    dismissNotification(notification.id);
-  }, [dismissNotification, handleTabChange]);
-
-  const handleTabClick = (e, tabId) => {
-    if (e.button === 0 && !e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey) {
-      e.preventDefault();
-      handleTabChange(tabId);
-      return true;
-    }
-    return false;
-  };
-
-  const handleNavigationItemClick = (event, tabId) => {
-    if (handleTabClick(event, tabId)) {
-      setIsMobileOpen(false);
-    }
-  };
-
-  // Auto-hide header when inside a specific workflow view or design agent
-  useEffect(() => {
-    const isEditingWorkflow = (activeTab === 'workflows' || !!idFromParams) && urlWorkflowId;
-    const isDesignAgent = activeTab === 'design-agent';
-    
-    if (isEditingWorkflow || isDesignAgent) {
-      setIsHeaderVisible(false);
-    } else {
-      setIsHeaderVisible(true);
-    }
-  }, [activeTab, urlWorkflowId, idFromParams]);
-
-  // Global builder CSS cleanup when switching away from Workflows or Design Agent tabs
-  useEffect(() => {
-    const fromBuilder = sessionStorage.getItem("fromWorkflowBuilder");
-    const fromDesignAgent = sessionStorage.getItem("fromDesignAgent");
-    
-    if ((fromBuilder && activeTab !== 'workflows') || (fromDesignAgent && activeTab !== 'design-agent')) {
-      sessionStorage.removeItem("fromWorkflowBuilder");
-      sessionStorage.removeItem("fromDesignAgent");
-      window.location.reload();
-    }
-  }, [activeTab]);
-
-  const fetchBalance = useCallback(async (key) => {
+  const openProject = useCallback(async (projectId) => {
+    setProjectsLoading(true);
+    setProjectError('');
     try {
-      const data = await getUserBalance(key);
-      setBalance(data.balance);
-    } catch (err) {
-      console.error('Balance fetch failed:', err);
+      const value = await projectRequest(`/${encodeURIComponent(projectId)}`);
+      applyCurrentProject(value.project);
+      return value.project;
+    } catch (loadError) {
+      setProjectError(loadError.message || 'Project could not be loaded.');
+      return null;
+    } finally {
+      setProjectsLoading(false);
     }
+  }, [applyCurrentProject]);
+
+  const refreshProjects = useCallback(async (preferredProjectId = '') => {
+    setProjectsLoading(true);
+    setProjectError('');
+    try {
+      const value = await projectRequest();
+      const summaries = Array.isArray(value.projects) ? value.projects : [];
+      setProjectSummaries(summaries);
+      let selectedId = preferredProjectId;
+      if (!selectedId) {
+        try { selectedId = window.localStorage.getItem(CURRENT_PROJECT_STORAGE_KEY) || ''; } catch {}
+      }
+      if (!summaries.some((project) => project.id === selectedId)) selectedId = summaries[0]?.id || '';
+      if (selectedId) {
+        const selected = await projectRequest(`/${encodeURIComponent(selectedId)}`);
+        applyCurrentProject(selected.project);
+      } else {
+        setCurrentProject(null);
+      }
+      return summaries;
+    } catch (loadError) {
+      if (loadError.status !== 401) setProjectError(loadError.message || 'Projects could not be loaded.');
+      return [];
+    } finally {
+      setProjectsLoading(false);
+    }
+  }, [applyCurrentProject]);
+
+  const enqueueProjectMutation = useCallback((operation) => {
+    const next = projectMutationRef.current.catch(() => {}).then(operation);
+    projectMutationRef.current = next.catch(() => {});
+    return next;
   }, []);
 
+  const createProject = useCallback(async (name) => {
+    setProjectsLoading(true);
+    setProjectError('');
+    try {
+      const value = await projectRequest('', { method: 'POST', body: { name } });
+      applyCurrentProject(value.project);
+      return value.project;
+    } catch (creationError) {
+      setProjectError(creationError.message || 'Project could not be created.');
+      return null;
+    } finally {
+      setProjectsLoading(false);
+    }
+  }, [applyCurrentProject]);
+
+  const renameProject = useCallback(async (projectId, name) => {
+    setProjectError('');
+    try {
+      const value = await enqueueProjectMutation(() => projectRequest(`/${encodeURIComponent(projectId)}`, {
+        method: 'PATCH',
+        body: { name },
+      }));
+      if (currentProject?.id === projectId) applyCurrentProject(value.project);
+      else setProjectSummaries((previous) => previous.map((project) => project.id === projectId ? { ...project, name, updatedAt: value.project.updatedAt, revision: value.project.revision } : project));
+      return value.project;
+    } catch (renameError) {
+      setProjectError(renameError.message || 'Project could not be renamed.');
+      return null;
+    }
+  }, [applyCurrentProject, currentProject?.id, enqueueProjectMutation]);
+
   useEffect(() => {
-    setHasMounted(true);
-    // Remove the legacy JavaScript-readable auth cookie. Authentication is header-only.
-    document.cookie = 'muapi_key=; path=/; max-age=0; SameSite=Lax';
-    const legacyStored = localStorage.getItem(STORAGE_KEY);
-    const stored = sessionStorage.getItem(STORAGE_KEY) || legacyStored;
+    setMounted(true);
+    // Only seed from the session-scoped compatibility cache when no durable Project is
+    // pending load; otherwise this would briefly flash a previous Project's assets before
+    // refreshProjects() replaces them with the real, current Project's Assets.
+    let pendingProjectId = '';
+    try { pendingProjectId = window.localStorage.getItem(CURRENT_PROJECT_STORAGE_KEY) || ''; } catch {}
+    if (!pendingProjectId) setAssets(loadAssets());
+    const legacy = window.localStorage.getItem(STORAGE_KEY);
+    const stored = window.sessionStorage.getItem(STORAGE_KEY) || legacy;
     if (stored) {
-      sessionStorage.setItem(STORAGE_KEY, stored);
-      if (legacyStored) localStorage.removeItem(STORAGE_KEY);
+      window.sessionStorage.setItem(STORAGE_KEY, stored);
+      window.localStorage.removeItem(STORAGE_KEY);
       setApiKey(stored);
-      fetchBalance(stored);
     }
-  }, [fetchBalance]);
-
-  useEffect(() => {
-    if (activeTab !== 'design-agent') localStorage.removeItem('token');
-  }, [activeTab]);
-
-  const handleKeySave = useCallback((key) => {
-    sessionStorage.setItem(STORAGE_KEY, key);
-    localStorage.removeItem(STORAGE_KEY);
-    setApiKey(key);
-    fetchBalance(key);
-  }, [fetchBalance]);
-
-  const handleKeyChange = useCallback(() => {
-    sessionStorage.removeItem(STORAGE_KEY);
-    localStorage.removeItem(STORAGE_KEY);
-    localStorage.removeItem('token');
-    setApiKey(null);
-    setBalance(null);
     document.cookie = 'muapi_key=; path=/; max-age=0; SameSite=Lax';
   }, []);
 
-  // Inject API key into all outgoing Axios requests (prop-based approach)
-  // We use an interceptor to be selective and NOT send the key to external domains like S3
   useEffect(() => {
-    // Safety: Clear any global defaults that might have been set previously
-    delete axios.defaults.headers.common['x-api-key'];
+    if (mounted) refreshProjects();
+  }, [mounted, refreshProjects]);
 
+  useEffect(() => {
     if (!apiKey) return;
-
-    const interceptorId = axios.interceptors.request.use((config) => {
-      let isInternalProxy = false;
-      try {
-        const target = new URL(String(config.url || ''), window.location.origin);
-        isInternalProxy = target.origin === window.location.origin && target.pathname.startsWith('/api/');
-      } catch {
-        isInternalProxy = false;
-      }
-
-      if (isInternalProxy) {
-        config.headers = config.headers || {};
-        config.headers['x-api-key'] = apiKey;
-      }
-      
-      return config;
-    });
-
-    return () => {
-      axios.interceptors.request.eject(interceptorId);
-    };
+    let active = true;
+    getUserBalance(apiKey).then((data) => { if (active) setBalance(data.balance); }).catch(() => {});
+    return () => { active = false; };
   }, [apiKey]);
 
-  // Poll for balance every 30 seconds if key is present
   useEffect(() => {
-    if (!apiKey) return;
-    const interval = setInterval(() => fetchBalance(apiKey), 30000);
-    return () => clearInterval(interval);
-  }, [apiKey, fetchBalance]);
+    try { window.sessionStorage.setItem(ASSET_STORAGE_KEY, JSON.stringify(assets)); } catch {}
+  }, [assets]);
 
-  // Drag and Drop Handlers
-  const handleDragOver = useCallback((e) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const saveKey = useCallback((key) => {
+    window.sessionStorage.setItem(STORAGE_KEY, key);
+    window.localStorage.removeItem(STORAGE_KEY);
+    setApiKey(key);
+  }, []);
+  const clearKey = useCallback(() => {
+    window.sessionStorage.removeItem(STORAGE_KEY);
+    window.localStorage.removeItem(STORAGE_KEY);
+    window.localStorage.removeItem('token');
+    setApiKey(null); setBalance(null);
   }, []);
 
-  const handleDragEnter = useCallback((e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const isFileDrag = e.dataTransfer.types && Array.from(e.dataTransfer.types).includes('Files');
-    if (isFileDrag && e.dataTransfer.items && e.dataTransfer.items.length > 0) {
-      setIsDragging(true);
+  const persistProjectAsset = useCallback(async (source, value = {}, uploadResult = null) => {
+    if (!currentProject?.id) return null;
+    const url = uploadResult?.url || (typeof value.url === 'string' ? value.url : '');
+    if (!url.startsWith('https://')) return null;
+    const body = {
+      type: inferAssetType(value, source),
+      url,
+      title: value.title || `${studioDestination(source).label} output`,
+      source,
+      storagePath: uploadResult?.pathname || null,
+      mimeType: value.mimeType || value.blob?.type || null,
+      size: value.size || value.blob?.size || 0,
+      provider: {
+        provider: typeof value.provider === 'string' ? value.provider : null,
+        model: value.model || null,
+        requestId: value.requestId || value.jobId || null,
+        keyMode: value.keyMode || null,
+      },
+    };
+    const result = await enqueueProjectMutation(() => projectRequest(`/${encodeURIComponent(currentProject.id)}/assets`, {
+      method: 'POST',
+      body,
+    }));
+    applyCurrentProject(result.project);
+    return result.asset;
+  }, [applyCurrentProject, currentProject?.id, enqueueProjectMutation]);
+
+  const recordAsset = useCallback((source) => async (value = {}) => {
+    let url = typeof value.url === 'string' ? value.url : '';
+    let uploadResult = null;
+    try {
+      if (!url.startsWith('https://') && value.blob instanceof Blob && currentProject?.id) {
+        const extension = value.blob.type === 'audio/mpeg' ? '.mp3' : '';
+        const pathname = `${currentProject.assetUploadPrefix}${window.crypto.randomUUID()}-${safeAssetFilename(value.title || `creator-audio${extension}`)}`;
+        uploadResult = await uploadBlob(pathname, value.blob, {
+          access: 'public',
+          contentType: value.blob.type || 'application/octet-stream',
+          handleUploadUrl: '/api/creator/projects/blob-upload',
+          clientPayload: JSON.stringify({ projectId: currentProject.id }),
+          multipart: value.blob.size > 5 * 1024 * 1024,
+        });
+        url = uploadResult.url;
+      }
+      if (url.startsWith('https://')) {
+        const localAsset = {
+          id: window.crypto.randomUUID(), type: inferAssetType(value, source), url,
+          title: value.title || `${studioDestination(source).label} output`, source,
+          model: value.model || null, createdAt: new Date().toISOString(),
+        };
+        setAssets((previous) => [localAsset, ...previous.filter((item) => item.url !== localAsset.url)].slice(0, 100));
+        await persistProjectAsset(source, { ...value, url }, uploadResult);
+      }
+      setNotifications((previous) => [
+        { id: `${Date.now()}-${Math.random()}`, type: 'success', label: studioDestination(source).label, url: url || null },
+        ...previous,
+      ].slice(0, 3));
+    } catch (assetError) {
+      setProjectError(`The generation completed, but its Project Asset could not be retained: ${assetError.message || 'storage failed'}`);
     }
-  }, []);
+  }, [currentProject?.assetUploadPrefix, currentProject?.id, persistProjectAsset]);
 
-  const handleDragLeave = useCallback((e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    // Only set to false if we're leaving the container itself, not moving between children
-    if (e.currentTarget.contains(e.relatedTarget)) return;
-    setIsDragging(false);
-  }, []);
-
-  const handleDrop = useCallback((e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-
-    const files = Array.from(e.dataTransfer.files);
-    if (files.length > 0) {
-      setDroppedFiles(files);
+  const uploadProjectAsset = useCallback(async (file) => {
+    if (!file || !currentProject?.id || !currentProject.assetUploadPrefix) return;
+    setAssetUploading(true);
+    setProjectError('');
+    try {
+      const pathname = `${currentProject.assetUploadPrefix}${window.crypto.randomUUID()}-${safeAssetFilename(file.name)}`;
+      const uploaded = await uploadBlob(pathname, file, {
+        access: 'public',
+        contentType: file.type,
+        handleUploadUrl: '/api/creator/projects/blob-upload',
+        clientPayload: JSON.stringify({ projectId: currentProject.id }),
+        multipart: file.size > 5 * 1024 * 1024,
+      });
+      await persistProjectAsset('upload', {
+        type: uploadAssetType(file),
+        title: file.name,
+        url: uploaded.url,
+        mimeType: file.type,
+        size: file.size,
+      }, uploaded);
+    } catch (uploadError) {
+      setProjectError(uploadError.message || 'Asset upload failed.');
+    } finally {
+      setAssetUploading(false);
     }
+  }, [currentProject?.assetUploadPrefix, currentProject?.id, persistProjectAsset]);
+
+  const deleteAsset = useCallback(async (assetId) => {
+    const asset = assets.find((item) => item.id === assetId);
+    if (!asset || !window.confirm(`Delete ${asset.title}? This removes the Project record and any owned uploaded Blob.`)) return;
+    if (!currentProject?.id || !currentProject.assets?.some((item) => item.id === assetId)) {
+      setAssets((previous) => previous.filter((item) => item.id !== assetId));
+      return;
+    }
+    try {
+      const result = await enqueueProjectMutation(() => projectRequest(`/${encodeURIComponent(currentProject.id)}/assets/${encodeURIComponent(assetId)}`, {
+        method: 'DELETE',
+        body: { approved: true },
+      }));
+      applyCurrentProject(result.project);
+    } catch (deleteError) {
+      setProjectError(deleteError.message || 'Asset could not be deleted.');
+    }
+  }, [applyCurrentProject, assets, currentProject?.assets, currentProject?.id, enqueueProjectMutation]);
+
+  const saveProjectStoryboard = useCallback((storyboard) => {
+    if (!currentProject?.id) return Promise.resolve(null);
+    return enqueueProjectMutation(() => projectRequest(`/${encodeURIComponent(currentProject.id)}/storyboard`, {
+      method: 'PUT',
+      body: { storyboard },
+    })).then((value) => {
+      applyCurrentProject(value.project);
+      return value.project;
+    }).catch((saveError) => {
+      setProjectError(saveError.message || 'Storyboard could not be saved.');
+      return null;
+    });
+  }, [applyCurrentProject, currentProject?.id, enqueueProjectMutation]);
+
+  const saveProjectConversation = useCallback((conversation) => {
+    if (!currentProject?.id) return Promise.resolve(null);
+    return enqueueProjectMutation(() => projectRequest(`/${encodeURIComponent(currentProject.id)}/conversation`, {
+      method: 'PUT',
+      body: { conversation },
+    })).then((value) => {
+      applyCurrentProject(value.project);
+      return value.project;
+    }).catch((saveError) => {
+      setProjectError(saveError.message || 'Selena conversation could not be saved.');
+      return null;
+    });
+  }, [applyCurrentProject, currentProject?.id, enqueueProjectMutation]);
+  const reportError = useCallback((source) => (value) => {
+    const message = typeof value === 'string' ? value : value?.message || 'The request failed.';
+    setNotifications((previous) => [
+      { id: `${Date.now()}-${Math.random()}`, type: 'error', label: studioDestination(source).label, message },
+      ...previous,
+    ].slice(0, 3));
   }, []);
+  const startGeneration = useCallback((source) => () => setGenerationCounts((previous) => ({ ...previous, [source]: (previous[source] || 0) + 1 })), []);
+  const endGeneration = useCallback((source) => () => setGenerationCounts((previous) => ({ ...previous, [source]: Math.max(0, (previous[source] || 0) - 1) })), []);
+  const callbacks = useCallback((source) => ({
+    onGenerationStart: startGeneration(source), onGenerationEnd: endGeneration(source),
+    onGenerationComplete: recordAsset(source), onGenerationError: reportError(source),
+  }), [endGeneration, recordAsset, reportError, startGeneration]);
 
-  const handleFilesHandled = useCallback(() => {
-    setDroppedFiles(null);
-  }, []);
+  const legacyShared = useMemo(() => ({
+    apiKey, droppedFiles, onFilesHandled: () => setDroppedFiles(null), ...callbacks(destinationId),
+  }), [apiKey, callbacks, destinationId, droppedFiles]);
 
-  if (!hasMounted) return (
-    <div className="min-h-screen bg-[#050505] flex items-center justify-center">
-      <div className="animate-spin text-[#22d3ee] text-3xl">◌</div>
-    </div>
-  );
+  const handleSelenaAction = useCallback((action) => {
+    const targets = {
+      'image.generate': '/studio/tools/image',
+      'video.generate': '/studio/tools/video',
+      'video.animate': '/studio/tools/video',
+      'graphic.open': '/studio/apps/graphic-studio',
+      'storyboard.create': '/studio/apps/scene-builder',
+      'storyboard.addScene': '/studio/apps/scene-builder',
+      'workflow.open': '/studio/workflows',
+      'asset.open': '/studio/assets',
+      'asset.delete': '/studio/assets',
+      'social.prepare': '/studio/publish',
+      'social.publish': '/studio/publish',
+    };
+    const target = targets[action?.action];
+    if (!target || action?.available === false) return;
+    if (action?.parameters?.assetId) {
+      const requestedAsset = assets.find((asset) => asset.id === action.parameters.assetId);
+      if (!requestedAsset) {
+        setNotifications((previous) => [
+          {
+            id: `${Date.now()}-${Math.random()}`,
+            type: 'error',
+            label: 'Selena',
+            message: 'That asset is no longer available in this Project. It may have been deleted or belong to a different Project.',
+          },
+          ...previous,
+        ].slice(0, 3));
+        setHandoffAsset(null);
+        return;
+      }
+      setHandoffAsset(requestedAsset);
+    }
+    setSelenaAction(action);
+    navigate(target);
+  }, [assets, navigate]);
 
-  if (!apiKey && activeTab !== 'creator') {
-    return <ApiKeyModal onSave={handleKeySave} />;
-  }
+  const creatorProjectProps = {
+    project: currentProject,
+    selectedAsset: handoffAsset,
+    initialAction: selenaAction,
+    onSelenaAction: handleSelenaAction,
+    onConversationChange: saveProjectConversation,
+    onStoryboardChange: saveProjectStoryboard,
+    onProjectNameChange: (name) => currentProject?.id && renameProject(currentProject.id, name),
+  };
 
+  const openAsset = useCallback((asset, target) => {
+    setHandoffAsset(asset);
+    const targets = {
+      'graphic-studio': '/studio/apps/graphic-studio',
+      'scene-builder': '/studio/apps/scene-builder',
+      'lipsync': '/studio/tools/lip-sync',
+      'publish': '/studio/publish',
+    };
+    navigate(targets[target] || '/studio/assets');
+  }, [navigate]);
+
+  const renderDestination = () => {
+    switch (destinationId) {
+      case 'home': return <CreatorHome onNavigate={navigate} onAskSelena={(prompt) => { setSelenaPrompt(prompt); navigate('/studio/selena'); }} />;
+      case 'selena': return <CreatorStudio {...callbacks('selena')} {...creatorProjectProps} initialToolId="assistant" allowedToolIds={['assistant']} initialPrompt={selenaPrompt} workspaceLabel="Selena" />;
+      case 'image': return <CreatorStudio {...callbacks('image')} {...creatorProjectProps} initialToolId="image" allowedToolIds={['image']} workspaceLabel="Image" />;
+      case 'video': return <CreatorStudio {...callbacks('video')} {...creatorProjectProps} initialToolId="video" allowedToolIds={['video']} initialAsset={handoffAsset} workspaceLabel="Video" />;
+      case 'audio': return <CreatorStudio {...callbacks('audio')} {...creatorProjectProps} initialToolId="voice" allowedToolIds={['voice']} workspaceLabel="Audio & Voice" />;
+      case 'avatar': return <CreatorStudio {...callbacks('avatar')} {...creatorProjectProps} initialToolId="avatar" allowedToolIds={['avatar']} workspaceLabel="Avatar" />;
+      case 'music': return <AudioStudio {...legacyShared} />;
+      case 'video-advanced': return slug.includes('cinema') ? <CinemaStudio {...legacyShared} /> : <VideoStudio {...legacyShared} />;
+      case 'generator': return <CreatorStudio {...callbacks('generator')} {...creatorProjectProps} initialToolId="image" allowedToolIds={['image', 'video']} initialAsset={handoffAsset} workspaceLabel="AI Generator" />;
+      case 'scene-builder': return <CreatorStudio {...callbacks('scene-builder')} {...creatorProjectProps} initialToolId="storyboard" allowedToolIds={['storyboard']} initialAsset={handoffAsset} workspaceLabel="Scene Builder" />;
+      case 'music-video': return <CreatorStudio {...callbacks('music-video')} {...creatorProjectProps} initialToolId="storyboard" allowedToolIds={['storyboard']} initialAsset={handoffAsset} workspaceLabel="Music Video" />;
+      case 'publish': return <SocialPublishStudio initialAsset={handoffAsset} initialDraft={selenaAction?.parameters} youtubeWorkspace={<CreatorStudio {...callbacks('publish')} {...creatorProjectProps} initialToolId="publish" allowedToolIds={['publish']} workspaceLabel="YouTube Publish" />} />;
+      case 'projects': return <ProjectsStudio projects={projectSummaries} currentProject={currentProject} loading={projectsLoading} error={projectError} onCreate={createProject} onOpen={openProject} onRename={renameProject} onRefresh={() => refreshProjects(currentProject?.id)} onNavigate={navigate} />;
+      case 'assets': return <StudioAssets assets={assets} currentProject={currentProject} onOpen={openAsset} onDelete={deleteAsset} onUpload={uploadProjectAsset} uploading={assetUploading} error={projectError} />;
+      case 'graphics':
+      case 'graphic-studio': return <GraphicStudio {...legacyShared} initialAsset={handoffAsset} isHeaderVisible={isHeaderVisible} onToggleHeader={setIsHeaderVisible} />;
+      case 'lipsync': return <LipSyncStudio {...legacyShared} initialAsset={handoffAsset} />;
+      case 'motion': return <VibeMotionStudio {...legacyShared} />;
+      case 'transform': return <RecastStudio {...legacyShared} />;
+      case 'smart-clip':
+      case 'edit-studio': return <ClippingStudio {...legacyShared} />;
+      case 'influencer': return <AiInfluencerStudio {...legacyShared} />;
+      case 'marketing': return <MarketingStudio {...legacyShared} />;
+      case 'workflows': return <WorkflowStudio {...legacyShared} isHeaderVisible={isHeaderVisible} onToggleHeader={setIsHeaderVisible} />;
+      case 'agent-blueprints': return <AgentStudio apiKey={apiKey} basePath="/studio/advanced/agents" />;
+      case 'marketplace': return <AppsStudio apiKey={apiKey} />;
+      case 'provider-settings': return <LegacyProviderSettings apiKey={apiKey} onSave={saveKey} onClear={clearKey} />;
+      default: return <CreatorHome onNavigate={navigate} />;
+    }
+  };
+
+  if (!mounted) return <div className="flex h-screen items-center justify-center bg-[#050506] text-cyan-200"><Sparkles className="animate-pulse" /></div>;
   return (
-    <div 
-      className="h-screen bg-[#030303] flex flex-col overflow-hidden text-white relative"
-      onDragOver={handleDragOver}
-      onDragEnter={handleDragEnter}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
-    >
-      {/* Drag Overlay */}
-      {activeTab !== 'creator' && isDragging && (
-        <div className="fixed inset-0 z-[100] bg-[#22d3ee]/10 backdrop-blur-md border-4 border-dashed border-[#22d3ee]/50 flex items-center justify-center pointer-events-none transition-all duration-300">
-          <div className="bg-[#0a0a0a] p-8 rounded-3xl border border-white/10 shadow-2xl flex flex-col items-center gap-4 scale-110 animate-pulse">
-            <div className="w-20 h-20 bg-[#22d3ee] rounded-2xl flex items-center justify-center">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="2.5">
-                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
-              </svg>
-            </div>
-            <div className="flex flex-col items-center">
-              <span className="text-xl font-bold text-white">Drop your media here</span>
-              <span className="text-sm text-white/40">Images, videos, or audio files</span>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Vadoo promo banner */}
-      {activeTab !== 'creator' && showVadooBanner && (
-        <div className="flex-shrink-0 w-full bg-indigo-600 flex items-center justify-center px-4 py-2 gap-3 relative z-50">
-          <a
-            href="https://vadoo.tv"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[13px] font-bold text-white hover:opacity-80 transition-opacity text-center"
-          >
-            Unrestricted AI Images &amp; Videos → Auto-Publish as YouTube Shorts &amp; TikToks, Earn ↗
-          </a>
-          <button
-            onClick={() => {
-              setShowVadooBanner(false);
-              localStorage.setItem('vadoo_banner_dismissed', '1');
-            }}
-            className="absolute right-3 text-white/60 hover:text-white transition-colors text-lg leading-none"
-            aria-label="Dismiss"
-          >
-            ✕
-          </button>
-        </div>
-      )}
-
-      {/* Header */}
+    <div className="flex h-screen flex-col overflow-hidden bg-[#050506] text-white"
+      onDragOver={(event) => event.preventDefault()}
+      onDragEnter={(event) => { if (event.dataTransfer?.types?.includes('Files')) setIsDragging(true); }}
+      onDragLeave={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setIsDragging(false); }}
+      onDrop={(event) => { event.preventDefault(); setIsDragging(false); setDroppedFiles(Array.from(event.dataTransfer.files || [])); }}>
       {isHeaderVisible && (
-        <header className="flex-shrink-0 h-14 border-b border-white/[0.05] flex items-center justify-between px-4 bg-[#0a0a0b]/80 backdrop-blur-md z-50 gap-4">
-          {/* Left: Mobile menu toggle + Logo + Desktop Sidebar Toggle */}
+        <header className="flex h-14 shrink-0 items-center justify-between border-b border-white/[0.07] bg-[#09090b] px-3 sm:px-4">
           <div className="flex items-center gap-3">
-            {/* Mobile drawer toggle */}
-            <button
-              onClick={() => setIsMobileOpen(!isMobileOpen)}
-              className="md:hidden p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors"
-              aria-label="Toggle Navigation Menu"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="3" y1="12" x2="21" y2="12" />
-                <line x1="3" y1="6" x2="21" y2="6" />
-                <line x1="3" y1="18" x2="21" y2="18" />
-              </svg>
+            <button type="button" onClick={() => setSidebarOpen(true)} className="rounded-lg p-2 text-white/50 hover:bg-white/[0.06] md:hidden" aria-label="Open navigation"><Menu size={18} /></button>
+            <button type="button" onClick={() => setSidebarCollapsed((value) => !value)} className="hidden rounded-lg p-2 text-white/45 hover:bg-white/[0.06] md:block" aria-label="Toggle sidebar">{sidebarCollapsed ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}</button>
+            <button type="button" onClick={() => navigate('/studio/home')} className="flex items-center gap-2.5">
+              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-cyan-300 text-black"><Sparkles size={17} /></span>
+              <span className="hidden text-sm font-black tracking-tight sm:inline">G.FURY CREATOR</span>
             </button>
-
-            {/* Desktop Sidebar Toggle Button (Single Toggle Button) */}
-            <div className="hidden md:block relative group">
-              <button
-                onClick={toggleSidebar}
-                className="flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors border border-white/5"
-                aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-              >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  className={`transition-transform duration-300 ${isSidebarCollapsed ? 'rotate-180' : ''}`}
-                >
-                  <rect x="3" y="3" width="18" height="18" rx="2" />
-                  <path d="M9 3v18" />
-                  <path d="M14 9l-3 3 3 3" />
-                </svg>
-              </button>
-              {/* Custom Tooltip */}
-              <div className="absolute left-0 top-full mt-2 px-2.5 py-1 bg-[#121215]/95 backdrop-blur-md text-white text-[11px] font-medium rounded-md shadow-2xl border border-white/15 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 z-50 whitespace-nowrap">
-                {isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-              </div>
-            </div>
-
-            {/* Logo & Title */}
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 bg-[#22d3ee] rounded-lg flex items-center justify-center shadow-lg shadow-[#22d3ee]/20">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                </svg>
-              </div>
-              <span className="text-sm font-bold tracking-tight hidden sm:block text-white">
-                OpenGenerativeAI
-              </span>
-            </div>
           </div>
-
-          {/* Active Tab Breadcrumb Badge */}
-          <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.05] text-xs text-white/60">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#22d3ee]" />
-            <span className="font-medium text-white/80">
-              {TABS.find(t => t.id === activeTab)?.label || 'Studio'}
-            </span>
-          </div>
-
-          {/* Right: Actions */}
-          <div className="flex-shrink-0 flex items-center gap-3">
-            {activeTab !== 'creator' && (
-              <>
-            <div className="flex items-center gap-2.5 bg-white/5 px-3 py-1.5 rounded-full border border-white/5 transition-colors">
-              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-              <span className="text-xs font-bold text-white/90">
-                ${balance !== null ? `${balance}` : '---'}
-              </span>
-            </div>
-
-            <button
-              onClick={() => setShowSettings(true)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-white/10 bg-white/5 text-[13px] font-bold text-white/80 hover:text-white hover:bg-white/10 hover:border-white/20 transition-colors"
-              aria-label="Settings"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="3" />
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-              </svg>
-              <span className="hidden sm:inline">Settings</span>
-            </button>
-              </>
-            )}
+          <div className="flex items-center gap-3">
+            <span className="hidden text-[10px] font-bold uppercase tracking-wider text-white/25 sm:inline">{destination.label}</span>
+            {apiKey && <span className="rounded-full border border-white/[0.08] bg-white/[0.04] px-2.5 py-1 text-[10px] text-white/35">Legacy ${balance ?? '—'}</span>}
           </div>
         </header>
       )}
 
-      {/* Main Body Layout: Left Sidebar + Studio Content Area */}
-      <div className="flex-1 min-h-0 flex relative overflow-hidden">
-        {/* Mobile Backdrop Overlay */}
-        {isMobileOpen && (
-          <div 
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 md:hidden animate-fade-in"
-            onClick={() => setIsMobileOpen(false)}
-          />
-        )}
-
-        {/* Left Sidebar Navigation */}
+      <div className="flex min-h-0 flex-1">
+        {isHeaderVisible && sidebarOpen && <button type="button" className="fixed inset-0 z-40 bg-black/70 md:hidden" onClick={() => setSidebarOpen(false)} aria-label="Close navigation overlay" />}
         {isHeaderVisible && (
-          <aside
-            className={`
-              fixed top-14 bottom-0 left-0 md:static md:h-full z-30 bg-[#0a0a0b]/95 backdrop-blur-md border-r border-white/[0.06] flex flex-col transition-all duration-300 ease-in-out flex-shrink-0 select-none
-              ${isMobileOpen ? 'translate-x-0 w-60 z-50' : '-translate-x-full md:translate-x-0'}
-              ${isSidebarCollapsed ? 'md:w-16' : 'md:w-52'}
-            `}
-          >
-            <nav aria-label="Studio navigation" className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-none py-2 px-2">
-              <div className="space-y-1">
-                {NAVIGATION_CATEGORIES.map((category) => {
-                  const isCategoryActive = activeCategory?.id === category.id;
-                  const isCollapsed = isSidebarCollapsed && !isMobileOpen;
-                  const isCategoryOpen = !isCollapsed && expandedCategoryId === category.id;
-                  const categoryPanelId = `navigation-category-${category.id}`;
-
-                  return (
-                    <div key={category.id} className="relative">
-                      <button
-                        type="button"
-                        onClick={() => handleCategoryToggle(category.id)}
-                        aria-label={category.label}
-                        aria-expanded={isCategoryOpen}
-                        aria-controls={isCollapsed ? undefined : categoryPanelId}
-                        title={isCollapsed ? category.label : undefined}
-                        className={`
-                          group relative flex items-center rounded-xl transition-all duration-150 font-semibold
-                          ${isCollapsed ? 'h-11 w-11 justify-center mx-auto' : 'px-3 py-2.5 w-full gap-3 text-left'}
-                          ${isCategoryActive
-                            ? 'bg-gradient-to-r from-[#22d3ee]/15 to-purple-500/10 text-[#22d3ee] border border-[#22d3ee]/20 shadow-[0_0_15px_rgba(34,211,238,0.08)]'
-                            : isCategoryOpen
-                              ? 'bg-white/[0.06] text-white border border-white/[0.08]'
-                              : 'text-white/60 hover:text-white hover:bg-white/[0.04] border border-transparent'
-                          }
-                        `}
-                      >
-                        {isCategoryActive && (
-                          <span className="absolute left-0 top-2 bottom-2 w-1 bg-gradient-to-b from-[#22d3ee] to-[#a855f7] rounded-r-full shadow-[0_0_8px_rgba(34,211,238,0.6)]" />
-                        )}
-
-                        <span className={`flex-shrink-0 transition-colors ${isCategoryActive ? 'text-[#22d3ee]' : 'text-white/55 group-hover:text-white'}`}>
-                          {category.icon}
-                        </span>
-
-                        {!isCollapsed && (
-                          <>
-                            <span className="flex-1 min-w-0 text-[12px] leading-4 tracking-tight">
-                              {category.label}
-                            </span>
-                            <svg
-                              width="15"
-                              height="15"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className={`flex-shrink-0 transition-transform duration-200 ${isCategoryOpen ? 'rotate-180' : ''}`}
-                              aria-hidden="true"
-                            >
-                              <path d="M6 9l6 6 6-6"/>
-                            </svg>
-                          </>
-                        )}
-                      </button>
-
-                      {!isCollapsed && isCategoryOpen && (
-                        <div
-                          id={categoryPanelId}
-                          role="group"
-                          aria-label={`${category.label} tools`}
-                          className="mt-1 ml-2 pl-2 border-l border-white/[0.08] space-y-1 max-h-64 overflow-y-auto scrollbar-none"
-                        >
-                          {category.tabIds.map((tabId) => {
-                            const tab = TABS.find((item) => item.id === tabId);
-                            if (!tab) return null;
-                            const isActive = activeTab === tab.id;
-
-                            return (
-                              <a
-                                key={tab.id}
-                                href={`/studio/${tab.id}`}
-                                onClick={(event) => handleNavigationItemClick(event, tab.id)}
-                                aria-current={isActive ? 'page' : undefined}
-                                className={`
-                                  group relative flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[12px] font-medium transition-all duration-150
-                                  ${isActive
-                                    ? 'bg-[#22d3ee]/12 text-[#22d3ee] border border-[#22d3ee]/20'
-                                    : 'text-white/55 hover:text-white hover:bg-white/[0.04] border border-transparent'
-                                  }
-                                `}
-                              >
-                                {isActive && (
-                                  <span className="absolute -left-[11px] top-2 bottom-2 w-0.5 rounded-full bg-[#22d3ee] shadow-[0_0_7px_rgba(34,211,238,0.7)]" />
-                                )}
-                                <span className={`flex-shrink-0 ${isActive ? 'text-[#22d3ee]' : 'text-white/45 group-hover:text-white/80'}`}>
-                                  {tab.icon}
-                                </span>
-                                <span className="truncate">{tab.label}</span>
-                              </a>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-
-              {EXPLORE_APPS_TAB && (
-                <div className="mt-3 pt-3 border-t border-white/[0.07]">
-                  <a
-                    href={`/studio/${EXPLORE_APPS_TAB.id}`}
-                    onClick={(event) => handleNavigationItemClick(event, EXPLORE_APPS_TAB.id)}
-                    aria-current={activeTab === EXPLORE_APPS_TAB.id ? 'page' : undefined}
-                    aria-label={EXPLORE_APPS_TAB.label}
-                    title={isSidebarCollapsed && !isMobileOpen ? EXPLORE_APPS_TAB.label : undefined}
-                    className={`
-                      group relative flex items-center rounded-xl transition-all duration-150 text-[13px] font-semibold
-                      ${isSidebarCollapsed && !isMobileOpen ? 'h-11 w-11 justify-center mx-auto' : 'px-3 py-2.5 w-full gap-3'}
-                      ${activeTab === EXPLORE_APPS_TAB.id
-                        ? 'bg-gradient-to-r from-[#22d3ee]/15 to-purple-500/10 text-[#22d3ee] border border-[#22d3ee]/20'
-                        : 'text-white/60 hover:text-white hover:bg-white/[0.04] border border-transparent'
-                      }
-                    `}
-                  >
-                    {activeTab === EXPLORE_APPS_TAB.id && (
-                      <span className="absolute left-0 top-2 bottom-2 w-1 bg-gradient-to-b from-[#22d3ee] to-[#a855f7] rounded-r-full" />
-                    )}
-                    <span className={`flex-shrink-0 ${activeTab === EXPLORE_APPS_TAB.id ? 'text-[#22d3ee]' : 'text-white/50 group-hover:text-white'}`}>
-                      {EXPLORE_APPS_TAB.icon}
-                    </span>
-                    {(!isSidebarCollapsed || isMobileOpen) && (
-                      <span className="truncate">{EXPLORE_APPS_TAB.label}</span>
-                    )}
-                  </a>
-                </div>
-              )}
+          <aside className={`fixed bottom-0 left-0 top-0 z-50 flex flex-col border-r border-white/[0.07] bg-[#09090b] transition-transform md:static md:z-auto ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'} ${sidebarCollapsed ? 'w-64 md:w-[72px]' : 'w-64 md:w-60'}`}>
+            <div className="flex h-14 items-center justify-between border-b border-white/[0.07] px-4 md:hidden"><span className="text-xs font-black">G.FURY CREATOR</span><button type="button" onClick={() => setSidebarOpen(false)} aria-label="Close navigation menu"><X size={18} /></button></div>
+            <nav aria-label="Creator Studio" className="flex-1 overflow-y-auto px-2 py-3">
+              {NAV_GROUPS.map((group, index) => {
+                const open = !group.label || openGroups.has(group.label) || sidebarCollapsed;
+                return (
+                  <div key={`${group.label}-${index}`} className={index ? 'mt-3 border-t border-white/[0.05] pt-3' : ''}>
+                    {group.label && !sidebarCollapsed && <button type="button" onClick={() => setOpenGroups((previous) => { const next = new Set(previous); next.has(group.label) ? next.delete(group.label) : next.add(group.label); return next; })} className="mb-1 flex w-full items-center justify-between px-3 py-1 text-[9px] font-black uppercase tracking-[0.18em] text-white/22">{group.label}<ChevronDown size={12} className={open ? 'rotate-180' : ''} /></button>}
+                    {open && <div className="space-y-0.5">{group.items.map((id) => {
+                      const item = studioDestination(id); const Icon = ICONS[id] || Blocks;
+                      const active = destinationId === id || (id === 'graphic-studio' && destinationId === 'graphics');
+                      return <button key={id} type="button" onClick={() => navigate(item.path)} title={sidebarCollapsed ? item.label : undefined} className={`flex w-full items-center rounded-xl text-left transition ${sidebarCollapsed ? 'h-11 justify-center px-0' : 'gap-3 px-3 py-2.5'} ${active ? 'bg-cyan-300/[0.11] text-cyan-200' : 'text-white/43 hover:bg-white/[0.045] hover:text-white'}`}><Icon size={17} className="shrink-0" />{!sidebarCollapsed && <span className={`truncate text-[12px] ${['lipsync','motion','transform','smart-clip'].includes(id) ? 'pl-1 text-[11px]' : 'font-semibold'}`}>{item.label}</span>}</button>;
+                    })}</div>}
+                  </div>
+                );
+              })}
             </nav>
           </aside>
         )}
-
-        {/* Studio Content */}
-        <div className="flex-1 min-h-0 h-full relative overflow-hidden bg-[#030303]">
-        <div className={activeTab === 'creator' ? "h-full w-full" : "hidden"}>
-          <CreatorStudio
-            onGenerationStart={makeGenerationStartCallback('creator')}
-            onGenerationEnd={makeGenerationEndCallback('creator')}
-            onGenerationComplete={makeSuccessCallback('creator')}
-            onGenerationError={makeErrorCallback('creator')}
-          />
-        </div>
-        <div className={activeTab === 'image' ? "h-full w-full" : "hidden"}>
-          <ImageStudio apiKey={apiKey} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('image')} onGenerationEnd={makeGenerationEndCallback('image')} onGenerationComplete={makeSuccessCallback('image')} onGenerationError={makeErrorCallback('image')} />
-        </div>
-        <div className={activeTab === 'layers' ? "h-full w-full" : "hidden"}>
-          <LayersStudio apiKey={apiKey} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('layers')} onGenerationEnd={makeGenerationEndCallback('layers')} onGenerationComplete={makeSuccessCallback('layers')} onGenerationError={makeErrorCallback('layers')} />
-        </div>
-        <div className={activeTab === 'video' ? "h-full w-full" : "hidden"}>
-          <VideoStudio apiKey={apiKey} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('video')} onGenerationEnd={makeGenerationEndCallback('video')} onGenerationComplete={makeSuccessCallback('video')} onGenerationError={makeErrorCallback('video')} />
-        </div>
-        <div className={activeTab === 'clipping' ? "h-full w-full" : "hidden"}>
-          <ClippingStudio apiKey={apiKey} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('clipping')} onGenerationEnd={makeGenerationEndCallback('clipping')} onGenerationComplete={makeSuccessCallback('clipping')} onGenerationError={makeErrorCallback('clipping')} />
-        </div>
-        <div className={activeTab === 'vibe-motion' ? "h-full w-full" : "hidden"}>
-          <VibeMotionStudio apiKey={apiKey} onGenerationStart={makeGenerationStartCallback('vibe-motion')} onGenerationEnd={makeGenerationEndCallback('vibe-motion')} onGenerationComplete={makeSuccessCallback('vibe-motion')} onGenerationError={makeErrorCallback('vibe-motion')} />
-        </div>
-        <div className={activeTab === 'lipsync' ? "h-full w-full" : "hidden"}>
-          <LipSyncStudio apiKey={apiKey} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('lipsync')} onGenerationEnd={makeGenerationEndCallback('lipsync')} onGenerationComplete={makeSuccessCallback('lipsync')} onGenerationError={makeErrorCallback('lipsync')} />
-        </div>
-        <div className={activeTab === 'body-swap' ? "h-full w-full" : "hidden"}>
-          <RecastStudio apiKey={apiKey} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('body-swap')} onGenerationEnd={makeGenerationEndCallback('body-swap')} onGenerationComplete={makeSuccessCallback('body-swap')} onGenerationError={makeErrorCallback('body-swap')} />
-        </div>
-        <div className={activeTab === 'cinema' ? "h-full w-full" : "hidden"}>
-          <CinemaStudio apiKey={apiKey} onGenerationStart={makeGenerationStartCallback('cinema')} onGenerationEnd={makeGenerationEndCallback('cinema')} onGenerationComplete={makeSuccessCallback('cinema')} onGenerationError={makeErrorCallback('cinema')} />
-        </div>
-        <div className={activeTab === 'audio' ? "h-full w-full" : "hidden"}>
-          <AudioStudio apiKey={apiKey} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('audio')} onGenerationEnd={makeGenerationEndCallback('audio')} onGenerationComplete={makeSuccessCallback('audio')} onGenerationError={makeErrorCallback('audio')} />
-        </div>
-        <div className={activeTab === 'marketing' ? "h-full w-full" : "hidden"}>
-          <MarketingStudio apiKey={apiKey} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('marketing')} onGenerationEnd={makeGenerationEndCallback('marketing')} onGenerationComplete={makeSuccessCallback('marketing')} onGenerationError={makeErrorCallback('marketing')} />
-        </div>
-        <div className={activeTab === 'workflows' ? "h-full w-full" : "hidden"}>
-          <WorkflowStudio
-            apiKey={apiKey}
-            isHeaderVisible={isHeaderVisible}
-            onToggleHeader={setIsHeaderVisible}
-            onGenerationStart={makeGenerationStartCallback('workflows')}
-            onGenerationEnd={makeGenerationEndCallback('workflows')}
-            onGenerationComplete={makeSuccessCallback('workflows')}
-            onGenerationError={makeErrorCallback('workflows')}
-          />
-        </div>
-        <div className={activeTab === 'agents' ? "h-full w-full" : "hidden"}>
-          <AgentStudio apiKey={apiKey} isHeaderVisible={isHeaderVisible} onToggleHeader={setIsHeaderVisible} />
-        </div>
-        <div className={activeTab === 'design-agent' ? "h-full w-full" : "hidden"}>
-          {activeTab === 'design-agent' && (
-            <DesignAgentStudio
-              apiKey={apiKey}
-              isHeaderVisible={isHeaderVisible}
-              onToggleHeader={setIsHeaderVisible}
-              onGenerationStart={makeGenerationStartCallback('design-agent')}
-              onGenerationEnd={makeGenerationEndCallback('design-agent')}
-              onGenerationComplete={makeSuccessCallback('design-agent')}
-              onGenerationError={makeErrorCallback('design-agent')}
-            />
-          )}
-        </div>
-        <div className={activeTab === 'apps' ? "h-full w-full" : "hidden"}>
-          <AppsStudio apiKey={apiKey} />
-        </div>
-        <div className={activeTab === 'ai-influencer' ? "h-full w-full" : "hidden"}>
-          <AiInfluencerStudio
-            apiKey={apiKey}
-            onGenerationStart={makeGenerationStartCallback('ai-influencer')}
-            onGenerationEnd={makeGenerationEndCallback('ai-influencer')}
-            onGenerationComplete={makeSuccessCallback('ai-influencer')}
-            onGenerationError={makeErrorCallback('ai-influencer')}
-          />
-        </div>
+        <main className="relative min-h-0 min-w-0 flex-1 overflow-hidden">
+          {!apiKey && LEGACY_DESTINATIONS.has(destinationId) && destinationId !== 'provider-settings'
+            ? <LegacyProviderSettings apiKey={apiKey} onSave={saveKey} onClear={clearKey} requiredFor={destination.label} />
+            : renderDestination()}
+          {isDragging && <div className="pointer-events-none absolute inset-4 z-50 flex items-center justify-center rounded-3xl border-2 border-dashed border-cyan-300/40 bg-cyan-300/[0.08] backdrop-blur"><p className="text-sm font-bold text-cyan-100">Drop media into the active tool</p></div>}
+        </main>
       </div>
-    </div>
 
-      {/* Global generation activity and notification stack */}
-      {(activeGenerations.length > 0 || notifications.length > 0) && (
-        <div
-          aria-live="polite"
-          aria-label="Generation activity and notifications"
-          className="fixed top-16 right-5 z-[200] flex max-h-[calc(100vh-80px)] w-[340px] max-w-[calc(100vw-32px)] flex-col gap-2 overflow-x-hidden overflow-y-auto global-notif-stack pointer-events-none"
-          data-testid="global-notification-stack"
-        >
-          {activeGenerations.map((generation) => (
-            <div
-              key={generation.tabId}
-              role="status"
-              data-generation-tab={generation.tabId}
-              className="pointer-events-auto flex items-center gap-3 rounded-xl border border-cyan-500/40 bg-white px-3.5 py-3 text-[13px] text-zinc-900 shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
-              data-testid="generation-activity"
-            >
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-cyan-400/40 bg-cyan-50">
-                <span
-                  className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-cyan-600/30 border-t-cyan-600"
-                  aria-hidden="true"
-                />
-              </span>
-              <p className="min-w-0 flex-1 font-semibold leading-5 text-zinc-900">
-                {generation.label} is generating
-                {generation.count > 1 ? ` (${generation.count})` : ''}
-              </p>
-            </div>
-          ))}
-
-          {notifications.map((notif) => (
-            <div
-              key={notif.id}
-              role={notif.type === 'error' ? 'alert' : 'status'}
-              data-notification-type={notif.type}
-              data-notification-tab={notif.tabId}
-              className="pointer-events-auto flex items-start gap-3 rounded-xl border bg-white px-3.5 py-3 text-[13px] text-zinc-900 shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
-              style={{
-                borderColor: notif.type === 'success' ? 'rgba(6,182,212,0.4)' : 'rgba(239,68,68,0.4)',
-                animation: 'slideInRight 280ms cubic-bezier(0.16,1,0.3,1) forwards',
-              }}
-            >
-              <span
-                className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border ${
-                  notif.type === 'success'
-                    ? 'border-cyan-400/40 bg-cyan-50 text-cyan-600'
-                    : 'border-red-400/40 bg-red-50 text-red-600'
-                }`}
-              >
-                {notif.type === 'success' ? (
-                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d="m5 12 4 4L19 6" />
-                  </svg>
-                ) : (
-                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <circle cx="12" cy="12" r="9" />
-                    <path d="M12 7v6" />
-                    <path d="M12 17h.01" />
-                  </svg>
-                )}
-              </span>
-
-              <div className="min-w-0 flex-1">
-                <p className="font-semibold leading-5 text-zinc-900">
-                  {notif.label}
-                  <span className="font-normal text-zinc-500">
-                    {notif.type === 'success' ? ' - Generation complete' : ' - Generation failed'}
-                  </span>
-                </p>
-                {notif.type === 'error' && notif.message && (
-                  <p className="mt-0.5 line-clamp-2 text-[12px] font-medium leading-4 text-red-600" title={typeof notif.message === 'string' ? notif.message : String(notif.message?.message || notif.message)}>
-                    {typeof notif.message === 'string' ? notif.message : String(notif.message?.message || notif.message)}
-                  </p>
-                )}
-                {notif.type === 'success' && (
-                  <p className="mt-0.5 text-[12px] leading-4 text-zinc-500">
-                    Your result is ready.
-                  </p>
-                )}
-                {notif.type === 'success' && (
-                  <button
-                    type="button"
-                    onClick={() => handleOpenNotification(notif)}
-                    className="mt-1.5 text-[11px] font-bold text-cyan-600 transition-colors hover:text-cyan-700"
-                    aria-label={`Open ${notif.label} result`}
-                  >
-                    Open →
-                  </button>
-                )}
-              </div>
-
-              <button
-                type="button"
-                onClick={() => dismissNotification(notif.id)}
-                className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-700 focus:outline-none focus:ring-1 focus:ring-zinc-300"
-                aria-label="Dismiss notification"
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-                  <path d="M18 6 6 18M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Keyframe for toast slide-in & scrollbar suppression */}
-      <style>{`
-        @keyframes slideInRight {
-          from { transform: translateX(110%); opacity: 0; }
-          to   { transform: translateX(0);    opacity: 1; }
-        }
-        .global-notif-stack::-webkit-scrollbar {
-          display: none;
-        }
-        .global-notif-stack {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-      `}</style>
-
-      {/* Settings Modal */}
-      {showSettings && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in-up">
-          <div className="bg-[#0a0a0a] border border-white/10 rounded-xl p-8 w-full max-w-sm shadow-2xl">
-            <h2 className="text-white font-bold text-lg mb-2">Settings</h2>
-            <p className="text-white/40 text-[13px] mb-8">
-              Manage your AI studio preferences and authentication.
-            </p>
-            
-            <div className="space-y-4 mb-8">
-              <div className="bg-white/5 border border-white/[0.03] rounded-md p-4">
-                <label className="block text-xs font-bold text-white/30 mb-2">
-                   Active API Key
-                </label>
-                <div className="text-[13px] font-mono text-white/80">
-                  {apiKey.slice(0, 8)}••••••••••••••••
-                </div>
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                onClick={handleKeyChange}
-                className="flex-1 h-10 rounded-md bg-red-500/10 text-red-400 hover:bg-red-500/20 text-xs font-semibold transition-all"
-              >
-                Change Key
-              </button>
-              <button
-                onClick={() => setShowSettings(false)}
-                className="flex-1 h-10 rounded-md bg-white/5 text-white/80 hover:bg-white/10 text-xs font-semibold transition-all border border-white/5"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {(Object.values(generationCounts).some(Boolean) || notifications.length > 0) && <div aria-live="polite" className="fixed right-4 top-16 z-[100] w-[330px] max-w-[calc(100vw-32px)] space-y-2">
+        {Object.entries(generationCounts).filter(([, count]) => count > 0).map(([id]) => <div key={id} className="rounded-xl border border-cyan-300/20 bg-[#101014] px-4 py-3 text-xs font-semibold shadow-2xl">{studioDestination(id).label} is working…</div>)}
+        {notifications.map((item) => <div key={item.id} role={item.type === 'error' ? 'alert' : 'status'} className={`rounded-xl border bg-[#101014] px-4 py-3 text-xs shadow-2xl ${item.type === 'error' ? 'border-red-300/20 text-red-200' : 'border-emerald-300/20 text-emerald-100'}`}><div className="flex justify-between gap-3"><span><strong>{item.label}</strong>{item.type === 'error' ? ` · ${item.message}` : ' · Complete'}</span><button type="button" aria-label="Dismiss notification" onClick={() => setNotifications((previous) => previous.filter((value) => value.id !== item.id))}>×</button></div>{item.url && <a href={item.url} target="_blank" rel="noreferrer" className="mt-2 inline-block text-[10px] font-bold text-cyan-200">Open asset →</a>}</div>)}
+      </div>}
     </div>
   );
 }

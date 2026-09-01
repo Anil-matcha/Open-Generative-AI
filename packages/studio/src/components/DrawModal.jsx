@@ -7,6 +7,7 @@ export default function DrawModal({
   apiKey,
   batchSize = 1,
   onAddHistoryItem,
+  initialImageUrl = null,
 }) {
   const [activeTab, setActiveTab] = useState("draw-to-edit"); // 'sketch-to-video' | 'draw-to-video' | 'draw-to-edit'
   const [viewState, setViewState] = useState("setup"); // 'setup' | 'canvas'
@@ -69,6 +70,12 @@ export default function DrawModal({
     "#ffffff", // White
     "#000000", // Black
   ];
+
+  useEffect(() => {
+    if (!isOpen || typeof initialImageUrl !== "string" || !initialImageUrl.startsWith("https://")) return;
+    setBgImageUrl(initialImageUrl);
+    setViewState("canvas");
+  }, [initialImageUrl, isOpen]);
 
   const handleSelectTool = (tool) => {
     setActiveTool(tool);

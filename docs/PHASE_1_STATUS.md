@@ -1,6 +1,8 @@
 # G.FURY Creator Studio v1 — Phase 1 Status
 
-Authoritative reconciliation snapshot for `lalambert1982-eng/Open-Generative-AI`. Deployment evidence was last reconciled on 2026-08-26, including the approved Brain Router, Greg Digital Twin release, and MuAPI Creator Studio Production deployment.
+Authoritative reconciliation snapshot for `lalambert1982-eng/Open-Generative-AI`. Historical Production evidence below was last reconciled on 2026-08-26. The integrated completion candidate was audited locally on 2026-08-30 from `feature/integrated-creator-shell` at starting HEAD `b93226c282974bc4704b39550bb8039038f4b76a`.
+
+**Re-verified 2026-08-31** at HEAD `640590c0f7383ec9cf6e1c9a35699bfc9d972a29` (three commits ahead of the 2026-08-30 audit: `37157f4`, `520d97b`, `640590c`), with three additional narrowly-scoped client-side fixes applied on top (Selena missing-asset handling, a stale-asset session cache guard, and a Publish double-submit guard). `npm run test:security` still passed 112/112, `node --test tests/*.test.js` still passed 38/38, `npm run test:creator-shell` still passed 21/21, and the full workspace/Next production build still passed. No credential, environment, Production, or paid-provider state was available or exercised in this pass; the determination below is unchanged.
 
 This document distinguishes four independent states:
 
@@ -10,6 +12,30 @@ This document distinguishes four independent states:
 - **Production ready**: built, configured, real-tested, secure, documented, merged, and deployed.
 
 Configuration is not implementation. A provider with a missing API key remains **Built — configuration required**.
+
+## Integrated completion candidate — Built locally, not deployed
+
+The current `feature/integrated-creator-shell` candidate completes the smallest secure integration slice without rebuilding the providers or creative tools:
+
+- Selena returns an allowlisted structured plan with server-derived approval and side-effect metadata.
+- Owner-authenticated Projects and Assets persist through private Vercel Blob manifests when `BLOB_READ_WRITE_TOKEN` is configured.
+- Generated media, uploads, voice, Graphic Studio, Storyboard, contextual tools, and Publish share Project Asset handoffs.
+- Embedded CreativeCanvas uses the authenticated Creator server adapter and no longer writes the MuAPI credential to browser storage.
+- Storyboards persist to a selected Project and produce a versioned `creator.timeline.v1` manifest.
+- Timeline transitions remain metadata; no compositor/render worker or finished Music Video export is claimed.
+
+| Candidate area | Built | Configured | Tested | Production Ready |
+|---|---|---|---|---|
+| Integrated Creator shell | Yes — local candidate | Existing Preview only; completion candidate not deployed | 21 shell tests and production build | No |
+| Selena structured orchestration | Yes | Brain credentials not re-verified | Allowlist/approval tests; no real Brain request | No |
+| Durable Projects and Assets | Yes | Requires target `BLOB_READ_WRITE_TOKEN`; not re-verified through owner session | Ownership/persistence tests only | No |
+| Graphic Studio secure canvas bridge | Yes | Inherits server MuAPI configuration | Proxy/security tests only | No |
+| Storyboard and timeline manifest | Yes | Inherits Project/Blob and MuAPI status | Scene/request/manifest tests only | No |
+| Transition rendering / final compositor | No — manifest boundary only | Not applicable | Not tested | No |
+
+Final local verification: `npm run test:security` passed 112/112, `node --test tests/*.test.js` passed 38/38, `npm run test:creator-shell` passed 21/21, and the complete workspace/Next production build passed. The existing deployed Preview loaded the public integrated Home shell, but owner authentication could not be completed because the secure browser transport reset. No completion code was pushed or deployed, no environment was changed, and no paid/provider side effect occurred.
+
+See [`CREATOR_STUDIO_OS.md`](./CREATOR_STUDIO_OS.md) and [`STORYBOARD_WORKSPACE.md`](./STORYBOARD_WORKSPACE.md) for current architecture and exact boundaries. Preview promotion still requires explicit approval.
 
 ## Brain Router release — Production deployed
 
@@ -198,8 +224,8 @@ The Vercel entries named `ANTHPOC`, `runway`, `Elevenlabs`, `myvocie`, and `open
 - Default image model: `nano-banana`
 - Default text-to-video model: `seedance-lite-t2v`
 - Default image-to-video model: `kling-v2.1-master-i2v`
-- Credential use: server-side `MUAPI_API_KEY` only
-- Cost gate: `MUAPI_KEY_MODE=sandbox`; production mode also requires `MUAPI_ALLOW_PAID_GENERATION=true`
+- Credential use: Sandbox selects server-side `MUAPI_API_KEY`; Production selects the separate server-side `MUAPI_PRODUCTION_API_KEY`
+- Cost gate: `MUAPI_KEY_MODE=sandbox` is the safe default; production mode also requires `MUAPI_ALLOW_PAID_GENERATION=true`
 - Source/UI: built, merged, and deployed through PR #8
 - General Studio live Sandbox mock: passed at `$0` on 2026-08-26
 - Private Creator Studio live Sandbox mock: passed task `8c3dc22a-f59a-4c74-abbd-587ad4c84730` on Production on 2026-08-26
@@ -216,6 +242,8 @@ The Vercel entries named `ANTHPOC`, `runway`, `Elevenlabs`, `myvocie`, and `open
 - Real speech generation: pending
 
 The existing production voice ID was not revealed or overwritten during this audit.
+
+The currently reported ElevenLabs `401`/`403` remains a credential/permission blocker. The Storyboard candidate preserves the Voice UI and secure server route and does not change this provider configuration.
 
 ### HeyGen
 
@@ -299,6 +327,27 @@ The Brain Router is a reusable reasoning boundary for the existing agents. It do
 - YouTube publication cannot become public automatically.
 
 ## Verification results
+
+### Local Storyboard candidate — 2026-08-27
+
+| Verification | Result |
+|---|---|
+| Security/auth/brain/provider/YouTube tests | 92 passed, 0 failed |
+| Existing repository tests | 17 passed, 0 failed |
+| Storyboard scene/request/routing tests | 6 passed, 0 failed |
+| Total local automated tests | 115 passed, 0 failed |
+| Workflow Builder compilation | 22 files compiled |
+| AI Agent compilation | 11 files compiled |
+| Design Agent compilation | 4 files compiled |
+| Studio compilation | 28 files compiled |
+| Next.js optimized production build | Passed locally |
+| Real Storyboard provider generation | Not run |
+| Preview/Production deployment | Not run |
+| Production environment changes | None |
+
+The local build emitted existing npm proxy/dependency and outdated Browserslist warnings. They did not fail compilation. Node also emitted a module-type performance warning for the new pure ESM test helper; this is non-failing and does not affect the bundled Studio output.
+
+### Historical deployed-release evidence
 
 | Verification | Result |
 |---|---|

@@ -9,12 +9,19 @@ import {
     handleMuapiStatus,
     handleMuapiVideo,
 } from '../../../../src/lib/creatorProviderGateway.js';
+import { handleCreatorProjectRoute } from '../../../../src/lib/creatorProjectRoutes.js';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 async function dispatch(request, context, method) {
     const { path = [] } = await context.params;
+    if (path[0] === 'projects') {
+        return handleCreatorProjectRoute(request, {
+            path: path.slice(1),
+            method,
+        });
+    }
     const route = `${method}:${path.join('/')}`;
 
     switch (route) {
@@ -45,4 +52,16 @@ export function GET(request, context) {
 
 export function POST(request, context) {
     return dispatch(request, context, 'POST');
+}
+
+export function PUT(request, context) {
+    return dispatch(request, context, 'PUT');
+}
+
+export function PATCH(request, context) {
+    return dispatch(request, context, 'PATCH');
+}
+
+export function DELETE(request, context) {
+    return dispatch(request, context, 'DELETE');
 }

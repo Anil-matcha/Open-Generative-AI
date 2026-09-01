@@ -1,8 +1,8 @@
-import { proxyMuapi } from '../../../../../src/lib/muapiProxy.js';
+import { proxyCreatorCreativeCanvas } from '../../../../../src/lib/creatorMuapiProxy.js';
 
 async function proxy(request, { params }, method) {
     const { path = [] } = await params;
-    return proxyMuapi(request, { prefix: 'api/v1/creative-agent', pathSegments: path, method });
+    return proxyCreatorCreativeCanvas(request, { prefix: 'api/v1/creative-agent', pathSegments: path, method });
 }
 
 export function GET(request, context) { return proxy(request, context, 'GET'); }

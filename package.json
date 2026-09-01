@@ -33,6 +33,8 @@
     "electron:build:linux:arm64:dir": "vite build && electron-builder --linux dir --arm64",
     "stage:local-ai": "node scripts/stage-local-ai-binary.js",
     "test:security": "node --test tests/security/*.test.js",
+    "test:creator-shell": "node --test tests/storyboardWorkspace.test.js tests/studioNavigation.test.js tests/creatorShellIntegration.test.js",
+    "test:storyboard": "node --test tests/storyboardWorkspace.test.js",
     "package:linux:deb": "node scripts/package-linux-deb.js",
     "package:linux:deb:arm64": "node scripts/package-linux-deb.js --arch arm64",
     "package:linux:deb:x64": "node scripts/package-linux-deb.js --arch x64",

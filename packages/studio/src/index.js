@@ -17,4 +17,7 @@ export { default as McpCliStudio } from './components/McpCliStudio';
 export { default as AiInfluencerStudio } from './components/AiInfluencerStudio';
 export { default as LayersStudio } from './components/LayersStudio';
 export { default as CreatorStudio } from './components/CreatorStudio';
+export { default as StoryboardWorkspace } from './components/StoryboardWorkspace';
+export { default as GraphicStudio } from './components/GraphicStudio';
+export { default as SocialPublishStudio } from './components/SocialPublishStudio';
 export * from './muapi';

@@ -15,9 +15,17 @@ export async function proxyUploadCredentials(request, {
     prefix,
     pathSegments,
     proxyUrl,
+    apiKeyOverride = null,
     env = process.env,
 } = {}) {
-    const result = await fetchMuapi(request, { prefix, pathSegments, method: 'GET', env });
+    const result = await fetchMuapi(request, {
+        prefix,
+        pathSegments,
+        method: 'GET',
+        env,
+        requireApiKey: !apiKeyOverride,
+        apiKeyOverride,
+    });
     if (!result.upstream || !result.upstream.ok) return result.response;
 
     try {

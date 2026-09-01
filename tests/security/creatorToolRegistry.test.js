@@ -6,10 +6,12 @@ import {
     BRAIN_REASONING_TOOL_ID,
     ELEVENLABS_VOICE_TOOL_ID,
     HEYGEN_AVATAR_VIDEO_TOOL_ID,
+    INSTAGRAM_PUBLISH_TOOL_ID,
     MUAPI_IMAGE_TOOL_ID,
     MUAPI_VIDEO_TOOL_ID,
     OPENAI_IMAGE_TOOL_ID,
     RUNWAY_VIDEO_TOOL_ID,
+    TIKTOK_PUBLISH_TOOL_ID,
     YOUTUBE_PUBLISH_TOOL_ID,
     getCreatorToolDefinition,
     listCreatorToolDefinitions,
@@ -25,6 +27,8 @@ const EXPECTED_TOOLS = [
     [HEYGEN_AVATAR_VIDEO_TOOL_ID, 'heygen'],
     [RUNWAY_VIDEO_TOOL_ID, 'runway'],
     [YOUTUBE_PUBLISH_TOOL_ID, 'youtube'],
+    [INSTAGRAM_PUBLISH_TOOL_ID, 'muapi-social'],
+    [TIKTOK_PUBLISH_TOOL_ID, 'muapi-social'],
 ];
 
 test('Creator Studio registry exposes the brain boundary and each existing Phase 1 tool exactly once', () => {
@@ -57,6 +61,15 @@ test('registry preserves asynchronous jobs and private YouTube approval constrai
     assert.equal(youtube.requiresExplicitApproval, true);
     assert.equal(youtube.forcedPrivacyStatus, 'private');
     assert.equal(youtube.accepts.includes('approved'), true);
+
+    for (const toolId of [INSTAGRAM_PUBLISH_TOOL_ID, TIKTOK_PUBLISH_TOOL_ID]) {
+        const social = getCreatorToolDefinition(toolId);
+        assert.equal(social.asynchronous, true);
+        assert.equal(social.requiresExplicitApproval, true);
+        assert.equal(social.sideEffect, 'publishing');
+        assert.equal(social.successfulPublishCostUsd, 0.01);
+        assert.equal(social.accepts.includes('approved'), true);
+    }
 });
 
 test('registry metadata contains no credential values or client-readable secret fields', () => {

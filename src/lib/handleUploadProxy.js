@@ -30,8 +30,13 @@ function rateLimitSettings(env) {
     return { limit, windowMs };
 }
 
-export async function handleUploadProxy(request, { env = process.env } = {}) {
-    const apiKey = getApiKeyFromRequest(request);
+export async function handleUploadProxy(request, {
+    env = process.env,
+    apiKeyOverride = null,
+} = {}) {
+    const apiKey = typeof apiKeyOverride === 'string' && apiKeyOverride.trim()
+        ? apiKeyOverride.trim()
+        : getApiKeyFromRequest(request);
     if (!apiKey) return unauthorizedResponse();
 
     const rate = checkRateLimit(rateLimitKey(apiKey), rateLimitSettings(env));

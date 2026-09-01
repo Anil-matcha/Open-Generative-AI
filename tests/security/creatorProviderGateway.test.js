@@ -129,7 +129,15 @@ test('provider-neutral assistant returns a normalized Gemini response without se
                 return new Response(JSON.stringify({
                     modelVersion: 'gemini-3.7-flash',
                     candidates: [{
-                        content: { parts: [{ text: '1. Draft the hook.\n2. Build the assets.' }] },
+                        content: { parts: [{ text: JSON.stringify({
+                            message: 'I prepared a safe launch plan.',
+                            plan: ['Draft the hook.', 'Build the assets.'],
+                            suggestedActions: [{
+                                action: 'image.generate',
+                                parameters: { prompt: 'A cinematic launch graphic.', aspectRatio: '16:9' },
+                            }],
+                            referencedAssets: [],
+                        }) }] },
                         finishReason: 'STOP',
                     }],
                     usageMetadata: { promptTokenCount: 12, candidatesTokenCount: 18, totalTokenCount: 30 },
@@ -144,7 +152,13 @@ test('provider-neutral assistant returns a normalized Gemini response without se
     const body = JSON.parse(text);
     assert.equal(body.provider, 'gemini');
     assert.equal(body.toolId, BRAIN_REASONING_TOOL_ID);
-    assert.equal(body.text.includes('Draft the hook'), true);
+    assert.equal(body.text, 'I prepared a safe launch plan.');
+    assert.deepEqual(body.plan, ['Draft the hook.', 'Build the assets.']);
+    assert.equal(body.suggestedActions[0].action, 'image.generate');
+    assert.equal(body.suggestedActions[0].requiresApproval, true);
+    assert.equal(body.requiresApproval, true);
+    const providerRequest = JSON.parse(captured.options.body);
+    assert.equal(providerRequest.generationConfig.responseMimeType, 'application/json');
     assert.equal(text.includes(providerKey), false);
     assert.equal(text.includes(session), false);
 });

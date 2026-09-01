@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import { WorkflowBuilder } from "workflow-builder";
 import "reactflow/dist/style.css";
 import "react-toastify/dist/ReactToastify.css";
@@ -16,10 +16,6 @@ const WorkflowUI = ({
   onGenerationComplete,
   onGenerationError,
 }) => {
-  useEffect(() => {
-    sessionStorage.setItem("fromWorkflowBuilder", "true");
-  }, []);
-
   return (
     <div className="w-full h-full bg-black">
       <WorkflowBuilder

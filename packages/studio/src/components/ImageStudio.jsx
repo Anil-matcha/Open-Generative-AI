@@ -313,7 +313,7 @@ function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [], 
     </div>
   ) : label === "Swap Face" ? (
     hasSelection ? (
-      <img src={selectedEntries[0].url} alt="" className="w-full h-full object-cover" />
+      <img src={selectedEntries[0].url} alt="Selected face image for swap" className="w-full h-full object-cover" />
     ) : (
       <span className="text-[10px] font-bold text-white/50">Face</span>
     )
@@ -896,6 +896,7 @@ export default function ImageStudio({
   onDeleteHistoryItem,
   droppedFiles,
   onFilesHandled,
+  initialAsset,
 }) {
   const LEGACY_PERSIST_KEY = "hg_image_studio_persistent";
   const PERSIST_KEY = scopedPersistKey(LEGACY_PERSIST_KEY, apiKey);
@@ -992,6 +993,28 @@ export default function ImageStudio({
       console.warn("Failed to load ImageStudio persistence:", err);
     }
   }, []);
+
+  // Apply an explicit Creator Asset after restoring legacy editor state so the
+  // requested handoff always wins without copying or re-uploading its URL.
+  useEffect(() => {
+    const url = typeof initialAsset?.url === "string" ? initialAsset.url : "";
+    if (initialAsset?.type !== "image" || !url.startsWith("https://")) return;
+    const entry = {
+      id: initialAsset.id || `creator-asset-${url}`,
+      url,
+      prompt: initialAsset.title || "Creator Studio asset",
+      model: initialAsset.model || "creator-gateway",
+      aspect_ratio: null,
+      timestamp: initialAsset.createdAt || new Date().toISOString(),
+    };
+    setImageMode(true);
+    setUploadedImageUrls([url]);
+    setUploadHistory((previous) => previous.some((item) => item.url === url)
+      ? previous
+      : [{ id: entry.id, name: initialAsset.title || "Creator Studio asset", url, progress: 100 }, ...previous]);
+    setLocalHistory((previous) => previous.some((item) => item.url === url) ? previous : [entry, ...previous]);
+    setCurrentImageUrl(url);
+  }, [initialAsset]);
 
   // ── Adjust height on load ────────────────────────────────────────────────
   // ── Persistence: Save ────────────────────────────────────────────────────
@@ -1263,6 +1286,13 @@ export default function ImageStudio({
   const handleGenerate = async () => {
     if (generating) return;
 
+    if (!apiKey) {
+      const message = "AI generation in this legacy editor requires its isolated session key. Use the secure Creator Image tool to generate, then open the resulting Asset here.";
+      setGenerateError(message);
+      onGenerationError?.(message);
+      return;
+    }
+
     if (imageMode) {
       if (uploadedImageUrls.length === 0) {
         alert("Please upload a reference image first.");
@@ -1511,7 +1541,7 @@ export default function ImageStudio({
             <div className="flex items-center gap-2.5 flex-wrap">
               {uploadedImageUrls && uploadedImageUrls.length > 0 && uploadedImageUrls.map((url, idx) => (
                 <div key={url} className={PROMPT_MEDIA_PREVIEW_CLASS}>
-                  <img src={url} alt="" className="w-full h-full object-cover" />
+                  <img src={url} alt={`Uploaded reference image ${idx + 1}`} className="w-full h-full object-cover" />
                   <button
                     type="button"
                     onClick={() => {
@@ -1810,6 +1840,7 @@ export default function ImageStudio({
         apiKey={apiKey}
         batchSize={1}
         onAddHistoryItem={addToHistory}
+        initialImageUrl={currentImageUrl || uploadedImageUrls[0] || null}
       />
       <Toaster position="top-right" containerStyle={{ zIndex: 99999 }} toastOptions={{ duration: 5000, style: { background: '#18181b', color: '#ffffff', border: '1px solid rgba(255,255,255,0.15)', fontSize: '13px', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.6)', maxWidth: '440px', wordBreak: 'break-word', whiteSpace: 'pre-wrap', padding: '12px 16px' } }} />
     </div>

@@ -7,6 +7,8 @@ export const ELEVENLABS_VOICE_TOOL_ID = 'elevenlabs_voice';
 export const HEYGEN_AVATAR_VIDEO_TOOL_ID = 'heygen_avatar_video';
 export const RUNWAY_VIDEO_TOOL_ID = 'runway_video';
 export const YOUTUBE_PUBLISH_TOOL_ID = 'youtube_publish';
+export const INSTAGRAM_PUBLISH_TOOL_ID = 'instagram_publish';
+export const TIKTOK_PUBLISH_TOOL_ID = 'tiktok_publish';
 
 export const BRAIN_REASONING_TOOL = Object.freeze({
     id: BRAIN_REASONING_TOOL_ID,
@@ -166,6 +168,45 @@ export const YOUTUBE_PUBLISH_TOOL = Object.freeze({
     ]),
 });
 
+function socialPublishTool(id, platform, label, accepts) {
+    return Object.freeze({
+        id,
+        provider: 'muapi-social',
+        platform,
+        label,
+        purpose: `Publish an explicitly reviewed Creator Asset to ${platform} through the server-owned MuAPI social adapter.`,
+        asynchronous: true,
+        executesExternalActions: true,
+        sideEffect: 'publishing',
+        requiresExplicitApproval: true,
+        successfulPublishCostUsd: 0.01,
+        accepts: Object.freeze([...accepts, 'approved']),
+        returns: Object.freeze([
+            'provider',
+            'platform',
+            'accountId',
+            'jobId',
+            'status',
+            'url',
+            'error',
+        ]),
+    });
+}
+
+export const INSTAGRAM_PUBLISH_TOOL = socialPublishTool(
+    INSTAGRAM_PUBLISH_TOOL_ID,
+    'instagram',
+    'Instagram Publishing',
+    ['accountId', 'mediaUrl', 'mediaType', 'caption', 'placement', 'shareToFeed'],
+);
+
+export const TIKTOK_PUBLISH_TOOL = socialPublishTool(
+    TIKTOK_PUBLISH_TOOL_ID,
+    'tiktok',
+    'TikTok Publishing',
+    ['accountId', 'mediaUrl', 'mediaType', 'caption', 'privacyLevel', 'disableComment', 'disableDuet', 'disableStitch'],
+);
+
 const CREATOR_TOOL_REGISTRY = Object.freeze({
     [BRAIN_REASONING_TOOL_ID]: BRAIN_REASONING_TOOL,
     [ANTHROPIC_ASSISTANT_TOOL_ID]: ANTHROPIC_ASSISTANT_TOOL,
@@ -176,6 +217,8 @@ const CREATOR_TOOL_REGISTRY = Object.freeze({
     [HEYGEN_AVATAR_VIDEO_TOOL_ID]: HEYGEN_AVATAR_VIDEO_TOOL,
     [RUNWAY_VIDEO_TOOL_ID]: RUNWAY_VIDEO_TOOL,
     [YOUTUBE_PUBLISH_TOOL_ID]: YOUTUBE_PUBLISH_TOOL,
+    [INSTAGRAM_PUBLISH_TOOL_ID]: INSTAGRAM_PUBLISH_TOOL,
+    [TIKTOK_PUBLISH_TOOL_ID]: TIKTOK_PUBLISH_TOOL,
 });
 
 export function getCreatorToolDefinition(toolId) {

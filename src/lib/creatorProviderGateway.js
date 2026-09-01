@@ -25,6 +25,12 @@ import {
     muapiProviderStatus,
 } from './muapiCreatorProvider.js';
 import { checkRateLimit } from './rateLimit.js';
+import { CreatorProjectError, getCreatorProject } from './creatorProjectStore.js';
+import {
+    boundedSelenaContext,
+    buildSelenaBrainRequest,
+    normalizeSelenaPlan,
+} from './selenaOrchestrator.js';
 
 const DEFAULT_REQUEST_LIMIT = 30;
 const DEFAULT_STATUS_LIMIT = 120;
@@ -418,8 +424,50 @@ async function handleBrainReasoning(request, {
 export async function handleBrainAssistant(request, {
     env = process.env,
     fetchImpl = fetch,
+    blobStore,
+    projectLoader = getCreatorProject,
 } = {}) {
-    return handleBrainReasoning(request, { env, fetchImpl, action: 'brain' });
+    const auth = authorizeCreatorRequest(request, { env, action: 'brain' });
+    if (auth.response) return auth.response;
+    const parsed = await parseCreatorJson(request, { env });
+    if (parsed.response) return parsed.response;
+
+    let project = null;
+    const projectId = typeof parsed.value.projectId === 'string' ? parsed.value.projectId.trim() : '';
+    if (projectId) {
+        try {
+            project = await projectLoader(auth.user, projectId, { env, blobStore });
+        } catch (error) {
+            if (error instanceof CreatorProjectError) {
+                return creatorJson({ error: error.message, code: error.code }, error.status);
+            }
+            return creatorJson({ error: 'Selena could not load the selected Project.' }, 503);
+        }
+    }
+
+    try {
+        const context = boundedSelenaContext({
+            workspace: parsed.value.workspace,
+            project,
+            selectedAssetId: parsed.value.selectedAssetId,
+        });
+        const result = await reasonWithBrain(
+            buildSelenaBrainRequest(parsed.value, context),
+            { env, fetchImpl },
+        );
+        const plan = normalizeSelenaPlan(result);
+        return creatorJson({
+            ...result,
+            ...plan,
+            text: plan.message,
+            structuredOutput: plan,
+            toolId: BRAIN_REASONING_TOOL_ID,
+            stopReason: result.finishReason,
+        });
+    } catch (error) {
+        const failure = brainErrorResponse(error);
+        return creatorJson(failure.body, failure.status);
+    }
 }
 
 export async function handleAnthropicAssistant(request, {

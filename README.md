@@ -5,7 +5,7 @@
 
 > **The free, open-source alternative to AI Video Platforms.** Generate AI images and videos using 400+ state-of-the-art models across 14 studios — no content filters, no closed ecosystem, no subscription fees.
 
-The web app also includes a private **Creator Studio** with a provider-neutral Selena Brain Router (Gemini, Groq, OpenRouter, and optional Anthropic), MuAPI image and cinematic-video generation, ElevenLabs voice, HeyGen avatar video, and manual private YouTube publishing in one canvas. Direct OpenAI image and Runway video adapters remain preserved but deferred. See [Creator Studio provider setup](docs/CREATOR_STUDIO.md) before adding deployment secrets.
+The web app also includes a private **Creator Studio** operating-system shell with Selena, durable owner-scoped Projects and Assets, Graphic Studio, Storyboard, Workflows, MuAPI image/video, ElevenLabs voice, HeyGen avatar video, Instagram/TikTok review, and manual private YouTube publishing. Selena reasons through the provider-neutral Brain Router (Gemini, Groq, OpenRouter, and optional Anthropic) and prepares allowlisted actions without silently spending, deleting, or publishing. Direct OpenAI image and Runway video adapters remain preserved but deferred. See [Creator Studio architecture](docs/CREATOR_STUDIO_OS.md) and [provider setup](docs/CREATOR_STUDIO.md) before adding deployment secrets.
 
 **Community:** Join [Discord](https://discord.gg/tANKJkHck) for discussions and support
 
@@ -465,13 +465,13 @@ Pick the entry point that matches your goal:
 
 ```bash
 # Clone the repository (with submodules — required for the workflow + agent packages)
-git clone --recurse-submodules https://github.com/Anil-matcha/Open-Generative-AI.git
+git clone --recurse-submodules https://github.com/lalambert1982-eng/Open-Generative-AI.git
 cd Open-Generative-AI
 
 # If you already cloned without --recurse-submodules, run this once:
 # git submodule update --init --recursive
 
-# Install dependencies + build workspace packages (studio, workflow, agents).
+# Install dependencies + build workspace packages (workflow, agents, design agent, studio).
 # This step is REQUIRED — `npm install` alone is not enough; the workspaces
 # need to be built before either dev script will work.
 npm run setup
@@ -483,7 +483,7 @@ npm run dev            # Hosted web version (Next.js) → http://localhost:3000
 
 You'll be prompted to enter your Muapi API key on first use (skip the key if you only plan to use local models).
 
-> **Troubleshooting — `Couldn't find a 'pages' directory`**: this means Next.js can't see the `app/` folder. Confirm you're running `npm run dev` from the repo root (the directory that contains `app/`, `package.json`, and `next.config.mjs`), and that you cloned with submodules. Re-run `npm run setup` if `packages/Vibe-Workflow` or `packages/agents` are empty.
+> **Troubleshooting — `Couldn't find a 'pages' directory`**: this means Next.js can't see the `app/` folder. Confirm you're running `npm run dev` from the repo root (the directory that contains `app/`, `package.json`, and `next.config.mjs`), and that you cloned with submodules. Re-run `npm run setup` if `packages/Vibe-Workflow`, `packages/Open-Poe-AI`, or `packages/Open-AI-Design-Agent` is empty. These are build-time source dependencies; they do not need runtime GitHub API tokens.
 
 ### Production Build
 

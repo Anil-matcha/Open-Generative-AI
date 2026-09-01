@@ -377,15 +377,6 @@ export default function WorkflowStudio({
     handleSelectWorkflow,
   ]);
 
-  // Handle reload on exit to clear builder CSS
-  useEffect(() => {
-    const fromBuilder = sessionStorage.getItem("fromWorkflowBuilder");
-    if (fromBuilder && (!urlWorkflowId || activeSubTab !== "builder")) {
-      sessionStorage.removeItem("fromWorkflowBuilder");
-      window.location.reload();
-    }
-  }, [urlWorkflowId, activeSubTab]);
-
   useEffect(() => {
     async function loadWorkflows() {
       try {
@@ -964,13 +955,20 @@ export default function WorkflowStudio({
 
       {/* Rename Modal */}
       {renamingWorkflow && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="rename-workflow-title"
+          tabIndex={-1}
+          onKeyDown={(event) => { if (event.key === "Escape") setRenamingWorkflow(null); }}
+          className="fixed inset-0 z-[100] flex items-center justify-center p-6"
+        >
           <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => setRenamingWorkflow(null)} />
-          <form 
+          <form
             onSubmit={handleRenameWorkflow}
             className="relative w-full max-w-sm bg-[#0a0a0a] border border-white/10 rounded-2xl p-8 shadow-2xl animate-in fade-in zoom-in duration-300"
           >
-            <h3 className="text-xl font-bold text-white mb-2">Rename Workflow</h3>
+            <h3 id="rename-workflow-title" className="text-xl font-bold text-white mb-2">Rename Workflow</h3>
             <p className="text-white/40 text-sm mb-6">Enter a new descriptive name for your pipeline.</p>
             
             <div className="space-y-4">
