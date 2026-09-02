@@ -1,0 +1,92 @@
+{
+  "categories": {
+    "all": "全部",
+    "t2v": "文本生成视频",
+    "i2v": "图片生成视频",
+    "v2v": "视频工具"
+  },
+  "providers": {
+    "allProviders": "所有提供商"
+  },
+  "search": {
+    "placeholder": "搜索模型..."
+  },
+  "media": {
+    "image": "图片",
+    "video": "视频",
+    "audio": "音频",
+    "endFrame": "结束帧",
+    "removePrefix": "移除"
+  },
+  "upload": {
+    "uploadStartFrame": "上传起始帧",
+    "uploadEndFrame": "上传结束帧",
+    "uploadUpToReferenceImages": "最多可上传 {count} 张参考图片",
+    "uploadingProgress": "{title}：已上传 {progress}%"
+  },
+  "placeholders": {
+    "editVideo": "描述如何编辑此视频",
+    "continueVideo": "描述如何继续此视频",
+    "motion": "描述运动效果",
+    "motionOptional": "描述运动效果（可选）",
+    "videoReadyRemoveWatermark": "视频已就绪 — 点击生成以去除水印",
+    "motionOrEffect": "描述运动或特效",
+    "motionOrEffectOptional": "描述运动或特效（可选）",
+    "optionalContinueVideo": "可选：描述如何继续此视频...",
+    "describeVideo": "描述你想要创建的视频"
+  },
+  "dropdowns": {
+    "model": "模型",
+    "source": "来源",
+    "baseGeneration": "基础生成",
+    "aspectRatio": "宽高比",
+    "effect": "特效",
+    "effectType": "特效类型",
+    "duration": "时长",
+    "resolution": "分辨率"
+  },
+  "controls": {
+    "draw": "绘制",
+    "generate": "生成",
+    "generating": "生成中..."
+  },
+  "extend": {
+    "continuingGeneration": "正在继续上一个 {family} 生成"
+  },
+  "gallery": {
+    "download": "下载",
+    "extend": "延长",
+    "extendSeedance": "使用 Seedance 2.0 延长功能延长此视频",
+    "delete": "删除",
+    "confirmDelete": "确定要删除此生成项吗？",
+    "noPromptProvided": "未提供提示词",
+    "fallbackTitle": "视频工作室"
+  },
+  "empty": {
+    "heading": "开始使用",
+    "subtitle": "通过动态效果将图片转化为精美的 AI 视频"
+  },
+  "creativeAssets": {
+    "asset1": "创意素材 1",
+    "asset2": "创意素材 2",
+    "asset3": "创意素材 3",
+    "asset4": "创意素材 4"
+  },
+  "errors": {
+    "modelChangedDuringUpload": "上传过程中模型已更改，请重新添加文件。",
+    "modelDoesNotSupportReference": "{family} 不支持{mediaType}参考素材。",
+    "sourceDoesNotAcceptImages": "所选来源不接受图片。",
+    "waitForCurrentUpload": "请等待当前上传完成后再重新添加这些文件。",
+    "imageExceeds10MB": "图片超过 10MB 限制。",
+    "labelExceedsLimit": "{label}超过 {limit}MB 限制。",
+    "labelUploadFailed": "{label}上传失败：{message}",
+    "noPromptForModel": "请为该模型输入提示词。",
+    "uploadVideoFirst": "请先上传视频。",
+    "uploadReferenceImageForMotion": "请上传用于运动控制的参考图片。",
+    "uploadAtLeastOneReferenceImage": "请先上传至少一张参考图片。",
+    "enterPromptToGenerate": "请输入提示词以生成视频。",
+    "noVideoUrlReturned": "API 未返回视频链接",
+    "videoGenerationFailed": "视频生成失败",
+    "deleteItemFailed": "删除项目失败"
+  }
+}

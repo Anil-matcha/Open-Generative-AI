@@ -1,0 +1,54 @@
+{
+  "hero": {
+    "titleLine1": "START CREATING WITH",
+    "titleLine2": "LIP SYNC STUDIO",
+    "subtitle": "Sync any voice with any face video to create premium talking avatars and videos."
+  },
+  "modes": {
+    "portraitImage": "Portrait Image",
+    "video": "Video"
+  },
+  "media": {
+    "imageLabel": "Image",
+    "videoLabel": "Video",
+    "audioLabel": "Audio",
+    "uploadFilePrefix": "Upload",
+    "uploadFileSuffix": "file",
+    "clickToClear": "click to clear",
+    "noImage": "No image",
+    "noVideo": "No video",
+    "noAudio": "No audio"
+  },
+  "prompt": {
+    "placeholder": "Describe speech style..."
+  },
+  "model": {
+    "selectModel": "Select model",
+    "dropdownTitle": "Model",
+    "resolutionDropdownTitle": "Resolution"
+  },
+  "actions": {
+    "generate": "Sync Lip",
+    "generating": "Generating...",
+    "download": "Download",
+    "delete": "Delete"
+  },
+  "confirm": {
+    "deleteItem": "Are you sure you want to delete this generated item?"
+  },
+  "badges": {
+    "lipSync": "Lip Sync"
+  },
+  "errors": {
+    "imageTooLarge": "Image exceeds 10MB limit.",
+    "videoTooLarge": "Video exceeds 50MB limit.",
+    "audioTooLarge": "Audio file exceeds 10MB limit.",
+    "imageUploadFailed": "Image upload failed: {message}",
+    "videoUploadFailed": "Video upload failed: {message}",
+    "audioUploadFailed": "Audio upload failed: {message}",
+    "needAudio": "Please upload an audio file first.",
+    "needImage": "Please upload a portrait image first.",
+    "needVideo": "Please upload a source video first.",
+    "generationFailed": "Lip sync generation failed"
+  }
+}

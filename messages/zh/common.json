@@ -1,0 +1,68 @@
+{
+  "tabs": {
+    "image": "图像工作室",
+    "layers": "图层工作室",
+    "video": "视频工作室",
+    "audio": "音频工作室",
+    "clipping": "AI 剪辑",
+    "vibe-motion": "动感运镜",
+    "lipsync": "唇形同步",
+    "body-swap": "换体",
+    "cinema": "影院工作室",
+    "marketing": "营销工作室",
+    "workflows": "工作流",
+    "agents": "智能体",
+    "design-agent": "设计智能体",
+    "apps": "探索应用",
+    "ai-influencer": "AI 网红工作室"
+  },
+  "categories": {
+    "images": "图像",
+    "video": "视频",
+    "audio": "音频",
+    "agents-automation": "智能体与自动化"
+  },
+  "shell": {
+    "brand": "OpenGenerativeAI",
+    "studioFallback": "工作室",
+    "expandSidebar": "展开侧边栏",
+    "collapseSidebar": "收起侧边栏",
+    "toggleNavMenu": "切换导航菜单",
+    "studioNavigation": "工作室导航",
+    "toolsSuffix": "工具",
+    "settings": "设置",
+    "dropHere": "将媒体文件拖放到此处",
+    "dropHereHint": "图片、视频或音频文件",
+    "vadooPromo": "无限制 AI 图像与视频 → 自动发布为 YouTube Shorts 和 TikTok，赚取收益 ↗",
+    "dismiss": "关闭"
+  },
+  "settingsModal": {
+    "title": "设置",
+    "subtitle": "管理您的 AI 工作室偏好设置和身份验证。",
+    "activeApiKey": "当前 API 密钥",
+    "changeKey": "更换密钥",
+    "close": "关闭"
+  },
+  "notifications": {
+    "generating": "正在生成",
+    "generationComplete": "- 生成完成",
+    "generationFailed": "- 生成失败",
+    "resultReady": "您的结果已就绪。",
+    "open": "打开 →",
+    "openResult": "打开 {label} 的结果",
+    "dismissNotification": "关闭通知",
+    "ariaLabel": "生成活动与通知"
+  },
+  "apiKeyModal": {
+    "title": "Open Generative AI",
+    "subtitlePrefix": "输入您的",
+    "subtitleSuffix": "API 密钥以开始创作",
+    "close": "关闭",
+    "label": "API 访问密钥",
+    "placeholder": "在此粘贴您的密钥...",
+    "missingKeyError": "请输入您的 API 密钥",
+    "submit": "开始使用",
+    "needKey": "还没有密钥？",
+    "getOneFree": "免费获取 →"
+  }
+}

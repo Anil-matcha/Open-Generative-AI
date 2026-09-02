@@ -1,0 +1,57 @@
+{
+  "tabs": {
+    "templates": "Templates",
+    "my-agents": "My Agents",
+    "my-chats": "My Chats"
+  },
+  "headings": {
+    "agents": "Agents",
+    "createAgent": "Create Agent"
+  },
+  "buttons": {
+    "back": "Agents",
+    "create": "Create",
+    "createAgentSubmit": "Create Agent",
+    "creating": "Creating...",
+    "send": "Send",
+    "retry": "Retry",
+    "browseTemplates": "Browse Templates"
+  },
+  "labels": {
+    "name": "Name",
+    "description": "Description",
+    "systemPrompt": "System Prompt",
+    "welcomeMessage": "Welcome Message (optional)"
+  },
+  "placeholders": {
+    "name": "e.g. Caption Crafter Pro",
+    "description": "What does this agent help with?",
+    "systemPrompt": "You are a helpful assistant that...",
+    "welcomeMessage": "Hi! How can I help you today?",
+    "chatInput": "Message this agent..."
+  },
+  "empty": {
+    "noChats": "No chats yet",
+    "noAgents": "No agents found"
+  },
+  "errors": {
+    "loadFailed": "Failed to load.",
+    "loadAgentFailed": "Failed to load agent",
+    "sendFailed": "Failed to send message",
+    "createFailed": "Failed to create agent"
+  },
+  "card": {
+    "defaultCategory": "AI Assistant",
+    "unnamedAgent": "Unnamed Agent",
+    "byPrefix": "By",
+    "unknownAgent": "Unknown Agent",
+    "newChat": "New Chat",
+    "msgsSuffix": "msgs"
+  },
+  "time": {
+    "justNow": "just now",
+    "minutesAgo": "{n}m ago",
+    "hoursAgo": "{n}h ago",
+    "daysAgo": "{n}d ago"
+  }
+}

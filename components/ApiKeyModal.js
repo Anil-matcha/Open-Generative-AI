@@ -1,15 +1,17 @@
 'use client';
 
 import { useState } from 'react';
+import { getCommonCopy } from '@/lib/locales';
 
-export default function ApiKeyModal({ onSave, onClose, overlay = false, title, subtitle }) {
+export default function ApiKeyModal({ onSave, onClose, overlay = false, title, subtitle, locale = 'en' }) {
   const [key, setKey] = useState('');
   const [error, setError] = useState('');
+  const copy = getCommonCopy(locale).apiKeyModal;
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const trimmed = key.trim();
-    if (!trimmed) { setError('Please enter your API key'); return; }
+    if (!trimmed) { setError(copy.missingKeyError); return; }
     onSave(trimmed);
   };
 
@@ -24,7 +26,7 @@ export default function ApiKeyModal({ onSave, onClose, overlay = false, title, s
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close"
+            aria-label={copy.close}
             className="absolute top-3 right-3 w-8 h-8 rounded-md text-white/40 hover:text-white hover:bg-white/10 transition-colors flex items-center justify-center"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -39,11 +41,11 @@ export default function ApiKeyModal({ onSave, onClose, overlay = false, title, s
             </svg>
           </div>
           <h1 className="text-xl font-bold text-white tracking-tight mb-2">
-            {title || 'Open Generative AI'}
+            {title || copy.title}
           </h1>
           <p className="text-white/40 text-[13px] leading-relaxed px-4">
             {subtitle || (
-              <>Enter your <a href="https://muapi.ai/access-keys" target="_blank" rel="noreferrer" className="text-[#22d3ee] hover:text-[#e5ff33] transition-colors">Muapi.ai</a> API key to start creating</>
+              <>{copy.subtitlePrefix} <a href="https://muapi.ai/access-keys" target="_blank" rel="noreferrer" className="text-[#22d3ee] hover:text-[#e5ff33] transition-colors">Muapi.ai</a> {copy.subtitleSuffix}</>
             )}
           </p>
         </div>
@@ -51,13 +53,13 @@ export default function ApiKeyModal({ onSave, onClose, overlay = false, title, s
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <label className="block text-xs font-bold text-white/30 ml-1">
-              API Access Key
+              {copy.label}
             </label>
             <input
               type="password"
               value={key}
               onChange={(e) => { setKey(e.target.value); setError(''); }}
-              placeholder="Paste your key here..."
+              placeholder={copy.placeholder}
               className="w-full bg-white/5 border border-white/[0.03] rounded-md px-5 py-3 text-sm text-white placeholder:text-white/10 focus:outline-none focus:ring-1 focus:ring-[#22d3ee]/30 focus:bg-white/[0.07] transition-all"
               suppressHydrationWarning
             />
@@ -69,13 +71,13 @@ export default function ApiKeyModal({ onSave, onClose, overlay = false, title, s
             className="w-full bg-[#22d3ee] text-black font-medium py-2.5 rounded-md hover:bg-[#e5ff33] hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-[#22d3ee]/5"
             suppressHydrationWarning
           >
-            Get Started
+            {copy.submit}
           </button>
 
           <p className="text-center text-[12px] text-white/20 pt-2">
-            Need a key?{' '}
+            {copy.needKey}{' '}
             <a href="https://muapi.ai/access-keys" target="_blank" rel="noreferrer" className="text-white/40 hover:text-[#22d3ee] transition-colors font-medium">
-              Get one free →
+              {copy.getOneFree}
             </a>
           </p>
         </form>

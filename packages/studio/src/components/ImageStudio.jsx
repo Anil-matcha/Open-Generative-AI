@@ -57,6 +57,9 @@ import {
   promptControlClassName,
   promptMediaButtonClassName,
 } from "./prompt/PromptComposer.jsx";
+import en from "../messages/en/imageStudio.json";
+import zh from "../messages/zh/imageStudio.json";
+import { resolveCopy } from "../i18nUtils";
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -79,7 +82,8 @@ async function downloadImage(url, filename) {
 
 // ─── UploadButton (inline picker) ───────────────────────────────────────────
 
-function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [], label = null, persistedHistory = null, onHistoryChange = null }) {
+function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [], label = null, persistedHistory = null, onHistoryChange = null, copy }) {
+  const t = copy.uploadButton;
   const [panelOpen, setPanelOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [selectedEntries, setSelectedEntries] = useState([]); // [{url, thumbnail}]
@@ -191,7 +195,7 @@ function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [], 
     const tooLarge = files.filter((f) => f.size > MAX_IMAGE_SIZE);
     if (tooLarge.length > 0) {
       alert(
-        `The following images are too large (max 10MB): ${tooLarge.map((f) => f.name).join(", ")}`,
+        t.tooLargeAlert.replace("{names}", tooLarge.map((f) => f.name).join(", ")),
       );
       return;
     }
@@ -247,7 +251,7 @@ function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [], 
         }),
       );
     } catch (err) {
-      alert(`Image upload failed: ${err.message}`);
+      alert(t.uploadFailedAlert.replace("{message}", err.message));
     } finally {
       setUploading(false);
       setLastUploadProgress(0);
@@ -377,11 +381,11 @@ function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [], 
         {lastUploadProgress}%
       </span>
     </div>
-  ) : label === "Swap Face" ? (
+  ) : label === copy.promptBar.swapFaceLabel ? (
     hasSelection ? (
       <img src={selectedEntries[0].url} alt="" className="w-full h-full object-cover" />
     ) : (
-      <span className="text-[10px] font-bold text-white/50">Face</span>
+      <span className="text-[10px] font-bold text-white/50">{t.faceLabel}</span>
     )
   ) : (
     <svg
@@ -398,13 +402,13 @@ function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [], 
     </svg>
   );
 
-  const defaultLabel = isMulti ? `Add up to ${maxImages} images` : "Reference image";
+  const defaultLabel = isMulti ? t.addUpToImages.replace("{max}", maxImages) : t.referenceImageLabel;
   const triggerTitle = hasSelection
     ? count > 1
-      ? `${count} of ${maxImages} images selected — click to manage`
+      ? t.multiSelectedTitle.replace("{count}", count).replace("{max}", maxImages)
       : isMulti
-        ? `1 image selected — click to add more (up to ${maxImages})`
-        : label || "Reference image"
+        ? t.singleSelectedTitle.replace("{max}", maxImages)
+        : label || t.referenceImageLabel
     : label || defaultLabel;
 
   return (
@@ -450,11 +454,11 @@ function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [], 
           <div className="flex items-center justify-between px-1 pb-3 mb-2 border-b border-white/5">
             <div className="flex flex-col gap-0.5">
               <span className="text-xs font-bold text-secondary">
-                Reference Images
+                {t.headerTitle}
               </span>
               {isMulti && (
                 <span className="text-[9px] text-muted">
-                  Select up to {maxImages} images
+                  {t.selectUpTo.replace("{max}", maxImages)}
                 </span>
               )}
             </div>
@@ -465,7 +469,7 @@ function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [], 
                   onClick={handleDone}
                   className="flex items-center gap-1 px-3 py-1.5 bg-primary text-black rounded-xl text-xs font-black transition-all hover:scale-105"
                 >
-                  ✓ Done ({count})
+                  {t.doneButton.replace("{count}", count)}
                 </button>
               )}
               <button
@@ -489,7 +493,7 @@ function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [], 
                   <polyline points="17 8 12 3 7 8" />
                   <line x1="12" y1="3" x2="12" y2="15" />
                 </svg>
-                {isMulti ? "Upload files" : "Upload new"}
+                {isMulti ? t.uploadFilesButton : t.uploadNewButton}
               </button>
             </div>
           </div>
@@ -510,7 +514,7 @@ function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [], 
                 <polyline points="17 8 12 3 7 8" />
                 <line x1="12" y1="3" x2="12" y2="15" />
               </svg>
-              <span className="text-xs text-secondary">No uploads yet</span>
+              <span className="text-xs text-secondary">{t.emptyState}</span>
             </div>
           ) : (
             <div className="grid grid-cols-3 gap-2 max-h-56 overflow-y-auto custom-scrollbar pr-0.5">
@@ -553,7 +557,7 @@ function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [], 
                       <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/cell:opacity-100 transition-opacity flex items-end justify-end p-1">
                         <button
                           type="button"
-                          title="Remove from history"
+                          title={t.removeFromHistory}
                           onClick={(e) => handleRemoveFromHistory(e, entry)}
                           className="w-5 h-5 bg-red-500/80 hover:bg-red-500 rounded-md flex items-center justify-center transition-colors"
                         >
@@ -603,14 +607,14 @@ function UploadButton({ apiKey, maxImages, onSelect, onClear, initialUrls = [], 
           {isMulti && hasSelection && (
             <div className="mt-3 pt-3 border-t border-white/5 flex items-center justify-between">
               <span className="text-xs text-secondary">
-                {count} of {maxImages} selected
+                {t.selectedCount.replace("{count}", count).replace("{max}", maxImages)}
               </span>
               <button
                 type="button"
                 onClick={handleDone}
                 className="px-4 py-1.5 bg-primary text-black rounded-xl text-xs font-black transition-all hover:scale-105"
               >
-                Use Selected
+                {t.useSelected}
               </button>
             </div>
           )}
@@ -652,23 +656,24 @@ const PROVIDER_LOGOS = {
 
 const invertLogos = ['openai', 'blackforest', 'runway', 'ideogram', 'lightricks', 'grok'];
 
-function ModelDropdown({ selectedModel, onSelect, onClose }) {
+function ModelDropdown({ selectedModel, onSelect, onClose, copy }) {
+  const t = copy.modelDropdown;
   const [search, setSearch] = useState("");
   const selectedEntry = imageModelPickerEntryByVariantId.get(selectedModel);
   const modelCategories = [
     {
       id: "all",
-      label: "All",
+      label: t.categoryAll,
       entries: imageModelPickerEntries,
     },
     {
       id: "t2i",
-      label: "Text to Image",
+      label: t.categoryT2I,
       entries: imageModelPickerEntries.filter((entry) => entry.variantsByMode.t2i),
     },
     {
       id: "i2i",
-      label: "Image to Image",
+      label: t.categoryI2I,
       entries: imageModelPickerEntries.filter((entry) => entry.variantsByMode.i2i),
     },
   ];
@@ -759,7 +764,7 @@ function ModelDropdown({ selectedModel, onSelect, onClose }) {
               ? "bg-white/10 text-yellow-400 border-yellow-500/30 shadow-md scale-105"
               : "bg-white/[0.02] text-white/50 border-white/[0.03] hover:bg-white/5 hover:text-white"
           }`}
-          title="All Providers"
+          title={t.allProviders}
         >
           <svg width="15" height="15" viewBox="0 0 24 24" fill={selectedProvider === "all" ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
@@ -833,7 +838,7 @@ function ModelDropdown({ selectedModel, onSelect, onClose }) {
             </svg>
             <input
               type="text"
-              placeholder="Search models..."
+              placeholder={t.searchPlaceholder}
               value={search}
               onClick={(e) => e.stopPropagation()}
               onChange={(e) => {
@@ -847,7 +852,7 @@ function ModelDropdown({ selectedModel, onSelect, onClose }) {
         </div>
         
         <div className="text-xs font-semibold text-secondary py-1 shrink-0 flex items-center justify-between">
-          <span>{activeCategory.label} models</span>
+          <span>{activeCategory.label} {t.modelsSuffix}</span>
           {selectedProvider !== "all" && (
             <span className="text-[10px] bg-white/5 px-2 py-0.5 rounded text-white/60">
               {availableProviders.find(p => p.id === selectedProvider)?.name || selectedProvider}
@@ -858,7 +863,7 @@ function ModelDropdown({ selectedModel, onSelect, onClose }) {
         <div className="flex flex-col gap-1.5 overflow-y-auto custom-scrollbar pr-1 pb-2 flex-1">
           {filtered.length === 0 ? (
             <div className="text-xs text-white/30 text-center py-6">
-              No models found
+              {t.noModelsFound}
             </div>
           ) : (
             filtered.map((entry) => {
@@ -971,7 +976,9 @@ export default function ImageStudio({
   onDeleteHistoryItem,
   droppedFiles,
   onFilesHandled,
+  locale = "en",
 }) {
+  const copy = resolveCopy(en, zh, locale);
   const LEGACY_PERSIST_KEY = "hg_image_studio_persistent";
   const PERSIST_KEY = scopedPersistKey(LEGACY_PERSIST_KEY, apiKey);
   useEffect(() => {
@@ -1129,7 +1136,7 @@ export default function ImageStudio({
     const tooLarge = files.filter((f) => f.size > MAX_IMAGE_SIZE);
     if (tooLarge.length > 0) {
       alert(
-        `The following images are too large (max 10MB): ${tooLarge.map((f) => f.name).join(", ")}`
+        copy.uploadButton.tooLargeAlert.replace("{names}", tooLarge.map((f) => f.name).join(", "))
       );
       return;
     }
@@ -1142,7 +1149,7 @@ export default function ImageStudio({
       selectedModelId,
     );
     if (!editor) {
-      toast.error(`${family.name} does not support image references.`);
+      toast.error(copy.errors.noImageReferenceSupport.replace("{name}", family.name));
       return;
     }
 
@@ -1170,7 +1177,7 @@ export default function ImageStudio({
 
       handleUploadSelect({ urls });
     } catch (err) {
-      alert(`Image upload failed: ${err.message}`);
+      alert(copy.uploadButton.uploadFailedAlert.replace("{message}", err.message));
     } finally {
       setGenerating(false);
     }
@@ -1275,7 +1282,7 @@ export default function ImageStudio({
         selection.selectedModelId,
       );
       if (!target) {
-        toast.error(`${family.name} does not support image references.`);
+        toast.error(copy.errors.noImageReferenceSupport.replace("{name}", family.name));
         return;
       }
 
@@ -1352,22 +1359,22 @@ export default function ImageStudio({
 
     if (imageMode) {
       if (uploadedImageUrls.length === 0) {
-        alert("Please upload a reference image first.");
+        alert(copy.errors.uploadReferenceFirst);
         return;
       }
       const modelInfo = getI2IModelById(selectedModelId);
       if (modelInfo?.swapField && !swapImageUrl) {
-        alert("Please upload a swap face image.");
+        alert(copy.errors.uploadSwapFaceFirst);
         return;
       }
     } else {
       const imageCapability = getModelMediaCapabilities(selectedVariant?.model).image;
       if (uploadedImageUrls.length > 0 && imageCapability.maxItems === 0) {
-        alert(`${selectedModelDisplayName} does not support image references.`);
+        alert(copy.errors.noImageReferenceSupport.replace("{name}", selectedModelDisplayName));
         return;
       }
       if (!prompt.trim()) {
-        alert("Please enter a prompt to generate an image.");
+        alert(copy.errors.enterPromptFirst);
         return;
       }
     }
@@ -1440,7 +1447,7 @@ export default function ImageStudio({
       });
     } catch (e) {
       console.error("[ImageStudio] Generation failed:", e);
-      const errMsg = formatErrorMessage(e, "Image generation failed");
+      const errMsg = formatErrorMessage(e, copy.errors.generationFailed);
       if (onGenerationError) onGenerationError(errMsg);
       else toast.error(errMsg);
     } finally {
@@ -1451,10 +1458,10 @@ export default function ImageStudio({
 
   const placeholderText =
     uploadedImageUrls.length > 1
-      ? `${uploadedImageUrls.length} images selected — describe the transformation (optional)`
+      ? copy.promptBar.placeholderMultiImage.replace("{count}", uploadedImageUrls.length)
       : imageMode
-        ? "Describe how to transform this image (optional)"
-        : "Describe the image you want to create";
+        ? copy.promptBar.placeholderI2I
+        : copy.promptBar.placeholderT2I;
 
   // ── Render ───────────────────────────────────────────────────────────────
   return (
@@ -1472,10 +1479,10 @@ export default function ImageStudio({
               >
                 <img
                   src={entry.url}
-                  alt={entry.prompt?.substring(0, 30) || "Generated image"}
+                  alt={entry.prompt?.substring(0, 30) || copy.gallery.generatedImageAlt}
                   className="w-full aspect-square object-cover bg-black/40 hover:opacity-80 transition-opacity"
                 />
-                
+
                 {/* Overlay actions */}
                 <div className="absolute top-2 right-2 hidden md:flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <GenerationCopyButtons
@@ -1485,7 +1492,7 @@ export default function ImageStudio({
                   />
                   <button
                     type="button"
-                    title="Download"
+                    title={copy.gallery.download}
                     onClick={(e) => {
                       e.stopPropagation();
                       downloadImage(entry.url, `muapi-${entry.id || idx}.jpg`);
@@ -1498,12 +1505,12 @@ export default function ImageStudio({
                   </button>
                   <button
                     type="button"
-                    title="Delete"
+                    title={copy.gallery.delete}
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (confirm("Are you sure you want to delete this generated item?")) {
+                      if (confirm(copy.gallery.deleteConfirm)) {
                         handleDeleteEntry(entry, idx).catch((err) => {
-                          onGenerationError?.(err.message || "Failed to delete item");
+                          onGenerationError?.(err.message || copy.gallery.deleteFailed);
                         });
                       }
                     }}
@@ -1524,18 +1531,18 @@ export default function ImageStudio({
                   actions={[
                     {
                       kind: "download",
-                      label: "Download",
+                      label: copy.gallery.download,
                       onSelect: () =>
                         downloadImage(entry.url, `muapi-${entry.id || idx}.jpg`),
                     },
                     {
                       kind: "delete",
-                      label: "Delete",
+                      label: copy.gallery.delete,
                       danger: true,
                       onSelect: () => {
-                        if (confirm("Are you sure you want to delete this generated item?")) {
+                        if (confirm(copy.gallery.deleteConfirm)) {
                           handleDeleteEntry(entry, idx).catch((err) => {
-                            onGenerationError?.(err.message || "Failed to delete item");
+                            onGenerationError?.(err.message || copy.gallery.deleteFailed);
                           });
                         }
                       },
@@ -1546,12 +1553,12 @@ export default function ImageStudio({
                 {/* Prompt & Details */}
                 <div className="p-3 bg-black/80 backdrop-blur-sm border-t border-white/5 flex-1 flex flex-col justify-between gap-2">
                   <p className="text-white/70 text-xs line-clamp-3 leading-relaxed" title={entry.prompt}>
-                    {entry.prompt || "No prompt provided"}
+                    {entry.prompt || copy.gallery.noPrompt}
                   </p>
                   <div className="flex items-center justify-between mt-1">
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] font-bold text-primary px-2 py-0.5 bg-primary/10 rounded border border-primary/20 capitalize">
-                        {entry.model?.replace("-", " ") || "Image Studio"}
+                        {entry.model?.replace("-", " ") || copy.gallery.modelFallback}
                       </span>
                       <span className="text-[10px] text-white/40">{entry.aspect_ratio}</span>
                     </div>
@@ -1595,13 +1602,13 @@ export default function ImageStudio({
             </div>
 
             <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-center px-4 flex flex-col items-center">
-              <span className="text-white font-black uppercase text-xl sm:text-3xl tracking-wide mb-1 opacity-90">START CREATING WITH</span>
+              <span className="text-white font-black uppercase text-xl sm:text-3xl tracking-wide mb-1 opacity-90">{copy.emptyState.heading}</span>
               <span className="text-[#22d3ee] font-black uppercase text-2xl sm:text-4xl sm:mt-1 tracking-tight">
                 {selectedModelDisplayName}
               </span>
             </h1>
             <p className="text-white/40 text-xs sm:text-sm font-medium tracking-wide text-center max-w-lg leading-relaxed px-4">
-              Describe a scene, character, mood, or style — and watch it come to life
+              {copy.emptyState.subtitle}
             </p>
           </div>
         )}
@@ -1640,6 +1647,7 @@ export default function ImageStudio({
                   initialUrls={uploadedImageUrls}
                   persistedHistory={uploadHistory}
                   onHistoryChange={setUploadHistory}
+                  copy={copy}
                 />
               )}
 
@@ -1651,7 +1659,8 @@ export default function ImageStudio({
                   onSelect={({ urls }) => setSwapImageUrl(urls[0] || null)}
                   onClear={() => setSwapImageUrl(null)}
                   initialUrls={swapImageUrl ? [swapImageUrl] : []}
-                  label="Swap Face"
+                  label={copy.promptBar.swapFaceLabel}
+                  copy={copy}
                 />
               )}
             </div>
@@ -1706,11 +1715,12 @@ export default function ImageStudio({
                     onClick={(e) => e.stopPropagation()}
                     className="w-[calc(100vw-2rem)] md:w-[480px] max-w-md md:max-w-none max-h-[70vh]"
                   >
-                    <PromptPopoverHeader>Model</PromptPopoverHeader>
+                    <PromptPopoverHeader>{copy.popovers.model}</PromptPopoverHeader>
                     <ModelDropdown
                       selectedModel={selectedModelId}
                       onSelect={handleModelSelect}
                       onClose={() => setDropdownOpen(null)}
+                      copy={copy}
                     />
                   </PromptPopover>
                 )}
@@ -1754,7 +1764,7 @@ export default function ImageStudio({
                     onClick={(e) => e.stopPropagation()}
                   >
                     <SimpleDropdown
-                      title="Aspect Ratio"
+                      title={copy.popovers.aspectRatio}
                       options={currentAspectRatios}
                       selected={selectedAr}
                       onSelect={(val) => setSelectedAr(val)}
@@ -1788,7 +1798,7 @@ export default function ImageStudio({
                       onClick={(e) => e.stopPropagation()}
                     >
                       <SimpleDropdown
-                        title="Resolution"
+                        title={copy.popovers.resolution}
                         options={currentResolutions}
                         selected={selectedQuality}
                         onSelect={(val) => setSelectedQuality(val)}
@@ -1816,7 +1826,7 @@ export default function ImageStudio({
                       <path d="M5 3l14 9-14 9V3z" />
                     </svg>
                     <span className={`${PROMPT_CONTROL_LABEL_CLASS} max-w-[140px] truncate`}>
-                      {selectedEffect || "Effect"}
+                      {selectedEffect || copy.promptBar.effectFallback}
                     </span>
                   </button>
 
@@ -1826,7 +1836,7 @@ export default function ImageStudio({
                       className="min-w-[200px]"
                     >
                       <SimpleDropdown
-                        title="Effect Type"
+                        title={copy.popovers.effectType}
                         options={currentEffects}
                         selected={selectedEffect}
                         onSelect={(val) => setSelectedEffect(val)}
@@ -1869,7 +1879,7 @@ export default function ImageStudio({
                   <path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
                 </svg>
                 <span className={PROMPT_CONTROL_LABEL_CLASS}>
-                  Draw
+                  {copy.promptBar.drawButton}
                 </span>
               </button>
             </PromptControls>
@@ -1882,11 +1892,11 @@ export default function ImageStudio({
               {generating ? (
                 <>
                   <span className="animate-spin inline-block text-black">◌</span>
-                  Generating...
+                  {copy.promptBar.generating}
                 </>
               ) : (
                 <>
-                  <span>Generate ✦</span>
+                  <span>{copy.promptBar.generateButton}</span>
                 </>
               )}
             </PromptAction>
@@ -1912,9 +1922,9 @@ export default function ImageStudio({
               <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
           </button>
-          <img 
-            src={fullscreenUrl} 
-            alt="Fullscreen Preview" 
+          <img
+            src={fullscreenUrl}
+            alt={copy.fullscreen.previewAlt}
             className="max-w-[95vw] max-h-[95vh] rounded-2xl shadow-2xl object-contain animate-scale-up" 
             onClick={(e) => e.stopPropagation()}
           />

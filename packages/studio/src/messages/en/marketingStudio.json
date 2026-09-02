@@ -1,0 +1,49 @@
+{
+  "empty": {
+    "titleLine1": "START CREATING WITH",
+    "titleLine2": "MARKETING STUDIO",
+    "subtitle": "Describe your scene, upload your product, and watch high-converting AI video ads come to life."
+  },
+  "uploadSlots": {
+    "product": "Product",
+    "avatar": "Avatar",
+    "references": "References",
+    "uploadPrefix": "Upload"
+  },
+  "prompt": {
+    "placeholder": "Describe your ad script... Use @image1 for product, @image2 for avatar."
+  },
+  "dropdowns": {
+    "videoFormatPresets": "Video Format Presets",
+    "avatarPresets": "Avatar Presets",
+    "aspectRatio": "Aspect Ratio",
+    "resolution": "Resolution",
+    "duration": "Duration",
+    "selectAvatarFallback": "Select Avatar"
+  },
+  "buttons": {
+    "generating": "Generating...",
+    "launch": "Launch",
+    "enlargePreview": "Enlarge preview",
+    "enlargeSelectedAvatar": "Enlarge selected avatar",
+    "selectAvatar": "Select Avatar",
+    "download": "Download",
+    "delete": "Delete"
+  },
+  "history": {
+    "badge": "Marketing Studio"
+  },
+  "alt": {
+    "creativeAsset": "Creative asset {index}",
+    "previousAvatar": "Previous Avatar",
+    "nextAvatar": "Next Avatar"
+  },
+  "errors": {
+    "missingScript": "Please enter an ad script.",
+    "missingProductImage": "Please upload a product image.",
+    "generationFailed": "Marketing generation failed"
+  },
+  "confirm": {
+    "deleteItem": "Are you sure you want to delete this generated item?"
+  }
+}

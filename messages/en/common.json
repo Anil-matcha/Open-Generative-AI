@@ -1,0 +1,68 @@
+{
+  "tabs": {
+    "image": "Image Studio",
+    "layers": "Layers Studio",
+    "video": "Video Studio",
+    "audio": "Audio Studio",
+    "clipping": "AI Clipping",
+    "vibe-motion": "Vibe Motion",
+    "lipsync": "Lip Sync",
+    "body-swap": "Body Swap",
+    "cinema": "Cinema Studio",
+    "marketing": "Marketing Studio",
+    "workflows": "Workflows",
+    "agents": "Agents",
+    "design-agent": "Design Agent",
+    "apps": "Explore Apps",
+    "ai-influencer": "AI Influencer Studio"
+  },
+  "categories": {
+    "images": "Images",
+    "video": "Video",
+    "audio": "Audio",
+    "agents-automation": "Agents & Automation"
+  },
+  "shell": {
+    "brand": "OpenGenerativeAI",
+    "studioFallback": "Studio",
+    "expandSidebar": "Expand sidebar",
+    "collapseSidebar": "Collapse sidebar",
+    "toggleNavMenu": "Toggle Navigation Menu",
+    "studioNavigation": "Studio navigation",
+    "toolsSuffix": "tools",
+    "settings": "Settings",
+    "dropHere": "Drop your media here",
+    "dropHereHint": "Images, videos, or audio files",
+    "vadooPromo": "Unrestricted AI Images & Videos → Auto-Publish as YouTube Shorts & TikToks, Earn ↗",
+    "dismiss": "Dismiss"
+  },
+  "settingsModal": {
+    "title": "Settings",
+    "subtitle": "Manage your AI studio preferences and authentication.",
+    "activeApiKey": "Active API Key",
+    "changeKey": "Change Key",
+    "close": "Close"
+  },
+  "notifications": {
+    "generating": "is generating",
+    "generationComplete": "- Generation complete",
+    "generationFailed": "- Generation failed",
+    "resultReady": "Your result is ready.",
+    "open": "Open →",
+    "openResult": "Open {label} result",
+    "dismissNotification": "Dismiss notification",
+    "ariaLabel": "Generation activity and notifications"
+  },
+  "apiKeyModal": {
+    "title": "Open Generative AI",
+    "subtitlePrefix": "Enter your",
+    "subtitleSuffix": "API key to start creating",
+    "close": "Close",
+    "label": "API Access Key",
+    "placeholder": "Paste your key here...",
+    "missingKeyError": "Please enter your API key",
+    "submit": "Get Started",
+    "needKey": "Need a key?",
+    "getOneFree": "Get one free →"
+  }
+}

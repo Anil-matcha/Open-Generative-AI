@@ -1,0 +1,49 @@
+{
+  "cameraOverlay": {
+    "eyebrow": "Cinema Studio",
+    "title": "Camera settings",
+    "description": "Build a consistent cinematic look by choosing the camera, lens, focal length, and depth of field.",
+    "close": "Close",
+    "closeAria": "Close camera settings",
+    "columns": {
+      "camera": "Camera",
+      "lens": "Lens",
+      "focalLength": "Focal length",
+      "aperture": "Aperture"
+    }
+  },
+  "dropdowns": {
+    "aspectRatio": "Aspect Ratio",
+    "resolution": "Resolution"
+  },
+  "actions": {
+    "copyPrompt": "Copy prompt",
+    "promptCopied": "Prompt copied",
+    "copyImage": "Copy image",
+    "imageCopied": "Image copied",
+    "download": "Download",
+    "delete": "Delete",
+    "deleteConfirm": "Are you sure you want to delete this generated item?"
+  },
+  "card": {
+    "noPrompt": "No prompt",
+    "badge": "Cinema Studio",
+    "historyItemAlt": "History item {index}"
+  },
+  "empty": {
+    "kicker": "START CREATING WITH",
+    "title": "CINEMA STUDIO",
+    "description": "What would you shoot with infinite budget? Control cameras, lighting, lenses, and prompt high-end cinematic scenes."
+  },
+  "prompt": {
+    "placeholder": "Describe your cinema scene...",
+    "generating": "Generating...",
+    "generate": "Shoot"
+  },
+  "fullscreen": {
+    "alt": "Fullscreen Preview"
+  },
+  "referenceImage": {
+    "alt": "Reference"
+  }
+}

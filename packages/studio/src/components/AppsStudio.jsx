@@ -9,6 +9,9 @@ import {
 } from "react-icons/fa";
 import { registerAppInterest, getAppInterests } from '../muapi.js';
 import toast, { Toaster } from 'react-hot-toast';
+import en from '../messages/en/appsStudio.json';
+import zh from '../messages/zh/appsStudio.json';
+import { resolveCopy } from '../i18nUtils';
 
 const templateApps = [
   {
@@ -129,7 +132,8 @@ const dummyAppsData = [
   { thumbnail: "https://cdn.muapi.ai/apps/Lumea_Residence.webp", name: "Lumea Residence", description: "Smart home property management and tenant portal.", icon: FaHome, category: "Real Estate" }
 ];
 
-export default function AppsStudio({ apiKey }) {
+export default function AppsStudio({ apiKey, locale = 'en' }) {
+  const copy = resolveCopy(en, zh, locale);
   const [selectedApp, setSelectedApp] = useState(null);
   const [isRequesting, setIsRequesting] = useState(false);
   const [requestedApps, setRequestedApps] = useState([]);
@@ -149,11 +153,11 @@ export default function AppsStudio({ apiKey }) {
     try {
       await registerAppInterest(apiKey, selectedApp.name);
       setRequestedApps(prev => [...prev, selectedApp.name]);
-      toast.success("Got it! We'll send you the template details shortly.");
+      toast.success(copy.toast.requestSuccess);
       setTimeout(() => setSelectedApp(null), 1500);
     } catch (error) {
       console.error(error);
-      toast.error("Failed to register interest. Please try again later.");
+      toast.error(copy.toast.requestError);
     } finally {
       setIsRequesting(false);
     }
@@ -200,7 +204,7 @@ export default function AppsStudio({ apiKey }) {
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="text-sm font-bold text-white uppercase tracking-tight truncate">{app.name}</h3>
-              <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest">{app.category || 'Template'}</p>
+              <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest">{app.category || copy.card.templateFallback}</p>
             </div>
           </div>
           
@@ -215,14 +219,14 @@ export default function AppsStudio({ apiKey }) {
                   className="flex-1 py-2 bg-white/5 text-white rounded-md text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-white/10 transition-all border border-white/5 active:scale-95"
                 >
                   <FaGithub className="text-xs" />
-                  Github
+                  {copy.card.github}
                 </button>
                 <button
                   onClick={() => setSelectedApp(app)}
                   className="flex-1 py-2 bg-[#22d3ee]/10 text-[#22d3ee] rounded-md text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-[#22d3ee]/20 transition-all border border-[#22d3ee]/20 active:scale-95"
                 >
                   <FaExternalLinkAlt className="text-[9px]" />
-                  Demo
+                  {copy.card.demo}
                 </button>
               </>
             ) : (
@@ -234,7 +238,7 @@ export default function AppsStudio({ apiKey }) {
                   className="flex-1 py-2 bg-white/5 text-white rounded-md text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-white/10 transition-all border border-white/5 active:scale-95"
                 >
                   <FaGithub className="text-xs" />
-                  Github
+                  {copy.card.github}
                 </a>
                 <a
                   href={app.hosted || '#'}
@@ -243,7 +247,7 @@ export default function AppsStudio({ apiKey }) {
                   className="flex-1 py-2 bg-[#22d3ee]/10 text-[#22d3ee] rounded-md text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-[#22d3ee]/20 transition-all border border-[#22d3ee]/20 active:scale-95"
                 >
                   <FaExternalLinkAlt className="text-[9px]" />
-                  Demo
+                  {copy.card.demo}
                 </a>
               </>
             )}
@@ -263,45 +267,29 @@ export default function AppsStudio({ apiKey }) {
         <div className="text-center space-y-6 max-w-3xl">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#22d3ee]/10 border border-[#22d3ee]/20 rounded-full">
             <FaDollarSign className="text-[#22d3ee] text-xs" />
-            <span className="text-[10px] font-black text-[#22d3ee] uppercase tracking-widest">Revenue-Ready Templates</span>
+            <span className="text-[10px] font-black text-[#22d3ee] uppercase tracking-widest">{copy.hero.badge}</span>
           </div>
           <h1 className="text-5xl font-black text-white tracking-tighter leading-[0.9]">
-            LAUNCH AN AI APP.<br />START EARNING TODAY.
+            {copy.hero.titleLine1}<br />{copy.hero.titleLine2}
           </h1>
           <p className="text-white/40 text-sm font-medium leading-relaxed max-w-xl mx-auto">
-            Each template is a fully-functional, Stripe-integrated AI SaaS you can deploy in minutes.
-            Charge your users, keep the revenue — muapi handles the AI infrastructure.
+            {copy.hero.subtitle}
           </p>
         </div>
 
         {/* Monetization Steps */}
         <div className="w-full grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[
-            {
-              icon: FaRocket,
-              step: "01",
-              title: "Deploy in Minutes",
-              body: "Fork the open-source template, add your muapi key, and push to Vercel. No backend setup needed."
-            },
-            {
-              icon: FaCreditCard,
-              step: "02",
-              title: "Collect Payments",
-              body: "Stripe is pre-wired. Set your own pricing — one-time credits, subscriptions, or pay-per-use."
-            },
-            {
-              icon: FaDollarSign,
-              step: "03",
-              title: "Keep the Revenue",
-              body: "Payments go straight to your Stripe account. You own the product, the brand, and the profits."
-            }
+            { icon: FaRocket, step: "01", title: copy.steps.deploy.title, body: copy.steps.deploy.body },
+            { icon: FaCreditCard, step: "02", title: copy.steps.collect.title, body: copy.steps.collect.body },
+            { icon: FaDollarSign, step: "03", title: copy.steps.keep.title, body: copy.steps.keep.body },
           ].map(({ icon: Icon, step, title, body }) => (
             <div key={step} className="flex items-start gap-4 bg-[#0a0a0a] border border-white/5 rounded-2xl p-6 hover:border-white/10 transition-colors">
               <div className="w-12 h-12 shrink-0 rounded-2xl bg-white/5 flex items-center justify-center text-[#22d3ee] border border-white/5">
                 <Icon className="text-lg" />
               </div>
               <div>
-                <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-1">Step {step}</p>
+                <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-1">{copy.steps.stepLabel} {step}</p>
                 <h3 className="text-sm font-bold text-white mb-1.5">{title}</h3>
                 <p className="text-xs text-white/40 leading-relaxed font-medium">{body}</p>
               </div>
@@ -319,7 +307,7 @@ export default function AppsStudio({ apiKey }) {
         <div className="pt-24 pb-12 flex flex-col items-center gap-4">
           <div className="inline-flex items-center gap-3 px-4 py-2 bg-white/5 rounded-full border border-white/5">
             <span className="block w-1.5 h-1.5 rounded-full bg-[#22d3ee] animate-pulse" />
-            <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">Muapi Ecosystem — More templates coming soon</span>
+            <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">{copy.footer.moreComingSoon}</span>
           </div>
         </div>
       </div>
@@ -334,26 +322,31 @@ export default function AppsStudio({ apiKey }) {
                 <selectedApp.icon />
               </div>
               <h2 className="text-2xl font-black text-white uppercase tracking-tight">
-                Deploy {selectedApp.name}
+                {copy.modal.deployTitle.replace('{appName}', selectedApp.name)}
               </h2>
               <p className="text-sm font-medium text-white/40 leading-relaxed px-4">
-                Enter your details and we&apos;ll send you the <b>{selectedApp.name}</b> template along with setup instructions so you can deploy and start earning immediately.
+                {copy.modal.body.split('{appName}').map((part, i, arr) => (
+                  <React.Fragment key={i}>
+                    {part}
+                    {i < arr.length - 1 && <b>{selectedApp.name}</b>}
+                  </React.Fragment>
+                ))}
               </p>
             </div>
 
             <div className="space-y-3">
-              <button 
+              <button
                 onClick={handleRequestAccess}
                 disabled={isRequesting}
                 className="w-full py-4 bg-[#22d3ee] text-black rounded-md text-sm font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-[#22d3ee]/90 transition-all shadow-lg active:scale-95 disabled:opacity-50"
               >
-                {isRequesting ? 'Sending Details...' : 'Get Template'}
+                {isRequesting ? copy.modal.sending : copy.modal.getTemplate}
               </button>
-              <button 
+              <button
                 onClick={() => setSelectedApp(null)}
                 className="w-full py-4 bg-white/5 border border-white/10 text-white/60 rounded-md text-sm font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-white/10 transition-all"
               >
-                Maybe Later
+                {copy.modal.maybeLater}
               </button>
             </div>
           </div>

@@ -1,0 +1,178 @@
+{
+  "common": {
+    "model": "Model",
+    "reset": "Reset"
+  },
+  "panels": {
+    "layer-decomposition": "Layer Decomposition",
+    "upscale": "Upscale",
+    "color-grading": "Color Grading",
+    "remove-bg": "Remove Background",
+    "expand-crop": "Expand Image",
+    "tools": "Tools"
+  },
+  "menuItems": {
+    "layer-decomposition": "Layer Decomposition",
+    "upscale": "Upscale",
+    "color-grading": "Color Grading",
+    "remove-bg": "Remove background",
+    "expand-crop": "Expand & Outpaint",
+    "edit-text": "Edit text",
+    "enhancer": "Enhancer",
+    "relight": "Relight",
+    "angles": "Angles",
+    "new": "New"
+  },
+  "tools": {
+    "uploadOrChangeImage": "Upload or Change Image",
+    "clearMarkedRegions": "Clear Marked Regions",
+    "runSelectionEdit": "Run Selection Edit",
+    "line": "Line",
+    "arrow": "Arrow",
+    "rectangle": "Rectangle",
+    "circle": "Circle",
+    "customColor": "Custom Color",
+    "undoStroke": "Undo Stroke",
+    "redoStroke": "Redo Stroke",
+    "clearDrawings": "Clear Drawings",
+    "selectPointerTool": "Select Pointer Tool",
+    "panTool": "Pan Tool",
+    "lassoEdit": "Lasso Edit",
+    "regionalEdit": "Regional Edit",
+    "highlightMarkerPen": "Highlight Marker Pen",
+    "eraserTool": "Eraser Tool",
+    "shapes": "Shapes (R)",
+    "resetZoomPan": "Reset Zoom & Pan",
+    "addImage": "Add Image",
+    "runLayerDecomposition": "Run Layer Decomposition",
+    "backToTools": "Back to Tools",
+    "closePanel": "Close Panel",
+    "regionalPromptPlaceholder": "Type your prompt here..."
+  },
+  "sample": {
+    "clickToLoad": "Click to load this layer decomposition example",
+    "original": "Original",
+    "layersCount": "5 Layers",
+    "try": "Try →",
+    "clickToExplore": "Click to explore sample"
+  },
+  "settings": {
+    "heading": "Settings",
+    "resolution": "Resolution",
+    "layers": "Layers"
+  },
+  "carousel": {
+    "heading": "Layer Carousel",
+    "soloActive": "Solo Active",
+    "stackMode": "Stack Mode",
+    "viewOnlyActive": "View only active layer",
+    "downloadAll": "Download All",
+    "previousLayer": "Previous Layer",
+    "nextLayer": "Next Layer",
+    "toggleVisibility": "Toggle Visibility",
+    "downloadThisLayer": "Download this layer",
+    "save": "Save",
+    "layerLabel": "Layer {n}",
+    "seedreamDecomposed": "Seedream Decomposed"
+  },
+  "colorGrading": {
+    "colorCorrect": { "heading": "Color Correct", "info": "Temperature, hue, saturation, contrast and split-tone", "reset": "Reset Color Correct" },
+    "softenDetails": { "heading": "Soften Details", "info": "Radius and detail softening", "reset": "Reset Soften Details" },
+    "bloom": { "heading": "Bloom", "info": "Luminescence diffusion and blend mode", "reset": "Reset Bloom" },
+    "halation": { "heading": "Halation", "info": "Film red glow around intense highlights", "reset": "Reset Halation" },
+    "lensInstructions": { "heading": "Lens Instructions", "info": "Vignette and optical lens distortion", "reset": "Reset Lens Instructions" },
+    "exposure": { "heading": "Exposure", "info": "Exposure stops adjustment", "reset": "Reset Exposure" },
+    "filmGrain": { "heading": "Film Grain", "info": "Analog film stock grain simulation", "reset": "Reset Film Grain" },
+    "resetToDefault": "Reset to default",
+    "resetAll": "Reset All Color Grading",
+    "download": "Download"
+  },
+  "removeBg": {
+    "credit": "1.0 credit",
+    "modelName": "AI Background Remover",
+    "targetPreview": "Target Preview",
+    "alphaMatte": "Alpha Matte Cutout",
+    "feature1": "Precision edge extraction (hair, fur, fine contours)",
+    "feature2": "High-resolution transparent PNG output"
+  },
+  "expandCrop": {
+    "credit": "0.03 credits",
+    "modelName": "AI Image Extension",
+    "canvasPreview": "Canvas Preview",
+    "boundaryOutpainting": "Boundary Outpainting",
+    "expand": "Expand",
+    "feature1": "Expands borders while matching lighting, style & textures",
+    "feature2": "Automatic intelligent edge outpainting & continuation"
+  },
+  "editText": {
+    "heading": "Edit Text Tool",
+    "placeholder": "Enter text modification prompt...",
+    "run": "Run Text Edit",
+    "processing": "Processing..."
+  },
+  "enhancer": {
+    "heading": "AI Enhancer",
+    "description": "Automatically optimize lighting, sharpness, and color balance.",
+    "run": "Enhance Image",
+    "processing": "Enhancing..."
+  },
+  "relight": {
+    "heading": "AI Relight",
+    "description": "Adjust illumination, ambient studio light, and shadows.",
+    "run": "Apply Relight",
+    "processing": "Relighting..."
+  },
+  "angles": {
+    "heading": "3D Angle Perspective",
+    "description": "Adjust perspective tilt and camera angle alignment.",
+    "run": "Apply Perspective Angle",
+    "processing": "Transforming..."
+  },
+  "footer": {
+    "decomposing": "Decomposing ({progress}%)...",
+    "separateLayers": "Separate layers {count}",
+    "upscaling": "Upscaling ({progress}%)...",
+    "upscaleCost": "Upscale {cost}",
+    "removingBackground": "Removing background ({progress}%)...",
+    "removeBackgroundCost": "Remove Background 1.0",
+    "expandingBorders": "Expanding borders ({progress}%)...",
+    "expandImageCost": "Expand Image 0.03"
+  },
+  "toasts": {
+    "enterApiKeyUpload": "Please enter your API Key to upload images.",
+    "imageUploaded": "Image uploaded successfully!",
+    "uploadFailed": "Upload failed: {error}",
+    "uploadImageFileOnly": "Please upload an image file.",
+    "fileTooLarge": "File too large (max 20MB): {name}",
+    "viewReset": "View reset",
+    "enterApiKey": "Please enter your API key.",
+    "enterRegionPrompt": "Please enter a prompt for the selected region.",
+    "editFailed": "Edit failed: {error}",
+    "apiKeyMissingSet": "API key is missing. Please set your API key.",
+    "uploadOrSelectDecompose": "Please upload or select an image to decompose into layers.",
+    "decomposedInto": "Decomposed into {count} layer(s)!",
+    "decompositionFailed": "Decomposition failed: {error}",
+    "uploadOrSelectUpscale": "Please select or upload an image to upscale.",
+    "upscaleSuccess": "Image upscaled successfully with {model}!",
+    "upscaleNoOutput": "Upscale completed but no output URL was returned.",
+    "upscaleFailed": "Upscale failed: {error}",
+    "uploadOrSelectRemoveBg": "Please upload or select an image to remove background.",
+    "removeBgSuccess": "Background removed cleanly with AI Background Remover!",
+    "removeBgNoOutput": "Background removal completed but no output URL was returned.",
+    "removeBgFailed": "Background removal failed: {error}",
+    "uploadOrSelectExpand": "Please upload or select an image to expand.",
+    "expandSuccess": "Image expanded cleanly with AI Image Extension!",
+    "expandNoOutput": "Image expansion completed but no output URL was returned.",
+    "expandFailed": "Image expansion failed: {error}",
+    "upscaleSettingsReset": "Upscale settings reset to default",
+    "resetCategory": "Reset {category}",
+    "colorGradingReset": "Color grading reset to default",
+    "downloadedGraded": "Downloaded color graded image!",
+    "loadedSample": "Loaded Seedream 5-layer sample!",
+    "apiKeyMissing": "API key is missing.",
+    "uploadImageFirst": "Please upload an image first.",
+    "toolCompleted": "{tool} completed successfully!",
+    "operationFailed": "Operation failed: {error}",
+    "downloadingAll": "Downloading all layers..."
+  }
+}

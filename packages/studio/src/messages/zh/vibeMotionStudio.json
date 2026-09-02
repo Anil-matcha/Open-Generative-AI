@@ -1,0 +1,59 @@
+{
+  "loading": {
+    "remixing": "正在混剪动态图形…",
+    "generating": "正在生成动态图形…",
+    "backend": "基于 Modal 的 React/Remotion 渲染"
+  },
+  "card": {
+    "modeEdit": "✏ 编辑",
+    "modeGenerated": "✦ 已生成",
+    "download": "下载",
+    "remixThis": "混剪此生成结果",
+    "legacyRemixUnavailable": "旧版生成结果 — 暂不支持混剪。请先生成一个新的动态图形以启用编辑功能。",
+    "delete": "删除",
+    "confirmDelete": "确定要删除此生成项吗？",
+    "noPrompt": "无提示词",
+    "tag": "动感运镜"
+  },
+  "mobileActions": {
+    "download": "下载",
+    "remix": "混剪",
+    "delete": "删除"
+  },
+  "empty": {
+    "titleLine1": "开始使用",
+    "titleLine2": "动感运镜工作室",
+    "description": "根据文本提示生成动态图形动画 — 动态排版、数据图表、Logo 展示等。"
+  },
+  "modeToggle": {
+    "generate": "生成",
+    "edit": "编辑"
+  },
+  "editBanner": {
+    "editingPrefix": "正在编辑：",
+    "selectSource": "从图库中选择一个源生成结果",
+    "cancelEdit": "取消编辑模式"
+  },
+  "placeholder": {
+    "edit": "描述要更改的内容 — “将背景改为深藏青色，柱状图改为金色，添加粒子效果……”",
+    "generate": "描述该动态图形 — “带有发光柱状图和上升数字的动态销售仪表盘”"
+  },
+  "controls": {
+    "aspectRatio": "宽高比",
+    "duration": "时长",
+    "sourcePrefix": "来源：",
+    "pickSource": "选择来源…",
+    "sourceGeneration": "源生成结果",
+    "shortcutHint": "Ctrl+Enter 运行"
+  },
+  "errors": {
+    "staleEditUnavailable": "此生成结果无法混剪 — 服务器未保存动画代码。请先生成一个新的动态图形，然后再对该结果进行混剪。",
+    "generationFailed": "动感运镜生成失败"
+  },
+  "generateButton": {
+    "remixing": "混剪中...",
+    "generating": "生成中...",
+    "remix": "混剪",
+    "generate": "生成"
+  }
+}

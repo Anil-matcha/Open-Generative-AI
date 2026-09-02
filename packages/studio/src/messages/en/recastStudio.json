@@ -1,0 +1,68 @@
+{
+  "labels": {
+    "video": "Video",
+    "characterImage": "Character image",
+    "library": "Library",
+    "orientationPrefix": "Orientation:"
+  },
+  "buttons": {
+    "use": "Use",
+    "download": "Download",
+    "delete": "Delete",
+    "swapBody": "Swap Body",
+    "swapping": "Swapping..."
+  },
+  "titles": {
+    "clickToClear": "{fileName} — click to clear",
+    "uploadFile": "Upload {label} file, or drag and drop",
+    "enlargePreview": "Enlarge preview",
+    "deleteFromLibrary": "Delete from Library"
+  },
+  "assetLibrary": {
+    "header": "Asset Library",
+    "tabs": {
+      "videos": "Videos",
+      "images": "Images",
+      "results": "Results"
+    },
+    "empty": "No assets found"
+  },
+  "dropdowns": {
+    "model": "Model",
+    "selectModel": "Select model",
+    "aspectRatio": "Aspect Ratio",
+    "orientation": "Orientation",
+    "orientationImage": "Image",
+    "orientationVideo": "Video",
+    "orientationImageDesc": "Use image orientation (Max 10s video)",
+    "orientationVideoDesc": "Use video orientation (Max 30s video)"
+  },
+  "empty": {
+    "titleLine1": "START CREATING WITH",
+    "titleLine2": "BODY SWAP STUDIO",
+    "description": "Swap the character in any video dynamically by choosing a video clip and a target character image."
+  },
+  "placeholders": {
+    "prompt": "Optional — describe the motion or scene..."
+  },
+  "badges": {
+    "bodySwap": "Body Swap"
+  },
+  "confirm": {
+    "deleteGenerated": "Are you sure you want to delete this generated item?"
+  },
+  "errors": {
+    "videoTooLarge": "Video exceeds 50MB limit.",
+    "imageTooLarge": "Image exceeds 10MB limit.",
+    "missingVideo": "Please upload a source video first.",
+    "missingImage": "Please upload a character image first.",
+    "videoUploadFailed": "Video upload failed: {message}",
+    "imageUploadFailed": "Image upload failed: {message}",
+    "generationFailed": "Body swap generation failed"
+  },
+  "defaults": {
+    "selectedVideo": "Selected Video",
+    "selectedImage": "Selected Image",
+    "resultVideo": "Result Video"
+  }
+}

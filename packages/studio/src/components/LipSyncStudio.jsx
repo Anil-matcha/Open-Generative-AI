@@ -33,6 +33,9 @@ import {
   promptControlClassName,
   promptMediaButtonClassName,
 } from "./prompt/PromptComposer.jsx";
+import en from "../messages/en/lipSyncStudio.json";
+import zh from "../messages/zh/lipSyncStudio.json";
+import { resolveCopy } from "../i18nUtils";
 
 // ---------------------------------------------------------------------------
 // Upload button states
@@ -55,6 +58,7 @@ function MediaPickerButton({
   previewUrl,
   isVideo,
   apiKey,
+  mediaCopy = en.media,
 }) {
   const inputRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -121,8 +125,8 @@ function MediaPickerButton({
       type="button"
       title={
         uploadState === UPLOAD_STATE.READY
-          ? `${fileName} — click to clear`
-          : `Upload ${label.toLowerCase()} file`
+          ? `${fileName} — ${mediaCopy.clickToClear}`
+          : `${mediaCopy.uploadFilePrefix} ${label} ${mediaCopy.uploadFileSuffix}`
       }
       onClick={handleClick}
       onDragEnter={handleDragEnter}
@@ -375,7 +379,9 @@ export default function LipSyncStudio({
   historyItems,
   droppedFiles,
   onFilesHandled,
+  locale = "en",
 }) {
+  const copy = resolveCopy(en, zh, locale);
   const LEGACY_PERSIST_KEY = "hg_lipsync_studio_persistent";
   const PERSIST_KEY = scopedPersistKey(LEGACY_PERSIST_KEY, apiKey);
   useEffect(() => {
@@ -532,7 +538,7 @@ export default function LipSyncStudio({
       const file = Array.isArray(files) ? files[0] : files;
       if (!file) return;
       if (file.size > 10 * 1024 * 1024) {
-        alert("Image exceeds 10MB limit.");
+        alert(copy.errors.imageTooLarge);
         return;
       }
       setImageState(UPLOAD_STATE.UPLOADING);
@@ -546,7 +552,7 @@ export default function LipSyncStudio({
         setImageState(UPLOAD_STATE.READY);
       } catch (err) {
         setImageState(UPLOAD_STATE.IDLE);
-        alert(`Image upload failed: ${err.message}`);
+        alert(copy.errors.imageUploadFailed.replace("{message}", err.message));
       } finally {
         setImageProgress(0);
       }
@@ -559,7 +565,7 @@ export default function LipSyncStudio({
       const file = Array.isArray(files) ? files[0] : files;
       if (!file) return;
       if (file.size > 50 * 1024 * 1024) {
-        alert("Video exceeds 50MB limit.");
+        alert(copy.errors.videoTooLarge);
         return;
       }
       setVideoState(UPLOAD_STATE.UPLOADING);
@@ -573,7 +579,7 @@ export default function LipSyncStudio({
         setVideoState(UPLOAD_STATE.READY);
       } catch (err) {
         setVideoState(UPLOAD_STATE.IDLE);
-        alert(`Video upload failed: ${err.message}`);
+        alert(copy.errors.videoUploadFailed.replace("{message}", err.message));
       } finally {
         setVideoProgress(0);
       }
@@ -590,7 +596,7 @@ export default function LipSyncStudio({
       const file = Array.isArray(files) ? files[0] : files;
       if (!file) return;
       if (file.size > 10 * 1024 * 1024) {
-        alert("Audio file exceeds 10MB limit.");
+        alert(copy.errors.audioTooLarge);
         return;
       }
       setAudioState(UPLOAD_STATE.UPLOADING);
@@ -604,7 +610,7 @@ export default function LipSyncStudio({
         setAudioState(UPLOAD_STATE.READY);
       } catch (err) {
         setAudioState(UPLOAD_STATE.IDLE);
-        alert(`Audio upload failed: ${err.message}`);
+        alert(copy.errors.audioUploadFailed.replace("{message}", err.message));
       } finally {
         setAudioProgress(0);
       }
@@ -695,15 +701,15 @@ export default function LipSyncStudio({
   // ── Generation ──────────────────────────────────────────────────────────
   const handleGenerate = async () => {
     if (!audioUrl) {
-      alert("Please upload an audio file first.");
+      alert(copy.errors.needAudio);
       return;
     }
     if (inputMode === "image" && !imageUrl) {
-      alert("Please upload a portrait image first.");
+      alert(copy.errors.needImage);
       return;
     }
     if (inputMode === "video" && !videoUrl) {
-      alert("Please upload a source video first.");
+      alert(copy.errors.needVideo);
       return;
     }
 
@@ -751,7 +757,7 @@ export default function LipSyncStudio({
       }
     } catch (e) {
       console.error("[LipSyncStudio]", e);
-      const errMsg = formatErrorMessage(e, "Lip sync generation failed");
+      const errMsg = formatErrorMessage(e, copy.errors.generationFailed);
       if (onGenerationError) onGenerationError(errMsg);
       else toast.error(errMsg);
     } finally {
@@ -781,17 +787,17 @@ export default function LipSyncStudio({
     inputMode === "image"
       ? imageState === UPLOAD_STATE.READY
         ? `✓ ${imageName}`
-        : "No image"
+        : copy.media.noImage
       : videoState === UPLOAD_STATE.READY
         ? `✓ ${videoName}`
-        : "No video";
+        : copy.media.noVideo;
   const mediaStatusClass =
     (inputMode === "image" ? imageState : videoState) === UPLOAD_STATE.READY
       ? "text-primary"
       : "text-muted";
 
   const audioStatusText =
-    audioState === UPLOAD_STATE.READY ? `✓ ${audioName}` : "No audio";
+    audioState === UPLOAD_STATE.READY ? `✓ ${audioName}` : copy.media.noAudio;
   const audioStatusClass =
     audioState === UPLOAD_STATE.READY ? "text-primary" : "text-muted";
 
@@ -840,7 +846,7 @@ export default function LipSyncStudio({
                   />
                   <button
                     type="button"
-                    title="Download"
+                    title={copy.actions.download}
                     onClick={(e) => {
                       e.stopPropagation();
                       downloadFile(entry.url, `lipsync-${entry.id || idx}.mp4`);
@@ -853,10 +859,10 @@ export default function LipSyncStudio({
                   </button>
                   <button
                     type="button"
-                    title="Delete"
+                    title={copy.actions.delete}
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (confirm("Are you sure you want to delete this generated item?")) {
+                      if (confirm(copy.confirm.deleteItem)) {
                         setInternalHistory(prev => prev.filter((_, i) => i !== idx));
                       }
                     }}
@@ -876,16 +882,16 @@ export default function LipSyncStudio({
                   actions={[
                     {
                       kind: "download",
-                      label: "Download",
+                      label: copy.actions.download,
                       onSelect: () =>
                         downloadFile(entry.url, `lipsync-${entry.id || idx}.mp4`),
                     },
                     {
                       kind: "delete",
-                      label: "Delete",
+                      label: copy.actions.delete,
                       danger: true,
                       onSelect: () => {
-                        if (confirm("Are you sure you want to delete this generated item?")) {
+                        if (confirm(copy.confirm.deleteItem)) {
                           setInternalHistory((prev) => prev.filter((_, i) => i !== idx));
                         }
                       },
@@ -903,7 +909,7 @@ export default function LipSyncStudio({
                   <div className="flex items-center justify-between flex-wrap gap-1 mt-1">
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] font-bold text-primary px-2 py-0.5 bg-primary/10 rounded border border-primary/20 whitespace-nowrap">
-                        Lip Sync
+                        {copy.badges.lipSync}
                       </span>
                       {entry.resolution && (
                         <span className="text-[10px] text-white/40">{entry.resolution}</span>
@@ -949,13 +955,13 @@ export default function LipSyncStudio({
             </div>
 
             <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-center px-4 flex flex-col items-center">
-              <span className="text-white font-black uppercase text-xl sm:text-3xl tracking-wide mb-1 opacity-90">START CREATING WITH</span>
+              <span className="text-white font-black uppercase text-xl sm:text-3xl tracking-wide mb-1 opacity-90">{copy.hero.titleLine1}</span>
               <span className="text-[#22d3ee] font-black uppercase text-2xl sm:text-4xl sm:mt-1 tracking-tight">
-                LIP SYNC STUDIO
+                {copy.hero.titleLine2}
               </span>
             </h1>
             <p className="text-white/40 text-xs sm:text-sm font-medium tracking-wide text-center max-w-lg leading-relaxed px-4">
-              Sync any voice with any face video to create premium talking avatars and videos.
+              {copy.hero.subtitle}
             </p>
           </div>
         )}
@@ -976,7 +982,7 @@ export default function LipSyncStudio({
                 <circle cx="8.5" cy="8.5" r="1.5" />
                 <path d="m21 15-5-5L5 21" />
               </svg>
-              Portrait Image
+              {copy.modes.portraitImage}
             </PromptSegmentOption>
             <PromptSegmentOption
               type="button"
@@ -987,7 +993,7 @@ export default function LipSyncStudio({
                 <rect x="2" y="5" width="15" height="14" rx="2" />
                 <path d="m17 10 5-3v10l-5-3" />
               </svg>
-              Video
+              {copy.modes.video}
             </PromptSegmentOption>
             </PromptSegmentedControl>
           </div>
@@ -999,7 +1005,8 @@ export default function LipSyncStudio({
               {inputMode === "image" && (
                 <MediaPickerButton
                   accept="image/*"
-                  label="Image"
+                  label={copy.media.imageLabel}
+                  mediaCopy={copy.media}
                   icon={
                     <svg
                       width="16"
@@ -1034,7 +1041,8 @@ export default function LipSyncStudio({
               {inputMode === "video" && (
                 <MediaPickerButton
                   accept="video/*"
-                  label="Video"
+                  label={copy.media.videoLabel}
+                  mediaCopy={copy.media}
                   icon={
                     <VideoIcon className="text-white/40 group-hover:text-[#22d3ee] transition-colors" />
                   }
@@ -1056,7 +1064,8 @@ export default function LipSyncStudio({
               {/* Audio picker — always visible */}
               <MediaPickerButton
                 accept="audio/*"
-                label="Audio"
+                label={copy.media.audioLabel}
+                mediaCopy={copy.media}
                 icon={
                   <MicIcon className="text-white/40 group-hover:text-[#22d3ee] transition-colors" />
                 }
@@ -1081,7 +1090,7 @@ export default function LipSyncStudio({
                 ref={textareaRef}
                 value={prompt}
                 onChange={handlePromptInput}
-                placeholder="Describe speech style..."
+                placeholder={copy.prompt.placeholder}
               />
             </div>
           </div>
@@ -1110,13 +1119,13 @@ export default function LipSyncStudio({
                     </span>
                   </div>
                   <span className={PROMPT_CONTROL_LABEL_CLASS}>
-                    {selectedModel?.name ?? "Select model"}
+                    {selectedModel?.name ?? copy.model.selectModel}
                   </span>
                   <PromptChevronIcon />
                 </button>
                 <Dropdown
                   isOpen={openDropdown === "model"}
-                  title="Model"
+                  title={copy.model.dropdownTitle}
                   items={modelDropdownItems}
                   selectedId={selectedModelId}
                   onSelect={handleModelSelect}
@@ -1149,7 +1158,7 @@ export default function LipSyncStudio({
                   </button>
                   <Dropdown
                     isOpen={openDropdown === "resolution"}
-                    title="Resolution"
+                    title={copy.model.resolutionDropdownTitle}
                     items={resolutionDropdownItems}
                     selectedId={selectedResolution}
                     onSelect={(item) => setSelectedResolution(item.id)}
@@ -1170,11 +1179,11 @@ export default function LipSyncStudio({
                   <span className="animate-spin inline-block text-black">
                     ◌
                   </span>{" "}
-                  Generating...
+                  {copy.actions.generating}
                 </>
               ) : (
                 <>
-                  <span>Sync Lip</span>
+                  <span>{copy.actions.generate}</span>
                 </>
               )}
             </PromptAction>

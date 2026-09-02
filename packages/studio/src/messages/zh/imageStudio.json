@@ -1,0 +1,68 @@
+{
+  "uploadButton": {
+    "faceLabel": "人脸",
+    "referenceImageLabel": "参考图片",
+    "addUpToImages": "最多添加 {max} 张图片",
+    "singleSelectedTitle": "已选择 1 张图片 — 点击可继续添加（最多 {max} 张）",
+    "multiSelectedTitle": "已选择 {count}/{max} 张图片 — 点击管理",
+    "tooLargeAlert": "以下图片过大（最大 10MB）：{names}",
+    "uploadFailedAlert": "图片上传失败：{message}",
+    "headerTitle": "参考图片",
+    "selectUpTo": "最多选择 {max} 张图片",
+    "doneButton": "✓ 完成（{count}）",
+    "uploadFilesButton": "上传文件",
+    "uploadNewButton": "上传新图片",
+    "emptyState": "暂无上传记录",
+    "removeFromHistory": "从历史记录中移除",
+    "selectedCount": "已选择 {count}/{max}",
+    "useSelected": "使用所选图片"
+  },
+  "modelDropdown": {
+    "categoryAll": "全部",
+    "categoryT2I": "文本生成图像",
+    "categoryI2I": "图像生成图像",
+    "allProviders": "所有提供商",
+    "searchPlaceholder": "搜索模型...",
+    "modelsSuffix": "个模型",
+    "noModelsFound": "未找到相关模型"
+  },
+  "gallery": {
+    "generatedImageAlt": "生成的图像",
+    "download": "下载",
+    "delete": "删除",
+    "deleteConfirm": "确定要删除这个生成的项目吗？",
+    "deleteFailed": "删除项目失败",
+    "noPrompt": "未提供提示词",
+    "modelFallback": "图像工作室"
+  },
+  "emptyState": {
+    "heading": "开始使用",
+    "subtitle": "描述一个场景、角色、情绪或风格 — 让它跃然眼前"
+  },
+  "promptBar": {
+    "placeholderMultiImage": "已选择 {count} 张图片 — 描述转换效果（可选）",
+    "placeholderI2I": "描述如何转换这张图片（可选）",
+    "placeholderT2I": "描述你想要创建的图像",
+    "swapFaceLabel": "换脸",
+    "effectFallback": "效果",
+    "drawButton": "绘制",
+    "generating": "生成中...",
+    "generateButton": "生成 ✦"
+  },
+  "popovers": {
+    "model": "模型",
+    "aspectRatio": "宽高比",
+    "resolution": "分辨率",
+    "effectType": "效果类型"
+  },
+  "errors": {
+    "noImageReferenceSupport": "{name} 不支持图像参考。",
+    "uploadReferenceFirst": "请先上传一张参考图片。",
+    "uploadSwapFaceFirst": "请上传一张换脸图片。",
+    "enterPromptFirst": "请输入提示词以生成图像。",
+    "generationFailed": "图像生成失败"
+  },
+  "fullscreen": {
+    "previewAlt": "全屏预览"
+  }
+}

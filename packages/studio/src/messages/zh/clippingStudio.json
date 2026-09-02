@@ -1,0 +1,73 @@
+{
+  "headings": {
+    "startCreatingWith": "开始使用",
+    "aiClippingStudio": "AI 剪辑工作室",
+    "emptyStateSubtitle": "自动从您的视频中提取爆款高光片段和精确的时间点。",
+    "clippingHistoryRuns": "剪辑历史记录",
+    "savedGenerations": "已保存 {count} 个生成结果",
+    "backToHistory": "返回历史记录",
+    "highlightsTimeline": "高光时间轴",
+    "matches": "{count} 个匹配项",
+    "extractedVideoClips": "已提取的视频片段",
+    "aspectRatioLabel": "宽高比：{ratio}",
+    "originalVideoPlayer": "原始视频播放器"
+  },
+  "modes": {
+    "timelineSeek": "时间轴定位模式",
+    "clipsGallery": "片段画廊模式"
+  },
+  "labels": {
+    "highlights": "{count} 个高光片段",
+    "clips": "{count} 个片段",
+    "highlightFallback": "高光片段 #{index}",
+    "scoreSuffix": "% 匹配度",
+    "durationSuffix": "秒时长",
+    "seekAndPlay": "跳转并播放",
+    "clipIndex": "片段 #{index}",
+    "aiClipping": "AI 剪辑"
+  },
+  "buttons": {
+    "deleteFromHistory": "从历史记录中删除",
+    "delete": "删除",
+    "copyLink": "复制链接",
+    "copyLinkShort": "复制链接",
+    "download": "下载",
+    "clearVideo": "清除视频",
+    "uploadSourceVideo": "上传源视频",
+    "generate": "生成 ✦ 5",
+    "generating": "生成中...",
+    "coordinatesOnly": "仅返回坐标"
+  },
+  "placeholders": {
+    "promptOrUrl": "描述要提取的提示词/高光片段"
+  },
+  "popovers": {
+    "aspectRatio": "宽高比",
+    "maxHighlights": "最大高光数量",
+    "limit": "限制："
+  },
+  "empty": {
+    "noHighlights": "未提取到任何高光片段。",
+    "noClips": "未生成任何视频片段，请重试。"
+  },
+  "alerts": {
+    "urlCopied": "链接已复制到剪贴板！",
+    "needVideo": "请先上传视频或粘贴视频链接。"
+  },
+  "errors": {
+    "dismissNotification": "关闭通知",
+    "videoTooLarge": "该文件在此模式下过大。请压缩或裁剪视频后再上传较小的文件。",
+    "videoExceedsLimit": "视频超过 {mb}MB 限制。",
+    "uploadFailed": "视频上传失败，请重试。",
+    "generationFailed": "AI 剪辑处理失败。"
+  },
+  "sourceVideoFallback": "source_video.mp4",
+  "aspectRatioLabels": {
+    "9:16": "9:16（TikTok / Reels / Shorts）",
+    "16:9": "16:9（YouTube / 电视）",
+    "1:1": "1:1（Instagram 方形）",
+    "4:5": "4:5（Instagram 竖版）",
+    "4:3": "4:3（经典视频）",
+    "3:4": "3:4（竖版）"
+  }
+}

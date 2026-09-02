@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getLocaleFromPathname } from './lib/locales';
 
 function addSecurityHeaders(response) {
     // Prevent MIME type sniffing (CWE-693)
@@ -41,8 +42,12 @@ export function middleware(request) {
         }
     }
 
-    // Add security headers to all responses
-    return addSecurityHeaders(NextResponse.next());
+    // Plain response header carrying the locale derived from the URL path
+    // (same "set in middleware, read via headers() in the root layout"
+    // trick the main muapi client uses — see docs/localization.md).
+    const response = NextResponse.next();
+    response.headers.set('x-locale', getLocaleFromPathname(url.pathname));
+    return addSecurityHeaders(response);
 }
 
 // Match all paths for security headers. Exclude Next.js internal paths.

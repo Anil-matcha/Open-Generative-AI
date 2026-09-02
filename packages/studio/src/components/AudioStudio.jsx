@@ -6,6 +6,9 @@ import { generateAudio, uploadFile } from "../muapi.js";
 import { formatErrorMessage } from "../utils/formatError.js";
 import { scopedPersistKey, migrateLegacyPersistKey } from "../persistKey.js";
 import { audioModels, getAudioModelById } from "../models.js";
+import en from "../messages/en/audioStudio.json";
+import zh from "../messages/zh/audioStudio.json";
+import { resolveCopy } from "../i18nUtils";
 
 // ---------------------------------------------------------------------------
 // Upload button states
@@ -67,7 +70,7 @@ const TrashIcon = () => (
 // ---------------------------------------------------------------------------
 // Single File Uploader Component
 // ---------------------------------------------------------------------------
-function AudioFileUploader({ label, value, onChange, apiKey }) {
+function AudioFileUploader({ label, value, onChange, apiKey, copy = en }) {
   const [uploadState, setUploadState] = useState(value ? UPLOAD_STATE.READY : UPLOAD_STATE.IDLE);
   const [progress, setProgress] = useState(0);
   const [fileName, setFileName] = useState(value ? value.split('/').pop().slice(-30) : "");
@@ -91,7 +94,7 @@ function AudioFileUploader({ label, value, onChange, apiKey }) {
     if (!file) return;
 
     if (file.size > 20 * 1024 * 1024) {
-      alert("Audio file exceeds 20MB limit.");
+      alert(copy.uploader.sizeLimitError);
       return;
     }
 
@@ -107,7 +110,7 @@ function AudioFileUploader({ label, value, onChange, apiKey }) {
       onChange(url);
     } catch (err) {
       setUploadState(UPLOAD_STATE.IDLE);
-      alert(`Upload failed: ${err.message}`);
+      alert(copy.uploader.uploadFailedError.replace('{message}', err.message));
     } finally {
       setProgress(0);
     }
@@ -172,7 +175,7 @@ function AudioFileUploader({ label, value, onChange, apiKey }) {
             onClick={clearFile}
             className="text-xs font-bold text-red-400 hover:text-red-300 transition-colors uppercase tracking-wider flex items-center gap-1.5"
           >
-            <TrashIcon /> Clear
+            <TrashIcon /> {copy.uploader.clear}
           </button>
         )}
       </div>
@@ -207,8 +210,8 @@ function AudioFileUploader({ label, value, onChange, apiKey }) {
               </svg>
             </div>
             <div className="text-left">
-              <div className="text-xs font-bold text-white">Upload audio track</div>
-              <div className="text-[11px] text-zinc-300 font-medium mt-0.5">MP3, WAV, M4A up to 20MB</div>
+              <div className="text-xs font-bold text-white">{copy.uploader.uploadPrompt}</div>
+              <div className="text-[11px] text-zinc-300 font-medium mt-0.5">{copy.uploader.uploadHint}</div>
             </div>
           </>
         )}
@@ -217,7 +220,7 @@ function AudioFileUploader({ label, value, onChange, apiKey }) {
           <div className="w-full flex items-center gap-4">
             <div className="flex-1">
               <div className="flex justify-between text-xs text-white/95 mb-1.5 font-bold">
-                <span>Uploading...</span>
+                <span>{copy.uploader.uploading}</span>
                 <span>{progress}%</span>
               </div>
               <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
@@ -234,7 +237,7 @@ function AudioFileUploader({ label, value, onChange, apiKey }) {
             </div>
             <div className="text-left flex-1 min-w-0">
               <div className="text-xs font-bold text-white truncate">{fileName}</div>
-              <div className="text-[11px] text-primary font-bold mt-0.5">Ready to generate</div>
+              <div className="text-[11px] text-primary font-bold mt-0.5">{copy.uploader.ready}</div>
             </div>
           </>
         )}
@@ -246,7 +249,7 @@ function AudioFileUploader({ label, value, onChange, apiKey }) {
 // ---------------------------------------------------------------------------
 // Multiple File Uploader Component (for array fields like audios_list)
 // ---------------------------------------------------------------------------
-function AudioListUploader({ label, value = [], onChange, apiKey, maxItems = 2 }) {
+function AudioListUploader({ label, value = [], onChange, apiKey, maxItems = 2, copy = en }) {
   const handleItemChange = (index, url) => {
     const newItems = [...value];
     if (url) {
@@ -260,16 +263,17 @@ function AudioListUploader({ label, value = [], onChange, apiKey, maxItems = 2 }
   return (
     <div className="space-y-4">
       <label className="block text-xs font-bold text-zinc-200 uppercase tracking-wider">
-        {label} (Max {maxItems})
+        {label} {copy.uploader.maxSuffix.replace('{max}', maxItems)}
       </label>
       <div className="space-y-3">
         {Array.from({ length: maxItems }).map((_, i) => (
           <AudioFileUploader
             key={i}
-            label={`Track #${i + 1}`}
+            label={copy.uploader.trackLabel.replace('{index}', i + 1)}
             value={value[i] || null}
             onChange={(url) => handleItemChange(i, url)}
             apiKey={apiKey}
+            copy={copy}
           />
         ))}
       </div>
@@ -280,7 +284,7 @@ function AudioListUploader({ label, value = [], onChange, apiKey, maxItems = 2 }
 // ---------------------------------------------------------------------------
 // Premium Custom Audio Player with Waveform Animation
 // ---------------------------------------------------------------------------
-function PremiumAudioPlayer({ url, title }) {
+function PremiumAudioPlayer({ url, title, copy = en }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -437,9 +441,9 @@ function PremiumAudioPlayer({ url, title }) {
         </div>
         <div className="text-center px-4 max-w-full relative z-10">
           <span className="text-xs font-black text-primary uppercase tracking-[0.2em] block mb-1">
-            Now Playing
+            {copy.player.nowPlaying}
           </span>
-          <p className="text-white font-bold text-base truncate max-w-xs">{title || "Generated Track"}</p>
+          <p className="text-white font-bold text-base truncate max-w-xs">{title || copy.player.defaultTitle}</p>
         </div>
       </div>
 
@@ -478,7 +482,7 @@ function PremiumAudioPlayer({ url, title }) {
             <button
               onClick={toggleMute}
               className="p-2 bg-zinc-800/80 border border-zinc-700 hover:bg-zinc-700 rounded text-zinc-200 hover:text-white transition-all"
-              title="Mute/Unmute"
+              title={copy.player.muteUnmute}
               type="button"
             >
               {isMuted ? <VolumeMuteIcon /> : <VolumeIcon />}
@@ -498,7 +502,7 @@ function PremiumAudioPlayer({ url, title }) {
           <button
             onClick={togglePlay}
             className="w-12 h-12 bg-primary hover:bg-white text-black rounded-full flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-glow"
-            title={isPlaying ? "Pause" : "Play"}
+            title={isPlaying ? copy.player.pause : copy.player.play}
             type="button"
           >
             {isPlaying ? <PauseIcon /> : <PlayIcon />}
@@ -508,13 +512,13 @@ function PremiumAudioPlayer({ url, title }) {
           <button
             onClick={downloadAudio}
             className="px-4 py-2 bg-zinc-800/80 hover:bg-zinc-700 border border-zinc-700 rounded text-xs font-bold text-white flex items-center gap-2 hover:border-primary/45 transition-all"
-            title="Download Audio"
+            title={copy.player.download}
             type="button"
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
             </svg>
-            <span>Save</span>
+            <span>{copy.player.save}</span>
           </button>
         </div>
       </div>
@@ -534,7 +538,9 @@ export default function AudioStudio({
   historyItems,
   droppedFiles,
   onFilesHandled,
+  locale = "en",
 }) {
+  const copy = resolveCopy(en, zh, locale);
   const LEGACY_PERSIST_KEY = "hg_audio_studio_persistent";
   const PERSIST_KEY = scopedPersistKey(LEGACY_PERSIST_KEY, apiKey);
   useEffect(() => {
@@ -648,7 +654,7 @@ export default function AudioStudio({
             .then(url => {
               setParams(prev => ({ ...prev, [key]: url }));
             })
-            .catch(err => alert(`Failed to upload dropped file: ${err.message}`));
+            .catch(err => alert(copy.generate.droppedFileUploadError.replace('{message}', err.message)));
         } else if (firstAudioListField) {
           const [key] = firstAudioListField;
           uploadFile(apiKey, audioFiles[0], () => {})
@@ -659,7 +665,7 @@ export default function AudioStudio({
                 return { ...prev, [key]: currentList };
               });
             })
-            .catch(err => alert(`Failed to upload dropped file: ${err.message}`));
+            .catch(err => alert(copy.generate.droppedFileUploadError.replace('{message}', err.message)));
         }
       }
       onFilesHandled?.();
@@ -673,7 +679,7 @@ export default function AudioStudio({
 
   const handleSelectHistory = (entry, index) => {
     setActiveResultUrl(entry.url);
-    setActiveResultTitle(entry.title || entry.prompt || "Generated Track");
+    setActiveResultTitle(entry.title || entry.prompt || copy.player.defaultTitle);
     setActiveHistoryIdx(index);
     setView("result");
   };
@@ -685,7 +691,7 @@ export default function AudioStudio({
     if (selectedModel.required) {
       for (const field of selectedModel.required) {
         if (!params[field] || (Array.isArray(params[field]) && params[field].length === 0)) {
-          alert(`Please complete the required field: ${selectedModel.inputs?.[field]?.title || field}`);
+          alert(copy.sidebar.requiredFieldError.replace('{field}', selectedModel.inputs?.[field]?.title || field));
           return;
         }
       }
@@ -705,7 +711,7 @@ export default function AudioStudio({
       const res = await generateAudio(apiKey, audioParams);
 
       if (!res?.url) {
-        throw new Error("No audio URL returned by the API.");
+        throw new Error(copy.generate.noUrlError);
       }
 
       const title = params.title || params.prompt || `Generated ${selectedModel.name}`;
@@ -735,7 +741,7 @@ export default function AudioStudio({
       }
     } catch (e) {
       console.error("[AudioStudio]", e);
-      const errMsg = formatErrorMessage(e, "Audio generation failed");
+      const errMsg = formatErrorMessage(e, copy.generate.genericError);
       if (onGenerationError) onGenerationError(errMsg);
       else toast.error(errMsg);
     } finally {
@@ -761,7 +767,7 @@ export default function AudioStudio({
           {/* Model Selector */}
           <div className="space-y-2 relative">
             <label className="text-xs font-bold text-zinc-300 uppercase tracking-wider block">
-              Audio Model
+              {copy.sidebar.modelLabel}
             </label>
             <button
               ref={modelBtnRef}
@@ -769,7 +775,7 @@ export default function AudioStudio({
               onClick={() => setOpenDropdown(!openDropdown)}
               className="w-full bg-zinc-900 border border-zinc-700 rounded px-4 py-3.5 text-sm text-left font-bold text-white flex items-center justify-between hover:bg-zinc-850 hover:border-primary/50 transition-all"
             >
-              <span>{selectedModel?.name ?? "Select Model"}</span>
+              <span>{selectedModel?.name ?? copy.sidebar.selectModel}</span>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={`transition-transform duration-200 ${openDropdown ? 'rotate-180' : ''}`}>
                 <polyline points="6 9 12 15 18 9" />
               </svg>
@@ -804,7 +810,7 @@ export default function AudioStudio({
           {/* Model Description */}
           {selectedModel?.description && (
             <div className="">
-              <span className="text-[10px] font-bold text-primary uppercase tracking-wider block mb-1.5">Description</span>
+              <span className="text-[10px] font-bold text-primary uppercase tracking-wider block mb-1.5">{copy.sidebar.descriptionLabel}</span>
               <p className="text-zinc-400 text-xs leading-relaxed font-semibold">{selectedModel.description}</p>
             </div>
           )}
@@ -823,6 +829,7 @@ export default function AudioStudio({
                     value={params[key] || ""}
                     onChange={(url) => setParams(prev => ({ ...prev, [key]: url }))}
                     apiKey={apiKey}
+                    copy={copy}
                   />
                 );
               }
@@ -836,6 +843,7 @@ export default function AudioStudio({
                     onChange={(urls) => setParams(prev => ({ ...prev, [key]: urls }))}
                     apiKey={apiKey}
                     maxItems={schema.maxItems || 2}
+                    copy={copy}
                   />
                 );
               }
@@ -883,7 +891,7 @@ export default function AudioStudio({
                       }}
                       className="w-full bg-zinc-900 border border-zinc-700 hover:border-zinc-600 rounded px-4 py-3.5 text-xs text-left font-bold text-white flex items-center justify-between transition-all cursor-pointer"
                     >
-                      <span>{params[key] || "Select option"}</span>
+                      <span>{params[key] || copy.sidebar.selectOption}</span>
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={`transition-transform duration-200 ${isOpen ? 'rotate-185' : ''}`}>
                         <polyline points="6 9 12 15 18 9" />
                       </svg>
@@ -961,13 +969,13 @@ export default function AudioStudio({
                 return (
                   <div key={key} className="space-y-2">
                     <label className="block text-xs font-bold text-zinc-200 uppercase tracking-wider">
-                      {schema.title || "Lyrics / Prompt"}
+                      {schema.title || copy.sidebar.lyricsPromptLabel}
                     </label>
                     <textarea
                       value={params[key] || ""}
                       onChange={(e) => setParams(prev => ({ ...prev, [key]: e.target.value }))}
                       className="w-full bg-zinc-900 border border-zinc-700 focus:border-primary/85 rounded p-3 text-xs text-white placeholder:text-zinc-400 focus:outline-none transition-all min-h-[100px] resize-none leading-relaxed shadow-inner"
-                      placeholder={schema.description || "Enter what you want generated..."}
+                      placeholder={schema.description || copy.sidebar.promptPlaceholder}
                     />
                     {schema.examples && Array.isArray(schema.examples) && (
                       <div className="flex flex-wrap gap-1.5 mt-2">
@@ -996,7 +1004,7 @@ export default function AudioStudio({
                   <input
                     type={isNumber ? "number" : "text"}
                     value={params[key] !== undefined ? params[key] : ""}
-                    placeholder={schema.placeholder || schema.description || `Enter ${key}...`}
+                    placeholder={schema.placeholder || schema.description || copy.sidebar.fieldPlaceholder.replace('{field}', key)}
                     onChange={(e) => {
                       const val = isNumber ? (e.target.value === "" ? "" : parseFloat(e.target.value)) : e.target.value;
                       setParams(prev => ({ ...prev, [key]: val }));
@@ -1026,14 +1034,14 @@ export default function AudioStudio({
             {isGenerating ? (
               <>
                 <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
-                <span>Generating Audio...</span>
+                <span>{copy.generate.generating}</span>
               </>
             ) : (
               <>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                   <path d="M5 3l14 9-14 9V3z" />
                 </svg>
-                <span>Generate Track</span>
+                <span>{copy.generate.cta}</span>
               </>
             )}
           </button>
@@ -1059,7 +1067,7 @@ export default function AudioStudio({
                 </div>
                 <div className="text-center">
                   <span className="text-xs font-black text-red-500 uppercase tracking-widest block mb-1">
-                    Generation Error
+                    {copy.result.errorHeading}
                   </span>
                   <p className="text-white font-medium text-sm leading-relaxed">
                     {generateError}
@@ -1079,10 +1087,10 @@ export default function AudioStudio({
                 </div>
                 <div className="text-center space-y-2">
                   <div className="text-xs font-black text-primary uppercase tracking-[0.3em] animate-pulse">
-                    Generating Soundtrack
+                    {copy.result.loadingHeading}
                   </div>
                   <div className="text-sm text-zinc-200 font-bold">
-                    Rendering audio waveforms and vocals...
+                    {copy.result.loadingSubtext}
                   </div>
                 </div>
               </div>
@@ -1097,9 +1105,9 @@ export default function AudioStudio({
                   <MusicIcon className="text-primary w-8 h-8 filter drop-shadow-[0_0_8px_rgba(34,211,238,0.3)]" />
                 </div>
                 <div className="relative z-10">
-                  <h3 className="text-white font-black text-xl mb-3 tracking-tight">Audio Studio</h3>
+                  <h3 className="text-white font-black text-xl mb-3 tracking-tight">{copy.result.emptyHeading}</h3>
                   <p className="text-sm text-zinc-200 font-medium leading-relaxed px-4">
-                    Choose an AI music model, voice cloner, or sound generator. Modify variables on the left and craft your next high-fidelity track.
+                    {copy.result.emptyBody}
                   </p>
                 </div>
               </div>
@@ -1118,13 +1126,13 @@ export default function AudioStudio({
                       <line x1="19" y1="12" x2="5" y2="12" />
                       <polyline points="12 19 5 12 12 5" />
                     </svg>
-                    <span>New Generation</span>
+                    <span>{copy.result.newGeneration}</span>
                   </button>
                   <span className="text-[11px] font-bold text-green-400 px-3.5 py-1.5 bg-green-500/10 border border-green-500/20 rounded-full flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" /> Success
+                    <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" /> {copy.result.success}
                   </span>
                 </div>
-                <PremiumAudioPlayer url={activeResultUrl} title={activeResultTitle} />
+                <PremiumAudioPlayer url={activeResultUrl} title={activeResultTitle} copy={copy} />
               </div>
             )}
 
@@ -1134,7 +1142,7 @@ export default function AudioStudio({
           {history.length > 0 && (
             <div className="border-t border-zinc-900 pt-6 w-full animate-fade-in-up">
               <h4 className="text-xs font-bold text-zinc-300 uppercase tracking-wider mb-4 px-1">
-                Generation History ({history.length})
+                {copy.history.heading.replace('{count}', history.length)}
               </h4>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
                 {history.map((entry, idx) => (
@@ -1156,11 +1164,11 @@ export default function AudioStudio({
                         </svg>
                       </div>
                       <span className="text-[10px] font-bold text-primary uppercase tracking-wider truncate">
-                        {entry.model ? entry.model.split('-').slice(0, 2).join(' ') : 'Audio'}
+                        {entry.model ? entry.model.split('-').slice(0, 2).join(' ') : copy.history.fallbackModel}
                       </span>
                     </div>
                     <p className="text-[11px] font-semibold text-white line-clamp-2 leading-tight">
-                      {entry.title || entry.prompt || "Untitled Audio"}
+                      {entry.title || entry.prompt || copy.history.untitled}
                     </p>
                   </div>
                 ))}

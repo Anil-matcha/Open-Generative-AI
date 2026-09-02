@@ -1,0 +1,63 @@
+{
+  "builder": {
+    "title": "Builder",
+    "reset": "Reset"
+  },
+  "categoryTabs": {
+    "face": "Face",
+    "body": "Body",
+    "style": "Style"
+  },
+  "subcategories": {
+    "character_type": "Character Type",
+    "gender": "Gender",
+    "ethnicity_origin_base": "Ethnicity / Origin",
+    "eye_color": "Eye Color",
+    "eyes_type": "Eye Type",
+    "eyes_details": "Eye Features",
+    "mouth": "Mouth & Teeth",
+    "ears": "Ears",
+    "horns": "Horns",
+    "skin_conditions": "Skin Conditions",
+    "face_skin_material": "Face Skin Material",
+    "face_surface_pattern": "Skin Pattern",
+    "body_type": "Body Type",
+    "left_arm": "Left Arm",
+    "right_arm": "Right Arm",
+    "left_leg": "Left Leg",
+    "right_leg": "Right Leg",
+    "hair": "Hair / Head Growth",
+    "accessories": "Accessories & Markings",
+    "rendering_style": "Rendering Style"
+  },
+  "toolbar": {
+    "shuffle": "Shuffle",
+    "generate": "Generate Character",
+    "generating": "Generating…"
+  },
+  "preview": {
+    "generating": "Generating your AI influencer…",
+    "emptyTitle": "Your AI influencer lives here.",
+    "emptySubtitleLine1": "Design and build your AI influencer",
+    "emptySubtitleLine2": "from scratch",
+    "save": "Save",
+    "altGenerated": "Generated AI Character"
+  },
+  "tags": {
+    "showMore": "show more",
+    "hide": "hide"
+  },
+  "customPrompt": {
+    "placeholder": "Add extra details… e.g. neon cyberpunk lighting, dramatic shadows"
+  },
+  "gallery": {
+    "title": "Generated",
+    "countSuffix": "characters",
+    "emptyText": "Generated characters\nappear here",
+    "altPrefix": "Character",
+    "download": "Download"
+  },
+  "errors": {
+    "generationFailed": "Generation failed. Please try again."
+  }
+}

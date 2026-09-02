@@ -1,0 +1,68 @@
+{
+  "uploadButton": {
+    "faceLabel": "Face",
+    "referenceImageLabel": "Reference image",
+    "addUpToImages": "Add up to {max} images",
+    "singleSelectedTitle": "1 image selected — click to add more (up to {max})",
+    "multiSelectedTitle": "{count} of {max} images selected — click to manage",
+    "tooLargeAlert": "The following images are too large (max 10MB): {names}",
+    "uploadFailedAlert": "Image upload failed: {message}",
+    "headerTitle": "Reference Images",
+    "selectUpTo": "Select up to {max} images",
+    "doneButton": "✓ Done ({count})",
+    "uploadFilesButton": "Upload files",
+    "uploadNewButton": "Upload new",
+    "emptyState": "No uploads yet",
+    "removeFromHistory": "Remove from history",
+    "selectedCount": "{count} of {max} selected",
+    "useSelected": "Use Selected"
+  },
+  "modelDropdown": {
+    "categoryAll": "All",
+    "categoryT2I": "Text to Image",
+    "categoryI2I": "Image to Image",
+    "allProviders": "All Providers",
+    "searchPlaceholder": "Search models...",
+    "modelsSuffix": "models",
+    "noModelsFound": "No models found"
+  },
+  "gallery": {
+    "generatedImageAlt": "Generated image",
+    "download": "Download",
+    "delete": "Delete",
+    "deleteConfirm": "Are you sure you want to delete this generated item?",
+    "deleteFailed": "Failed to delete item",
+    "noPrompt": "No prompt provided",
+    "modelFallback": "Image Studio"
+  },
+  "emptyState": {
+    "heading": "START CREATING WITH",
+    "subtitle": "Describe a scene, character, mood, or style — and watch it come to life"
+  },
+  "promptBar": {
+    "placeholderMultiImage": "{count} images selected — describe the transformation (optional)",
+    "placeholderI2I": "Describe how to transform this image (optional)",
+    "placeholderT2I": "Describe the image you want to create",
+    "swapFaceLabel": "Swap Face",
+    "effectFallback": "Effect",
+    "drawButton": "Draw",
+    "generating": "Generating...",
+    "generateButton": "Generate ✦"
+  },
+  "popovers": {
+    "model": "Model",
+    "aspectRatio": "Aspect Ratio",
+    "resolution": "Resolution",
+    "effectType": "Effect Type"
+  },
+  "errors": {
+    "noImageReferenceSupport": "{name} does not support image references.",
+    "uploadReferenceFirst": "Please upload a reference image first.",
+    "uploadSwapFaceFirst": "Please upload a swap face image.",
+    "enterPromptFirst": "Please enter a prompt to generate an image.",
+    "generationFailed": "Image generation failed"
+  },
+  "fullscreen": {
+    "previewAlt": "Fullscreen Preview"
+  }
+}

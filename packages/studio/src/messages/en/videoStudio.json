@@ -1,0 +1,92 @@
+{
+  "categories": {
+    "all": "All",
+    "t2v": "Text to Video",
+    "i2v": "Image to Video",
+    "v2v": "Video Tools"
+  },
+  "providers": {
+    "allProviders": "All Providers"
+  },
+  "search": {
+    "placeholder": "Search models..."
+  },
+  "media": {
+    "image": "Image",
+    "video": "Video",
+    "audio": "Audio",
+    "endFrame": "End frame",
+    "removePrefix": "Remove"
+  },
+  "upload": {
+    "uploadStartFrame": "Upload start frame",
+    "uploadEndFrame": "Upload end frame",
+    "uploadUpToReferenceImages": "Upload up to {count} reference images",
+    "uploadingProgress": "{title}: {progress}% uploaded"
+  },
+  "placeholders": {
+    "editVideo": "Describe how to edit the video",
+    "continueVideo": "Describe how to continue the video",
+    "motion": "Describe the motion",
+    "motionOptional": "Describe the motion (optional)",
+    "videoReadyRemoveWatermark": "Video ready — click Generate to remove watermark",
+    "motionOrEffect": "Describe the motion or effect",
+    "motionOrEffectOptional": "Describe the motion or effect (optional)",
+    "optionalContinueVideo": "Optional: describe how to continue the video...",
+    "describeVideo": "Describe the video you want to create"
+  },
+  "dropdowns": {
+    "model": "Model",
+    "source": "Source",
+    "baseGeneration": "Base generation",
+    "aspectRatio": "Aspect Ratio",
+    "effect": "Effect",
+    "effectType": "Effect Type",
+    "duration": "Duration",
+    "resolution": "Resolution"
+  },
+  "controls": {
+    "draw": "Draw",
+    "generate": "Generate",
+    "generating": "Generating..."
+  },
+  "extend": {
+    "continuingGeneration": "Continuing the previous {family} generation"
+  },
+  "gallery": {
+    "download": "Download",
+    "extend": "Extend",
+    "extendSeedance": "Extend this video using Seedance 2.0 Extend",
+    "delete": "Delete",
+    "confirmDelete": "Are you sure you want to delete this generated item?",
+    "noPromptProvided": "No prompt provided",
+    "fallbackTitle": "Video Studio"
+  },
+  "empty": {
+    "heading": "START CREATING WITH",
+    "subtitle": "Animate images into stunning AI videos with motion effects"
+  },
+  "creativeAssets": {
+    "asset1": "Creative asset 1",
+    "asset2": "Creative asset 2",
+    "asset3": "Creative asset 3",
+    "asset4": "Creative asset 4"
+  },
+  "errors": {
+    "modelChangedDuringUpload": "The model changed during upload. Please add the file again.",
+    "modelDoesNotSupportReference": "{family} does not support {mediaType} references.",
+    "sourceDoesNotAcceptImages": "The selected source does not accept images.",
+    "waitForCurrentUpload": "Wait for the current upload to finish, then add these files again.",
+    "imageExceeds10MB": "Image exceeds 10MB limit.",
+    "labelExceedsLimit": "{label} exceeds {limit}MB limit.",
+    "labelUploadFailed": "{label} upload failed: {message}",
+    "noPromptForModel": "Please enter a prompt for this model.",
+    "uploadVideoFirst": "Please upload a video first.",
+    "uploadReferenceImageForMotion": "Please upload a reference image for motion control.",
+    "uploadAtLeastOneReferenceImage": "Please upload at least one reference image first.",
+    "enterPromptToGenerate": "Please enter a prompt to generate a video.",
+    "noVideoUrlReturned": "No video URL returned by API",
+    "videoGenerationFailed": "Video generation failed",
+    "deleteItemFailed": "Failed to delete item"
+  }
+}

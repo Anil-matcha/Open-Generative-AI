@@ -1,0 +1,73 @@
+{
+  "headings": {
+    "startCreatingWith": "START CREATING WITH",
+    "aiClippingStudio": "AI CLIPPING STUDIO",
+    "emptyStateSubtitle": "Extract viral highlights and precise timings from your videos automatically.",
+    "clippingHistoryRuns": "Clipping History Runs",
+    "savedGenerations": "{count} Saved Generations",
+    "backToHistory": "Back to History",
+    "highlightsTimeline": "Highlights Timeline",
+    "matches": "{count} Matches",
+    "extractedVideoClips": "Extracted Video Clips",
+    "aspectRatioLabel": "Aspect Ratio: {ratio}",
+    "originalVideoPlayer": "Original Video Player"
+  },
+  "modes": {
+    "timelineSeek": "Timeline Seek Mode",
+    "clipsGallery": "Clips Gallery Mode"
+  },
+  "labels": {
+    "highlights": "{count} Highlights",
+    "clips": "{count} Clips",
+    "highlightFallback": "Highlight #{index}",
+    "scoreSuffix": "% Score",
+    "durationSuffix": "s duration",
+    "seekAndPlay": "Seek & Play",
+    "clipIndex": "Clip #{index}",
+    "aiClipping": "AI Clipping"
+  },
+  "buttons": {
+    "deleteFromHistory": "Delete from history",
+    "delete": "Delete",
+    "copyLink": "Copy Link",
+    "copyLinkShort": "Copy link",
+    "download": "Download",
+    "clearVideo": "Clear video",
+    "uploadSourceVideo": "Upload source video",
+    "generate": "Generate ✦ 5",
+    "generating": "Generating...",
+    "coordinatesOnly": "Coordinates Only"
+  },
+  "placeholders": {
+    "promptOrUrl": "Describe prompt / highlights to extract"
+  },
+  "popovers": {
+    "aspectRatio": "Aspect Ratio",
+    "maxHighlights": "Max Highlights",
+    "limit": "Limit:"
+  },
+  "empty": {
+    "noHighlights": "No highlights extracted.",
+    "noClips": "No video clips generated. Try re-running."
+  },
+  "alerts": {
+    "urlCopied": "URL copied to clipboard!",
+    "needVideo": "Please upload a video or paste a video URL first."
+  },
+  "errors": {
+    "dismissNotification": "Dismiss notification",
+    "videoTooLarge": "The file is too large for this mode. Compress or trim the video, then upload a smaller file.",
+    "videoExceedsLimit": "Video exceeds {mb}MB limit.",
+    "uploadFailed": "Video upload failed. Please try again.",
+    "generationFailed": "Failed to process AI clipping."
+  },
+  "sourceVideoFallback": "source_video.mp4",
+  "aspectRatioLabels": {
+    "9:16": "9:16 (TikTok / Reels / Shorts)",
+    "16:9": "16:9 (YouTube / TV)",
+    "1:1": "1:1 (Instagram Square)",
+    "4:5": "4:5 (Instagram Portrait)",
+    "4:3": "4:3 (Classic Video)",
+    "3:4": "3:4 (Portrait)"
+  }
+}

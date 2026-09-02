@@ -1,0 +1,35 @@
+{
+  "hero": {
+    "badge": "面向开发者与 AI 智能体",
+    "title": "MCP 与 CLI",
+    "description": "在终端、IDE 或任何兼容 MCP 的助手中使用 Open Generative AI。跨 100 多个模型生成电影级图像、视频与音频——无需离开你的工作流程。"
+  },
+  "quickStart": {
+    "sectionLabel": "快速开始",
+    "steps": {
+      "installCli": "安装命令行工具",
+      "signIn": "登录",
+      "addSkills": "添加技能包"
+    }
+  },
+  "features": {
+    "cli": {
+      "description": "在终端中跨 14 种以上 AI 模型生成图像、视频和音频。双重输出模式——面向人类的彩色输出，以及面向智能体的 JSON 输出（--output-json、--jq 过滤）。支持异步工作流、文件上传和额度追踪。"
+    },
+    "mcp": {
+      "description": "将 Claude、Cursor、Windsurf 及任何兼容 MCP 的助手连接到 100 多个生成式模型。托管端点，无需安装。提供 19 个带输入/输出模式的结构化工具，支持异步轮询和账户管理。"
+    },
+    "skills": {
+      "description": "面向 Claude Code、Cursor 和 Gemini CLI 的多模态工具包。内置 Cinema Director、Nano-Banana、UI Designer、Logo Creator、Seedance 2、AI 剪辑和 YouTube Shorts 预设。原生适配智能体，支持 JSON 输出和语义化退出码。"
+    }
+  },
+  "viewOnGithub": "在 GitHub 上查看",
+  "examples": {
+    "sectionLabel": "示例",
+    "imageGeneration": "图像生成",
+    "textToVideo": "文字转视频",
+    "audioCreation": "音频创作",
+    "runSkill": "运行技能"
+  },
+  "footer": "开源 · MIT 许可 · 支持 Claude、Cursor、Windsurf 和 Gemini CLI"
+}

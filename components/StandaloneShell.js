@@ -11,7 +11,13 @@ const DesignAgentStudio = dynamic(() => import('studio').then(mod => mod.DesignA
 });
 import axios from 'axios';
 import ApiKeyModal from './ApiKeyModal';
+import { getCommonCopy, getLocaleConfig, localizeStudioPath } from '@/lib/locales';
 
+// Tab/category ids, icons, and English `label` fallbacks are stable
+// identifiers, not locale copy — the actual rendered label is resolved
+// per-locale from `copy.tabs`/`copy.categories` via tabLabel()/categoryLabel()
+// inside the component below, with these English strings as the fallback
+// when a locale bundle is missing the key.
 const TABS = [
   {
     id: 'image',
@@ -279,12 +285,23 @@ const persistNotifications = (notifications) => {
   }
 };
 
-export default function StandaloneShell() {
+export default function StandaloneShell({ locale = 'en' }) {
   const params = useParams();
   const router = useRouter();
-  const slug = params?.slug || []; 
+  const slug = params?.slug || [];
   const idFromParams = params?.id;
   const tabFromParams = params?.tab;
+
+  const copy = getCommonCopy(locale);
+  const tabLabel = useCallback(
+    (tabId) => copy.tabs?.[tabId] || TABS.find((t) => t.id === tabId)?.label || tabId,
+    [copy],
+  );
+  const categoryLabel = useCallback(
+    (categoryId) => copy.categories?.[categoryId] || NAVIGATION_CATEGORIES.find((c) => c.id === categoryId)?.label || categoryId,
+    [copy],
+  );
+  const studioPath = useCallback((tabId) => localizeStudioPath(locale, tabId), [locale]);
 
   // Helper to extract workflow details precisely from either route structure
   const getWorkflowInfo = useCallback(() => {
@@ -473,7 +490,7 @@ export default function StandaloneShell() {
     .filter((tab) => generationCounts[tab.id] > 0)
     .map((tab) => ({
       tabId: tab.id,
-      label: tab.label,
+      label: tabLabel(tab.id),
       count: generationCounts[tab.id],
     }));
 
@@ -481,7 +498,12 @@ export default function StandaloneShell() {
   useEffect(() => {
     const handlePopState = () => {
       const path = window.location.pathname;
-      const segments = path.split('/').filter(Boolean);
+      // Strip the locale root prefix (if any) before reading the
+      // /studio/<tab> segment, so this works for both /studio/<tab> and
+      // /<locale>/studio/<tab>.
+      const { rootPath } = getLocaleConfig(locale);
+      const localeAwarePath = rootPath && path.startsWith(rootPath) ? path.slice(rootPath.length) : path;
+      const segments = localeAwarePath.split('/').filter(Boolean);
       const tabId = segments[1] || 'image';
       if (TABS.find(t => t.id === tabId)) {
         setActiveTab(tabId);
@@ -489,12 +511,12 @@ export default function StandaloneShell() {
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
+  }, [locale]);
 
   const handleTabChange = useCallback((tabId) => {
-    window.history.pushState(null, '', `/studio/${tabId}`);
+    window.history.pushState(null, '', studioPath(tabId));
     setActiveTab(tabId);
-  }, []);
+  }, [studioPath]);
 
   const handleOpenNotification = useCallback((notification) => {
     handleTabChange(notification.tabId);
@@ -642,7 +664,7 @@ export default function StandaloneShell() {
   );
 
   if (!apiKey) {
-    return <ApiKeyModal onSave={handleKeySave} />;
+    return <ApiKeyModal onSave={handleKeySave} locale={locale} />;
   }
 
   return (
@@ -663,8 +685,8 @@ export default function StandaloneShell() {
               </svg>
             </div>
             <div className="flex flex-col items-center">
-              <span className="text-xl font-bold text-white">Drop your media here</span>
-              <span className="text-sm text-white/40">Images, videos, or audio files</span>
+              <span className="text-xl font-bold text-white">{copy.shell.dropHere}</span>
+              <span className="text-sm text-white/40">{copy.shell.dropHereHint}</span>
             </div>
           </div>
         </div>
@@ -679,7 +701,7 @@ export default function StandaloneShell() {
             rel="noopener noreferrer"
             className="text-[13px] font-bold text-white hover:opacity-80 transition-opacity text-center"
           >
-            Unrestricted AI Images &amp; Videos → Auto-Publish as YouTube Shorts &amp; TikToks, Earn ↗
+            {copy.shell.vadooPromo}
           </a>
           <button
             onClick={() => {
@@ -687,7 +709,7 @@ export default function StandaloneShell() {
               localStorage.setItem('vadoo_banner_dismissed', '1');
             }}
             className="absolute right-3 text-white/60 hover:text-white transition-colors text-lg leading-none"
-            aria-label="Dismiss"
+            aria-label={copy.shell.dismiss}
           >
             ✕
           </button>
@@ -703,7 +725,7 @@ export default function StandaloneShell() {
             <button
               onClick={() => setIsMobileOpen(!isMobileOpen)}
               className="md:hidden p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors"
-              aria-label="Toggle Navigation Menu"
+              aria-label={copy.shell.toggleNavMenu}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <line x1="3" y1="12" x2="21" y2="12" />
@@ -717,7 +739,7 @@ export default function StandaloneShell() {
               <button
                 onClick={toggleSidebar}
                 className="flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors border border-white/5"
-                aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+                aria-label={isSidebarCollapsed ? copy.shell.expandSidebar : copy.shell.collapseSidebar}
               >
                 <svg
                   width="18"
@@ -735,7 +757,7 @@ export default function StandaloneShell() {
               </button>
               {/* Custom Tooltip */}
               <div className="absolute left-0 top-full mt-2 px-2.5 py-1 bg-[#121215]/95 backdrop-blur-md text-white text-[11px] font-medium rounded-md shadow-2xl border border-white/15 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 z-50 whitespace-nowrap">
-                {isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+                {isSidebarCollapsed ? copy.shell.expandSidebar : copy.shell.collapseSidebar}
               </div>
             </div>
 
@@ -747,7 +769,7 @@ export default function StandaloneShell() {
                 </svg>
               </div>
               <span className="text-sm font-bold tracking-tight hidden sm:block text-white">
-                OpenGenerativeAI
+                {copy.shell.brand}
               </span>
             </div>
           </div>
@@ -756,7 +778,7 @@ export default function StandaloneShell() {
           <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.05] text-xs text-white/60">
             <span className="w-1.5 h-1.5 rounded-full bg-[#22d3ee]" />
             <span className="font-medium text-white/80">
-              {TABS.find(t => t.id === activeTab)?.label || 'Studio'}
+              {tabLabel(activeTab) || copy.shell.studioFallback}
             </span>
           </div>
 
@@ -772,13 +794,13 @@ export default function StandaloneShell() {
             <button
               onClick={() => setShowSettings(true)}
               className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-white/10 bg-white/5 text-[13px] font-bold text-white/80 hover:text-white hover:bg-white/10 hover:border-white/20 transition-colors"
-              aria-label="Settings"
+              aria-label={copy.shell.settings}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="3" />
                 <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
               </svg>
-              <span className="hidden sm:inline">Settings</span>
+              <span className="hidden sm:inline">{copy.shell.settings}</span>
             </button>
           </div>
         </header>
@@ -803,23 +825,24 @@ export default function StandaloneShell() {
               ${isSidebarCollapsed ? 'md:w-16' : 'md:w-52'}
             `}
           >
-            <nav aria-label="Studio navigation" className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-none py-2 px-2">
+            <nav aria-label={copy.shell.studioNavigation} className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-none py-2 px-2">
               <div className="space-y-1">
                 {NAVIGATION_CATEGORIES.map((category) => {
                   const isCategoryActive = activeCategory?.id === category.id;
                   const isCollapsed = isSidebarCollapsed && !isMobileOpen;
                   const isCategoryOpen = !isCollapsed && expandedCategoryId === category.id;
                   const categoryPanelId = `navigation-category-${category.id}`;
+                  const categoryLabelText = categoryLabel(category.id);
 
                   return (
                     <div key={category.id} className="relative">
                       <button
                         type="button"
                         onClick={() => handleCategoryToggle(category.id)}
-                        aria-label={category.label}
+                        aria-label={categoryLabelText}
                         aria-expanded={isCategoryOpen}
                         aria-controls={isCollapsed ? undefined : categoryPanelId}
-                        title={isCollapsed ? category.label : undefined}
+                        title={isCollapsed ? categoryLabelText : undefined}
                         className={`
                           group relative flex items-center rounded-xl transition-all duration-150 font-semibold
                           ${isCollapsed ? 'h-11 w-11 justify-center mx-auto' : 'px-3 py-2.5 w-full gap-3 text-left'}
@@ -842,7 +865,7 @@ export default function StandaloneShell() {
                         {!isCollapsed && (
                           <>
                             <span className="flex-1 min-w-0 text-[12px] leading-4 tracking-tight">
-                              {category.label}
+                              {categoryLabelText}
                             </span>
                             <svg
                               width="15"
@@ -866,7 +889,7 @@ export default function StandaloneShell() {
                         <div
                           id={categoryPanelId}
                           role="group"
-                          aria-label={`${category.label} tools`}
+                          aria-label={`${categoryLabelText} ${copy.shell.toolsSuffix}`}
                           className="mt-1 ml-2 pl-2 border-l border-white/[0.08] space-y-1 max-h-64 overflow-y-auto scrollbar-none"
                         >
                           {category.tabIds.map((tabId) => {
@@ -877,7 +900,7 @@ export default function StandaloneShell() {
                             return (
                               <a
                                 key={tab.id}
-                                href={`/studio/${tab.id}`}
+                                href={studioPath(tab.id)}
                                 onClick={(event) => handleNavigationItemClick(event, tab.id)}
                                 aria-current={isActive ? 'page' : undefined}
                                 className={`
@@ -894,7 +917,7 @@ export default function StandaloneShell() {
                                 <span className={`flex-shrink-0 ${isActive ? 'text-[#22d3ee]' : 'text-white/45 group-hover:text-white/80'}`}>
                                   {tab.icon}
                                 </span>
-                                <span className="truncate">{tab.label}</span>
+                                <span className="truncate">{tabLabel(tab.id)}</span>
                               </a>
                             );
                           })}
@@ -908,11 +931,11 @@ export default function StandaloneShell() {
               {EXPLORE_APPS_TAB && (
                 <div className="mt-3 pt-3 border-t border-white/[0.07]">
                   <a
-                    href={`/studio/${EXPLORE_APPS_TAB.id}`}
+                    href={studioPath(EXPLORE_APPS_TAB.id)}
                     onClick={(event) => handleNavigationItemClick(event, EXPLORE_APPS_TAB.id)}
                     aria-current={activeTab === EXPLORE_APPS_TAB.id ? 'page' : undefined}
-                    aria-label={EXPLORE_APPS_TAB.label}
-                    title={isSidebarCollapsed && !isMobileOpen ? EXPLORE_APPS_TAB.label : undefined}
+                    aria-label={tabLabel(EXPLORE_APPS_TAB.id)}
+                    title={isSidebarCollapsed && !isMobileOpen ? tabLabel(EXPLORE_APPS_TAB.id) : undefined}
                     className={`
                       group relative flex items-center rounded-xl transition-all duration-150 text-[13px] font-semibold
                       ${isSidebarCollapsed && !isMobileOpen ? 'h-11 w-11 justify-center mx-auto' : 'px-3 py-2.5 w-full gap-3'}
@@ -929,7 +952,7 @@ export default function StandaloneShell() {
                       {EXPLORE_APPS_TAB.icon}
                     </span>
                     {(!isSidebarCollapsed || isMobileOpen) && (
-                      <span className="truncate">{EXPLORE_APPS_TAB.label}</span>
+                      <span className="truncate">{tabLabel(EXPLORE_APPS_TAB.id)}</span>
                     )}
                   </a>
                 </div>
@@ -941,34 +964,34 @@ export default function StandaloneShell() {
         {/* Studio Content */}
         <div className="flex-1 min-h-0 h-full relative overflow-hidden bg-[#030303]">
         <div className={activeTab === 'image' ? "h-full w-full" : "hidden"}>
-          <ImageStudio apiKey={apiKey} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('image')} onGenerationEnd={makeGenerationEndCallback('image')} onGenerationComplete={makeSuccessCallback('image')} onGenerationError={makeErrorCallback('image')} />
+          <ImageStudio apiKey={apiKey} locale={locale} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('image')} onGenerationEnd={makeGenerationEndCallback('image')} onGenerationComplete={makeSuccessCallback('image')} onGenerationError={makeErrorCallback('image')} />
         </div>
         <div className={activeTab === 'layers' ? "h-full w-full" : "hidden"}>
-          <LayersStudio apiKey={apiKey} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('layers')} onGenerationEnd={makeGenerationEndCallback('layers')} onGenerationComplete={makeSuccessCallback('layers')} onGenerationError={makeErrorCallback('layers')} />
+          <LayersStudio apiKey={apiKey} locale={locale} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('layers')} onGenerationEnd={makeGenerationEndCallback('layers')} onGenerationComplete={makeSuccessCallback('layers')} onGenerationError={makeErrorCallback('layers')} />
         </div>
         <div className={activeTab === 'video' ? "h-full w-full" : "hidden"}>
-          <VideoStudio apiKey={apiKey} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('video')} onGenerationEnd={makeGenerationEndCallback('video')} onGenerationComplete={makeSuccessCallback('video')} onGenerationError={makeErrorCallback('video')} />
+          <VideoStudio apiKey={apiKey} locale={locale} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('video')} onGenerationEnd={makeGenerationEndCallback('video')} onGenerationComplete={makeSuccessCallback('video')} onGenerationError={makeErrorCallback('video')} />
         </div>
         <div className={activeTab === 'clipping' ? "h-full w-full" : "hidden"}>
-          <ClippingStudio apiKey={apiKey} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('clipping')} onGenerationEnd={makeGenerationEndCallback('clipping')} onGenerationComplete={makeSuccessCallback('clipping')} onGenerationError={makeErrorCallback('clipping')} />
+          <ClippingStudio apiKey={apiKey} locale={locale} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('clipping')} onGenerationEnd={makeGenerationEndCallback('clipping')} onGenerationComplete={makeSuccessCallback('clipping')} onGenerationError={makeErrorCallback('clipping')} />
         </div>
         <div className={activeTab === 'vibe-motion' ? "h-full w-full" : "hidden"}>
-          <VibeMotionStudio apiKey={apiKey} onGenerationStart={makeGenerationStartCallback('vibe-motion')} onGenerationEnd={makeGenerationEndCallback('vibe-motion')} onGenerationComplete={makeSuccessCallback('vibe-motion')} onGenerationError={makeErrorCallback('vibe-motion')} />
+          <VibeMotionStudio apiKey={apiKey} locale={locale} onGenerationStart={makeGenerationStartCallback('vibe-motion')} onGenerationEnd={makeGenerationEndCallback('vibe-motion')} onGenerationComplete={makeSuccessCallback('vibe-motion')} onGenerationError={makeErrorCallback('vibe-motion')} />
         </div>
         <div className={activeTab === 'lipsync' ? "h-full w-full" : "hidden"}>
-          <LipSyncStudio apiKey={apiKey} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('lipsync')} onGenerationEnd={makeGenerationEndCallback('lipsync')} onGenerationComplete={makeSuccessCallback('lipsync')} onGenerationError={makeErrorCallback('lipsync')} />
+          <LipSyncStudio apiKey={apiKey} locale={locale} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('lipsync')} onGenerationEnd={makeGenerationEndCallback('lipsync')} onGenerationComplete={makeSuccessCallback('lipsync')} onGenerationError={makeErrorCallback('lipsync')} />
         </div>
         <div className={activeTab === 'body-swap' ? "h-full w-full" : "hidden"}>
-          <RecastStudio apiKey={apiKey} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('body-swap')} onGenerationEnd={makeGenerationEndCallback('body-swap')} onGenerationComplete={makeSuccessCallback('body-swap')} onGenerationError={makeErrorCallback('body-swap')} />
+          <RecastStudio apiKey={apiKey} locale={locale} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('body-swap')} onGenerationEnd={makeGenerationEndCallback('body-swap')} onGenerationComplete={makeSuccessCallback('body-swap')} onGenerationError={makeErrorCallback('body-swap')} />
         </div>
         <div className={activeTab === 'cinema' ? "h-full w-full" : "hidden"}>
-          <CinemaStudio apiKey={apiKey} onGenerationStart={makeGenerationStartCallback('cinema')} onGenerationEnd={makeGenerationEndCallback('cinema')} onGenerationComplete={makeSuccessCallback('cinema')} onGenerationError={makeErrorCallback('cinema')} />
+          <CinemaStudio apiKey={apiKey} locale={locale} onGenerationStart={makeGenerationStartCallback('cinema')} onGenerationEnd={makeGenerationEndCallback('cinema')} onGenerationComplete={makeSuccessCallback('cinema')} onGenerationError={makeErrorCallback('cinema')} />
         </div>
         <div className={activeTab === 'audio' ? "h-full w-full" : "hidden"}>
-          <AudioStudio apiKey={apiKey} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('audio')} onGenerationEnd={makeGenerationEndCallback('audio')} onGenerationComplete={makeSuccessCallback('audio')} onGenerationError={makeErrorCallback('audio')} />
+          <AudioStudio apiKey={apiKey} locale={locale} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('audio')} onGenerationEnd={makeGenerationEndCallback('audio')} onGenerationComplete={makeSuccessCallback('audio')} onGenerationError={makeErrorCallback('audio')} />
         </div>
         <div className={activeTab === 'marketing' ? "h-full w-full" : "hidden"}>
-          <MarketingStudio apiKey={apiKey} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('marketing')} onGenerationEnd={makeGenerationEndCallback('marketing')} onGenerationComplete={makeSuccessCallback('marketing')} onGenerationError={makeErrorCallback('marketing')} />
+          <MarketingStudio apiKey={apiKey} locale={locale} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('marketing')} onGenerationEnd={makeGenerationEndCallback('marketing')} onGenerationComplete={makeSuccessCallback('marketing')} onGenerationError={makeErrorCallback('marketing')} />
         </div>
         <div className={activeTab === 'workflows' ? "h-full w-full" : "hidden"}>
           <WorkflowStudio
@@ -982,7 +1005,7 @@ export default function StandaloneShell() {
           />
         </div>
         <div className={activeTab === 'agents' ? "h-full w-full" : "hidden"}>
-          <AgentStudio apiKey={apiKey} isHeaderVisible={isHeaderVisible} onToggleHeader={setIsHeaderVisible} />
+          <AgentStudio apiKey={apiKey} locale={locale} isHeaderVisible={isHeaderVisible} onToggleHeader={setIsHeaderVisible} />
         </div>
         <div className={activeTab === 'design-agent' ? "h-full w-full" : "hidden"}>
           {activeTab === 'design-agent' && (
@@ -998,11 +1021,12 @@ export default function StandaloneShell() {
           )}
         </div>
         <div className={activeTab === 'apps' ? "h-full w-full" : "hidden"}>
-          <AppsStudio apiKey={apiKey} />
+          <AppsStudio apiKey={apiKey} locale={locale} />
         </div>
         <div className={activeTab === 'ai-influencer' ? "h-full w-full" : "hidden"}>
           <AiInfluencerStudio
             apiKey={apiKey}
+            locale={locale}
             onGenerationStart={makeGenerationStartCallback('ai-influencer')}
             onGenerationEnd={makeGenerationEndCallback('ai-influencer')}
             onGenerationComplete={makeSuccessCallback('ai-influencer')}
@@ -1016,7 +1040,7 @@ export default function StandaloneShell() {
       {(activeGenerations.length > 0 || notifications.length > 0) && (
         <div
           aria-live="polite"
-          aria-label="Generation activity and notifications"
+          aria-label={copy.notifications.ariaLabel}
           className="fixed top-16 right-5 z-[200] flex max-h-[calc(100vh-80px)] w-[340px] max-w-[calc(100vw-32px)] flex-col gap-2 overflow-x-hidden overflow-y-auto global-notif-stack pointer-events-none"
           data-testid="global-notification-stack"
         >
@@ -1035,7 +1059,7 @@ export default function StandaloneShell() {
                 />
               </span>
               <p className="min-w-0 flex-1 font-semibold leading-5 text-zinc-900">
-                {generation.label} is generating
+                {generation.label} {copy.notifications.generating}
                 {generation.count > 1 ? ` (${generation.count})` : ''}
               </p>
             </div>
@@ -1077,7 +1101,8 @@ export default function StandaloneShell() {
                 <p className="font-semibold leading-5 text-zinc-900">
                   {notif.label}
                   <span className="font-normal text-zinc-500">
-                    {notif.type === 'success' ? ' - Generation complete' : ' - Generation failed'}
+                    {' '}
+                    {notif.type === 'success' ? copy.notifications.generationComplete : copy.notifications.generationFailed}
                   </span>
                 </p>
                 {notif.type === 'error' && notif.message && (
@@ -1087,7 +1112,7 @@ export default function StandaloneShell() {
                 )}
                 {notif.type === 'success' && (
                   <p className="mt-0.5 text-[12px] leading-4 text-zinc-500">
-                    Your result is ready.
+                    {copy.notifications.resultReady}
                   </p>
                 )}
                 {notif.type === 'success' && (
@@ -1095,9 +1120,9 @@ export default function StandaloneShell() {
                     type="button"
                     onClick={() => handleOpenNotification(notif)}
                     className="mt-1.5 text-[11px] font-bold text-cyan-600 transition-colors hover:text-cyan-700"
-                    aria-label={`Open ${notif.label} result`}
+                    aria-label={copy.notifications.openResult.replace('{label}', notif.label)}
                   >
-                    Open →
+                    {copy.notifications.open}
                   </button>
                 )}
               </div>
@@ -1106,7 +1131,7 @@ export default function StandaloneShell() {
                 type="button"
                 onClick={() => dismissNotification(notif.id)}
                 className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-700 focus:outline-none focus:ring-1 focus:ring-zinc-300"
-                aria-label="Dismiss notification"
+                aria-label={copy.notifications.dismissNotification}
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
                   <path d="M18 6 6 18M6 6l12 12" />
@@ -1136,15 +1161,15 @@ export default function StandaloneShell() {
       {showSettings && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in-up">
           <div className="bg-[#0a0a0a] border border-white/10 rounded-xl p-8 w-full max-w-sm shadow-2xl">
-            <h2 className="text-white font-bold text-lg mb-2">Settings</h2>
+            <h2 className="text-white font-bold text-lg mb-2">{copy.settingsModal.title}</h2>
             <p className="text-white/40 text-[13px] mb-8">
-              Manage your AI studio preferences and authentication.
+              {copy.settingsModal.subtitle}
             </p>
-            
+
             <div className="space-y-4 mb-8">
               <div className="bg-white/5 border border-white/[0.03] rounded-md p-4">
                 <label className="block text-xs font-bold text-white/30 mb-2">
-                   Active API Key
+                   {copy.settingsModal.activeApiKey}
                 </label>
                 <div className="text-[13px] font-mono text-white/80">
                   {apiKey.slice(0, 8)}••••••••••••••••
@@ -1157,13 +1182,13 @@ export default function StandaloneShell() {
                 onClick={handleKeyChange}
                 className="flex-1 h-10 rounded-md bg-red-500/10 text-red-400 hover:bg-red-500/20 text-xs font-semibold transition-all"
               >
-                Change Key
+                {copy.settingsModal.changeKey}
               </button>
               <button
                 onClick={() => setShowSettings(false)}
                 className="flex-1 h-10 rounded-md bg-white/5 text-white/80 hover:bg-white/10 text-xs font-semibold transition-all border border-white/5"
               >
-                Close
+                {copy.settingsModal.close}
               </button>
             </div>
           </div>

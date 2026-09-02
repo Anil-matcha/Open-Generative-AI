@@ -1,0 +1,35 @@
+{
+  "hero": {
+    "badge": "For developers & AI agents",
+    "title": "MCP & CLI",
+    "description": "Use Open Generative AI from your terminal, your IDE, or any MCP-compatible assistant. Generate cinematic images, videos, and audio across 100+ models — without leaving your workflow."
+  },
+  "quickStart": {
+    "sectionLabel": "Quick start",
+    "steps": {
+      "installCli": "Install the CLI",
+      "signIn": "Sign in",
+      "addSkills": "Add the skills"
+    }
+  },
+  "features": {
+    "cli": {
+      "description": "Generate images, videos, and audio from the terminal across 14+ AI models. Dual interface — colored human output plus JSON for agents (--output-json, --jq filtering). Async workflows, file uploads, credit tracking."
+    },
+    "mcp": {
+      "description": "Connect Claude, Cursor, Windsurf, and any MCP-compatible assistant to 100+ generative models. Hosted endpoint — no install. 19 structured tools with input/output schemas, async polling, and account management."
+    },
+    "skills": {
+      "description": "Multimodal toolkit for Claude Code, Cursor, and Gemini CLI. Cinema Director, Nano-Banana, UI Designer, Logo Creator, Seedance 2, AI Clipping, and YouTube Shorts presets. Agent-native with JSON outputs and semantic exit codes."
+    }
+  },
+  "viewOnGithub": "View on GitHub",
+  "examples": {
+    "sectionLabel": "Examples",
+    "imageGeneration": "Image generation",
+    "textToVideo": "Text-to-video",
+    "audioCreation": "Audio creation",
+    "runSkill": "Run a skill"
+  },
+  "footer": "Open-source · MIT licensed · Works with Claude, Cursor, Windsurf, and Gemini CLI"
+}

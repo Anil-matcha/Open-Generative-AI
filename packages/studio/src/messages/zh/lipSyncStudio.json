@@ -1,0 +1,54 @@
+{
+  "hero": {
+    "titleLine1": "开始使用",
+    "titleLine2": "唇形同步工作室",
+    "subtitle": "将任意语音与任意人脸视频同步，创建高质量的说话头像和视频。"
+  },
+  "modes": {
+    "portraitImage": "人像图片",
+    "video": "视频"
+  },
+  "media": {
+    "imageLabel": "图片",
+    "videoLabel": "视频",
+    "audioLabel": "音频",
+    "uploadFilePrefix": "上传",
+    "uploadFileSuffix": "文件",
+    "clickToClear": "点击清除",
+    "noImage": "无图片",
+    "noVideo": "无视频",
+    "noAudio": "无音频"
+  },
+  "prompt": {
+    "placeholder": "描述说话风格..."
+  },
+  "model": {
+    "selectModel": "选择模型",
+    "dropdownTitle": "模型",
+    "resolutionDropdownTitle": "分辨率"
+  },
+  "actions": {
+    "generate": "同步唇形",
+    "generating": "生成中...",
+    "download": "下载",
+    "delete": "删除"
+  },
+  "confirm": {
+    "deleteItem": "确定要删除此生成内容吗？"
+  },
+  "badges": {
+    "lipSync": "唇形同步"
+  },
+  "errors": {
+    "imageTooLarge": "图片超过 10MB 限制。",
+    "videoTooLarge": "视频超过 50MB 限制。",
+    "audioTooLarge": "音频文件超过 10MB 限制。",
+    "imageUploadFailed": "图片上传失败：{message}",
+    "videoUploadFailed": "视频上传失败：{message}",
+    "audioUploadFailed": "音频上传失败：{message}",
+    "needAudio": "请先上传音频文件。",
+    "needImage": "请先上传人像图片。",
+    "needVideo": "请先上传源视频。",
+    "generationFailed": "唇形同步生成失败"
+  }
+}

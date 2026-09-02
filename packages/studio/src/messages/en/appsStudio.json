@@ -1,0 +1,42 @@
+{
+  "hero": {
+    "badge": "Revenue-Ready Templates",
+    "titleLine1": "LAUNCH AN AI APP.",
+    "titleLine2": "START EARNING TODAY.",
+    "subtitle": "Each template is a fully-functional, Stripe-integrated AI SaaS you can deploy in minutes. Charge your users, keep the revenue — muapi handles the AI infrastructure."
+  },
+  "steps": {
+    "stepLabel": "Step",
+    "deploy": {
+      "title": "Deploy in Minutes",
+      "body": "Fork the open-source template, add your muapi key, and push to Vercel. No backend setup needed."
+    },
+    "collect": {
+      "title": "Collect Payments",
+      "body": "Stripe is pre-wired. Set your own pricing — one-time credits, subscriptions, or pay-per-use."
+    },
+    "keep": {
+      "title": "Keep the Revenue",
+      "body": "Payments go straight to your Stripe account. You own the product, the brand, and the profits."
+    }
+  },
+  "card": {
+    "templateFallback": "Template",
+    "github": "Github",
+    "demo": "Demo"
+  },
+  "footer": {
+    "moreComingSoon": "Muapi Ecosystem — More templates coming soon"
+  },
+  "modal": {
+    "deployTitle": "Deploy {appName}",
+    "body": "Enter your details and we'll send you the {appName} template along with setup instructions so you can deploy and start earning immediately.",
+    "sending": "Sending Details...",
+    "getTemplate": "Get Template",
+    "maybeLater": "Maybe Later"
+  },
+  "toast": {
+    "requestSuccess": "Got it! We'll send you the template details shortly.",
+    "requestError": "Failed to register interest. Please try again later."
+  }
+}

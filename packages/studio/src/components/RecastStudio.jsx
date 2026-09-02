@@ -29,6 +29,9 @@ import {
   promptControlClassName,
   promptMediaButtonClassName,
 } from "./prompt/PromptComposer.jsx";
+import en from "../messages/en/recastStudio.json";
+import zh from "../messages/zh/recastStudio.json";
+import { resolveCopy } from "../i18nUtils";
 
 // ---------------------------------------------------------------------------
 // Upload button states
@@ -50,6 +53,7 @@ function MediaPickerButton({
   fileName,
   previewUrl,
   isVideo,
+  copy,
 }) {
   const inputRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -132,8 +136,8 @@ function MediaPickerButton({
       type="button"
       title={
         uploadState === UPLOAD_STATE.READY
-          ? `${fileName} — click to clear`
-          : `Upload ${label.toLowerCase()} file, or drag and drop`
+          ? copy.titles.clickToClear.replace("{fileName}", fileName)
+          : copy.titles.uploadFile.replace("{label}", label.toLowerCase())
       }
       onClick={handleClick}
       onDragEnter={handleDragEnter}
@@ -233,6 +237,7 @@ function AssetsDropdown({
   setFullscreenUrl,
   onClose,
   anchorRef,
+  copy,
 }) {
   const [activeTab, setActiveTab] = useState("videos"); // 'videos' | 'images' | 'results'
   const dropRef = useRef(null);
@@ -258,7 +263,7 @@ function AssetsDropdown({
       className="w-80 max-h-80 overflow-hidden flex flex-col gap-2"
       onClick={(e) => e.stopPropagation()}
     >
-      <PromptPopoverHeader className="mb-0">Asset Library</PromptPopoverHeader>
+      <PromptPopoverHeader className="mb-0">{copy.assetLibrary.header}</PromptPopoverHeader>
       {/* Tabs */}
       <div className="flex border-b border-white/5 pb-1">
         {["videos", "images", "results"].map((tab) => (
@@ -272,7 +277,7 @@ function AssetsDropdown({
                 : "text-white/40 hover:text-white/80"
             }`}
           >
-            {tab}
+            {copy.assetLibrary.tabs[tab]}
           </button>
         ))}
       </div>
@@ -281,7 +286,7 @@ function AssetsDropdown({
       <div className="overflow-y-auto custom-scrollbar flex-1 flex flex-col gap-1.5 min-h-[180px] max-h-60">
         {items.length === 0 ? (
           <div className="flex flex-col items-center justify-center flex-1 py-10 text-xs text-white/20">
-            No assets found
+            {copy.assetLibrary.empty}
           </div>
         ) : (
           items.map((item, idx) => (
@@ -318,7 +323,7 @@ function AssetsDropdown({
                 {/* Enlarge preview overlay */}
                 <button
                   type="button"
-                  title="Enlarge preview"
+                  title={copy.titles.enlargePreview}
                   onClick={(e) => {
                     e.stopPropagation();
                     setFullscreenUrl(item.url);
@@ -350,11 +355,11 @@ function AssetsDropdown({
                   type="button"
                   className="text-xs text-black font-black px-2.5 py-1 bg-[#22d3ee] rounded-md hover:bg-[#22d3ee]/90 transition-colors"
                 >
-                  Use
+                  {copy.buttons.use}
                 </button>
                 <button
                   type="button"
-                  title="Delete from Library"
+                  title={copy.titles.deleteFromLibrary}
                   onClick={(e) => {
                     e.stopPropagation();
                     onDeleteAsset(activeTab, item.url);
@@ -482,7 +487,9 @@ export default function RecastStudio({
   historyItems,
   droppedFiles,
   onFilesHandled,
+  locale = "en",
 }) {
+  const copy = resolveCopy(en, zh, locale);
   const LEGACY_PERSIST_KEY = "hg_recast_studio_persistent";
   const PERSIST_KEY = scopedPersistKey(LEGACY_PERSIST_KEY, apiKey);
   useEffect(() => {
@@ -671,7 +678,7 @@ export default function RecastStudio({
   const handleVideoPick = useCallback(
     async (file) => {
       if (file.size > 50 * 1024 * 1024) {
-        alert("Video exceeds 50MB limit.");
+        alert(copy.errors.videoTooLarge);
         return;
       }
       setVideoState(UPLOAD_STATE.UPLOADING);
@@ -690,7 +697,7 @@ export default function RecastStudio({
         });
       } catch (err) {
         setVideoState(UPLOAD_STATE.IDLE);
-        alert(`Video upload failed: ${err.message}`);
+        alert(copy.errors.videoUploadFailed.replace("{message}", err.message));
       } finally {
         setVideoProgress(0);
       }
@@ -705,7 +712,7 @@ export default function RecastStudio({
   const handleImageUpload = useCallback(
     async (file) => {
       if (file.size > 10 * 1024 * 1024) {
-        alert("Image exceeds 10MB limit.");
+        alert(copy.errors.imageTooLarge);
         return;
       }
       setImageState(UPLOAD_STATE.UPLOADING);
@@ -724,7 +731,7 @@ export default function RecastStudio({
         });
       } catch (err) {
         setImageState(UPLOAD_STATE.IDLE);
-        alert(`Image upload failed: ${err.message}`);
+        alert(copy.errors.imageUploadFailed.replace("{message}", err.message));
       } finally {
         setImageProgress(0);
       }
@@ -777,11 +784,11 @@ export default function RecastStudio({
   // ── Generation ──────────────────────────────────────────────────────────────
   const handleGenerate = async () => {
     if (!videoUrl) {
-      alert("Please upload a source video first.");
+      alert(copy.errors.missingVideo);
       return;
     }
     if (!imageUrl) {
-      alert("Please upload a character image first.");
+      alert(copy.errors.missingImage);
       return;
     }
 
@@ -835,7 +842,7 @@ export default function RecastStudio({
       }
     } catch (e) {
       console.error("[RecastStudio]", e);
-      const errMsg = formatErrorMessage(e, "Body swap generation failed");
+      const errMsg = formatErrorMessage(e, copy.errors.generationFailed);
       if (onGenerationError) onGenerationError(errMsg);
       else toast.error(errMsg);
     } finally {
@@ -883,7 +890,7 @@ export default function RecastStudio({
                   />
                   <button
                     type="button"
-                    title="Download"
+                    title={copy.buttons.download}
                     onClick={(e) => {
                       e.stopPropagation();
                       downloadFile(entry.url, `bodyswap-${entry.id || idx}.mp4`);
@@ -896,10 +903,10 @@ export default function RecastStudio({
                   </button>
                   <button
                     type="button"
-                    title="Delete"
+                    title={copy.buttons.delete}
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (confirm("Are you sure you want to delete this generated item?")) {
+                      if (confirm(copy.confirm.deleteGenerated)) {
                         setInternalHistory(prev => prev.filter((_, i) => i !== idx));
                       }
                     }}
@@ -919,13 +926,13 @@ export default function RecastStudio({
                   actions={[
                     {
                       kind: "download",
-                      label: "Download",
+                      label: copy.buttons.download,
                       onSelect: () =>
                         downloadFile(entry.url, `bodyswap-${entry.id || idx}.mp4`),
                     },
                     {
                       kind: "delete",
-                      label: "Delete",
+                      label: copy.buttons.delete,
                       danger: true,
                       onSelect: () => {
                         if (confirm("Are you sure you want to delete this generated item?")) {
@@ -945,7 +952,7 @@ export default function RecastStudio({
                   )}
                   <div className="flex items-center justify-between flex-wrap gap-1 mt-1">
                     <span className="text-[10px] font-bold text-primary px-2 py-0.5 bg-primary/10 rounded border border-primary/20 whitespace-nowrap">
-                      Body Swap
+                      {copy.badges.bodySwap}
                     </span>
                   </div>
                 </div>
@@ -987,13 +994,13 @@ export default function RecastStudio({
             </div>
 
             <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-center px-4 flex flex-col items-center">
-              <span className="text-white font-black uppercase text-xl sm:text-3xl tracking-wide mb-1 opacity-90">START CREATING WITH</span>
+              <span className="text-white font-black uppercase text-xl sm:text-3xl tracking-wide mb-1 opacity-90">{copy.empty.titleLine1}</span>
               <span className="text-[#22d3ee] font-black uppercase text-2xl sm:text-4xl sm:mt-1 tracking-tight">
-                BODY SWAP STUDIO
+                {copy.empty.titleLine2}
               </span>
             </h1>
             <p className="text-white/40 text-xs sm:text-sm font-medium tracking-wide text-center max-w-lg leading-relaxed px-4">
-              Swap the character in any video dynamically by choosing a video clip and a target character image.
+              {copy.empty.description}
             </p>
           </div>
         )}
@@ -1007,7 +1014,7 @@ export default function RecastStudio({
               {/* Source video */}
               <MediaPickerButton
                 accept="video/*"
-                label="Video"
+                label={copy.labels.video}
                 icon={<VideoIcon className="text-white/40 group-hover:text-[#22d3ee] transition-colors" />}
                 onUpload={handleVideoPick}
                 onClear={() => {
@@ -1020,12 +1027,13 @@ export default function RecastStudio({
                 fileName={videoName}
                 previewUrl={videoUrl}
                 isVideo={true}
+                copy={copy}
               />
 
               {/* Character image */}
               <MediaPickerButton
                 accept="image/*"
-                label="Character image"
+                label={copy.labels.characterImage}
                 icon={<ImageIcon className="text-white/40 group-hover:text-[#22d3ee] transition-colors" />}
                 onUpload={handleImageUpload}
                 onClear={() => {
@@ -1038,6 +1046,7 @@ export default function RecastStudio({
                 fileName={imageName}
                 previewUrl={imageUrl}
                 isVideo={false}
+                copy={copy}
               />
             </div>
 
@@ -1047,7 +1056,7 @@ export default function RecastStudio({
                 ref={textareaRef}
                 value={prompt}
                 onChange={handlePromptInput}
-                placeholder="Optional — describe the motion or scene..."
+                placeholder={copy.placeholders.prompt}
               />
             </div>
           </div>
@@ -1072,13 +1081,13 @@ export default function RecastStudio({
                     <span className="text-[9px] font-black text-black">R</span>
                   </div>
                   <span className={PROMPT_CONTROL_LABEL_CLASS}>
-                    {selectedModel?.name ?? "Select model"}
+                    {selectedModel?.name ?? copy.dropdowns.selectModel}
                   </span>
                   <PromptChevronIcon />
                 </button>
                 <Dropdown
                   isOpen={openDropdown === "model"}
-                  title="Model"
+                  title={copy.dropdowns.model}
                   items={recastModels}
                   selectedId={selectedModelId}
                   onSelect={handleModelSelect}
@@ -1110,7 +1119,7 @@ export default function RecastStudio({
                   </button>
                   <Dropdown
                     isOpen={openDropdown === "aspect"}
-                    title="Aspect Ratio"
+                    title={copy.dropdowns.aspectRatio}
                     items={aspectDropdownItems}
                     selectedId={selectedAspectRatio}
                     onSelect={(item) => setSelectedAspectRatio(item.id)}
@@ -1135,7 +1144,7 @@ export default function RecastStudio({
                     })}
                   >
                     <span className="text-xs font-semibold text-current opacity-50 group-hover:opacity-100 transition-opacity">
-                      Orientation:
+                      {copy.labels.orientationPrefix}
                     </span>
                     <span className="text-xs font-semibold text-current capitalize">
                       {characterOrientation}
@@ -1144,10 +1153,10 @@ export default function RecastStudio({
                   </button>
                   <Dropdown
                     isOpen={openDropdown === "orientation"}
-                    title="Orientation"
+                    title={copy.dropdowns.orientation}
                     items={[
-                      { id: "image", name: "Image", description: "Use image orientation (Max 10s video)" },
-                      { id: "video", name: "Video", description: "Use video orientation (Max 30s video)" },
+                      { id: "image", name: copy.dropdowns.orientationImage, description: copy.dropdowns.orientationImageDesc },
+                      { id: "video", name: copy.dropdowns.orientationVideo, description: copy.dropdowns.orientationVideoDesc },
                     ]}
                     selectedId={characterOrientation}
                     onSelect={(item) => setCharacterOrientation(item.id)}
@@ -1184,7 +1193,7 @@ export default function RecastStudio({
                     <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
                   </svg>
                   <span className="text-xs font-semibold text-white/70 group-hover:text-[#22d3ee] transition-colors">
-                    Library
+                    {copy.labels.library}
                   </span>
                   <PromptChevronIcon />
                 </button>
@@ -1195,19 +1204,19 @@ export default function RecastStudio({
                     results={assetResults}
                     onSelectVideo={(url, name) => {
                       setVideoUrl(url);
-                      setVideoName(name || "Selected Video");
+                      setVideoName(name || copy.defaults.selectedVideo);
                       setVideoState(UPLOAD_STATE.READY);
                       setOpenDropdown(null);
                     }}
                     onSelectImage={(url, name) => {
                       setImageUrl(url);
-                      setImageName(name || "Selected Image");
+                      setImageName(name || copy.defaults.selectedImage);
                       setImageState(UPLOAD_STATE.READY);
                       setOpenDropdown(null);
                     }}
                     onSelectResultAsVideo={(url, name) => {
                       setVideoUrl(url);
-                      setVideoName(name || "Result Video");
+                      setVideoName(name || copy.defaults.resultVideo);
                       setVideoState(UPLOAD_STATE.READY);
                       setOpenDropdown(null);
                     }}
@@ -1215,6 +1224,7 @@ export default function RecastStudio({
                     setFullscreenUrl={setFullscreenUrl}
                     onClose={() => setOpenDropdown(null)}
                     anchorRef={assetsBtnRef}
+                    copy={copy}
                   />
                 )}
               </div>
@@ -1228,10 +1238,10 @@ export default function RecastStudio({
               {isGenerating ? (
                 <>
                   <span className="animate-spin inline-block text-black">◌</span>{" "}
-                  Swapping...
+                  {copy.buttons.swapping}
                 </>
               ) : (
-                <span>Swap Body</span>
+                <span>{copy.buttons.swapBody}</span>
               )}
             </PromptAction>
           </PromptFooter>

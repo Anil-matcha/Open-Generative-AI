@@ -26,6 +26,9 @@ import {
   PromptTextarea,
   promptControlClassName,
 } from "./prompt/PromptComposer.jsx";
+import en from "../messages/en/vibeMotionStudio.json";
+import zh from "../messages/zh/vibeMotionStudio.json";
+import { resolveCopy } from "../i18nUtils";
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 async function downloadFile(url, filename) {
@@ -74,7 +77,9 @@ export default function VibeMotionStudio({
   onGenerationEnd,
   onGenerationComplete,
   onGenerationError,
+  locale = "en",
 }) {
+  const copy = resolveCopy(en, zh, locale);
   const LEGACY_PERSIST_KEY = "hg_vibe_motion_studio_persistent";
   const PERSIST_KEY = scopedPersistKey(LEGACY_PERSIST_KEY, apiKey);
   useEffect(() => {
@@ -202,14 +207,14 @@ export default function VibeMotionStudio({
 
       if (isStaleEdit) {
         console.warn("[VibeMotionStudio] Remix unavailable:", raw.slice(0, 120));
-        const msg = "This generation can't be remixed — the animation code wasn't saved server-side. Generate a new motion graphic first, then remix that result.";
+        const msg = copy.errors.staleEditUnavailable;
         if (onGenerationError) onGenerationError(msg);
         else toast.error(msg);
         setEditMode(false);
         setEditSourceId(null);
       } else {
         console.error("[VibeMotionStudio]", err);
-        const errMsg = formatErrorMessage(raw || err, "Vibe Motion generation failed");
+        const errMsg = formatErrorMessage(raw || err, copy.errors.generationFailed);
         if (onGenerationError) onGenerationError(errMsg);
         else toast.error(errMsg);
       }
@@ -231,6 +236,7 @@ export default function VibeMotionStudio({
     onGenerationEnd,
     onGenerationError,
     onGenerationStart,
+    copy,
   ]);
 
   const handleKeyDown = (e) => {
@@ -290,9 +296,9 @@ export default function VibeMotionStudio({
               </div>
               <div className="flex flex-col items-center gap-1">
                 <span className="text-white/80 font-semibold text-sm">
-                  {editMode ? "Remixing motion graphics…" : "Generating motion graphics…"}
+                  {editMode ? copy.loading.remixing : copy.loading.generating}
                 </span>
-                <span className="text-white/30 text-xs">React/Remotion rendering on Modal</span>
+                <span className="text-white/30 text-xs">{copy.loading.backend}</span>
               </div>
               <div className="flex items-center gap-2 text-white/30 text-xs bg-white/[0.03] px-4 py-1.5 rounded-full border border-white/[0.05]">
                 <svg className="animate-spin" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
@@ -331,7 +337,7 @@ export default function VibeMotionStudio({
                     ? "bg-[#22d3ee]/20 text-[#22d3ee] border-[#22d3ee]/30"
                     : "bg-violet-600/30 text-violet-300 border-violet-500/30"
                 }`}>
-                  {entry.mode === "edit" ? "✏ Edit" : "✦ Generated"}
+                  {entry.mode === "edit" ? copy.card.modeEdit : copy.card.modeGenerated}
                 </div>
 
                 {/* ── Hover overlay actions ── */}
@@ -342,7 +348,7 @@ export default function VibeMotionStudio({
                   />
                   <button
                     type="button"
-                    title="Download"
+                    title={copy.card.download}
                     onClick={(e) => { e.stopPropagation(); downloadFile(entry.url, `motion-${entry.id || idx}.mp4`); }}
                     className="p-2 bg-black/60 backdrop-blur-md rounded-full text-white hover:bg-primary hover:text-black transition-all border border-white/10"
                   >
@@ -353,7 +359,7 @@ export default function VibeMotionStudio({
                   {entry.requestId && entry.canEdit !== false ? (
                     <button
                       type="button"
-                      title="Remix this generation"
+                      title={copy.card.remixThis}
                       onClick={(e) => {
                         e.stopPropagation();
                         setEditMode(true);
@@ -371,7 +377,7 @@ export default function VibeMotionStudio({
                   ) : entry.requestId && entry.canEdit === false ? (
                     /* Legacy generation — animation code not saved by API, remix not available */
                     <div
-                      title="Legacy generation — remix not available. Generate a new motion graphic to enable editing."
+                      title={copy.card.legacyRemixUnavailable}
                       className="p-2 bg-black/60 backdrop-blur-md rounded-full text-white/20 border border-white/5 cursor-not-allowed"
                     >
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-40">
@@ -383,10 +389,10 @@ export default function VibeMotionStudio({
                   ) : null}
                   <button
                     type="button"
-                    title="Delete"
+                    title={copy.card.delete}
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (confirm("Are you sure you want to delete this generated item?")) {
+                      if (confirm(copy.card.confirmDelete)) {
                         setHistory(prev => prev.filter((_, i) => i !== idx));
                       }
                     }}
@@ -406,14 +412,14 @@ export default function VibeMotionStudio({
                   actions={[
                     {
                       kind: "download",
-                      label: "Download",
+                      label: copy.mobileActions.download,
                       onSelect: () =>
                         downloadFile(entry.url, `motion-${entry.id || idx}.mp4`),
                     },
                     entry.requestId &&
                       entry.canEdit !== false && {
                         kind: "remix",
-                        label: "Remix",
+                        label: copy.mobileActions.remix,
                         onSelect: () => {
                           setEditMode(true);
                           setEditSourceId(entry.requestId);
@@ -423,10 +429,10 @@ export default function VibeMotionStudio({
                       },
                     {
                       kind: "delete",
-                      label: "Delete",
+                      label: copy.mobileActions.delete,
                       danger: true,
                       onSelect: () => {
-                        if (confirm("Are you sure you want to delete this generated item?")) {
+                        if (confirm(copy.card.confirmDelete)) {
                           setHistory((prev) => prev.filter((_, i) => i !== idx));
                         }
                       },
@@ -437,12 +443,12 @@ export default function VibeMotionStudio({
                 {/* ── Card footer: prompt + metadata ── */}
                 <div className="p-3 bg-black/80 backdrop-blur-sm border-t border-white/5 flex-1 flex flex-col justify-between gap-2">
                   <p className="text-white/70 text-xs line-clamp-3 leading-relaxed" title={entry.prompt}>
-                    {entry.prompt || "No prompt"}
+                    {entry.prompt || copy.card.noPrompt}
                   </p>
                   <div className="flex items-center justify-between mt-1 flex-wrap gap-1">
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] font-bold text-primary px-2 py-0.5 bg-primary/10 rounded border border-primary/20 whitespace-nowrap">
-                        Vibe Motion
+                        {copy.card.tag}
                       </span>
                       <div className="flex gap-2">
                         {entry.aspectRatio && (
@@ -494,13 +500,13 @@ export default function VibeMotionStudio({
             </div>
 
             <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-center px-4 flex flex-col items-center">
-              <span className="text-white font-black uppercase text-xl sm:text-3xl tracking-wide mb-1 opacity-90">START CREATING WITH</span>
+              <span className="text-white font-black uppercase text-xl sm:text-3xl tracking-wide mb-1 opacity-90">{copy.empty.titleLine1}</span>
               <span className="text-[#22d3ee] font-black uppercase text-2xl sm:text-4xl sm:mt-1 tracking-tight">
-                VIBE MOTION STUDIO
+                {copy.empty.titleLine2}
               </span>
             </h1>
             <p className="text-white/40 text-xs sm:text-sm font-medium tracking-wide text-center max-w-lg leading-relaxed px-4">
-              Generate animated motion graphics from a text prompt — kinetic typography, data charts, logo reveals, and more.
+              {copy.empty.description}
             </p>
           </div>
         ) : null}
@@ -518,7 +524,7 @@ export default function VibeMotionStudio({
                 onClick={() => { setEditMode(false); setEditSourceId(null); }}
                 selected={!editMode}
               >
-                Generate
+                {copy.modeToggle.generate}
               </PromptSegmentOption>
               <PromptSegmentOption
                 type="button"
@@ -527,7 +533,7 @@ export default function VibeMotionStudio({
                 selected={editMode}
                 className="disabled:opacity-30 disabled:cursor-not-allowed"
               >
-                Edit
+                {copy.modeToggle.edit}
               </PromptSegmentOption>
             </PromptSegmentedControl>
 
@@ -540,13 +546,13 @@ export default function VibeMotionStudio({
                 </svg>
                 <span className="truncate">
                   {sourceEntry
-                    ? `Editing: "${sourceEntry.prompt?.slice(0, 45)}${sourceEntry.prompt?.length > 45 ? "…" : ""}"`
-                    : "Select a source generation from the gallery"}
+                    ? `${copy.editBanner.editingPrefix} "${sourceEntry.prompt?.slice(0, 45)}${sourceEntry.prompt?.length > 45 ? "…" : ""}"`
+                    : copy.editBanner.selectSource}
                 </span>
                 <button
                   onClick={() => { setEditMode(false); setEditSourceId(null); setPrompt(""); }}
                   className="ml-auto text-[#22d3ee]/40 hover:text-[#22d3ee] transition-colors text-sm leading-none flex-shrink-0"
-                  title="Cancel Edit Mode"
+                  title={copy.editBanner.cancelEdit}
                 >
                   ×
                 </button>
@@ -563,8 +569,8 @@ export default function VibeMotionStudio({
                 onKeyDown={handleKeyDown}
                 placeholder={
                   editMode
-                    ? "Describe what to change — 'change background to dark navy, make bars gold, add particles…'"
-                    : "Describe the motion graphic — 'Animated sales dashboard with glowing bar charts and rising numbers'"
+                    ? copy.placeholder.edit
+                    : copy.placeholder.generate
                 }
               />
             </div>
@@ -597,7 +603,7 @@ export default function VibeMotionStudio({
                 </button>
                 {openDropdown === "ar" && (
                   <PromptPopover>
-                    <PromptPopoverHeader>Aspect Ratio</PromptPopoverHeader>
+                    <PromptPopoverHeader>{copy.controls.aspectRatio}</PromptPopoverHeader>
                     <PromptMenuList>
                       {ASPECT_RATIOS.map((ar) => (
                         <DropdownItem
@@ -628,7 +634,7 @@ export default function VibeMotionStudio({
                 </button>
                 {openDropdown === "dur" && (
                   <PromptPopover>
-                    <PromptPopoverHeader>Duration</PromptPopoverHeader>
+                    <PromptPopoverHeader>{copy.controls.duration}</PromptPopoverHeader>
                     <PromptMenuList>
                       {DURATION_OPTIONS.map((d) => (
                         <DropdownItem
@@ -658,13 +664,13 @@ export default function VibeMotionStudio({
                       </svg>
                     </div>
                     <span className={`${PROMPT_CONTROL_LABEL_CLASS} text-[#22d3ee]/70 max-w-[120px] truncate`}>
-                      {sourceEntry ? `Source: ${sourceEntry.prompt?.slice(0, 20)}…` : "Pick source…"}
+                      {sourceEntry ? `${copy.controls.sourcePrefix} ${sourceEntry.prompt?.slice(0, 20)}…` : copy.controls.pickSource}
                     </span>
                     <PromptChevronIcon />
                   </button>
                   {openDropdown === "source" && (
                     <PromptPopover className="w-64">
-                      <PromptPopoverHeader>Source Generation</PromptPopoverHeader>
+                      <PromptPopoverHeader>{copy.controls.sourceGeneration}</PromptPopoverHeader>
                       <div className="flex flex-col gap-1">
                         {editSources.map((src) => (
                           <div
@@ -688,7 +694,7 @@ export default function VibeMotionStudio({
                 </div>
               )}
 
-              <span className="text-[10px] text-white/20 hidden sm:block ml-2">Ctrl+Enter to run</span>
+              <span className="text-[10px] text-white/20 hidden sm:block ml-2">{copy.controls.shortcutHint}</span>
             </PromptControls>
 
             {/* ── Generate Button — matches VideoStudio exactly ── */}
@@ -699,12 +705,12 @@ export default function VibeMotionStudio({
               {generating ? (
                 <>
                   <span className="animate-spin inline-block text-black">◌</span>{" "}
-                  {editMode ? "Remixing..." : "Generating..."}
+                  {editMode ? copy.generateButton.remixing : copy.generateButton.generating}
                 </>
               ) : editMode ? (
-                <span>Remix</span>
+                <span>{copy.generateButton.remix}</span>
               ) : (
-                <span>Generate</span>
+                <span>{copy.generateButton.generate}</span>
               )}
             </PromptAction>
           </PromptFooter>

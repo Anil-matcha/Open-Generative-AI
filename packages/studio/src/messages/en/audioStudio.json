@@ -1,0 +1,53 @@
+{
+  "uploader": {
+    "clear": "Clear",
+    "uploadPrompt": "Upload audio track",
+    "uploadHint": "MP3, WAV, M4A up to 20MB",
+    "uploading": "Uploading...",
+    "ready": "Ready to generate",
+    "maxSuffix": "(Max {max})",
+    "trackLabel": "Track #{index}",
+    "sizeLimitError": "Audio file exceeds 20MB limit.",
+    "uploadFailedError": "Upload failed: {message}"
+  },
+  "player": {
+    "nowPlaying": "Now Playing",
+    "defaultTitle": "Generated Track",
+    "muteUnmute": "Mute/Unmute",
+    "pause": "Pause",
+    "play": "Play",
+    "download": "Download Audio",
+    "save": "Save"
+  },
+  "sidebar": {
+    "modelLabel": "Audio Model",
+    "selectModel": "Select Model",
+    "descriptionLabel": "Description",
+    "selectOption": "Select option",
+    "promptPlaceholder": "Enter what you want generated...",
+    "lyricsPromptLabel": "Lyrics / Prompt",
+    "fieldPlaceholder": "Enter {field}...",
+    "requiredFieldError": "Please complete the required field: {field}"
+  },
+  "generate": {
+    "generating": "Generating Audio...",
+    "cta": "Generate Track",
+    "noUrlError": "No audio URL returned by the API.",
+    "genericError": "Audio generation failed",
+    "droppedFileUploadError": "Failed to upload dropped file: {message}"
+  },
+  "result": {
+    "errorHeading": "Generation Error",
+    "loadingHeading": "Generating Soundtrack",
+    "loadingSubtext": "Rendering audio waveforms and vocals...",
+    "emptyHeading": "Audio Studio",
+    "emptyBody": "Choose an AI music model, voice cloner, or sound generator. Modify variables on the left and craft your next high-fidelity track.",
+    "newGeneration": "New Generation",
+    "success": "Success"
+  },
+  "history": {
+    "heading": "Generation History ({count})",
+    "untitled": "Untitled Audio",
+    "fallbackModel": "Audio"
+  }
+}

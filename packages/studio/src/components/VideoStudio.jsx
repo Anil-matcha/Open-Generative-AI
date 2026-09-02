@@ -76,6 +76,9 @@ import {
   promptControlClassName,
   promptMediaButtonClassName,
 } from "./prompt/PromptComposer.jsx";
+import en from "../messages/en/videoStudio.json";
+import zh from "../messages/zh/videoStudio.json";
+import { resolveCopy } from "../i18nUtils";
 
 async function downloadFile(url, filename) {
   try {
@@ -137,8 +140,9 @@ function ReferencePreview({
   onRemove,
   label = null,
   description = null,
+  copy = en,
 }) {
-  const mediaLabel = label || (type === "image" ? "image" : type === "video" ? "video" : "audio");
+  const mediaLabel = label || (type === "image" ? copy.media.image : type === "video" ? copy.media.video : copy.media.audio);
   const actionLabel = description || mediaLabel;
   return (
     <div className="flex min-w-[60px] flex-col items-center gap-1.5">
@@ -158,8 +162,8 @@ function ReferencePreview({
         )}
         <button
           type="button"
-          aria-label={`Remove ${actionLabel.toLowerCase()}`}
-          title={`Remove ${actionLabel.toLowerCase()}`}
+          aria-label={`${copy.media.removePrefix} ${actionLabel}`}
+          title={`${copy.media.removePrefix} ${actionLabel}`}
           onClick={() => onRemove(index)}
           className="absolute top-0.5 right-0.5 w-4 h-4 bg-black/60 hover:bg-black rounded-full flex items-center justify-center text-white/85 hover:text-white text-[8px] border border-white/5"
         >
@@ -184,6 +188,7 @@ function ReferenceUploadButton({
   label = null,
   required = false,
   disabled = false,
+  copy = en,
 }) {
   const localInputRef = useRef(null);
   const resolvedInputRef = inputRef || localInputRef;
@@ -323,7 +328,7 @@ function ReferenceUploadButton({
         aria-live="polite"
         aria-atomic="true"
       >
-        {uploading ? `${title}: ${announcedProgress}% uploaded` : ""}
+        {uploading ? copy.upload.uploadingProgress.replace('{title}', title).replace('{progress}', announcedProgress) : ""}
       </span>
       <ReferenceMediaLabel label={label} required={required} />
     </div>
@@ -415,22 +420,22 @@ function ModelDropdown({ selectedModel, onSelect, onClose }) {
   const modelCategories = [
     {
       id: "all",
-      label: "All",
+      label: copy.categories.all,
       entries: videoModelPickerEntries,
     },
     {
       id: "t2v",
-      label: "Text to Video",
+      label: copy.categories.t2v,
       entries: videoModelPickerEntries.filter((entry) => entry.variantsByMode.t2v),
     },
     {
       id: "i2v",
-      label: "Image to Video",
+      label: copy.categories.i2v,
       entries: videoModelPickerEntries.filter((entry) => entry.variantsByMode.i2v),
     },
     {
       id: "v2v",
-      label: "Video Tools",
+      label: copy.categories.v2v,
       entries: videoModelPickerEntries.filter((entry) => entry.variantsByMode.v2v),
     },
   ];
@@ -579,7 +584,7 @@ function ModelDropdown({ selectedModel, onSelect, onClose }) {
               ? "bg-white/10 text-yellow-400 border-yellow-500/30 shadow-md scale-105"
               : "bg-white/[0.02] text-white/50 border-white/[0.03] hover:bg-white/5 hover:text-white"
           }`}
-          title="All Providers"
+          title={copy.providers.allProviders}
         >
           <svg width="15" height="15" viewBox="0 0 24 24" fill={selectedProvider === "all" ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
@@ -653,7 +658,7 @@ function ModelDropdown({ selectedModel, onSelect, onClose }) {
             </svg>
             <input
               type="text"
-              placeholder="Search models..."
+              placeholder={copy.search.placeholder}
               value={search}
               onChange={(e) => {
                 const value = e.target.value;
@@ -706,7 +711,9 @@ export default function VideoStudio({
   onDeleteHistoryItem,
   droppedFiles,
   onFilesHandled,
+  locale = "en",
 }) {
+  const copy = resolveCopy(en, zh, locale);
   const LEGACY_PERSIST_KEY = "hg_video_studio_persistent";
   const PERSIST_KEY = scopedPersistKey(LEGACY_PERSIST_KEY, apiKey);
   useEffect(() => {
@@ -1236,13 +1243,13 @@ export default function VideoStudio({
       const validUrls = urls.filter(Boolean);
       if (validUrls.length === 0) return;
       if (selectionAtStart && !isSameSelection(selectionAtStart, selectionRef.current)) {
-        toast.error("The model changed during upload. Please add the file again.");
+        toast.error(copy.errors.modelChangedDuringUpload);
         return;
       }
       const resolvedTarget = target || resolveMediaTarget(mediaType);
       if (!resolvedTarget) {
         const family = videoModelCatalog.familyById.get(selectionRef.current.selectedFamilyId);
-        toast.error(`${family.name} does not support ${mediaType} references.`);
+        toast.error(copy.errors.modelDoesNotSupportReference.replace('{family}', family.name).replace('{mediaType}', mediaType));
         return;
       }
 
@@ -1292,7 +1299,7 @@ export default function VideoStudio({
         );
       });
       if (!slot || !workflowMediaDraftKey || !entry?.url) {
-        toast.error("The selected source does not accept images.");
+        toast.error(copy.errors.sourceDoesNotAcceptImages);
         return;
       }
       setWorkflowMediaDrafts((drafts) => {
@@ -1326,7 +1333,7 @@ export default function VideoStudio({
       const selectedFiles = Array.from(files);
       const tooLarge = selectedFiles.find((file) => file.size > maxBytes);
       if (tooLarge) {
-        alert(`${label} exceeds ${Math.round(maxBytes / 1024 / 1024)}MB limit.`);
+        alert(copy.errors.labelExceedsLimit.replace('{label}', label).replace('{limit}', Math.round(maxBytes / 1024 / 1024)));
         return [];
       }
       setUploading(true);
@@ -1345,7 +1352,7 @@ export default function VideoStudio({
         );
       } catch (err) {
         console.error(`[VideoStudio] ${label} upload failed:`, err);
-        alert(`${label} upload failed: ${err.message}`);
+        alert(copy.errors.labelUploadFailed.replace('{label}', label).replace('{message}', err.message));
         return [];
       } finally {
         setUploading(false);
@@ -1502,10 +1509,10 @@ export default function VideoStudio({
       if (remaining === 0) return;
 
       const options = mediaType === "image"
-        ? { label: "Image", maxBytes: 10 * 1024 * 1024, setUploading: setImageUploading, setProgress: setImageProgress }
+        ? { label: copy.media.image, maxBytes: 10 * 1024 * 1024, setUploading: setImageUploading, setProgress: setImageProgress }
         : mediaType === "video"
-          ? { label: "Video", maxBytes: 50 * 1024 * 1024, setUploading: setVideoUploading, setProgress: setVideoProgress }
-          : { label: "Audio", maxBytes: 50 * 1024 * 1024, setUploading: setAudioUploading, setProgress: setAudioProgress };
+          ? { label: copy.media.video, maxBytes: 50 * 1024 * 1024, setUploading: setVideoUploading, setProgress: setVideoProgress }
+          : { label: copy.media.audio, maxBytes: 50 * 1024 * 1024, setUploading: setAudioUploading, setProgress: setAudioProgress };
       const urls = await uploadFiles(Array.from(files).slice(0, remaining), options);
       applyReferenceUrls(mediaType, urls, target, selectionAtStart);
     },
@@ -1517,9 +1524,7 @@ export default function VideoStudio({
     if (droppedFiles && droppedFiles.length > 0) {
       if (selectedWorkflowId) {
         if (workflowUploadSlotRef.current) {
-          toast.error(
-            "Wait for the current upload to finish, then add these files again.",
-          );
+          toast.error(copy.errors.waitForCurrentUpload);
           onFilesHandled?.();
           return;
         }
@@ -1600,7 +1605,7 @@ export default function VideoStudio({
     const file = e.target.files[0];
     if (!file) return;
     if (file.size > 10 * 1024 * 1024) {
-      alert("Image exceeds 10MB limit.");
+      alert(copy.errors.imageExceeds10MB);
       return;
     }
     setEndImageUploading(true);
@@ -1762,7 +1767,7 @@ export default function VideoStudio({
       return;
     }
     if (currentModel?.promptRequired && !trimmedPrompt) {
-      alert("Please enter a prompt for this model.");
+      alert(copy.errors.noPromptForModel);
       return;
     }
 
@@ -1778,11 +1783,11 @@ export default function VideoStudio({
       }
     } else if (v2vMode) {
       if (!uploadedVideoUrl) {
-        alert("Please upload a video first.");
+        alert(copy.errors.uploadVideoFirst);
         return;
       }
       if (currentModel?.imageField && !currentModel?.imageOptional && !uploadedImageUrl) {
-        alert("Please upload a reference image for motion control.");
+        alert(copy.errors.uploadReferenceImageForMotion);
         return;
       }
     } else if (isExtendMode) {
@@ -1792,12 +1797,12 @@ export default function VideoStudio({
       }
     } else if (imageMode) {
       if (uploadedImageUrls.length === 0) {
-        alert("Please upload at least one reference image first.");
+        alert(copy.errors.uploadAtLeastOneReferenceImage);
         return;
       }
     } else {
       if (!trimmedPrompt) {
-        alert("Please enter a prompt to generate a video.");
+        alert(copy.errors.enterPromptToGenerate);
         return;
       }
     }
@@ -1828,7 +1833,7 @@ export default function VideoStudio({
           v2vParams.prompt = trimmedPrompt;
         }
         res = await processV2V(apiKey, v2vParams);
-        if (!res?.url) throw new Error("No video URL returned by API");
+        if (!res?.url) throw new Error(copy.errors.noVideoUrlReturned);
 
         const genId = res.id || Date.now().toString();
         const entry = {
@@ -1863,7 +1868,7 @@ export default function VideoStudio({
         if (showEffect && selectedEffect) i2vParams.name = selectedEffect;
 
         res = await generateI2V(apiKey, i2vParams);
-        if (!res?.url) throw new Error("No video URL returned by API");
+        if (!res?.url) throw new Error(copy.errors.noVideoUrlReturned);
 
         const genId = res.id || Date.now().toString();
         setGenerationSources((sources) =>
@@ -1909,7 +1914,7 @@ export default function VideoStudio({
         if (selectedQuality) params.quality = selectedQuality;
 
         res = await generateVideo(apiKey, params);
-        if (!res?.url) throw new Error("No video URL returned by API");
+        if (!res?.url) throw new Error(copy.errors.noVideoUrlReturned);
 
         const genId = res.id || Date.now().toString();
         setGenerationSources((sources) =>
@@ -1936,7 +1941,7 @@ export default function VideoStudio({
       }
     } catch (e) {
       console.error("[VideoStudio]", e);
-      const errMsg = formatErrorMessage(e, "Video generation failed");
+      const errMsg = formatErrorMessage(e, copy.errors.videoGenerationFailed);
       if (onGenerationError) onGenerationError(errMsg);
       else toast.error(errMsg);
     } finally {
@@ -2053,24 +2058,24 @@ export default function VideoStudio({
     : imageUploadCapability.separateLastItem;
 
   const promptPlaceholder = selectedWorkflowId === "edit_video"
-    ? "Describe how to edit the video"
+    ? copy.placeholders.editVideo
     : selectedWorkflowId === "extend_uploaded_video"
-      ? "Describe how to continue the video"
+      ? copy.placeholders.continueVideo
       : selectedWorkflowId === "motion_transfer"
-        ? "Describe the motion"
+        ? copy.placeholders.motion
         : v2vMode
           ? currentModelObj?.imageField
             ? currentModelObj?.promptRequired
-              ? "Describe the motion"
-              : "Describe the motion (optional)"
-            : "Video ready — click Generate to remove watermark"
+              ? copy.placeholders.motion
+              : copy.placeholders.motionOptional
+            : copy.placeholders.videoReadyRemoveWatermark
           : imageMode
             ? currentModelObj?.promptRequired
-              ? "Describe the motion or effect"
-              : "Describe the motion or effect (optional)"
+              ? copy.placeholders.motionOrEffect
+              : copy.placeholders.motionOrEffectOptional
             : isExtendMode
-              ? "Optional: describe how to continue the video..."
-              : "Describe the video you want to create";
+              ? copy.placeholders.optionalContinueVideo
+              : copy.placeholders.describeVideo;
 
   const focusWorkflowMenuItem = useCallback((target = "selected") => {
     const items = Array.from(
@@ -2211,7 +2216,7 @@ export default function VideoStudio({
                     />
                     <button
                       type="button"
-                      title="Download"
+                      title={copy.gallery.download}
                       onClick={(e) => {
                         e.stopPropagation();
                         downloadFile(entry.url, `video-${entry.id || idx}.mp4`);
@@ -2225,7 +2230,7 @@ export default function VideoStudio({
                     {isSeedance2 && (
                       <button
                         type="button"
-                        title="Extend this video using Seedance 2.0 Extend"
+                        title={copy.gallery.extendSeedance}
                         onClick={(e) => {
                           e.stopPropagation();
                           handleExtend(entry.id, entry.model);
@@ -2239,12 +2244,12 @@ export default function VideoStudio({
                     )}
                     <button
                       type="button"
-                      title="Delete"
+                      title={copy.gallery.delete}
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (confirm("Are you sure you want to delete this generated item?")) {
+                        if (confirm(copy.gallery.confirmDelete)) {
                           handleDeleteEntry(entry, idx).catch((err) => {
-                            onGenerationError?.(err.message || "Failed to delete item");
+                            onGenerationError?.(err.message || copy.errors.deleteItemFailed);
                           });
                         }
                       }}
@@ -2264,23 +2269,23 @@ export default function VideoStudio({
                     actions={[
                       {
                         kind: "download",
-                        label: "Download",
+                        label: copy.gallery.download,
                         onSelect: () =>
                           downloadFile(entry.url, `video-${entry.id || idx}.mp4`),
                       },
                       isSeedance2 && {
                         kind: "extend",
-                        label: "Extend",
+                        label: copy.gallery.extend,
                         onSelect: () => handleExtend(entry.id, entry.model),
                       },
                       {
                         kind: "delete",
-                        label: "Delete",
+                        label: copy.gallery.delete,
                         danger: true,
                         onSelect: () => {
-                          if (confirm("Are you sure you want to delete this generated item?")) {
+                          if (confirm(copy.gallery.confirmDelete)) {
                             handleDeleteEntry(entry, idx).catch((err) => {
-                              onGenerationError?.(err.message || "Failed to delete item");
+                              onGenerationError?.(err.message || copy.errors.deleteItemFailed);
                             });
                           }
                         },
@@ -2291,12 +2296,12 @@ export default function VideoStudio({
                   {/* Prompt & Details */}
                   <div className="p-3 bg-black/80 backdrop-blur-sm border-t border-white/5 flex-1 flex flex-col justify-between gap-2">
                     <p className="text-white/70 text-xs line-clamp-3 leading-relaxed" title={entry.prompt}>
-                      {entry.prompt || "No prompt provided"}
+                      {entry.prompt || copy.gallery.noPromptProvided}
                     </p>
                     <div className="flex items-center justify-between mt-1 flex-wrap gap-1">
                       <div className="flex items-center gap-2">
                         <span className="text-[10px] font-bold text-primary px-2 py-0.5 bg-primary/10 rounded border border-primary/20 whitespace-nowrap capitalize">
-                          {entry.model?.replace("-", " ") || "Video Studio"}
+                          {entry.model?.replace("-", " ") || copy.gallery.fallbackTitle}
                         </span>
                         <div className="flex gap-2">
                           {entry.resolution && (
@@ -2320,41 +2325,41 @@ export default function VideoStudio({
               <div className="w-18 h-22 sm:w-24 sm:h-28 rounded-2xl border border-white/10 shadow-2xl -rotate-[12deg] transform hover:rotate-0 hover:scale-110 hover:z-20 transition-all duration-300 overflow-hidden bg-white/[0.01] flex-shrink-0">
                 <img
                   src="https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/sdxl-image.avif"
-                  alt="Creative asset 1"
+                  alt={copy.creativeAssets.asset1}
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="w-18 h-22 sm:w-24 sm:h-28 rounded-2xl border border-white/10 shadow-2xl -rotate-[4deg] transform hover:rotate-0 hover:scale-110 hover:z-20 transition-all duration-300 overflow-hidden bg-white/[0.01] -ml-3 sm:-ml-4 flex-shrink-0">
                 <img
                   src="https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/chroma-image.avif"
-                  alt="Creative asset 2"
+                  alt={copy.creativeAssets.asset2}
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="w-18 h-18 sm:w-24 sm:h-24 rounded-full border border-white/10 shadow-2xl rotate-[6deg] transform hover:rotate-0 hover:scale-110 hover:z-20 transition-all duration-300 overflow-hidden bg-white/[0.01] -ml-3 sm:-ml-4 flex-shrink-0">
                 <img
                   src="https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/neta-lumina.avif"
-                  alt="Creative asset 3"
+                  alt={copy.creativeAssets.asset3}
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="w-18 h-22 sm:w-24 sm:h-28 rounded-2xl border border-white/10 shadow-2xl rotate-[12deg] transform hover:rotate-0 hover:scale-110 hover:z-20 transition-all duration-300 overflow-hidden bg-white/[0.01] -ml-3 sm:-ml-4 flex-shrink-0">
                 <img
                   src="https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/perfect-pony-xl.avif"
-                  alt="Creative asset 4"
+                  alt={copy.creativeAssets.asset4}
                   className="w-full h-full object-cover"
                 />
               </div>
             </div>
 
             <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-center px-4 flex flex-col items-center">
-              <span className="text-white font-black uppercase text-xl sm:text-3xl tracking-wide mb-1 opacity-90">START CREATING WITH</span>
+              <span className="text-white font-black uppercase text-xl sm:text-3xl tracking-wide mb-1 opacity-90">{copy.empty.heading}</span>
               <span className="text-[#22d3ee] font-black uppercase text-2xl sm:text-4xl sm:mt-1 tracking-tight">
                 {selectedFamily.name}
               </span>
             </h1>
             <p className="text-white/40 text-xs sm:text-sm font-medium tracking-wide text-center max-w-lg leading-relaxed px-4">
-              Animate images into stunning AI videos with motion effects
+              {copy.empty.subtitle}
             </p>
           </div>
         )}
@@ -2371,6 +2376,7 @@ export default function VideoStudio({
                     const values = activeWorkflowMediaDraft?.[slot.id] || [];
                     return values.map((url, index) => (
                       <ReferencePreview
+                        copy={copy}
                         key={`${slot.id}:${index}:${url}`}
                         type={slot.mediaType}
                         url={url}
@@ -2408,6 +2414,7 @@ export default function VideoStudio({
                         : audioProgress;
                     return (
                       <ReferenceUploadButton
+                  copy={copy}
                         key={slot.id}
                         accept={`${slot.mediaType}/*`}
                         multiple={remaining > 1}
@@ -2435,6 +2442,7 @@ export default function VideoStudio({
                 <>
               {uploadedImageUrls.map((url, index) => (
                 <ReferencePreview
+                        copy={copy}
                   key={url}
                   type="image"
                   url={url}
@@ -2442,24 +2450,26 @@ export default function VideoStudio({
                   onRemove={removeImageAtIndex}
                   label={
                     uploadedImageUrls.length > 1
-                      ? `Image · ${index + 1}`
-                      : "Image"
+                      ? `${copy.media.image} · ${index + 1}`
+                      : copy.media.image
                   }
                 />
               ))}
 
               {uploadedEndImageUrl && (
                 <ReferencePreview
+                        copy={copy}
                   type="image"
                   url={uploadedEndImageUrl}
                   index={0}
                   onRemove={clearEndImage}
-                  label="End frame"
+                  label={copy.media.endFrame}
                 />
               )}
 
               {uploadedVideoUrls.map((url, index) => (
                 <ReferencePreview
+                        copy={copy}
                   key={url}
                   type="video"
                   url={url}
@@ -2467,14 +2477,15 @@ export default function VideoStudio({
                   onRemove={removeVideoAtIndex}
                   label={
                     uploadedVideoUrls.length > 1
-                      ? `Video · ${index + 1}`
-                      : "Video"
+                      ? `${copy.media.video} · ${index + 1}`
+                      : copy.media.video
                   }
                 />
               ))}
 
               {uploadedAudioUrls.map((url, index) => (
                 <ReferencePreview
+                        copy={copy}
                   key={url}
                   type="audio"
                   url={url}
@@ -2482,8 +2493,8 @@ export default function VideoStudio({
                   onRemove={removeAudioAtIndex}
                   label={
                     uploadedAudioUrls.length > 1
-                      ? `Audio · ${index + 1}`
-                      : "Audio"
+                      ? `${copy.media.audio} · ${index + 1}`
+                      : copy.media.audio
                   }
                 />
               ))}
@@ -2491,6 +2502,7 @@ export default function VideoStudio({
               {/* Upload trigger buttons */}
               {canUploadImageReference && uploadedImageUrls.length < imageUploadLimit && (
                 <ReferenceUploadButton
+                  copy={copy}
                   inputRef={imageFileInputRef}
                   accept="image/*"
                   multiple={imageUploadLimit - uploadedImageUrls.length > 1}
@@ -2498,8 +2510,8 @@ export default function VideoStudio({
                   onClick={() => imageFileInputRef.current?.click()}
                   title={
                     selectedWorkflowId === "keyframes"
-                      ? "Upload start frame"
-                      : `Upload up to ${imageUploadLimit} reference images`
+                      ? copy.upload.uploadStartFrame
+                      : copy.upload.uploadUpToReferenceImages.replace('{count}', imageUploadLimit)
                   }
                   uploading={imageUploading}
                   progress={imageProgress}
@@ -2509,12 +2521,13 @@ export default function VideoStudio({
 
               {showEndImageUpload && !uploadedEndImageUrl && (
                 <ReferenceUploadButton
+                  copy={copy}
                   inputRef={endImageFileInputRef}
                   accept="image/*"
                   multiple={false}
                   onChange={handleEndImageFileChange}
                   onClick={() => endImageFileInputRef.current?.click()}
-                  title="Upload end frame"
+                  title={copy.upload.uploadEndFrame}
                   uploading={endImageUploading}
                   progress={endImageProgress}
                   type="image"
@@ -2523,6 +2536,7 @@ export default function VideoStudio({
 
               {videoUploadLimit > 0 && uploadedVideoUrls.length < videoUploadLimit && (
                 <ReferenceUploadButton
+                  copy={copy}
                   inputRef={videoFileInputRef}
                   accept="video/*"
                   multiple={videoUploadLimit - uploadedVideoUrls.length > 1}
@@ -2537,6 +2551,7 @@ export default function VideoStudio({
 
               {audioUploadLimit > 0 && uploadedAudioUrls.length < audioUploadLimit && (
                 <ReferenceUploadButton
+                  copy={copy}
                   inputRef={audioFileInputRef}
                   accept="audio/*"
                   multiple={audioUploadLimit - uploadedAudioUrls.length > 1}
@@ -2577,7 +2592,7 @@ export default function VideoStudio({
               >
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
-              <span>Continuing the previous {selectedFamily.name} generation</span>
+              <span>{copy.extend.continuingGeneration.replace('{family}', selectedFamily.name)}</span>
             </div>
           )}
 
@@ -2617,7 +2632,7 @@ export default function VideoStudio({
                     onClick={(e) => e.stopPropagation()}
                     className="w-[calc(100vw-2rem)] md:w-[480px] max-w-md md:max-w-none max-h-[70vh]"
                   >
-                    <PromptPopoverHeader>Model</PromptPopoverHeader>
+                    <PromptPopoverHeader>{copy.dropdowns.model}</PromptPopoverHeader>
                     <ModelDropdown
                       selectedModel={selectedModel}
                       onSelect={handleModelSelect}
@@ -2688,7 +2703,7 @@ export default function VideoStudio({
                       style={{ maxHeight: "55vh" }}
                       onClick={(event) => event.stopPropagation()}
                     >
-                      <PromptPopoverHeader>Source</PromptPopoverHeader>
+                      <PromptPopoverHeader>{copy.dropdowns.source}</PromptPopoverHeader>
                       <div
                         ref={workflowMenuRef}
                         id={workflowMenuId}
@@ -2737,7 +2752,7 @@ export default function VideoStudio({
                                 <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
                                 <path d="M3 3v5h5" />
                               </svg>
-                              <span>Base generation</span>
+                              <span>{copy.dropdowns.baseGeneration}</span>
                             </button>
                           </div>
                         )}
@@ -2777,7 +2792,7 @@ export default function VideoStudio({
                       onClick={(e) => e.stopPropagation()}
                     >
                       <PromptPopoverHeader>
-                        Aspect Ratio
+                        {copy.dropdowns.aspectRatio}
                       </PromptPopoverHeader>
                       <PromptMenuList>
                         {getCurrentAspectRatios(selectedModel).map((r) => (
@@ -2821,7 +2836,7 @@ export default function VideoStudio({
                       <path d="M5 3l14 9-14 9V3z" />
                     </svg>
                     <span className={`${PROMPT_CONTROL_LABEL_CLASS} max-w-[140px] truncate`}>
-                      {selectedEffect || "Effect"}
+                      {selectedEffect || copy.dropdowns.effect}
                     </span>
                   </button>
                   {openDropdown === "effect" && (
@@ -2830,7 +2845,7 @@ export default function VideoStudio({
                       className="min-w-[200px]"
                     >
                       <PromptPopoverHeader>
-                        Effect Type
+                        {copy.dropdowns.effectType}
                       </PromptPopoverHeader>
                       <PromptMenuList>
                         {getEffectsForI2VModel(selectedModel).map((eff) => (
@@ -2872,7 +2887,7 @@ export default function VideoStudio({
                       onClick={(e) => e.stopPropagation()}
                     >
                       <PromptPopoverHeader>
-                        Duration
+                        {copy.dropdowns.duration}
                       </PromptPopoverHeader>
                       <PromptMenuList>
                         {getCurrentDurations(selectedModel).map((d) => (
@@ -2914,7 +2929,7 @@ export default function VideoStudio({
                       onClick={(e) => e.stopPropagation()}
                     >
                       <PromptPopoverHeader>
-                        Resolution
+                        {copy.dropdowns.resolution}
                       </PromptPopoverHeader>
                       <PromptMenuList>
                         {getCurrentResolutions(selectedModel).map((r) => (
@@ -2954,7 +2969,7 @@ export default function VideoStudio({
                     <path d="M12 20h9" />
                     <path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
                   </svg>
-                  <span className={PROMPT_CONTROL_LABEL_CLASS}>Draw</span>
+                  <span className={PROMPT_CONTROL_LABEL_CLASS}>{copy.controls.draw}</span>
                 </button>
               )}
             </PromptControls>
@@ -2969,11 +2984,11 @@ export default function VideoStudio({
                   <span className="animate-spin inline-block text-black">
                     ◌
                   </span>{" "}
-                  Generating...
+                  {copy.controls.generating}
                 </>
               ) : (
                 <>
-                  <span>Generate</span>
+                  <span>{copy.controls.generate}</span>
                 </>
               )}
             </PromptAction>

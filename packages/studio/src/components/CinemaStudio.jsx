@@ -21,6 +21,9 @@ import {
   promptControlClassName,
   promptMediaButtonClassName,
 } from "./prompt/PromptComposer.jsx";
+import en from "../messages/en/cinemaStudio.json";
+import zh from "../messages/zh/cinemaStudio.json";
+import { resolveCopy } from "../i18nUtils";
 
 // ─── Constants (inlined from promptUtils) ───────────────────────────────────
 
@@ -397,6 +400,7 @@ function CameraControlsOverlay({
   onClose,
   settings,
   onSettingsChange,
+  copy,
 }) {
   const backdropRef = useRef(null);
 
@@ -451,27 +455,26 @@ function CameraControlsOverlay({
                 <path d="M14.5 4H9.5L8 6H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-3Z" />
                 <circle cx="12" cy="12.5" r="3.5" />
               </svg>
-              Cinema Studio
+              {copy.cameraOverlay.eyebrow}
             </div>
             <h2
               id="camera-config-title"
               className="text-xl font-semibold tracking-tight text-white md:text-2xl"
             >
-              Camera settings
+              {copy.cameraOverlay.title}
             </h2>
             <p
               id="camera-config-description"
               className="mt-1.5 max-w-2xl text-xs leading-relaxed text-white/45 md:text-sm"
             >
-              Build a consistent cinematic look by choosing the camera, lens,
-              focal length, and depth of field.
+              {copy.cameraOverlay.description}
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close camera settings"
-            title="Close"
+            aria-label={copy.cameraOverlay.closeAria}
+            title={copy.cameraOverlay.close}
             className="ml-4 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/[0.06] bg-white/[0.03] text-white/40 transition-all hover:border-white/15 hover:bg-white/[0.07] hover:text-white"
           >
             <svg
@@ -490,28 +493,28 @@ function CameraControlsOverlay({
         <div className="overflow-x-auto px-5 py-6 no-scrollbar md:px-7 md:py-7">
           <div className="mx-auto flex w-max min-w-full justify-start gap-3 sm:justify-center md:gap-5">
             <ScrollColumn
-              title="Camera"
+              title={copy.cameraOverlay.columns.camera}
               items={CAMERAS}
               columnKey="camera"
               value={settings.camera}
               onChange={updateSetting("camera")}
             />
             <ScrollColumn
-              title="Lens"
+              title={copy.cameraOverlay.columns.lens}
               items={LENSES}
               columnKey="lens"
               value={settings.lens}
               onChange={updateSetting("lens")}
             />
             <ScrollColumn
-              title="Focal length"
+              title={copy.cameraOverlay.columns.focalLength}
               items={FOCAL_LENGTHS}
               columnKey="focal"
               value={settings.focal}
               onChange={updateSetting("focal")}
             />
             <ScrollColumn
-              title="Aperture"
+              title={copy.cameraOverlay.columns.aperture}
               items={APERTURES}
               columnKey="aperture"
               value={settings.aperture}
@@ -533,7 +536,9 @@ export default function CinemaStudio({
   onGenerationComplete,
   onGenerationError,
   historyItems,
+  locale = "en",
 }) {
+  const copy = resolveCopy(en, zh, locale);
   const LEGACY_PERSIST_KEY = "hg_cinema_studio_persistent";
   const PERSIST_KEY = scopedPersistKey(LEGACY_PERSIST_KEY, apiKey);
   useEffect(() => {
@@ -870,7 +875,7 @@ export default function CinemaStudio({
               >
                 <img
                   src={entry.url}
-                  alt={`History item ${idx + 1}`}
+                  alt={copy.card.historyItemAlt.replace("{index}", idx + 1)}
                   className="w-full aspect-[4/3] object-cover bg-black/40"
                 />
                 
@@ -878,8 +883,8 @@ export default function CinemaStudio({
                 <div className="absolute top-2 right-2 hidden md:flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     type="button"
-                    title={copiedPromptIndex === idx ? "Prompt copied" : "Copy prompt"}
-                    aria-label={copiedPromptIndex === idx ? "Prompt copied" : "Copy prompt"}
+                    title={copiedPromptIndex === idx ? copy.actions.promptCopied : copy.actions.copyPrompt}
+                    aria-label={copiedPromptIndex === idx ? copy.actions.promptCopied : copy.actions.copyPrompt}
                     onClick={(event) => {
                       event.stopPropagation();
                       handleCopyPrompt(entry.settings?.prompt, idx);
@@ -898,8 +903,8 @@ export default function CinemaStudio({
                   </button>
                   <button
                     type="button"
-                    title={copiedImageIndex === idx ? "Image copied" : "Copy image"}
-                    aria-label={copiedImageIndex === idx ? "Image copied" : "Copy image"}
+                    title={copiedImageIndex === idx ? copy.actions.imageCopied : copy.actions.copyImage}
+                    aria-label={copiedImageIndex === idx ? copy.actions.imageCopied : copy.actions.copyImage}
                     onClick={(event) => {
                       event.stopPropagation();
                       handleCopyImage(entry.url, idx);
@@ -918,7 +923,7 @@ export default function CinemaStudio({
                   </button>
                   <button
                     type="button"
-                    title="Download"
+                    title={copy.actions.download}
                     onClick={async (e) => {
                       e.stopPropagation();
                       try {
@@ -944,10 +949,10 @@ export default function CinemaStudio({
                   </button>
                   <button
                     type="button"
-                    title="Delete"
+                    title={copy.actions.delete}
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (confirm("Are you sure you want to delete this generated item?")) {
+                      if (confirm(copy.actions.deleteConfirm)) {
                         setInternalHistory(prev => prev.filter((_, i) => i !== idx));
                       }
                     }}
@@ -965,18 +970,18 @@ export default function CinemaStudio({
                   actions={[
                     {
                       kind: "text",
-                      label: "Copy prompt",
+                      label: copy.actions.copyPrompt,
                       onSelect: () =>
                         handleCopyPrompt(entry.settings?.prompt, idx),
                     },
                     {
                       kind: "image",
-                      label: "Copy image",
+                      label: copy.actions.copyImage,
                       onSelect: () => handleCopyImage(entry.url, idx),
                     },
                     {
                       kind: "download",
-                      label: "Download",
+                      label: copy.actions.download,
                       onSelect: async () => {
                         try {
                           const response = await fetch(entry.url);
@@ -996,10 +1001,10 @@ export default function CinemaStudio({
                     },
                     {
                       kind: "delete",
-                      label: "Delete",
+                      label: copy.actions.delete,
                       danger: true,
                       onSelect: () => {
-                        if (confirm("Are you sure you want to delete this generated item?")) {
+                        if (confirm(copy.actions.deleteConfirm)) {
                           setInternalHistory((prev) => prev.filter((_, i) => i !== idx));
                         }
                       },
@@ -1011,21 +1016,21 @@ export default function CinemaStudio({
                 <div className="p-3 bg-black/80 backdrop-blur-sm border-t border-white/5 flex-1 flex flex-col justify-between gap-2">
                   <p
                     className="w-full text-left text-xs line-clamp-3 leading-relaxed text-white/70"
-                    title={entry.settings?.prompt || "No prompt"}
+                    title={entry.settings?.prompt || copy.card.noPrompt}
                   >
-                    {entry.settings?.prompt || "No prompt"}
+                    {entry.settings?.prompt || copy.card.noPrompt}
                   </p>
                   <span className="sr-only" aria-live="polite">
                     {copiedPromptIndex === idx
-                      ? "Prompt copied"
+                      ? copy.actions.promptCopied
                       : copiedImageIndex === idx
-                        ? "Image copied"
+                        ? copy.actions.imageCopied
                         : ""}
                   </span>
                   <div className="flex items-center mt-1 flex-wrap gap-1">
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] font-bold text-[#22d3ee] px-2 py-0.5 bg-[#22d3ee]/10 rounded border border-[#22d3ee]/20">
-                        Cinema Studio
+                        {copy.card.badge}
                       </span>
                       {entry.settings?.camera && (
                         <span className="text-[10px] text-white/40">{entry.settings.camera}</span>
@@ -1071,13 +1076,13 @@ export default function CinemaStudio({
             </div>
 
             <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-center px-4 flex flex-col items-center">
-              <span className="text-white font-black uppercase text-xl sm:text-3xl tracking-wide mb-1 opacity-90">START CREATING WITH</span>
+              <span className="text-white font-black uppercase text-xl sm:text-3xl tracking-wide mb-1 opacity-90">{copy.empty.kicker}</span>
               <span className="text-[#22d3ee] font-black uppercase text-2xl sm:text-4xl sm:mt-1 tracking-tight">
-                CINEMA STUDIO
+                {copy.empty.title}
               </span>
             </h1>
             <p className="text-white/40 text-xs sm:text-sm font-medium tracking-wide text-center max-w-lg leading-relaxed px-4">
-              What would you shoot with infinite budget? Control cameras, lighting, lenses, and prompt high-end cinematic scenes.
+              {copy.empty.description}
             </p>
           </div>
         )}
@@ -1149,7 +1154,7 @@ export default function CinemaStudio({
                   <div className="relative w-full h-full group">
                     <img
                       src={uploadedImage}
-                      alt="Reference"
+                      alt={copy.referenceImage.alt}
                       className="w-full h-full object-cover opacity-80 group-hover:opacity-40 transition-opacity"
                     />
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -1174,7 +1179,7 @@ export default function CinemaStudio({
               onChange={(e) =>
                 setSettings((prev) => ({ ...prev, prompt: e.target.value }))
               }
-              placeholder="Describe your cinema scene..."
+              placeholder={copy.prompt.placeholder}
             />
           </div>
 
@@ -1198,7 +1203,7 @@ export default function CinemaStudio({
                 </button>
                 {openDropdown === "ar" && (
                   <Dropdown
-                    title="Aspect Ratio"
+                    title={copy.dropdowns.aspectRatio}
                     items={ASPECT_RATIOS}
                     selected={settings.aspect_ratio}
                     onSelect={(val) =>
@@ -1227,7 +1232,7 @@ export default function CinemaStudio({
                 </button>
                 {openDropdown === "res" && (
                   <Dropdown
-                    title="Resolution"
+                    title={copy.dropdowns.resolution}
                     items={RESOLUTIONS}
                     selected={resolution}
                     onSelect={setResolution}
@@ -1259,11 +1264,11 @@ export default function CinemaStudio({
               {isGenerating ? (
                 <>
                   <span className="animate-spin inline-block text-black">◌</span>
-                  <span>Generating...</span>
+                  <span>{copy.prompt.generating}</span>
                 </>
               ) : (
                 <>
-                  <span>Shoot ✦ 10</span>
+                  <span>{copy.prompt.generate} ✦ 10</span>
                 </>
               )}
             </PromptAction>
@@ -1287,9 +1292,9 @@ export default function CinemaStudio({
               <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
           </button>
-          <img 
-            src={fullscreenUrl} 
-            alt="Fullscreen Preview" 
+          <img
+            src={fullscreenUrl}
+            alt={copy.fullscreen.alt}
             className="max-w-[95vw] max-h-[95vh] rounded-2xl shadow-2xl object-contain animate-scale-up" 
             onClick={(e) => e.stopPropagation()}
           />
@@ -1301,6 +1306,7 @@ export default function CinemaStudio({
         onClose={() => setIsOverlayOpen(false)}
         settings={settings}
         onSettingsChange={setSettings}
+        copy={copy}
       />
     </div>
   );

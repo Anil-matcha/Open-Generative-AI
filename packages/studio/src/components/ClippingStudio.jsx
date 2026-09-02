@@ -25,12 +25,13 @@ import {
   promptControlClassName,
   promptMediaButtonClassName,
 } from "./prompt/PromptComposer.jsx";
+import en from "../messages/en/clippingStudio.json";
+import zh from "../messages/zh/clippingStudio.json";
+import { resolveCopy } from "../i18nUtils";
 
 const MAX_VIDEO_SIZE_MB = 100;
 const MAX_VIDEO_SIZE_BYTES = MAX_VIDEO_SIZE_MB * 1024 * 1024;
 const CLIPPING_TOASTER_ID = "clipping-studio";
-const VIDEO_TOO_LARGE_FOR_MODE_MESSAGE =
-  "The file is too large for this mode. Compress or trim the video, then upload a smaller file.";
 const MAX_VISIBLE_ERROR_TOASTS = 3;
 const ERROR_TOAST_DURATION_MS = 7000;
 const activeErrorToastIds = [];
@@ -92,7 +93,7 @@ const CopyIcon = () => (
   </svg>
 );
 
-const ErrorToast = ({ toastInstance, message }) => (
+const ErrorToast = ({ toastInstance, message, dismissLabel = "Dismiss notification" }) => (
   <div
     className={`pointer-events-auto flex w-[340px] max-w-[calc(100vw-32px)] items-start gap-3 rounded-xl border border-red-400/40 bg-white px-3.5 py-3 text-[13px] text-zinc-900 shadow-[0_10px_30px_rgba(0,0,0,0.15)] transition-all duration-200 ${
       toastInstance.visible ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
@@ -121,7 +122,7 @@ const ErrorToast = ({ toastInstance, message }) => (
       type="button"
       onClick={() => dismissErrorToast(toastInstance.id)}
       className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-700 focus:outline-none focus:ring-1 focus:ring-zinc-300"
-      aria-label="Dismiss notification"
+      aria-label={dismissLabel}
     >
       <svg
         width="14"
@@ -139,7 +140,7 @@ const ErrorToast = ({ toastInstance, message }) => (
   </div>
 );
 
-const showErrorToast = (message) => {
+const showErrorToast = (message, copy = en) => {
   const options = {
     duration: ERROR_TOAST_DURATION_MS,
     position: "bottom-right",
@@ -156,6 +157,7 @@ const showErrorToast = (message) => {
       <ErrorToast
         toastInstance={toastInstance}
         message={message}
+        dismissLabel={copy.errors.dismissNotification}
       />
     ),
     options,
@@ -168,8 +170,8 @@ const showErrorToast = (message) => {
   );
 };
 
-const showVideoSizeLimitToast = () => {
-  showErrorToast(`Video exceeds ${MAX_VIDEO_SIZE_MB}MB limit.`);
+const showVideoSizeLimitToast = (copy = en) => {
+  showErrorToast(copy.errors.videoExceedsLimit.replace("{mb}", MAX_VIDEO_SIZE_MB), copy);
 };
 
 const isFileSizeError = (error) => {
@@ -177,17 +179,17 @@ const isFileSizeError = (error) => {
   return /(?:\b413\b|payload too large|request entity too large|file(?: size)? (?:is )?too large|file is too heavy|exceeds?.*(?:size|limit)|слишком (?:больш|тяж)|превышает.*(?:размер|лимит))/i.test(message);
 };
 
-const showVideoUploadError = (error) => {
+const showVideoUploadError = (error, copy = en) => {
   if (isFileSizeError(error)) {
-    showErrorToast(VIDEO_TOO_LARGE_FOR_MODE_MESSAGE);
+    showErrorToast(copy.errors.videoTooLarge, copy);
     return;
   }
 
   const message = formatErrorMessage(
     error,
-    "Video upload failed. Please try again.",
+    copy.errors.uploadFailed,
   );
-  showErrorToast(message);
+  showErrorToast(message, copy);
 };
 
 const getAspectClass = (ar) => {
@@ -214,7 +216,9 @@ export default function ClippingStudio({
   onGenerationError,
   droppedFiles,
   onFilesHandled,
+  locale = "en",
 }) {
+  const copy = resolveCopy(en, zh, locale);
   const LEGACY_PERSIST_KEY = "hg_clipping_studio_persistent";
   const PERSIST_KEY = scopedPersistKey(LEGACY_PERSIST_KEY, apiKey);
   useEffect(() => {
@@ -257,12 +261,12 @@ export default function ClippingStudio({
   const [history, setHistory] = useState([]);
 
   const ASPECT_RATIOS = [
-    { label: "9:16 (TikTok / Reels / Shorts)", value: "9:16" },
-    { label: "16:9 (YouTube / TV)", value: "16:9" },
-    { label: "1:1 (Instagram Square)", value: "1:1" },
-    { label: "4:5 (Instagram Portrait)", value: "4:5" },
-    { label: "4:3 (Classic Video)", value: "4:3" },
-    { label: "3:4 (Portrait)", value: "3:4" },
+    { label: copy.aspectRatioLabels["9:16"], value: "9:16" },
+    { label: copy.aspectRatioLabels["16:9"], value: "16:9" },
+    { label: copy.aspectRatioLabels["1:1"], value: "1:1" },
+    { label: copy.aspectRatioLabels["4:5"], value: "4:5" },
+    { label: copy.aspectRatioLabels["4:3"], value: "4:3" },
+    { label: copy.aspectRatioLabels["3:4"], value: "3:4" },
   ];
 
   // Close dropdown when clicking outside
@@ -341,7 +345,7 @@ export default function ClippingStudio({
       if (videoFiles.length > 0) {
         const file = videoFiles[0];
         if (file.size > MAX_VIDEO_SIZE_BYTES) {
-          showVideoSizeLimitToast();
+          showVideoSizeLimitToast(copy);
           onFilesHandled?.();
           return;
         }
@@ -356,7 +360,7 @@ export default function ClippingStudio({
           })
           .catch(err => {
             setVideoUploading(false);
-            showVideoUploadError(err);
+            showVideoUploadError(err, copy);
           });
       }
       onFilesHandled?.();
@@ -383,7 +387,7 @@ export default function ClippingStudio({
   // ── Copy Link & Download Helpers ─────────────────────────────────────────
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
-    alert("URL copied to clipboard!");
+    alert(copy.alerts.urlCopied);
   };
 
   const downloadVideo = async (url, title = "clipped_video") => {
@@ -418,7 +422,7 @@ export default function ClippingStudio({
     const file = files && files[0];
     if (!file) return;
     if (file.size > MAX_VIDEO_SIZE_BYTES) {
-      showVideoSizeLimitToast();
+      showVideoSizeLimitToast(copy);
       if (videoFileInputRef.current) videoFileInputRef.current.value = "";
       return;
     }
@@ -431,7 +435,7 @@ export default function ClippingStudio({
       setVideoUrl(url);
     } catch (err) {
       console.error("[ClippingStudio] Video upload failed:", err);
-      showVideoUploadError(err);
+      showVideoUploadError(err, copy);
     } finally {
       setVideoUploading(false);
       setVideoProgress(0);
@@ -488,7 +492,7 @@ export default function ClippingStudio({
   // ── Dispatch Run / Call submitAndPoll ────────────────────────────────────
   const handleGenerate = async () => {
     if (!videoUrl) {
-      alert("Please upload a video or paste a video URL first.");
+      alert(copy.alerts.needVideo);
       return;
     }
 
@@ -548,12 +552,12 @@ export default function ClippingStudio({
       }
     } catch (err) {
       console.error("[ClippingStudio] Error generating clips:", err);
-      const errMsg = formatErrorMessage(err, "Failed to process AI clipping.");
+      const errMsg = formatErrorMessage(err, copy.errors.generationFailed);
       const notificationMessage = isFileSizeError(err)
-        ? VIDEO_TOO_LARGE_FOR_MODE_MESSAGE
+        ? copy.errors.videoTooLarge
         : errMsg;
       if (onGenerationError) onGenerationError(notificationMessage);
-      else showErrorToast(notificationMessage);
+      else showErrorToast(notificationMessage, copy);
     } finally {
       setIsGenerating(false);
       onGenerationEnd?.();
@@ -618,13 +622,13 @@ export default function ClippingStudio({
             </div>
 
             <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-center px-4 flex flex-col items-center">
-              <span className="text-white font-black uppercase text-xl sm:text-3xl tracking-wide mb-1 opacity-90">START CREATING WITH</span>
+              <span className="text-white font-black uppercase text-xl sm:text-3xl tracking-wide mb-1 opacity-90">{copy.headings.startCreatingWith}</span>
               <span className="text-[#22d3ee] font-black uppercase text-2xl sm:text-4xl sm:mt-1 tracking-tight">
-                AI CLIPPING STUDIO
+                {copy.headings.aiClippingStudio}
               </span>
             </h1>
             <p className="text-white/40 text-xs sm:text-sm font-medium tracking-wide text-center max-w-lg leading-relaxed px-4">
-              Extract viral highlights and precise timings from your videos automatically.
+              {copy.headings.emptyStateSubtitle}
             </p>
           </div>
         )}
@@ -635,10 +639,10 @@ export default function ClippingStudio({
             <div className="flex items-center justify-between border-b border-white/5 pb-4">
               <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
                 <ScissorsIcon className="text-primary w-4 h-4" />
-                Clipping History Runs
+                {copy.headings.clippingHistoryRuns}
               </h2>
               <span className="text-xs font-bold text-zinc-400 bg-white/5 border border-white/5 px-2.5 py-1 rounded">
-                {history.length} Saved Generations
+                {copy.headings.savedGenerations.replace('{count}', history.length)}
               </span>
             </div>
 
@@ -668,7 +672,7 @@ export default function ClippingStudio({
                     <div className="absolute top-2 right-2 z-10 hidden md:flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         type="button"
-                        title="Delete from history"
+                        title={copy.buttons.deleteFromHistory}
                         onClick={(e) => {
                           e.stopPropagation();
                           setHistory((prev) => prev.filter((h) => h.id !== entry.id));
@@ -682,7 +686,7 @@ export default function ClippingStudio({
                       actions={[
                         {
                           kind: "delete",
-                          label: "Delete",
+                          label: copy.buttons.delete,
                           danger: true,
                           onSelect: () =>
                             setHistory((prev) =>
@@ -695,10 +699,10 @@ export default function ClippingStudio({
                   <div className="p-3 bg-black/80 backdrop-blur-sm border-t border-white/5 flex-1 flex flex-col justify-between gap-2">
                     <div className="flex flex-col gap-1">
                       <h4 className="text-xs font-bold text-white truncate" title={entry.videoUrl.split('/').pop()}>
-                        {entry.videoUrl.split('/').pop() || "source_video.mp4"}
+                        {entry.videoUrl.split('/').pop() || copy.sourceVideoFallback}
                       </h4>
                       <p className="text-[9px] text-zinc-500 font-semibold uppercase tracking-wider">
-                        {entry.returnCoordinatesOnly ? "Timeline Seek Mode" : "Clips Gallery Mode"}
+                        {entry.returnCoordinatesOnly ? copy.modes.timelineSeek : copy.modes.clipsGallery}
                       </p>
                     </div>
                     <div className="flex items-center justify-between mt-1">
@@ -706,7 +710,7 @@ export default function ClippingStudio({
                         {entry.aspectRatio}
                       </span>
                       <span className="text-[10px] text-white/40">
-                        {entry.returnCoordinatesOnly ? `${entry.coordinates?.length || 0} Highlights` : `${entry.clips?.length || 0} Clips`}
+                        {entry.returnCoordinatesOnly ? copy.labels.highlights.replace('{count}', entry.coordinates?.length || 0) : copy.labels.clips.replace('{count}', entry.clips?.length || 0)}
                       </span>
                     </div>
                   </div>
@@ -730,11 +734,11 @@ export default function ClippingStudio({
                   <line x1="19" y1="12" x2="5" y2="12" />
                   <polyline points="12 19 5 12 12 5" />
                 </svg>
-                Back to History
+                {copy.headings.backToHistory}
               </button>
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-bold text-primary bg-primary/10 border border-primary/20 px-2.5 py-0.5 rounded">
-                  {result.returnCoordinatesOnly ? "Timeline Seek Mode" : "Clips Gallery Mode"}
+                  {result.returnCoordinatesOnly ? copy.modes.timelineSeek : copy.modes.clipsGallery}
                 </span>
                 <span className="text-[10px] text-zinc-400 bg-white/5 border border-white/5 px-2.5 py-0.5 rounded">
                   {result.aspectRatio}
@@ -748,7 +752,7 @@ export default function ClippingStudio({
                 {/* Left Side: Original Player */}
                 <div className="flex-1 bg-black border border-zinc-900 rounded-lg overflow-hidden flex flex-col shadow-2xl relative min-h-[300px] lg:min-h-0">
                   <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-md border border-white/5 z-10 text-[10px] uppercase font-bold tracking-wider text-primary">
-                    Original Video Player
+                    {copy.headings.originalVideoPlayer}
                   </div>
                   <video
                     ref={mainVideoRef}
@@ -763,10 +767,10 @@ export default function ClippingStudio({
                 <div className="w-full lg:w-[350px] border border-zinc-900 bg-zinc-950/40 backdrop-blur-md rounded-lg p-5 flex flex-col min-h-[350px] lg:min-h-0">
                   <div className="pb-4 border-b border-zinc-900 flex items-center justify-between">
                     <h3 className="text-xs font-black text-white uppercase tracking-widest">
-                      Highlights Timeline
+                      {copy.headings.highlightsTimeline}
                     </h3>
                     <span className="text-[10px] font-bold text-zinc-400 bg-zinc-900 px-2 py-0.5 rounded border border-zinc-800">
-                      {result.coordinates?.length || 0} Matches
+                      {copy.headings.matches.replace('{count}', result.coordinates?.length || 0)}
                     </span>
                   </div>
 
@@ -793,11 +797,11 @@ export default function ClippingStudio({
                           >
                             <div className="flex items-center justify-between w-full">
                               <span className={`text-xs font-bold transition-colors ${isActive ? "text-primary" : "text-white"}`}>
-                                {hl.label || `Highlight #${i + 1}`}
+                                {hl.label || copy.labels.highlightFallback.replace('{index}', i + 1)}
                               </span>
                               {hl.score && (
                                 <span className="text-[9px] font-black text-emerald-400 bg-emerald-400/10 px-1.5 py-0.5 rounded border border-emerald-400/20">
-                                  {(hl.score * 100).toFixed(0)}% Score
+                                  {(hl.score * 100).toFixed(0)}{copy.labels.scoreSuffix}
                                 </span>
                               )}
                             </div>
@@ -805,18 +809,18 @@ export default function ClippingStudio({
                               <ClockIcon />
                               <span>{formatSeconds(start)} - {formatSeconds(end)}</span>
                               <span className="text-zinc-650">•</span>
-                              <span className="text-primary/80 font-bold">{(end - start).toFixed(0)}s duration</span>
+                              <span className="text-primary/80 font-bold">{(end - start).toFixed(0)}{copy.labels.durationSuffix}</span>
                             </div>
                             
                             <div className="flex items-center gap-1.5 text-[10px] font-bold text-primary mt-1 opacity-0 group-hover/hl:opacity-100 transition-opacity">
-                              <PlayIcon /> Seek & Play
+                              <PlayIcon /> {copy.labels.seekAndPlay}
                             </div>
                           </button>
                         );
                       })
                     ) : (
                       <div className="text-center py-8 text-xs text-zinc-500 font-semibold">
-                        No highlights extracted.
+                        {copy.empty.noHighlights}
                       </div>
                     )}
                   </div>
@@ -827,10 +831,10 @@ export default function ClippingStudio({
               <div className="space-y-5">
                 <div className="flex items-center justify-between border-b border-zinc-900 pb-3.5">
                   <h3 className="text-xs font-black text-white uppercase tracking-widest">
-                    Extracted Video Clips
+                    {copy.headings.extractedVideoClips}
                   </h3>
                   <span className="text-[10px] font-bold text-zinc-400 bg-zinc-900 px-2.5 py-1 rounded border border-zinc-800">
-                    Aspect Ratio: {result.aspectRatio}
+                    {copy.headings.aspectRatioLabel.replace('{ratio}', result.aspectRatio)}
                   </span>
                 </div>
 
@@ -865,7 +869,7 @@ export default function ClippingStudio({
                             />
                             <button
                               type="button"
-                              title="Copy Link"
+                              title={copy.buttons.copyLink}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 copyToClipboard(clipUrl);
@@ -876,7 +880,7 @@ export default function ClippingStudio({
                             </button>
                             <button
                               type="button"
-                              title="Download"
+                              title={copy.buttons.download}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 downloadVideo(clipUrl, `clip-${i + 1}.mp4`);
@@ -892,12 +896,12 @@ export default function ClippingStudio({
                             actions={[
                               {
                                 kind: "copy",
-                                label: "Copy link",
+                                label: copy.buttons.copyLinkShort,
                                 onSelect: () => copyToClipboard(clipUrl),
                               },
                               {
                                 kind: "download",
-                                label: "Download",
+                                label: copy.buttons.download,
                                 onSelect: () =>
                                   downloadVideo(clipUrl, `clip-${i + 1}.mp4`),
                               },
@@ -905,7 +909,7 @@ export default function ClippingStudio({
                           />
 
                           <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-md px-2 py-1 rounded border border-white/5 text-[9px] uppercase font-black tracking-wider text-primary">
-                            Clip #{i + 1}
+                            {copy.labels.clipIndex.replace('{index}', i + 1)}
                           </div>
                         </div>
 
@@ -918,9 +922,9 @@ export default function ClippingStudio({
                           <div className="flex items-center justify-between mt-1">
                             <div className="flex items-center gap-2">
                               <span className="text-[10px] font-bold text-primary px-2 py-0.5 bg-primary/10 rounded border border-primary/20 whitespace-nowrap">
-                                AI Clipping
+                                {copy.labels.aiClipping}
                               </span>
-                              <span className="text-[10px] text-white/40">{result.aspectRatio || `Clip #${i + 1}`}</span>
+                              <span className="text-[10px] text-white/40">{result.aspectRatio || copy.labels.clipIndex.replace('{index}', i + 1)}</span>
                             </div>
                           </div>
                         </div>
@@ -929,7 +933,7 @@ export default function ClippingStudio({
                   </div>
                 ) : (
                   <div className="py-20 text-center text-xs text-zinc-500 font-semibold border border-zinc-900 rounded bg-zinc-950/20">
-                    No video clips generated. Try re-running.
+                    {copy.empty.noClips}
                   </div>
                 )}
               </div>
@@ -951,7 +955,7 @@ export default function ClippingStudio({
                   type="button"
                   onClick={clearVideoUpload}
                   className="absolute top-0.5 right-0.5 w-4 h-4 bg-black/60 hover:bg-black rounded-full flex items-center justify-center text-white/85 hover:text-white text-[8px] border border-white/5"
-                  title="Clear video"
+                  title={copy.buttons.clearVideo}
                 >
                   ×
                 </button>
@@ -974,7 +978,7 @@ export default function ClippingStudio({
             {!videoUrl && (
               <button
                 type="button"
-                title="Upload source video"
+                title={copy.buttons.uploadSourceVideo}
                 onClick={() => videoFileInputRef.current?.click()}
                 onDragEnter={handleVideoDragEnter}
                 onDragLeave={handleVideoDragLeave}
@@ -1018,7 +1022,7 @@ export default function ClippingStudio({
               <PromptTextarea
                 value={prompt}
                 onChange={handlePromptInput}
-                placeholder="Describe prompt / highlights to extract"
+                placeholder={copy.placeholders.promptOrUrl}
               />
             </div>
           </div>
@@ -1033,7 +1037,7 @@ export default function ClippingStudio({
                   <span className="text-[9px] font-bold text-black uppercase">C</span>
                 </div>
                 <span className={PROMPT_CONTROL_LABEL_CLASS}>
-                  AI Clipping
+                  {copy.labels.aiClipping}
                 </span>
               </div>
 
@@ -1054,7 +1058,7 @@ export default function ClippingStudio({
                 {aspectDropdownOpen && (
                   <PromptPopover>
                     <PromptPopoverHeader>
-                      Aspect Ratio
+                      {copy.popovers.aspectRatio}
                     </PromptPopoverHeader>
                     <PromptMenuList>
                       {ASPECT_RATIOS.map((r) => (
@@ -1085,17 +1089,17 @@ export default function ClippingStudio({
                 >
                   <PromptDurationIcon />
                   <span className={PROMPT_CONTROL_LABEL_CLASS}>
-                    {numHighlights} Highlights
+                    {copy.labels.highlights.replace('{count}', numHighlights)}
                   </span>
                 </button>
                 {highlightsDropdownOpen && (
                   <PromptPopover className="min-w-[180px] overflow-visible">
                     <PromptPopoverHeader className="mb-3">
-                      Max Highlights
+                      {copy.popovers.maxHighlights}
                     </PromptPopoverHeader>
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs text-white/60">Limit:</span>
+                        <span className="text-xs text-white/60">{copy.popovers.limit}</span>
                         <span className="text-xs font-black text-primary bg-primary/10 px-2.5 py-0.5 rounded">
                           {numHighlights}
                         </span>
@@ -1127,7 +1131,7 @@ export default function ClippingStudio({
               >
                 <ScissorsIcon className="w-4 h-4 text-current" />
                 <span className="text-xs font-semibold">
-                  Coordinates Only
+                  {copy.buttons.coordinatesOnly}
                 </span>
               </button>
 
@@ -1141,11 +1145,11 @@ export default function ClippingStudio({
               {isGenerating ? (
                 <>
                   <span className="animate-spin inline-block text-black">◌</span>
-                  <span>Generating...</span>
+                  <span>{copy.buttons.generating}</span>
                 </>
               ) : (
                 <>
-                  <span>Generate ✦ 5</span>
+                  <span>{copy.buttons.generate}</span>
                 </>
               )}
             </PromptAction>

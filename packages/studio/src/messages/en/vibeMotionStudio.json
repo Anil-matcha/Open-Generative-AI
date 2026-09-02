@@ -1,0 +1,59 @@
+{
+  "loading": {
+    "remixing": "Remixing motion graphics…",
+    "generating": "Generating motion graphics…",
+    "backend": "React/Remotion rendering on Modal"
+  },
+  "card": {
+    "modeEdit": "✏ Edit",
+    "modeGenerated": "✦ Generated",
+    "download": "Download",
+    "remixThis": "Remix this generation",
+    "legacyRemixUnavailable": "Legacy generation — remix not available. Generate a new motion graphic to enable editing.",
+    "delete": "Delete",
+    "confirmDelete": "Are you sure you want to delete this generated item?",
+    "noPrompt": "No prompt",
+    "tag": "Vibe Motion"
+  },
+  "mobileActions": {
+    "download": "Download",
+    "remix": "Remix",
+    "delete": "Delete"
+  },
+  "empty": {
+    "titleLine1": "START CREATING WITH",
+    "titleLine2": "VIBE MOTION STUDIO",
+    "description": "Generate animated motion graphics from a text prompt — kinetic typography, data charts, logo reveals, and more."
+  },
+  "modeToggle": {
+    "generate": "Generate",
+    "edit": "Edit"
+  },
+  "editBanner": {
+    "editingPrefix": "Editing:",
+    "selectSource": "Select a source generation from the gallery",
+    "cancelEdit": "Cancel Edit Mode"
+  },
+  "placeholder": {
+    "edit": "Describe what to change — 'change background to dark navy, make bars gold, add particles…'",
+    "generate": "Describe the motion graphic — 'Animated sales dashboard with glowing bar charts and rising numbers'"
+  },
+  "controls": {
+    "aspectRatio": "Aspect Ratio",
+    "duration": "Duration",
+    "sourcePrefix": "Source:",
+    "pickSource": "Pick source…",
+    "sourceGeneration": "Source Generation",
+    "shortcutHint": "Ctrl+Enter to run"
+  },
+  "errors": {
+    "staleEditUnavailable": "This generation can't be remixed — the animation code wasn't saved server-side. Generate a new motion graphic first, then remix that result.",
+    "generationFailed": "Vibe Motion generation failed"
+  },
+  "generateButton": {
+    "remixing": "Remixing...",
+    "generating": "Generating...",
+    "remix": "Remix",
+    "generate": "Generate"
+  }
+}

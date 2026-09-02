@@ -14,22 +14,25 @@ import {
   pollAgentChatResult,
   createAgent,
 } from "../muapi.js";
+import en from "../messages/en/agentStudio.json";
+import zh from "../messages/zh/agentStudio.json";
+import { resolveCopy } from "../i18nUtils";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
-function timeAgo(dateStr) {
+function timeAgo(dateStr, copy) {
   if (!dateStr) return "";
   const utcStr =
     dateStr.endsWith("Z") || dateStr.includes("+") ? dateStr : dateStr + "Z";
   const diff = Math.floor((Date.now() - new Date(utcStr)) / 1000);
-  if (diff < 60) return "just now";
-  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-  if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
+  if (diff < 60) return copy.time.justNow;
+  if (diff < 3600) return copy.time.minutesAgo.replace("{n}", Math.floor(diff / 60));
+  if (diff < 86400) return copy.time.hoursAgo.replace("{n}", Math.floor(diff / 3600));
+  if (diff < 604800) return copy.time.daysAgo.replace("{n}", Math.floor(diff / 86400));
   return new Date(utcStr).toLocaleDateString();
 }
 
 // ─── Agent Card (grid) ───────────────────────────────────────────────────────
-function AgentCard({ agent, onClick, onEdit }) {
+function AgentCard({ agent, onClick, onEdit, copy }) {
   return (
     <div className="group relative aspect-[4/5] rounded-xl cursor-pointer">
       <div
@@ -52,14 +55,14 @@ function AgentCard({ agent, onClick, onEdit }) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 p-4">
           <div className="text-[10px] font-bold text-[#22d3ee] uppercase tracking-wider mb-1 opacity-80">
-            {agent.category || "AI Assistant"}
+            {agent.category || copy.card.defaultCategory}
           </div>
           <h3 className="text-sm font-bold text-white truncate group-hover:text-[#22d3ee] transition-colors">
-            {agent.name || "Unnamed Agent"}
+            {agent.name || copy.card.unnamedAgent}
           </h3>
           {agent.owner_username && (
             <p className="text-[9px] text-white/40 mt-1 uppercase tracking-tighter font-black">
-              By {agent.owner_username}
+              {copy.card.byPrefix} {agent.owner_username}
             </p>
           )}
         </div>
@@ -84,8 +87,8 @@ function AgentCard({ agent, onClick, onEdit }) {
 }
 
 // ─── Conversation Card (My Chats) ────────────────────────────────────────────
-function ConversationCard({ conv, onClick }) {
-  const displayTitle = conv.title || "New Chat";
+function ConversationCard({ conv, onClick, copy }) {
+  const displayTitle = conv.title || copy.card.newChat;
   const agentSlug = conv.agent_slug || conv.agent_id;
   return (
     <div
@@ -106,7 +109,7 @@ function ConversationCard({ conv, onClick }) {
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-[10px] font-black text-[#22d3ee] uppercase tracking-wider truncate">
-            {conv.agent_name || "Unknown Agent"}
+            {conv.agent_name || copy.card.unknownAgent}
           </p>
           <p className="text-sm font-bold text-white truncate" title={displayTitle}>
             {displayTitle}
@@ -114,8 +117,8 @@ function ConversationCard({ conv, onClick }) {
         </div>
       </div>
       <div className="flex items-center justify-between pt-2 border-t border-white/5 mt-auto text-[10px] text-white/30 font-medium">
-        <span>{timeAgo(conv.updated_at)}</span>
-        {conv.message_count != null && <span>{conv.message_count} msgs</span>}
+        <span>{timeAgo(conv.updated_at, copy)}</span>
+        {conv.message_count != null && <span>{conv.message_count} {copy.card.msgsSuffix}</span>}
       </div>
     </div>
   );
@@ -159,9 +162,10 @@ function ChatBubble({ message }) {
 // ─── Main Component ──────────────────────────────────────────────────────────
 const TABS = ["templates", "my-agents", "my-chats"];
 
-export default function AgentStudio({ apiKey }) {
+export default function AgentStudio({ apiKey, locale = "en" }) {
   const router = useRouter();
   const params = useParams();
+  const copy = resolveCopy(en, zh, locale);
 
   const [activeMainTab, setActiveMainTab] = useState("templates");
   const [agents, setAgents] = useState([]);
@@ -255,7 +259,7 @@ export default function AgentStudio({ apiKey }) {
         }
         setView("chat");
       } catch (err) {
-        if (!cancelled) setChatError(err.message || "Failed to load agent");
+        if (!cancelled) setChatError(err.message || copy.errors.loadAgentFailed);
       } finally {
         if (!cancelled) setChatLoading(false);
       }
@@ -293,7 +297,7 @@ export default function AgentStudio({ apiKey }) {
         router.replace(`/agents/${agentSlug}/${result.conversation_id}`, { scroll: false });
       }
     } catch (err) {
-      setChatError(err.message || "Failed to send message");
+      setChatError(err.message || copy.errors.sendFailed);
     } finally {
       setSending(false);
     }
@@ -315,7 +319,7 @@ export default function AgentStudio({ apiKey }) {
         });
         router.push(`/agents/${created.agent_id}`);
       } catch (err) {
-        setCreateError(err.message || "Failed to create agent");
+        setCreateError(err.message || copy.errors.createFailed);
       } finally {
         setCreating(false);
       }
@@ -345,7 +349,7 @@ export default function AgentStudio({ apiKey }) {
         }
       } catch (err) {
         console.error("AgentStudio load error:", err);
-        if (!cancelled) setError(err.message || "Failed to load.");
+        if (!cancelled) setError(err.message || copy.errors.loadFailed);
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -368,53 +372,53 @@ export default function AgentStudio({ apiKey }) {
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
-            Agents
+            {copy.buttons.back}
           </button>
-          <h2 className="text-sm font-black uppercase tracking-[0.2em] text-[#22d3ee]">Create Agent</h2>
+          <h2 className="text-sm font-black uppercase tracking-[0.2em] text-[#22d3ee]">{copy.headings.createAgent}</h2>
         </div>
 
         <form onSubmit={handleCreateSubmit} className="max-w-2xl w-full mx-auto p-8 space-y-6">
           <div className="space-y-2">
-            <label className="block text-[10px] font-black text-white/40 uppercase tracking-widest">Name</label>
+            <label className="block text-[10px] font-black text-white/40 uppercase tracking-widest">{copy.labels.name}</label>
             <input
               type="text"
               required
               value={createForm.name}
               onChange={(e) => setCreateForm((f) => ({ ...f, name: e.target.value }))}
-              placeholder="e.g. Caption Crafter Pro"
+              placeholder={copy.placeholders.name}
               className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#22d3ee]/50 transition-colors"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="block text-[10px] font-black text-white/40 uppercase tracking-widest">Description</label>
+            <label className="block text-[10px] font-black text-white/40 uppercase tracking-widest">{copy.labels.description}</label>
             <input
               type="text"
               value={createForm.description}
               onChange={(e) => setCreateForm((f) => ({ ...f, description: e.target.value }))}
-              placeholder="What does this agent help with?"
+              placeholder={copy.placeholders.description}
               className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#22d3ee]/50 transition-colors"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="block text-[10px] font-black text-white/40 uppercase tracking-widest">System Prompt</label>
+            <label className="block text-[10px] font-black text-white/40 uppercase tracking-widest">{copy.labels.systemPrompt}</label>
             <textarea
               required
               value={createForm.system_prompt}
               onChange={(e) => setCreateForm((f) => ({ ...f, system_prompt: e.target.value }))}
-              placeholder="You are a helpful assistant that..."
+              placeholder={copy.placeholders.systemPrompt}
               className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#22d3ee]/50 transition-colors min-h-[140px] resize-none"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="block text-[10px] font-black text-white/40 uppercase tracking-widest">Welcome Message (optional)</label>
+            <label className="block text-[10px] font-black text-white/40 uppercase tracking-widest">{copy.labels.welcomeMessage}</label>
             <input
               type="text"
               value={createForm.welcome_message}
               onChange={(e) => setCreateForm((f) => ({ ...f, welcome_message: e.target.value }))}
-              placeholder="Hi! How can I help you today?"
+              placeholder={copy.placeholders.welcomeMessage}
               className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#22d3ee]/50 transition-colors"
             />
           </div>
@@ -431,10 +435,10 @@ export default function AgentStudio({ apiKey }) {
             {creating ? (
               <>
                 <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
-                <span>Creating...</span>
+                <span>{copy.buttons.creating}</span>
               </>
             ) : (
-              <span>Create Agent</span>
+              <span>{copy.buttons.createAgentSubmit}</span>
             )}
           </button>
         </form>
@@ -455,7 +459,7 @@ export default function AgentStudio({ apiKey }) {
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
-            Agents
+            {copy.buttons.back}
           </button>
           <div className="h-4 w-[1px] bg-white/10" />
           {activeAgent && (
@@ -511,7 +515,7 @@ export default function AgentStudio({ apiKey }) {
                   handleSendMessage();
                 }
               }}
-              placeholder="Message this agent..."
+              placeholder={copy.placeholders.chatInput}
               rows={1}
               className="flex-1 bg-white/5 border border-white/10 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-[#22d3ee]/50 transition-colors resize-none max-h-40"
             />
@@ -520,7 +524,7 @@ export default function AgentStudio({ apiKey }) {
               disabled={!chatInput.trim() || sending}
               className="px-5 py-3 bg-[#22d3ee] text-black text-xs font-black uppercase tracking-widest rounded-xl hover:bg-white transition-all disabled:opacity-40"
             >
-              Send
+              {copy.buttons.send}
             </button>
           </form>
         </div>
@@ -535,7 +539,7 @@ export default function AgentStudio({ apiKey }) {
       <div className="flex-shrink-0 h-16 border-b border-white/5 flex items-center justify-between px-8 bg-black/40">
         <div className="flex items-center gap-8 h-full">
           <h2 className="text-sm font-black uppercase tracking-[0.2em] text-[#22d3ee]">
-            Agents
+            {copy.headings.agents}
           </h2>
           <div className="flex gap-1 bg-white/5 p-1 rounded-xl">
             {TABS.map((tab) => (
@@ -548,7 +552,7 @@ export default function AgentStudio({ apiKey }) {
                     : "text-white/40 hover:text-white hover:bg-white/5"
                 }`}
               >
-                {tab.replace(/-/g, " ")}
+                {copy.tabs[tab] || tab.replace(/-/g, " ")}
               </button>
             ))}
           </div>
@@ -559,7 +563,7 @@ export default function AgentStudio({ apiKey }) {
           className="px-6 py-2 bg-[#22d3ee] text-black text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-[#ebff66] transition-all active:scale-95 flex items-center gap-2"
         >
           <span className="text-sm">+</span>
-          Create
+          {copy.buttons.create}
         </button>
       </div>
 
@@ -581,7 +585,7 @@ export default function AgentStudio({ apiKey }) {
               onClick={() => setActiveMainTab(activeMainTab)} // retrigger effect
               className="text-[10px] text-white/40 hover:text-white border border-white/10 px-4 py-2 rounded-lg transition-colors"
             >
-              Retry
+              {copy.buttons.retry}
             </button>
           </div>
         ) : activeMainTab === "my-chats" ? (
@@ -591,12 +595,12 @@ export default function AgentStudio({ apiKey }) {
               <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.5">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
               </svg>
-              <p className="text-[10px] font-black uppercase tracking-[0.3em]">No chats yet</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em]">{copy.empty.noChats}</p>
               <button
                 onClick={() => setActiveMainTab("templates")}
                 className="text-[10px] text-[#22d3ee] hover:text-white border border-[#22d3ee]/20 hover:border-white/20 px-4 py-2 rounded-lg transition-colors"
               >
-                Browse Templates
+                {copy.buttons.browseTemplates}
               </button>
             </div>
           ) : (
@@ -606,6 +610,7 @@ export default function AgentStudio({ apiKey }) {
                   key={conv.id}
                   conv={conv}
                   onClick={handleOpenConversation}
+                  copy={copy}
                 />
               ))}
             </div>
@@ -617,7 +622,7 @@ export default function AgentStudio({ apiKey }) {
               <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.5">
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
               </svg>
-              <p className="text-[10px] font-black uppercase tracking-[0.3em]">No agents found</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em]">{copy.empty.noAgents}</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 max-w-[1600px] mx-auto">
@@ -626,6 +631,7 @@ export default function AgentStudio({ apiKey }) {
                   key={agent.agent_id || agent.id}
                   agent={agent}
                   onClick={handleSelectAgent}
+                  copy={copy}
                 />
               ))}
             </div>

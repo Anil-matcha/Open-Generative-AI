@@ -1,0 +1,57 @@
+{
+  "tabs": {
+    "templates": "模板",
+    "my-agents": "我的智能体",
+    "my-chats": "我的对话"
+  },
+  "headings": {
+    "agents": "智能体",
+    "createAgent": "创建智能体"
+  },
+  "buttons": {
+    "back": "智能体",
+    "create": "创建",
+    "createAgentSubmit": "创建智能体",
+    "creating": "创建中...",
+    "send": "发送",
+    "retry": "重试",
+    "browseTemplates": "浏览模板"
+  },
+  "labels": {
+    "name": "名称",
+    "description": "描述",
+    "systemPrompt": "系统提示词",
+    "welcomeMessage": "欢迎语（可选）"
+  },
+  "placeholders": {
+    "name": "例如：文案精灵 Pro",
+    "description": "这个智能体能帮助解决什么问题？",
+    "systemPrompt": "你是一个乐于助人的助手，会……",
+    "welcomeMessage": "你好！今天有什么可以帮你的吗？",
+    "chatInput": "给这个智能体发消息……"
+  },
+  "empty": {
+    "noChats": "暂无对话",
+    "noAgents": "未找到智能体"
+  },
+  "errors": {
+    "loadFailed": "加载失败。",
+    "loadAgentFailed": "加载智能体失败",
+    "sendFailed": "发送消息失败",
+    "createFailed": "创建智能体失败"
+  },
+  "card": {
+    "defaultCategory": "AI 助手",
+    "unnamedAgent": "未命名智能体",
+    "byPrefix": "创建者：",
+    "unknownAgent": "未知智能体",
+    "newChat": "新对话",
+    "msgsSuffix": "条消息"
+  },
+  "time": {
+    "justNow": "刚刚",
+    "minutesAgo": "{n} 分钟前",
+    "hoursAgo": "{n} 小时前",
+    "daysAgo": "{n} 天前"
+  }
+}

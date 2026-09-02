@@ -24,6 +24,9 @@ import {
   promptControlClassName,
   promptMediaButtonClassName,
 } from "./prompt/PromptComposer.jsx";
+import en from "../messages/en/marketingStudio.json";
+import zh from "../messages/zh/marketingStudio.json";
+import { resolveCopy } from "../i18nUtils";
 
 const SCROLLBAR_STYLE = `
   .custom-scrollbar-thin::-webkit-scrollbar {
@@ -117,7 +120,7 @@ const OPTIONS = {
 
 // ── Components ───────────────────────────────────────────────────────────────
 
-function UploadSlot({ icon, url, progress, label, onUpload, onClear, multiple = false, images = [] }) {
+function UploadSlot({ icon, url, progress, label, title, onUpload, onClear, multiple = false, images = [] }) {
   const inputRef = useRef(null);
   const [isDraggingSlot, setIsDraggingSlot] = useState(false);
   const dragCounterRef = useRef(0);
@@ -165,7 +168,7 @@ function UploadSlot({ icon, url, progress, label, onUpload, onClear, multiple = 
         onDragLeave={handleSlotDragLeave}
         onDragOver={handleSlotDragOver}
         onDrop={handleSlotDrop}
-        title={`Upload ${label}`}
+        title={title}
         className={promptMediaButtonClassName({
           active: Boolean(url) || isDraggingSlot,
           className: `cursor-pointer${isDraggingSlot ? " ring-2 ring-primary ring-offset-1 ring-offset-black/40" : ""}`,
@@ -240,7 +243,7 @@ function Dropdown({ isOpen, title, items, selectedId, onSelect, onClose, isVideo
             {onPreview && !isVideo && (
               <button
                 type="button"
-                title="Enlarge preview"
+                title={copy.buttons.enlargePreview}
                 onClick={(e) => {
                   e.stopPropagation();
                   onPreview(item);
@@ -321,7 +324,9 @@ export default function MarketingStudio({
   onGenerationComplete,
   onGenerationError,
   historyItems,
+  locale = "en",
 }) {
+  const copy = resolveCopy(en, zh, locale);
   const LEGACY_PERSIST_KEY = "hg_marketing_studio_persistent";
   const PERSIST_KEY = scopedPersistKey(LEGACY_PERSIST_KEY, apiKey);
   useEffect(() => {
@@ -421,8 +426,8 @@ export default function MarketingStudio({
   };
 
   const handleGenerate = async () => {
-    if (!prompt.trim()) return alert("Please enter an ad script.");
-    if (!productImage) return alert("Please upload a product image.");
+    if (!prompt.trim()) return alert(copy.errors.missingScript);
+    if (!productImage) return alert(copy.errors.missingProductImage);
 
     onGenerationStart?.();
     setIsGenerating(true);
@@ -451,7 +456,7 @@ export default function MarketingStudio({
         onGenerationComplete?.({ url: result.url, type: "video" });
       }
     } catch (err) {
-      onGenerationError?.(err.message?.slice(0, 120) || "Marketing generation failed");
+      onGenerationError?.(err.message?.slice(0, 120) || copy.errors.generationFailed);
     } finally {
       setIsGenerating(false);
       onGenerationEnd?.();
@@ -489,7 +494,7 @@ export default function MarketingStudio({
                    <button
                     onClick={(e) => { e.stopPropagation(); downloadFile(entry.url, `marketing-ad-${entry.id}.mp4`); }}
                     className="p-2 bg-black/60 backdrop-blur-md rounded-full text-white hover:bg-primary hover:text-black transition-all border border-white/10"
-                    title="Download"
+                    title={copy.buttons.download}
                    >
                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" />
@@ -497,10 +502,10 @@ export default function MarketingStudio({
                    </button>
                    <button
                     type="button"
-                    title="Delete"
+                    title={copy.buttons.delete}
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (confirm("Are you sure you want to delete this generated item?")) {
+                      if (confirm(copy.confirm.deleteItem)) {
                         if (!historyItems) {
                           setLocalHistory(prev => prev.filter(h => h.id !== entry.id));
                         }
@@ -522,16 +527,16 @@ export default function MarketingStudio({
                   actions={[
                     {
                       kind: "download",
-                      label: "Download",
+                      label: copy.buttons.download,
                       onSelect: () =>
                         downloadFile(entry.url, `marketing-ad-${entry.id}.mp4`),
                     },
                     {
                       kind: "delete",
-                      label: "Delete",
+                      label: copy.buttons.delete,
                       danger: true,
                       onSelect: () => {
-                        if (confirm("Are you sure you want to delete this generated item?")) {
+                        if (confirm(copy.confirm.deleteItem)) {
                           if (!historyItems) {
                             setLocalHistory((prev) =>
                               prev.filter((item) => item.id !== entry.id),
@@ -546,7 +551,7 @@ export default function MarketingStudio({
                 <div className="p-3 bg-black/80 backdrop-blur-sm border-t border-white/5 flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <span className="text-[9px] font-black text-primary px-2 py-0.5 bg-primary/10 rounded border border-primary/20 uppercase tracking-tighter">
-                      Marketing Studio
+                      {copy.history.badge}
                     </span>
                     {entry.format && (
                       <span className="text-[9px] text-white/40 font-bold">{entry.format}</span>
@@ -563,41 +568,41 @@ export default function MarketingStudio({
               <div className="w-18 h-22 sm:w-24 sm:h-28 rounded-2xl border border-white/10 shadow-2xl -rotate-[12deg] transform hover:rotate-0 hover:scale-110 hover:z-20 transition-all duration-300 overflow-hidden bg-white/[0.01] flex-shrink-0">
                 <img
                   src="https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/sdxl-image.avif"
-                  alt="Creative asset 1"
+                  alt={copy.alt.creativeAsset.replace("{index}", "1")}
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="w-18 h-22 sm:w-24 sm:h-28 rounded-2xl border border-white/10 shadow-2xl -rotate-[4deg] transform hover:rotate-0 hover:scale-110 hover:z-20 transition-all duration-300 overflow-hidden bg-white/[0.01] -ml-3 sm:-ml-4 flex-shrink-0">
                 <img
                   src="https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/chroma-image.avif"
-                  alt="Creative asset 2"
+                  alt={copy.alt.creativeAsset.replace("{index}", "2")}
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="w-18 h-18 sm:w-24 sm:h-24 rounded-full border border-white/10 shadow-2xl rotate-[6deg] transform hover:rotate-0 hover:scale-110 hover:z-20 transition-all duration-300 overflow-hidden bg-white/[0.01] -ml-3 sm:-ml-4 flex-shrink-0">
                 <img
                   src="https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/neta-lumina.avif"
-                  alt="Creative asset 3"
+                  alt={copy.alt.creativeAsset.replace("{index}", "3")}
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="w-18 h-22 sm:w-24 sm:h-28 rounded-2xl border border-white/10 shadow-2xl rotate-[12deg] transform hover:rotate-0 hover:scale-110 hover:z-20 transition-all duration-300 overflow-hidden bg-white/[0.01] -ml-3 sm:-ml-4 flex-shrink-0">
                 <img
                   src="https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/perfect-pony-xl.avif"
-                  alt="Creative asset 4"
+                  alt={copy.alt.creativeAsset.replace("{index}", "4")}
                   className="w-full h-full object-cover"
                 />
               </div>
             </div>
 
             <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-center px-4 flex flex-col items-center">
-              <span className="text-white font-black uppercase text-xl sm:text-3xl tracking-wide mb-1 opacity-90">START CREATING WITH</span>
+              <span className="text-white font-black uppercase text-xl sm:text-3xl tracking-wide mb-1 opacity-90">{copy.empty.titleLine1}</span>
               <span className="text-[#22d3ee] font-black uppercase text-2xl sm:text-4xl sm:mt-1 tracking-tight">
-                MARKETING STUDIO
+                {copy.empty.titleLine2}
               </span>
             </h1>
             <p className="text-white/40 text-xs sm:text-sm font-medium tracking-wide text-center max-w-lg leading-relaxed px-4">
-              Describe your scene, upload your product, and watch high-converting AI video ads come to life.
+              {copy.empty.subtitle}
             </p>
           </div>
         )}
@@ -626,7 +631,7 @@ export default function MarketingStudio({
               ref={textareaRef}
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              placeholder="Describe your ad script... Use @image1 for product, @image2 for avatar."
+              placeholder={copy.prompt.placeholder}
             />
           </div>
 
@@ -637,7 +642,8 @@ export default function MarketingStudio({
               {/* Asset Uploads Group */}
               <div className="flex items-center gap-1.5 pr-3 border-r border-white/10">
                 <UploadSlot 
-                  label="Product" 
+                  label={copy.uploadSlots.product}
+                  title={`${copy.uploadSlots.uploadPrefix} ${copy.uploadSlots.product}`}
                   icon={<ProductIcon />} 
                   url={productImage} 
                   progress={uploadProgress.product} 
@@ -645,7 +651,8 @@ export default function MarketingStudio({
                   onClear={() => setProductImage(null)}
                 />
                 <UploadSlot
-                  label="Avatar"
+                  label={copy.uploadSlots.avatar}
+                  title={`${copy.uploadSlots.uploadPrefix} ${copy.uploadSlots.avatar}`}
                   icon={<AvatarIcon />}
                   url={avatarImage}
                   progress={uploadProgress.avatar}
@@ -653,7 +660,8 @@ export default function MarketingStudio({
                   onClear={() => setAvatarImage(null)}
                 />
                 <UploadSlot
-                  label="References"
+                  label={copy.uploadSlots.references}
+                  title={`${copy.uploadSlots.uploadPrefix} ${copy.uploadSlots.references}`}
                   icon={<RefIcon />}
                   url={additionalImages[0]}
                   progress={uploadProgress.additional}
@@ -686,7 +694,7 @@ export default function MarketingStudio({
                 </button>
                 <Dropdown 
                   isOpen={dropdown === 'format'} 
-                  title="Video Format Presets"
+                  title={copy.dropdowns.videoFormatPresets}
                   items={ASSETS.ugc} 
                   selectedId={params.format}
                   onSelect={(item) => setParams({ ...params, format: item.name, videoUrl: item.url })}
@@ -707,7 +715,7 @@ export default function MarketingStudio({
                     <img src={avatarImage || ASSETS.avatar[0].url} className="w-full h-full object-cover" />
                   </div>
                   <span className={PROMPT_CONTROL_LABEL_CLASS}>
-                    {ASSETS.avatar.find(a => a.url === avatarImage)?.name || "Select Avatar"}
+                    {ASSETS.avatar.find(a => a.url === avatarImage)?.name || copy.dropdowns.selectAvatarFallback}
                   </span>
                   <PromptChevronIcon />
                 </button>
@@ -715,7 +723,7 @@ export default function MarketingStudio({
                 {avatarImage && (
                   <button
                     type="button"
-                    title="Enlarge selected avatar"
+                    title={copy.buttons.enlargeSelectedAvatar}
                     onClick={(e) => {
                       e.stopPropagation();
                       const currentAvatar = ASSETS.avatar.find(a => a.url === avatarImage);
@@ -741,7 +749,7 @@ export default function MarketingStudio({
 
                 <Dropdown 
                   isOpen={dropdown === 'avatar'} 
-                  title="Avatar Presets"
+                  title={copy.dropdowns.avatarPresets}
                   items={ASSETS.avatar} 
                   selectedId={avatarImage}
                   onSelect={(item) => setAvatarImage(item.url)}
@@ -778,10 +786,10 @@ export default function MarketingStudio({
                     isOpen={dropdown === key} 
                     title={
                       key === "ratio"
-                        ? "Aspect Ratio"
+                        ? copy.dropdowns.aspectRatio
                         : key === "res"
-                          ? "Resolution"
-                          : "Duration"
+                          ? copy.dropdowns.resolution
+                          : copy.dropdowns.duration
                     }
                     options={OPTIONS[key]} 
                     selected={params[key]} 
@@ -799,10 +807,10 @@ export default function MarketingStudio({
               {isGenerating ? (
                 <>
                   <span className="animate-spin inline-block text-black">◌</span>
-                  Generating...
+                  {copy.buttons.generating}
                 </>
               ) : (
-                <span>Launch</span>
+                <span>{copy.buttons.launch}</span>
               )}
             </PromptAction>
           </PromptFooter>
@@ -928,7 +936,7 @@ export default function MarketingStudio({
               >
                 <img
                   src={ASSETS.avatar[(ASSETS.avatar.findIndex(a => a.id === previewAvatar.id) - 1 + ASSETS.avatar.length) % ASSETS.avatar.length].url}
-                  alt="Previous Avatar"
+                  alt={copy.alt.previousAvatar}
                   className="w-full h-full object-cover aspect-[3/4]"
                 />
               </div>
@@ -966,7 +974,7 @@ export default function MarketingStudio({
                     className="bg-[#22d3ee] text-black px-6 py-2.5 rounded-full font-bold text-sm hover:opacity-95 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-1.5 shadow-lg shadow-[#22d3ee]/20"
                   >
                     <CheckSvg />
-                    Select Avatar
+                    {copy.buttons.selectAvatar}
                   </button>
                 </div>
               </div>
@@ -988,7 +996,7 @@ export default function MarketingStudio({
               >
                 <img
                   src={ASSETS.avatar[(ASSETS.avatar.findIndex(a => a.id === previewAvatar.id) + 1) % ASSETS.avatar.length].url}
-                  alt="Next Avatar"
+                  alt={copy.alt.nextAvatar}
                   className="w-full h-full object-cover aspect-[3/4]"
                 />
               </div>
