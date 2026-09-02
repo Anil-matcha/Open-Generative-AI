@@ -1,6 +1,10 @@
 import {
     creatorNotFound,
     handleBrainAssistant,
+    handleCreatorAgentConversation,
+    handleCreatorAgentDelegate,
+    handleCreatorAgentEnsure,
+    handleCreatorAgents,
     handleCreatorProviders,
     handleElevenLabsSpeech,
     handleHeyGenStatus,
@@ -41,6 +45,14 @@ async function dispatch(request, context, method) {
             return handleHeyGenVideo(request);
         case 'GET:heygen/status':
             return handleHeyGenStatus(request);
+        case 'GET:agents':
+            return handleCreatorAgents(request);
+        case 'POST:agents/ensure':
+            return handleCreatorAgentEnsure(request);
+        case 'POST:agents/delegate':
+            return handleCreatorAgentDelegate(request);
+        case 'GET:agents/conversation':
+            return handleCreatorAgentConversation(request);
         default:
             return creatorNotFound();
     }

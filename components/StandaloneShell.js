@@ -26,7 +26,7 @@ const NAV_GROUPS = [
   { label: '', items: ['home'] },
   { label: 'Agent', items: ['selena'] },
   { label: 'Tools', items: ['image', 'video', 'audio', 'graphics', 'avatar', 'music', 'video-advanced', 'lipsync', 'motion', 'transform', 'smart-clip'] },
-  { label: 'Apps', items: ['generator', 'influencer', 'graphic-studio', 'scene-builder', 'music-video', 'marketing', 'edit-studio'] },
+  { label: 'Apps', items: ['generator', 'influencer', 'graphic-studio', 'scene-builder', 'music-video', 'marketing', 'edit-studio', 'agent-team'] },
   { label: '', items: ['workflows', 'projects', 'assets', 'publish'] },
   { label: 'Advanced', items: ['agent-blueprints', 'marketplace', 'provider-settings'] },
 ];
@@ -35,7 +35,7 @@ const ICONS = {
   avatar: UserRound, music: Mic2, 'video-advanced': Film,
   lipsync: Mic2, motion: Zap, transform: Sparkles, 'smart-clip': Clapperboard,
   generator: WandSparkles, influencer: UserRound, 'graphic-studio': LayoutGrid,
-  'scene-builder': Boxes, 'music-video': Music2, marketing: Send, 'edit-studio': Clapperboard,
+  'scene-builder': Boxes, 'music-video': Music2, marketing: Send, 'edit-studio': Clapperboard, 'agent-team': Bot,
   workflows: Workflow, projects: FolderOpen, assets: Boxes, publish: Share2, 'agent-blueprints': Blocks,
   marketplace: Boxes, 'provider-settings': Settings2,
 };
@@ -435,6 +435,9 @@ export default function StandaloneShell() {
       'asset.delete': '/studio/assets',
       'social.prepare': '/studio/publish',
       'social.publish': '/studio/publish',
+      'agent.delegate': '/studio/apps/agent-team',
+      'agent.open': '/studio/apps/agent-team',
+      'agent.continue': '/studio/apps/agent-team',
     };
     const target = targets[action?.action];
     if (!target || action?.available === false) return;
@@ -493,6 +496,7 @@ export default function StandaloneShell() {
       case 'generator': return <CreatorStudio {...callbacks('generator')} {...creatorProjectProps} initialToolId="image" allowedToolIds={['image', 'video']} initialAsset={handoffAsset} workspaceLabel="AI Generator" />;
       case 'scene-builder': return <CreatorStudio {...callbacks('scene-builder')} {...creatorProjectProps} initialToolId="storyboard" allowedToolIds={['storyboard']} initialAsset={handoffAsset} workspaceLabel="Scene Builder" />;
       case 'music-video': return <CreatorStudio {...callbacks('music-video')} {...creatorProjectProps} initialToolId="storyboard" allowedToolIds={['storyboard']} initialAsset={handoffAsset} workspaceLabel="Music Video" />;
+      case 'agent-team': return <CreatorStudio {...callbacks('agent-team')} {...creatorProjectProps} initialToolId="agent-team" allowedToolIds={['agent-team']} initialAsset={handoffAsset} workspaceLabel="Agent Team" />;
       case 'publish': return <SocialPublishStudio initialAsset={handoffAsset} initialDraft={selenaAction?.parameters} youtubeWorkspace={<CreatorStudio {...callbacks('publish')} {...creatorProjectProps} initialToolId="publish" allowedToolIds={['publish']} workspaceLabel="YouTube Publish" />} />;
       case 'projects': return <ProjectsStudio projects={projectSummaries} currentProject={currentProject} loading={projectsLoading} error={projectError} onCreate={createProject} onOpen={openProject} onRename={renameProject} onRefresh={() => refreshProjects(currentProject?.id)} onNavigate={navigate} />;
       case 'assets': return <StudioAssets assets={assets} currentProject={currentProject} onOpen={openAsset} onDelete={deleteAsset} onUpload={uploadProjectAsset} uploading={assetUploading} error={projectError} />;

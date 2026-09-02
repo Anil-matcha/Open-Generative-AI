@@ -97,6 +97,15 @@ const TOOLS = [
     icon: YoutubeMark,
     accent: "from-red-500 to-rose-400",
   },
+  {
+    id: "agent-team",
+    label: "Agent Team",
+    provider: "muapi",
+    eyebrow: "Delegate",
+    description: "Delegate a bounded task to a G.FURY Creator Team agent and review its reply before acting on it.",
+    icon: Bot,
+    accent: "from-indigo-400 to-violet-500",
+  },
 ];
 
 const INITIAL_DRAFTS = {
@@ -133,6 +142,11 @@ const INITIAL_DRAFTS = {
     madeForKids: null,
     containsSyntheticMedia: true,
     approved: false,
+  },
+  "agent-team": {
+    agentId: "",
+    task: "",
+    conversationId: "",
   },
 };
 
@@ -551,9 +565,43 @@ function YoutubeControls({
   );
 }
 
-function InspectorFields({ activeTool, draft, updateDraft, provider, youtube }) {
+function InspectorFields({ activeTool, draft, updateDraft, provider, youtube, agentCatalog }) {
   if (activeTool.id === "publish") {
     return <YoutubeControls draft={draft} updateDraft={updateDraft} {...youtube} />;
+  }
+
+  if (activeTool.id === "agent-team") {
+    const agents = Array.isArray(agentCatalog) ? agentCatalog : [];
+    const selectedAgent = agents.find((agent) => agent.id === draft.agentId) || null;
+    return (
+      <>
+        <div>
+          <FieldLabel>Creator Team agent</FieldLabel>
+          <select value={draft.agentId} onChange={(event) => updateDraft("agentId", event.target.value)} className={selectClass}>
+            <option value="">Choose an agent…</option>
+            {agents.map((agent) => <option key={agent.id} value={agent.id}>{agent.label}</option>)}
+          </select>
+          {selectedAgent?.description && (
+            <p className="mt-2 text-[10px] leading-4 text-white/35">{selectedAgent.description}</p>
+          )}
+          {Array.isArray(selectedAgent?.boundaries) && selectedAgent.boundaries.length > 0 && (
+            <ul className="mt-2 space-y-1 text-[10px] leading-4 text-amber-100/55">
+              {selectedAgent.boundaries.map((boundary, index) => <li key={index}>• {boundary}</li>)}
+            </ul>
+          )}
+        </div>
+        <div>
+          <FieldLabel hint={`${draft.task.length}/4000`}>Task</FieldLabel>
+          <PromptTextarea value={draft.task} onChange={(value) => updateDraft("task", value)} placeholder="Describe the bounded task for this agent to prepare or draft…" maxLength={4000} />
+        </div>
+        <div className="rounded-xl border border-white/[0.07] bg-black/20 px-3 py-2.5 text-[10px] text-white/35">
+          {draft.conversationId ? `Continuing conversation ${draft.conversationId}` : "Starts a new conversation with the agent"}
+        </div>
+        <div className="rounded-xl border border-amber-400/15 bg-amber-400/[0.06] px-3 py-2.5 text-[10px] leading-4 text-amber-100/70">
+          Delegating a task consumes the same billed MuAPI credits as image or video generation.
+        </div>
+      </>
+    );
   }
 
   if (activeTool.id === "assistant") {
@@ -718,6 +766,7 @@ function hasRequiredInput(toolId, draft) {
   }
   if (toolId === "voice") return Boolean(draft.text.trim());
   if (toolId === "avatar") return Boolean(draft.script.trim());
+  if (toolId === "agent-team") return Boolean(draft.agentId) && Boolean(draft.task.trim());
   return Boolean(draft.prompt.trim());
 }
 
@@ -763,6 +812,7 @@ export default function CreatorStudio({
   const [session, setSession] = useState(null);
   const [authState, setAuthState] = useState("checking");
   const [providers, setProviders] = useState([]);
+  const [agentCatalog, setAgentCatalog] = useState([]);
   const [activeToolId, setActiveToolId] = useState(initialToolId);
   const [drafts, setDrafts] = useState(INITIAL_DRAFTS);
   const [outputs, setOutputs] = useState({});
@@ -856,6 +906,18 @@ export default function CreatorStudio({
             : previous.video.firstFrameUrl,
         },
       }));
+    } else if (['agent.delegate', 'agent.open', 'agent.continue'].includes(initialAction.action)) {
+      consumedActionRef.current = actionKey;
+      setActiveToolId('agent-team');
+      setDrafts((previous) => ({
+        ...previous,
+        "agent-team": {
+          ...previous["agent-team"],
+          agentId: parameters.agentId || previous["agent-team"].agentId,
+          task: parameters.task || previous["agent-team"].task,
+          conversationId: parameters.conversationId || previous["agent-team"].conversationId,
+        },
+      }));
     }
   }, [initialAction, initialAsset]);
 
@@ -929,6 +991,14 @@ export default function CreatorStudio({
     return data;
   }, [request]);
 
+  const loadAgentCatalog = useCallback(async () => {
+    const response = await request("agents");
+    if (!response.ok) throw new Error(await responseError(response));
+    const data = await response.json();
+    setAgentCatalog(Array.isArray(data.agents) ? data.agents : []);
+    return data;
+  }, [request]);
+
   const loadYoutubeStatus = useCallback(async () => {
     const response = await fetch("/api/social/youtube/status", {
       credentials: "same-origin",
@@ -990,6 +1060,7 @@ export default function CreatorStudio({
           loadYoutubeStatus().catch((statusError) => {
             if (active) setError(statusError.message || "Unable to load the YouTube connection.");
           }),
+          loadAgentCatalog().catch(() => {}),
         ]);
       } catch (sessionError) {
         if (!active) return;
@@ -999,7 +1070,7 @@ export default function CreatorStudio({
     };
     checkSession();
     return () => { active = false; };
-  }, [loadProviders, loadYoutubeStatus]);
+  }, [loadProviders, loadYoutubeStatus, loadAgentCatalog]);
 
   useEffect(() => () => {
     generationTokenRef.current += 1;
@@ -1269,6 +1340,29 @@ export default function CreatorStudio({
         if (!response.ok) throw new Error(await responseError(response));
         const blob = await response.blob();
         output = { type: "audio", url: rememberObjectUrl(blob), blob, mimeType: blob.type || "audio/mpeg" };
+      } else if (toolId === "agent-team") {
+        const response = await request("agents/delegate", {
+          method: "POST",
+          body: {
+            agentId: draft.agentId,
+            task: draft.task,
+            conversationId: draft.conversationId || null,
+            projectId: project?.id || null,
+            selectedAssetId: selectedAsset?.id || initialAsset?.id || null,
+          },
+        });
+        if (!response.ok) throw new Error(await responseError(response));
+        const data = await response.json();
+        setDrafts((previous) => ({
+          ...previous,
+          "agent-team": { ...previous["agent-team"], conversationId: data.result?.conversationId || previous["agent-team"].conversationId },
+        }));
+        output = {
+          type: "text",
+          text: data.result?.message,
+          model: data.result?.agentId,
+          provider: data.result?.label,
+        };
       } else if (toolId === "avatar") {
         const response = await request("heygen", { method: "POST", body: draft });
         if (!response.ok) throw new Error(await responseError(response));
@@ -1533,6 +1627,7 @@ export default function CreatorStudio({
                 draft={activeDraft}
                 updateDraft={updateDraft}
                 provider={activeProvider}
+                agentCatalog={agentCatalog}
                 youtube={{
                   status: youtubeStatus,
                   file: youtubeFile,
@@ -1562,8 +1657,8 @@ export default function CreatorStudio({
                 activeTool.accent,
               )}
             >
-              {working ? <LoaderCircle size={17} className="animate-spin" /> : activeTool.id === "assistant" ? <Send size={16} /> : activeTool.id === "publish" ? <YoutubeMark size={17} /> : <Play size={16} fill="currentColor" />}
-              {working ? "Working…" : activeTool.id === "assistant" ? "Ask Selena" : activeTool.id === "publish" ? "Upload privately to YouTube" : `Generate ${activeTool.label}`}
+              {working ? <LoaderCircle size={17} className="animate-spin" /> : activeTool.id === "assistant" ? <Send size={16} /> : activeTool.id === "publish" ? <YoutubeMark size={17} /> : activeTool.id === "agent-team" ? <Send size={16} /> : <Play size={16} fill="currentColor" />}
+              {working ? "Working…" : activeTool.id === "assistant" ? "Ask Selena" : activeTool.id === "publish" ? "Upload privately to YouTube" : activeTool.id === "agent-team" ? "Delegate to Agent" : `Generate ${activeTool.label}`}
             </button>
 
             <div className="mt-5 flex items-center justify-center gap-2 text-[10px] text-white/22">

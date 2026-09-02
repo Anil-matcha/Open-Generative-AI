@@ -19,6 +19,7 @@ export const STUDIO_NAVIGATION = Object.freeze([
     { id: 'music-video', label: 'Music Video', path: '/studio/apps/music-video', section: 'apps' },
     { id: 'marketing', label: 'Marketing Studio', path: '/studio/apps/marketing', section: 'apps' },
     { id: 'edit-studio', label: 'Edit Studio', path: '/studio/apps/edit-studio', section: 'apps' },
+    { id: 'agent-team', label: 'Agent Team', path: '/studio/apps/agent-team', section: 'apps' },
     { id: 'workflows', label: 'Workflows', path: '/studio/workflows', section: 'primary' },
     { id: 'projects', label: 'Projects', path: '/studio/projects', section: 'primary' },
     { id: 'assets', label: 'Assets', path: '/studio/assets', section: 'primary' },

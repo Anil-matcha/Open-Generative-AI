@@ -1,3 +1,5 @@
+import { isValidCreatorAgentId } from './creatorAgentRegistry.js';
+
 const ACTION_ID_PATTERN = /^[a-z][a-z0-9.-]{1,80}$/;
 const OPAQUE_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]{0,139}$/;
 const ASPECT_RATIOS = new Set(['16:9', '9:16', '1:1', '4:5']);
@@ -100,6 +102,35 @@ export const SELENA_ACTION_REGISTRY = Object.freeze({
         sideEffect: 'Deletion removes Project metadata and owned Blob media after explicit confirmation.',
         fields: Object.freeze(['assetId']),
     }),
+    // Delegation to the EXISTING MuAPI Agent Blueprints system (Creator Team),
+    // never a new agent framework. Agent chat turns poll the same billed
+    // predictions endpoint used by paid image/video generation, so sending a
+    // new task — whether starting or continuing a conversation — always
+    // requires approval, matching image.generate/video.generate.
+    'agent.delegate': Object.freeze({
+        label: 'Delegate to Creator Team Agent',
+        destination: '/studio/apps/agent-team',
+        requiresApproval: true,
+        available: true,
+        sideEffect: 'Delegating a task consumes the same billed MuAPI credits as image or video generation.',
+        fields: Object.freeze(['agentId', 'task', 'assetId']),
+    }),
+    'agent.open': Object.freeze({
+        label: 'Open Creator Team Agent',
+        destination: '/studio/apps/agent-team',
+        requiresApproval: false,
+        available: true,
+        sideEffect: null,
+        fields: Object.freeze(['agentId', 'conversationId']),
+    }),
+    'agent.continue': Object.freeze({
+        label: 'Continue Agent Conversation',
+        destination: '/studio/apps/agent-team',
+        requiresApproval: true,
+        available: true,
+        sideEffect: 'Continuing a conversation sends a new billed task to the same MuAPI agent.',
+        fields: Object.freeze(['agentId', 'conversationId', 'task']),
+    }),
 });
 
 export const SELENA_PLAN_SCHEMA = Object.freeze({
@@ -167,6 +198,15 @@ function normalizeParameters(actionId, value) {
         } else if (field === 'caption') {
             const caption = text(source.caption, 2200);
             if (caption) parameters.caption = caption;
+        } else if (field === 'agentId') {
+            const agentId = text(source.agentId, 60);
+            if (isValidCreatorAgentId(agentId)) parameters.agentId = agentId;
+        } else if (field === 'task') {
+            const task = text(source.task, 4000);
+            if (task) parameters.task = task;
+        } else if (field === 'conversationId') {
+            const conversationId = opaqueId(source.conversationId);
+            if (conversationId) parameters.conversationId = conversationId;
         }
     }
     return parameters;
