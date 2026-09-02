@@ -4,17 +4,19 @@ import test from 'node:test';
 import { createCreatorSession, creatorCookieSettings } from '../../src/lib/creatorAuth.js';
 import {
     CreatorAgentError,
-    delegateToCreatorAgent,
     ensureCreatorAgents,
     fetchCreatorAgentConversation,
+    pollCreatorAgentDelegation,
     resetCreatorAgentCache,
     resolveCreatorAgent,
+    submitCreatorAgentDelegation,
 } from '../../src/lib/creatorAgentGateway.js';
 import {
     handleCreatorAgentConversation,
     handleCreatorAgentDelegate,
     handleCreatorAgentEnsure,
     handleCreatorAgents,
+    handleCreatorAgentStatus,
 } from '../../src/lib/creatorProviderGateway.js';
 import {
     CREATOR_AGENT_REGISTRY,
@@ -155,7 +157,7 @@ test('ensureCreatorAgents is idempotent: reuses existing agents by name and only
     });
 });
 
-test('delegateToCreatorAgent rejects an empty or oversized task without contacting MuAPI', async () => {
+test('submitCreatorAgentDelegation rejects an empty or oversized task without contacting MuAPI', async () => {
     resetCreatorAgentCache();
     let called = false;
     await withMockFetch(async () => {
@@ -163,20 +165,21 @@ test('delegateToCreatorAgent rejects an empty or oversized task without contacti
         return jsonResponse([]);
     }, async () => {
         await assert.rejects(
-            () => delegateToCreatorAgent('creative-director', { task: '   ', env: configuredEnv }),
+            () => submitCreatorAgentDelegation('creative-director', { task: '   ', env: configuredEnv }),
             (error) => error instanceof CreatorAgentError && error.code === 'invalid_task',
         );
         await assert.rejects(
-            () => delegateToCreatorAgent('creative-director', { task: 'x'.repeat(4001), env: configuredEnv }),
+            () => submitCreatorAgentDelegation('creative-director', { task: 'x'.repeat(4001), env: configuredEnv }),
             (error) => error instanceof CreatorAgentError && error.code === 'invalid_task',
         );
     });
     assert.equal(called, false);
 });
 
-test('delegateToCreatorAgent merges bounded Project context into the outgoing task and returns the agent reply', async () => {
+test('submitCreatorAgentDelegation returns immediately with a pending requestId instead of blocking on the agent reply', async () => {
     resetCreatorAgentCache();
     let chatBody;
+    let resultEndpointCalled = false;
     await withMockFetch(async (url, options = {}) => {
         const href = String(url);
         if (href.endsWith('/agents/user/agents')) {
@@ -187,32 +190,30 @@ test('delegateToCreatorAgent merges bounded Project context into the outgoing ta
             return jsonResponse({ request_id: 'req-1' });
         }
         if (href.endsWith('/api/v1/predictions/req-1/result')) {
-            return jsonResponse({
-                is_complete: true,
-                conversation_id: 'conv-1',
-                messages: [
-                    { role: 'user', content: chatBody.message },
-                    { role: 'assistant', content: 'Here are three hooks for your launch video.' },
-                ],
-            });
+            resultEndpointCalled = true;
+            return jsonResponse({ is_complete: true, conversation_id: 'conv-1', messages: [] });
         }
         throw new Error(`Unexpected request to ${href}`);
     }, async () => {
-        const result = await delegateToCreatorAgent('content-script', {
+        const submitted = await submitCreatorAgentDelegation('content-script', {
             task: 'Write three short hooks for a Creator Studio launch video.',
             contextSummary: 'Project "Launch" — 2 asset(s), 0 storyboard scene(s).',
             env: configuredEnv,
         });
-        assert.equal(result.agentId, 'content-script');
-        assert.equal(result.conversationId, 'conv-1');
-        assert.equal(result.message, 'Here are three hooks for your launch video.');
+        assert.equal(submitted.agentId, 'content-script');
+        assert.equal(submitted.status, 'pending');
+        assert.equal(submitted.requestId, 'req-1');
     });
     assert.match(chatBody.message, /Project "Launch"/);
     assert.match(chatBody.message, /Write three short hooks/);
     assert.equal(chatBody.conversation_id, null);
+    // submitCreatorAgentDelegation must never itself poll for the result — that
+    // is the whole point of splitting submit from poll, so a Creator Studio
+    // request can never be held open for minutes waiting on the agent.
+    assert.equal(resultEndpointCalled, false);
 });
 
-test('delegateToCreatorAgent surfaces dispatch and polling failures as bounded, provider-detail-free errors', async () => {
+test('submitCreatorAgentDelegation surfaces dispatch failures as bounded, provider-detail-free errors', async () => {
     resetCreatorAgentCache();
     await withMockFetch(async (url) => {
         const href = String(url);
@@ -225,7 +226,7 @@ test('delegateToCreatorAgent surfaces dispatch and polling failures as bounded, 
         throw new Error(`Unexpected request to ${href}`);
     }, async () => {
         await assert.rejects(
-            () => delegateToCreatorAgent('marketing', { task: 'Draft a campaign angle.', env: configuredEnv }),
+            () => submitCreatorAgentDelegation('marketing', { task: 'Draft a campaign angle.', env: configuredEnv }),
             (error) => {
                 assert.ok(error instanceof CreatorAgentError);
                 assert.equal(error.code, 'agent_dispatch_failed');
@@ -235,6 +236,64 @@ test('delegateToCreatorAgent surfaces dispatch and polling failures as bounded, 
             },
         );
     });
+});
+
+test('pollCreatorAgentDelegation makes exactly one bounded check per call and never blocks waiting for completion', async () => {
+    resetCreatorAgentCache();
+    let resultCalls = 0;
+    await withMockFetch(async (url) => {
+        const href = String(url);
+        if (href.endsWith('/api/v1/predictions/req-pending/result')) {
+            resultCalls += 1;
+            return jsonResponse({ is_complete: false });
+        }
+        throw new Error(`Unexpected request to ${href}`);
+    }, async () => {
+        const start = Date.now();
+        const pending = await pollCreatorAgentDelegation('creative-director', 'req-pending', { env: configuredEnv });
+        assert.equal(pending.status, 'pending');
+        assert.equal(pending.message, null);
+        assert.ok(Date.now() - start < 500, 'a single status check must not sleep/retry internally');
+    });
+    assert.equal(resultCalls, 1);
+});
+
+test('pollCreatorAgentDelegation returns the assistant reply once the agent turn is complete', async () => {
+    resetCreatorAgentCache();
+    await withMockFetch(async (url) => {
+        const href = String(url);
+        if (href.endsWith('/api/v1/predictions/req-done/result')) {
+            return jsonResponse({
+                is_complete: true,
+                conversation_id: 'conv-1',
+                messages: [
+                    { role: 'user', content: 'Write three short hooks.' },
+                    { role: 'assistant', content: 'Here are three hooks for your launch video.' },
+                ],
+            });
+        }
+        throw new Error(`Unexpected request to ${href}`);
+    }, async () => {
+        const result = await pollCreatorAgentDelegation('content-script', 'req-done', { env: configuredEnv });
+        assert.equal(result.status, 'completed');
+        assert.equal(result.conversationId, 'conv-1');
+        assert.equal(result.message, 'Here are three hooks for your launch video.');
+    });
+});
+
+test('pollCreatorAgentDelegation rejects a malformed requestId before any network call', async () => {
+    resetCreatorAgentCache();
+    let called = false;
+    await withMockFetch(async () => {
+        called = true;
+        return jsonResponse({});
+    }, async () => {
+        await assert.rejects(
+            () => pollCreatorAgentDelegation('creative-director', '../../etc/passwd', { env: configuredEnv }),
+            (error) => error instanceof CreatorAgentError && error.code === 'invalid_request' && error.status === 400,
+        );
+    });
+    assert.equal(called, false);
 });
 
 test('fetchCreatorAgentConversation requires a bounded conversation id', async () => {
@@ -262,17 +321,70 @@ test('handleCreatorAgents returns only the public catalog shape behind Creator S
     assert.equal(JSON.stringify(body).includes('provisionName'), false);
 });
 
-test('handleCreatorAgentDelegate rejects unknown agents, invalid tasks, and cross-origin requests', async () => {
+test('handleCreatorAgentEnsure requires authentication, a configured MuAPI key, and explicit confirmation', async () => {
+    resetRateLimitStore();
+    const unauthenticated = await handleCreatorAgentEnsure(creatorRequest('agents/ensure', {}, ''), { env: configuredEnv });
+    assert.equal(unauthenticated.status, 401);
+
+    resetRateLimitStore();
+    const unconfirmed = await handleCreatorAgentEnsure(creatorRequest('agents/ensure', {}), { env: configuredEnv });
+    assert.equal(unconfirmed.status, 400);
+
+    resetRateLimitStore();
+    const unconfigured = await handleCreatorAgentEnsure(creatorRequest('agents/ensure', { confirm: true }), { env: baseEnv });
+    assert.equal(unconfigured.status, 503);
+});
+
+test('handleCreatorAgentEnsure never calls MuAPI without confirm: true, and never returns external slugs or provision names', async () => {
+    resetRateLimitStore();
+    resetCreatorAgentCache();
+    let called = false;
+    await withMockFetch(async () => {
+        called = true;
+        return jsonResponse([]);
+    }, async () => {
+        const unconfirmed = await handleCreatorAgentEnsure(creatorRequest('agents/ensure', {}), { env: configuredEnv });
+        assert.equal(unconfirmed.status, 400);
+    });
+    assert.equal(called, false, 'provisioning must never run without explicit confirmation');
+
+    resetRateLimitStore();
+    resetCreatorAgentCache();
+    let createCalls = 0;
+    await withMockFetch(async (url, options = {}) => {
+        const href = String(url);
+        if (href.endsWith('/agents/user/agents')) return jsonResponse([]);
+        if (href.endsWith('/agents') && options.method === 'POST') {
+            createCalls += 1;
+            const payload = JSON.parse(options.body);
+            return jsonResponse({ name: payload.name, agent_id: `created-agent-${createCalls}` });
+        }
+        throw new Error(`Unexpected request to ${href}`);
+    }, async () => {
+        const confirmed = await handleCreatorAgentEnsure(creatorRequest('agents/ensure', { confirm: true }), { env: configuredEnv });
+        assert.equal(confirmed.status, 200);
+        const body = await confirmed.json();
+        assert.equal(body.agents.length, 8);
+        for (const agent of body.agents) {
+            assert.deepEqual(Object.keys(agent).sort(), ['id', 'status']);
+        }
+        assert.equal(JSON.stringify(body).includes('created-'), false);
+        assert.equal(JSON.stringify(body).includes('agent_id'), false);
+        assert.equal(JSON.stringify(body).includes('G.FURY'), false);
+    });
+});
+
+test('handleCreatorAgentDelegate rejects unknown agents, invalid tasks, cross-origin requests, and missing confirmation', async () => {
     resetRateLimitStore();
     const badAgent = await handleCreatorAgentDelegate(
-        creatorRequest('agents/delegate', { agentId: 'made-up-agent', task: 'Do something.' }),
+        creatorRequest('agents/delegate', { confirm: true, agentId: 'made-up-agent', task: 'Do something.' }),
         { env: configuredEnv },
     );
     assert.equal(badAgent.status, 400);
 
     resetRateLimitStore();
     const badTask = await handleCreatorAgentDelegate(
-        creatorRequest('agents/delegate', { agentId: 'creative-director', task: '' }),
+        creatorRequest('agents/delegate', { confirm: true, agentId: 'creative-director', task: '' }),
         { env: configuredEnv },
     );
     assert.equal(badTask.status, 400);
@@ -281,16 +393,31 @@ test('handleCreatorAgentDelegate rejects unknown agents, invalid tasks, and cros
     const crossOrigin = await handleCreatorAgentDelegate(
         creatorRequest(
             'agents/delegate',
-            { agentId: 'creative-director', task: 'Propose direction.' },
+            { confirm: true, agentId: 'creative-director', task: 'Propose direction.' },
             session,
             { origin: 'https://attacker.test', 'sec-fetch-site': 'cross-site' },
         ),
         { env: configuredEnv },
     );
     assert.equal(crossOrigin.status, 403);
+
+    resetRateLimitStore();
+    resetCreatorAgentCache();
+    let called = false;
+    await withMockFetch(async () => {
+        called = true;
+        return jsonResponse([]);
+    }, async () => {
+        const unconfirmed = await handleCreatorAgentDelegate(
+            creatorRequest('agents/delegate', { agentId: 'creative-director', task: 'Propose direction.' }),
+            { env: configuredEnv },
+        );
+        assert.equal(unconfirmed.status, 400);
+    });
+    assert.equal(called, false, 'a consequential/billable delegation must never dispatch without confirm: true');
 });
 
-test('handleCreatorAgentDelegate loads only the authenticated owner Project and never leaks credentials in the response', async () => {
+test('handleCreatorAgentDelegate loads only the authenticated owner Project, never leaks credentials, and returns a pending job', async () => {
     resetRateLimitStore();
     resetCreatorAgentCache();
     let projectLoaderUser;
@@ -317,40 +444,57 @@ test('handleCreatorAgentDelegate loads only the authenticated owner Project and 
             assert.equal(body.message.includes('project-secret'), false);
             return jsonResponse({ request_id: 'req-2' });
         }
-        if (href.endsWith('/api/v1/predictions/req-2/result')) {
-            return jsonResponse({
-                is_complete: true,
-                conversation_id: 'conv-2',
-                messages: [{ role: 'assistant', content: 'Direction proposed.' }],
-            });
-        }
         throw new Error(`Unexpected request to ${href}`);
     }, async () => {
         const response = await handleCreatorAgentDelegate(
             creatorRequest('agents/delegate', {
+                confirm: true,
                 agentId: 'creative-director',
                 task: 'Propose an opening concept.',
                 projectId,
             }),
             { env: configuredEnv, projectLoader },
         );
-        assert.equal(response.status, 200);
+        assert.equal(response.status, 202);
         const body = await response.json();
-        assert.equal(body.result.message, 'Direction proposed.');
+        assert.equal(body.result.status, 'pending');
+        assert.equal(body.result.requestId, 'req-2');
         assert.equal(JSON.stringify(body).includes('project-secret'), false);
         assert.equal(JSON.stringify(body).includes(configuredEnv.MUAPI_API_KEY), false);
     });
     assert.equal(projectLoaderUser.id, String(githubUser.id));
 });
 
-test('handleCreatorAgentEnsure requires authentication and a configured MuAPI key', async () => {
+test('handleCreatorAgentStatus polls once per call, requires a valid agent id, and never leaks credentials', async () => {
     resetRateLimitStore();
-    const unauthenticated = await handleCreatorAgentEnsure(creatorRequest('agents/ensure', {}, ''), { env: configuredEnv });
-    assert.equal(unauthenticated.status, 401);
+    resetCreatorAgentCache();
+    const badAgent = await handleCreatorAgentStatus(
+        creatorRequest('agents/status?agentId=made-up-agent&requestId=req-3', undefined),
+        { env: configuredEnv },
+    );
+    assert.equal(badAgent.status, 400);
 
     resetRateLimitStore();
-    const unconfigured = await handleCreatorAgentEnsure(creatorRequest('agents/ensure', {}), { env: baseEnv });
-    assert.equal(unconfigured.status, 503);
+    let resultCalls = 0;
+    await withMockFetch(async (url) => {
+        const href = String(url);
+        if (href.endsWith('/api/v1/predictions/req-3/result')) {
+            resultCalls += 1;
+            return jsonResponse({ is_complete: true, conversation_id: 'conv-3', messages: [{ role: 'assistant', content: 'Direction proposed.' }] });
+        }
+        throw new Error(`Unexpected request to ${href}`);
+    }, async () => {
+        const response = await handleCreatorAgentStatus(
+            creatorRequest('agents/status?agentId=creative-director&requestId=req-3', undefined),
+            { env: configuredEnv },
+        );
+        assert.equal(response.status, 200);
+        const body = await response.json();
+        assert.equal(body.result.status, 'completed');
+        assert.equal(body.result.message, 'Direction proposed.');
+        assert.equal(JSON.stringify(body).includes(configuredEnv.MUAPI_API_KEY), false);
+    });
+    assert.equal(resultCalls, 1);
 });
 
 test('handleCreatorAgentConversation rejects an unknown agent id', async () => {

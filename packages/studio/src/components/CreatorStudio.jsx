@@ -1344,6 +1344,7 @@ export default function CreatorStudio({
         const response = await request("agents/delegate", {
           method: "POST",
           body: {
+            confirm: true,
             agentId: draft.agentId,
             task: draft.task,
             conversationId: draft.conversationId || null,
@@ -1352,7 +1353,23 @@ export default function CreatorStudio({
           },
         });
         if (!response.ok) throw new Error(await responseError(response));
-        const data = await response.json();
+        const submitted = await response.json();
+        const requestId = submitted.result?.requestId;
+        if (!requestId) throw new Error("The Creator Team agent did not accept this task.");
+        let data = submitted;
+        for (let attempt = 0; attempt < 90; attempt += 1) {
+          await sleep(2000 + Math.floor(Math.random() * 400));
+          if (generationTokenRef.current !== token) throw new Error("Generation was stopped.");
+          const statusResponse = await request(
+            `agents/status?agentId=${encodeURIComponent(draft.agentId)}&requestId=${encodeURIComponent(requestId)}`,
+          );
+          if (!statusResponse.ok) throw new Error(await responseError(statusResponse));
+          data = await statusResponse.json();
+          if (data.result?.status === "completed") break;
+        }
+        if (data.result?.status !== "completed") {
+          throw new Error("The Creator Team agent is still working. Reopen this conversation to check it.");
+        }
         setDrafts((previous) => ({
           ...previous,
           "agent-team": { ...previous["agent-team"], conversationId: data.result?.conversationId || previous["agent-team"].conversationId },

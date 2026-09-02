@@ -5,6 +5,7 @@ import {
     handleCreatorAgentDelegate,
     handleCreatorAgentEnsure,
     handleCreatorAgents,
+    handleCreatorAgentStatus,
     handleCreatorProviders,
     handleElevenLabsSpeech,
     handleHeyGenStatus,
@@ -51,6 +52,8 @@ async function dispatch(request, context, method) {
             return handleCreatorAgentEnsure(request);
         case 'POST:agents/delegate':
             return handleCreatorAgentDelegate(request);
+        case 'GET:agents/status':
+            return handleCreatorAgentStatus(request);
         case 'GET:agents/conversation':
             return handleCreatorAgentConversation(request);
         default:

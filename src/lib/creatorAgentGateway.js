@@ -146,11 +146,21 @@ function mergedTaskMessage(task, contextSummary) {
     return `Project context (reference only, do not restate as fact beyond what is given):\n${boundedContext}\n\nTask:\n${boundedInput}`;
 }
 
-// Delegates one bounded task to an existing MuAPI agent and returns its reply.
-// Agent chat turns poll the same billed predictions endpoint used by paid media
-// generation (see pollAgentChatResult in muapi.js), so callers MUST treat this as
-// cost-incurring and gate it behind the same approval flow as image/video generation.
-export async function delegateToCreatorAgent(internalId, { task, contextSummary, conversationId, env = process.env } = {}) {
+function extractAssistantReply(messages) {
+    const list = Array.isArray(messages) ? messages : [];
+    const reply = [...list].reverse().find((message) => message?.role === 'assistant' && typeof message?.content === 'string' && message.content.trim());
+    return reply ? reply.content.trim().slice(0, 12_000) : '';
+}
+
+// Submits one bounded task to an existing MuAPI agent and returns immediately
+// with an opaque requestId — it never waits for the agent's reply. Agent chat
+// turns are answered via the same billed predictions endpoint used by paid
+// media generation (see pollAgentChatResult in muapi.js), so callers MUST
+// treat this as cost-incurring and gate it behind the same approval flow as
+// image/video generation. Callers poll pollCreatorAgentDelegation below for
+// the result, matching the existing MuAPI image/video job submit+poll pattern
+// instead of holding a server request open for up to five minutes.
+export async function submitCreatorAgentDelegation(internalId, { task, contextSummary, conversationId, env = process.env } = {}) {
     const boundedInput = mergedTaskMessage(task, contextSummary);
     const boundedConversation = boundedConversationId(conversationId);
     const { definition, slug } = await resolveCreatorAgent(internalId, { env });
@@ -164,19 +174,46 @@ export async function delegateToCreatorAgent(internalId, { task, contextSummary,
     if (!submission?.request_id) {
         throw new CreatorAgentError('agent_dispatch_failed', 'The Creator Team agent did not accept this task.', 502);
     }
-    let result;
-    try {
-        result = await pollAgentChatResult(configuration.apiKey, submission.request_id);
-    } catch {
-        throw new CreatorAgentError('agent_result_failed', 'The Creator Team agent did not return a result in time.', 502);
-    }
-    const messages = Array.isArray(result?.messages) ? result.messages : [];
-    const reply = [...messages].reverse().find((message) => message?.role === 'assistant' && typeof message?.content === 'string' && message.content.trim());
     return {
         agentId: definition.id,
         label: definition.label,
-        conversationId: result?.conversation_id || boundedConversation || null,
-        message: reply ? reply.content.trim().slice(0, 12_000) : 'The agent did not return a text reply.',
+        requestId: submission.request_id,
+        conversationId: boundedConversation || null,
+        status: 'pending',
+    };
+}
+
+// Single, bounded check of a previously submitted delegation — reuses
+// pollAgentChatResult's exact request/response handling with maxAttempts: 1 so
+// a single call here never blocks. Callers (the agents/status route) are
+// expected to call this repeatedly from the client, exactly like the existing
+// MuAPI image/video status route polls createMuapiImageJob/createMuapiVideoJob
+// results.
+export async function pollCreatorAgentDelegation(internalId, requestId, { env = process.env } = {}) {
+    const definition = creatorAgentDefinition(internalId);
+    if (!definition || !definition.enabled) {
+        throw new CreatorAgentError('agent_unavailable', 'That Creator Team agent is not available.', 404);
+    }
+    if (!OPAQUE_ID_PATTERN.test(String(requestId || ''))) {
+        throw new CreatorAgentError('invalid_request', 'A valid agent task reference is required.', 400);
+    }
+    const configuration = requireConfiguredMuapi(env);
+    let result;
+    try {
+        result = await pollAgentChatResult(configuration.apiKey, requestId, { maxAttempts: 1, interval: 0 });
+    } catch (error) {
+        if (error?.message === 'Agent response timed out.') {
+            return { agentId: definition.id, label: definition.label, requestId, status: 'pending', conversationId: null, message: null };
+        }
+        throw new CreatorAgentError('agent_result_failed', 'The Creator Team agent did not return a result.', 502);
+    }
+    return {
+        agentId: definition.id,
+        label: definition.label,
+        requestId,
+        status: 'completed',
+        conversationId: result?.conversation_id || null,
+        message: extractAssistantReply(result?.messages) || 'The agent did not return a text reply.',
     };
 }
 

@@ -15,10 +15,11 @@ import {
 } from './creatorToolRegistry.js';
 import {
     CreatorAgentError,
-    delegateToCreatorAgent,
     ensureCreatorAgents,
     fetchCreatorAgentConversation,
     listCreatorAgentCatalog,
+    pollCreatorAgentDelegation,
+    submitCreatorAgentDelegation,
 } from './creatorAgentGateway.js';
 import { isValidCreatorAgentId } from './creatorAgentRegistry.js';
 import {
@@ -805,22 +806,46 @@ export async function handleCreatorAgents(request, { env = process.env } = {}) {
     return creatorJson({ agents: listCreatorAgentCatalog() });
 }
 
-// Non-billable, idempotent provisioning: reuses any already-created MuAPI agent
-// matching a registry entry's name and only creates the ones that are missing.
+// Any consequential Agent Team action — provisioning an external MuAPI agent,
+// or dispatching a billable task — must carry an explicit confirm: true flag
+// in the request body. This is the real server-side execution boundary: it is
+// enforced here regardless of what a client (or a compromised/buggy UI) sends,
+// independent of Selena's action-registry `requiresApproval` metadata, which
+// only controls whether the UI shows a confirmation prompt before calling in.
+function requireExplicitConfirmation(parsedValue) {
+    if (parsedValue?.confirm !== true) {
+        return creatorJson({ error: 'Explicit confirmation is required before this action can run.' }, 400);
+    }
+    return null;
+}
+
+// Provisioning creates external MuAPI agents (a real side effect) and its cost
+// is unverified, so it requires the same explicit confirm: true gate as
+// delegation, in addition to auth/CSRF/rate limiting. The response never
+// exposes the external MuAPI slug or provisioned agent name — only the fixed
+// internal allowlisted id and a bounded status.
 export async function handleCreatorAgentEnsure(request, { env = process.env } = {}) {
     const auth = authorizeCreatorRequest(request, { env, action: 'agents-ensure' });
     if (auth.response) return auth.response;
+    const parsed = await parseCreatorJson(request, { env });
+    if (parsed.response) return parsed.response;
+    const confirmation = requireExplicitConfirmation(parsed.value);
+    if (confirmation) return confirmation;
     try {
         const agents = await ensureCreatorAgents({ env });
-        return creatorJson({ agents });
+        return creatorJson({
+            agents: agents.map((agent) => ({ id: agent.id, status: agent.status === 'created' ? 'created' : 'ready' })),
+        });
     } catch (error) {
         return agentFailure(error);
     }
 }
 
-// Delegates one bounded, user-approved task to an existing MuAPI Creator Team
-// agent. Callers (Selena's agent.delegate action) MUST treat this as
-// cost-incurring, matching image/video generation's approval gate.
+// Submits one bounded, user-approved task to an existing MuAPI Creator Team
+// agent and returns immediately with a requestId to poll — it never waits for
+// the agent's reply. Callers (Selena's agent.delegate/agent.continue actions)
+// MUST treat this as cost-incurring, matching image/video generation's
+// approval gate, and it requires an explicit confirm: true flag in the body.
 export async function handleCreatorAgentDelegate(request, {
     env = process.env,
     blobStore,
@@ -830,6 +855,8 @@ export async function handleCreatorAgentDelegate(request, {
     if (auth.response) return auth.response;
     const parsed = await parseCreatorJson(request, { env });
     if (parsed.response) return parsed.response;
+    const confirmation = requireExplicitConfirmation(parsed.value);
+    if (confirmation) return confirmation;
 
     const agentId = typeof parsed.value.agentId === 'string' ? parsed.value.agentId.trim() : '';
     if (!isValidCreatorAgentId(agentId)) {
@@ -841,17 +868,38 @@ export async function handleCreatorAgentDelegate(request, {
 
     try {
         const { contextSummary } = await loadAgentProjectContext(auth, parsed.value, { env, blobStore, projectLoader });
-        const result = await delegateToCreatorAgent(agentId, {
+        const result = await submitCreatorAgentDelegation(agentId, {
             task: task.value,
             contextSummary,
             conversationId,
             env,
         });
-        return creatorJson({ result });
+        return creatorJson({ result }, 202);
     } catch (error) {
         if (error instanceof CreatorProjectError) {
             return creatorJson({ error: error.message, code: error.code }, error.status);
         }
+        return agentFailure(error);
+    }
+}
+
+// Bounded, single-check status poll for a previously submitted delegation.
+// Mirrors handleMuapiStatus's GET ?id=&kind= shape for image/video jobs so the
+// client can poll a fixed-path status endpoint instead of holding a request
+// open while the agent works.
+export async function handleCreatorAgentStatus(request, { env = process.env } = {}) {
+    const auth = authorizeCreatorRequest(request, { env, action: 'agents-status', statusRequest: true });
+    if (auth.response) return auth.response;
+    const url = new URL(request.url);
+    const agentId = (url.searchParams.get('agentId') || '').trim();
+    const requestId = (url.searchParams.get('requestId') || '').trim();
+    if (!isValidCreatorAgentId(agentId)) {
+        return creatorJson({ error: 'A valid Creator Team agent is required.' }, 400);
+    }
+    try {
+        const result = await pollCreatorAgentDelegation(agentId, requestId, { env });
+        return creatorJson({ result });
+    } catch (error) {
         return agentFailure(error);
     }
 }
