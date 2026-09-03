@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATHAR ONE — Advertisement</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #0a0a0a;
+    --black-soft: #111111;
+    --gold: #C8A45D;
+    --gold-light: #D8C39A;
+    --off-white: #F7F3EA;
+    --stone: #B8B1A4;
+    --text-muted: #888880;
+    --blue-led: #6FD6FF;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Jost', sans-serif;
+    background: var(--black);
+    color: var(--off-white);
+    overflow-x: hidden;
+    font-weight: 300;
+  }
+
+  /* ── FULL PAGE AD ── */
+  .ad-wrap {
+    position: relative;
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    overflow: hidden;
+  }
+
+  /* Animated background gradient */
+  .ad-wrap::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 80% at 70% 50%, rgba(200,164,93,0.06) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 60% at 30% 20%, rgba(111,214,255,0.03) 0%, transparent 60%);
+    animation: bgShift 8s ease-in-out infinite alternate;
+    z-index: 0;
+  }
+
+  @keyframes bgShift {
+    0% { opacity: 0.6; }
+    100% { opacity: 1; }
+  }
+
+  /* ── LEFT PANEL ── */
+  .left-panel {
+    position: relative; z-index: 1;
+    display: flex; flex-direction: column;
+    justify-content: center;
+    padding: 7rem 5rem 7rem 7rem;
+  }
+
+  .brand-lock {
+    display: flex; flex-direction: column;
+    gap: 0; margin-bottom: 4rem;
+  }
+
+  .brand-lock .eyebrow {
+    font-size: 9px; letter-spacing: 0.5em; text-transform: uppercase;
+    color: var(--gold); font-weight: 400; margin-bottom: 0.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.2s;
+  }
+
+  .brand-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(72px, 10vw, 130px);
+    font-weight: 300; line-height: 0.9;
+    letter-spacing: 0.05em;
+    color: var(--off-white);
+    opacity: 0;
+    animation: fadeUp 0.9s ease forwards 0.4s;
+  }
+
+  .brand-name em {
+    display: block;
+    color: var(--gold); font-style: italic;
+    font-size: 0.35em; letter-spacing: 0.2em;
+    margin-top: 0.4rem;
+  }
+
+  .divider {
+    width: 0; height: 0.5px; background: var(--gold);
+    margin: 2.5rem 0;
+    animation: expandLine 1s ease forwards 1s;
+  }
+  @keyframes expandLine {
+    to { width: 60px; height: 0.5px; }
+  }
+
+  .headline {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(28px, 3.5vw, 46px);
+    font-weight: 300; line-height: 1.25;
+    color: var(--off-white);
+    max-width: 420px; margin-bottom: 2rem;
+    opacity: 0;
+    animation: fadeUp 0.9s ease forwards 0.8s;
+  }
+
+  .headline em { color: var(--gold); font-style: italic; }
+
+  .subline {
+    font-size: 14px; line-height: 1.9;
+    color: var(--stone); max-width: 380px;
+    margin-bottom: 3.5rem;
+    opacity: 0;
+    animation: fadeUp 0.9s ease forwards 1s;
+  }
+
+  /* Stat row */
+  .stats {
+    display: flex; gap: 3rem; margin-bottom: 4rem;
+    opacity: 0;
+    animation: fadeUp 0.9s ease forwards 1.2s;
+  }
+  .stat { display: flex; flex-direction: column; gap: 0.2rem; }
+  .stat-val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 40px; font-weight: 300; color: var(--off-white);
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .stat-divider { width: 0.5px; background: rgba(200,164,93,0.2); }
+
+  /* CTA area */
+  .cta-row {
+    display: flex; flex-direction: column; gap: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.9s ease forwards 1.4s;
+  }
+
+  .cta-primary {
+    display: inline-flex; align-items: center; gap: 1rem;
+    background: var(--gold); color: var(--black);
+    padding: 1rem 2.5rem; font-family: 'Jost', sans-serif;
+    font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase;
+    font-weight: 500; border: none; cursor: pointer;
+    width: fit-content; transition: background 0.3s;
+    position: relative; overflow: hidden;
+  }
+  .cta-primary::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: rgba(255,255,255,0.1);
+    transform: translateX(-100%);
+    transition: transform 0.4s ease;
+  }
+  .cta-primary:hover::after { transform: translateX(0); }
+  .cta-primary:hover { background: var(--gold-light); }
+  .cta-arrow { font-size: 14px; transition: transform 0.3s; }
+  .cta-primary:hover .cta-arrow { transform: translateX(4px); }
+
+  .cta-secondary-row {
+    display: flex; gap: 2rem;
+  }
+  .cta-link {
+    font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--stone); text-decoration: none;
+    border-bottom: 0.5px solid rgba(184,177,164,0.3);
+    padding-bottom: 2px; transition: color 0.3s, border-color 0.3s;
+    cursor: pointer;
+  }
+  .cta-link:hover { color: var(--gold); border-color: var(--gold); }
+
+  /* Arabic bottom */
+  .arabic-lockup {
+    margin-top: 5rem; padding-top: 2rem;
+    border-top: 0.5px solid rgba(200,164,93,0.15);
+    direction: rtl; text-align: right;
+    opacity: 0;
+    animation: fadeUp 0.9s ease forwards 1.6s;
+  }
+  .arabic-main {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px; color: var(--gold); font-weight: 300;
+  }
+  .arabic-sub {
+    font-size: 11px; color: var(--text-muted); margin-top: 0.4rem;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── RIGHT PANEL ── */
+  .right-panel {
+    position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(160deg, #0f0f0f 0%, #141208 100%);
+    border-left: 0.5px solid rgba(200,164,93,0.1);
+    overflow: hidden;
+    padding: 4rem 3rem;
+  }
+
+  /* Subtle vertical gold line */
+  .right-panel::before {
+    content: '';
+    position: absolute; top: 10%; bottom: 10%; left: 0;
+    width: 0.5px;
+    background: linear-gradient(180deg, transparent, rgba(200,164,93,0.3), transparent);
+  }
+
+  /* Glow halo behind product */
+  .product-halo {
+    position: absolute;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(200,164,93,0.08) 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    animation: haloPulse 4s ease-in-out infinite;
+  }
+  @keyframes haloPulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+    50% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+  }
+
+  .product-img-wrap {
+    position: relative; z-index: 2;
+    opacity: 0;
+    animation: fadeIn 1.2s ease forwards 0.6s;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .product-img {
+    width: 100%; max-width: 480px;
+    display: block;
+    filter: drop-shadow(0 40px 80px rgba(0,0,0,0.8))
+            drop-shadow(0 0 60px rgba(200,164,93,0.08));
+  }
+
+  /* Floating spec tags */
+  .spec-tag {
+    position: absolute;
+    background: rgba(10,10,10,0.9);
+    border: 0.5px solid rgba(200,164,93,0.25);
+    backdrop-filter: blur(12px);
+    padding: 0.6rem 1.1rem;
+    display: flex; align-items: center; gap: 0.6rem;
+    opacity: 0;
+    animation: fadeIn 0.8s ease forwards;
+  }
+  .spec-tag .tag-val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px; font-weight: 300; color: var(--off-white);
+  }
+  .spec-tag .tag-label {
+    font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--text-muted); line-height: 1.4;
+  }
+
+  .tag-1 { top: 12%; right: 5%; animation-delay: 1.4s; }
+  .tag-2 { bottom: 22%; left: 2%; animation-delay: 1.6s; }
+  .tag-3 { top: 55%; right: 2%; animation-delay: 1.8s; }
+
+  /* LED dot */
+  .led-indicator {
+    position: absolute; bottom: 10%; left: 50%;
+    transform: translateX(-50%);
+    display: flex; align-items: center; gap: 0.7rem;
+    opacity: 0;
+    animation: fadeIn 0.8s ease forwards 2s;
+  }
+  .led-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--blue-led);
+    box-shadow: 0 0 10px var(--blue-led), 0 0 20px rgba(111,214,255,0.4);
+    animation: ledPulse 2.5s ease-in-out infinite;
+  }
+  @keyframes ledPulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 10px var(--blue-led), 0 0 20px rgba(111,214,255,0.4); }
+    50% { opacity: 0.3; box-shadow: 0 0 4px var(--blue-led); }
+  }
+  .led-label {
+    font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--blue-led); font-weight: 400;
+  }
+
+  /* Corner branding */
+  .corner-brand {
+    position: absolute; top: 2.5rem; right: 2.5rem;
+    text-align: right;
+    opacity: 0;
+    animation: fadeIn 0.8s ease forwards 0.2s;
+  }
+  .corner-brand .cb-main {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px; letter-spacing: 0.2em; color: var(--off-white);
+    font-weight: 300;
+  }
+  .corner-brand .cb-sub {
+    font-size: 8px; letter-spacing: 0.35em; text-transform: uppercase;
+    color: var(--gold); font-weight: 400;
+  }
+
+  /* Origin tag bottom right */
+  .origin-tag {
+    position: absolute; bottom: 2rem; right: 2.5rem;
+    font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--text-muted);
+    opacity: 0;
+    animation: fadeIn 0.8s ease forwards 2.2s;
+  }
+  .origin-tag span { color: var(--gold); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* ── SECOND SECTION — Scent strip ── */
+  .scent-strip {
+    background: var(--black-soft);
+    border-top: 0.5px solid rgba(200,164,93,0.12);
+    padding: 5rem 7rem;
+  }
+
+  .scent-strip-header {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    margin-bottom: 3.5rem;
+  }
+  .scent-strip-header h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(28px, 3vw, 42px); font-weight: 300;
+    color: var(--off-white);
+  }
+  .scent-strip-header h2 em { color: var(--gold); font-style: italic; }
+  .scent-count {
+    font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .scents-row {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1px;
+    background: rgba(200,164,93,0.08);
+    border: 0.5px solid rgba(200,164,93,0.08);
+  }
+  .scent-item {
+    background: var(--black-soft);
+    padding: 2rem 1.5rem;
+    transition: background 0.3s;
+    cursor: default;
+  }
+  .scent-item:hover { background: #161610; }
+  .scent-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px; color: rgba(200,164,93,0.2); font-weight: 300;
+    margin-bottom: 1rem; line-height: 1;
+  }
+  .scent-name-sm {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px; color: var(--off-white); font-weight: 400;
+    margin-bottom: 0.3rem;
+  }
+  .scent-cat-sm {
+    font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--gold); font-weight: 400;
+  }
+
+  /* ── THIRD SECTION — Full bleed tagline ── */
+  .tagline-block {
+    position: relative;
+    padding: 9rem 7rem;
+    text-align: center;
+    overflow: hidden;
+    background: linear-gradient(180deg, #0d0d0d 0%, #0a0a0a 100%);
+  }
+
+  .tagline-block::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(200,164,93,0.06) 0%, transparent 70%);
+  }
+
+  .tagline-arabic {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(36px, 5vw, 64px); color: var(--gold);
+    font-weight: 300; margin-bottom: 1.5rem;
+    opacity: 0.8; position: relative; z-index: 1;
+  }
+
+  .tagline-en {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(20px, 2.5vw, 32px); font-weight: 300;
+    color: var(--stone); font-style: italic;
+    position: relative; z-index: 1; margin-bottom: 4rem;
+  }
+
+  .model-badge {
+    display: inline-flex; align-items: center; gap: 2rem;
+    border: 0.5px solid rgba(200,164,93,0.2);
+    padding: 1.2rem 3rem;
+    position: relative; z-index: 1;
+  }
+  .model-badge .mb-label {
+    font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .model-badge .mb-val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px; color: var(--off-white); font-weight: 300;
+  }
+  .mb-dot { width: 1px; height: 24px; background: rgba(200,164,93,0.2); }
+
+  /* ── FOOTER ── */
+  .ad-footer {
+    background: var(--black);
+    border-top: 0.5px solid rgba(200,164,93,0.12);
+    padding: 2.5rem 7rem;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .af-brand {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px; letter-spacing: 0.15em; color: var(--off-white);
+    font-weight: 300;
+  }
+  .af-brand small {
+    display: block; font-size: 8px; font-family: 'Jost', sans-serif;
+    letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--gold); margin-top: 0.3rem;
+  }
+  .af-links {
+    display: flex; gap: 2.5rem;
+  }
+  .af-link {
+    font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--text-muted); text-decoration: none;
+    transition: color 0.3s; cursor: pointer;
+  }
+  .af-link:hover { color: var(--gold); }
+  .af-origin {
+    font-size: 10px; letter-spacing: 0.15em; color: var(--text-muted);
+    text-align: right;
+  }
+  .af-origin strong { color: var(--gold); display: block; font-weight: 400; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .ad-wrap { grid-template-columns: 1fr; min-height: auto; }
+    .right-panel { min-height: 70vh; border-left: none; border-top: 0.5px solid rgba(200,164,93,0.1); }
+    .left-panel { padding: 5rem 2.5rem; }
+    .stats { gap: 1.5rem; }
+    .scents-row { grid-template-columns: repeat(3, 1fr); }
+    .tagline-block { padding: 5rem 2.5rem; }
+    .scent-strip { padding: 4rem 2.5rem; }
+    .ad-footer { flex-direction: column; gap: 1.5rem; padding: 2rem 2.5rem; text-align: center; }
+    .af-links { justify-content: center; }
+    .tag-1, .tag-2, .tag-3 { display: none; }
+  }
+  @media (max-width: 600px) {
+    .scents-row { grid-template-columns: repeat(2, 1fr); }
+    .brand-name { font-size: 64px; }
+    .scent-strip-header { flex-direction: column; gap: 0.5rem; align-items: flex-start; }
+    .model-badge { flex-direction: column; gap: 0.75rem; }
+    .mb-dot { width: 40px; height: 1px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HERO AD ── -->
+<div class="ad-wrap">
+
+  <!-- LEFT: Copy -->
+  <div class="left-panel">
+
+    <div class="brand-lock">
+      <span class="eyebrow">by Organica Black® — UAE</span>
+      <div class="brand-name">
+        <em>ATHAR</em>
+        ONE
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h2 class="headline">
+      The Scent of<br>
+      <em>Luxury Living,</em><br>
+      Redefined.
+    </h2>
+
+    <p class="subline">
+      Silent as the morning. Present as the evening. ATHAR ONE diffuses your signature scent through 200&nbsp;m³ of space — without a sound, without effort, without compromise.
+    </p>
+
+    <div class="stats">
+      <div class="stat">
+        <span class="stat-val">200</span>
+        <span class="stat-label">m³ Coverage</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <span class="stat-val">&lt;34</span>
+        <span class="stat-label">dBA Noise</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <span class="stat-val">120</span>
+        <span class="stat-label">ml Capacity</span>
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <button class="cta-primary">
+        Order ATHAR ONE
+        <span class="cta-arrow">→</span>
+      </button>
+      <div class="cta-secondary-row">
+        <span class="cta-link">Subscribe Monthly</span>
+        <span class="cta-link">Book a Consultation</span>
+        <span class="cta-link">Request a Sample</span>
+      </div>
+    </div>
+
+    <div class="arabic-lockup">
+      <div class="arabic-main">أثَر يبقى في الذاكرة</div>
+      <div class="arabic-sub">A scent that leaves a lasting impression.</div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Product visual -->
+  <div class="right-panel">
+
+    <div class="corner-brand">
+      <div class="cb-main">ATHAR</div>
+      <div class="cb-sub">Organica Black®</div>
+    </div>
+
+    <div class="product-halo"></div>
+
+    <div class="product-img-wrap">
+      <img
+        class="product-img"
+        src="/mnt/user-data/uploads/ChatGPT_Image_May_16__2026__05_21_32_PM__1_.png"
+        alt="ATHAR ONE Luxury Aroma Diffuser"
+      >
+    </div>
+
+    <!-- Floating spec tags -->
+    <div class="spec-tag tag-1">
+      <div>
+        <div class="tag-val">930mm</div>
+        <div class="tag-label">Tower Height</div>
+      </div>
+    </div>
+    <div class="spec-tag tag-2">
+      <div>
+        <div class="tag-val">5W</div>
+        <div class="tag-label">USB-C Power</div>
+      </div>
+    </div>
+    <div class="spec-tag tag-3">
+      <div>
+        <div class="tag-val">Al + ABS</div>
+        <div class="tag-label">Premium Material</div>
+      </div>
+    </div>
+
+    <!-- LED indicator -->
+    <div class="led-indicator">
+      <div class="led-dot"></div>
+      <span class="led-label">Ambient LED Ring — Active</span>
+    </div>
+
+    <div class="origin-tag">Designed in <span>UAE</span></div>
+  </div>
+</div>
+
+<!-- ── SCENT COLLECTION STRIP ── -->
+<section class="scent-strip">
+  <div class="scent-strip-header">
+    <h2>The ATHAR<br><em>Scent Collection</em></h2>
+    <span class="scent-count">06 Curated Scents</span>
+  </div>
+
+  <div class="scents-row">
+    <div class="scent-item">
+      <div class="scent-num">01</div>
+      <div class="scent-name-sm">Opulent Oud</div>
+      <div class="scent-cat-sm">Warm Oriental</div>
+    </div>
+    <div class="scent-item">
+      <div class="scent-num">02</div>
+      <div class="scent-name-sm">Amber</div>
+      <div class="scent-cat-sm">Oriental Spiced</div>
+    </div>
+    <div class="scent-item">
+      <div class="scent-num">03</div>
+      <div class="scent-name-sm">Bakhoor Maani</div>
+      <div class="scent-cat-sm">Traditional Arabian</div>
+    </div>
+    <div class="scent-item">
+      <div class="scent-num">04</div>
+      <div class="scent-name-sm">Noir Cèdre</div>
+      <div class="scent-cat-sm">Woody Contemporary</div>
+    </div>
+    <div class="scent-item">
+      <div class="scent-num">05</div>
+      <div class="scent-name-sm">Jardin de Rose</div>
+      <div class="scent-cat-sm">Floral Elegant</div>
+    </div>
+    <div class="scent-item">
+      <div class="scent-num">06</div>
+      <div class="scent-name-sm">Majlis Oud Wood</div>
+      <div class="scent-cat-sm">Signature Emirati</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TAGLINE BLOCK ── -->
+<section class="tagline-block">
+  <div class="tagline-arabic">أثَر وان</div>
+  <div class="tagline-en">"A scent that leaves a lasting impression."</div>
+
+  <div class="model-badge">
+    <div>
+      <div class="mb-label">Model</div>
+      <div class="mb-val">TW-TA01</div>
+    </div>
+    <div class="mb-dot"></div>
+    <div>
+      <div class="mb-label">Finish</div>
+      <div class="mb-val">Matte Black</div>
+    </div>
+    <div class="mb-dot"></div>
+    <div>
+      <div class="mb-label">Coverage</div>
+      <div class="mb-val">200 m³</div>
+    </div>
+    <div class="mb-dot"></div>
+    <div>
+      <div class="mb-label">Origin</div>
+      <div class="mb-val">UAE</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── AD FOOTER ── -->
+<footer class="ad-footer">
+  <div class="af-brand">
+    ATHAR
+    <small>by Organica Black®  ·  Abu Dhabi, UAE</small>
+  </div>
+  <div class="af-links">
+    <span class="af-link">WhatsApp</span>
+    <span class="af-link">Instagram</span>
+    <span class="af-link">Website</span>
+    <span class="af-link">Email</span>
+  </div>
+  <div class="af-origin">
+    <strong>Organica Black®</strong>
+    UAE Licensed Supplier · AED Invoicing
+  </div>
+</footer>
+
+</body>
+</html>

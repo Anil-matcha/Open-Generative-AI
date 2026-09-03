@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1080">
+<title>ATHAR ONE — Instagram Post</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #0a0a0a;
+    --gold: #C8A45D;
+    --gold-light: #D8C39A;
+    --off-white: #F7F3EA;
+    --stone: #B8B1A4;
+    --muted: #888880;
+    --blue-led: #6FD6FF;
+  }
+
+  body {
+    font-family: 'Jost', sans-serif;
+    background: #1a1a1a;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 48px;
+    padding: 48px 24px;
+  }
+
+  .label {
+    font-family: 'Jost', sans-serif;
+    font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase;
+    color: #555; margin-bottom: -32px;
+  }
+
+  /* ════════════════════════════════
+     POST 1 — Hero Product (Square)
+  ════════════════════════════════ */
+  .post {
+    width: 1080px;
+    height: 1080px;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  /* ── POST 1 ── */
+  .post-1 {
+    background: var(--black);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .p1-left {
+    position: relative; z-index: 2;
+    display: flex; flex-direction: column;
+    justify-content: center;
+    padding: 80px 60px 80px 80px;
+    background: linear-gradient(105deg, #0a0a0a 60%, transparent 100%);
+  }
+
+  .p1-eyebrow {
+    font-size: 13px; letter-spacing: 0.45em; text-transform: uppercase;
+    color: var(--gold); font-weight: 400; margin-bottom: 28px;
+  }
+
+  .p1-brand {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 100px; font-weight: 300; line-height: 0.85;
+    color: var(--off-white); letter-spacing: 0.04em;
+    margin-bottom: 6px;
+  }
+
+  .p1-model {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px; font-style: italic;
+    color: var(--gold); letter-spacing: 0.15em;
+    margin-bottom: 48px;
+  }
+
+  .p1-divider {
+    width: 48px; height: 0.5px;
+    background: var(--gold); margin-bottom: 40px;
+  }
+
+  .p1-tagline {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px; font-weight: 300; line-height: 1.3;
+    color: var(--off-white); margin-bottom: 40px;
+    max-width: 320px;
+  }
+  .p1-tagline em { color: var(--gold); font-style: italic; }
+
+  .p1-stats {
+    display: flex; gap: 32px; margin-bottom: 52px;
+  }
+  .p1-stat-val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 38px; font-weight: 300; color: var(--off-white);
+    line-height: 1; display: block;
+  }
+  .p1-stat-label {
+    font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--muted); display: block; margin-top: 4px;
+  }
+
+  .p1-cta {
+    display: inline-flex; align-items: center; gap: 14px;
+    background: var(--gold); color: var(--black);
+    padding: 16px 32px; width: fit-content;
+    font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .p1-arabic {
+    margin-top: auto; padding-top: 32px;
+    border-top: 0.5px solid rgba(200,164,93,0.2);
+    direction: rtl; text-align: right;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px; color: rgba(200,164,93,0.6);
+    font-weight: 300;
+  }
+
+  .p1-right {
+    position: relative;
+    background: linear-gradient(135deg, #0f0f0f 0%, #141208 100%);
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .p1-right::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 80% at 50% 60%, rgba(200,164,93,0.1) 0%, transparent 65%);
+  }
+
+  .p1-img {
+    width: 85%; max-height: 900px;
+    object-fit: contain;
+    position: relative; z-index: 1;
+    filter: drop-shadow(0 30px 60px rgba(0,0,0,0.9));
+  }
+
+  .p1-led {
+    position: absolute; bottom: 60px; left: 50%;
+    transform: translateX(-50%);
+    display: flex; align-items: center; gap: 10px;
+    background: rgba(10,10,10,0.85);
+    border: 0.5px solid rgba(111,214,255,0.25);
+    padding: 10px 18px;
+    z-index: 2;
+    white-space: nowrap;
+  }
+  .led-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--blue-led);
+    box-shadow: 0 0 12px var(--blue-led);
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink {
+    0%,100% { opacity:1; } 50% { opacity:0.3; }
+  }
+  .led-txt {
+    font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--blue-led);
+  }
+
+  .p1-corner {
+    position: absolute; top: 40px; right: 40px; z-index: 3;
+    text-align: right;
+  }
+  .p1-corner-main {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px; letter-spacing: 0.2em; color: var(--off-white);
+    font-weight: 300;
+  }
+  .p1-corner-sub {
+    font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  /* ── POST 2 — Dark Minimal Scent ── */
+  .post-2 {
+    background: var(--black);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 100px 120px;
+    position: relative;
+  }
+
+  .post-2::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 70% 50% at 50% 40%, rgba(200,164,93,0.07) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 40% at 20% 80%, rgba(111,214,255,0.03) 0%, transparent 60%);
+  }
+
+  .p2-eyebrow {
+    font-size: 11px; letter-spacing: 0.5em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 36px; position: relative;
+  }
+
+  .p2-headline {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 80px; font-weight: 300; line-height: 1.05;
+    color: var(--off-white); position: relative; margin-bottom: 16px;
+  }
+  .p2-headline em { color: var(--gold); font-style: italic; display: block; }
+
+  .p2-sub {
+    font-size: 15px; color: var(--stone); line-height: 1.9;
+    max-width: 560px; margin: 0 auto 60px; position: relative;
+  }
+
+  .p2-scents {
+    display: flex; gap: 24px; flex-wrap: wrap; justify-content: center;
+    position: relative; margin-bottom: 60px;
+  }
+  .p2-scent {
+    border: 0.5px solid rgba(200,164,93,0.2);
+    padding: 12px 24px;
+    font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--stone);
+  }
+  .p2-scent.featured {
+    border-color: var(--gold); color: var(--gold);
+  }
+
+  .p2-divider-row {
+    display: flex; align-items: center; gap: 24px;
+    margin-bottom: 60px; position: relative;
+  }
+  .p2-line { flex: 1; height: 0.5px; background: rgba(200,164,93,0.2); }
+  .p2-arabic {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px; color: rgba(200,164,93,0.5); font-weight: 300;
+  }
+
+  .p2-footer-tag {
+    font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--muted); position: relative;
+  }
+  .p2-footer-tag span { color: var(--gold); }
+
+  /* ── POST 3 — Specs Dark ── */
+  .post-3 {
+    background: #0d0d0d;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .p3-top {
+    display: grid; grid-template-columns: 1fr 1fr;
+    padding: 80px;
+    gap: 80px;
+    align-items: center;
+  }
+
+  .p3-img-wrap {
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .p3-img-wrap::before {
+    content: '';
+    position: absolute; inset: -40px;
+    background: radial-gradient(ellipse at center, rgba(200,164,93,0.08) 0%, transparent 70%);
+  }
+  .p3-img {
+    width: 100%; max-height: 700px;
+    object-fit: contain;
+    position: relative; z-index: 1;
+    filter: drop-shadow(0 20px 50px rgba(0,0,0,0.8));
+  }
+
+  .p3-content {
+    display: flex; flex-direction: column; justify-content: center;
+  }
+
+  .p3-eyebrow {
+    font-size: 11px; letter-spacing: 0.45em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 24px;
+  }
+
+  .p3-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 60px; font-weight: 300; line-height: 1.0;
+    color: var(--off-white); margin-bottom: 8px;
+  }
+  .p3-title em { color: var(--gold); font-style: italic; }
+
+  .p3-subtitle {
+    font-size: 13px; color: var(--stone); margin-bottom: 48px;
+    letter-spacing: 0.05em;
+  }
+
+  .p3-specs {
+    display: flex; flex-direction: column; gap: 0;
+    border-top: 0.5px solid rgba(200,164,93,0.12);
+  }
+  .p3-spec-row {
+    display: flex; justify-content: space-between;
+    padding: 16px 0;
+    border-bottom: 0.5px solid rgba(200,164,93,0.08);
+    font-size: 13px;
+  }
+  .p3-spec-key { color: var(--muted); letter-spacing: 0.05em; }
+  .p3-spec-val { color: var(--off-white); font-weight: 400; }
+  .p3-spec-val.gold { color: var(--gold); font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 300; }
+
+  .p3-bottom {
+    background: rgba(200,164,93,0.06);
+    border-top: 0.5px solid rgba(200,164,93,0.12);
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 28px 80px;
+  }
+  .p3-brand {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px; letter-spacing: 0.15em; color: var(--off-white);
+    font-weight: 300;
+  }
+  .p3-brand small {
+    display: block; font-size: 9px; font-family: 'Jost', sans-serif;
+    letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold);
+    margin-top: 4px;
+  }
+  .p3-model-tag {
+    font-size: 11px; letter-spacing: 0.2em; color: var(--muted);
+    text-transform: uppercase;
+  }
+  .p3-uae {
+    font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--muted); text-align: right;
+  }
+  .p3-uae strong { color: var(--gold); display: block; font-size: 13px; font-weight: 400; }
+</style>
+</head>
+<body>
+
+<p class="label">Post 1 — Hero Product</p>
+
+<!-- ══ POST 1 ══ -->
+<div class="post post-1">
+
+  <div class="p1-left">
+    <p class="p1-eyebrow">Luxury Aroma Diffuser</p>
+    <div class="p1-brand">ATHAR</div>
+    <div class="p1-model">ONE</div>
+    <div class="p1-divider"></div>
+    <h2 class="p1-tagline">
+      Silence is the<br>
+      <em>new luxury.</em>
+    </h2>
+    <div class="p1-stats">
+      <div>
+        <span class="p1-stat-val">200</span>
+        <span class="p1-stat-label">m³ Coverage</span>
+      </div>
+      <div>
+        <span class="p1-stat-val">&lt;34</span>
+        <span class="p1-stat-label">dBA Noise</span>
+      </div>
+    </div>
+    <div class="p1-cta">Shop Now →</div>
+    <div class="p1-arabic">أثَر يبقى في الذاكرة</div>
+  </div>
+
+  <div class="p1-right">
+    <img class="p1-img"
+      src="/mnt/user-data/uploads/ChatGPT_Image_May_16__2026__05_21_32_PM__1_.png"
+      alt="ATHAR ONE">
+    <div class="p1-led">
+      <div class="led-dot"></div>
+      <span class="led-txt">Ambient LED — Active</span>
+    </div>
+    <div class="p1-corner">
+      <div class="p1-corner-main">ATHAR</div>
+      <div class="p1-corner-sub">by Organica Black®</div>
+    </div>
+  </div>
+</div>
+
+<p class="label">Post 2 — Scent Collection</p>
+
+<!-- ══ POST 2 ══ -->
+<div class="post post-2">
+  <p class="p2-eyebrow">ATHAR Scent Collection — 06 Curated Fragrances</p>
+
+  <h2 class="p2-headline">
+    Arabian Heritage.
+    <em>Modern Refinement.</em>
+  </h2>
+
+  <p class="p2-sub">
+    Six signature scents inspired by the Gulf — from the warmth of Opulent Oud to the contemporary calm of Noir Cèdre. Each crafted for the ATHAR ONE diffuser.
+  </p>
+
+  <div class="p2-scents">
+    <div class="p2-scent featured">Opulent Oud</div>
+    <div class="p2-scent">Amber</div>
+    <div class="p2-scent">Bakhoor Maani</div>
+    <div class="p2-scent">Noir Cèdre</div>
+    <div class="p2-scent">Jardin de Rose</div>
+    <div class="p2-scent featured">Majlis Oud Wood</div>
+  </div>
+
+  <div class="p2-divider-row">
+    <div class="p2-line"></div>
+    <div class="p2-arabic">أثَر وان</div>
+    <div class="p2-line"></div>
+  </div>
+
+  <p class="p2-footer-tag">Subscribe monthly · Change anytime · <span>UAE Delivery</span></p>
+</div>
+
+<p class="label">Post 3 — Technical Specs</p>
+
+<!-- ══ POST 3 ══ -->
+<div class="post post-3">
+  <div class="p3-top">
+
+    <div class="p3-img-wrap">
+      <img class="p3-img"
+        src="/mnt/user-data/uploads/ChatGPT_Image_May_16__2026__05_21_32_PM__1_.png"
+        alt="ATHAR ONE">
+    </div>
+
+    <div class="p3-content">
+      <p class="p3-eyebrow">Technical Specifications</p>
+      <h2 class="p3-title">Built to<br><em>Perform.</em></h2>
+      <p class="p3-subtitle">Model TW-TA01 — Designed in UAE</p>
+
+      <div class="p3-specs">
+        <div class="p3-spec-row">
+          <span class="p3-spec-key">Coverage</span>
+          <span class="p3-spec-val gold">200 m³</span>
+        </div>
+        <div class="p3-spec-row">
+          <span class="p3-spec-key">Noise Level</span>
+          <span class="p3-spec-val gold">&lt;34 dBA</span>
+        </div>
+        <div class="p3-spec-row">
+          <span class="p3-spec-key">Capacity</span>
+          <span class="p3-spec-val">120 ml</span>
+        </div>
+        <div class="p3-spec-row">
+          <span class="p3-spec-key">Power</span>
+          <span class="p3-spec-val">USB-C 5V / 2A</span>
+        </div>
+        <div class="p3-spec-row">
+          <span class="p3-spec-key">Height</span>
+          <span class="p3-spec-val">930 mm</span>
+        </div>
+        <div class="p3-spec-row">
+          <span class="p3-spec-key">Material</span>
+          <span class="p3-spec-val">Aluminum + ABS</span>
+        </div>
+        <div class="p3-spec-row">
+          <span class="p3-spec-key">Finish</span>
+          <span class="p3-spec-val">Matte Black</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="p3-bottom">
+    <div class="p3-brand">
+      ATHAR
+      <small>by Organica Black®</small>
+    </div>
+    <div class="p3-model-tag">TW-TA01</div>
+    <div class="p3-uae">
+      <strong>UAE</strong>
+      Abu Dhabi · AED Invoicing
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
