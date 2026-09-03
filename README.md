@@ -7,8 +7,8 @@
 
 **Community:** Join [Discord](https://discord.gg/tANKJkHck) for discussions and support
 
-<p align="center"><a href="https://youtu.be/SI1KJ2prGmc"><img src="https://i.ytimg.com/vi/SI1KJ2prGmc/maxresdefault.jpg" width="720"></a></p>
-<p align="center"><a href="https://youtu.be/SI1KJ2prGmc"><b>▶ Watch: Best AI Image Generator (API) in 2026 (Quality, Price, Uncensored, Editing) </b></a></p>
+<p align="center"><a href="https://youtu.be/72ng1tSD0kY"><img src="https://i.ytimg.com/vi/72ng1tSD0kY/maxresdefault.jpg" width="720"></a></p>
+<p align="center"><a href="https://youtu.be/72ng1tSD0kY"><b>▶ Watch: Free Claude AI Image Generator (via MCP) — Full Tutorial </b></a></p>
 
 <p align="center">
   <a href="https://github.com/Anil-matcha/awesome-generative-ai-apps">
