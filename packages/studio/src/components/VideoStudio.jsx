@@ -1796,7 +1796,9 @@ export default function VideoStudio({
         return;
       }
     } else if (imageMode) {
-      if (uploadedImageUrls.length === 0) {
+      const requiresImage =
+        currentModel?.imageField && !currentModel?.imageOptional;
+      if (requiresImage && uploadedImageUrls.length === 0) {
         alert(copy.errors.uploadAtLeastOneReferenceImage);
         return;
       }
@@ -1859,7 +1861,8 @@ export default function VideoStudio({
           ...referenceParams,
         };
         if (trimmedPrompt) i2vParams.prompt = trimmedPrompt;
-        i2vParams.aspect_ratio = selectedAr;
+        const aspectRatios = getAspectRatiosForI2VModel(selectedModel);
+        if (aspectRatios.length > 0) i2vParams.aspect_ratio = selectedAr;
         const durations = getDurationsForI2VModel(selectedModel);
         if (durations.length > 0) i2vParams.duration = selectedDuration;
         const resolutions = getResolutionsForI2VModel(selectedModel);
@@ -1879,7 +1882,7 @@ export default function VideoStudio({
           url: res.url,
           prompt: trimmedPrompt,
           model: selectedModel,
-          aspect_ratio: selectedAr,
+          ...(aspectRatios.length > 0 ? { aspect_ratio: selectedAr } : {}),
           duration: selectedDuration,
           timestamp: new Date().toISOString(),
         };

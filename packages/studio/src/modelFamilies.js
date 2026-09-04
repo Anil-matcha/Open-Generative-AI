@@ -144,6 +144,33 @@ const PREFERRED_VIDEO_VARIANTS = {
     i2v: "kling-v3.0-standard-image-to-video",
     v2v: "kling-v3.0-std-motion-control",
   },
+  "seedance-2.5": {
+    t2v: "seedance-2.5-text-to-video",
+    i2v: "seedance-2.5-image-to-video",
+    v2v: "seedance-2.5-video-edit",
+  },
+  "wan-3": {
+    t2v: "wan3.0-text-to-video",
+    i2v: "wan3.0-image-to-video",
+  },
+  "flux-3": {
+    t2v: "flux-3-text-to-video",
+    i2v: "flux-3-image-to-video",
+    v2v: "flux-3-video-extend",
+  },
+  "gemini-omni": {
+    t2v: "gemini-omni-flash-1-1-text-to-video",
+    i2v: "gemini-omni-flash-1-1-image-to-video",
+    v2v: "gemini-omni-flash-1-1-edit",
+  },
+  "ltx-2.5": {
+    t2v: "ltx-2.5-text-to-video",
+    i2v: "ltx-2.5-image-to-video",
+  },
+  "minimax-h3": {
+    t2v: "minimax-h3-text-to-video",
+    i2v: "minimax-h3-image-to-video",
+  },
 };
 
 function normalizeVersion(value) {

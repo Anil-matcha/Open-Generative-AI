@@ -72,7 +72,8 @@ export function getImageInputContract(model, mode) {
     ? CONTRACTS[contractKey]
     : {};
   const isTextToImage = mode === "t2i";
-  const promptRequired = patch.promptRequired ?? isTextToImage;
+  const promptRequired =
+    patch.promptRequired ?? model?.promptRequired ?? isTextToImage;
   return {
     ...BASE_CONTRACT,
     primaryImageRequired: mode === "i2i" || BASE_CONTRACT.primaryImageRequired,
