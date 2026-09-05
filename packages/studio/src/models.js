@@ -47,7 +47,7 @@ export const t2iModels = [
   },
   {
     "id": "flux-dev",
-    "name": "Flux Dev",
+    "name": "FLUX.1 Dev",
     "endpoint": "flux-dev-image",
     "inputs": {
       "prompt": {
@@ -96,7 +96,7 @@ export const t2iModels = [
 
   {
     "id": "flux-kontext-dev-t2i",
-    "name": "Flux Kontext Dev T2I",
+    "name": "FLUX.1 Kontext Dev",
     "inputs": {
       "prompt": {
         "examples": [
@@ -142,7 +142,7 @@ export const t2iModels = [
   },
   {
     "id": "hidream-i1-fast",
-    "name": "Hidream I1 Fast",
+    "name": "HiDream I1 Fast",
     "endpoint": "hidream_i1_fast_image",
     "inputs": {
       "prompt": {
@@ -190,7 +190,7 @@ export const t2iModels = [
   },
   {
     "id": "hidream-i1-dev",
-    "name": "Hidream I1 Dev",
+    "name": "HiDream I1 Dev",
     "endpoint": "hidream_i1_dev_image",
     "inputs": {
       "prompt": {
@@ -238,7 +238,7 @@ export const t2iModels = [
   },
   {
     "id": "hidream-i1-full",
-    "name": "Hidream I1 Full",
+    "name": "HiDream I1 Full",
     "endpoint": "hidream_i1_full_image",
     "inputs": {
       "prompt": {
@@ -325,7 +325,7 @@ export const t2iModels = [
   },
   {
     "id": "wan2.1-text-to-image",
-    "name": "Wan2.1 Text To Image",
+    "name": "Wan 2.1",
     "inputs": {
       "prompt": {
         "examples": [
@@ -362,7 +362,7 @@ export const t2iModels = [
   },
   {
     "id": "flux-kontext-pro-t2i",
-    "name": "Flux Kontext Pro T2I",
+    "name": "FLUX.1 Kontext Pro",
     "inputs": {
       "prompt": {
         "examples": [
@@ -395,7 +395,7 @@ export const t2iModels = [
   },
   {
     "id": "flux-kontext-max-t2i",
-    "name": "Flux Kontext Max T2I",
+    "name": "FLUX.1 Kontext Max",
     "inputs": {
       "prompt": {
         "examples": [
@@ -428,7 +428,7 @@ export const t2iModels = [
   },
   {
     "id": "gpt4o-text-to-image",
-    "name": "Gpt4o Text To Image",
+    "name": "GPT-4o",
     "inputs": {
       "prompt": {
         "examples": [
@@ -470,7 +470,7 @@ export const t2iModels = [
 
   {
     "id": "flux-schnell",
-    "name": "Flux Schnell",
+    "name": "FLUX.1 Schnell",
     "endpoint": "flux-schnell-image",
     "inputs": {
       "prompt": {
@@ -518,7 +518,7 @@ export const t2iModels = [
   },
   {
     "id": "bytedance-seedream-v3",
-    "name": "Bytedance Seedream v3",
+    "name": "Seedream 3.0",
     "endpoint": "bytedance-seedream-image",
     "inputs": {
       "prompt": {
@@ -636,7 +636,7 @@ export const t2iModels = [
   },
   {
     "id": "ideogram-v3-t2i",
-    "name": "Ideogram v3 T2I",
+    "name": "Ideogram 3.0",
     "inputs": {
       "prompt": {
         "examples": [
@@ -703,7 +703,7 @@ export const t2iModels = [
   },
   {
     "id": "google-imagen4",
-    "name": "Google Imagen4",
+    "name": "Imagen 4",
     "inputs": {
       "prompt": {
         "examples": [
@@ -745,7 +745,7 @@ export const t2iModels = [
   },
   {
     "id": "google-imagen4-fast",
-    "name": "Google Imagen4 Fast",
+    "name": "Imagen 4 Fast",
     "inputs": {
       "prompt": {
         "examples": [
@@ -787,7 +787,7 @@ export const t2iModels = [
   },
   {
     "id": "google-imagen4-ultra",
-    "name": "Google Imagen4 Ultra",
+    "name": "Imagen 4 Ultra",
     "inputs": {
       "prompt": {
         "examples": [
@@ -818,7 +818,7 @@ export const t2iModels = [
   },
   {
     "id": "sdxl-image",
-    "name": "Sdxl Image",
+    "name": "Stable Diffusion XL 1.0",
     "inputs": {
       "prompt": {
         "examples": [
@@ -855,7 +855,7 @@ export const t2iModels = [
   },
   {
     "id": "bytedance-seedream-v4",
-    "name": "Bytedance Seedream v4",
+    "name": "Seedream 4.0",
     "inputs": {
       "prompt": {
         "examples": [
@@ -985,7 +985,7 @@ export const t2iModels = [
   },
   {
     "id": "flux-redux",
-    "name": "Flux Redux",
+    "name": "FLUX.1 Redux Dev",
     "inputs": {
       "prompt": {
         "examples": [
@@ -1040,7 +1040,7 @@ export const t2iModels = [
   },
   {
     "id": "flux-krea-dev",
-    "name": "Flux Krea Dev",
+    "name": "FLUX.1 Krea Dev",
     "inputs": {
       "prompt": {
         "examples": [
@@ -1159,7 +1159,7 @@ export const t2iModels = [
   },
   {
     "id": "wan2.5-text-to-image",
-    "name": "Wan2.5 Text To Image",
+    "name": "Wan 2.5",
     "inputs": {
       "prompt": {
         "examples": [
@@ -1233,7 +1233,7 @@ export const t2iModels = [
   },
   {
     "id": "leonardoai-phoenix-1.0",
-    "name": "Leonardoai Phoenix 1.0",
+    "name": "Leonardo Phoenix 1.0",
     "inputs": {
       "prompt": {
         "examples": [
@@ -1268,7 +1268,7 @@ export const t2iModels = [
   },
   {
     "id": "leonardoai-lucid-origin",
-    "name": "Leonardoai Lucid Origin",
+    "name": "Lucid Origin",
     "inputs": {
       "prompt": {
         "examples": [
@@ -1303,7 +1303,7 @@ export const t2iModels = [
   },
   {
     "id": "reve-text-to-image",
-    "name": "Reve Text To Image",
+    "name": "Reve Image",
     "inputs": {
       "prompt": {
         "examples": [
@@ -1336,7 +1336,7 @@ export const t2iModels = [
   },
   {
     "id": "grok-imagine-text-to-image",
-    "name": "Grok Imagine Text To Image",
+    "name": "Grok Imagine Image",
     "inputs": {
       "prompt": {
         "examples": [
@@ -1416,7 +1416,7 @@ export const t2iModels = [
   },
   {
     "id": "kling-o1-text-to-image",
-    "name": "Kling O1 Text To Image",
+    "name": "Kling Image O1",
     "inputs": {
       "prompt": {
         "examples": [
@@ -1508,7 +1508,7 @@ export const t2iModels = [
   },
   {
     "id": "flux-2-dev",
-    "name": "Flux 2 Dev",
+    "name": "FLUX.2 Dev",
     "inputs": {
       "prompt": {
         "examples": [
@@ -1545,7 +1545,7 @@ export const t2iModels = [
   },
   {
     "id": "flux-2-flex",
-    "name": "Flux 2 Flex",
+    "name": "FLUX.2 Flex",
     "inputs": {
       "prompt": {
         "examples": [
@@ -1589,7 +1589,7 @@ export const t2iModels = [
   },
   {
     "id": "flux-2-pro",
-    "name": "Flux 2 Pro",
+    "name": "FLUX.2 Pro",
     "inputs": {
       "prompt": {
         "examples": [
@@ -1633,7 +1633,7 @@ export const t2iModels = [
   },
   {
     "id": "vidu-q2-text-to-image",
-    "name": "Vidu Q2 Text To Image",
+    "name": "Vidu Q2 Image",
     "inputs": {
       "prompt": {
         "examples": [
@@ -1679,7 +1679,7 @@ export const t2iModels = [
   },
   {
     "id": "bytedance-seedream-v4.5",
-    "name": "Bytedance Seedream V4.5",
+    "name": "Seedream 4.5",
     "inputs": {
       "prompt": {
         "examples": [
@@ -1724,7 +1724,7 @@ export const t2iModels = [
   },
   {
     "id": "gpt-image-1.5",
-    "name": "Gpt Image 1.5",
+    "name": "GPT Image 1.5",
     "inputs": {
       "prompt": {
         "examples": [
@@ -1765,7 +1765,7 @@ export const t2iModels = [
   },
   {
     "id": "gpt-image-2",
-    "name": "Gpt Image 2",
+    "name": "GPT Image 2",
     "endpoint": "gpt-image-2-text-to-image",
     "family": "gpt-2",
     "inputs": {
@@ -1811,7 +1811,7 @@ export const t2iModels = [
   },
   {
     "id": "wan2.6-text-to-image",
-    "name": "Wan2.6 Text To Image",
+    "name": "Wan 2.6",
     "inputs": {
       "prompt": {
         "examples": [
@@ -1848,7 +1848,7 @@ export const t2iModels = [
   },
   {
     "id": "qwen-text-to-image-2512",
-    "name": "Qwen Text To Image 2512",
+    "name": "Qwen Image 2512",
     "inputs": {
       "prompt": {
         "examples": [
@@ -1885,7 +1885,7 @@ export const t2iModels = [
   },
   {
     "id": "flux-2-klein-4b",
-    "name": "Flux 2 Klein 4b",
+    "name": "FLUX.2 Klein 4B",
     "inputs": {
       "prompt": {
         "examples": [
@@ -1918,7 +1918,7 @@ export const t2iModels = [
   },
   {
     "id": "flux-2-klein-9b",
-    "name": "Flux 2 Klein 9b",
+    "name": "FLUX.2 Klein 9B",
     "inputs": {
       "prompt": {
         "examples": [
@@ -2379,7 +2379,7 @@ export const t2iModels = [
   },
   {
     "id": "wan2.7-text-to-image",
-    "name": "Wan 2.7 Text to Image",
+    "name": "Wan 2.7 Image",
     "endpoint": "wan2.7-text-to-image",
     "inputs": {
       "prompt": {
@@ -2422,7 +2422,7 @@ export const t2iModels = [
   },
   {
     "id": "wan2.7-text-to-image-pro",
-    "name": "Wan 2.7 Text to Image Pro",
+    "name": "Wan 2.7 Image Pro",
     "endpoint": "wan2.7-text-to-image-pro",
     "inputs": {
       "prompt": {
@@ -2735,7 +2735,7 @@ export const t2iModels = [
   },
   {
     "id": "grok-imagine-text-to-image-quality",
-    "name": "Grok Imagine (Quality)",
+    "name": "Grok Imagine Image Quality",
     "endpoint": "grok-imagine-text-to-image-quality",
     "inputs": {
       "prompt": {
@@ -3044,7 +3044,7 @@ export const t2iModels = [
   },
   {
     "id": "qwen3-text-to-image",
-    "name": "Qwen 3 Text to Image",
+    "name": "Qwen Image 3.0",
     "endpoint": "qwen3-text-to-image",
     "inputs": {
       "prompt": {
@@ -3091,7 +3091,7 @@ export const t2iModels = [
   },
   {
     "id": "qwen3-pro-text-to-image",
-    "name": "Qwen 3 Pro Text to Image",
+    "name": "Qwen Image 3.0 Pro",
     "endpoint": "qwen3-pro-text-to-image",
     "inputs": {
       "prompt": {
@@ -3138,7 +3138,7 @@ export const t2iModels = [
   },
   {
     "id": "z-image-base-text-to-image-lora",
-    "name": "Z-Image Base Text to Image LoRA",
+    "name": "Z-Image Base LoRA",
     "endpoint": "z-image-base-text-to-image-lora",
     "inputs": {
       "prompt": {
@@ -3231,7 +3231,7 @@ export const t2iModels = [
   },
   {
     "id": "z-image-turbo-text-to-image-lora",
-    "name": "Z-Image Turbo Text to Image LoRA",
+    "name": "Z-Image Turbo LoRA",
     "endpoint": "z-image-turbo-text-to-image-lora",
     "inputs": {
       "prompt": {
@@ -3307,7 +3307,7 @@ export const t2iModels = [
   },
   {
     "id": "grok-imagine-image-2",
-    "name": "Grok Imagine Image 2",
+    "name": "Grok Imagine Image 2.0",
     "endpoint": "grok-imagine-image-2",
     "inputs": {
       "prompt": {
@@ -3392,7 +3392,7 @@ export const t2iModels = [
   },
   {
     "id": "krea-v2-turbo",
-    "name": "Krea v2 Turbo",
+    "name": "Krea 2 Turbo",
     "endpoint": "krea-v2-turbo",
     "inputs": {
       "prompt": {
@@ -3475,7 +3475,7 @@ export const t2iModels = [
   },
   {
     "id": "krea-v2-turbo-lora",
-    "name": "Krea v2 Turbo LoRA",
+    "name": "Krea 2 Turbo LoRA",
     "endpoint": "krea-v2-turbo-lora",
     "inputs": {
       "prompt": {
@@ -3631,7 +3631,7 @@ export const t2iModels = [
   },
   {
     "id": "qwen-image-text-to-image-lora",
-    "name": "Qwen Image Text to Image LoRA",
+    "name": "Qwen Image LoRA",
     "endpoint": "qwen-image-text-to-image-lora",
     "inputs": {
       "prompt": {
@@ -3720,7 +3720,7 @@ export const t2iModels = [
   },
   {
     "id": "qwen-image-text-to-image-2512-lora",
-    "name": "Qwen Image Text to Image 2512 LoRA",
+    "name": "Qwen Image 2512 LoRA",
     "endpoint": "qwen-image-text-to-image-2512-lora",
     "inputs": {
       "prompt": {
@@ -3831,7 +3831,7 @@ export const getAspectRatiosForModel = (modelId) => {
 export const t2vModels = [
   {
     "id": "seedance-lite-t2v",
-    "name": "Seedance Lite",
+    "name": "Seedance 1.0 Lite",
     "inputs": {
       "prompt": {
         "type": "string",
@@ -3883,7 +3883,7 @@ export const t2vModels = [
   },
   {
     "id": "seedance-pro-t2v",
-    "name": "Seedance Pro",
+    "name": "Seedance 1.0 Pro",
     "inputs": {
       "prompt": {
         "type": "string",
@@ -3935,7 +3935,7 @@ export const t2vModels = [
   },
   {
     "id": "seedance-pro-t2v-fast",
-    "name": "Seedance Pro Fast",
+    "name": "Seedance 1.0 Pro Fast",
     "inputs": {
       "prompt": {
         "type": "string",
@@ -3986,7 +3986,7 @@ export const t2vModels = [
   },
   {
     "id": "seedance-v1.5-pro-t2v",
-    "name": "Seedance v1.5 Pro",
+    "name": "Seedance 1.5 Pro",
     "inputs": {
       "prompt": {
         "type": "string",
@@ -4196,7 +4196,7 @@ export const t2vModels = [
   },
   {
     "id": "kling-v2.1-master-t2v",
-    "name": "Kling v2.1 Master",
+    "name": "Kling 2.1 Master",
     "inputs": {
       "prompt": {
         "type": "string",
@@ -4232,7 +4232,7 @@ export const t2vModels = [
   },
   {
     "id": "kling-v2.5-turbo-pro-t2v",
-    "name": "Kling v2.5 Turbo Pro",
+    "name": "Kling 2.5 Turbo Pro",
     "inputs": {
       "prompt": {
         "type": "string",
@@ -4268,7 +4268,7 @@ export const t2vModels = [
   },
   {
     "id": "kling-v2.6-pro-t2v",
-    "name": "Kling v2.6 Pro",
+    "name": "Kling 2.6 Pro",
     "inputs": {
       "prompt": {
         "type": "string",
@@ -4342,7 +4342,7 @@ export const t2vModels = [
   },
   {
     "id": "kling-v3.0-pro-text-to-video",
-    "name": "Kling v3.0 Pro",
+    "name": "Kling 3.0 Pro",
     "inputs": {
       "prompt": {
         "type": "string",
@@ -4378,7 +4378,7 @@ export const t2vModels = [
   },
   {
     "id": "kling-v3.0-standard-text-to-video",
-    "name": "Kling v3.0 Standard",
+    "name": "Kling 3.0 Standard",
     "inputs": {
       "prompt": {
         "type": "string",
@@ -4994,7 +4994,7 @@ export const t2vModels = [
   },
   {
     "id": "pixverse-v4.5-t2v",
-    "name": "Pixverse v4.5",
+    "name": "PixVerse V4.5",
     "inputs": {
       "prompt": {
         "type": "string",
@@ -5055,7 +5055,7 @@ export const t2vModels = [
   },
   {
     "id": "pixverse-v5-t2v",
-    "name": "Pixverse v5",
+    "name": "PixVerse V5",
     "inputs": {
       "prompt": {
         "type": "string",
@@ -5106,7 +5106,7 @@ export const t2vModels = [
   },
   {
     "id": "pixverse-v5.5-t2v",
-    "name": "Pixverse v5.5",
+    "name": "PixVerse V5.5",
     "inputs": {
       "prompt": {
         "type": "string",
@@ -5168,7 +5168,7 @@ export const t2vModels = [
   },
   {
     "id": "minimax-hailuo-02-standard-t2v",
-    "name": "Hailuo 02 Standard",
+    "name": "MiniMax Hailuo 02 Standard",
     "inputs": {
       "prompt": {
         "type": "string",
@@ -5203,7 +5203,7 @@ export const t2vModels = [
   },
   {
     "id": "minimax-hailuo-02-pro-t2v",
-    "name": "Hailuo 02 Pro",
+    "name": "MiniMax Hailuo 02 Pro",
     "inputs": {
       "prompt": {
         "type": "string",
@@ -5237,7 +5237,7 @@ export const t2vModels = [
   },
   {
     "id": "minimax-hailuo-2.3-pro-t2v",
-    "name": "Hailuo 2.3 Pro",
+    "name": "MiniMax Hailuo 2.3 Pro",
     "inputs": {
       "prompt": {
         "type": "string",
@@ -5261,7 +5261,7 @@ export const t2vModels = [
   },
   {
     "id": "minimax-hailuo-2.3-standard-t2v",
-    "name": "Hailuo 2.3 Standard",
+    "name": "MiniMax Hailuo 2.3 Standard",
     "inputs": {
       "prompt": {
         "type": "string",
@@ -5413,7 +5413,7 @@ export const t2vModels = [
   },
   {
     "id": "vidu-v2.0-t2v",
-    "name": "Vidu v2.0",
+    "name": "Vidu 2.0",
     "inputs": {
       "prompt": {
         "type": "string",
@@ -5457,7 +5457,7 @@ export const t2vModels = [
   },
   {
     "id": "ovi-text-to-video",
-    "name": "OVI",
+    "name": "Ovi",
     "inputs": {
       "prompt": {
         "type": "string",
@@ -5639,7 +5639,7 @@ export const t2vModels = [
 ,
   {
     "id": "veo3.1-extend-video",
-    "name": "Veo3.1 Extend Video",
+    "name": "Veo 3.1 Extend",
     "requiresRequestId": true,
     "endpoint": "veo3.1-extend-video",
     "inputs": {
@@ -5669,7 +5669,7 @@ export const t2vModels = [
   },
   {
     "id": "veo3.1-4k-video",
-    "name": "Veo3.1 4K Video",
+    "name": "Veo 3.1 4K",
     "requiresRequestId": true,
     "endpoint": "veo3.1-4k-video",
     "inputs": {
@@ -6003,7 +6003,7 @@ export const t2vModels = [
   },
   {
     "id": "pixverse-v6-t2v",
-    "name": "Pixverse v6 T2V",
+    "name": "PixVerse V6",
     "endpoint": "pixverse-v6-t2v",
     "inputs": {
       "prompt": {
@@ -6231,7 +6231,7 @@ export const t2vModels = [
   },
   {
     "id": "seedance-2-text-to-video-fast",
-    "name": "Seedance 2 Text to Video Fast",
+    "name": "Seedance 2.0 Fast",
     "endpoint": "seedance-2-text-to-video-fast",
     "inputs": {
       "prompt": {
@@ -6374,7 +6374,7 @@ export const t2vModels = [
   },
   {
     "id": "happy-horse-1-text-to-video-1080p",
-    "name": "Happy Horse 1 Text to Video 1080P",
+    "name": "HappyHorse 1.0 1080P",
     "endpoint": "happy-horse-1-text-to-video-1080p",
     "inputs": {
       "prompt": {
@@ -6416,7 +6416,7 @@ export const t2vModels = [
   },
   {
     "id": "happy-horse-1-text-to-video-720p",
-    "name": "Happy Horse 1 Text to Video 720P",
+    "name": "HappyHorse 1.0 720P",
     "endpoint": "happy-horse-1-text-to-video-720p",
     "inputs": {
       "prompt": {
@@ -6584,7 +6584,7 @@ export const t2vModels = [
   },
   {
     "id": "kling-v3.0-4k-text-to-video",
-    "name": "Kling v3.0 4K",
+    "name": "Kling 3.0 4K",
     "endpoint": "kling-v3.0-4k-text-to-video",
     "inputs": {
       "prompt": {
@@ -7099,7 +7099,7 @@ export const t2vModels = [
   },
   {
     "id": "kling-v3.0-omni-standard-text-to-video",
-    "name": "Kling v3.0 Omni Standard",
+    "name": "Kling 3.0 Omni Standard",
     "endpoint": "kling-v3.0-omni-standard-text-to-video",
     "inputs": {
       "prompt": {
@@ -7158,7 +7158,7 @@ export const t2vModels = [
   },
   {
     "id": "kling-v3.0-omni-pro-text-to-video",
-    "name": "Kling v3.0 Omni Pro",
+    "name": "Kling 3.0 Omni Pro",
     "endpoint": "kling-v3.0-omni-pro-text-to-video",
     "inputs": {
       "prompt": {
@@ -7217,7 +7217,7 @@ export const t2vModels = [
   },
   {
     "id": "kling-v3.0-omni-4k-text-to-video",
-    "name": "Kling v3.0 Omni 4K",
+    "name": "Kling 3.0 Omni 4K",
     "endpoint": "kling-v3.0-omni-4k-text-to-video",
     "inputs": {
       "prompt": {
@@ -7269,7 +7269,7 @@ export const t2vModels = [
   },
   {
     "id": "gemini-omni-text-to-video",
-    "name": "Gemini Omni",
+    "name": "Gemini Omni Flash",
     "endpoint": "gemini-omni-text-to-video",
     "inputs": {
       "prompt": {
@@ -7352,7 +7352,7 @@ export const t2vModels = [
   },
   {
     "id": "kling-v3-turbo-standard-text-to-video",
-    "name": "Kling v3 Turbo Standard",
+    "name": "Kling 3.0 Turbo Standard",
     "endpoint": "kling-v3-turbo-standard-text-to-video",
     "inputs": {
       "prompt": {
@@ -7392,7 +7392,7 @@ export const t2vModels = [
   },
   {
     "id": "kling-v3-turbo-pro-text-to-video",
-    "name": "Kling v3 Turbo Pro",
+    "name": "Kling 3.0 Turbo Pro",
     "endpoint": "kling-v3-turbo-pro-text-to-video",
     "inputs": {
       "prompt": {
@@ -7496,7 +7496,7 @@ export const t2vModels = [
   },
     {
     "id": "seedance-2.5-text-to-video-480p",
-    "name": "Seedance 2.5 Text to Video 480p",
+    "name": "Seedance 2.5 480p",
     "endpoint": "seedance-2.5-text-to-video-480p",
     "inputs": {
       "prompt": {
@@ -7559,7 +7559,7 @@ export const t2vModels = [
   },
   {
     "id": "seedance-2-mini-text-to-video",
-    "name": "Seedance 2 Mini",
+    "name": "Seedance 2.0 Mini",
     "endpoint": "seedance-2-mini-text-to-video",
     "inputs": {
       "prompt": {
@@ -7627,7 +7627,7 @@ export const t2vModels = [
   },
   {
     "id": "happy-horse-1.1-text-to-video-1080p",
-    "name": "Happy Horse 1.1 Text to Video 1080P",
+    "name": "HappyHorse 1.1 1080P",
     "endpoint": "happy-horse-1.1-text-to-video-1080p",
     "inputs": {
       "prompt": {
@@ -7669,7 +7669,7 @@ export const t2vModels = [
   },
   {
     "id": "happy-horse-1.1-text-to-video-720p",
-    "name": "Happy Horse 1.1 Text to Video 720P",
+    "name": "HappyHorse 1.1 720P",
     "endpoint": "happy-horse-1.1-text-to-video-720p",
     "inputs": {
       "prompt": {
@@ -8111,7 +8111,7 @@ export const t2vModels = [
   },
   {
     "id": "minimax-h3-text-to-video",
-    "name": "MiniMax H3 Text to Video",
+    "name": "MiniMax H3",
     "endpoint": "minimax-h3-text-to-video",
     "family": "minimax-h3",
     "inputs": {
@@ -8148,7 +8148,7 @@ export const t2vModels = [
   },
   {
     "id": "minimax-h3-open-text-to-video",
-    "name": "MiniMax H3 Open Text to Video",
+    "name": "MiniMax H3 Base FL2VA",
     "endpoint": "minimax-h3-open-text-to-video",
     "family": "minimax-h3",
     "inputs": {
@@ -8396,7 +8396,7 @@ export const t2vModels = [
   },
   {
     "id": "seedance-2.5-text-to-video-1080p",
-    "name": "Seedance 2.5 Text to Video 1080p",
+    "name": "Seedance 2.5 1080p",
     "endpoint": "seedance-2.5-text-to-video-1080p",
     "inputs": {
       "prompt": {
@@ -8459,7 +8459,7 @@ export const t2vModels = [
   },
   {
     "id": "seedance-2.5-text-to-video-4k",
-    "name": "Seedance 2.5 Text to Video 4K",
+    "name": "Seedance 2.5 4K",
     "endpoint": "seedance-2.5-text-to-video-4k",
     "inputs": {
       "prompt": {
@@ -8585,7 +8585,7 @@ export const t2vModels = [
   },
   {
     "id": "seedance-2.5-intl-text-to-video-480p",
-    "name": "Seedance 2.5 Intl Text to Video 480p",
+    "name": "Seedance 2.5 Intl 480p",
     "endpoint": "seedance-2.5-intl-text-to-video-480p",
     "inputs": {
       "prompt": {
@@ -8648,7 +8648,7 @@ export const t2vModels = [
   },
   {
     "id": "seedance-2.5-spicy-text-to-video-480p",
-    "name": "Seedance 2.5 Spicy Text to Video 480p",
+    "name": "Seedance 2.5 Spicy 480p",
     "endpoint": "seedance-2.5-spicy-text-to-video-480p",
     "inputs": {
       "prompt": {
@@ -8711,7 +8711,7 @@ export const t2vModels = [
   },
   {
     "id": "seedance-2.5-intl-text-to-video-1080p",
-    "name": "Seedance 2.5 Intl Text to Video 1080p",
+    "name": "Seedance 2.5 Intl 1080p",
     "endpoint": "seedance-2.5-intl-text-to-video-1080p",
     "inputs": {
       "prompt": {
@@ -8774,7 +8774,7 @@ export const t2vModels = [
   },
   {
     "id": "seedance-2.5-spicy-text-to-video-1080p",
-    "name": "Seedance 2.5 Spicy Text to Video 1080p",
+    "name": "Seedance 2.5 Spicy 1080p",
     "endpoint": "seedance-2.5-spicy-text-to-video-1080p",
     "inputs": {
       "prompt": {
@@ -8837,7 +8837,7 @@ export const t2vModels = [
   },
   {
     "id": "seedance-2.5-intl-text-to-video-4k",
-    "name": "Seedance 2.5 Intl Text to Video 4K",
+    "name": "Seedance 2.5 Intl 4K",
     "endpoint": "seedance-2.5-intl-text-to-video-4k",
     "inputs": {
       "prompt": {
@@ -8900,7 +8900,7 @@ export const t2vModels = [
   },
   {
     "id": "seedance-2.5-spicy-text-to-video-4k",
-    "name": "Seedance 2.5 Spicy Text to Video 4K",
+    "name": "Seedance 2.5 Spicy 4K",
     "endpoint": "seedance-2.5-spicy-text-to-video-4k",
     "inputs": {
       "prompt": {
@@ -9239,7 +9239,7 @@ export const t2vModels = [
   },
   {
     "id": "gemini-omni-flash-1-1-text-to-video",
-    "name": "Gemini Omni Flash 1.1",
+    "name": "Gemini Omni 1.1 Flash",
     "endpoint": "gemini-omni-flash-1-1-text-to-video",
     "inputs": {
       "prompt": {
@@ -9787,7 +9787,7 @@ export const i2iModels = [
 
   {
     "id": "bytedance-seededit-v3",
-    "name": "Bytedance Seededit v3",
+    "name": "SeedEdit 3.0",
     "endpoint": "bytedance-seededit-image",
     "family": "seedream",
     "imageField": "image_url",
@@ -9810,7 +9810,7 @@ export const i2iModels = [
 
   {
     "id": "minimax-image-01-subject-reference",
-    "name": "Minimax Image 01 Subject Reference",
+    "name": "MiniMax Image 01 Subject Reference",
     "endpoint": "minimax-01-subject-reference",
     "family": "minimax",
     "imageField": "image_url",
@@ -9858,7 +9858,7 @@ export const i2iModels = [
   },
   {
     "id": "ideogram-character",
-    "name": "Ideogram Character",
+    "name": "Ideogram 3.0 Character Reference",
     "endpoint": "ideogram-character",
     "family": "ideogram",
     "imageField": "image_url",
@@ -10040,7 +10040,7 @@ export const i2iModels = [
   },
   {
     "id": "nano-banana-edit",
-    "name": "Nano Banana Edit",
+    "name": "Nano Banana",
     "endpoint": "nano-banana-edit",
     "family": "nano",
     "imageField": "images_list",
@@ -10082,7 +10082,7 @@ export const i2iModels = [
   },
   {
     "id": "ideogram-v3-reframe",
-    "name": "Ideogram v3 Reframe",
+    "name": "Ideogram 3.0 Reframe",
     "endpoint": "ideogram-v3-reframe",
     "family": "ideogram",
     "imageField": "image_url",
@@ -10578,7 +10578,7 @@ export const i2iModels = [
   },
   {
     "id": "nano-banana-pro-edit",
-    "name": "Nano Banana Pro Edit",
+    "name": "Nano Banana Pro",
     "endpoint": "nano-banana-pro-edit",
     "family": "nano",
     "imageField": "images_list",
@@ -10842,7 +10842,7 @@ export const i2iModels = [
   },
   {
     "id": "vidu-q2-reference-to-image",
-    "name": "Vidu Q2 Reference To Image",
+    "name": "Vidu Q2 Reference",
     "endpoint": "vidu-q2-reference-to-image",
     "family": "vidu-q2",
     "imageField": "images_list",
@@ -11048,7 +11048,7 @@ export const i2iModels = [
   },
   {
     "id": "gpt-image-2-edit",
-    "name": "Gpt Image 2 Edit",
+    "name": "GPT Image 2 Edit",
     "endpoint": "gpt-image-2-image-to-image",
     "family": "gpt-2",
     "imageField": "images_list",
@@ -11097,7 +11097,7 @@ export const i2iModels = [
   },
   {
     "id": "gpt-image-1.5-edit",
-    "name": "Gpt Image 1.5 Edit",
+    "name": "GPT Image 1.5 Edit",
     "endpoint": "gpt-image-1.5-edit",
     "family": "gpt-1.5",
     "imageField": "images_list",
@@ -11310,7 +11310,7 @@ export const i2iModels = [
   },
   {
     "id": "nano-banana-2-edit",
-    "name": "Nano Banana 2 Edit",
+    "name": "Nano Banana 2",
     "endpoint": "nano-banana-2-edit",
     "family": "nano",
     "imageField": "images_list",
@@ -11569,7 +11569,7 @@ export const i2iModels = [
   },
   {
     "id": "qwen-image-2.0-edit",
-    "name": "Qwen Image 2.0 Edit",
+    "name": "Qwen Image 2.0",
     "endpoint": "qwen-image-2.0-edit",
     "imageField": "images_list",
     "inputs": {
@@ -11618,7 +11618,7 @@ export const i2iModels = [
   },
   {
     "id": "qwen-image-2.0-pro-edit",
-    "name": "Qwen Image 2.0 Pro Edit",
+    "name": "Qwen Image 2.0 Pro",
     "endpoint": "qwen-image-2.0-pro-edit",
     "imageField": "images_list",
     "inputs": {
@@ -12214,7 +12214,7 @@ export const i2iModels = [
   },
   {
     "id": "nano-banana-2-lite-edit",
-    "name": "Nano Banana 2 Lite Edit",
+    "name": "Nano Banana 2 Lite",
     "endpoint": "nano-banana-2-lite-edit",
     "imageField": "images_list",
     "inputs": {
@@ -12266,7 +12266,7 @@ export const i2iModels = [
   },
   {
     "id": "bytedance-seedream-5.0-pro-edit",
-    "name": "Seedream 5.0 Pro Edit",
+    "name": "Seedream 5.0 Pro",
     "endpoint": "seedream-5.0-pro-edit",
     "imageField": "images_list",
     "inputs": {
@@ -13246,7 +13246,7 @@ export const i2vModels = [
   },
   {
     "id": "veo3-image-to-video",
-    "name": "Veo3 Image To Video",
+    "name": "Veo 3",
     "endpoint": "veo3-image-to-video",
     "family": "veo",
     "imageField": "images_list",
@@ -13278,7 +13278,7 @@ export const i2vModels = [
   },
   {
     "id": "veo3-fast-image-to-video",
-    "name": "Veo3 Fast Image To Video",
+    "name": "Veo 3 Fast",
     "endpoint": "veo3-fast-image-to-video",
     "family": "veo",
     "imageField": "images_list",
@@ -13511,7 +13511,7 @@ export const i2vModels = [
   },
   {
     "id": "kling-v2.1-standard-i2v",
-    "name": "Kling v2.1 Standard I2V",
+    "name": "Kling 2.1 Standard",
     "endpoint": "kling-v2.1-standard-i2v",
     "family": "kling-v2.1",
     "imageField": "image_url",
@@ -13556,7 +13556,7 @@ export const i2vModels = [
   },
   {
     "id": "kling-v2.1-pro-i2v",
-    "name": "Kling v2.1 Pro I2V",
+    "name": "Kling 2.1 Pro",
     "endpoint": "kling-v2.1-pro-i2v",
     "family": "kling-v2.1",
     "imageField": "image_url",
@@ -13667,7 +13667,7 @@ export const i2vModels = [
   },
   {
     "id": "runway-act-two-i2v",
-    "name": "Runway Act Two I2V",
+    "name": "Runway Act-Two",
     "endpoint": "runway-act-two-i2v",
     "family": "runway",
     "imageField": "image_url",
@@ -14163,7 +14163,7 @@ export const i2vModels = [
   },
   {
     "id": "seedance-lite-reference-video",
-    "name": "Seedance Lite Reference Video",
+    "name": "Seedance 1.0 Lite Reference",
     "endpoint": "seedance-lite-reference-to-video",
     "family": "bytedance",
     "imageField": "images_list",
@@ -14378,7 +14378,7 @@ export const i2vModels = [
   },
   {
     "id": "openai-sora-2-image-to-video",
-    "name": "Openai Sora 2 Image To Video",
+    "name": "Sora 2",
     "endpoint": "openai-sora-2-image-to-video",
     "family": "sora",
     "imageField": "images_list",
@@ -14452,7 +14452,7 @@ export const i2vModels = [
   },
   {
     "id": "openai-sora-2-pro-image-to-video",
-    "name": "Openai Sora 2 Pro Image To Video",
+    "name": "Sora 2 Pro",
     "endpoint": "openai-sora-2-pro-image-to-video",
     "family": "sora",
     "imageField": "images_list",
@@ -14516,7 +14516,7 @@ export const i2vModels = [
   },
   {
     "id": "leonardoai-motion-2.0",
-    "name": "Leonardoai Motion 2.0",
+    "name": "Motion 2.0",
     "endpoint": "leonardoai-motion-2.0",
     "family": "leonardoai",
     "imageField": "image_url",
@@ -14548,7 +14548,7 @@ export const i2vModels = [
   },
   {
     "id": "veo3.1-image-to-video",
-    "name": "Veo3.1 Image To Video",
+    "name": "Veo 3.1",
     "endpoint": "veo3.1-image-to-video",
     "family": "veo3.1",
     "imageField": "image_url",
@@ -14602,7 +14602,7 @@ export const i2vModels = [
   },
   {
     "id": "veo3.1-fast-image-to-video",
-    "name": "Veo3.1 Fast Image To Video",
+    "name": "Veo 3.1 Fast",
     "endpoint": "veo3.1-fast-image-to-video",
     "family": "veo3.1",
     "imageField": "image_url",
@@ -14656,7 +14656,7 @@ export const i2vModels = [
   },
   {
     "id": "veo3.1-lite-image-to-video",
-    "name": "Veo3.1 Lite Image To Video",
+    "name": "Veo 3.1 Lite",
     "endpoint": "veo3.1-lite-image-to-video",
     "family": "veo3.1",
     "imageField": "image_url",
@@ -14707,7 +14707,7 @@ export const i2vModels = [
   },
   {
     "id": "veo3.1-reference-to-video",
-    "name": "Veo3.1 Reference To Video",
+    "name": "Veo 3.1 Reference",
     "endpoint": "veo3.1-reference-to-video",
     "family": "veo3.1",
     "imageField": "images_list",
@@ -14808,7 +14808,7 @@ export const i2vModels = [
   },
   {
     "id": "ltx-2-pro-image-to-video",
-    "name": "Ltx 2 Pro Image To Video",
+    "name": "LTX 2 Pro",
     "endpoint": "ltx-2-pro-image-to-video",
     "family": "ltx",
     "imageField": "image_url",
@@ -14848,7 +14848,7 @@ export const i2vModels = [
   },
   {
     "id": "ltx-2-fast-image-to-video",
-    "name": "Ltx 2 Fast Image To Video",
+    "name": "LTX 2 Fast",
     "endpoint": "ltx-2-fast-image-to-video",
     "family": "ltx",
     "imageField": "image_url",
@@ -14966,7 +14966,7 @@ export const i2vModels = [
   },
   {
     "id": "vidu-q2-turbo-start-end-video",
-    "name": "Vidu Q2 Turbo Start End Video",
+    "name": "Vidu Q2 Turbo Start End",
     "endpoint": "vidu-q2-turbo-start-end-video",
     "family": "vidu-q2",
     "imageField": "image_url",
@@ -15030,7 +15030,7 @@ export const i2vModels = [
   },
   {
     "id": "vidu-q2-pro-start-end-video",
-    "name": "Vidu Q2 Pro Start End Video",
+    "name": "Vidu Q2 Pro Start End",
     "endpoint": "vidu-q2-pro-start-end-video",
     "family": "vidu-q2",
     "imageField": "image_url",
@@ -15157,7 +15157,7 @@ export const i2vModels = [
   },
   {
     "id": "minimax-hailuo-2.3-fast",
-    "name": "Minimax Hailuo 2.3 Fast",
+    "name": "MiniMax Hailuo 2.3 Fast",
     "endpoint": "minimax-hailuo-2.3-fast",
     "family": "minimax-2.3",
     "imageField": "image_url",
@@ -15196,7 +15196,7 @@ export const i2vModels = [
   },
   {
     "id": "kling-v2.5-turbo-std-i2v",
-    "name": "Kling v2.5 Turbo Std I2V",
+    "name": "Kling 2.5 Turbo Standard",
     "endpoint": "kling-v2.5-turbo-std-i2v",
     "family": "kling-v2.5",
     "imageField": "image_url",
@@ -15274,7 +15274,7 @@ export const i2vModels = [
   },
   {
     "id": "kling-o1-image-to-video",
-    "name": "Kling O1 Image To Video",
+    "name": "Kling O1 Pro",
     "endpoint": "kling-o1-image-to-video",
     "family": "kling-o1",
     "imageField": "image_url",
@@ -15320,7 +15320,7 @@ export const i2vModels = [
   },
   {
     "id": "kling-o1-reference-to-video",
-    "name": "Kling O1 Reference To Video",
+    "name": "Kling O1 Pro Reference",
     "endpoint": "kling-o1-reference-to-video",
     "family": "kling-o1",
     "imageField": "images_list",
@@ -15624,7 +15624,7 @@ export const i2vModels = [
   },
   {
     "id": "kling-o1-standard-image-to-video",
-    "name": "Kling O1 Standard Image To Video",
+    "name": "Kling O1 Standard",
     "endpoint": "kling-o1-standard-image-to-video",
     "family": "kling-o1",
     "imageField": "image_url",
@@ -15658,7 +15658,7 @@ export const i2vModels = [
   },
   {
     "id": "kling-o1-standard-reference-to-video",
-    "name": "Kling O1 Standard Reference To Video",
+    "name": "Kling O1 Standard Reference",
     "endpoint": "kling-o1-standard-reference-to-video",
     "family": "kling-o1",
     "imageField": "images_list",
@@ -15855,7 +15855,7 @@ export const i2vModels = [
   },
   {
     "id": "ltx-2-19b-image-to-video",
-    "name": "Ltx 2 19b Image To Video",
+    "name": "LTX 2 19B",
     "endpoint": "ltx-2-19b-image-to-video",
     "family": "ltx",
     "imageField": "image_url",
@@ -16591,7 +16591,7 @@ export const i2vModels = [
   },
   {
     "id": "pixverse-v6-transition",
-    "name": "Pixverse v6 Transition",
+    "name": "PixVerse V6 Transition",
     "endpoint": "pixverse-v6-transition",
     "family": "pixverse-v6",
     "imageField": "image_url",
@@ -16782,7 +16782,7 @@ export const i2vModels = [
   },
   {
     "id": "wan2.7-reference-to-video",
-    "name": "Wan2.7 Reference to Video",
+    "name": "Wan 2.7 Reference",
     "endpoint": "wan2.7-reference-to-video",
     "family": "wan2.7",
     "imageField": "images_list",
@@ -18966,7 +18966,7 @@ export const i2vModels = [
   },
   {
     "id": "happy-horse-1-reference-to-video-1080p",
-    "name": "Happy Horse 1 Reference to Video 1080P",
+    "name": "HappyHorse 1.0 Reference 1080P",
     "endpoint": "happy-horse-1-reference-to-video-1080p",
     "family": "happy-horse-1",
     "imageField": "images_list",
@@ -19037,7 +19037,7 @@ export const i2vModels = [
   },
   {
     "id": "happy-horse-1-reference-to-video-720p",
-    "name": "Happy Horse 1 Reference to Video 720P",
+    "name": "HappyHorse 1.0 Reference 720P",
     "endpoint": "happy-horse-1-reference-to-video-720p",
     "family": "happy-horse-1",
     "imageField": "images_list",
@@ -19633,7 +19633,7 @@ export const i2vModels = [
   },
   {
     "id": "happy-horse-1.1-reference-to-video-1080p",
-    "name": "Happy Horse 1.1 Reference to Video 1080P",
+    "name": "HappyHorse 1.1 Reference 1080P",
     "endpoint": "happy-horse-1.1-reference-to-video-1080p",
     "family": "happy-horse-1.1",
     "imageField": "images_list",
@@ -19704,7 +19704,7 @@ export const i2vModels = [
   },
   {
     "id": "happy-horse-1.1-reference-to-video-720p",
-    "name": "Happy Horse 1.1 Reference to Video 720P",
+    "name": "HappyHorse 1.1 Reference 720P",
     "endpoint": "happy-horse-1.1-reference-to-video-720p",
     "family": "happy-horse-1.1",
     "imageField": "images_list",
@@ -20765,7 +20765,7 @@ export const i2vModels = [
   },
   {
     "id": "minimax-h3-reference-to-video",
-    "name": "MiniMax H3 Reference to Video",
+    "name": "MiniMax H3 Reference",
     "endpoint": "minimax-h3-reference-to-video",
     "family": "minimax-h3",
     "imageField": "reference_images",
@@ -20872,7 +20872,7 @@ export const i2vModels = [
   },
   {
     "id": "minimax-h3-open-reference-to-video",
-    "name": "MiniMax H3 Open Reference to Video",
+    "name": "MiniMax H3 Base Ref2VA",
     "endpoint": "minimax-h3-open-reference-to-video",
     "family": "minimax-h3",
     "imageField": "images_list",
@@ -23583,7 +23583,7 @@ export const i2vModels = [
   },
   {
     "id": "wan2.7-image-to-video-spicy",
-    "name": "Wan 2.7 Image to Video Spicy",
+    "name": "Wan 2.7 Spicy",
     "endpoint": "wan2.7-image-to-video-spicy",
     "family": "wan2.7-spicy",
     "imageField": "image_url",
@@ -23677,7 +23677,7 @@ export const i2vModels = [
   },
   {
     "id": "wan2.6-image-to-video-spicy",
-    "name": "Wan 2.6 Image to Video Spicy",
+    "name": "Wan 2.6 Spicy",
     "endpoint": "wan2.6-image-to-video-spicy",
     "family": "wan2.6-spicy",
     "imageField": "image_url",
@@ -24675,7 +24675,7 @@ export const i2vModels = [
   },
   {
     "id": "gemini-omni-flash-1-1-reference-to-video",
-    "name": "Gemini Omni Flash 1.1 Reference to Video",
+    "name": "Gemini Omni 1.1 Flash Reference",
     "endpoint": "gemini-omni-flash-1-1-reference-to-video",
     "family": "gemini-omni",
     "imageField": "image_urls",
@@ -24753,7 +24753,7 @@ export const i2vModels = [
   },
   {
     "id": "minimax-h3-image-to-video-spicy",
-    "name": "MiniMax H3 Image to Video Spicy",
+    "name": "MiniMax H3 Spicy",
     "endpoint": "minimax-h3-image-to-video-spicy",
     "family": "minimax-h3-spicy",
     "imageField": "image_url",
@@ -24952,7 +24952,7 @@ export const v2vModels = [
   },
   {
     "id": "kling-v2.6-std-motion-control",
-    "name": "Kling 2.6 Std Motion Control",
+    "name": "Kling 2.6 Standard Motion Control",
     "endpoint": "kling-v2.6-std-motion-control",
     "family": "kling",
     "videoField": "video_url",
@@ -24965,7 +24965,7 @@ export const v2vModels = [
   },
   {
     "id": "kling-v3.0-std-motion-control",
-    "name": "Kling 3.0 Std Motion Control",
+    "name": "Kling 3.0 Standard Motion Control",
     "endpoint": "kling-v3.0-std-motion-control",
     "family": "kling",
     "videoField": "video_url",
@@ -25002,7 +25002,7 @@ export const v2vModels = [
   },
   {
     "id": "mmaudio-v2-video-to-video",
-    "name": "MMAudio v2 Video to Video",
+    "name": "MMAudio v2",
     "endpoint": "mmaudio-v2/video-to-video",
     "family": "mmaudio",
     "videoField": "video_url",
@@ -25013,7 +25013,7 @@ export const v2vModels = [
   },
   {
     "id": "runway-aleph-v2v",
-    "name": "Runway Aleph V2V",
+    "name": "Runway Aleph",
     "endpoint": "runway-aleph-v2v",
     "family": "runway",
     "videoField": "video_url",
@@ -25104,7 +25104,7 @@ export const v2vModels = [
   },
   {
     "id": "kling-o1-video-edit",
-    "name": "Kling O1 Video Edit",
+    "name": "Kling O1 Pro Edit",
     "endpoint": "kling-o1-video-edit",
     "family": "kling-o1",
     "videoField": "video_url",
@@ -25133,7 +25133,7 @@ export const v2vModels = [
   },
   {
     "id": "kling-o1-video-edit-fast",
-    "name": "Kling O1 Video Edit Fast",
+    "name": "Kling O1 Pro Edit Fast",
     "endpoint": "kling-o1-video-edit-fast",
     "family": "kling-o1",
     "videoField": "video_url",
@@ -25162,7 +25162,7 @@ export const v2vModels = [
   },
   {
     "id": "kling-o1-standard-video-edit",
-    "name": "Kling O1 Standard Video Edit",
+    "name": "Kling O1 Standard Edit",
     "endpoint": "kling-o1-standard-video-edit",
     "family": "kling-o1",
     "videoField": "video_url",
@@ -25261,7 +25261,7 @@ export const v2vModels = [
   },
   {
     "id": "ltx-2.3-video-extend",
-    "name": "LTX 2.3 Video Extend",
+    "name": "LTX 2.3 Extend",
     "endpoint": "ltx-2.3-video-extend",
     "family": "ltx2.3",
     "videoField": "video_url",
@@ -25283,7 +25283,7 @@ export const v2vModels = [
   },
   {
     "id": "pixverse-v6-extend",
-    "name": "Pixverse v6 Extend",
+    "name": "PixVerse V6 Extend",
     "endpoint": "pixverse-v6-extend",
     "family": "pixverse-v6",
     "videoField": "video_url",
@@ -25294,7 +25294,7 @@ export const v2vModels = [
   },
   {
     "id": "wan2.7-video-extend",
-    "name": "Wan2.7 Video Extend",
+    "name": "Wan 2.7 Extend",
     "endpoint": "wan2.7-video-extend",
     "family": "wan2.7",
     "videoField": "video_url",
@@ -25307,7 +25307,7 @@ export const v2vModels = [
   },
   {
     "id": "wan2.7-video-edit",
-    "name": "Wan2.7 Video Edit",
+    "name": "Wan 2.7 Edit",
     "endpoint": "wan2.7-video-edit",
     "family": "wan2.7",
     "videoField": "video_url",
@@ -25322,7 +25322,7 @@ export const v2vModels = [
   },
   {
     "id": "happy-horse-1-video-edit-1080p",
-    "name": "Happy Horse 1 Video Edit 1080P",
+    "name": "HappyHorse 1.0 Edit 1080P",
     "endpoint": "happy-horse-1-video-edit-1080p",
     "family": "happy-horse-1",
     "videoField": "video_url",
@@ -25336,7 +25336,7 @@ export const v2vModels = [
   },
   {
     "id": "happy-horse-1-video-edit-720p",
-    "name": "Happy Horse 1 Video Edit 720P",
+    "name": "HappyHorse 1.0 Edit 720P",
     "endpoint": "happy-horse-1-video-edit-720p",
     "family": "happy-horse-1",
     "videoField": "video_url",
@@ -25397,7 +25397,7 @@ export const v2vModels = [
   },
   {
     "id": "kling-v2.6-pro-motion-control",
-    "name": "Kling v2.6 Pro Motion Control",
+    "name": "Kling 2.6 Pro Motion Control",
     "endpoint": "kling-v2.6-pro-motion-control",
     "family": "kling-v2.6",
     "videoField": "video_url",
@@ -25410,7 +25410,7 @@ export const v2vModels = [
   },
   {
     "id": "infinitetalk-video-to-video",
-    "name": "Infinitetalk Video to Video",
+    "name": "InfiniteTalk",
     "endpoint": "infinitetalk-video-to-video",
     "family": "infinite-talk",
     "videoField": "video_url",
@@ -25537,7 +25537,7 @@ export const v2vModels = [
   },
   {
     "id": "volcengine-video-to-video-lip-sync",
-    "name": "Volcengine Video to Video Lip Sync",
+    "name": "Volcengine Lipsync",
     "endpoint": "volcengine-video-to-video-lip-sync",
     "family": "volcengine-lipsync",
     "videoField": "video_url",
@@ -27938,7 +27938,7 @@ export const v2vModels = [
   },
   {
     "id": "flux-3-video-upscaler",
-    "name": "FLUX 3 Video Upscaler",
+    "name": "FLUX Video Upscale",
     "endpoint": "flux-3-video-upscaler",
     "family": "flux-3",
     "videoField": "video_url",
@@ -28064,7 +28064,7 @@ export const v2vModels = [
   },
   {
     "id": "gemini-omni-flash-1-1-edit",
-    "name": "Gemini Omni Flash 1.1 Edit",
+    "name": "Gemini Omni 1.1 Flash Edit",
     "endpoint": "gemini-omni-flash-1-1-edit",
     "family": "gemini-omni",
     "videoField": "video_url",
@@ -28112,7 +28112,7 @@ export const v2vModels = [
   },
   {
     "id": "depth-anything",
-    "name": "Depth Anything",
+    "name": "Depth Anything V2",
     "endpoint": "depth-anything",
     "family": "video",
     "videoField": "video_url",

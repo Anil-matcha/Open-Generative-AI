@@ -1034,7 +1034,7 @@ export default function DrawModal({
           const entry = {
             id: res.id || Math.random().toString(36).substring(7),
             url: res.url,
-            prompt: `Draw to Edit with ${selectedModel === "nano-banana-pro-edit" ? "Nano Banana Pro Edit" : "Nano Banana 2 Edit"}`,
+            prompt: `Draw to Edit with ${selectedModel === "nano-banana-pro-edit" ? "Nano Banana Pro" : "Nano Banana 2"}`,
             model: selectedModel,
             aspect_ratio: aspectRatio === "Auto" ? "1:1" : aspectRatio,
             timestamp: new Date().toISOString(),
@@ -1690,8 +1690,8 @@ export default function DrawModal({
                     G
                   </span>
                   {selectedModel === "nano-banana-pro-edit"
-                    ? "Nano Banana Pro Edit"
-                    : "Nano Banana 2 Edit"}
+                    ? "Nano Banana Pro"
+                    : "Nano Banana 2"}
                   <span className="opacity-45 text-[8px] ml-0.5">▼</span>
                 </button>
 
@@ -1713,7 +1713,7 @@ export default function DrawModal({
                       }`}
                     >
                       <div className="text-xs font-bold flex items-center gap-1.5">
-                        Nano Banana 2 Edit
+                        Nano Banana 2
                         {selectedModel === "nano-banana-2-edit" && (
                           <span className="text-[#b5f500]">✓</span>
                         )}
@@ -1735,7 +1735,7 @@ export default function DrawModal({
                       }`}
                     >
                       <div className="text-xs font-bold flex items-center gap-1.5">
-                        Nano Banana Pro Edit
+                        Nano Banana Pro
                         {selectedModel === "nano-banana-pro-edit" && (
                           <span className="text-[#b5f500]">✓</span>
                         )}
