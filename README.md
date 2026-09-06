@@ -7,8 +7,8 @@
 
 **Community:** Join [Discord](https://discord.gg/tANKJkHck) for discussions and support
 
-<p align="center"><a href="https://youtu.be/72ng1tSD0kY"><img src="https://i.ytimg.com/vi/72ng1tSD0kY/maxresdefault.jpg" width="720"></a></p>
-<p align="center"><a href="https://youtu.be/72ng1tSD0kY"><b>▶ Watch: Free Claude AI Image Generator (via MCP) — Full Tutorial </b></a></p>
+<p align="center"><a href="https://youtu.be/u_fguVP6nSk"><img src="https://i.ytimg.com/vi/u_fguVP6nSk/maxresdefault.jpg" width="720"></a></p>
+<p align="center"><a href="https://youtu.be/u_fguVP6nSk"><b>▶ Watch: 📺 GPT-6 Astra Just Crossed a Line Even OpenAI Is Scared Of → </b></a></p>
 
 <p align="center">
   <a href="https://github.com/Anil-matcha/awesome-generative-ai-apps">
