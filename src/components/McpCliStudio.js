@@ -103,7 +103,7 @@ export function McpCliStudio() {
             <div class="flex flex-col gap-1.5 flex-1 w-full">
                 <label class="text-[11px] font-bold tracking-wider uppercase text-secondary">Select Target Model</label>
                 <select id="modelSelector" class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-white/30">
-                    <option value="image generate 'a retro-futuristic synthwave car' --model flux-dev">Flux Dev (Image)</option>
+                    <option value="image generate 'a retro-futuristic synthwave car' --model flux-dev">FLUX.1 Dev (Image)</option>
                     <option value="image generate 'oil painting of an astronaut' --model midjourney">Midjourney (Image)</option>
                     <option value="video generate 'cinematic drone shot of an ancient castle' --model kling-master">Kling Master (Video)</option>
                     <option value="video generate 'cyberpunk neon alleyway rain' --model luma-ray">Luma Ray (Video)</option>
