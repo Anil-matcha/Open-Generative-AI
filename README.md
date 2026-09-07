@@ -7,8 +7,8 @@
 
 **Community:** Join [Discord](https://discord.gg/tANKJkHck) for discussions and support
 
-<p align="center"><a href="https://youtu.be/u_fguVP6nSk"><img src="https://i.ytimg.com/vi/u_fguVP6nSk/maxresdefault.jpg" width="720"></a></p>
-<p align="center"><a href="https://youtu.be/u_fguVP6nSk"><b>▶ Watch: 📺 GPT-6 Astra Just Crossed a Line Even OpenAI Is Scared Of → </b></a></p>
+<p align="center"><a href="https://youtu.be/SOXsxqnQGlc"><img src="https://i.ytimg.com/vi/SOXsxqnQGlc/maxresdefault.jpg" width="720"></a></p>
+<p align="center"><a href="https://youtu.be/SOXsxqnQGlc"><b>▶ Watch: Best AI Video Generator (API) in 2026 (Quality, Price, Uncensored, Editing) </b></a></p>
 
 <p align="center">
   <a href="https://github.com/Anil-matcha/awesome-generative-ai-apps">
