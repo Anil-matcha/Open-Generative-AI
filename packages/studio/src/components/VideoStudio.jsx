@@ -413,7 +413,7 @@ const PROVIDER_LOGOS = {
 
 const invertLogos = ['openai', 'blackforest', 'runway', 'ideogram', 'lightricks', 'grok'];
 
-function ModelDropdown({ selectedModel, onSelect, onClose }) {
+function ModelDropdown({ selectedModel, onSelect, onClose, copy = en }) {
   const [search, setSearch] = useState("");
   const selectedEntry = videoModelPickerEntryByVariantId.get(selectedModel);
   const selectedModelProvider = selectedEntry?.family.provider || "all";
@@ -2640,6 +2640,7 @@ export default function VideoStudio({
                       selectedModel={selectedModel}
                       onSelect={handleModelSelect}
                       onClose={() => setOpenDropdown(null)}
+                      copy={copy}
                     />
                   </PromptPopover>
                 )}

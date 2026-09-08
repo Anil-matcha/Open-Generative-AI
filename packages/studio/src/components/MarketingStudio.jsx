@@ -211,7 +211,7 @@ function UploadSlot({ icon, url, progress, label, title, onUpload, onClear, mult
   );
 }
 
-function Dropdown({ isOpen, title, items, selectedId, onSelect, onClose, isVideo = false, onPreview = null }) {
+function Dropdown({ isOpen, title, items, selectedId, onSelect, onClose, isVideo = false, onPreview = null, copy = en }) {
   const ref = useRef(null);
   
   useEffect(() => {
@@ -700,6 +700,7 @@ export default function MarketingStudio({
                   onSelect={(item) => setParams({ ...params, format: item.name, videoUrl: item.url })}
                   onClose={() => setDropdown(null)}
                   isVideo
+                  copy={copy}
                 />
               </div>
 
@@ -755,6 +756,7 @@ export default function MarketingStudio({
                   onSelect={(item) => setAvatarImage(item.url)}
                   onPreview={(item) => setPreviewAvatar(item)}
                   onClose={() => setDropdown(null)}
+                  copy={copy}
                 />
               </div>
 
