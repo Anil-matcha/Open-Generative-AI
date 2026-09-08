@@ -21,19 +21,16 @@ const UPSCALE_MODELS = [
     id: "topaz-image-upscale",
     name: "Topaz",
     subtitle: "The default model for general-purpose...",
-    cost: "1.0",
   },
   {
     id: "seedvr2-image-upscale",
     name: "SeedVR2",
     subtitle: "Diffusion-transformer super-resolution (up to 8K)",
-    cost: "0.02",
   },
   {
     id: "ai-image-upscaler",
     name: "AI Upscaler",
     subtitle: "Fast 1-click automatic super-resolution",
-    cost: "1.0",
   },
 ];
 
@@ -2569,9 +2566,6 @@ export default function LayersStudio({
                               <span className="text-xs font-bold text-white">
                                 {opt.name}
                               </span>
-                              <span className="text-[10px] font-bold text-[#a3e635]">
-                                {opt.cost} credits
-                              </span>
                             </div>
                             <span className="text-[10px] text-white/40">
                               {opt.subtitle}
@@ -3705,9 +3699,6 @@ export default function LayersStudio({
                     <span className="text-[11px] font-extrabold uppercase tracking-wider text-white/40">
                       {copy.common.model}
                     </span>
-                    <span className="text-[10px] font-bold text-[#a3e635] bg-[#84cc16]/15 px-2 py-0.5 rounded-md">
-                      {copy.removeBg.credit}
-                    </span>
                   </div>
 
                   <div className="bg-[#2d313d] p-3.5 rounded-2xl border border-white/5 flex items-center gap-3 shadow-sm">
@@ -3784,9 +3775,6 @@ export default function LayersStudio({
                   <div className="flex items-center justify-between px-1">
                     <span className="text-[11px] font-extrabold uppercase tracking-wider text-white/40">
                       {copy.common.model}
-                    </span>
-                    <span className="text-[10px] font-bold text-[#a3e635] bg-[#84cc16]/15 px-2 py-0.5 rounded-md">
-                      {copy.expandCrop.credit}
                     </span>
                   </div>
 

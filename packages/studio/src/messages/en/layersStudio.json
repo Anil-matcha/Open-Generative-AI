@@ -88,7 +88,6 @@
     "download": "Download"
   },
   "removeBg": {
-    "credit": "1.0 credit",
     "modelName": "AI Background Remover",
     "targetPreview": "Target Preview",
     "alphaMatte": "Alpha Matte Cutout",
@@ -96,7 +95,6 @@
     "feature2": "High-resolution transparent PNG output"
   },
   "expandCrop": {
-    "credit": "0.03 credits",
     "modelName": "AI Image Extension",
     "canvasPreview": "Canvas Preview",
     "boundaryOutpainting": "Boundary Outpainting",

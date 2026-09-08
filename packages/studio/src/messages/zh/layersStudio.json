@@ -88,7 +88,6 @@
     "download": "下载"
   },
   "removeBg": {
-    "credit": "1.0 积分",
     "modelName": "AI 背景移除",
     "targetPreview": "目标预览",
     "alphaMatte": "透明通道抠图",
@@ -96,7 +95,6 @@
     "feature2": "高分辨率透明 PNG 输出"
   },
   "expandCrop": {
-    "credit": "0.03 积分",
     "modelName": "AI 图像扩展",
     "canvasPreview": "画布预览",
     "boundaryOutpainting": "边界外扩绘制",
