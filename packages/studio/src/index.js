@@ -1,6 +1,6 @@
 "use client";
 
-export { default as ImageStudio } from './components/ImageStudio';
+export { default as ImageStudio } from './components/ProviderAwareImageStudio';
 export { default as VideoStudio } from './components/VideoStudio';
 export { default as ClippingStudio } from './components/ClippingStudio';
 export { default as VibeMotionStudio } from './components/VibeMotionStudio';
