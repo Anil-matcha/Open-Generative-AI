@@ -32,12 +32,29 @@ jobs:
           if '<ProviderPicker />' not in text:
               text = text.replace('      <PromptComposer>', '      <ProviderPicker />\n      <PromptComposer>', 1)
           path.write_text(text, encoding='utf-8')
+      - name: Integrate Video Studio provider picker
+        shell: python
+        run: |
+          from pathlib import Path
+          path = Path('packages/studio/src/components/VideoStudio.jsx')
+          text = path.read_text(encoding='utf-8')
+          old_import = 'import { generateVideo, generateI2V, processV2V, uploadFile } from "../muapi.js";'
+          new_import = 'import { generateVideo, generateI2V, processV2V } from "../providerAwareVideo.js";\nimport { uploadFile } from "../muapi.js";'
+          if old_import in text:
+              text = text.replace(old_import, new_import, 1)
+          marker = 'import VideoProviderPicker from "./VideoProviderPicker.jsx";'
+          if marker not in text:
+              anchor = 'import { resolveCopy } from "../i18nUtils";'
+              text = text.replace(anchor, anchor + '\n' + marker, 1)
+          if '<VideoProviderPicker />' not in text:
+              text = text.replace('      <PromptComposer>', '      <VideoProviderPicker />\n      <PromptComposer>', 1)
+          path.write_text(text, encoding='utf-8')
       - name: Commit integration
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add packages/studio/src/components/ImageStudio.jsx
+          git add packages/studio/src/components/ImageStudio.jsx packages/studio/src/components/VideoStudio.jsx
           if git diff --cached --quiet; then exit 0; fi
-          git commit -m "feat(studio): integrate provider picker [provider-integration]"
+          git commit -m "feat(studio): integrate provider pickers [provider-integration]"
           git push
