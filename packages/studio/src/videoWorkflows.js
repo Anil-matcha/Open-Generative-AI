@@ -3,11 +3,12 @@ import {
   videoModelCatalog,
   videoModelPickerEntryByVariantId,
 } from "./modelFamilies.js";
+import { getSeedanceConfiguration } from "./seedanceModels.js";
 import {
-  SEEDANCE_WORKFLOW_VARIANTS,
-  getSeedanceConfiguration,
-  resolveSeedanceVariant,
-} from "./seedanceModels.js";
+  GROUPED_VIDEO_WORKFLOW_VARIANTS,
+  getGroupedVideoConfiguration,
+  resolveGroupedVideoVariant,
+} from "./groupedVideoModels.js";
 
 export const VIDEO_WORKFLOW_IDS = Object.freeze([
   "animate_image",
@@ -91,19 +92,6 @@ export const VIDEO_WORKFLOW_VARIANTS = Object.freeze({
   "grok-imagine-video": {
     animate_image: ["grok-imagine-video-1-5-preview"],
     references: ["grok-imagine-image-to-video"],
-  },
-  "veo-3.1": {
-    animate_image: [
-      "veo3.1-image-to-video",
-      "veo3.1-fast-image-to-video",
-      "veo3.1-lite-image-to-video",
-    ],
-    keyframes: [
-      "veo3.1-image-to-video",
-      "veo3.1-fast-image-to-video",
-      "veo3.1-lite-image-to-video",
-    ],
-    references: ["veo3.1-reference-to-video"],
   },
   "wan-2.7": {
     animate_image: ["wan2.7-image-to-video"],
@@ -189,7 +177,7 @@ export const VIDEO_WORKFLOW_VARIANTS = Object.freeze({
     ],
     keyframes: ["kling-v2.1-pro-i2v"],
   },
-  ...SEEDANCE_WORKFLOW_VARIANTS,
+  ...GROUPED_VIDEO_WORKFLOW_VARIANTS,
 });
 
 const TECHNICAL_EXCLUDED_VARIANTS = Object.freeze({
@@ -309,7 +297,10 @@ export function getVideoWorkflowControlState(workflowFamilyOrId, variantId = nul
     : workflowFamilyOrId;
   if (!workflowFamily) return { kind: "hidden", workflow: null };
 
-  if (variantId && workflowFamily.unmanagedVariantIds?.has(variantId)) {
+  if (variantId && (
+    videoModelCatalog.variantById.get(variantId)?.model.requiresRequestId ||
+    workflowFamily.unmanagedVariantIds?.has(variantId)
+  )) {
     return { kind: "hidden", workflow: null };
   }
 
@@ -415,15 +406,15 @@ function sameFamilyVariantId(familyId, variantId) {
     : null;
 }
 
-function resolveSeedanceWorkflowVariant(
+function resolveGroupedWorkflowVariant(
   familyId,
   workflowId,
   group,
   currentVariantId,
   preferredVariantId,
 ) {
-  const current = getSeedanceConfiguration(currentVariantId);
-  const preferred = getSeedanceConfiguration(preferredVariantId);
+  const current = getGroupedVideoConfiguration(currentVariantId);
+  const preferred = getGroupedVideoConfiguration(preferredVariantId);
   const hasCurrent = current?.familyId === familyId;
   const hasPreferred = preferred?.familyId === familyId;
   // Remembering a workflow must not silently change a selected service,
@@ -437,7 +428,7 @@ function resolveSeedanceWorkflowVariant(
     const remembered = variantForId(group, preferredVariantId);
     if (remembered) return remembered;
   }
-  const variantId = resolveSeedanceVariant({
+  const variantId = resolveGroupedVideoVariant({
     familyId,
     workflowId,
     currentModelId: hasCurrent
@@ -455,8 +446,8 @@ export function resolveVideoWorkflowVariant(
 ) {
   const group = getVideoWorkflowGroup(familyId, workflowId);
   if (!group) return null;
-  if (SEEDANCE_WORKFLOW_VARIANTS[familyId]) {
-    return resolveSeedanceWorkflowVariant(
+  if (GROUPED_VIDEO_WORKFLOW_VARIANTS[familyId]) {
+    return resolveGroupedWorkflowVariant(
       familyId, workflowId, group, currentVariantId, preferredVariantId,
     );
   }
@@ -474,8 +465,8 @@ export function resolveVideoBaseVariant(
 ) {
   const group = getVideoWorkflowGroup(familyId, null);
   if (!group) return null;
-  if (SEEDANCE_WORKFLOW_VARIANTS[familyId]) {
-    return resolveSeedanceWorkflowVariant(
+  if (GROUPED_VIDEO_WORKFLOW_VARIANTS[familyId]) {
+    return resolveGroupedWorkflowVariant(
       familyId, null, group, currentVariantId, preferredVariantId,
     );
   }
@@ -506,7 +497,7 @@ export function resolvePersistedVideoWorkflowSelection(
   const family = videoModelCatalog.familyByVariantId.get(variantId) || null;
   const variant = videoModelCatalog.variantById.get(variantId) || null;
   const workflowFamily = family ? getVideoWorkflowFamily(family.id) : null;
-  if (!family || !variant || !workflowFamily) {
+  if (!family || !variant || !workflowFamily || variant.model.requiresRequestId) {
     return { family, variant, workflowId: null };
   }
 
@@ -748,11 +739,12 @@ export function getVideoWorkflowMediaSlots(model, workflowId) {
         Math.max(capabilities.image.maxItems, 1),
         {
           isArray: capabilities.image.isArray,
-          ...(SEEDANCE_WORKFLOW_VARIANTS[familyId] &&
-            model.inputs?.[capabilities.image.field]?.minItems > 0
+          ...((getSeedanceConfiguration(model.id) &&
+            model.inputs?.[capabilities.image.field]?.minItems > 0) ||
+            model.id === "veo3.1-reference-to-video"
             ? {
               required: true,
-              minItems: model.inputs[capabilities.image.field].minItems,
+              minItems: model.inputs?.[capabilities.image.field]?.minItems || 1,
               requiredMessage: "Please add a reference image.",
             }
             : {}),

@@ -4538,7 +4538,9 @@ export const t2vModels = [
       },
       "resolution": {
         "enum": [
-          "1080p"
+          "720p",
+          "1080p",
+          "4k"
         ],
         "title": "Resolution",
         "name": "resolution",
@@ -4583,7 +4585,9 @@ export const t2vModels = [
       },
       "resolution": {
         "enum": [
-          "1080p"
+          "720p",
+          "1080p",
+          "4k"
         ],
         "title": "Resolution",
         "name": "resolution",
@@ -4628,7 +4632,9 @@ export const t2vModels = [
       },
       "resolution": {
         "enum": [
-          "1080p"
+          "720p",
+          "1080p",
+          "4k"
         ],
         "title": "Resolution",
         "name": "resolution",
@@ -13084,6 +13090,7 @@ export const i2vModels = [
     "family": "veo",
     "imageField": "images_list",
     "hasPrompt": true,
+    "promptRequired": true,
     "inputs": {
       "prompt": {
         "type": "string",
@@ -13116,6 +13123,7 @@ export const i2vModels = [
     "family": "veo",
     "imageField": "images_list",
     "hasPrompt": true,
+    "promptRequired": true,
     "inputs": {
       "prompt": {
         "type": "string",
@@ -14425,7 +14433,9 @@ export const i2vModels = [
         "name": "resolution",
         "description": "The resolution of the generated video.",
         "enum": [
-          "1080p"
+          "720p",
+          "1080p",
+          "4k"
         ],
         "default": "1080p"
       }
@@ -14479,7 +14489,9 @@ export const i2vModels = [
         "name": "resolution",
         "description": "The resolution of the generated video.",
         "enum": [
-          "1080p"
+          "720p",
+          "1080p",
+          "4k"
         ],
         "default": "1080p"
       }
@@ -14530,7 +14542,9 @@ export const i2vModels = [
         "name": "resolution",
         "description": "The resolution of the generated video.",
         "enum": [
-          "1080p"
+          "720p",
+          "1080p",
+          "4k"
         ],
         "default": "1080p"
       }
@@ -14564,7 +14578,8 @@ export const i2vModels = [
         "description": "The resolution of the generated video.",
         "enum": [
           "720p",
-          "1080p"
+          "1080p",
+          "4k"
         ],
         "default": "720p"
       },

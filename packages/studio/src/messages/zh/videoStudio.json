@@ -90,7 +90,7 @@
     "deleteItemFailed": "删除项目失败",
     "noContinuationSource": "请选择兼容的 {family} 结果继续生成。"
   },
-  "seedance": {
+  "modelControls": {
     "modes": {
       "text": "文字生成",
       "animate_image": "图片动画",
@@ -100,18 +100,12 @@
       "extend_uploaded_video": "延长视频"
     },
     "settings": "设置",
-    "speed": "速度",
-    "speeds": {
-      "standard": "标准速度",
-      "fast": "快速"
-    },
     "quality": "质量",
     "extensionDuration": "续接片段时长",
     "defaultResolution": "服务默认值",
     "incompatible": "此模型版本不支持该选择。",
     "incompatibleShort": "此版本不支持",
     "inheritedFormat": "画面比例继承自原始图片",
-    "tools": "Seedance 视频工具",
     "inheritedVideoResolution": "分辨率继承自原始视频",
     "modeDescriptions": {
       "text": "根据你的描述生成视频。",
@@ -121,6 +115,52 @@
       "edit_video": "上传视频并描述你想修改的内容。",
       "extend_uploaded_video": "在上传的视频末尾添加新的片段。"
     },
+    "defaultVariant": "默认",
+    "advanced": "高级",
+    "adjustments": {
+      "resolution": "使用 {value}",
+      "duration": "时长：{value} 秒",
+      "aspectRatio": "画面比例：{value}",
+      "speed": "速度：{value}",
+      "profile": "服务：{value}",
+      "quality": "质量：{value}"
+    },
+    "fields": {
+      "seed": {
+        "title": "随机种子",
+        "description": "设为 −1 使用随机结果。"
+      },
+      "high_bitrate": {
+        "title": "高码率",
+        "description": "更多细节，更大的文件。"
+      },
+      "generate_audio": {
+        "title": "生成音频",
+        "description": ""
+      },
+      "camera_fixed": {
+        "title": "固定镜头",
+        "description": "保持镜头静止。"
+      }
+    },
+    "provider": "生成服务",
+    "providerHelp": "有特定需要时，可选择指定服务。",
+    "resolutionUnknown": "此服务未指定输出分辨率。",
+    "referenceSupport": "支持：{media}。",
+    "referenceMediaTypes": {
+      "image": "图片",
+      "video": "视频",
+      "audio": "音频"
+    },
+    "restoreDefaultResolution": "使用服务默认的输出分辨率"
+  },
+  "seedance": {
+    "speed": "速度",
+    "speeds": {
+      "standard": "标准速度",
+      "fast": "快速"
+    },
+    "tools": "Seedance 视频工具",
     "profiles": {
       "standard": {
         "label": "标准版",
@@ -155,36 +195,8 @@
         "description": ""
       }
     },
-    "defaultVariant": "默认",
     "continueGenerated": "续接 Seedance 2.0 结果",
     "removeWatermark": "去除水印",
-    "advanced": "高级",
-    "adjustments": {
-      "resolution": "使用 {value}",
-      "duration": "时长：{value} 秒",
-      "aspectRatio": "画面比例：{value}",
-      "speed": "速度：{value}",
-      "profile": "服务：{value}",
-      "quality": "质量：{value}"
-    },
-    "fields": {
-      "seed": {
-        "title": "随机种子",
-        "description": "设为 −1 使用随机结果。"
-      },
-      "high_bitrate": {
-        "title": "高码率",
-        "description": "更多细节，更大的文件。"
-      },
-      "generate_audio": {
-        "title": "生成音频",
-        "description": ""
-      },
-      "camera_fixed": {
-        "title": "固定镜头",
-        "description": "保持镜头静止。"
-      }
-    },
     "toolNames": {
       "continueGenerated": "续接 Seedance 2.0",
       "removeWatermark": "去除水印"
@@ -194,19 +206,36 @@
       "vip": "VIP",
       "pro": "Pro"
     },
-    "provider": "生成服务",
-    "providerHelp": "有特定需要时，可选择指定服务。",
-    "resolutionUnknown": "此服务未指定输出分辨率。",
-    "referenceSupport": "支持：{media}。",
-    "referenceMediaTypes": {
-      "image": "图片",
-      "video": "视频",
-      "audio": "音频"
-    },
     "editAudio": {
       "title": "新音频",
       "description": "关闭时保留原音频。"
+    }
+  },
+  "veo": {
+    "speed": "生成方式",
+    "speeds": {
+      "standard": "标准",
+      "fast": "快速",
+      "lite": "轻量"
     },
-    "restoreDefaultResolution": "使用服务默认的输出分辨率"
+    "speedDescriptions": {
+      "standard": "",
+      "fast": "生成更快。",
+      "lite": "费用更低。"
+    },
+    "tools": "Veo 视频工具",
+    "toolNames": {
+      "continueGenerated": "续写 Veo 3.1",
+      "upscale": "创建 4K 副本"
+    },
+    "toolsHelp": "使用已生成的 Veo 3.1 视频。",
+    "sourceVideo": "源视频",
+    "sourceHelp": {
+      "continueGenerated": "请先使用 Veo 3.1 标准或快速模式生成 720p 视频。",
+      "upscale": "请先使用 Veo 3.1 标准或快速模式生成视频。"
+    },
+    "adjustments": {
+      "speed": "生成方式：{value}"
+    }
   }
 }

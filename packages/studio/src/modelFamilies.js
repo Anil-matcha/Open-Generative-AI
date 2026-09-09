@@ -7,10 +7,10 @@ import {
 } from "./models.js";
 import { getModelMediaCapabilities } from "./modelCapabilities.js";
 import {
-  getSeedanceConfiguration,
-  resolveSeedanceVariant,
-  SEEDANCE_FAMILY_NAMES,
-} from "./seedanceModels.js";
+  getGroupedVideoConfiguration,
+  resolveGroupedVideoVariant,
+  GROUPED_VIDEO_FAMILY_NAMES,
+} from "./groupedVideoModels.js";
 
 const IMAGE_FAMILY_ALIASES = {
   "bytedance-seededit-v3": "bytedance-seedream-v3",
@@ -782,7 +782,7 @@ function buildVideoModelMenuEntries() {
   const groupedFamilies = new Set();
   const variantIdsByFamily = new Map();
   for (const variantId of videoModelCatalog.variantById.keys()) {
-    const config = getSeedanceConfiguration(variantId);
+    const config = getGroupedVideoConfiguration(variantId);
     if (!config) continue;
     let variantIds = variantIdsByFamily.get(config.familyId);
     if (!variantIds) {
@@ -792,7 +792,7 @@ function buildVideoModelMenuEntries() {
     variantIds.add(variantId);
   }
   for (const entry of videoModelPickerEntries) {
-    const config = getSeedanceConfiguration(entry.defaultVariant?.model.id);
+    const config = getGroupedVideoConfiguration(entry.defaultVariant?.model.id);
     if (!config) {
       entries.push(entry);
       continue;
@@ -808,7 +808,7 @@ function buildVideoModelMenuEntries() {
       v2v: ["edit_video", "extend_uploaded_video"],
     })) {
       for (const workflowId of workflowIds) {
-        const variantId = resolveSeedanceVariant({ familyId: config.familyId, workflowId });
+        const variantId = resolveGroupedVideoVariant({ familyId: config.familyId, workflowId });
         const variant = videoModelCatalog.variantById.get(variantId);
         if (variant?.mode === mode) {
           variantsByMode[mode] = variant;
@@ -816,12 +816,12 @@ function buildVideoModelMenuEntries() {
         }
       }
     }
-    const name = SEEDANCE_FAMILY_NAMES[config.familyId];
+    const name = GROUPED_VIDEO_FAMILY_NAMES[config.familyId];
     entries.push(Object.freeze({
       id: `${config.familyId}:grouped`,
       family,
       name,
-      groupedSeedance: true,
+      groupedVideo: true,
       variantIds,
       variantsByMode,
       defaultVariant: variantsByMode.t2v || variantsByMode.i2v || variantsByMode.v2v,

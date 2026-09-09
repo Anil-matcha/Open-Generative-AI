@@ -299,3 +299,11 @@ export function getSeedanceVariantOptions(familyId, workflowId = null, currentMo
   const selected = current?.familyId === familyId ? current : group.defaultConfiguration;
   return group.optionsByCoordinates.get(coordinateKey(selected));
 }
+
+export const SEEDANCE_MODEL_GROUP = Object.freeze({
+  familyNames: SEEDANCE_FAMILY_NAMES,
+  configurations,
+  workflowVariants: SEEDANCE_WORKFLOW_VARIANTS,
+  resolveVariant: resolveSeedanceVariant,
+  getVariantOptions: getSeedanceVariantOptions,
+});

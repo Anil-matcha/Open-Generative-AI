@@ -1,6 +1,6 @@
 import { getVideoWorkflowMediaSlots } from "./videoWorkflows.js";
 
-export function getSeedanceModeDescription(model, workflowId, copy) {
+export function getVideoModeDescription(model, workflowId, copy) {
   const description = copy.modeDescriptions[workflowId || "text"];
   if (workflowId !== "references" || !model) return description;
 

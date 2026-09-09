@@ -16,7 +16,7 @@ import {
 const SELECT_CLASS = "w-full rounded-lg border border-white/10 bg-[#17191c] px-3 py-2 text-xs text-white outline-none focus:border-[#22d3ee]/50";
 const ADVANCED_KEYS = ["seed"];
 
-export function SeedanceOptionControl({ label, field, icon, open, onToggle, onSelect, copy }) {
+export function VideoOptionControl({ label, field, icon, open, onToggle, onSelect, copy }) {
   const controlId = useId();
   const menuId = `${controlId}-menu`;
   const { triggerRef, menuRef, onTriggerKeyDown, onMenuKeyDown, restoreFocus } = usePromptMenu({
@@ -29,7 +29,7 @@ export function SeedanceOptionControl({ label, field, icon, open, onToggle, onSe
     : option.label;
   const selectedLabel = selected ? optionLabel(selected) : field.label || label;
   if (field.options.length === 0 || (field.options.length === 1 && selected)) {
-    if (field.key !== "resolution" || (field.options.length === 0 && !field.label)) return null;
+    if (field.key === "speed" || (field.options.length === 0 && !field.label)) return null;
     return (
       <div
         role="group"
@@ -100,7 +100,7 @@ export function SeedanceOptionControl({ label, field, icon, open, onToggle, onSe
   );
 }
 
-export function SeedanceSettingsControl({
+export function VideoSettingsControl({
   profile, qualities, quality, onProfileChange, onQualityChange, onDefaultResolution,
   inputs, values, onChange, open, onToggle, copy,
 }) {

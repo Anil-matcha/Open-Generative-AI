@@ -6,75 +6,11 @@ import {
   resolveSeedanceVariant,
 } from "./seedanceModels.js";
 
-const COMMON_FIELDS = Object.freeze([
-  ["aspectRatio", "aspect_ratio", "aspectRatios"],
-  ["duration", "duration", "durations"],
-  ["resolution", "resolution", "resolutions"],
-  ["quality", "quality", "qualities"],
-]);
-
-function schemaOptions(schema) {
-  if (!schema) return [];
-  if (Array.isArray(schema.enum)) return [...schema.enum];
-  const minimum = schema.minValue ?? schema.minimum;
-  const maximum = schema.maxValue ?? schema.maximum;
-  const step = schema.step ?? (["int", "integer"].includes(schema.type) ? 1 : undefined);
-  if (
-    Number.isFinite(minimum) && Number.isFinite(maximum) &&
-    Number.isFinite(step) && step > 0 && maximum >= minimum
-  ) {
-    const count = Math.floor((maximum - minimum) / step + 1e-9) + 1;
-    // Common controls are small selects. Do not materialize an unbounded or
-    // unexpectedly large range from a future provider schema.
-    if (count > 1000) return [];
-    return Array.from({ length: count }, (_, index) =>
-      Number((minimum + index * step).toFixed(10)));
-  }
-  return schema.default === undefined ? [] : [schema.default];
-}
-
-function matchingValue(options, value) {
-  if (value === undefined || value === null || value === "") return undefined;
-  return options.find((option) => option === value || String(option) === String(value));
-}
-
-function nearestDuration(options, value) {
-  if (value === undefined || value === null || value === "" || !Number.isFinite(Number(value))) return undefined;
-  let nearest;
-  for (const option of options) {
-    if (Number.isFinite(Number(option)) &&
-        (nearest === undefined || Math.abs(Number(option) - Number(value)) < Math.abs(Number(nearest) - Number(value)))) {
-      nearest = option;
-    }
-  }
-  return nearest;
-}
-
-export function getSeedanceCommonOptions(model) {
-  return Object.fromEntries(COMMON_FIELDS.map(([, field, key]) =>
-    [key, field === "aspect_ratio" && model?.aspectRatioMode === "inherited"
-      ? []
-      : schemaOptions(model?.inputs?.[field])]));
-}
-
-export function getSeedanceCommonValues(model, previous = {}) {
-  const options = getSeedanceCommonOptions(model);
-  return Object.fromEntries(COMMON_FIELDS.map(([key, field, optionsKey]) => {
-    const allowed = options[optionsKey];
-    const value = matchingValue(allowed, previous[key]) ??
-      (key === "duration" ? nearestDuration(allowed, previous[key]) : undefined) ??
-      matchingValue(allowed, model?.inputs?.[field]?.default) ?? allowed[0];
-    return [key, value];
-  }));
-}
-
-export function buildSeedanceCommonPayload(model, values = {}) {
-  const options = getSeedanceCommonOptions(model);
-  return Object.fromEntries(COMMON_FIELDS.flatMap(([key, field, optionsKey]) => {
-    const value = matchingValue(options[optionsKey], values[key]);
-    return value === undefined ? [] : [[field, value]];
-  }));
-}
+import {
+  getVideoCommonOptions,
+  getVideoCommonValues,
+  matchingVideoParameterValue as matchingValue,
+} from "./videoModelParameters.js";
 
 function resolutionLabel(value) {
   return String(value).toLowerCase() === "4k" ? "4K" : String(value);
@@ -87,7 +23,7 @@ function modelForId(modelId) {
 function followsSourceVideoResolution(modelId) {
   const config = getSeedanceConfiguration(modelId);
   if (config.resolution !== "default" || !config.workflowIds.includes("extend_uploaded_video") ||
-    getSeedanceCommonOptions(modelForId(modelId)).resolutions.length) return false;
+    getVideoCommonOptions(modelForId(modelId)).resolutions.length) return false;
   return !getSeedanceVariantOptions(config.familyId, "extend_uploaded_video", modelId)
     .some((field) => field.key === "resolution" && field.options.some((option) =>
       !option.disabled && option.value !== "default"));
@@ -101,7 +37,7 @@ for (const { model } of videoModelCatalog.variantById.values()) {
   if (!config) continue;
   let workflows = selectionCandidates.get(config.familyId);
   if (!workflows) selectionCandidates.set(config.familyId, workflows = new Map());
-  const candidate = { model, config, options: getSeedanceCommonOptions(model) };
+  const candidate = { model, config, options: getVideoCommonOptions(model) };
   for (const workflowId of config.workflowIds) {
     let candidates = workflows.get(workflowId);
     if (!candidates) workflows.set(workflowId, candidates = []);
@@ -117,7 +53,7 @@ function effectiveResolution(modelId, nativeResolution) {
   if (!config) return undefined;
   const fixed = getSeedanceEndpointResolution(modelId);
   if (fixed !== undefined) return fixed;
-  const native = getSeedanceCommonValues(modelForId(modelId), { resolution: nativeResolution }).resolution;
+  const native = getVideoCommonValues(modelForId(modelId), { resolution: nativeResolution }).resolution;
   if (native !== undefined) return normalizeResolution(native);
   return followsSourceVideoResolution(modelId) ? undefined : "default";
 }
@@ -141,7 +77,7 @@ function compareScores(left, right) {
 }
 
 function commonAdjustments(model, previous) {
-  const target = getSeedanceCommonValues(model, previous);
+  const target = getVideoCommonValues(model, previous);
   return ["duration", "aspectRatio", "quality"].flatMap((key) =>
     previous[key] !== undefined && target[key] !== undefined && String(previous[key]) !== String(target[key])
       ? [{ key, from: previous[key], to: target[key] }] : []);
@@ -166,7 +102,7 @@ export function getSeedanceSelectionAdjustments({
       resolution !== undefined && sourceResolution !== resolution) {
     adjustments.push({ key: "resolution", from: sourceResolution, to: resolution });
   }
-  const visibleCommonValues = getSeedanceCommonValues(modelForId(currentModelId), commonValues);
+  const visibleCommonValues = getVideoCommonValues(modelForId(currentModelId), commonValues);
   adjustments.push(...commonAdjustments(modelForId(selection.modelId), visibleCommonValues));
   return adjustments;
 }
@@ -209,7 +145,7 @@ export function planSeedanceSelection({
     if (candidate.config.profile.startsWith("legacy") &&
         candidate.config.profile !== current?.profile && changes.profile !== candidate.config.profile) continue;
     const { model, config, options } = candidate;
-    let resolution = getSeedanceCommonValues(model).resolution;
+    let resolution = getVideoCommonValues(model).resolution;
     if (Object.hasOwn(changes, "resolution")) {
       if (changes.resolution === "default") {
         if (config.resolution !== "default") continue;
@@ -260,7 +196,7 @@ export function resolveSeedanceSelection({
   });
   const withDefaultResolution = (modelId) => {
     if (!modelId) return null;
-    const resolution = getSeedanceCommonValues(modelForId(modelId)).resolution;
+    const resolution = getVideoCommonValues(modelForId(modelId)).resolution;
     return { modelId, ...(resolution === undefined ? {} : { resolution }) };
   };
 
@@ -272,7 +208,7 @@ export function resolveSeedanceSelection({
     // variants whose provider contract has no native resolution input.
     for (const modelId of new Set([resolve("default"), resolve(size)])) {
       if (!modelId) continue;
-      const native = getSeedanceCommonOptions(modelForId(modelId)).resolutions
+      const native = getVideoCommonOptions(modelForId(modelId)).resolutions
         .find((value) => normalizeResolution(value) === size);
       if (native !== undefined) return { modelId, resolution: native };
       if (getSeedanceEndpointResolution(modelId) === size) return { modelId };
@@ -291,7 +227,7 @@ export function resolveSeedanceSelection({
     // The UI can retain its earlier native setting while this field is hidden
     // and restore that preference when returning to a compatible mode.
     if (modelId && followsSourceVideoResolution(currentModelId)) {
-      const resolution = matchingValue(getSeedanceCommonOptions(modelForId(modelId)).resolutions, nativeResolution);
+      const resolution = matchingValue(getVideoCommonOptions(modelForId(modelId)).resolutions, nativeResolution);
       if (resolution !== undefined) return { modelId, resolution };
     }
     return withDefaultResolution(modelId);
@@ -304,7 +240,7 @@ export function resolveSeedanceSelection({
   const candidates = new Set([resolve("default"), resolve(), resolve(outputResolution)]);
   for (const modelId of candidates) {
     if (!modelId) continue;
-    const nativeOptions = getSeedanceCommonOptions(modelForId(modelId)).resolutions;
+    const nativeOptions = getVideoCommonOptions(modelForId(modelId)).resolutions;
     const resolution = nativeOptions.find((option) =>
       String(option).toLowerCase() === outputResolution);
     if (resolution !== undefined) return { modelId, resolution };
@@ -318,7 +254,7 @@ export function resolveSeedanceSelection({
 // output-size input. Keep the fallback for catalogs that may still be stale.
 export function migrateSeedanceResolutionSelection(modelId, resolution) {
   if (modelId !== "seedance-2.5-spicy-text-to-video" && modelId !== "seedance-2.5-spicy-image-to-video") return modelId;
-  if (getSeedanceCommonOptions(modelForId(modelId)).resolutions.length) return modelId;
+  if (getVideoCommonOptions(modelForId(modelId)).resolutions.length) return modelId;
   return resolveSeedanceSelection({
     familyId: "seedance-2.5",
     workflowId: modelId.endsWith("image-to-video") ? "animate_image" : null,

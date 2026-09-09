@@ -90,7 +90,7 @@
     "deleteItemFailed": "Failed to delete item",
     "noContinuationSource": "Choose a compatible {family} result to continue."
   },
-  "seedance": {
+  "modelControls": {
     "modes": {
       "text": "From prompt",
       "animate_image": "Animate image",
@@ -100,18 +100,12 @@
       "extend_uploaded_video": "Extend video"
     },
     "settings": "Settings",
-    "speed": "Speed",
-    "speeds": {
-      "standard": "Standard speed",
-      "fast": "Fast"
-    },
     "quality": "Quality",
     "extensionDuration": "Extension duration",
     "defaultResolution": "Service default",
     "incompatible": "This choice is unavailable for this model version.",
     "incompatibleShort": "Unavailable for this version",
     "inheritedFormat": "Format follows the source image",
-    "tools": "Seedance video tools",
     "inheritedVideoResolution": "Resolution follows the source video",
     "modeDescriptions": {
       "text": "Create a video from your description.",
@@ -121,6 +115,52 @@
       "edit_video": "Upload a video and describe your changes.",
       "extend_uploaded_video": "Add new footage to the end of an uploaded video."
     },
+    "defaultVariant": "Default",
+    "advanced": "Advanced",
+    "adjustments": {
+      "resolution": "Uses {value}",
+      "duration": "Duration: {value} s",
+      "aspectRatio": "Format: {value}",
+      "speed": "Speed: {value}",
+      "profile": "Service: {value}",
+      "quality": "Quality: {value}"
+    },
+    "fields": {
+      "seed": {
+        "title": "Seed",
+        "description": "Use −1 for random results."
+      },
+      "high_bitrate": {
+        "title": "High bitrate",
+        "description": "Larger files, more detail."
+      },
+      "generate_audio": {
+        "title": "Generate audio",
+        "description": ""
+      },
+      "camera_fixed": {
+        "title": "Fixed camera",
+        "description": "Keep the camera still."
+      }
+    },
+    "provider": "Generation service",
+    "providerHelp": "Choose a specific service when needed.",
+    "resolutionUnknown": "Output resolution is not specified by this service.",
+    "referenceSupport": "Supports: {media}.",
+    "referenceMediaTypes": {
+      "image": "Images",
+      "video": "Video",
+      "audio": "Audio"
+    },
+    "restoreDefaultResolution": "Use the service’s default output size"
+  },
+  "seedance": {
+    "speed": "Speed",
+    "speeds": {
+      "standard": "Standard speed",
+      "fast": "Fast"
+    },
+    "tools": "Seedance video tools",
     "profiles": {
       "standard": {
         "label": "Standard",
@@ -155,36 +195,8 @@
         "description": ""
       }
     },
-    "defaultVariant": "Default",
     "continueGenerated": "Continue a Seedance 2.0 result",
     "removeWatermark": "Remove watermark",
-    "advanced": "Advanced",
-    "adjustments": {
-      "resolution": "Uses {value}",
-      "duration": "Duration: {value} s",
-      "aspectRatio": "Format: {value}",
-      "speed": "Speed: {value}",
-      "profile": "Service: {value}",
-      "quality": "Quality: {value}"
-    },
-    "fields": {
-      "seed": {
-        "title": "Seed",
-        "description": "Use −1 for random results."
-      },
-      "high_bitrate": {
-        "title": "High bitrate",
-        "description": "Larger files, more detail."
-      },
-      "generate_audio": {
-        "title": "Generate audio",
-        "description": ""
-      },
-      "camera_fixed": {
-        "title": "Fixed camera",
-        "description": "Keep the camera still."
-      }
-    },
     "toolNames": {
       "continueGenerated": "Continue Seedance 2.0",
       "removeWatermark": "Remove watermark"
@@ -194,19 +206,36 @@
       "vip": "VIP",
       "pro": "Pro"
     },
-    "provider": "Generation service",
-    "providerHelp": "Choose a specific service when needed.",
-    "resolutionUnknown": "Output resolution is not specified by this service.",
-    "referenceSupport": "Supports: {media}.",
-    "referenceMediaTypes": {
-      "image": "Images",
-      "video": "Video",
-      "audio": "Audio"
-    },
     "editAudio": {
       "title": "New audio",
       "description": "Off keeps the original audio."
+    }
+  },
+  "veo": {
+    "speed": "Generation",
+    "speeds": {
+      "standard": "Standard",
+      "fast": "Fast",
+      "lite": "Lite"
     },
-    "restoreDefaultResolution": "Use the service’s default output size"
+    "speedDescriptions": {
+      "standard": "",
+      "fast": "Faster generation.",
+      "lite": "Lower cost."
+    },
+    "tools": "Veo video tools",
+    "toolNames": {
+      "continueGenerated": "Continue Veo 3.1",
+      "upscale": "Create a 4K copy"
+    },
+    "toolsHelp": "Use a completed Veo 3.1 video.",
+    "sourceVideo": "Source video",
+    "sourceHelp": {
+      "continueGenerated": "Create a 720p video with Veo 3.1 Standard or Fast first.",
+      "upscale": "Create a video with Veo 3.1 Standard or Fast first."
+    },
+    "adjustments": {
+      "speed": "Generation: {value}"
+    }
   }
 }
