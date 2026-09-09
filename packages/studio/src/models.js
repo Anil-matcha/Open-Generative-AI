@@ -28428,6 +28428,49 @@ export const getAspectRatiosForRecastModel = (id) => {
   return model?.inputs?.aspect_ratio?.enum || [];
 };
 
+// ─── Motion Control Models (Seedance) ───────────────────────────────────────────────
+export const motionControlModels = [
+  {
+    id: "seedance-2.5-motion-control",
+    name: "Seedance 2.5 Motion Control",
+    endpoint: "seedance-2.5-motion-control",
+    family: "seedance",
+    description: "Next-gen motion control with up to 30s duration, multi-image conditioning (up to 30 assets), adaptive aspect ratio, and audio generation.",
+    maxDuration: 30,
+    minDuration: 4,
+    defaultDuration: 5,
+    maxImages: 30,
+    supportsAudio: true,
+    supportsBitrate: true,
+    supportsSeed: true,
+    aspectRatios: ["adaptive", "16:9", "9:16", "1:1", "4:3", "3:4", "21:9", "9:21"],
+    defaultAspectRatio: "16:9"
+  },
+  {
+    id: "seedance-2-motion-control",
+    name: "Seedance 2.0 Motion Control",
+    endpoint: "seedance-2-motion-control",
+    family: "seedance",
+    description: "Extract motion from reference video and rebuild scenes with new character identities (up to 15s, up to 9 assets).",
+    maxDuration: 15,
+    minDuration: 4,
+    defaultDuration: 5,
+    maxImages: 9,
+    supportsAudio: true,
+    supportsQuality: true,
+    supportsSeed: true,
+    aspectRatios: ["16:9", "9:16", "4:3", "1:1", "3:4", "21:9"],
+    defaultAspectRatio: "16:9"
+  }
+];
+
+export const getMotionControlModelById = (id) => motionControlModels.find(m => m.id === id) || motionControlModels[0];
+export const getAspectRatiosForMotionControlModel = (id) => {
+  const model = getMotionControlModelById(id);
+  return model?.aspectRatios || ["16:9", "9:16", "1:1", "4:3", "3:4", "21:9"];
+};
+
+
 
 // ── Audio Models ──────────────────────────────────────────────────────────
 export const audioModels = [

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { ImageStudio, VideoStudio, ClippingStudio, VibeMotionStudio, LipSyncStudio, RecastStudio, CinemaStudio, AudioStudio, MarketingStudio, WorkflowStudio, AgentStudio, AppsStudio, AiInfluencerStudio, LayersStudio, getUserBalance } from 'studio';
+import { ImageStudio, VideoStudio, ClippingStudio, MotionControlStudio, VibeMotionStudio, LipSyncStudio, RecastStudio, CinemaStudio, AudioStudio, MarketingStudio, WorkflowStudio, AgentStudio, AppsStudio, AiInfluencerStudio, LayersStudio, getUserBalance } from 'studio';
 
 const DesignAgentStudio = dynamic(() => import('studio').then(mod => mod.DesignAgentStudio), {
   ssr: false,
@@ -72,6 +72,18 @@ const TABS = [
         <line x1="20" y1="4" x2="8.12" y2="15.88"/>
         <line x1="14.47" y1="14.47" x2="20" y2="20"/>
         <line x1="8.12" y1="8.12" x2="12" y2="12"/>
+      </svg>
+    )
+  },
+  {
+    id: 'motion-control',
+    label: 'Motion Control',
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="5" r="3"/>
+        <line x1="12" y1="8" x2="12" y2="14"/>
+        <path d="M9 11l3 3 3-3"/>
+        <path d="M7 21l5-5 5 5"/>
       </svg>
     )
   },
@@ -211,7 +223,7 @@ const NAVIGATION_CATEGORIES = [
   {
     id: 'video',
     label: 'Video',
-    tabIds: ['video', 'clipping', 'vibe-motion', 'lipsync', 'body-swap', 'marketing'],
+    tabIds: ['video', 'clipping', 'motion-control', 'vibe-motion', 'lipsync', 'body-swap', 'marketing'],
     icon: (
       <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <rect x="2" y="4" width="15" height="16" rx="2"/>
@@ -974,6 +986,9 @@ export default function StandaloneShell({ locale = 'en' }) {
         </div>
         <div className={activeTab === 'clipping' ? "h-full w-full" : "hidden"}>
           <ClippingStudio apiKey={apiKey} locale={locale} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('clipping')} onGenerationEnd={makeGenerationEndCallback('clipping')} onGenerationComplete={makeSuccessCallback('clipping')} onGenerationError={makeErrorCallback('clipping')} />
+        </div>
+        <div className={activeTab === 'motion-control' ? "h-full w-full" : "hidden"}>
+          <MotionControlStudio apiKey={apiKey} locale={locale} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('motion-control')} onGenerationEnd={makeGenerationEndCallback('motion-control')} onGenerationComplete={makeSuccessCallback('motion-control')} onGenerationError={makeErrorCallback('motion-control')} />
         </div>
         <div className={activeTab === 'vibe-motion' ? "h-full w-full" : "hidden"}>
           <VibeMotionStudio apiKey={apiKey} locale={locale} onGenerationStart={makeGenerationStartCallback('vibe-motion')} onGenerationEnd={makeGenerationEndCallback('vibe-motion')} onGenerationComplete={makeSuccessCallback('vibe-motion')} onGenerationError={makeErrorCallback('vibe-motion')} />

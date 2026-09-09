@@ -1,0 +1,90 @@
+{
+  "labels": {
+    "referenceVideo": "Reference Video",
+    "characterImages": "Performer / Character Images",
+    "addImage": "Add Image",
+    "library": "Library",
+    "mode": "Mode",
+    "motionTransfer": "Motion Transfer",
+    "objectsSwap": "Objects Swap",
+    "duration": "Duration",
+    "durationSeconds": "{count}s",
+    "quality": "Quality",
+    "highBitrate": "High Bitrate",
+    "generateAudio": "Generate Audio",
+    "seed": "Seed",
+    "randomSeed": "Random (-1)"
+  },
+  "buttons": {
+    "use": "Use",
+    "useAsVideo": "Use as Video",
+    "useAsImage": "Add as Image",
+    "download": "Download",
+    "delete": "Delete",
+    "generate": "Generate Motion",
+    "generating": "Generating..."
+  },
+  "titles": {
+    "clickToClear": "{fileName} — click to clear",
+    "uploadVideo": "Upload reference video (MP4/WebM/MOV) or drag and drop",
+    "uploadImage": "Upload character or performer images (PNG/JPEG/WebP)",
+    "enlargePreview": "Enlarge preview",
+    "deleteFromLibrary": "Delete from Library",
+    "removeImage": "Remove image"
+  },
+  "assetLibrary": {
+    "header": "Asset Library",
+    "tabs": {
+      "videos": "Videos",
+      "images": "Images",
+      "results": "Results"
+    },
+    "empty": "No assets found"
+  },
+  "dropdowns": {
+    "model": "Model",
+    "selectModel": "Select model",
+    "aspectRatio": "Aspect Ratio",
+    "qualityBasic": "Basic",
+    "qualityHigh": "High",
+    "qualityBasicDesc": "Faster generation, standard resolution",
+    "qualityHighDesc": "Highest cinematic detail and motion consistency"
+  },
+  "modes": {
+    "motionTransfer": "Motion Transfer",
+    "motionTransferDesc": "Extract motion and choreography from video and rebuild the scene with your character",
+    "objectsSwap": "Objects Swap",
+    "objectsSwapDesc": "Keep video scene unchanged, swap outfits, characters, or products"
+  },
+  "empty": {
+    "titleLine1": "START CREATING WITH",
+    "titleLine2": "MOTION CONTROL STUDIO",
+    "description": "Drive character images with reference video motion, choreography, and camera movements using Seedance Motion Control."
+  },
+  "placeholders": {
+    "prompt": "Optional — describe additional scene details, lighting, or motion nuances..."
+  },
+  "badges": {
+    "motionControl": "Motion Control",
+    "motionTransfer": "Motion Transfer",
+    "objectsSwap": "Objects Swap"
+  },
+  "confirm": {
+    "deleteGenerated": "Are you sure you want to delete this generated item?"
+  },
+  "errors": {
+    "videoTooLarge": "Video exceeds 100MB limit.",
+    "imageTooLarge": "Image exceeds 20MB limit.",
+    "missingVideo": "Please upload or select a reference video first.",
+    "missingImages": "Please upload or select at least one character/performer image.",
+    "maxImagesExceeded": "Maximum {max} images allowed for this model.",
+    "videoUploadFailed": "Video upload failed: {message}",
+    "imageUploadFailed": "Image upload failed: {message}",
+    "generationFailed": "Motion control video generation failed"
+  },
+  "defaults": {
+    "selectedVideo": "Reference Video",
+    "selectedImage": "Character Image",
+    "resultVideo": "Motion Control Video"
+  }
+}

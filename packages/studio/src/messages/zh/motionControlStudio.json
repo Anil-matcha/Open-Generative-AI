@@ -1,0 +1,90 @@
+{
+  "labels": {
+    "referenceVideo": "参考视频",
+    "characterImages": "角色/主体图片",
+    "addImage": "添加图片",
+    "library": "素材库",
+    "mode": "模式",
+    "motionTransfer": "动作迁移",
+    "objectsSwap": "主体替换",
+    "duration": "时长",
+    "durationSeconds": "{count}秒",
+    "quality": "画质",
+    "highBitrate": "高码率",
+    "generateAudio": "生成音频",
+    "seed": "随机种子",
+    "randomSeed": "随机 (-1)"
+  },
+  "buttons": {
+    "use": "使用",
+    "useAsVideo": "设为视频",
+    "useAsImage": "添加为图片",
+    "download": "下载",
+    "delete": "删除",
+    "generate": "生成动作控制视频",
+    "generating": "生成中..."
+  },
+  "titles": {
+    "clickToClear": "{fileName} — 点击清除",
+    "uploadVideo": "上传参考视频 (MP4/WebM/MOV) 或拖放到此处",
+    "uploadImage": "上传角色或主体图片 (PNG/JPEG/WebP)",
+    "enlargePreview": "放大预览",
+    "deleteFromLibrary": "从素材库删除",
+    "removeImage": "移除图片"
+  },
+  "assetLibrary": {
+    "header": "素材库",
+    "tabs": {
+      "videos": "视频",
+      "images": "图片",
+      "results": "生成结果"
+    },
+    "empty": "暂无素材"
+  },
+  "dropdowns": {
+    "model": "模型",
+    "selectModel": "选择模型",
+    "aspectRatio": "画面比例",
+    "qualityBasic": "基础",
+    "qualityHigh": "高画质",
+    "qualityBasicDesc": "生成速度快，标准分辨率",
+    "qualityHighDesc": "电影级细节与最高动作连贯性"
+  },
+  "modes": {
+    "motionTransfer": "动作迁移",
+    "motionTransferDesc": "提取视频动作与运镜，由新角色重新表演",
+    "objectsSwap": "主体替换",
+    "objectsSwapDesc": "保持视频背景与场景不变，替换人物服装或道具"
+  },
+  "empty": {
+    "titleLine1": "开始使用",
+    "titleLine2": "动作控制工作室",
+    "description": "借助 Seedance 动作控制模型，使用参考视频的动作、舞蹈编排和镜头运镜驱动角色图像。"
+  },
+  "placeholders": {
+    "prompt": "可选 — 描述补充场景细节、光影或动作特点..."
+  },
+  "badges": {
+    "motionControl": "动作控制",
+    "motionTransfer": "动作迁移",
+    "objectsSwap": "主体替换"
+  },
+  "confirm": {
+    "deleteGenerated": "确定要删除此生成项吗？"
+  },
+  "errors": {
+    "videoTooLarge": "视频大小超过 100MB 限制。",
+    "imageTooLarge": "图片大小超过 20MB 限制。",
+    "missingVideo": "请先上传或选择参考视频。",
+    "missingImages": "请先上传或选择至少一张角色图片。",
+    "maxImagesExceeded": "该模型最多支持 {max} 张图片。",
+    "videoUploadFailed": "视频上传失败: {message}",
+    "imageUploadFailed": "图片上传失败: {message}",
+    "generationFailed": "动作控制视频生成失败"
+  },
+  "defaults": {
+    "selectedVideo": "参考视频",
+    "selectedImage": "角色图片",
+    "resultVideo": "动作控制视频"
+  }
+}
