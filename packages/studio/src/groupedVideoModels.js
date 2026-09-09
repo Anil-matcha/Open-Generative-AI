@@ -2,8 +2,9 @@ import { SEEDANCE_MODEL_GROUP } from "./seedanceModels.js";
 import { VEO_MODEL_GROUP } from "./veoModels.js";
 import { MINIMAX_MODEL_GROUP } from "./minimaxModels.js";
 import { ALIBABA_MODEL_GROUP } from "./alibabaModels.js";
+import { HAPPY_HORSE_MODEL_GROUP } from "./happyHorseModels.js";
 
-const groups = [SEEDANCE_MODEL_GROUP, VEO_MODEL_GROUP, MINIMAX_MODEL_GROUP, ALIBABA_MODEL_GROUP];
+const groups = [SEEDANCE_MODEL_GROUP, VEO_MODEL_GROUP, MINIMAX_MODEL_GROUP, ALIBABA_MODEL_GROUP, HAPPY_HORSE_MODEL_GROUP];
 const groupByFamilyId = new Map();
 const configurationByModelId = new Map();
 const familyNames = {};

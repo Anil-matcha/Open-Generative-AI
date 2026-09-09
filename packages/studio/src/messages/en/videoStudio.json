@@ -213,6 +213,22 @@
       "description": "Off keeps the original audio."
     }
   },
+  "happyHorse": {
+    "fields": {
+      "seed": {
+        "title": "Seed",
+        "description": "Leave blank for random results."
+      },
+      "audio_setting": {
+        "title": "Audio",
+        "description": "",
+        "optionLabels": {
+          "auto": "Let model choose",
+          "origin": "Keep original"
+        }
+      }
+    }
+  },
   "veo": {
     "speed": "Generation",
     "speeds": {

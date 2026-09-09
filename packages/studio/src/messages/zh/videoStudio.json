@@ -213,6 +213,22 @@
       "description": "关闭时保留原音频。"
     }
   },
+  "happyHorse": {
+    "fields": {
+      "seed": {
+        "title": "种子",
+        "description": "留空以随机生成。"
+      },
+      "audio_setting": {
+        "title": "音频",
+        "description": "",
+        "optionLabels": {
+          "auto": "由模型决定",
+          "origin": "保留原音频"
+        }
+      }
+    }
+  },
   "veo": {
     "speed": "生成方式",
     "speeds": {

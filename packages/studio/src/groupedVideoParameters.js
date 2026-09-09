@@ -8,6 +8,8 @@ import { VEO_MODEL_GROUP } from "./veoModels.js";
 import { MINIMAX_MODEL_GROUP } from "./minimaxModels.js";
 import { ALIBABA_MODEL_GROUP } from "./alibabaModels.js";
 import { alibabaParameters } from "./alibabaParameters.js";
+import { HAPPY_HORSE_MODEL_GROUP } from "./happyHorseModels.js";
+import { happyHorseParameters } from "./happyHorseParameters.js";
 import {
   getMiniMaxResolutionOptions,
   getMiniMaxSelectionAdjustments,
@@ -21,6 +23,7 @@ import {
 } from "./veoParameters.js";
 
 const groups = [
+  { familyNames: HAPPY_HORSE_MODEL_GROUP.familyNames, ...happyHorseParameters },
   { familyNames: ALIBABA_MODEL_GROUP.familyNames, ...alibabaParameters },
   {
     familyNames: SEEDANCE_MODEL_GROUP.familyNames,

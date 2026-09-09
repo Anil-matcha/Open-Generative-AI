@@ -75,6 +75,26 @@ const WAN_27_RESOLUTION_INPUT = Object.freeze({
   enum: Object.freeze(["720p", "1080p"]), default: "720p",
 });
 
+// Happy Horse inputs verified against https://api.muapi.ai/openapi.json on 2026-09-09.
+const HAPPY_HORSE_SEED_INPUT = Object.freeze({
+  type: "int", title: "Seed", name: "seed",
+  description: "Optional seed for repeatable results.",
+  minValue: 0, maxValue: 2147483647, step: 1,
+});
+const HAPPY_HORSE_EDIT_INPUTS = Object.freeze({
+  prompt: { type: "string", title: "Prompt", name: "prompt" },
+  video_url: { type: "string", title: "Source video", name: "video_url" },
+  images_list: {
+    type: "array", items: { type: "string" }, title: "Reference images",
+    name: "images_list", maxItems: 5,
+  },
+  audio_setting: {
+    type: "string", title: "Audio", name: "audio_setting",
+    enum: ["auto", "origin"], default: "auto",
+  },
+  seed: HAPPY_HORSE_SEED_INPUT,
+});
+
 export const t2iModels = [
   {
     "id": "nano-banana",
@@ -6464,6 +6484,7 @@ export const t2vModels = [
     "id": "happy-horse-1-text-to-video-1080p",
     "name": "HappyHorse 1.0 1080P",
     "endpoint": "happy-horse-1-text-to-video-1080p",
+    "fixedParameters": { "resolution": "1080p" },
     "inputs": {
       "prompt": {
         "type": "string",
@@ -6506,6 +6527,7 @@ export const t2vModels = [
     "id": "happy-horse-1-text-to-video-720p",
     "name": "HappyHorse 1.0 720P",
     "endpoint": "happy-horse-1-text-to-video-720p",
+    "fixedParameters": { "resolution": "720p" },
     "inputs": {
       "prompt": {
         "type": "string",
@@ -7687,6 +7709,7 @@ export const t2vModels = [
     "id": "happy-horse-1.1-text-to-video-1080p",
     "name": "HappyHorse 1.1 1080P",
     "endpoint": "happy-horse-1.1-text-to-video-1080p",
+    "fixedParameters": { "resolution": "1080p" },
     "inputs": {
       "prompt": {
         "type": "string",
@@ -7729,6 +7752,7 @@ export const t2vModels = [
     "id": "happy-horse-1.1-text-to-video-720p",
     "name": "HappyHorse 1.1 720P",
     "endpoint": "happy-horse-1.1-text-to-video-720p",
+    "fixedParameters": { "resolution": "720p" },
     "inputs": {
       "prompt": {
         "type": "string",
@@ -17794,6 +17818,7 @@ export const i2vModels = [
     "id": "happy-horse-1-image-to-video-1080p",
     "name": "Happy Horse 1 Image to Video 1080P",
     "endpoint": "happy-horse-1-image-to-video-1080p",
+    "fixedParameters": { "resolution": "1080p" },
     "family": "happy-horse-1",
     "imageField": "images_list",
     "hasPrompt": true,
@@ -17853,6 +17878,7 @@ export const i2vModels = [
     "id": "happy-horse-1-image-to-video-720p",
     "name": "Happy Horse 1 Image to Video 720P",
     "endpoint": "happy-horse-1-image-to-video-720p",
+    "fixedParameters": { "resolution": "720p" },
     "family": "happy-horse-1",
     "imageField": "images_list",
     "hasPrompt": true,
@@ -18883,6 +18909,7 @@ export const i2vModels = [
     "id": "happy-horse-1-reference-to-video-1080p",
     "name": "HappyHorse 1.0 Reference 1080P",
     "endpoint": "happy-horse-1-reference-to-video-1080p",
+    "fixedParameters": { "resolution": "1080p" },
     "family": "happy-horse-1",
     "imageField": "images_list",
     "hasPrompt": true,
@@ -18910,6 +18937,7 @@ export const i2vModels = [
         },
         "title": "Reference Images",
         "name": "images_list",
+        "minItems": 1,
         "maxItems": 9
       },
       "aspect_ratio": {
@@ -18936,16 +18964,7 @@ export const i2vModels = [
         "maxValue": 15,
         "step": 1
       },
-      "seed": {
-        "type": "int",
-        "title": "Seed",
-        "name": "seed",
-        "description": "Optional random seed for reproducibility (0-2147483647).",
-        "default": 0,
-        "minValue": 0,
-        "maxValue": 2147483647,
-        "step": 1
-      }
+      "seed": HAPPY_HORSE_SEED_INPUT
     },
     "provider": "happy-horse",
     "provider_name": "Happy Horse"
@@ -18954,6 +18973,7 @@ export const i2vModels = [
     "id": "happy-horse-1-reference-to-video-720p",
     "name": "HappyHorse 1.0 Reference 720P",
     "endpoint": "happy-horse-1-reference-to-video-720p",
+    "fixedParameters": { "resolution": "720p" },
     "family": "happy-horse-1",
     "imageField": "images_list",
     "hasPrompt": true,
@@ -18981,6 +19001,7 @@ export const i2vModels = [
         },
         "title": "Reference Images",
         "name": "images_list",
+        "minItems": 1,
         "maxItems": 9
       },
       "aspect_ratio": {
@@ -19007,16 +19028,7 @@ export const i2vModels = [
         "maxValue": 15,
         "step": 1
       },
-      "seed": {
-        "type": "int",
-        "title": "Seed",
-        "name": "seed",
-        "description": "Optional random seed for reproducibility (0-2147483647).",
-        "default": 0,
-        "minValue": 0,
-        "maxValue": 2147483647,
-        "step": 1
-      }
+      "seed": HAPPY_HORSE_SEED_INPUT
     },
     "provider": "happy-horse",
     "provider_name": "Happy Horse"
@@ -19432,6 +19444,7 @@ export const i2vModels = [
     "id": "happy-horse-1.1-image-to-video-1080p",
     "name": "Happy Horse 1.1 Image to Video 1080P",
     "endpoint": "happy-horse-1.1-image-to-video-1080p",
+    "fixedParameters": { "resolution": "1080p" },
     "family": "happy-horse-1.1",
     "imageField": "images_list",
     "hasPrompt": true,
@@ -19491,6 +19504,7 @@ export const i2vModels = [
     "id": "happy-horse-1.1-image-to-video-720p",
     "name": "Happy Horse 1.1 Image to Video 720P",
     "endpoint": "happy-horse-1.1-image-to-video-720p",
+    "fixedParameters": { "resolution": "720p" },
     "family": "happy-horse-1.1",
     "imageField": "images_list",
     "hasPrompt": true,
@@ -19550,6 +19564,7 @@ export const i2vModels = [
     "id": "happy-horse-1.1-reference-to-video-1080p",
     "name": "HappyHorse 1.1 Reference 1080P",
     "endpoint": "happy-horse-1.1-reference-to-video-1080p",
+    "fixedParameters": { "resolution": "1080p" },
     "family": "happy-horse-1.1",
     "imageField": "images_list",
     "hasPrompt": true,
@@ -19577,6 +19592,7 @@ export const i2vModels = [
         },
         "title": "Reference Images",
         "name": "images_list",
+        "minItems": 1,
         "maxItems": 9
       },
       "aspect_ratio": {
@@ -19603,16 +19619,7 @@ export const i2vModels = [
         "maxValue": 15,
         "step": 1
       },
-      "seed": {
-        "type": "int",
-        "title": "Seed",
-        "name": "seed",
-        "description": "Optional random seed for reproducibility (0-2147483647).",
-        "default": 0,
-        "minValue": 0,
-        "maxValue": 2147483647,
-        "step": 1
-      }
+      "seed": HAPPY_HORSE_SEED_INPUT
     },
     "provider": "happy-horse",
     "provider_name": "Happy Horse"
@@ -19621,6 +19628,7 @@ export const i2vModels = [
     "id": "happy-horse-1.1-reference-to-video-720p",
     "name": "HappyHorse 1.1 Reference 720P",
     "endpoint": "happy-horse-1.1-reference-to-video-720p",
+    "fixedParameters": { "resolution": "720p" },
     "family": "happy-horse-1.1",
     "imageField": "images_list",
     "hasPrompt": true,
@@ -19648,6 +19656,7 @@ export const i2vModels = [
         },
         "title": "Reference Images",
         "name": "images_list",
+        "minItems": 1,
         "maxItems": 9
       },
       "aspect_ratio": {
@@ -19674,16 +19683,7 @@ export const i2vModels = [
         "maxValue": 15,
         "step": 1
       },
-      "seed": {
-        "type": "int",
-        "title": "Seed",
-        "name": "seed",
-        "description": "Optional random seed for reproducibility (0-2147483647).",
-        "default": 0,
-        "minValue": 0,
-        "maxValue": 2147483647,
-        "step": 1
-      }
+      "seed": HAPPY_HORSE_SEED_INPUT
     },
     "provider": "happy-horse",
     "provider_name": "Happy Horse"
@@ -25056,12 +25056,14 @@ export const v2vModels = [
     "id": "happy-horse-1-video-edit-1080p",
     "name": "HappyHorse 1.0 Edit 1080P",
     "endpoint": "happy-horse-1-video-edit-1080p",
+    "fixedParameters": { "resolution": "1080p" },
     "family": "happy-horse-1",
     "videoField": "video_url",
     "imageField": "images_list",
     "maxImages": 5,
     "hasPrompt": true,
     "promptRequired": true,
+    "inputs": HAPPY_HORSE_EDIT_INPUTS,
     "description": "Happy Horse 1.0 Video Edit (1080p) - modify an input video at 1080p using a natural-language instruction with optional reference images.",
     "provider": "happy-horse",
     "provider_name": "Happy Horse"
@@ -25070,12 +25072,14 @@ export const v2vModels = [
     "id": "happy-horse-1-video-edit-720p",
     "name": "HappyHorse 1.0 Edit 720P",
     "endpoint": "happy-horse-1-video-edit-720p",
+    "fixedParameters": { "resolution": "720p" },
     "family": "happy-horse-1",
     "videoField": "video_url",
     "imageField": "images_list",
     "maxImages": 5,
     "hasPrompt": true,
     "promptRequired": true,
+    "inputs": HAPPY_HORSE_EDIT_INPUTS,
     "description": "Happy Horse 1.0 Video Edit (720p) - modify an input video at 720p using a natural-language instruction with optional reference images.",
     "provider": "happy-horse",
     "provider_name": "Happy Horse"
@@ -25084,9 +25088,14 @@ export const v2vModels = [
     "id": "happy-horse-1.1-video-edit-1080p",
     "name": "Happy Horse 1.1 Video Edit 1080P",
     "endpoint": "happy-horse-1.1-video-edit-1080p",
+    "fixedParameters": { "resolution": "1080p" },
     "family": "happy-horse-1.1",
     "videoField": "video_url",
+    "imageField": "images_list",
+    "maxImages": 5,
     "hasPrompt": true,
+    "promptRequired": true,
+    "inputs": HAPPY_HORSE_EDIT_INPUTS,
     "description": "Happy Horse 1.1 Video Edit (1080p) — modify an input video using natural-language instructions with optional reference images.",
     "provider": "happy-horse",
     "provider_name": "Happy Horse"
@@ -25095,9 +25104,14 @@ export const v2vModels = [
     "id": "happy-horse-1.1-video-edit-720p",
     "name": "Happy Horse 1.1 Video Edit 720P",
     "endpoint": "happy-horse-1.1-video-edit-720p",
+    "fixedParameters": { "resolution": "720p" },
     "family": "happy-horse-1.1",
     "videoField": "video_url",
+    "imageField": "images_list",
+    "maxImages": 5,
     "hasPrompt": true,
+    "promptRequired": true,
+    "inputs": HAPPY_HORSE_EDIT_INPUTS,
     "description": "Happy Horse 1.1 Video Edit (720p) — modify an input video using natural-language instructions with optional reference images.",
     "provider": "happy-horse",
     "provider_name": "Happy Horse"

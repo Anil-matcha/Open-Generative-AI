@@ -108,30 +108,6 @@ export const VIDEO_WORKFLOW_VARIANTS = Object.freeze({
       "kling-o1-video-edit",
     ],
   },
-  "happy-horse-1": {
-    animate_image: [
-      "happy-horse-1-image-to-video-720p",
-      "happy-horse-1-image-to-video-1080p",
-    ],
-    references: [
-      "happy-horse-1-reference-to-video-720p",
-      "happy-horse-1-reference-to-video-1080p",
-    ],
-    edit_video: [
-      "happy-horse-1-video-edit-720p",
-      "happy-horse-1-video-edit-1080p",
-    ],
-  },
-  "happy-horse-1.1": {
-    animate_image: [
-      "happy-horse-1.1-image-to-video-720p",
-      "happy-horse-1.1-image-to-video-1080p",
-    ],
-    references: [
-      "happy-horse-1.1-reference-to-video-720p",
-      "happy-horse-1.1-reference-to-video-1080p",
-    ],
-  },
   "kling-v2.6": {
     animate_image: ["kling-v2.6-pro-i2v"],
     motion_transfer: ["kling-v2.6-pro-motion-control", "kling-v2.6-std-motion-control"],
@@ -710,7 +686,7 @@ export function getVideoWorkflowMediaSlots(model, workflowId) {
         Math.max(capabilities.image.maxItems, 1),
         {
           isArray: capabilities.image.isArray,
-          ...((getSeedanceConfiguration(model.id) &&
+          ...((getGroupedVideoConfiguration(model.id) &&
             model.inputs?.[capabilities.image.field]?.minItems > 0) ||
             model.id === "veo3.1-reference-to-video"
             ? {
