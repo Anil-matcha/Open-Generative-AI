@@ -420,16 +420,18 @@ Object.assign(VIDEO_TOOL_OVERRIDES, {
   },
 });
 
-VIDEO_TOOL_OVERRIDES["seedance-v1.5-pro-video-extend"] = {
-  ...VIDEO_TOOL_OVERRIDES["seedance-v1.5-pro-video-extend"],
-  estimateCost: true,
-  payloadDefaults: {
-    resolution: "720p",
-    duration: 5,
-    generate_audio: true,
-    camera_fixed: false,
-  },
-};
+for (const id of ["seedance-v1.5-pro-video-extend", "seedance-v1.5-pro-video-extend-fast"]) {
+  VIDEO_TOOL_OVERRIDES[id] = {
+    ...VIDEO_TOOL_OVERRIDES[id],
+    estimateCost: id === "seedance-v1.5-pro-video-extend",
+    inputs: {
+      resolution: { configurable: true },
+      duration: { configurable: true },
+      generate_audio: { configurable: true },
+      camera_fixed: { configurable: true },
+    },
+  };
+}
 
 for (const id of HAPPY_HORSE_EDIT_TOOL_IDS) {
   VIDEO_TOOL_OVERRIDES[id] = {

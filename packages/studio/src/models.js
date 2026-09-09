@@ -34,12 +34,27 @@ const SEEDANCE_HIGH_BITRATE_INPUT = Object.freeze({
   description: "Enable high bitrate mode for better visual fidelity. Produces larger files.",
   default: false,
 });
-const SEEDANCE_25_GENERATE_AUDIO_INPUT = Object.freeze({
+const SEEDANCE_GENERATE_AUDIO_INPUT = Object.freeze({
   type: "boolean",
   title: "Generate Audio",
   name: "generate_audio",
   description: "Whether to generate audio for the video.",
   default: true,
+});
+const SEEDANCE_15_EXTEND_INPUTS = Object.freeze({
+  resolution: {
+    type: "string", title: "Resolution", name: "resolution",
+    enum: ["480p", "720p"], default: "720p",
+  },
+  duration: {
+    type: "int", title: "Duration", name: "duration",
+    default: 5, minValue: 4, maxValue: 12, step: 1,
+  },
+  generate_audio: SEEDANCE_GENERATE_AUDIO_INPUT,
+  camera_fixed: {
+    type: "boolean", title: "Camera Fixed", name: "camera_fixed",
+    description: "Keep the camera still.", default: false,
+  },
 });
 const SEEDANCE_25_SEED_INPUT = Object.freeze({
   type: "int",
@@ -4051,7 +4066,6 @@ export const t2vModels = [
           "1:1",
           "4:3",
           "3:4",
-          "21:9",
           "9:21"
         ],
         "title": "Aspect Ratio",
@@ -4103,8 +4117,7 @@ export const t2vModels = [
           "1:1",
           "4:3",
           "3:4",
-          "21:9",
-          "9:21"
+          "21:9"
         ],
         "title": "Aspect Ratio",
         "name": "aspect_ratio",
@@ -8027,7 +8040,7 @@ export const t2vModels = [
     "endpoint": "seedance-2.5-spicy-text-to-video",
     "inputs": {
       "resolution": SEEDANCE_25_RESOLUTION_INPUT,
-      "generate_audio": SEEDANCE_25_GENERATE_AUDIO_INPUT,
+      "generate_audio": SEEDANCE_GENERATE_AUDIO_INPUT,
       "prompt": {
         "examples": [
           "A high-contrast, adrenaline-fueled chase through a rain-soaked neon megacity at night, sparks and shattering glass in slow motion, aggressive handheld camera energy, exaggerated color grading, 4K cinematic quality."
@@ -14044,6 +14057,7 @@ export const i2vModels = [
     "family": "bytedance",
     "imageField": "image_url",
     "hasPrompt": true,
+    "promptRequired": true,
     "inputs": {
       "prompt": {
         "type": "string",
@@ -14754,6 +14768,7 @@ export const i2vModels = [
     "family": "bytedance",
     "imageField": "image_url",
     "hasPrompt": true,
+    "promptRequired": true,
     "inputs": {
       "prompt": {
         "type": "string",
@@ -16103,6 +16118,7 @@ export const i2vModels = [
     "family": "seedance-v2.0",
     "imageField": "images_list",
     "hasPrompt": true,
+    "promptRequired": true,
     "maxImages": 5,
     "inputs": {
       "prompt": {
@@ -19884,7 +19900,7 @@ export const i2vModels = [
     "promptRequired": true,
     "inputs": {
       "resolution": SEEDANCE_25_RESOLUTION_INPUT,
-      "generate_audio": SEEDANCE_25_GENERATE_AUDIO_INPUT,
+      "generate_audio": SEEDANCE_GENERATE_AUDIO_INPUT,
       "prompt": {
         "examples": [
           "Bold, high-energy dolly forward through a neon-drenched alley at night, sparks flying off a passing train, exaggerated lighting contrast, dramatic camera shake, photorealistic 4K quality."
@@ -24868,6 +24884,7 @@ export const v2vModels = [
     "videoField": "video_url",
     "hasPrompt": true,
     "promptRequired": true,
+    "inputs": SEEDANCE_15_EXTEND_INPUTS,
     "description": "Seedance v1.5 Pro Video Extend continues an existing video by generating additional frames that match the original scene’s style, lighting, motion, and mood.",
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -24880,6 +24897,10 @@ export const v2vModels = [
     "videoField": "video_url",
     "hasPrompt": true,
     "promptRequired": true,
+    "inputs": {
+      ...SEEDANCE_15_EXTEND_INPUTS,
+      "resolution": { ...SEEDANCE_15_EXTEND_INPUTS.resolution, "enum": ["720p", "1080p"] }
+    },
     "description": "Seedance v1.5 Pro Video Extend Fast quickly extends an existing video by generating a short continuation that matches the original style, motion, and lighting.",
     "provider": "bytedance",
     "provider_name": "ByteDance"
