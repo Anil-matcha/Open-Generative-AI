@@ -1,11 +1,12 @@
 # Multi-Provider AI
 
-The `feat/multi-provider-ai` branch adds a provider-neutral API alongside the existing MuAPI routes.
+The `feat/multi-provider-ai` branch adds a provider-neutral AI layer alongside the existing MuAPI routes.
 
 ## Providers in this phase
 
-- **Google Gemini**: cloud text and image generation through the Google Generative Language API.
-- **Ollama**: local text generation through an Ollama server.
+- **Google Gemini**: cloud text generation plus optional native image generation. Gemini 2.5 Flash has a free API tier; `gemini-2.5-flash-image` is currently paid-tier rather than free-tier, so it should not be described as a free image provider.
+- **Ollama**: local text generation through an Ollama server with no API usage cost.
+- **ComfyUI**: local image/video workflows through a ComfyUI server; model cost is local compute rather than API credits.
 - **MuAPI**: existing image/video/audio functionality remains available through the original routes.
 
 ## API
@@ -18,7 +19,7 @@ The `feat/multi-provider-ai` branch adds a provider-neutral API alongside the ex
 
 `POST /api/ai/generate`
 
-Example text request:
+Example Gemini text request:
 
 ```json
 {
@@ -40,8 +41,20 @@ Example local request:
 }
 ```
 
+Example local ComfyUI image request:
+
+```json
+{
+  "provider": "comfyui",
+  "task": "image",
+  "prompt": "A cute 3D baby panda in a magical fairy garden"
+}
+```
+
 ## Configuration
 
 Copy `.env.example` to `.env.local` for local development and provide `GEMINI_API_KEY` if using Gemini. Install Ollama separately and ensure the configured model has been pulled before using the Ollama provider.
 
-The provider layer is deliberately separate from the existing MuAPI proxy routes. The next integration phase can migrate individual Studio experiences to `/api/ai/generate` without breaking existing workflows.
+For ComfyUI, export an API-format workflow JSON and configure the corresponding image/video workflow environment variable. Set `COMFYUI_PROMPT_NODE_ID` and `COMFYUI_PROMPT_INPUT` when the workflow needs prompt injection.
+
+The provider layer is deliberately separate from the existing MuAPI proxy routes. Studio experiences are being migrated incrementally so existing workflows remain intact while local/free providers are introduced.
