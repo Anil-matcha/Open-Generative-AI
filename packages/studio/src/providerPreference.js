@@ -3,8 +3,8 @@ const DEFAULT_PROVIDER = 'muapi';
 
 export const IMAGE_PROVIDERS = [
   { id: 'muapi', label: 'MuAPI', badge: 'Cloud' },
-  { id: 'gemini', label: 'Gemini Image', badge: 'Cloud' },
-  { id: 'comfyui', label: 'ComfyUI', badge: 'Local' },
+  { id: 'gemini', label: 'Gemini Image', badge: 'Cloud · Paid' },
+  { id: 'comfyui', label: 'ComfyUI', badge: 'Local · Free' },
 ];
 
 export function getPreferredProvider() {
