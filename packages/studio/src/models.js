@@ -14398,7 +14398,9 @@ export const i2vModels = [
     "endpoint": "openai-sora-2-image-to-video",
     "family": "sora",
     "imageField": "images_list",
+    "maxImages": 1,
     "hasPrompt": true,
+    "promptRequired": true,
     "inputs": {
       "prompt": {
         "type": "string",
@@ -14433,13 +14435,6 @@ export const i2vModels = [
           20
         ],
         "default": 8
-      },
-      "remove_watermark": {
-        "type": "boolean",
-        "title": "Remove Watermark",
-        "name": "remove_watermark",
-        "description": "When enabled, removes watermarks from the generated video.",
-        "default": true
       }
     },
     "provider": "openai",
@@ -14472,7 +14467,9 @@ export const i2vModels = [
     "endpoint": "openai-sora-2-pro-image-to-video",
     "family": "sora",
     "imageField": "images_list",
+    "maxImages": 1,
     "hasPrompt": true,
+    "promptRequired": true,
     "inputs": {
       "prompt": {
         "type": "string",
@@ -14518,13 +14515,6 @@ export const i2vModels = [
           "1080p"
         ],
         "default": "720p"
-      },
-      "remove_watermark": {
-        "type": "boolean",
-        "title": "Remove Watermark",
-        "name": "remove_watermark",
-        "description": "When enabled, removes watermarks from the generated video.",
-        "default": true
       }
     },
     "provider": "openai",

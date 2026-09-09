@@ -458,6 +458,23 @@
     },
     "musicDuration": "时长设为 4 秒。"
   },
+  "sora": {
+    "provider": "生成方式",
+    "providerHelp": "",
+    "profiles": {
+      "standard": {
+        "label": "标准",
+        "description": "适合日常视频。"
+      },
+      "pro": {
+        "label": "Pro",
+        "description": "细节更丰富，最高 1080p。"
+      }
+    },
+    "adjustments": {
+      "profile": "生成方式：{value}"
+    }
+  },
   "ltx": {
     "provider": "生成方式",
     "providerHelp": "",

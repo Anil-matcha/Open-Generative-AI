@@ -458,6 +458,23 @@
     },
     "musicDuration": "Sets duration to 4 seconds."
   },
+  "sora": {
+    "provider": "Generation",
+    "providerHelp": "",
+    "profiles": {
+      "standard": {
+        "label": "Standard",
+        "description": "For everyday videos."
+      },
+      "pro": {
+        "label": "Pro",
+        "description": "More detail, up to 1080p."
+      }
+    },
+    "adjustments": {
+      "profile": "Generation: {value}"
+    }
+  },
   "ltx": {
     "provider": "Generation",
     "providerHelp": "",
