@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { generate } from '../../../../../lib/ai/providers';
+import { generate } from '../../../../lib/ai/providers';
 
 export async function POST(request) {
   try {
