@@ -5,7 +5,6 @@ import {
   useCallback,
   useEffect,
   useImperativeHandle,
-  useLayoutEffect,
   useRef,
 } from "react";
 
@@ -37,7 +36,7 @@ const DEFAULT_POPOVER_POSITION_CLASS =
   "absolute bottom-[calc(100%+12px)] left-0 z-50";
 
 const DEFAULT_POPOVER_CLASS =
-  "rounded-xl p-3.5 shadow-[0_10px_40px_rgba(0,0,0,0.8)] border border-white/[0.08] backdrop-blur-2xl min-w-[160px] max-h-[40vh] overflow-y-auto custom-scrollbar";
+  "bg-[#0c0c0f]/95 rounded-xl p-3.5 shadow-[0_10px_40px_rgba(0,0,0,0.8)] border border-white/[0.08] backdrop-blur-2xl min-w-[160px] max-h-[40vh] overflow-y-auto custom-scrollbar";
 
 function joinClasses(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -166,35 +165,17 @@ export const PromptPopover = forwardRef(function PromptPopover(
     children,
     className = "",
     positionClassName = DEFAULT_POPOVER_POSITION_CLASS,
-    fitViewport = false,
-    solid = false,
     ...props
   },
   ref,
 ) {
-  const popoverRef = useRef(null);
-  useImperativeHandle(ref, () => popoverRef.current);
-  useLayoutEffect(() => {
-    if (!fitViewport) return;
-    const position = () => {
-      const popover = popoverRef.current;
-      popover.style.translate = "";
-      const bounds = popover.getBoundingClientRect();
-      const shift = Math.max(16 - bounds.left, Math.min(0, window.innerWidth - 16 - bounds.right));
-      popover.style.translate = `${shift}px 0`;
-    };
-    position();
-    window.addEventListener("resize", position);
-    return () => window.removeEventListener("resize", position);
-  }, [fitViewport, children]);
   return (
     <div
       {...props}
-      ref={popoverRef}
+      ref={ref}
       className={joinClasses(
         positionClassName,
         DEFAULT_POPOVER_CLASS,
-        solid ? "bg-[#0c0c0f]" : "bg-[#0c0c0f]/95",
         className,
       )}
     >
@@ -227,7 +208,6 @@ export function PromptMenuList({ children, className = "" }) {
 export function PromptMenuItem({
   children,
   description,
-  wrapDescription = false,
   selected = false,
   className = "",
   type = "button",
@@ -248,12 +228,7 @@ export function PromptMenuItem({
       <span className="min-w-0">
         <span className="block truncate">{children}</span>
         {description && (
-          <span className={joinClasses(
-            "block font-medium mt-0.5",
-            wrapDescription
-              ? "text-[10px] leading-relaxed whitespace-normal text-white/55 group-hover/menu-item:text-white/70"
-              : "text-[9px] text-white/35 truncate group-hover/menu-item:text-white/50",
-          )}>
+          <span className="block text-[9px] font-medium text-white/35 mt-0.5 truncate group-hover/menu-item:text-white/50">
             {description}
           </span>
         )}

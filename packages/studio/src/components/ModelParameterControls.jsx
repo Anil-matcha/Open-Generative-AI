@@ -1,7 +1,5 @@
 "use client";
 
-import { Children, useRef } from "react";
-
 import {
   PROMPT_CONTROL_LABEL_CLASS,
   PromptChevronIcon,
@@ -184,93 +182,49 @@ export default function ModelParameterControls({
   onChange,
   open,
   onToggle,
-  children,
-  label = <span className="text-[10px] font-black text-primary/80">PARAMS</span>,
-  title = "Model parameters",
-  summary = inputs.length,
-  fitViewport = false,
-  solid = false,
-  advancedKeys = [],
-  advancedLabel = "Advanced",
-  advancedChildren,
 }) {
-  const triggerRef = useRef(null);
-  const extraControls = Children.toArray(children);
-  const extraAdvancedControls = Children.toArray(advancedChildren);
-  if (inputs.length === 0 && extraControls.length === 0 && extraAdvancedControls.length === 0) return null;
-  const advancedKeySet = new Set(advancedKeys);
-  const primaryInputs = [];
-  const advancedInputs = [];
-  for (const input of inputs) {
-    (advancedKeySet.has(input.key) ? advancedInputs : primaryInputs).push(input);
-  }
-  const renderInput = ({ key, schema }) => (
-    <div key={key} className="flex flex-col gap-2">
-      <div className={schema.type === "boolean" ? "flex items-center justify-between gap-4" : "flex flex-col gap-2"}>
-        <FieldLabel schema={schema} inputKey={key} />
-        {schema.type === "array" ? (
-          <ArrayInput
-            schema={schema}
-            label={schema.title || key.replaceAll("_", " ")}
-            value={values[key]}
-            onChange={(nextValue) => onChange(key, nextValue)}
-          />
-        ) : (
-          <ScalarInput
-            schema={schema}
-            label={schema.title || key.replaceAll("_", " ")}
-            value={values[key]}
-            onChange={(nextValue) => onChange(key, nextValue)}
-          />
-        )}
-      </div>
-    </div>
-  );
+  if (inputs.length === 0) return null;
 
   return (
-    <div
-      className="relative"
-      onKeyDown={(event) => {
-        if (!open || event.key !== "Escape") return;
-        event.preventDefault();
-        event.stopPropagation();
-        onToggle(event);
-        triggerRef.current?.focus();
-      }}
-    >
+    <div className="relative">
       <button
         type="button"
-        ref={triggerRef}
-        aria-expanded={open}
         onClick={onToggle}
         className={promptControlClassName({ active: open })}
       >
-        <span className={PROMPT_CONTROL_LABEL_CLASS}>{label}</span>
-        {summary !== "" && <span className={PROMPT_CONTROL_LABEL_CLASS}>{summary}</span>}
+        <span className="text-[10px] font-black text-primary/80">PARAMS</span>
+        <span className={PROMPT_CONTROL_LABEL_CLASS}>{inputs.length}</span>
         <PromptChevronIcon />
       </button>
       {open && (
         <PromptPopover
-          fitViewport={fitViewport}
-          solid={solid}
           onClick={(event) => event.stopPropagation()}
           className="w-[min(420px,calc(100vw-2rem))] max-h-[60vh]"
         >
-          <PromptPopoverHeader>{title}</PromptPopoverHeader>
+          <PromptPopoverHeader>Model parameters</PromptPopoverHeader>
           <div className="flex flex-col gap-4">
-            {extraControls}
-            {primaryInputs.map(renderInput)}
-            {(advancedInputs.length > 0 || extraAdvancedControls.length > 0) && (
-              <details className="border-t border-white/[0.07] pt-2">
-                <summary className="cursor-pointer py-2 text-xs font-semibold text-white/60 focus-visible:outline focus-visible:outline-1 focus-visible:outline-primary">
-                  {advancedLabel}
-                </summary>
-                <div className="flex flex-col gap-4 pt-2">
-                  {advancedInputs.map(renderInput)}
-                  {extraAdvancedControls}
+            {inputs.map(({ key, schema }) => (
+              <div key={key} className="flex flex-col gap-2">
+                <div className={schema.type === "boolean" ? "flex items-center justify-between gap-4" : "flex flex-col gap-2"}>
+                  <FieldLabel schema={schema} inputKey={key} />
+                  {schema.type === "array" ? (
+                    <ArrayInput
+                      schema={schema}
+                      label={schema.title || key.replaceAll("_", " ")}
+                      value={values[key]}
+                      onChange={(nextValue) => onChange(key, nextValue)}
+                    />
+                  ) : (
+                    <ScalarInput
+                      schema={schema}
+                      label={schema.title || key.replaceAll("_", " ")}
+                      value={values[key]}
+                      onChange={(nextValue) => onChange(key, nextValue)}
+                    />
+                  )}
                 </div>
-              </details>
-            )}
+              </div>
+            ))}
           </div>
         </PromptPopover>
       )}
