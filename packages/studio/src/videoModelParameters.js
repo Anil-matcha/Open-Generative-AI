@@ -34,6 +34,8 @@ export function matchingVideoParameterValue(options, value) {
 
 function nearestDuration(options, value) {
   if (value === undefined || value === null || value === "" || !Number.isFinite(Number(value))) return undefined;
+  // Zero means source length; use the target model's default when unsupported.
+  if (Number(value) === 0) return undefined;
   let nearest;
   for (const option of options) {
     if (Number.isFinite(Number(option)) &&

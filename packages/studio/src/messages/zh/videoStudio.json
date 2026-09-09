@@ -97,7 +97,8 @@
       "keyframes": "起始与结束帧",
       "references": "使用参考素材",
       "edit_video": "编辑视频",
-      "extend_uploaded_video": "延长视频"
+      "extend_uploaded_video": "延长视频",
+      "motion_transfer": "动作迁移"
     },
     "settings": "设置",
     "quality": "质量",
@@ -113,13 +114,14 @@
       "keyframes": "用你选定的两张图片作为首尾帧生成视频。",
       "references": "参考上传的素材生成视频。",
       "edit_video": "上传视频并描述你想修改的内容。",
-      "extend_uploaded_video": "在上传的视频末尾添加新的片段。"
+      "extend_uploaded_video": "在上传的视频末尾添加新的片段。",
+      "motion_transfer": "将视频中的动作应用到角色图片。"
     },
     "defaultVariant": "默认",
     "advanced": "高级",
     "adjustments": {
       "resolution": "使用 {value}",
-      "duration": "时长：{value} 秒",
+      "duration": "时长：{value}",
       "aspectRatio": "画面比例：{value}",
       "speed": "速度：{value}",
       "profile": "服务：{value}",
@@ -275,6 +277,78 @@
       "loras": {
         "title": "LoRA",
         "description": "最多添加 3 个自定义风格或角色。"
+      }
+    }
+  },
+  "alibaba": {
+    "speed": "速度",
+    "speeds": {
+      "standard": "标准速度",
+      "fast": "快速"
+    },
+    "speedDescriptions": {
+      "standard": "",
+      "fast": "更快生成。"
+    },
+    "provider": "生成服务",
+    "providerHelp": "为同一 Wan 版本选择其他生成服务。",
+    "profiles": {
+      "standard": {
+        "label": "Standard",
+        "description": ""
+      },
+      "prime": {
+        "label": "Prime",
+        "description": ""
+      },
+      "spicy": {
+        "label": "Spicy",
+        "description": ""
+      }
+    },
+    "durationLabels": {
+      "0": "原视频时长（最多 10 秒）"
+    },
+    "fields": {
+      "enable_audio": {
+        "title": "生成音频",
+        "description": ""
+      },
+      "thinking_mode": {
+        "title": "提示词推理",
+        "description": "帮助模型理解复杂描述。"
+      },
+      "negative_prompt": {
+        "title": "排除内容",
+        "description": "描述不希望出现的内容。"
+      },
+      "shot_type": {
+        "title": "镜头",
+        "description": "使用一个连续镜头或多个镜头。",
+        "optionLabels": {
+          "single": "单镜头",
+          "multi": "多镜头"
+        }
+      },
+      "enable_prompt_expansion": {
+        "title": "扩展提示词",
+        "description": "让模型为描述补充细节。"
+      },
+      "audio_setting": {
+        "title": "音频",
+        "description": "按描述处理音频，或保留原音频。",
+        "optionLabels": {
+          "auto": "按提示词处理",
+          "origin": "保留原音频"
+        }
+      },
+      "mode": {
+        "title": "角色动画",
+        "description": "让角色动起来，或替换视频中的角色。",
+        "optionLabels": {
+          "animate": "生成角色动画",
+          "replace": "替换角色"
+        }
       }
     }
   }

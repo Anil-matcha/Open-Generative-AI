@@ -805,7 +805,7 @@ function buildVideoModelMenuEntries() {
     for (const [mode, workflowIds] of Object.entries({
       t2v: [null],
       i2v: ["animate_image", "keyframes", "references"],
-      v2v: ["edit_video", "extend_uploaded_video"],
+      v2v: ["edit_video", "extend_uploaded_video", "motion_transfer"],
     })) {
       for (const workflowId of workflowIds) {
         const variantId = resolveGroupedVideoVariant({ familyId: config.familyId, workflowId });

@@ -85,13 +85,6 @@ export const VIDEO_WORKFLOW_VARIANTS = Object.freeze({
     animate_image: ["grok-imagine-video-1-5-preview"],
     references: ["grok-imagine-image-to-video"],
   },
-  "wan-2.7": {
-    animate_image: ["wan2.7-image-to-video"],
-    keyframes: ["wan2.7-image-to-video"],
-    references: ["wan2.7-reference-to-video"],
-    edit_video: ["wan2.7-video-edit"],
-    extend_uploaded_video: ["wan2.7-video-extend"],
-  },
   "vidu-q3": {
     animate_image: ["vidu-q3-turbo-image-to-video", "vidu-q3-pro-image-to-video"],
     keyframes: ["vidu-q3-turbo-first-last-frames", "vidu-q3-pro-first-last-frames"],
@@ -146,16 +139,6 @@ export const VIDEO_WORKFLOW_VARIANTS = Object.freeze({
   "ltx-2.3": {
     animate_image: ["ltx-2.3-image-to-video"],
     extend_uploaded_video: ["ltx-2.3-video-extend"],
-  },
-  "wan-2.2": {
-    animate_image: ["wan2.2-spicy-image-to-video", "wan2.2-image-to-video"],
-    keyframes: ["wan2.2-image-to-video"],
-    edit_video: ["wan2.2-edit-video"],
-    extend_uploaded_video: ["wan2.2-spicy-video-extend"],
-  },
-  "wan-2.1": {
-    animate_image: ["wan2.1-image-to-video"],
-    references: ["wan2.1-reference-video"],
   },
   "kling-v2.1": {
     animate_image: [

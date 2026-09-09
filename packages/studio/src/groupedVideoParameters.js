@@ -6,6 +6,8 @@ import {
 import { SEEDANCE_MODEL_GROUP } from "./seedanceModels.js";
 import { VEO_MODEL_GROUP } from "./veoModels.js";
 import { MINIMAX_MODEL_GROUP } from "./minimaxModels.js";
+import { ALIBABA_MODEL_GROUP } from "./alibabaModels.js";
+import { alibabaParameters } from "./alibabaParameters.js";
 import {
   getMiniMaxResolutionOptions,
   getMiniMaxSelectionAdjustments,
@@ -19,6 +21,7 @@ import {
 } from "./veoParameters.js";
 
 const groups = [
+  { familyNames: ALIBABA_MODEL_GROUP.familyNames, ...alibabaParameters },
   {
     familyNames: SEEDANCE_MODEL_GROUP.familyNames,
     plan: planSeedanceSelection,

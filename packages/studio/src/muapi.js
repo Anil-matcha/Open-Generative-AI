@@ -8,7 +8,7 @@ import { buildImageInputPayload, getImageInputValidationError, normalizePrimaryI
 import { pollForGenerationResult } from './utils/generationLifecycle.js';
 import { getModelMediaCapabilities, mapReferenceParams } from './modelCapabilities.js';
 import { buildSupplementalInputPayload } from './modelParameters.js';
-import { getSeedanceConfiguration } from './seedanceModels.js';
+import { getGroupedVideoConfiguration } from './groupedVideoModels.js';
 
 // In an http(s) browser we route through the host app's proxy (Next.js routes
 // under /api/* re-issue the call server-side) so api.muapi.ai CORS is bypassed.
@@ -221,7 +221,7 @@ export async function processV2V(apiKey, params) {
     if (modelInfo?.hasPrompt && params.prompt) {
         payload.prompt = params.prompt;
     }
-    if (getSeedanceConfiguration(modelInfo?.id)) {
+    if (getGroupedVideoConfiguration(modelInfo?.id)) {
         for (const field of ['duration', 'aspect_ratio', 'resolution', 'quality']) {
             if (modelInfo.inputs?.[field] && params[field] !== undefined) {
                 payload[field] = params[field];

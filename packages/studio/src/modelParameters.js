@@ -31,7 +31,7 @@ export function getSupplementalModelInputs(model) {
   if (!model?.inputs) return [];
   const mediaKeys = mediaInputKeys(model);
   return Object.entries(model.inputs)
-    .filter(([key]) => !COMMON_INPUT_KEYS.has(key) && !mediaKeys.has(key))
+    .filter(([key, schema]) => (schema.configurable || !COMMON_INPUT_KEYS.has(key)) && !mediaKeys.has(key))
     .map(([key, schema]) => ({ key, schema }));
 }
 

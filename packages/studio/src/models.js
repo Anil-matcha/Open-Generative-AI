@@ -57,6 +57,24 @@ const MINIMAX_H3_OPEN_SEED_INPUT = Object.freeze({
   default: -1,
 });
 
+// Wan inputs verified against https://api.muapi.ai/openapi.json on 2026-09-09.
+const WAN_AUDIO_INPUT = Object.freeze({
+  type: "string", field: "audio", title: "Guiding audio", name: "audio_url",
+  description: "Audio to guide the video.",
+});
+const WAN_NEGATIVE_PROMPT_INPUT = Object.freeze({
+  type: "string", title: "Negative prompt", name: "negative_prompt",
+  description: "What to leave out of the video.",
+});
+const WAN_22_RESOLUTION_INPUT = Object.freeze({
+  type: "string", title: "Resolution", name: "resolution",
+  enum: Object.freeze(["480p", "720p"]), default: "480p",
+});
+const WAN_27_RESOLUTION_INPUT = Object.freeze({
+  type: "string", title: "Resolution", name: "resolution",
+  enum: Object.freeze(["720p", "1080p"]), default: "720p",
+});
+
 export const t2iModels = [
   {
     "id": "nano-banana",
@@ -4859,6 +4877,7 @@ export const t2vModels = [
     "id": "wan2.5-text-to-video",
     "name": "Wan 2.5",
     "inputs": {
+      "audio_url": WAN_AUDIO_INPUT,
       "prompt": {
         "type": "string",
         "title": "Prompt",
@@ -4906,6 +4925,7 @@ export const t2vModels = [
     "id": "wan2.5-text-to-video-fast",
     "name": "Wan 2.5 Fast",
     "inputs": {
+      "audio_url": WAN_AUDIO_INPUT,
       "prompt": {
         "type": "string",
         "title": "Prompt",
@@ -4952,6 +4972,11 @@ export const t2vModels = [
     "id": "wan2.6-text-to-video",
     "name": "Wan 2.6",
     "inputs": {
+      "shot_type": {
+        "type": "string", "title": "Shots", "name": "shot_type",
+        "enum": ["single", "multi"], "default": "single"
+      },
+      "audio_url": WAN_AUDIO_INPUT,
       "prompt": {
         "type": "string",
         "title": "Prompt",
@@ -14152,7 +14177,10 @@ export const i2vModels = [
     "family": "wan2.5",
     "imageField": "image_url",
     "hasPrompt": true,
+    "promptRequired": true,
+    "aspectRatioMode": "inherited",
     "inputs": {
+      "audio_url": WAN_AUDIO_INPUT,
       "prompt": {
         "type": "string",
         "title": "Prompt",
@@ -14195,7 +14223,10 @@ export const i2vModels = [
     "family": "wan2.5",
     "imageField": "image_url",
     "hasPrompt": true,
+    "promptRequired": true,
+    "aspectRatioMode": "inherited",
     "inputs": {
+      "audio_url": WAN_AUDIO_INPUT,
       "prompt": {
         "type": "string",
         "title": "Prompt",
@@ -15397,6 +15428,7 @@ export const i2vModels = [
     "family": "wan2.2",
     "imageField": "image_url",
     "hasPrompt": true,
+    "aspectRatioMode": "inherited",
     "promptRequired": true,
     "inputs": {
       "prompt": {
@@ -15441,7 +15473,10 @@ export const i2vModels = [
     "family": "wan2.6",
     "imageField": "image_url",
     "hasPrompt": true,
+    "promptRequired": true,
+    "aspectRatioMode": "inherited",
     "inputs": {
+      "audio_url": WAN_AUDIO_INPUT,
       "prompt": {
         "type": "string",
         "title": "Prompt",
@@ -16583,6 +16618,7 @@ export const i2vModels = [
     "imageField": "image_url",
     "lastImageField": "last_image",
     "hasPrompt": true,
+    "aspectRatioMode": "inherited",
     "promptRequired": true,
     "inputs": {
       "prompt": {
@@ -16653,6 +16689,7 @@ export const i2vModels = [
     "endpoint": "wan2.7-reference-to-video",
     "family": "wan2.7",
     "imageField": "images_list",
+    "imageOptional": true,
     "hasPrompt": true,
     "promptRequired": true,
     "inputs": {
@@ -24716,6 +24753,9 @@ export const v2vModels = [
     "videoField": "video_url",
     "hasPrompt": true,
     "promptRequired": true,
+    "inputs": {
+      "resolution": WAN_22_RESOLUTION_INPUT
+    },
     "description": "Easily modify existing videos using simple text commands.",
     "provider": "alibaba",
     "provider_name": "Alibaba"
@@ -24859,6 +24899,13 @@ export const v2vModels = [
     "videoField": "video_url",
     "hasPrompt": true,
     "promptRequired": true,
+    "inputs": {
+      "resolution": WAN_22_RESOLUTION_INPUT,
+      "duration": {
+        "type": "integer", "title": "Duration", "name": "duration",
+        "enum": [5, 8], "default": 5
+      }
+    },
     "description": "Wan-2.2-spicy Video Extend continues an existing video by generating new frames that match the original style but add stronger motion, bolder effects, and spicier dramatics.",
     "provider": "alibaba",
     "provider_name": "Alibaba"
@@ -24963,6 +25010,15 @@ export const v2vModels = [
     "audioField": "audio_url",
     "hasPrompt": true,
     "promptRequired": true,
+    "inputs": {
+      "audio_url": WAN_AUDIO_INPUT,
+      "negative_prompt": WAN_NEGATIVE_PROMPT_INPUT,
+      "resolution": WAN_27_RESOLUTION_INPUT,
+      "duration": {
+        "type": "integer", "title": "Duration", "name": "duration",
+        "minValue": 5, "maxValue": 15, "default": 5
+      }
+    },
     "description": "Extend existing videos seamlessly with Wan 2.7.",
     "provider": "alibaba",
     "provider_name": "Alibaba"
@@ -24978,6 +25034,20 @@ export const v2vModels = [
     "imageOptional": true,
     "hasPrompt": true,
     "promptRequired": true,
+    "inputs": {
+      "negative_prompt": WAN_NEGATIVE_PROMPT_INPUT,
+      "resolution": WAN_27_RESOLUTION_INPUT,
+      "duration": {
+        "type": "integer", "title": "Duration", "name": "duration",
+        "description": "Use 0 to match the source video length, up to 10 seconds.",
+        "minValue": 0, "maxValue": 10, "default": 0
+      },
+      "audio_setting": {
+        "type": "string", "title": "Audio", "name": "audio_setting",
+        "description": "Follow the prompt or keep the source audio.",
+        "enum": ["auto", "origin"], "default": "auto"
+      }
+    },
     "description": "Perform prompt-driven video editing with multi-image reference support.",
     "provider": "alibaba",
     "provider_name": "Alibaba"
@@ -25171,6 +25241,7 @@ export const v2vModels = [
         "name": "video_url"
       },
       "mode": {
+        "configurable": true,
         "enum": [
           "animate",
           "replace"

@@ -60,7 +60,7 @@ function ScalarInput({ schema, value, onChange, label }) {
       >
         {schema.enum.map((option) => (
           <option key={String(option)} value={String(option)}>
-            {String(option)}
+            {schema.optionLabels?.[option] || String(option)}
           </option>
         ))}
       </select>

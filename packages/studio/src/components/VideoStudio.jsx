@@ -42,7 +42,7 @@ import {
   getGroupedVideoSelectionAdjustments,
 } from "../groupedVideoParameters.js";
 import { migrateSeedanceResolutionSelection } from "../seedanceParameters.js";
-import { getVideoModeDescription } from "../videoModelCopy.js";
+import { getVideoDurationLabel, getVideoModeDescription } from "../videoModelCopy.js";
 import {
   buildReferenceParams,
   getModelMediaCapabilities,
@@ -1091,6 +1091,7 @@ export default function VideoStudio({
   }), [selectedFamilyId, selectedWorkflowId, selectedModel, selectedResolution, selectedAr, selectedDuration, selectedQuality]);
   const describeSelectionAdjustments = useCallback((adjustments) => {
     const valueLabel = (key, value) => {
+      if (key === "duration") return getVideoDurationLabel(value, groupCopy);
       if (key === "profile") return groupCopy.profiles[value]?.label || value;
       if (key === "speed") return groupCopy.speeds[value] || value;
       if (key === "resolution" && value === "default") return groupCopy.defaultResolution;
@@ -2406,7 +2407,9 @@ export default function VideoStudio({
     : selectedWorkflowId === "extend_uploaded_video"
       ? copy.placeholders.continueVideo
       : selectedWorkflowId === "motion_transfer"
-        ? copy.placeholders.motion
+        ? currentModelObj?.promptRequired
+          ? copy.placeholders.motion
+          : copy.placeholders.motionOptional
         : v2vMode
           ? currentModelObj?.imageField
             ? currentModelObj?.promptRequired
@@ -3224,7 +3227,7 @@ export default function VideoStudio({
                   field={{
                     key: "duration",
                     value: selectedDuration,
-                    options: commonOptions.durations.map((value) => ({ value, label: `${value}s` })),
+                    options: commonOptions.durations.map((value) => ({ value, label: getVideoDurationLabel(value, groupCopy) })),
                   }}
                   icon={<PromptDurationIcon />}
                   open={openDropdown === "duration"}

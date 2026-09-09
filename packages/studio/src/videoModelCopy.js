@@ -1,11 +1,14 @@
 import { getVideoWorkflowMediaSlots } from "./videoWorkflows.js";
 
+export function getVideoDurationLabel(value, copy) {
+  return copy.durationLabels?.[value] || `${value}s`;
+}
+
 export function getVideoModeDescription(model, workflowId, copy) {
   const description = copy.modeDescriptions[workflowId || "text"];
   if (workflowId !== "references" || !model) return description;
 
-  const media = getVideoWorkflowMediaSlots(model, workflowId)
-    .map((slot) => copy.referenceMediaTypes[slot.mediaType])
-    .join(" · ");
+  const media = [...new Set(getVideoWorkflowMediaSlots(model, workflowId)
+    .map((slot) => copy.referenceMediaTypes[slot.mediaType]))].join(" · ");
   return `${description} ${copy.referenceSupport.replace("{media}", media)}`;
 }

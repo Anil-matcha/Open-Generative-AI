@@ -97,7 +97,8 @@
       "keyframes": "Start & end frames",
       "references": "Use references",
       "edit_video": "Edit video",
-      "extend_uploaded_video": "Extend video"
+      "extend_uploaded_video": "Extend video",
+      "motion_transfer": "Transfer motion"
     },
     "settings": "Settings",
     "quality": "Quality",
@@ -113,13 +114,14 @@
       "keyframes": "Create a video between two images you choose.",
       "references": "Create a video using uploaded files as guides.",
       "edit_video": "Upload a video and describe your changes.",
-      "extend_uploaded_video": "Add new footage to the end of an uploaded video."
+      "extend_uploaded_video": "Add new footage to the end of an uploaded video.",
+      "motion_transfer": "Apply motion from a video to a character image."
     },
     "defaultVariant": "Default",
     "advanced": "Advanced",
     "adjustments": {
       "resolution": "Uses {value}",
-      "duration": "Duration: {value} s",
+      "duration": "Duration: {value}",
       "aspectRatio": "Format: {value}",
       "speed": "Speed: {value}",
       "profile": "Service: {value}",
@@ -275,6 +277,78 @@
       "loras": {
         "title": "LoRAs",
         "description": "Add up to 3 custom styles or characters."
+      }
+    }
+  },
+  "alibaba": {
+    "speed": "Speed",
+    "speeds": {
+      "standard": "Standard speed",
+      "fast": "Fast"
+    },
+    "speedDescriptions": {
+      "standard": "",
+      "fast": "Faster generation."
+    },
+    "provider": "Generation service",
+    "providerHelp": "Use a different service for the same Wan version.",
+    "profiles": {
+      "standard": {
+        "label": "Standard",
+        "description": ""
+      },
+      "prime": {
+        "label": "Prime",
+        "description": ""
+      },
+      "spicy": {
+        "label": "Spicy",
+        "description": ""
+      }
+    },
+    "durationLabels": {
+      "0": "Source length (up to 10s)"
+    },
+    "fields": {
+      "enable_audio": {
+        "title": "Generate audio",
+        "description": ""
+      },
+      "thinking_mode": {
+        "title": "Prompt reasoning",
+        "description": "Help the model interpret complex descriptions."
+      },
+      "negative_prompt": {
+        "title": "Avoid",
+        "description": "Describe what to leave out."
+      },
+      "shot_type": {
+        "title": "Shots",
+        "description": "Use one continuous shot or several shots.",
+        "optionLabels": {
+          "single": "Single shot",
+          "multi": "Multiple shots"
+        }
+      },
+      "enable_prompt_expansion": {
+        "title": "Expand prompt",
+        "description": "Let the model add detail to your description."
+      },
+      "audio_setting": {
+        "title": "Audio",
+        "description": "Follow your description or keep the source audio.",
+        "optionLabels": {
+          "auto": "Follow prompt",
+          "origin": "Keep original"
+        }
+      },
+      "mode": {
+        "title": "Character animation",
+        "description": "Animate the character or replace the one in the video.",
+        "optionLabels": {
+          "animate": "Animate character",
+          "replace": "Replace character"
+        }
       }
     }
   }
