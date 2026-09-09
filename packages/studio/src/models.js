@@ -8,7 +8,9 @@ import {
 } from './imageSizing.js';
 
 // Verified against https://api.muapi.ai/openapi.json on 2026-09-09.
-// Seedance 2.5 uses the same inputs across its Standard, Intl and Spicy routes.
+// Seedance 2.5 shares common inputs across its Standard, Intl and Spicy routes.
+// Spicy T2V/I2V routes additionally support native resolution and audio
+// generation controls.
 const SEEDANCE_25_ASPECT_RATIO_INPUT = Object.freeze({
   enum: Object.freeze(["adaptive", "16:9", "9:16", "1:1", "4:3", "3:4", "21:9", "9:21"]),
   type: "string",
@@ -17,12 +19,27 @@ const SEEDANCE_25_ASPECT_RATIO_INPUT = Object.freeze({
   description: "Aspect ratio of the output video.",
   default: "16:9",
 });
+const SEEDANCE_25_RESOLUTION_INPUT = Object.freeze({
+  enum: Object.freeze(["480p", "720p", "1080p", "4K"]),
+  type: "string",
+  title: "Resolution",
+  name: "resolution",
+  description: "Output video resolution.",
+  default: "1080p",
+});
 const SEEDANCE_HIGH_BITRATE_INPUT = Object.freeze({
   type: "boolean",
   title: "High Bitrate",
   name: "high_bitrate",
   description: "Enable high bitrate mode for better visual fidelity. Produces larger files.",
   default: false,
+});
+const SEEDANCE_25_GENERATE_AUDIO_INPUT = Object.freeze({
+  type: "boolean",
+  title: "Generate Audio",
+  name: "generate_audio",
+  description: "Whether to generate audio for the video.",
+  default: true,
 });
 const SEEDANCE_25_SEED_INPUT = Object.freeze({
   type: "int",
@@ -7867,6 +7884,8 @@ export const t2vModels = [
     "name": "Seedance 2.5 Spicy",
     "endpoint": "seedance-2.5-spicy-text-to-video",
     "inputs": {
+      "resolution": SEEDANCE_25_RESOLUTION_INPUT,
+      "generate_audio": SEEDANCE_25_GENERATE_AUDIO_INPUT,
       "prompt": {
         "examples": [
           "A high-contrast, adrenaline-fueled chase through a rain-soaked neon megacity at night, sparks and shattering glass in slow motion, aggressive handheld camera energy, exaggerated color grading, 4K cinematic quality."
@@ -19819,6 +19838,8 @@ export const i2vModels = [
     "hasPrompt": true,
     "promptRequired": true,
     "inputs": {
+      "resolution": SEEDANCE_25_RESOLUTION_INPUT,
+      "generate_audio": SEEDANCE_25_GENERATE_AUDIO_INPUT,
       "prompt": {
         "examples": [
           "Bold, high-energy dolly forward through a neon-drenched alley at night, sparks flying off a passing train, exaggerated lighting contrast, dramatic camera shake, photorealistic 4K quality."

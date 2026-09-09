@@ -267,7 +267,10 @@ export function resolveSeedanceSelection({
   const requestedResolution = changes.resolution;
   if (requestedResolution !== undefined && requestedResolution !== "default") {
     const size = normalizeResolution(requestedResolution);
-    for (const modelId of new Set([resolve(size), resolve("default")])) {
+    // Prefer a native-resolution route when the selected model exposes the
+    // documented control. Dedicated size endpoints remain the fallback for
+    // variants whose provider contract has no native resolution input.
+    for (const modelId of new Set([resolve("default"), resolve(size)])) {
       if (!modelId) continue;
       const native = getSeedanceCommonOptions(modelForId(modelId)).resolutions
         .find((value) => normalizeResolution(value) === size);
@@ -295,7 +298,10 @@ export function resolveSeedanceSelection({
   }
 
   const outputResolution = normalizeResolution(sourceResolution);
-  const candidates = new Set([resolve(), resolve(outputResolution), resolve("default")]);
+  // Give a target's native-resolution route the first chance to retain the
+  // current output size. This keeps documented Spicy controls on the base
+  // route when switching into Spicy from a dedicated-size variant.
+  const candidates = new Set([resolve("default"), resolve(), resolve(outputResolution)]);
   for (const modelId of candidates) {
     if (!modelId) continue;
     const nativeOptions = getSeedanceCommonOptions(modelForId(modelId)).resolutions;
@@ -308,10 +314,11 @@ export function resolveSeedanceSelection({
   return null;
 }
 
-// These two entries previously exposed a native size input. Preserve the
-// saved output size when restoring them against the corrected API contract.
+// Preserve the native routes for the two Spicy entries that expose a native
+// output-size input. Keep the fallback for catalogs that may still be stale.
 export function migrateSeedanceResolutionSelection(modelId, resolution) {
   if (modelId !== "seedance-2.5-spicy-text-to-video" && modelId !== "seedance-2.5-spicy-image-to-video") return modelId;
+  if (getSeedanceCommonOptions(modelForId(modelId)).resolutions.length) return modelId;
   return resolveSeedanceSelection({
     familyId: "seedance-2.5",
     workflowId: modelId.endsWith("image-to-video") ? "animate_image" : null,

@@ -163,6 +163,7 @@ export async function generateVideo(apiKey, params) {
     if (params.aspect_ratio) payload.aspect_ratio = params.aspect_ratio;
     if (params.duration) payload.duration = params.duration;
     if (params.resolution) payload.resolution = params.resolution;
+    if (typeof params.generate_audio === 'boolean') payload.generate_audio = params.generate_audio;
     if (params.quality) payload.quality = params.quality;
     if (params.mode) payload.mode = params.mode;
     if (!mediaCapabilities.image.field && params.image_url) payload.image_url = params.image_url;
@@ -186,6 +187,7 @@ export async function generateI2V(apiKey, params) {
     if (params.aspect_ratio) payload.aspect_ratio = params.aspect_ratio;
     if (params.duration) payload.duration = params.duration;
     if (params.resolution) payload.resolution = params.resolution;
+    if (typeof params.generate_audio === 'boolean') payload.generate_audio = params.generate_audio;
     if (params.quality) payload.quality = params.quality;
     if (params.mode) payload.mode = params.mode;
     if (modelInfo?.inputs?.name) {

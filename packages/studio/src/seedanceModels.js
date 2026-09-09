@@ -1,7 +1,7 @@
 import { i2vModels, t2vModels, v2vModels } from "./models.js";
 
-// Endpoint coordinates are separate from ordinary generation parameters. In
-// particular, an unsuffixed endpoint does not promise a specific resolution.
+// Endpoint coordinates are separate from ordinary generation parameters for
+// routes whose schema has no native resolution input.
 const FACETS = Object.freeze(["profile", "speed", "resolution"]);
 const modelIds = new Set(
   [...t2vModels, ...i2vModels, ...v2vModels].map((model) => model.id),
@@ -66,11 +66,14 @@ const MODERN_WORKFLOWS = Object.freeze({
 for (const profile of ["standard", "intl", "spicy"]) {
   for (const { stem, workflowId } of Object.values(MODERN_WORKFLOWS)) {
     for (const resolution of ["default", "480p", "1080p", "4k"]) {
+      const usesNativeResolution = profile === "spicy" &&
+        resolution === "default" &&
+        (workflowId === null || workflowId === "animate_image");
       register(
         `seedance-2.5-${profile === "standard" ? "" : `${profile}-`}${stem}${resolution === "default" ? "" : `-${resolution}`}`,
         "seedance-2.5",
         [workflowId],
-        { profile, resolution },
+        { profile, resolution, ...(usesNativeResolution ? { usesNativeResolution: true } : {}) },
       );
     }
   }
@@ -147,12 +150,14 @@ export function getSeedanceConfiguration(modelId) {
   return configurations.get(modelId) || null;
 }
 
-// MuAPI's family tables specify 720p for these unsuffixed services:
+// MuAPI's family tables specify 720p for unsuffixed services that do not
+// expose a native resolution input:
 // https://muapi.ai/seedance-2.5 and https://muapi.ai/seedance-2 (2026-09-09).
 // Older API routes with no documented size deliberately remain unspecified.
 export function getSeedanceEndpointResolution(modelId) {
   const config = getSeedanceConfiguration(modelId);
   if (!config) return undefined;
+  if (config.usesNativeResolution) return undefined;
   if (config.resolution !== "default") return config.resolution;
   if (config.familyId === "seedance-2.5" ||
       (config.familyId === "seedance-2" && ["standard", "vip", "spicy"].includes(config.profile))) return "720p";
