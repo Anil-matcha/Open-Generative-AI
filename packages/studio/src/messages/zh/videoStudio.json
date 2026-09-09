@@ -458,6 +458,23 @@
     },
     "musicDuration": "时长设为 4 秒。"
   },
+  "xai": {
+    "aspectRatioLabels": {
+      "auto": "匹配图片"
+    },
+    "singleImageFormat": "只有一张图片时，画面比例随图片。",
+    "fields": {
+      "mode": {
+        "title": "风格",
+        "description": "",
+        "optionLabels": {
+          "normal": "标准",
+          "fun": "创意",
+          "spicy": "Spicy"
+        }
+      }
+    }
+  },
   "sora": {
     "provider": "生成方式",
     "providerHelp": "",

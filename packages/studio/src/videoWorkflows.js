@@ -58,10 +58,6 @@ export const VIDEO_WORKFLOW_VARIANTS = Object.freeze({
     references: ["gemini-omni-image-to-video"],
     edit_video: ["gemini-omni-video-edit"],
   },
-  "grok-imagine-video": {
-    animate_image: ["grok-imagine-video-1-5-preview"],
-    references: ["grok-imagine-image-to-video"],
-  },
   ...GROUPED_VIDEO_WORKFLOW_VARIANTS,
 });
 
@@ -761,10 +757,15 @@ export function getVideoWorkflowDraftKey(familyId, workflowId) {
 }
 
 export function migrateVideoWorkflowMediaDrafts(drafts) {
-  // Omni references used to share Kling 3.0's draft before becoming a separate model.
-  const { "kling-v3:references": omniReferences, ...migrated } = drafts;
-  const key = getVideoWorkflowDraftKey("kling-v3-omni", "references");
-  if (omniReferences && !Object.hasOwn(migrated, key)) migrated[key] = omniReferences;
+  // Preserve uploads when a model becomes a separate family.
+  const migrated = { ...drafts };
+  for (const [from, to] of [
+    ["kling-v3:references", "kling-v3-omni:references"],
+    ["grok-imagine-video:animate_image", "grok-imagine-video-1.5:animate_image"],
+  ]) {
+    if (drafts[from] && !Object.hasOwn(migrated, to)) migrated[to] = drafts[from];
+    delete migrated[from];
+  }
   return migrated;
 }
 

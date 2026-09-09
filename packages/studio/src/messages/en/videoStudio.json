@@ -458,6 +458,23 @@
     },
     "musicDuration": "Sets duration to 4 seconds."
   },
+  "xai": {
+    "aspectRatioLabels": {
+      "auto": "Match image"
+    },
+    "singleImageFormat": "With one image, the format follows that image.",
+    "fields": {
+      "mode": {
+        "title": "Style",
+        "description": "",
+        "optionLabels": {
+          "normal": "Standard",
+          "fun": "Creative",
+          "spicy": "Spicy"
+        }
+      }
+    }
+  },
   "sora": {
     "provider": "Generation",
     "providerHelp": "",

@@ -49,6 +49,27 @@ const SEEDANCE_25_SEED_INPUT = Object.freeze({
   minValue: -1,
   maxValue: 4294967295,
 });
+const GROK_ASPECT_RATIO_INPUT = Object.freeze({
+  type: "string", title: "Aspect Ratio", name: "aspect_ratio",
+  enum: Object.freeze(["9:16", "16:9", "2:3", "3:2", "1:1"]),
+  default: "2:3",
+});
+const GROK_RESOLUTION_INPUT = Object.freeze({
+  type: "string", title: "Resolution", name: "resolution",
+  enum: Object.freeze(["480p", "720p"]), default: "480p",
+});
+const GROK_DURATION_INPUT = Object.freeze({
+  type: "int", title: "Duration", name: "duration",
+  default: 6, minValue: 6, maxValue: 30, step: 1,
+});
+const GROK_IMAGE_INPUT = Object.freeze({
+  type: "array", title: "Image URLs", name: "images_list",
+  items: Object.freeze({ type: "string" }), minItems: 1, maxItems: 7,
+});
+const GROK_STYLE_INPUT = Object.freeze({
+  type: "string", title: "Style", name: "mode", configurable: true,
+  enum: Object.freeze(["normal", "fun", "spicy"]), default: "normal",
+});
 const MINIMAX_H3_OPEN_SEED_INPUT = Object.freeze({
   type: "integer",
   title: "Seed",
@@ -5701,44 +5722,10 @@ export const t2vModels = [
         "name": "prompt",
         "description": "Text prompt describing the video."
       },
-      "aspect_ratio": {
-        "enum": [
-          "9:16",
-          "16:9",
-          "2:3",
-          "3:2",
-          "1:1"
-        ],
-        "title": "Aspect Ratio",
-        "name": "aspect_ratio",
-        "type": "string",
-        "description": "Aspect ratio of the output video.",
-        "default": "1:1"
-      },
-      "mode": {
-        "enum": [
-          "fun",
-          "normal",
-          "spicy"
-        ],
-        "title": "Mode",
-        "name": "mode",
-        "type": "string",
-        "description": "Generation style: normal = standard output; fun = more creative/expressive; spicy = edgier content (text-to-video only).",
-        "default": "normal"
-      },
-      "duration": {
-        "enum": [
-          6,
-          10,
-          15
-        ],
-        "title": "Duration",
-        "name": "duration",
-        "type": "int",
-        "description": "The duration of the generated video in seconds.",
-        "default": 6
-      }
+      "aspect_ratio": { ...GROK_ASPECT_RATIO_INPUT, default: "1:1" },
+      "mode": GROK_STYLE_INPUT,
+      "resolution": GROK_RESOLUTION_INPUT,
+      "duration": GROK_DURATION_INPUT
     },
     "provider": "grok",
     "provider_name": "xAI"
@@ -6166,6 +6153,7 @@ export const t2vModels = [
     "id": "grok-imagine-extend",
     "name": "Grok Imagine Extend",
     "requiresRequestId": true,
+    "promptRequired": true,
     "endpoint": "grok-imagine-extend",
     "inputs": {
       "request_id": {
@@ -6199,17 +6187,7 @@ export const t2vModels = [
         "description": "Duration in seconds to extend the video.",
         "default": 6
       },
-      "resolution": {
-        "enum": [
-          "480p",
-          "720p"
-        ],
-        "title": "Resolution",
-        "name": "resolution",
-        "type": "string",
-        "description": "Output video resolution.",
-        "default": "480p"
-      }
+      "resolution": GROK_RESOLUTION_INPUT
     },
     "provider": "grok",
     "provider_name": "xAI"
@@ -15246,8 +15224,8 @@ export const i2vModels = [
     "imageField": "images_list",
     "hasPrompt": true,
     "promptRequired": true,
-    "maxImages": 7,
     "inputs": {
+      "images_list": GROK_IMAGE_INPUT,
       "prompt": {
         "type": "string",
         "title": "Prompt",
@@ -15257,30 +15235,10 @@ export const i2vModels = [
           "Camera glides through vines toward temple entrance, mist disperses as sunlight pierces canopy, birds fly off, subtle dust motes in the air, adventure-style cinematic score."
         ]
       },
-      "mode": {
-        "type": "string",
-        "title": "Mode",
-        "name": "mode",
-        "description": "Note: When generating videos using external image inputs, Spicy mode is not supported and will automatically switch to Normal.",
-        "enum": [
-          "fun",
-          "normal",
-          "spicy"
-        ],
-        "default": "normal"
-      },
-      "duration": {
-        "type": "int",
-        "title": "Duration",
-        "name": "duration",
-        "description": "The duration of the generated video in seconds.",
-        "enum": [
-          6,
-          10,
-          15
-        ],
-        "default": 6
-      }
+      "aspect_ratio": { ...GROK_ASPECT_RATIO_INPUT, descriptionKey: "singleImageFormat" },
+      "mode": { ...GROK_STYLE_INPUT, enum: ["normal", "fun"] },
+      "resolution": GROK_RESOLUTION_INPUT,
+      "duration": GROK_DURATION_INPUT
     },
     "provider": "grok",
     "provider_name": "xAI"
@@ -19178,8 +19136,6 @@ export const i2vModels = [
     "family": "video-generation",
     "imageField": "images_list",
     "hasPrompt": true,
-    "aspectRatioMode": "inherited",
-    "parameterNotice": "Aspect ratio is inherited from the input image.",
     "inputs": {
       "prompt": {
         "type": "string",
@@ -19190,20 +19146,7 @@ export const i2vModels = [
           "The whale suddenly begins swimming through the apartment as if the room is underwater. Furniture crashes into walls, water bursts outward, and the whale breaks through multiple rooms while the camera follows beside it."
         ]
       },
-      "images_list": {
-        "examples": [
-          "https://cdn.muapi.ai/assets/grok-imagine-video-1-5-preview.jpg"
-        ],
-        "description": "Upload or provide image URLs to use as input for video generation.",
-        "field": "images_list",
-        "type": "array",
-        "items": {
-          "type": "string"
-        },
-        "title": "Image URLs",
-        "name": "images_list",
-        "maxItems": 7
-      },
+      "images_list": GROK_IMAGE_INPUT,
       "aspect_ratio": {
         "enum": [
           "auto",
@@ -19221,17 +19164,7 @@ export const i2vModels = [
         "description": "Aspect ratio for the generated video. Use 'auto' to match the input image.",
         "default": "auto"
       },
-      "resolution": {
-        "enum": [
-          "480p",
-          "720p"
-        ],
-        "type": "string",
-        "title": "Resolution",
-        "name": "resolution",
-        "description": "Output video resolution.",
-        "default": "480p"
-      },
+      "resolution": GROK_RESOLUTION_INPUT,
       "duration": {
         "type": "int",
         "title": "Duration (seconds)",

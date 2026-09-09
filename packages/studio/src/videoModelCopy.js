@@ -4,6 +4,10 @@ export function getVideoDurationLabel(value, copy) {
   return copy.durationLabels?.[value] || `${value}s`;
 }
 
+export function getVideoAspectRatioLabel(value, copy) {
+  return copy.aspectRatioLabels?.[value] || value;
+}
+
 export function getVideoModeDescription(model, workflowId, copy) {
   const description = copy.modeDescriptions[workflowId || "text"];
   if (workflowId !== "references" || !model) return description;

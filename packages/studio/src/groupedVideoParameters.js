@@ -20,6 +20,8 @@ import { LTX_MODEL_GROUP } from "./ltxModels.js";
 import { ltxParameters } from "./ltxParameters.js";
 import { SORA_MODEL_GROUP } from "./soraModels.js";
 import { soraParameters } from "./soraParameters.js";
+import { XAI_MODEL_GROUP } from "./xaiModels.js";
+import { xaiParameters } from "./xaiParameters.js";
 import {
   getMiniMaxResolutionOptions,
   getMiniMaxSelectionAdjustments,
@@ -35,6 +37,7 @@ import {
 } from "./veoParameters.js";
 
 const groups = [
+  { familyNames: XAI_MODEL_GROUP.familyNames, ...xaiParameters },
   { familyNames: SORA_MODEL_GROUP.familyNames, ...soraParameters },
   { familyNames: LTX_MODEL_GROUP.familyNames, ...ltxParameters },
   { familyNames: PIXVERSE_MODEL_GROUP.familyNames, ...pixverseParameters },

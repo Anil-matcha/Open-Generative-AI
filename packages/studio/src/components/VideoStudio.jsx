@@ -42,7 +42,7 @@ import {
   getGroupedVideoSelectionAdjustments,
 } from "../groupedVideoParameters.js";
 import { migrateSeedanceResolutionSelection } from "../seedanceParameters.js";
-import { getVideoDurationLabel, getVideoModeDescription } from "../videoModelCopy.js";
+import { getVideoAspectRatioLabel, getVideoDurationLabel, getVideoModeDescription } from "../videoModelCopy.js";
 import {
   buildReferenceParams,
   getModelMediaCapabilities,
@@ -1109,6 +1109,7 @@ export default function VideoStudio({
   const describeSelectionAdjustments = useCallback((adjustments) => {
     const valueLabel = (key, value) => {
       if (key === "duration") return getVideoDurationLabel(value, groupCopy);
+      if (key === "aspectRatio") return getVideoAspectRatioLabel(value, groupCopy);
       if (key === "profile") return groupCopy.profiles[value]?.label || value;
       if (key === "speed") return groupCopy.speeds[value] || value;
       if (key === "resolution" && value === "default") return groupCopy.defaultResolution;
@@ -1162,6 +1163,7 @@ export default function VideoStudio({
       resolution: selectedResolution, quality: selectedQuality,
     }), [selectedVariant, modelParameterValues, selectedAr, selectedDuration, selectedResolution, selectedQuality],
   );
+  const aspectRatioHelp = groupCopy[selectedVariant?.model.inputs?.aspect_ratio?.descriptionKey];
   const groupedModes = useMemo(() => groupedConfiguration && workflowFamily
     ? [...(workflowFamily.hasBase ? [{ id: null }] : []), ...workflowFamily.workflows].map((workflow) => {
         const plan = getSelectionPlan({ workflowId: workflow.id });
@@ -1661,21 +1663,13 @@ export default function VideoStudio({
           urls.length > 0 &&
           draftSession === workflowDraftSessionRef.current
         ) {
-          const latestDraft = workflowMediaDraftsRef.current[draftKey] || {};
-          const latestActiveDraft = projectVideoWorkflowMedia(
-            targetModel,
-            workflowIdAtStart,
-            latestDraft,
+          const appendUploads = (drafts) => appendVideoWorkflowMedia(
+            drafts, draftKey, slot, urls,
+            projectVideoWorkflowMedia(targetModel, workflowIdAtStart, drafts[draftKey] || {}),
           );
-          const nextDrafts = appendVideoWorkflowMedia(
-            workflowMediaDraftsRef.current,
-            draftKey,
-            slot,
-            urls,
-            latestActiveDraft,
-          );
-          workflowMediaDraftsRef.current = nextDrafts;
-          setWorkflowMediaDrafts(nextDrafts);
+          // Keep upload capacity current without overwriting queued draft edits.
+          workflowMediaDraftsRef.current = appendUploads(workflowMediaDraftsRef.current);
+          setWorkflowMediaDrafts(appendUploads);
         }
       } finally {
         workflowUploadSlotRef.current = null;
@@ -3180,7 +3174,7 @@ export default function VideoStudio({
                   >
                     <PromptAspectRatioIcon />
                     <span className={PROMPT_CONTROL_LABEL_CLASS}>
-                      {selectedAr}
+                      {getVideoAspectRatioLabel(selectedAr, groupCopy)}
                     </span>
                   </button>
                   {openDropdown === "ar" && (
@@ -3190,6 +3184,9 @@ export default function VideoStudio({
                       <PromptPopoverHeader>
                         {copy.dropdowns.aspectRatio}
                       </PromptPopoverHeader>
+                      {aspectRatioHelp && (
+                        <p className="px-3 pb-2 text-[11px] text-white/45">{aspectRatioHelp}</p>
+                      )}
                       <PromptMenuList>
                         {(groupedConfiguration ? commonOptions.aspectRatios : getCurrentAspectRatios(selectedModel)).map((r) => (
                           <PromptMenuItem
@@ -3201,7 +3198,7 @@ export default function VideoStudio({
                               setOpenDropdown(null);
                             }}
                           >
-                            {r}
+                            {getVideoAspectRatioLabel(r, groupCopy)}
                           </PromptMenuItem>
                         ))}
                       </PromptMenuList>
