@@ -47,7 +47,7 @@
     "effectFallback": "Effect",
     "drawButton": "Draw",
     "generating": "Generating...",
-    "generateButton": "Generate ✦"
+    "generateButton": "Generate"
   },
   "popovers": {
     "model": "Model",

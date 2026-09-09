@@ -1398,7 +1398,7 @@ export default function MotionControlStudio({
             {isGenerating ? (
               <>
                 <span className="animate-spin inline-block text-black mr-1.5">◌</span>
-                <span>{copy.buttons.generating} ({formatTime(elapsedTime)})</span>
+                <span>{copy.buttons.generating}</span>
               </>
             ) : (
               <span>{copy.buttons.generate}</span>

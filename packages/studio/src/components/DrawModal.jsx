@@ -1667,7 +1667,6 @@ export default function DrawModal({
                   ) : (
                     <>
                       Generate Image
-                      <span className="opacity-80">✦ {batchSize}</span>
                     </>
                   )}
                 </button>

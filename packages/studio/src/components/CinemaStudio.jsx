@@ -1268,7 +1268,7 @@ export default function CinemaStudio({
                 </>
               ) : (
                 <>
-                  <span>{copy.prompt.generate} ✦ 10</span>
+                  <span>{copy.prompt.generate}</span>
                 </>
               )}
             </PromptAction>
