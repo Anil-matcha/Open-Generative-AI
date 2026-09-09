@@ -7,6 +7,32 @@ import {
   T2I_DIMENSION_RATIOS,
 } from './imageSizing.js';
 
+// Verified against https://api.muapi.ai/openapi.json on 2026-09-09.
+// Seedance 2.5 uses the same inputs across its Standard, Intl and Spicy routes.
+const SEEDANCE_25_ASPECT_RATIO_INPUT = Object.freeze({
+  enum: Object.freeze(["adaptive", "16:9", "9:16", "1:1", "4:3", "3:4", "21:9", "9:21"]),
+  type: "string",
+  title: "Aspect Ratio",
+  name: "aspect_ratio",
+  description: "Aspect ratio of the output video.",
+  default: "16:9",
+});
+const SEEDANCE_HIGH_BITRATE_INPUT = Object.freeze({
+  type: "boolean",
+  title: "High Bitrate",
+  name: "high_bitrate",
+  description: "Enable high bitrate mode for better visual fidelity. Produces larger files.",
+  default: false,
+});
+const SEEDANCE_25_SEED_INPUT = Object.freeze({
+  type: "int",
+  title: "Seed",
+  name: "seed",
+  description: "Random seed for reproducible generation. Use -1 for random.",
+  minValue: -1,
+  maxValue: 4294967295,
+});
+
 export const t2iModels = [
   {
     "id": "nano-banana",
@@ -6224,7 +6250,8 @@ export const t2vModels = [
         "minValue": 4,
         "maxValue": 15,
         "step": 1
-      }
+      },
+      "high_bitrate": SEEDANCE_HIGH_BITRATE_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -6267,7 +6294,8 @@ export const t2vModels = [
         "minValue": 4,
         "maxValue": 15,
         "step": 1
-      }
+      },
+      "high_bitrate": SEEDANCE_HIGH_BITRATE_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -6534,7 +6562,8 @@ export const t2vModels = [
         "minValue": 4,
         "maxValue": 15,
         "step": 1
-      }
+      },
+      "high_bitrate": SEEDANCE_HIGH_BITRATE_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -6577,7 +6606,8 @@ export const t2vModels = [
         "minValue": 4,
         "maxValue": 15,
         "step": 1
-      }
+      },
+      "high_bitrate": SEEDANCE_HIGH_BITRATE_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -7455,23 +7485,7 @@ export const t2vModels = [
         "maxValue": 30,
         "step": 1
       },
-      "aspect_ratio": {
-        "enum": [
-          "adaptive",
-          "16:9",
-          "9:16",
-          "1:1",
-          "4:3",
-          "3:4",
-          "21:9",
-          "9:21"
-        ],
-        "title": "Aspect Ratio",
-        "name": "aspect_ratio",
-        "type": "string",
-        "description": "Aspect ratio of the output video.",
-        "default": "16:9"
-      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT,
       "seed": {
         "type": "int",
         "title": "Seed",
@@ -7518,23 +7532,7 @@ export const t2vModels = [
         "maxValue": 30,
         "step": 1
       },
-      "aspect_ratio": {
-        "enum": [
-          "adaptive",
-          "16:9",
-          "9:16",
-          "1:1",
-          "4:3",
-          "3:4",
-          "21:9",
-          "9:21"
-        ],
-        "title": "Aspect Ratio",
-        "name": "aspect_ratio",
-        "type": "string",
-        "description": "Aspect ratio of the output video.",
-        "default": "16:9"
-      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT,
       "seed": {
         "type": "int",
         "title": "Seed",
@@ -7858,7 +7856,8 @@ export const t2vModels = [
         "minValue": 4,
         "maxValue": 15,
         "step": 1
-      }
+      },
+      "high_bitrate": SEEDANCE_HIGH_BITRATE_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -7877,35 +7876,7 @@ export const t2vModels = [
         "title": "Prompt",
         "name": "prompt"
       },
-      "aspect_ratio": {
-        "enum": [
-          "adaptive",
-          "16:9",
-          "9:16",
-          "1:1",
-          "3:4",
-          "4:3",
-          "21:9"
-        ],
-        "title": "Aspect Ratio",
-        "name": "aspect_ratio",
-        "type": "string",
-        "description": "Aspect ratio of the output video.",
-        "default": "16:9"
-      },
-      "resolution": {
-        "enum": [
-          "480p",
-          "720p",
-          "1080p",
-          "4K"
-        ],
-        "title": "Resolution",
-        "name": "resolution",
-        "type": "string",
-        "description": "Output video resolution.",
-        "default": "1080p"
-      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT,
       "duration": {
         "title": "Duration",
         "name": "duration",
@@ -7913,22 +7884,8 @@ export const t2vModels = [
         "description": "The duration of the generated video in seconds.",
         "default": 5,
         "minValue": 4,
-        "maxValue": 16,
+        "maxValue": 30,
         "step": 1
-      },
-      "generate_audio": {
-        "type": "boolean",
-        "title": "Generate Audio",
-        "name": "generate_audio",
-        "description": "Whether to generate audio for the video.",
-        "default": true
-      },
-      "camera_fixed": {
-        "type": "boolean",
-        "title": "Camera Fixed",
-        "name": "camera_fixed",
-        "description": "Whether to fix the camera position.",
-        "default": false
       },
       "high_bitrate": {
         "type": "boolean",
@@ -7936,7 +7893,8 @@ export const t2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "seed": SEEDANCE_25_SEED_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -8418,23 +8376,7 @@ export const t2vModels = [
         "maxValue": 30,
         "step": 1
       },
-      "aspect_ratio": {
-        "enum": [
-          "adaptive",
-          "16:9",
-          "9:16",
-          "1:1",
-          "4:3",
-          "3:4",
-          "21:9",
-          "9:21"
-        ],
-        "title": "Aspect Ratio",
-        "name": "aspect_ratio",
-        "type": "string",
-        "description": "Aspect ratio of the output video.",
-        "default": "16:9"
-      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT,
       "seed": {
         "type": "int",
         "title": "Seed",
@@ -8481,23 +8423,7 @@ export const t2vModels = [
         "maxValue": 30,
         "step": 1
       },
-      "aspect_ratio": {
-        "enum": [
-          "adaptive",
-          "16:9",
-          "9:16",
-          "1:1",
-          "4:3",
-          "3:4",
-          "21:9",
-          "9:21"
-        ],
-        "title": "Aspect Ratio",
-        "name": "aspect_ratio",
-        "type": "string",
-        "description": "Aspect ratio of the output video.",
-        "default": "16:9"
-      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT,
       "seed": {
         "type": "int",
         "title": "Seed",
@@ -8544,23 +8470,7 @@ export const t2vModels = [
         "maxValue": 30,
         "step": 1
       },
-      "aspect_ratio": {
-        "enum": [
-          "adaptive",
-          "16:9",
-          "9:16",
-          "1:1",
-          "4:3",
-          "3:4",
-          "21:9",
-          "9:21"
-        ],
-        "title": "Aspect Ratio",
-        "name": "aspect_ratio",
-        "type": "string",
-        "description": "Aspect ratio of the output video.",
-        "default": "16:9"
-      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT,
       "seed": {
         "type": "int",
         "title": "Seed",
@@ -8607,23 +8517,7 @@ export const t2vModels = [
         "maxValue": 30,
         "step": 1
       },
-      "aspect_ratio": {
-        "enum": [
-          "adaptive",
-          "16:9",
-          "9:16",
-          "1:1",
-          "4:3",
-          "3:4",
-          "21:9",
-          "9:21"
-        ],
-        "title": "Aspect Ratio",
-        "name": "aspect_ratio",
-        "type": "string",
-        "description": "Aspect ratio of the output video.",
-        "default": "16:9"
-      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT,
       "seed": {
         "type": "int",
         "title": "Seed",
@@ -8670,23 +8564,7 @@ export const t2vModels = [
         "maxValue": 30,
         "step": 1
       },
-      "aspect_ratio": {
-        "enum": [
-          "adaptive",
-          "16:9",
-          "9:16",
-          "1:1",
-          "4:3",
-          "3:4",
-          "21:9",
-          "9:21"
-        ],
-        "title": "Aspect Ratio",
-        "name": "aspect_ratio",
-        "type": "string",
-        "description": "Aspect ratio of the output video.",
-        "default": "16:9"
-      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT,
       "seed": {
         "type": "int",
         "title": "Seed",
@@ -8733,23 +8611,7 @@ export const t2vModels = [
         "maxValue": 30,
         "step": 1
       },
-      "aspect_ratio": {
-        "enum": [
-          "adaptive",
-          "16:9",
-          "9:16",
-          "1:1",
-          "4:3",
-          "3:4",
-          "21:9",
-          "9:21"
-        ],
-        "title": "Aspect Ratio",
-        "name": "aspect_ratio",
-        "type": "string",
-        "description": "Aspect ratio of the output video.",
-        "default": "16:9"
-      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT,
       "seed": {
         "type": "int",
         "title": "Seed",
@@ -8796,23 +8658,7 @@ export const t2vModels = [
         "maxValue": 30,
         "step": 1
       },
-      "aspect_ratio": {
-        "enum": [
-          "adaptive",
-          "16:9",
-          "9:16",
-          "1:1",
-          "4:3",
-          "3:4",
-          "21:9",
-          "9:21"
-        ],
-        "title": "Aspect Ratio",
-        "name": "aspect_ratio",
-        "type": "string",
-        "description": "Aspect ratio of the output video.",
-        "default": "16:9"
-      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT,
       "seed": {
         "type": "int",
         "title": "Seed",
@@ -8859,23 +8705,7 @@ export const t2vModels = [
         "maxValue": 30,
         "step": 1
       },
-      "aspect_ratio": {
-        "enum": [
-          "adaptive",
-          "16:9",
-          "9:16",
-          "1:1",
-          "4:3",
-          "3:4",
-          "21:9",
-          "9:21"
-        ],
-        "title": "Aspect Ratio",
-        "name": "aspect_ratio",
-        "type": "string",
-        "description": "Aspect ratio of the output video.",
-        "default": "16:9"
-      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT,
       "seed": {
         "type": "int",
         "title": "Seed",
@@ -8922,23 +8752,7 @@ export const t2vModels = [
         "maxValue": 30,
         "step": 1
       },
-      "aspect_ratio": {
-        "enum": [
-          "adaptive",
-          "16:9",
-          "9:16",
-          "1:1",
-          "4:3",
-          "3:4",
-          "21:9",
-          "9:21"
-        ],
-        "title": "Aspect Ratio",
-        "name": "aspect_ratio",
-        "type": "string",
-        "description": "Aspect ratio of the output video.",
-        "default": "16:9"
-      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT,
       "seed": {
         "type": "int",
         "title": "Seed",
@@ -17096,7 +16910,8 @@ export const i2vModels = [
         "minValue": 4,
         "maxValue": 15,
         "step": 1
-      }
+      },
+      "high_bitrate": SEEDANCE_HIGH_BITRATE_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -17157,7 +16972,8 @@ export const i2vModels = [
         "minValue": 4,
         "maxValue": 15,
         "step": 1
-      }
+      },
+      "high_bitrate": SEEDANCE_HIGH_BITRATE_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -17219,7 +17035,8 @@ export const i2vModels = [
         "minValue": 4,
         "maxValue": 15,
         "step": 1
-      }
+      },
+      "high_bitrate": SEEDANCE_HIGH_BITRATE_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -17283,7 +17100,8 @@ export const i2vModels = [
         "minValue": 4,
         "maxValue": 15,
         "step": 1
-      }
+      },
+      "high_bitrate": SEEDANCE_HIGH_BITRATE_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -17790,7 +17608,8 @@ export const i2vModels = [
         "minValue": 4,
         "maxValue": 15,
         "step": 1
-      }
+      },
+      "high_bitrate": SEEDANCE_HIGH_BITRATE_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -17875,7 +17694,8 @@ export const i2vModels = [
         "minValue": 4,
         "maxValue": 15,
         "step": 1
-      }
+      },
+      "high_bitrate": SEEDANCE_HIGH_BITRATE_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -18111,7 +17931,8 @@ export const i2vModels = [
         "minValue": 4,
         "maxValue": 15,
         "step": 1
-      }
+      },
+      "high_bitrate": SEEDANCE_HIGH_BITRATE_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -18172,7 +17993,8 @@ export const i2vModels = [
         "minValue": 4,
         "maxValue": 15,
         "step": 1
-      }
+      },
+      "high_bitrate": SEEDANCE_HIGH_BITRATE_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -18257,7 +18079,8 @@ export const i2vModels = [
         "minValue": 4,
         "maxValue": 15,
         "step": 1
-      }
+      },
+      "high_bitrate": SEEDANCE_HIGH_BITRATE_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -18342,7 +18165,8 @@ export const i2vModels = [
         "minValue": 4,
         "maxValue": 15,
         "step": 1
-      }
+      },
+      "high_bitrate": SEEDANCE_HIGH_BITRATE_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -18404,7 +18228,8 @@ export const i2vModels = [
         "minValue": 4,
         "maxValue": 15,
         "step": 1
-      }
+      },
+      "high_bitrate": SEEDANCE_HIGH_BITRATE_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -19373,7 +19198,6 @@ export const i2vModels = [
     "endpoint": "seedance-2.5-image-to-video",
     "family": "seedance-2.5",
     "imageField": "image_url",
-    "aspectRatioMode": "inherited",
     "hasPrompt": true,
     "promptRequired": true,
     "inputs": {
@@ -19423,7 +19247,8 @@ export const i2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -19829,7 +19654,8 @@ export const i2vModels = [
         "minValue": 4,
         "maxValue": 15,
         "step": 1
-      }
+      },
+      "high_bitrate": SEEDANCE_HIGH_BITRATE_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -19891,7 +19717,8 @@ export const i2vModels = [
         "minValue": 4,
         "maxValue": 15,
         "step": 1
-      }
+      },
+      "high_bitrate": SEEDANCE_HIGH_BITRATE_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -19976,7 +19803,8 @@ export const i2vModels = [
         "minValue": 4,
         "maxValue": 15,
         "step": 1
-      }
+      },
+      "high_bitrate": SEEDANCE_HIGH_BITRATE_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -19988,7 +19816,6 @@ export const i2vModels = [
     "family": "seedance-2.5",
     "imageField": "image_url",
     "lastImageField": "last_image",
-    "aspectRatioMode": "inherited",
     "hasPrompt": true,
     "promptRequired": true,
     "inputs": {
@@ -20011,29 +19838,6 @@ export const i2vModels = [
         "title": "Image URL",
         "name": "image_url"
       },
-      "last_image": {
-        "examples": [
-          null
-        ],
-        "description": "Optional URL of the last frame image for first-last frame control.",
-        "field": "image",
-        "type": "string",
-        "title": "Last Image",
-        "name": "last_image"
-      },
-      "resolution": {
-        "enum": [
-          "480p",
-          "720p",
-          "1080p",
-          "4K"
-        ],
-        "title": "Resolution",
-        "name": "resolution",
-        "type": "string",
-        "description": "Output video resolution.",
-        "default": "1080p"
-      },
       "duration": {
         "title": "Duration",
         "name": "duration",
@@ -20041,22 +19845,8 @@ export const i2vModels = [
         "description": "The duration of the generated video in seconds.",
         "default": 5,
         "minValue": 4,
-        "maxValue": 16,
+        "maxValue": 30,
         "step": 1
-      },
-      "generate_audio": {
-        "type": "boolean",
-        "title": "Generate Audio",
-        "name": "generate_audio",
-        "description": "Whether to generate audio for the video.",
-        "default": true
-      },
-      "camera_fixed": {
-        "type": "boolean",
-        "title": "Camera Fixed",
-        "name": "camera_fixed",
-        "description": "Whether to fix the camera position.",
-        "default": false
       },
       "high_bitrate": {
         "type": "boolean",
@@ -20064,7 +19854,9 @@ export const i2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT,
+      "seed": SEEDANCE_25_SEED_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -20075,7 +19867,6 @@ export const i2vModels = [
     "endpoint": "seedance-2.5-image-to-video-480p",
     "family": "seedance-2.5",
     "imageField": "image_url",
-    "aspectRatioMode": "inherited",
     "hasPrompt": true,
     "promptRequired": true,
     "inputs": {
@@ -20125,7 +19916,8 @@ export const i2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -20136,7 +19928,6 @@ export const i2vModels = [
     "endpoint": "seedance-2.5-first-last-frame",
     "family": "seedance-2.5",
     "imageField": "images_list",
-    "aspectRatioMode": "inherited",
     "hasPrompt": true,
     "promptRequired": true,
     "inputs": {
@@ -20191,7 +19982,8 @@ export const i2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -20202,7 +19994,6 @@ export const i2vModels = [
     "endpoint": "seedance-2.5-first-last-frame-480p",
     "family": "seedance-2.5",
     "imageField": "images_list",
-    "aspectRatioMode": "inherited",
     "hasPrompt": true,
     "promptRequired": true,
     "inputs": {
@@ -20257,7 +20048,8 @@ export const i2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -20327,23 +20119,7 @@ export const i2vModels = [
         "maxValue": 30,
         "step": 1
       },
-      "aspect_ratio": {
-        "enum": [
-          "adaptive",
-          "16:9",
-          "9:16",
-          "1:1",
-          "4:3",
-          "3:4",
-          "21:9",
-          "9:21"
-        ],
-        "title": "Aspect Ratio",
-        "name": "aspect_ratio",
-        "type": "string",
-        "description": "Aspect ratio of the output video.",
-        "default": "16:9"
-      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT,
       "seed": {
         "type": "int",
         "title": "Seed",
@@ -20444,23 +20220,7 @@ export const i2vModels = [
         "maxValue": 30,
         "step": 1
       },
-      "aspect_ratio": {
-        "enum": [
-          "adaptive",
-          "16:9",
-          "9:16",
-          "1:1",
-          "4:3",
-          "3:4",
-          "21:9",
-          "9:21"
-        ],
-        "title": "Aspect Ratio",
-        "name": "aspect_ratio",
-        "type": "string",
-        "description": "Aspect ratio of the output video.",
-        "default": "16:9"
-      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT,
       "seed": {
         "type": "int",
         "title": "Seed",
@@ -21208,7 +20968,6 @@ export const i2vModels = [
     "endpoint": "seedance-2.5-image-to-video-1080p",
     "family": "seedance-2.5",
     "imageField": "image_url",
-    "aspectRatioMode": "inherited",
     "hasPrompt": true,
     "promptRequired": true,
     "inputs": {
@@ -21258,7 +21017,8 @@ export const i2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -21269,7 +21029,6 @@ export const i2vModels = [
     "endpoint": "seedance-2.5-image-to-video-4k",
     "family": "seedance-2.5",
     "imageField": "image_url",
-    "aspectRatioMode": "inherited",
     "hasPrompt": true,
     "promptRequired": true,
     "inputs": {
@@ -21319,7 +21078,8 @@ export const i2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -21330,7 +21090,6 @@ export const i2vModels = [
     "endpoint": "seedance-2.5-first-last-frame-1080p",
     "family": "seedance-2.5",
     "imageField": "images_list",
-    "aspectRatioMode": "inherited",
     "hasPrompt": true,
     "promptRequired": true,
     "inputs": {
@@ -21385,7 +21144,8 @@ export const i2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -21396,7 +21156,6 @@ export const i2vModels = [
     "endpoint": "seedance-2.5-first-last-frame-4k",
     "family": "seedance-2.5",
     "imageField": "images_list",
-    "aspectRatioMode": "inherited",
     "hasPrompt": true,
     "promptRequired": true,
     "inputs": {
@@ -21451,7 +21210,8 @@ export const i2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -21521,23 +21281,7 @@ export const i2vModels = [
         "maxValue": 30,
         "step": 1
       },
-      "aspect_ratio": {
-        "enum": [
-          "adaptive",
-          "16:9",
-          "9:16",
-          "1:1",
-          "4:3",
-          "3:4",
-          "21:9",
-          "9:21"
-        ],
-        "title": "Aspect Ratio",
-        "name": "aspect_ratio",
-        "type": "string",
-        "description": "Aspect ratio of the output video.",
-        "default": "16:9"
-      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT,
       "seed": {
         "type": "int",
         "title": "Seed",
@@ -21638,23 +21382,7 @@ export const i2vModels = [
         "maxValue": 30,
         "step": 1
       },
-      "aspect_ratio": {
-        "enum": [
-          "adaptive",
-          "16:9",
-          "9:16",
-          "1:1",
-          "4:3",
-          "3:4",
-          "21:9",
-          "9:21"
-        ],
-        "title": "Aspect Ratio",
-        "name": "aspect_ratio",
-        "type": "string",
-        "description": "Aspect ratio of the output video.",
-        "default": "16:9"
-      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT,
       "seed": {
         "type": "int",
         "title": "Seed",
@@ -21696,7 +21424,6 @@ export const i2vModels = [
     "endpoint": "seedance-2.5-intl-image-to-video",
     "family": "seedance-2.5",
     "imageField": "image_url",
-    "aspectRatioMode": "inherited",
     "hasPrompt": true,
     "promptRequired": true,
     "inputs": {
@@ -21746,7 +21473,8 @@ export const i2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -21757,7 +21485,6 @@ export const i2vModels = [
     "endpoint": "seedance-2.5-intl-image-to-video-480p",
     "family": "seedance-2.5",
     "imageField": "image_url",
-    "aspectRatioMode": "inherited",
     "hasPrompt": true,
     "promptRequired": true,
     "inputs": {
@@ -21807,7 +21534,8 @@ export const i2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -21818,7 +21546,6 @@ export const i2vModels = [
     "endpoint": "seedance-2.5-spicy-image-to-video-480p",
     "family": "seedance-2.5",
     "imageField": "image_url",
-    "aspectRatioMode": "inherited",
     "hasPrompt": true,
     "promptRequired": true,
     "inputs": {
@@ -21868,7 +21595,8 @@ export const i2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -21879,7 +21607,6 @@ export const i2vModels = [
     "endpoint": "seedance-2.5-intl-image-to-video-1080p",
     "family": "seedance-2.5",
     "imageField": "image_url",
-    "aspectRatioMode": "inherited",
     "hasPrompt": true,
     "promptRequired": true,
     "inputs": {
@@ -21929,7 +21656,8 @@ export const i2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -21940,7 +21668,6 @@ export const i2vModels = [
     "endpoint": "seedance-2.5-spicy-image-to-video-1080p",
     "family": "seedance-2.5",
     "imageField": "image_url",
-    "aspectRatioMode": "inherited",
     "hasPrompt": true,
     "promptRequired": true,
     "inputs": {
@@ -21990,7 +21717,8 @@ export const i2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -22001,7 +21729,6 @@ export const i2vModels = [
     "endpoint": "seedance-2.5-intl-image-to-video-4k",
     "family": "seedance-2.5",
     "imageField": "image_url",
-    "aspectRatioMode": "inherited",
     "hasPrompt": true,
     "promptRequired": true,
     "inputs": {
@@ -22051,7 +21778,8 @@ export const i2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -22062,7 +21790,6 @@ export const i2vModels = [
     "endpoint": "seedance-2.5-spicy-image-to-video-4k",
     "family": "seedance-2.5",
     "imageField": "image_url",
-    "aspectRatioMode": "inherited",
     "hasPrompt": true,
     "promptRequired": true,
     "inputs": {
@@ -22112,7 +21839,8 @@ export const i2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -22123,7 +21851,6 @@ export const i2vModels = [
     "endpoint": "seedance-2.5-intl-first-last-frame",
     "family": "seedance-2.5",
     "imageField": "images_list",
-    "aspectRatioMode": "inherited",
     "hasPrompt": true,
     "promptRequired": true,
     "inputs": {
@@ -22178,7 +21905,8 @@ export const i2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -22189,7 +21917,6 @@ export const i2vModels = [
     "endpoint": "seedance-2.5-spicy-first-last-frame",
     "family": "seedance-2.5",
     "imageField": "images_list",
-    "aspectRatioMode": "inherited",
     "hasPrompt": true,
     "promptRequired": true,
     "inputs": {
@@ -22244,7 +21971,8 @@ export const i2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -22255,7 +21983,6 @@ export const i2vModels = [
     "endpoint": "seedance-2.5-intl-first-last-frame-480p",
     "family": "seedance-2.5",
     "imageField": "images_list",
-    "aspectRatioMode": "inherited",
     "hasPrompt": true,
     "promptRequired": true,
     "inputs": {
@@ -22310,7 +22037,8 @@ export const i2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -22321,7 +22049,6 @@ export const i2vModels = [
     "endpoint": "seedance-2.5-spicy-first-last-frame-480p",
     "family": "seedance-2.5",
     "imageField": "images_list",
-    "aspectRatioMode": "inherited",
     "hasPrompt": true,
     "promptRequired": true,
     "inputs": {
@@ -22376,7 +22103,8 @@ export const i2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -22387,7 +22115,6 @@ export const i2vModels = [
     "endpoint": "seedance-2.5-intl-first-last-frame-1080p",
     "family": "seedance-2.5",
     "imageField": "images_list",
-    "aspectRatioMode": "inherited",
     "hasPrompt": true,
     "promptRequired": true,
     "inputs": {
@@ -22442,7 +22169,8 @@ export const i2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -22453,7 +22181,6 @@ export const i2vModels = [
     "endpoint": "seedance-2.5-spicy-first-last-frame-1080p",
     "family": "seedance-2.5",
     "imageField": "images_list",
-    "aspectRatioMode": "inherited",
     "hasPrompt": true,
     "promptRequired": true,
     "inputs": {
@@ -22508,7 +22235,8 @@ export const i2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -22519,7 +22247,6 @@ export const i2vModels = [
     "endpoint": "seedance-2.5-intl-first-last-frame-4k",
     "family": "seedance-2.5",
     "imageField": "images_list",
-    "aspectRatioMode": "inherited",
     "hasPrompt": true,
     "promptRequired": true,
     "inputs": {
@@ -22574,7 +22301,8 @@ export const i2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -22585,7 +22313,6 @@ export const i2vModels = [
     "endpoint": "seedance-2.5-spicy-first-last-frame-4k",
     "family": "seedance-2.5",
     "imageField": "images_list",
-    "aspectRatioMode": "inherited",
     "hasPrompt": true,
     "promptRequired": true,
     "inputs": {
@@ -22640,7 +22367,8 @@ export const i2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "provider": "bytedance",
     "provider_name": "ByteDance"
@@ -22710,23 +22438,7 @@ export const i2vModels = [
         "maxValue": 30,
         "step": 1
       },
-      "aspect_ratio": {
-        "enum": [
-          "adaptive",
-          "16:9",
-          "9:16",
-          "1:1",
-          "4:3",
-          "3:4",
-          "21:9",
-          "9:21"
-        ],
-        "title": "Aspect Ratio",
-        "name": "aspect_ratio",
-        "type": "string",
-        "description": "Aspect ratio of the output video.",
-        "default": "16:9"
-      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT,
       "seed": {
         "type": "int",
         "title": "Seed",
@@ -22827,23 +22539,7 @@ export const i2vModels = [
         "maxValue": 30,
         "step": 1
       },
-      "aspect_ratio": {
-        "enum": [
-          "adaptive",
-          "16:9",
-          "9:16",
-          "1:1",
-          "4:3",
-          "3:4",
-          "21:9",
-          "9:21"
-        ],
-        "title": "Aspect Ratio",
-        "name": "aspect_ratio",
-        "type": "string",
-        "description": "Aspect ratio of the output video.",
-        "default": "16:9"
-      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT,
       "seed": {
         "type": "int",
         "title": "Seed",
@@ -22944,23 +22640,7 @@ export const i2vModels = [
         "maxValue": 30,
         "step": 1
       },
-      "aspect_ratio": {
-        "enum": [
-          "adaptive",
-          "16:9",
-          "9:16",
-          "1:1",
-          "4:3",
-          "3:4",
-          "21:9",
-          "9:21"
-        ],
-        "title": "Aspect Ratio",
-        "name": "aspect_ratio",
-        "type": "string",
-        "description": "Aspect ratio of the output video.",
-        "default": "16:9"
-      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT,
       "seed": {
         "type": "int",
         "title": "Seed",
@@ -23061,23 +22741,7 @@ export const i2vModels = [
         "maxValue": 30,
         "step": 1
       },
-      "aspect_ratio": {
-        "enum": [
-          "adaptive",
-          "16:9",
-          "9:16",
-          "1:1",
-          "4:3",
-          "3:4",
-          "21:9",
-          "9:21"
-        ],
-        "title": "Aspect Ratio",
-        "name": "aspect_ratio",
-        "type": "string",
-        "description": "Aspect ratio of the output video.",
-        "default": "16:9"
-      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT,
       "seed": {
         "type": "int",
         "title": "Seed",
@@ -23178,23 +22842,7 @@ export const i2vModels = [
         "maxValue": 30,
         "step": 1
       },
-      "aspect_ratio": {
-        "enum": [
-          "adaptive",
-          "16:9",
-          "9:16",
-          "1:1",
-          "4:3",
-          "3:4",
-          "21:9",
-          "9:21"
-        ],
-        "title": "Aspect Ratio",
-        "name": "aspect_ratio",
-        "type": "string",
-        "description": "Aspect ratio of the output video.",
-        "default": "16:9"
-      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT,
       "seed": {
         "type": "int",
         "title": "Seed",
@@ -23295,23 +22943,7 @@ export const i2vModels = [
         "maxValue": 30,
         "step": 1
       },
-      "aspect_ratio": {
-        "enum": [
-          "adaptive",
-          "16:9",
-          "9:16",
-          "1:1",
-          "4:3",
-          "3:4",
-          "21:9",
-          "9:21"
-        ],
-        "title": "Aspect Ratio",
-        "name": "aspect_ratio",
-        "type": "string",
-        "description": "Aspect ratio of the output video.",
-        "default": "16:9"
-      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT,
       "seed": {
         "type": "int",
         "title": "Seed",
@@ -23412,23 +23044,7 @@ export const i2vModels = [
         "maxValue": 30,
         "step": 1
       },
-      "aspect_ratio": {
-        "enum": [
-          "adaptive",
-          "16:9",
-          "9:16",
-          "1:1",
-          "4:3",
-          "3:4",
-          "21:9",
-          "9:21"
-        ],
-        "title": "Aspect Ratio",
-        "name": "aspect_ratio",
-        "type": "string",
-        "description": "Aspect ratio of the output video.",
-        "default": "16:9"
-      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT,
       "seed": {
         "type": "int",
         "title": "Seed",
@@ -23529,23 +23145,7 @@ export const i2vModels = [
         "maxValue": 30,
         "step": 1
       },
-      "aspect_ratio": {
-        "enum": [
-          "adaptive",
-          "16:9",
-          "9:16",
-          "1:1",
-          "4:3",
-          "3:4",
-          "21:9",
-          "9:21"
-        ],
-        "title": "Aspect Ratio",
-        "name": "aspect_ratio",
-        "type": "string",
-        "description": "Aspect ratio of the output video.",
-        "default": "16:9"
-      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT,
       "seed": {
         "type": "int",
         "title": "Seed",
@@ -25719,7 +25319,8 @@ export const v2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "description": "Seedance 2.5 Video Edit edits an input video from a natural-language prompt. The reference video drives subject identity, composition, and motion while the model rewrites lighting, style, weather, environment, or specific elements as instructed.",
     "provider": "bytedance",
@@ -25821,7 +25422,8 @@ export const v2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "description": "Seedance 2.5 Video Edit 480p edits an input video from a natural-language prompt. The reference video drives subject identity, composition, and motion while the model rewrites lighting, style, weather, environment, or specific elements as instructed.",
     "provider": "bytedance",
@@ -25923,7 +25525,8 @@ export const v2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "description": "Seedance 2.5 Video Edit 1080p edits an input video from a natural-language prompt. The reference video drives subject identity, composition, and motion while the model rewrites lighting, style, weather, environment, or specific elements as instructed.",
     "provider": "bytedance",
@@ -26025,7 +25628,8 @@ export const v2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "description": "Seedance 2.5 Video Edit 4K edits an input video from a natural-language prompt. The reference video drives subject identity, composition, and motion while the model rewrites lighting, style, weather, environment, or specific elements as instructed.",
     "provider": "bytedance",
@@ -26109,7 +25713,8 @@ export const v2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "description": "Seedance 2.5 Video Extend extends an input video with a new cinematic continuation generated from its last frame and a natural-language prompt.",
     "provider": "bytedance",
@@ -26193,7 +25798,8 @@ export const v2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "description": "Seedance 2.5 Video Extend 480p extends an input video with a new cinematic continuation generated from its last frame and a natural-language prompt.",
     "provider": "bytedance",
@@ -26277,7 +25883,8 @@ export const v2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "description": "Seedance 2.5 Video Extend 1080p extends an input video with a new cinematic continuation generated from its last frame and a natural-language prompt.",
     "provider": "bytedance",
@@ -26361,7 +25968,8 @@ export const v2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "description": "Seedance 2.5 Video Extend 4K extends an input video with a new cinematic continuation generated from its last frame and a natural-language prompt.",
     "provider": "bytedance",
@@ -26463,7 +26071,8 @@ export const v2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "description": "Seedance 2.5 Video Edit edits an input video from a natural-language prompt. The reference video drives subject identity, composition, and motion while the model rewrites lighting, style, weather, environment, or specific elements as instructed. This international-region endpoint is served via a Dreamina-hosted deployment of the same Seedance 2.5 model, for traffic outside mainland China.",
     "provider": "bytedance",
@@ -26565,7 +26174,8 @@ export const v2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "description": "Seedance 2.5 Video Edit edits an input video from a natural-language prompt. The reference video drives subject identity, composition, and motion while the model rewrites lighting, style, weather, environment, or specific elements as instructed. This Spicy endpoint is the relaxed-moderation sibling of the standard tier, with lighter content-safety filtering and bolder, higher-contrast output.",
     "provider": "bytedance",
@@ -26667,7 +26277,8 @@ export const v2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "description": "Seedance 2.5 Video Edit 480p edits an input video from a natural-language prompt. The reference video drives subject identity, composition, and motion while the model rewrites lighting, style, weather, environment, or specific elements as instructed. This international-region endpoint is served via a Dreamina-hosted deployment of the same Seedance 2.5 model, for traffic outside mainland China.",
     "provider": "bytedance",
@@ -26769,7 +26380,8 @@ export const v2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "description": "Seedance 2.5 Video Edit 480p edits an input video from a natural-language prompt. The reference video drives subject identity, composition, and motion while the model rewrites lighting, style, weather, environment, or specific elements as instructed. This Spicy endpoint is the relaxed-moderation sibling of the standard tier, with lighter content-safety filtering and bolder, higher-contrast output.",
     "provider": "bytedance",
@@ -26871,7 +26483,8 @@ export const v2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "description": "Seedance 2.5 Video Edit 1080p edits an input video from a natural-language prompt. The reference video drives subject identity, composition, and motion while the model rewrites lighting, style, weather, environment, or specific elements as instructed. This international-region endpoint is served via a Dreamina-hosted deployment of the same Seedance 2.5 model, for traffic outside mainland China.",
     "provider": "bytedance",
@@ -26973,7 +26586,8 @@ export const v2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "description": "Seedance 2.5 Video Edit 1080p edits an input video from a natural-language prompt. The reference video drives subject identity, composition, and motion while the model rewrites lighting, style, weather, environment, or specific elements as instructed. This Spicy endpoint is the relaxed-moderation sibling of the standard tier, with lighter content-safety filtering and bolder, higher-contrast output.",
     "provider": "bytedance",
@@ -27075,7 +26689,8 @@ export const v2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "description": "Seedance 2.5 Video Edit 4K edits an input video from a natural-language prompt. The reference video drives subject identity, composition, and motion while the model rewrites lighting, style, weather, environment, or specific elements as instructed. This international-region endpoint is served via a Dreamina-hosted deployment of the same Seedance 2.5 model, for traffic outside mainland China.",
     "provider": "bytedance",
@@ -27177,7 +26792,8 @@ export const v2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "description": "Seedance 2.5 Video Edit 4K edits an input video from a natural-language prompt. The reference video drives subject identity, composition, and motion while the model rewrites lighting, style, weather, environment, or specific elements as instructed. This Spicy endpoint is the relaxed-moderation sibling of the standard tier, with lighter content-safety filtering and bolder, higher-contrast output.",
     "provider": "bytedance",
@@ -27261,7 +26877,8 @@ export const v2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "description": "Seedance 2.5 Video Extend extends an input video with a new cinematic continuation generated from its last frame and a natural-language prompt. This international-region endpoint is served via a Dreamina-hosted deployment of the same Seedance 2.5 model, for traffic outside mainland China.",
     "provider": "bytedance",
@@ -27345,7 +26962,8 @@ export const v2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "description": "Seedance 2.5 Video Extend extends an input video with a new cinematic continuation generated from its last frame and a natural-language prompt. This Spicy endpoint is the relaxed-moderation sibling of the standard tier, with lighter content-safety filtering and bolder, higher-contrast output.",
     "provider": "bytedance",
@@ -27429,7 +27047,8 @@ export const v2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "description": "Seedance 2.5 Video Extend 480p extends an input video with a new cinematic continuation generated from its last frame and a natural-language prompt. This international-region endpoint is served via a Dreamina-hosted deployment of the same Seedance 2.5 model, for traffic outside mainland China.",
     "provider": "bytedance",
@@ -27513,7 +27132,8 @@ export const v2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "description": "Seedance 2.5 Video Extend 480p extends an input video with a new cinematic continuation generated from its last frame and a natural-language prompt. This Spicy endpoint is the relaxed-moderation sibling of the standard tier, with lighter content-safety filtering and bolder, higher-contrast output.",
     "provider": "bytedance",
@@ -27597,7 +27217,8 @@ export const v2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "description": "Seedance 2.5 Video Extend 1080p extends an input video with a new cinematic continuation generated from its last frame and a natural-language prompt. This international-region endpoint is served via a Dreamina-hosted deployment of the same Seedance 2.5 model, for traffic outside mainland China.",
     "provider": "bytedance",
@@ -27681,7 +27302,8 @@ export const v2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "description": "Seedance 2.5 Video Extend 1080p extends an input video with a new cinematic continuation generated from its last frame and a natural-language prompt. This Spicy endpoint is the relaxed-moderation sibling of the standard tier, with lighter content-safety filtering and bolder, higher-contrast output.",
     "provider": "bytedance",
@@ -27765,7 +27387,8 @@ export const v2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "description": "Seedance 2.5 Video Extend 4K extends an input video with a new cinematic continuation generated from its last frame and a natural-language prompt. This international-region endpoint is served via a Dreamina-hosted deployment of the same Seedance 2.5 model, for traffic outside mainland China.",
     "provider": "bytedance",
@@ -27849,7 +27472,8 @@ export const v2vModels = [
         "name": "high_bitrate",
         "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
         "default": false
-      }
+      },
+      "aspect_ratio": SEEDANCE_25_ASPECT_RATIO_INPUT
     },
     "description": "Seedance 2.5 Video Extend 4K extends an input video with a new cinematic continuation generated from its last frame and a natural-language prompt. This Spicy endpoint is the relaxed-moderation sibling of the standard tier, with lighter content-safety filtering and bolder, higher-contrast output.",
     "provider": "bytedance",

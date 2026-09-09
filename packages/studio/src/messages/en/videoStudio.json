@@ -37,7 +37,7 @@
   },
   "dropdowns": {
     "model": "Model",
-    "source": "Source",
+    "source": "Video mode",
     "baseGeneration": "Base generation",
     "aspectRatio": "Aspect Ratio",
     "effect": "Effect",
@@ -87,6 +87,126 @@
     "enterPromptToGenerate": "Please enter a prompt to generate a video.",
     "noVideoUrlReturned": "No video URL returned by API",
     "videoGenerationFailed": "Video generation failed",
-    "deleteItemFailed": "Failed to delete item"
+    "deleteItemFailed": "Failed to delete item",
+    "noContinuationSource": "Choose a compatible {family} result to continue."
+  },
+  "seedance": {
+    "modes": {
+      "text": "From prompt",
+      "animate_image": "Animate image",
+      "keyframes": "Start & end frames",
+      "references": "Use references",
+      "edit_video": "Edit video",
+      "extend_uploaded_video": "Extend video"
+    },
+    "settings": "Settings",
+    "speed": "Speed",
+    "speeds": {
+      "standard": "Standard speed",
+      "fast": "Fast"
+    },
+    "quality": "Quality",
+    "extensionDuration": "Extension duration",
+    "defaultResolution": "Service default",
+    "incompatible": "This choice is unavailable for this model version.",
+    "incompatibleShort": "Unavailable for this version",
+    "inheritedFormat": "Format follows the source image",
+    "tools": "Seedance video tools",
+    "inheritedVideoResolution": "Resolution follows the source video",
+    "modeDescriptions": {
+      "text": "Create a video from your description.",
+      "animate_image": "Animate an uploaded image using your description.",
+      "keyframes": "Create a video between two images you choose.",
+      "references": "Create a video using uploaded files as guides.",
+      "edit_video": "Upload a video and describe your changes.",
+      "extend_uploaded_video": "Add new footage to the end of an uploaded video."
+    },
+    "profiles": {
+      "standard": {
+        "label": "Standard",
+        "description": ""
+      },
+      "intl": {
+        "label": "International",
+        "description": "International deployment."
+      },
+      "vip": {
+        "label": "VIP",
+        "description": "Priority processing."
+      },
+      "mini": {
+        "label": "Mini",
+        "description": "Lighter model."
+      },
+      "spicy": {
+        "label": "Spicy",
+        "description": "Bolder contrast and motion."
+      },
+      "mini_spicy": {
+        "label": "Mini Spicy",
+        "description": ""
+      },
+      "legacy": {
+        "label": "Seedance 2.0 API",
+        "description": ""
+      },
+      "legacy_new": {
+        "label": "Seedance 2.0 New API",
+        "description": ""
+      }
+    },
+    "defaultVariant": "Default",
+    "continueGenerated": "Continue a Seedance 2.0 result",
+    "removeWatermark": "Remove watermark",
+    "advanced": "Advanced",
+    "adjustments": {
+      "resolution": "Uses {value}",
+      "duration": "Duration: {value} s",
+      "aspectRatio": "Format: {value}",
+      "speed": "Speed: {value}",
+      "profile": "Service: {value}",
+      "quality": "Quality: {value}"
+    },
+    "fields": {
+      "seed": {
+        "title": "Seed",
+        "description": "Use −1 for random results."
+      },
+      "high_bitrate": {
+        "title": "High bitrate",
+        "description": "Larger files, more detail."
+      },
+      "generate_audio": {
+        "title": "Generate audio",
+        "description": ""
+      },
+      "camera_fixed": {
+        "title": "Fixed camera",
+        "description": "Keep the camera still."
+      }
+    },
+    "toolNames": {
+      "continueGenerated": "Continue Seedance 2.0",
+      "removeWatermark": "Remove watermark"
+    },
+    "toolVariants": {
+      "standard": "Standard",
+      "vip": "VIP",
+      "pro": "Pro"
+    },
+    "provider": "Generation service",
+    "providerHelp": "Choose a specific service when needed.",
+    "resolutionUnknown": "Output resolution is not specified by this service.",
+    "referenceSupport": "Supports: {media}.",
+    "referenceMediaTypes": {
+      "image": "Images",
+      "video": "Video",
+      "audio": "Audio"
+    },
+    "editAudio": {
+      "title": "New audio",
+      "description": "Off keeps the original audio."
+    },
+    "restoreDefaultResolution": "Use the service’s default output size"
   }
 }

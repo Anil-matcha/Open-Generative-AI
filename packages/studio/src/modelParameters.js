@@ -60,6 +60,7 @@ function normalizeValue(value, schema, { includeEmpty = false } = {}) {
   }
   if (schema.type === "boolean") return typeof value === "boolean" ? value : !!schema.default;
   if (["number", "integer", "int"].includes(schema.type)) {
+    if (value === "" || value == null) return includeEmpty ? "" : undefined;
     return clampNumber(value, schema);
   }
   if (schema.type === "array") {
