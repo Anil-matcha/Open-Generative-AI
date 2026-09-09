@@ -62,10 +62,6 @@ export const VIDEO_WORKFLOW_VARIANTS = Object.freeze({
     animate_image: ["grok-imagine-video-1-5-preview"],
     references: ["grok-imagine-image-to-video"],
   },
-  "pixverse-6": {
-    animate_image: ["pixverse-v6-i2v"],
-    keyframes: ["pixverse-v6-transition"],
-  },
   "ltx-2.3": {
     animate_image: ["ltx-2.3-image-to-video"],
     extend_uploaded_video: ["ltx-2.3-video-extend"],

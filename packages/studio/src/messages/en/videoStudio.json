@@ -457,5 +457,56 @@
       }
     },
     "musicDuration": "Sets duration to 4 seconds."
+  },
+  "pixverse": {
+    "fields": {
+      "audio": {
+        "title": "Generate audio",
+        "description": ""
+      },
+      "generate_audio_switch": {
+        "title": "Generate audio",
+        "description": ""
+      },
+      "style": {
+        "title": "Style",
+        "description": "",
+        "emptyLabel": "No preset",
+        "optionLabels": {
+          "none": "No preset",
+          "anime": "Anime",
+          "3d_animation": "3D animation",
+          "clay": "Clay",
+          "comic": "Comic",
+          "cyberpunk": "Cyberpunk"
+        }
+      },
+      "thinking": {
+        "title": "Prompt enhancement",
+        "description": "Let the model refine your description.",
+        "optionLabels": {
+          "auto": "Let model choose",
+          "enabled": "On",
+          "disabled": "Off"
+        }
+      },
+      "thinking_type": {
+        "title": "Prompt enhancement",
+        "description": "Help the model interpret your description.",
+        "optionLabels": {
+          "auto": "Let model choose",
+          "enabled": "On",
+          "disabled": "Off"
+        }
+      },
+      "multi_clip": {
+        "title": "Multiple shots",
+        "description": "Use several shots with camera changes."
+      },
+      "negative_prompt": {
+        "title": "Avoid",
+        "description": "Describe what to leave out."
+      }
+    }
   }
 }

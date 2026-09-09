@@ -58,6 +58,9 @@ function ScalarInput({ schema, value, onChange, label }) {
           onChange(selected);
         }}
       >
+        {schema.emptyLabel && schema.default === undefined && (
+          <option value="">{schema.emptyLabel}</option>
+        )}
         {schema.enum.map((option) => (
           <option key={String(option)} value={String(option)}>
             {schema.optionLabels?.[option] || String(option)}

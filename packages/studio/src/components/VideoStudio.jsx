@@ -1260,14 +1260,26 @@ export default function VideoStudio({
     (variant, mode, family, workflowId = null) => {
       if (workflowId) {
         const draftKey = getVideoWorkflowDraftKey(family.id, workflowId);
+        const previous = selectionRef.current;
+        const sourceWorkflowId = previous?.selectedFamilyId === family.id
+          ? previous.selectedWorkflowId : null;
+        const sourceDraftKey = sourceWorkflowId
+          ? getVideoWorkflowDraftKey(family.id, sourceWorkflowId) : null;
+        const sourceModel = sourceDraftKey
+          ? videoModelCatalog.variantById.get(previous.selectedModel)?.model : null;
+        const legacyMedia = mediaRef.current;
         setWorkflowMediaDrafts((drafts) => {
           if (drafts[draftKey]) return drafts;
+          // Seed a new mode from matching active slots; keep existing drafts intact.
+          const media = sourceDraftKey
+            ? projectVideoWorkflowMedia(sourceModel, sourceWorkflowId, drafts[sourceDraftKey])
+            : legacyMedia;
           return {
             ...drafts,
-            [draftKey]: legacyVideoMediaToWorkflowDraft(
+            [draftKey]: projectVideoWorkflowMedia(
               variant.model,
               workflowId,
-              mediaRef.current,
+              media,
             ),
           };
         });

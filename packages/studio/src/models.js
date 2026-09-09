@@ -160,6 +160,32 @@ const VIDU_2_FORMAT_RULES = Object.freeze([
   { when: { resolution: ["1080p"] }, options: { aspectRatios: ["1:1"] } },
 ]);
 
+// PixVerse 4.5 supports five seconds at 1080p; 5.5 also supports eight.
+const PIXVERSE_45_DURATION_RULES = Object.freeze([
+  { when: { resolution: ["1080p"] }, options: { durations: [5] } },
+]);
+const PIXVERSE_55_DURATION_RULES = Object.freeze([
+  { when: { resolution: ["1080p"] }, options: { durations: [5, 8] } },
+]);
+const PIXVERSE_55_SETTINGS = Object.freeze({
+  style: {
+    type: "string", title: "Style", name: "style",
+    enum: ["none", "anime", "3d_animation", "clay", "comic", "cyberpunk"], default: "none",
+  },
+  thinking: {
+    type: "string", title: "Prompt enhancement", name: "thinking",
+    enum: ["auto", "enabled", "disabled"], default: "auto",
+    description: "Let the model refine your description.",
+  },
+  audio: {
+    type: "boolean", title: "Generate audio", name: "audio", default: false,
+  },
+  multi_clip: {
+    type: "boolean", title: "Multiple shots", name: "multi_clip", default: false,
+    description: "Use several shots with camera changes.",
+  },
+});
+
 export const t2iModels = [
   {
     "id": "nano-banana",
@@ -5167,6 +5193,7 @@ export const t2vModels = [
   {
     "id": "pixverse-v4.5-t2v",
     "name": "PixVerse V4.5",
+    "commonParameterRules": PIXVERSE_45_DURATION_RULES,
     "inputs": {
       "prompt": {
         "type": "string",
@@ -5279,7 +5306,9 @@ export const t2vModels = [
   {
     "id": "pixverse-v5.5-t2v",
     "name": "PixVerse V5.5",
+    "commonParameterRules": PIXVERSE_55_DURATION_RULES,
     "inputs": {
+      ...PIXVERSE_55_SETTINGS,
       "prompt": {
         "type": "string",
         "title": "Prompt",
@@ -13665,6 +13694,8 @@ export const i2vModels = [
     "imageField": "images_list",
     "lastImageField": "images_list",
     "hasPrompt": true,
+    "promptRequired": true,
+    "commonParameterRules": PIXVERSE_45_DURATION_RULES,
     "inputs": {
       "prompt": {
         "type": "string",
@@ -14079,6 +14110,7 @@ export const i2vModels = [
     "imageField": "images_list",
     "lastImageField": "images_list",
     "hasPrompt": true,
+    "promptRequired": true,
     "inputs": {
       "prompt": {
         "type": "string",
@@ -15407,7 +15439,10 @@ export const i2vModels = [
     "imageField": "images_list",
     "lastImageField": "images_list",
     "hasPrompt": true,
+    "promptRequired": true,
+    "commonParameterRules": PIXVERSE_55_DURATION_RULES,
     "inputs": {
+      ...PIXVERSE_55_SETTINGS,
       "prompt": {
         "type": "string",
         "title": "Prompt",
@@ -15416,33 +15451,6 @@ export const i2vModels = [
         "examples": [
           "Slow upward camera glide along the staircase, lanterns gently swaying, stardust drifting in soft spirals, nebula clouds subtly shifting, and the cosmic gateway pulsing with rhythmic light; maintain original colors, composition, and celestial atmosphere with smooth cinematic motion."
         ]
-      },
-      "style": {
-        "type": "string",
-        "title": "Style",
-        "name": "style",
-        "description": "The style of the generated video.",
-        "enum": [
-          "none",
-          "anime",
-          "3d_animation",
-          "clay",
-          "comic",
-          "cyberpunk"
-        ],
-        "default": "none"
-      },
-      "thinking": {
-        "type": "string",
-        "title": "Thinking",
-        "name": "thinking",
-        "description": "Prompt optimization mode for model decision.",
-        "enum": [
-          "auto",
-          "enabled",
-          "disabled"
-        ],
-        "default": "auto"
       },
       "aspect_ratio": {
         "type": "string",
@@ -15491,20 +15499,6 @@ export const i2vModels = [
           10
         ],
         "default": 5
-      },
-      "audio": {
-        "type": "boolean",
-        "title": "Audio",
-        "name": "audio",
-        "description": "Enable audio generation (BGM, SFX, dialogue).",
-        "default": false
-      },
-      "multi_clip": {
-        "type": "boolean",
-        "title": "Multi Clip",
-        "name": "multi_clip",
-        "description": "Enable multi-clip generation with dynamic camera changes.",
-        "default": false
       }
     },
     "provider": "pixverse",
@@ -25032,6 +25026,28 @@ export const v2vModels = [
     "family": "pixverse-v6",
     "videoField": "video_url",
     "hasPrompt": true,
+    "promptRequired": true,
+    "inputs": {
+      "resolution": {
+        "type": "string", "title": "Resolution", "name": "resolution",
+        "enum": ["360p", "540p", "720p", "1080p"], "default": "720p"
+      },
+      "duration": {
+        "type": "integer", "title": "Duration", "name": "duration",
+        "enum": Array.from({ length: 15 }, (_, index) => index + 1), "default": 5
+      },
+      "generate_audio_switch": {
+        "type": "boolean", "title": "Generate audio", "name": "generate_audio_switch",
+        "default": false
+      },
+      "negative_prompt": {
+        "type": "string", "title": "Negative prompt", "name": "negative_prompt"
+      },
+      "style": {
+        "type": "string", "title": "Style", "name": "style",
+        "enum": ["anime", "3d_animation", "clay", "comic", "cyberpunk"]
+      }
+    },
     "description": "Extend any existing video with new frames using PixVerse V6.",
     "provider": "pixverse",
     "provider_name": "Pixverse"

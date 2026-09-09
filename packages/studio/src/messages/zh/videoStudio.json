@@ -457,5 +457,56 @@
       }
     },
     "musicDuration": "时长设为 4 秒。"
+  },
+  "pixverse": {
+    "fields": {
+      "audio": {
+        "title": "生成音频",
+        "description": ""
+      },
+      "generate_audio_switch": {
+        "title": "生成音频",
+        "description": ""
+      },
+      "style": {
+        "title": "风格",
+        "description": "",
+        "emptyLabel": "无预设",
+        "optionLabels": {
+          "none": "无预设",
+          "anime": "动漫",
+          "3d_animation": "3D 动画",
+          "clay": "黏土",
+          "comic": "漫画",
+          "cyberpunk": "赛博朋克"
+        }
+      },
+      "thinking": {
+        "title": "提示词优化",
+        "description": "让模型完善你的描述。",
+        "optionLabels": {
+          "auto": "由模型决定",
+          "enabled": "开启",
+          "disabled": "关闭"
+        }
+      },
+      "thinking_type": {
+        "title": "提示词优化",
+        "description": "帮助模型理解你的描述。",
+        "optionLabels": {
+          "auto": "由模型决定",
+          "enabled": "开启",
+          "disabled": "关闭"
+        }
+      },
+      "multi_clip": {
+        "title": "多镜头",
+        "description": "使用多个镜头和视角切换。"
+      },
+      "negative_prompt": {
+        "title": "排除内容",
+        "description": "描述不希望出现的内容。"
+      }
+    }
   }
 }

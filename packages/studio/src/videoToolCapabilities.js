@@ -404,35 +404,19 @@ Object.assign(VIDEO_TOOL_OVERRIDES, {
     ...VIDEO_TOOL_OVERRIDES["pixverse-v6-extend"],
     inputs: {
       resolution: {
-        title: "Resolution",
-        type: "string",
-        enum: ["360p", "540p", "720p", "1080p"],
-        default: "720p",
         configurable: true,
       },
       duration: {
-        title: "Duration",
-        type: "integer",
-        enum: Array.from({ length: 15 }, (_, index) => index + 1),
-        default: 5,
         configurable: true,
       },
       generate_audio_switch: {
-        title: "Generate audio",
-        type: "boolean",
-        default: false,
         configurable: true,
       },
       negative_prompt: {
-        title: "Negative prompt",
-        type: "string",
         configurable: true,
         optional: true,
       },
       style: {
-        title: "Style",
-        type: "string",
-        enum: ["anime", "3d_animation", "clay", "comic", "cyberpunk"],
         configurable: true,
         optional: true,
       },

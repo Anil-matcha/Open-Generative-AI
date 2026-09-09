@@ -14,6 +14,8 @@ import { KLING_MODEL_GROUP } from "./klingModels.js";
 import { klingParameters } from "./klingParameters.js";
 import { VIDU_MODEL_GROUP } from "./viduModels.js";
 import { viduParameters } from "./viduParameters.js";
+import { PIXVERSE_MODEL_GROUP } from "./pixverseModels.js";
+import { pixverseParameters } from "./pixverseParameters.js";
 import {
   getMiniMaxResolutionOptions,
   getMiniMaxSelectionAdjustments,
@@ -29,6 +31,7 @@ import {
 } from "./veoParameters.js";
 
 const groups = [
+  { familyNames: PIXVERSE_MODEL_GROUP.familyNames, ...pixverseParameters },
   { familyNames: VIDU_MODEL_GROUP.familyNames, ...viduParameters },
   { familyNames: KLING_MODEL_GROUP.familyNames, ...klingParameters },
   { familyNames: HAPPY_HORSE_MODEL_GROUP.familyNames, ...happyHorseParameters },
