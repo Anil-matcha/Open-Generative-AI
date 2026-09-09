@@ -6,9 +6,8 @@ import {
 import { buildImageSizePayload } from './imageSizing.js';
 import { buildImageInputPayload, getImageInputValidationError, normalizePrimaryImageUrls } from './imageInputContracts.js';
 import { pollForGenerationResult } from './utils/generationLifecycle.js';
-import { getModelMediaCapabilities, mapReferenceParams } from './modelCapabilities.js';
+import { mapReferenceParams } from './modelCapabilities.js';
 import { buildSupplementalInputPayload } from './modelParameters.js';
-import { getSeedanceConfiguration } from './seedanceModels.js';
 
 // In an http(s) browser we route through the host app's proxy (Next.js routes
 // under /api/* re-issue the call server-side) so api.muapi.ai CORS is bypassed.
@@ -152,7 +151,6 @@ export async function decomposeLayers(apiKey, params) {
 export async function generateVideo(apiKey, params) {
     const modelInfo = getVideoModelById(params.model);
     const endpoint = modelInfo?.endpoint || params.model;
-    const mediaCapabilities = getModelMediaCapabilities(modelInfo);
     assertRequiredPrompt(modelInfo, params);
     let payload = {
         ...mapReferenceParams(modelInfo, params),
@@ -163,13 +161,12 @@ export async function generateVideo(apiKey, params) {
     if (params.aspect_ratio) payload.aspect_ratio = params.aspect_ratio;
     if (params.duration) payload.duration = params.duration;
     if (params.resolution) payload.resolution = params.resolution;
-    if (typeof params.generate_audio === 'boolean') payload.generate_audio = params.generate_audio;
     if (params.quality) payload.quality = params.quality;
     if (params.mode) payload.mode = params.mode;
-    if (!mediaCapabilities.image.field && params.image_url) payload.image_url = params.image_url;
-    if (!mediaCapabilities.image.field && params.images_list?.length > 0) payload.images_list = params.images_list;
-    if (!mediaCapabilities.video.field && params.videos_list?.length > 0) payload.videos_list = params.videos_list;
-    if (!mediaCapabilities.video.field && params.video_files?.length > 0) payload.video_files = params.video_files;
+    if (params.image_url) payload.image_url = params.image_url;
+    if (params.images_list?.length > 0) payload.images_list = params.images_list;
+    if (params.videos_list?.length > 0) payload.videos_list = params.videos_list;
+    if (params.video_files?.length > 0) payload.video_files = params.video_files;
     Object.assign(payload, serializeVideoToolOptions(modelInfo, params.options));
     payload = includeRequiredArrayDefaults(modelInfo, payload);
     return submitAndPoll(endpoint, payload, apiKey, params.onRequestId, 900);
@@ -187,7 +184,6 @@ export async function generateI2V(apiKey, params) {
     if (params.aspect_ratio) payload.aspect_ratio = params.aspect_ratio;
     if (params.duration) payload.duration = params.duration;
     if (params.resolution) payload.resolution = params.resolution;
-    if (typeof params.generate_audio === 'boolean') payload.generate_audio = params.generate_audio;
     if (params.quality) payload.quality = params.quality;
     if (params.mode) payload.mode = params.mode;
     if (modelInfo?.inputs?.name) {
@@ -214,19 +210,12 @@ export async function processV2V(apiKey, params) {
     const endpoint = modelInfo?.endpoint || params.model;
     const toolPayload = buildVideoToolPayload(modelInfo, params);
     let payload = {
+        ...mapReferenceParams(modelInfo, params),
         ...buildSupplementalInputPayload(modelInfo, params),
         ...toolPayload,
-        ...mapReferenceParams(modelInfo, params),
     };
     if (modelInfo?.hasPrompt && params.prompt) {
         payload.prompt = params.prompt;
-    }
-    if (getSeedanceConfiguration(modelInfo?.id)) {
-        for (const field of ['duration', 'aspect_ratio', 'resolution', 'quality']) {
-            if (modelInfo.inputs?.[field] && params[field] !== undefined) {
-                payload[field] = params[field];
-            }
-        }
     }
     payload = includeRequiredArrayDefaults(modelInfo, payload);
     return submitAndPoll(endpoint, payload, apiKey, params.onRequestId, 900);
