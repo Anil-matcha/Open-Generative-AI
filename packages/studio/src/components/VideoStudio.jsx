@@ -7,6 +7,7 @@ import { formatErrorMessage } from "../utils/formatError.js";
 import { scopedPersistKey, migrateLegacyPersistKey } from "../persistKey.js";
 import DrawModal from "./DrawModal.jsx";
 import ModelParameterControls from "./ModelParameterControls.jsx";
+import { SeedanceOptionControl, SeedanceSettingsControl } from "./SeedanceControls.jsx";
 import MobileGenerationActions, {
   GenerationCopyButtons,
 } from "./MobileGenerationActions.jsx";
@@ -24,9 +25,25 @@ import {
 import {
   getFamilyVariant,
   videoModelCatalog,
-  videoModelPickerEntries,
-  videoModelPickerEntryByVariantId,
+  videoModelMenuEntries as videoModelPickerEntries,
+  videoModelMenuEntryByVariantId as videoModelPickerEntryByVariantId,
 } from "../modelFamilies.js";
+import {
+  getSeedanceConfiguration,
+  getSeedanceEndpointResolution,
+  getSeedanceVariantOptions,
+  getSeedanceToolConfiguration,
+} from "../seedanceModels.js";
+import {
+  getSeedanceCommonOptions,
+  getSeedanceCommonValues,
+  getSeedanceResolutionOptions,
+  planSeedanceSelection,
+  getSeedanceSelectionAdjustments,
+  buildSeedanceCommonPayload,
+  migrateSeedanceResolutionSelection,
+} from "../seedanceParameters.js";
+import { getSeedanceModeDescription } from "../seedanceCopy.js";
 import {
   buildReferenceParams,
   getModelMediaCapabilities,
@@ -38,6 +55,7 @@ import {
   createModelParameterValues,
   getSupplementalModelInputs,
 } from "../modelParameters.js";
+import { isContinuationSourceModel } from "../videoToolCapabilities.js";
 import {
   appendVideoWorkflowMedia,
   buildVideoWorkflowMediaParams,
@@ -76,6 +94,7 @@ import {
   promptControlClassName,
   promptMediaButtonClassName,
 } from "./prompt/PromptComposer.jsx";
+import usePromptMenu from "./prompt/usePromptMenu.js";
 import en from "../messages/en/videoStudio.json";
 import zh from "../messages/zh/videoStudio.json";
 import { resolveCopy } from "../i18nUtils";
@@ -413,6 +432,14 @@ const PROVIDER_LOGOS = {
 
 const invertLogos = ['openai', 'blackforest', 'runway', 'ideogram', 'lightricks', 'grok'];
 
+function seedanceToolLabel(tool, copy, includeAction = false) {
+  return [
+    includeAction ? copy.seedance.toolNames[tool.group] : null,
+    copy.seedance.toolVariants[tool.variant],
+    tool.resolution,
+  ].filter(Boolean).join(" · ");
+}
+
 function ModelDropdown({ selectedModel, onSelect, onClose, copy = en }) {
   const [search, setSearch] = useState("");
   const selectedEntry = videoModelPickerEntryByVariantId.get(selectedModel);
@@ -516,6 +543,14 @@ function ModelDropdown({ selectedModel, onSelect, onClose, copy = en }) {
     // 2. Filter by search query
     return entry.searchText.includes(lf);
   });
+  const selectedTool = getSeedanceToolConfiguration(selectedModel);
+  const mainEntries = [];
+  const seedanceToolsByGroup = { continueGenerated: [], removeWatermark: [] };
+  for (const entry of filtered) {
+    const tool = getSeedanceToolConfiguration(entry.defaultVariant.model.id);
+    if (tool) seedanceToolsByGroup[tool.group][tool.order] = entry;
+    else mainEntries.push(entry);
+  }
 
   const getIconColor = (family) => {
     if (family.id.includes("kling")) return "bg-blue-500/10 text-blue-400 border-blue-500/10";
@@ -524,14 +559,16 @@ function ModelDropdown({ selectedModel, onSelect, onClose, copy = en }) {
     return "bg-primary/10 text-primary border-primary/10";
   };
 
-  const renderItem = (entry) => {
+  const renderItem = (entry, label = entry.name) => {
     const { family } = entry;
     const isSelected = selectedEntry === entry;
     return (
-    <div
+    <button
+      type="button"
       key={entry.id}
+      aria-pressed={isSelected}
       ref={isSelected ? activeItemRef : null}
-      className={`flex items-center justify-between p-3.5 hover:bg-white/5 rounded-2xl cursor-pointer transition-all border border-transparent hover:border-white/5 ${isSelected ? "bg-white/5 border-white/5" : ""}`}
+      className={`flex w-full text-left items-center justify-between p-3.5 hover:bg-white/5 rounded-2xl cursor-pointer transition-all border border-transparent hover:border-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary ${isSelected ? "bg-white/5 border-white/5" : ""}`}
       onClick={(e) => {
         e.stopPropagation();
         onSelect(entry, activeCategory.id);
@@ -556,7 +593,7 @@ function ModelDropdown({ selectedModel, onSelect, onClose, copy = en }) {
         )}
         <div className="flex flex-col gap-0.5 min-w-0">
           <span className="text-xs font-bold text-white tracking-tight truncate">
-            {entry.name}
+            {label}
           </span>
           <div className="flex items-center gap-1.5">
             {selectedProvider === "all" && family.provider_name && (
@@ -568,7 +605,7 @@ function ModelDropdown({ selectedModel, onSelect, onClose, copy = en }) {
         </div>
       </div>
       {isSelected && <CheckSvg />}
-    </div>
+    </button>
     );
   };
 
@@ -686,7 +723,25 @@ function ModelDropdown({ selectedModel, onSelect, onClose, copy = en }) {
               No models found
             </div>
           ) : (
-            filtered.map((entry) => renderItem(entry))
+            <>
+              {mainEntries.map((entry) => renderItem(entry))}
+              {mainEntries.length < filtered.length && (
+                <details open={Boolean(search.trim()) || Boolean(selectedTool)} className="mt-2 border-t border-white/5 pt-2">
+                  <summary className="cursor-pointer px-3 py-2 text-xs font-semibold text-white/50">
+                    {copy.seedance.tools}
+                  </summary>
+                  {["continueGenerated", "removeWatermark"].map((group) => {
+                    const entries = seedanceToolsByGroup[group].filter(Boolean);
+                    return entries.length > 0 && (
+                      <div key={group} role="group" aria-label={copy.seedance[group]} className="pt-2">
+                        <p className="px-3 pb-1 text-[11px] font-semibold text-white/60">{copy.seedance[group]}</p>
+                        {entries.map((entry) => renderItem(entry, seedanceToolLabel(getSeedanceToolConfiguration(entry.defaultVariant.model.id), copy)))}
+                      </div>
+                    );
+                  })}
+                </details>
+              )}
+            </>
           )}
         </div>
       </div>
@@ -713,7 +768,7 @@ export default function VideoStudio({
   onFilesHandled,
   locale = "en",
 }) {
-  const copy = resolveCopy(en, zh, locale);
+  const copy = useMemo(() => resolveCopy(en, zh, locale), [locale]);
   const LEGACY_PERSIST_KEY = "hg_video_studio_persistent";
   const PERSIST_KEY = scopedPersistKey(LEGACY_PERSIST_KEY, apiKey);
   useEffect(() => {
@@ -771,6 +826,8 @@ export default function VideoStudio({
   const [audioProgress, setAudioProgress] = useState(0);
   const [workflowMediaDrafts, setWorkflowMediaDrafts] = useState({});
   const [workflowUploadSlotId, setWorkflowUploadSlotId] = useState(null);
+  const mediaUploading = imageUploading || endImageUploading || videoUploading ||
+    audioUploading || Boolean(workflowUploadSlotId);
   const uploadedImageUrl = uploadedImageUrls[0] || null;
   const uploadedVideoUrl = uploadedVideoUrls[0] || null;
 
@@ -803,9 +860,6 @@ export default function VideoStudio({
   const videoFileInputRef = useRef(null);
   const audioFileInputRef = useRef(null);
   const resultVideoRef = useRef(null);
-  const workflowTriggerRef = useRef(null);
-  const workflowMenuRef = useRef(null);
-  const workflowMenuFocusTargetRef = useRef("selected");
   const workflowControlId = useId();
   const workflowMenuId = `${workflowControlId}-menu`;
   const hasRestored = useRef(false);
@@ -829,6 +883,13 @@ export default function VideoStudio({
   };
   const workflowMediaDraftsRef = useRef(workflowMediaDrafts);
   workflowMediaDraftsRef.current = workflowMediaDrafts;
+  const commonParameterValuesRef = useRef(null);
+  commonParameterValuesRef.current = {
+    aspectRatio: selectedAr,
+    duration: selectedDuration,
+    resolution: selectedResolution,
+    quality: selectedQuality,
+  };
 
   // ── derived data ──
   const history = historyItems ?? localHistory;
@@ -847,7 +908,9 @@ export default function VideoStudio({
 
   const getCurrentAspectRatios = useCallback(
     (id) =>
-      imageMode
+      getSeedanceConfiguration(id)
+        ? getSeedanceCommonOptions(videoModelCatalog.variantById.get(id)?.model).aspectRatios
+        : imageMode
         ? getAspectRatiosForI2VModel(id)
         : getAspectRatiosForVideoModel(id),
     [imageMode],
@@ -855,7 +918,9 @@ export default function VideoStudio({
 
   const getCurrentDurations = useCallback(
     (id) =>
-      imageMode ? getDurationsForI2VModel(id) : getDurationsForModel(id),
+      getSeedanceConfiguration(id)
+        ? getSeedanceCommonOptions(videoModelCatalog.variantById.get(id)?.model).durations
+        : imageMode ? getDurationsForI2VModel(id) : getDurationsForModel(id),
     [imageMode],
   );
 
@@ -884,6 +949,22 @@ export default function VideoStudio({
   // ── update controls when the selected model changes ─────────────────────
   const applyControlsForModel = useCallback(
     (modelId, isImageMode, isV2vMode) => {
+      if (getSeedanceConfiguration(modelId)) {
+        const model = videoModelCatalog.variantById.get(modelId)?.model;
+        const options = getSeedanceCommonOptions(model);
+        const values = getSeedanceCommonValues(model, commonParameterValuesRef.current);
+        setShowAr(options.aspectRatios.length > 0);
+        setShowDuration(options.durations.length > 0);
+        setShowResolution(options.resolutions.length > 0);
+        setShowQuality(options.qualities.length > 0);
+        setShowEffect(false);
+        if (values.aspectRatio !== undefined) setSelectedAr(values.aspectRatio);
+        if (values.duration !== undefined) setSelectedDuration(values.duration);
+        const resolution = values.resolution ?? getSeedanceEndpointResolution(modelId);
+        if (resolution !== undefined) setSelectedResolution(resolution);
+        if (values.quality !== undefined) setSelectedQuality(values.quality);
+        return;
+      }
       if (isV2vMode) {
         setShowAr(false);
         setShowDuration(false);
@@ -953,7 +1034,10 @@ export default function VideoStudio({
   const selectedWorkflow = selectedWorkflowId
     ? workflowFamily?.workflowById.get(selectedWorkflowId) || null
     : null;
-  const workflowControlState = getVideoWorkflowControlState(
+  const seedanceConfiguration = getSeedanceConfiguration(selectedModel);
+  const workflowControlState = seedanceConfiguration && workflowFamily
+    ? { kind: "menu", workflow: null }
+    : getVideoWorkflowControlState(
     workflowFamily,
     selectedModel,
   );
@@ -962,6 +1046,86 @@ export default function VideoStudio({
     : null;
   const selectedVariant = videoModelCatalog.variantById.get(selectedModel);
   const selectedPickerEntry = videoModelPickerEntryByVariantId.get(selectedModel);
+  const selectedTool = getSeedanceToolConfiguration(selectedModel);
+  const selectedPickerLabel = selectedTool
+    ? seedanceToolLabel(selectedTool, copy, true)
+    : selectedPickerEntry?.name || selectedFamily.name;
+  const getSeedancePlan = useCallback((options = {}) => planSeedanceSelection({
+    familyId: selectedFamilyId,
+    workflowId: selectedWorkflowId,
+    currentModelId: selectedModel,
+    nativeResolution: selectedResolution,
+    commonValues: {
+      aspectRatio: selectedAr, duration: selectedDuration,
+      resolution: selectedResolution, quality: selectedQuality,
+    },
+    ...options,
+  }), [selectedFamilyId, selectedWorkflowId, selectedModel, selectedResolution, selectedAr, selectedDuration, selectedQuality]);
+  const describeSeedanceAdjustments = useCallback((adjustments) => {
+    const valueLabel = (key, value) => {
+      if (key === "profile") return copy.seedance.profiles[value]?.label || value;
+      if (key === "speed") return copy.seedance.speeds[value] || value;
+      if (key === "resolution" && value === "default") return copy.seedance.defaultResolution;
+      return String(value).toLowerCase() === "4k" ? "4K" : value;
+    };
+    return adjustments.map(({ key, to }) =>
+      copy.seedance.adjustments[key].replace("{value}", valueLabel(key, to))).join(" · ");
+  }, [copy]);
+  const seedanceVariantOptions = useMemo(() => seedanceConfiguration
+    ? getSeedanceVariantOptions(selectedFamilyId, selectedWorkflowId, selectedModel)
+      .filter((field) => field.key !== "resolution")
+      .map((field) => ({
+        ...field,
+        options: field.options.map((option) => {
+          const plan = getSeedancePlan({ changes: { [field.key]: option.value } });
+          return {
+            ...option,
+            disabled: !plan,
+            adjustmentDescription: plan ? describeSeedanceAdjustments(plan.adjustments) : "",
+          };
+        }),
+      }))
+    : [], [seedanceConfiguration, selectedFamilyId, selectedWorkflowId, selectedModel, getSeedancePlan, describeSeedanceAdjustments, copy]);
+  const seedanceProfile = seedanceVariantOptions.find((field) => field.key === "profile");
+  const seedanceSpeed = seedanceVariantOptions.find((field) => field.key === "speed");
+  const seedanceResolution = useMemo(() => {
+    if (!seedanceConfiguration) return null;
+    const field = getSeedanceResolutionOptions(selectedFamilyId, selectedWorkflowId, selectedModel, selectedResolution, {
+      aspectRatio: selectedAr, duration: selectedDuration, quality: selectedQuality,
+    });
+    return {
+      ...field,
+      key: "resolution",
+      ...(!field.value && selectedWorkflowId !== "extend_uploaded_video"
+        ? { label: copy.seedance.defaultResolution } : {}),
+      options: field.options.map((option) => {
+        const adjustments = option.disabled ? [] : getSeedanceSelectionAdjustments({
+          currentModelId: selectedModel, nativeResolution: selectedResolution,
+          commonValues: { aspectRatio: selectedAr, duration: selectedDuration, quality: selectedQuality },
+          selection: option, changes: { resolution: option.value },
+        });
+        return { ...option, adjustmentDescription: describeSeedanceAdjustments(adjustments) };
+      }),
+    };
+  }, [seedanceConfiguration, selectedFamilyId, selectedWorkflowId, selectedModel, selectedResolution, selectedAr, selectedDuration, selectedQuality, describeSeedanceAdjustments, copy]);
+  const seedanceCommonOptions = useMemo(
+    () => getSeedanceCommonOptions(selectedVariant?.model), [selectedVariant],
+  );
+  const seedanceModes = useMemo(() => seedanceConfiguration && workflowFamily
+    ? [...(workflowFamily.hasBase ? [{ id: null }] : []), ...workflowFamily.workflows].map((workflow) => {
+        const plan = getSeedancePlan({ workflowId: workflow.id });
+        return {
+          id: workflow.id,
+          label: copy.seedance.modes[workflow.id || "text"],
+          description: getSeedanceModeDescription(
+            videoModelCatalog.variantById.get(plan?.selection.modelId)?.model,
+            workflow.id, copy.seedance,
+          ),
+          adjustmentDescription: plan ? describeSeedanceAdjustments(plan.adjustments) : "",
+          disabled: !plan,
+        };
+      })
+    : [], [seedanceConfiguration, workflowFamily, getSeedancePlan, describeSeedanceAdjustments, copy]);
   const activeWorkflowMediaDraft = useMemo(
     () => workflowMediaDraftKey
       ? projectVideoWorkflowMedia(
@@ -988,7 +1152,22 @@ export default function VideoStudio({
     [selectedVariant, selectedWorkflowId],
   );
   const currentModelCapabilities = getModelMediaCapabilities(selectedVariant?.model);
-  const supplementalInputs = getSupplementalModelInputs(selectedVariant?.model);
+  const supplementalInputs = useMemo(
+    () => {
+      const inputs = getSupplementalModelInputs(selectedVariant?.model);
+      return seedanceConfiguration
+        ? inputs.filter(({ key }) => key !== "omni_reference_task_type").map(({ key, schema }) => ({
+            key, schema: {
+              ...schema, ...copy.seedance.fields[key],
+              ...(key === "generate_audio" && selectedWorkflowId === "edit_video" ? copy.seedance.editAudio : {}),
+            },
+          }))
+        : inputs;
+    }, [selectedVariant, seedanceConfiguration, selectedWorkflowId, copy],
+  );
+  const handleModelParameterChange = useCallback((key, value) => {
+    setModelParameterValues((values) => ({ ...values, [key]: value }));
+  }, []);
 
   const applySelectedVariant = useCallback(
     (variant, mode, family, workflowId = null) => {
@@ -1075,7 +1254,7 @@ export default function VideoStudio({
         let restoredFamilyId = defaultFamily.id;
         if (data.selectedModel) {
           const restored = resolvePersistedVideoWorkflowSelection(
-            data.selectedModel,
+            migrateSeedanceResolutionSelection(data.selectedModel, data.selectedResolution),
             data.selectedWorkflowId || null,
             { hasEndFrame: Boolean(data.uploadedEndImageUrl) },
           );
@@ -1144,6 +1323,12 @@ export default function VideoStudio({
         if (data.localHistory) setLocalHistory(data.localHistory);
 
         // Update control visibility based on restored model/mode
+        commonParameterValuesRef.current = {
+          aspectRatio: data.selectedAr,
+          duration: data.selectedDuration,
+          resolution: data.selectedResolution,
+          quality: data.selectedQuality,
+        };
         applyControlsForModel(
           restoredModelId,
           restoredMode === "i2v",
@@ -1340,7 +1525,7 @@ export default function VideoStudio({
       setProgress(0);
       try {
         const progress = new Array(selectedFiles.length).fill(0);
-        return await Promise.all(
+        const results = await Promise.allSettled(
           selectedFiles.map((file, index) =>
             uploadFile(apiKey, file, (value) => {
               progress[index] = value;
@@ -1349,6 +1534,19 @@ export default function VideoStudio({
               );
             }),
           ),
+        );
+        const failures = results.flatMap((result, index) =>
+          result.status === "rejected"
+            ? [`${selectedFiles[index].name}: ${result.reason?.message || result.reason}`]
+            : [],
+        );
+        if (failures.length > 0) {
+          alert(copy.errors.labelUploadFailed
+            .replace('{label}', label)
+            .replace('{message}', failures.join('\n')));
+        }
+        return results.flatMap((result) =>
+          result.status === "fulfilled" ? [result.value] : [],
         );
       } catch (err) {
         console.error(`[VideoStudio] ${label} upload failed:`, err);
@@ -1359,7 +1557,7 @@ export default function VideoStudio({
         setProgress(0);
       }
     },
-    [apiKey],
+    [apiKey, copy.errors.labelExceedsLimit, copy.errors.labelUploadFailed],
   );
 
   const uploadWorkflowSlotFiles = useCallback(
@@ -1671,10 +1869,51 @@ export default function VideoStudio({
     setUploadedAudioUrls((urls) => urls.filter((_, itemIndex) => itemIndex !== index));
   };
 
+  const handleSeedanceSelection = useCallback((plan, family, workflowId) => {
+    if (!plan) {
+      toast.error(copy.seedance.incompatible);
+      return;
+    }
+    const { selection, adjustments } = plan;
+    const target = videoModelCatalog.variantById.get(selection.modelId);
+    applyUserSelectedVariant(target, target.mode, family, workflowId);
+    if (selection.resolution !== undefined) setSelectedResolution(selection.resolution);
+    if (adjustments.length) {
+      toast(describeSeedanceAdjustments(adjustments));
+    }
+  }, [applyUserSelectedVariant, describeSeedanceAdjustments, copy]);
+
   // ── model selection from dropdown ─────────────────────────────────────────
   const handleModelSelect = useCallback(
     (pickerEntry, category = "all") => {
       const { family, variantsByMode, defaultVariant } = pickerEntry;
+      if (pickerEntry.groupedSeedance) {
+        // Reopening the model picker must not reset a configured version.
+        if (family.id === selectedFamilyId &&
+            (category === "all" || (category === currentFamilyMode &&
+              (category !== "t2v" || !selectedWorkflowId))) &&
+            pickerEntry.variantIds.has(selectedModel)) return;
+        const candidate = category !== "all"
+          ? variantsByMode[category]
+          : variantsByMode[currentFamilyMode] || defaultVariant;
+        if (!candidate) return;
+        const targetFamily = getVideoWorkflowFamily(family.id);
+        const workflowId = category === "all" && selectedWorkflowId &&
+          targetFamily?.workflowById.has(selectedWorkflowId)
+          ? selectedWorkflowId
+          : inferVideoWorkflowId(family.id, candidate.model.id);
+        const remembered = workflowVariantPreferencesRef.current.get(
+          workflowContextKey(family.id, workflowId),
+        );
+        const plan = getSeedancePlan({
+          familyId: family.id,
+          workflowId,
+          currentModelId: family.id === selectedFamilyId ? selectedModel : remembered,
+          nativeResolution: family.id === selectedFamilyId ? selectedResolution : undefined,
+        });
+        handleSeedanceSelection(plan, family, workflowId);
+        return;
+      }
       const target = category !== "all"
         ? variantsByMode[category]
         : variantsByMode[currentFamilyMode] || defaultVariant;
@@ -1685,7 +1924,11 @@ export default function VideoStudio({
         const workflowId = targetWorkflowFamily.base.variantIds.has(target.model.id) ||
           targetWorkflowFamily.unmanagedVariantIds.has(target.model.id)
           ? null
-          : inferVideoWorkflowId(family.id, target.model.id);
+          : inferVideoWorkflowId(family.id, target.model.id, {
+              preferredWorkflowId: family.id === selectedFamilyId
+                ? selectedWorkflowId
+                : null,
+            });
         applyUserSelectedVariant(target, target.mode, family, workflowId);
         return;
       }
@@ -1694,11 +1937,21 @@ export default function VideoStudio({
     },
     [
       applyUserSelectedVariant,
+      handleSeedanceSelection,
+      getSeedancePlan,
       currentFamilyMode,
+      selectedFamilyId,
+      selectedWorkflowId,
+      selectedModel,
+      selectedResolution,
     ],
   );
 
   const handleWorkflowSelect = useCallback((workflowId) => {
+    if (getSeedanceConfiguration(selectedModel)) {
+      handleSeedanceSelection(getSeedancePlan({ workflowId }), selectedFamily, workflowId);
+      return;
+    }
     const preferred = workflowVariantPreferencesRef.current.get(
       workflowContextKey(selectedFamilyId, workflowId),
     );
@@ -1711,9 +1964,13 @@ export default function VideoStudio({
     if (target) {
       applyUserSelectedVariant(target, target.mode, selectedFamily, workflowId);
     }
-  }, [applyUserSelectedVariant, selectedFamily, selectedFamilyId, selectedModel]);
+  }, [applyUserSelectedVariant, selectedFamily, selectedFamilyId, selectedModel, getSeedancePlan, handleSeedanceSelection]);
 
   const clearWorkflow = useCallback(() => {
+    if (getSeedanceConfiguration(selectedModel)) {
+      handleSeedanceSelection(getSeedancePlan({ workflowId: null }), selectedFamily, null);
+      return;
+    }
     const preferred = workflowVariantPreferencesRef.current.get(
       workflowContextKey(selectedFamilyId, null),
     );
@@ -1723,7 +1980,24 @@ export default function VideoStudio({
       preferred,
     );
     if (target) applyUserSelectedVariant(target, target.mode, selectedFamily, null);
-  }, [applyUserSelectedVariant, selectedFamily, selectedFamilyId, selectedModel]);
+  }, [applyUserSelectedVariant, selectedFamily, selectedFamilyId, selectedModel, getSeedancePlan, handleSeedanceSelection]);
+
+  const handleSeedanceOptionChange = useCallback((key, value) => {
+    handleSeedanceSelection(getSeedancePlan({ changes: { [key]: value } }), selectedFamily, selectedWorkflowId);
+  }, [selectedFamily, selectedWorkflowId, getSeedancePlan, handleSeedanceSelection]);
+
+  const handleSeedanceResolutionChange = useCallback((option) => {
+    if (option.disabled) return;
+    const adjustments = getSeedanceSelectionAdjustments({
+      currentModelId: selectedModel,
+      nativeResolution: selectedResolution,
+      commonValues: commonParameterValuesRef.current,
+      selection: option,
+      changes: { resolution: option.value },
+    });
+    handleSeedanceSelection({ selection: option, adjustments }, selectedFamily, selectedWorkflowId);
+    setOpenDropdown(null);
+  }, [handleSeedanceSelection, selectedFamily, selectedWorkflowId, selectedModel, selectedResolution]);
 
   // ── add to local history ──────────────────────────────────────────────────
   const addToLocalHistory = useCallback((entry) => {
@@ -1740,7 +2014,26 @@ export default function VideoStudio({
 
   // ── generate ──────────────────────────────────────────────────────────────
   const handleGenerate = useCallback(async () => {
+    if (mediaUploading || workflowUploadSlotRef.current) {
+      toast.error(copy.errors.waitForCurrentUpload);
+      return;
+    }
     const currentModel = getCurrentModel();
+    const seedance = getSeedanceConfiguration(selectedModel);
+    const generationParameterValues = seedance && currentModel.inputs?.omni_reference_task_type
+      ? { ...modelParameterValues, omni_reference_task_type: "auto" }
+      : modelParameterValues;
+    const seedanceCommonParams = seedance
+      ? buildSeedanceCommonPayload(currentModel, {
+          aspectRatio: selectedAr, duration: selectedDuration,
+          resolution: selectedResolution, quality: selectedQuality,
+        })
+      : {};
+    const seedanceHistorySettings = seedance ? {
+      ...seedanceCommonParams,
+      workflowId: selectedWorkflowId,
+      modelParameterValues: { ...generationParameterValues },
+    } : {};
     const isExtendMode = currentModel?.requiresRequestId;
     const capabilities = getModelMediaCapabilities(currentModel);
     const requestSource = generationSources[selectedFamily.id];
@@ -1791,8 +2084,8 @@ export default function VideoStudio({
         return;
       }
     } else if (isExtendMode) {
-      if (!requestSource?.requestId) {
-        alert(`No ${selectedFamily.name} generation found to continue.`);
+      if (!requestSource?.requestId || (selectedFamily.id === "seedance-2" && !isContinuationSourceModel(currentModel, requestSource.modelId))) {
+        alert(copy.errors.noContinuationSource.replace("{family}", selectedFamily.name));
         return;
       }
     } else if (imageMode) {
@@ -1828,7 +2121,8 @@ export default function VideoStudio({
         // remover) and motion-control models (which take video + image + prompt)
         const v2vParams = {
           model: selectedModel,
-          ...buildSupplementalInputPayload(currentModel, modelParameterValues),
+          ...buildSupplementalInputPayload(currentModel, generationParameterValues),
+          ...seedanceCommonParams,
           ...referenceParams,
         };
         if (currentModel?.hasPrompt && trimmedPrompt) {
@@ -1843,6 +2137,7 @@ export default function VideoStudio({
           url: res.url,
           prompt: currentModel?.hasPrompt ? trimmedPrompt : "",
           model: selectedModel,
+          ...seedanceHistorySettings,
           timestamp: new Date().toISOString(),
         };
         addToLocalHistory(entry);
@@ -1857,17 +2152,18 @@ export default function VideoStudio({
       } else if (imageMode) {
         const i2vParams = {
           model: selectedModel,
-          ...buildSupplementalInputPayload(currentModel, modelParameterValues),
+          ...buildSupplementalInputPayload(currentModel, generationParameterValues),
+          ...seedanceCommonParams,
           ...referenceParams,
         };
         if (trimmedPrompt) i2vParams.prompt = trimmedPrompt;
         const aspectRatios = getAspectRatiosForI2VModel(selectedModel);
-        if (aspectRatios.length > 0) i2vParams.aspect_ratio = selectedAr;
+        if (!seedance && aspectRatios.length > 0) i2vParams.aspect_ratio = selectedAr;
         const durations = getDurationsForI2VModel(selectedModel);
-        if (durations.length > 0) i2vParams.duration = selectedDuration;
+        if (!seedance && durations.length > 0) i2vParams.duration = selectedDuration;
         const resolutions = getResolutionsForI2VModel(selectedModel);
-        if (resolutions.length > 0) i2vParams.resolution = selectedResolution;
-        if (selectedQuality) i2vParams.quality = selectedQuality;
+        if (!seedance && resolutions.length > 0) i2vParams.resolution = selectedResolution;
+        if (!seedance && selectedQuality) i2vParams.quality = selectedQuality;
         if (showEffect && selectedEffect) i2vParams.name = selectedEffect;
 
         res = await generateI2V(apiKey, i2vParams);
@@ -1884,6 +2180,7 @@ export default function VideoStudio({
           model: selectedModel,
           ...(aspectRatios.length > 0 ? { aspect_ratio: selectedAr } : {}),
           duration: selectedDuration,
+          ...seedanceHistorySettings,
           timestamp: new Date().toISOString(),
         };
         addToLocalHistory(entry);
@@ -1899,22 +2196,23 @@ export default function VideoStudio({
         // T2V (including extend mode)
         const params = {
           model: selectedModel,
-          ...buildSupplementalInputPayload(currentModel, modelParameterValues),
+          ...buildSupplementalInputPayload(currentModel, generationParameterValues),
+          ...seedanceCommonParams,
           ...referenceParams,
         };
         if (trimmedPrompt) params.prompt = trimmedPrompt;
 
         if (isExtendMode) {
           params.request_id = requestSource.requestId;
-        } else {
+        } else if (!seedance) {
           params.aspect_ratio = selectedAr;
         }
 
         const durations = getDurationsForModel(selectedModel);
-        if (durations.length > 0) params.duration = selectedDuration;
+        if (!seedance && durations.length > 0) params.duration = selectedDuration;
         const resolutions = getResolutionsForVideoModel(selectedModel);
-        if (resolutions.length > 0) params.resolution = selectedResolution;
-        if (selectedQuality) params.quality = selectedQuality;
+        if (!seedance && resolutions.length > 0) params.resolution = selectedResolution;
+        if (!seedance && selectedQuality) params.quality = selectedQuality;
 
         res = await generateVideo(apiKey, params);
         if (!res?.url) throw new Error(copy.errors.noVideoUrlReturned);
@@ -1930,6 +2228,7 @@ export default function VideoStudio({
           model: selectedModel,
           aspect_ratio: selectedAr,
           duration: selectedDuration,
+          ...seedanceHistorySettings,
           timestamp: new Date().toISOString(),
         };
         addToLocalHistory(entry);
@@ -1953,6 +2252,7 @@ export default function VideoStudio({
     }
   }, [
     apiKey,
+    copy,
     prompt,
     v2vMode,
     imageMode,
@@ -1972,6 +2272,7 @@ export default function VideoStudio({
     uploadedAudioUrls,
     activeWorkflowMediaDraft,
     generationSources,
+    mediaUploading,
     getCurrentModel,
     addToLocalHistory,
     showVideoInCanvas,
@@ -2020,10 +2321,11 @@ export default function VideoStudio({
   }, [applyUserSelectedVariant, resetToPromptBar]);
 
   // ── derived UI values ────────────────────────────────────────────────────
-  const isSeedance2Canvas =
-    videoModelCatalog.familyByVariantId.get(canvasModel)?.id === "seedance-2";
   const currentModelObj = selectedVariant?.model;
   const isExtendMode = currentModelObj?.requiresRequestId;
+  const continuationSource = generationSources[selectedFamily.id];
+  const hasContinuationSource = continuationSource?.requestId &&
+    (!selectedTool || isContinuationSourceModel(currentModelObj, continuationSource.modelId));
   const isMotionControlModel = isMotionControlSelection(selectedModel, v2vMode);
   const workflowMediaConfig = selectedWorkflowId
     ? getVideoWorkflowMediaConfig(currentModelObj, selectedWorkflowId)
@@ -2080,99 +2382,19 @@ export default function VideoStudio({
               ? copy.placeholders.optionalContinueVideo
               : copy.placeholders.describeVideo;
 
-  const focusWorkflowMenuItem = useCallback((target = "selected") => {
-    const items = Array.from(
-      workflowMenuRef.current?.querySelectorAll(
-        '[role="menuitemradio"], [role="menuitem"]',
-      ) || [],
-    );
-    if (items.length === 0) return;
-
-    const item = target === "last"
-      ? items[items.length - 1]
-      : target === "first"
-        ? items[0]
-        : items.find((candidate) => candidate.getAttribute("aria-checked") === "true") ||
-          items[0];
-    item.focus();
-  }, []);
-
-  const closeWorkflowMenu = useCallback((restoreFocus = false) => {
-    setOpenDropdown(null);
-    if (restoreFocus) {
-      requestAnimationFrame(() => workflowTriggerRef.current?.focus());
-    }
-  }, []);
-
-  const handleWorkflowTriggerKeyDown = useCallback(
-    (event) => {
-      const focusTarget = event.key === "ArrowUp" || event.key === "End"
-        ? "last"
-        : event.key === "ArrowDown" || event.key === "Home"
-          ? "first"
-          : null;
-      if (!focusTarget) return;
-
-      event.preventDefault();
-      event.stopPropagation();
-      if (openDropdown === "workflow") {
-        focusWorkflowMenuItem(focusTarget);
-        return;
-      }
-      workflowMenuFocusTargetRef.current = focusTarget;
-      setOpenDropdown("workflow");
-    },
-    [focusWorkflowMenuItem, openDropdown],
-  );
-
-  const handleWorkflowMenuKeyDown = useCallback(
-    (event) => {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        event.stopPropagation();
-        closeWorkflowMenu(true);
-        return;
-      }
-      if (event.key === "Tab") {
-        setOpenDropdown(null);
-        return;
-      }
-      if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
-
-      const items = Array.from(
-        workflowMenuRef.current?.querySelectorAll(
-          '[role="menuitemradio"], [role="menuitem"]',
-        ) || [],
-      );
-      if (items.length === 0) return;
-
-      event.preventDefault();
-      event.stopPropagation();
-      const currentIndex = items.indexOf(document.activeElement);
-      const nextIndex = event.key === "Home"
-        ? 0
-        : event.key === "End"
-          ? items.length - 1
-          : event.key === "ArrowDown"
-            ? currentIndex < 0
-              ? 0
-              : (currentIndex + 1) % items.length
-            : currentIndex < 0
-              ? items.length - 1
-              : (currentIndex - 1 + items.length) % items.length;
-      items[nextIndex].focus();
-    },
-    [closeWorkflowMenu],
-  );
-
-  useEffect(() => {
-    if (openDropdown !== "workflow") return undefined;
-    const frame = requestAnimationFrame(() => {
-      focusWorkflowMenuItem(workflowMenuFocusTargetRef.current);
-      workflowMenuFocusTargetRef.current = "selected";
-    });
-    return () => cancelAnimationFrame(frame);
-  }, [focusWorkflowMenuItem, openDropdown, selectedWorkflowId]);
+  const {
+    triggerRef: workflowTriggerRef,
+    menuRef: workflowMenuRef,
+    focusTargetRef: workflowMenuFocusTargetRef,
+    onTriggerKeyDown: handleWorkflowTriggerKeyDown,
+    onMenuKeyDown: handleWorkflowMenuKeyDown,
+    closeMenu: closeWorkflowMenu,
+  } = usePromptMenu({
+    open: openDropdown === "workflow",
+    onOpen: () => setOpenDropdown("workflow"),
+    onClose: () => setOpenDropdown(null),
+    selectionKey: selectedWorkflowId,
+  });
 
   const toggleDropdown = (type) => (e) => {
     e.stopPropagation();
@@ -2190,7 +2412,7 @@ export default function VideoStudio({
         {history.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full pt-4 animate-fade-in-up">
             {history.map((entry, idx) => {
-              const isSeedance2 = entry.model === "seedance-v2.0-t2v" || entry.model === "seedance-v2.0-i2v";
+              const isSeedance2 = isContinuationSourceModel("seedance-2-extend", entry.model);
               return (
                 <div
                   key={entry.id || idx}
@@ -2356,14 +2578,18 @@ export default function VideoStudio({
             </div>
 
             <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-center px-4 flex flex-col items-center">
-              <span className="text-white font-black uppercase text-xl sm:text-3xl tracking-wide mb-1 opacity-90">{copy.empty.heading}</span>
+              {!selectedTool && <span className="text-white font-black uppercase text-xl sm:text-3xl tracking-wide mb-1 opacity-90">{copy.empty.heading}</span>}
               <span className="text-[#22d3ee] font-black uppercase text-2xl sm:text-4xl sm:mt-1 tracking-tight">
-                {selectedFamily.name}
+                {selectedTool || selectedPickerEntry?.groupedSeedance ? selectedPickerLabel : selectedFamily.name}
               </span>
             </h1>
-            <p className="text-white/40 text-xs sm:text-sm font-medium tracking-wide text-center max-w-lg leading-relaxed px-4">
-              {copy.empty.subtitle}
-            </p>
+            {!selectedTool && (
+              <p className="text-white/40 text-xs sm:text-sm font-medium tracking-wide text-center max-w-lg leading-relaxed px-4">
+                {seedanceConfiguration
+                  ? getSeedanceModeDescription(selectedVariant.model, selectedWorkflowId, copy.seedance)
+                  : copy.empty.subtitle}
+              </p>
+            )}
           </div>
         )}
       </div>
@@ -2595,8 +2821,20 @@ export default function VideoStudio({
               >
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
-              <span>{copy.extend.continuingGeneration.replace('{family}', selectedFamily.name)}</span>
+              <span>{hasContinuationSource
+                ? copy.extend.continuingGeneration.replace('{family}', selectedFamily.name)
+                : copy.errors.noContinuationSource.replace("{family}", selectedFamily.name)}</span>
             </div>
+          )}
+
+          {seedanceConfiguration && selectedVariant.model.aspectRatioMode === "inherited" && (
+            <p className="px-2 text-[10px] text-white/40">{copy.seedance.inheritedFormat}</p>
+          )}
+          {seedanceConfiguration && selectedWorkflowId === "extend_uploaded_video" && seedanceResolution.options.length === 0 && (
+            <p className="px-2 text-[10px] text-white/40">{copy.seedance.inheritedVideoResolution}</p>
+          )}
+          {seedanceResolution?.label && (
+            <p className="px-2 text-[10px] text-white/40">{copy.seedance.resolutionUnknown}</p>
           )}
 
           {/* Bottom row: controls + generate */}
@@ -2626,7 +2864,7 @@ export default function VideoStudio({
                     })()}
                 </div>
                 <span className={PROMPT_CONTROL_LABEL_CLASS}>
-                    {selectedPickerEntry?.name || selectedFamily.name}
+                    {selectedPickerLabel}
                   </span>
                   <PromptChevronIcon />
                 </button>
@@ -2634,6 +2872,8 @@ export default function VideoStudio({
                   <PromptPopover
                     onClick={(e) => e.stopPropagation()}
                     className="w-[calc(100vw-2rem)] md:w-[480px] max-w-md md:max-w-none max-h-[70vh]"
+                    fitViewport={Boolean(seedanceConfiguration)}
+                    solid={Boolean(seedanceConfiguration)}
                   >
                     <PromptPopoverHeader>{copy.dropdowns.model}</PromptPopoverHeader>
                     <ModelDropdown
@@ -2697,14 +2937,18 @@ export default function VideoStudio({
                     })}
                   >
                     <span className={PROMPT_CONTROL_LABEL_CLASS}>
-                      {getVideoWorkflowControlLabel(selectedWorkflow)}
+                      {seedanceConfiguration
+                        ? copy.seedance.modes[selectedWorkflowId || "text"]
+                        : getVideoWorkflowControlLabel(selectedWorkflow)}
                     </span>
                     {workflowControlState.kind === "menu" && <PromptChevronIcon />}
                   </button>
                   {workflowControlState.kind === "menu" && openDropdown === "workflow" && (
                     <PromptPopover
-                      className="min-w-[210px]"
-                      style={{ maxHeight: "55vh" }}
+                      className={seedanceConfiguration ? "w-[300px] max-w-[calc(100vw-32px)]" : "min-w-[210px]"}
+                      fitViewport={Boolean(seedanceConfiguration)}
+                      solid={Boolean(seedanceConfiguration)}
+                      style={{ maxHeight: seedanceConfiguration ? "65vh" : "55vh" }}
                       onClick={(event) => event.stopPropagation()}
                     >
                       <PromptPopoverHeader>{copy.dropdowns.source}</PromptPopoverHeader>
@@ -2716,20 +2960,32 @@ export default function VideoStudio({
                         onKeyDown={handleWorkflowMenuKeyDown}
                         className="flex flex-col gap-1"
                       >
-                        {workflowFamily.workflows.map((workflow) => (
+                        {(seedanceConfiguration ? seedanceModes : workflowFamily.workflows).map((workflow) => (
                           <PromptMenuItem
-                            key={workflow.id}
+                            key={workflow.id || "text"}
                             selected={selectedWorkflowId === workflow.id}
+                            disabled={workflow.disabled}
+                            wrapDescription={Boolean(seedanceConfiguration)}
+                            description={seedanceConfiguration && (
+                              <>
+                                {workflow.description}
+                                {workflow.adjustmentDescription && (
+                                  <span className="mt-1 block text-amber-200/85">{workflow.adjustmentDescription}</span>
+                                )}
+                              </>
+                            )}
+                            className="disabled:opacity-40 disabled:cursor-not-allowed"
                             onClick={(event) => {
                               event.stopPropagation();
-                              handleWorkflowSelect(workflow.id);
+                              if (workflow.id === null) clearWorkflow();
+                              else handleWorkflowSelect(workflow.id);
                               closeWorkflowMenu(true);
                             }}
                           >
                             {workflow.label}
                           </PromptMenuItem>
                         ))}
-                        {selectedWorkflow && workflowFamily?.hasBase && (
+                        {!seedanceConfiguration && selectedWorkflow && workflowFamily?.hasBase && (
                           <div className="mt-2 border-t border-white/[0.05] pt-2">
                             <button
                               type="button"
@@ -2766,15 +3022,43 @@ export default function VideoStudio({
                 </div>
               )}
 
-              <ModelParameterControls
-                inputs={supplementalInputs}
-                values={modelParameterValues}
-                onChange={(key, value) =>
-                  setModelParameterValues((values) => ({ ...values, [key]: value }))
-                }
-                open={openDropdown === "parameters"}
-                onToggle={toggleDropdown("parameters")}
+              <SeedanceOptionControl
+                label={copy.seedance.speed}
+                field={seedanceSpeed}
+                open={openDropdown === "seedance-speed"}
+                onToggle={toggleDropdown("seedance-speed")}
+                onSelect={(option) => {
+                  handleSeedanceOptionChange("speed", option.value);
+                  setOpenDropdown(null);
+                }}
+                copy={copy.seedance}
               />
+
+              {seedanceConfiguration ? (
+                <SeedanceSettingsControl
+                  profile={seedanceProfile}
+                  onDefaultResolution={seedanceConfiguration.profile === "legacy" && seedanceConfiguration.resolution !== "default"
+                    ? () => handleSeedanceOptionChange("resolution", "default") : undefined}
+                  qualities={seedanceCommonOptions.qualities}
+                  quality={selectedQuality}
+                  onProfileChange={(value) => handleSeedanceOptionChange("profile", value)}
+                  onQualityChange={setSelectedQuality}
+                  inputs={supplementalInputs}
+                  values={modelParameterValues}
+                  onChange={handleModelParameterChange}
+                  open={openDropdown === "parameters"}
+                  onToggle={toggleDropdown("parameters")}
+                  copy={copy.seedance}
+                />
+              ) : (
+                <ModelParameterControls
+                  inputs={supplementalInputs}
+                  values={modelParameterValues}
+                  onChange={handleModelParameterChange}
+                  open={openDropdown === "parameters"}
+                  onToggle={toggleDropdown("parameters")}
+                />
+              )}
 
               {/* Aspect ratio btn */}
               {showAr && (
@@ -2891,7 +3175,9 @@ export default function VideoStudio({
                       onClick={(e) => e.stopPropagation()}
                     >
                       <PromptPopoverHeader>
-                        {copy.dropdowns.duration}
+                        {seedanceConfiguration && selectedWorkflowId === "extend_uploaded_video"
+                          ? copy.seedance.extensionDuration
+                          : copy.dropdowns.duration}
                       </PromptPopoverHeader>
                       <PromptMenuList>
                         {getCurrentDurations(selectedModel).map((d) => (
@@ -2914,7 +3200,16 @@ export default function VideoStudio({
               )}
 
               {/* Resolution btn */}
-              {showResolution && (
+              <SeedanceOptionControl
+                label={copy.dropdowns.resolution}
+                field={seedanceResolution}
+                icon={<PromptQualityIcon />}
+                open={openDropdown === "resolution"}
+                onToggle={toggleDropdown("resolution")}
+                onSelect={handleSeedanceResolutionChange}
+                copy={copy.seedance}
+              />
+              {!seedanceConfiguration && showResolution && (
                 <div className="relative">
                   <button
                     type="button"
@@ -2981,7 +3276,7 @@ export default function VideoStudio({
             {/* Generate button */}
             <PromptAction
               onClick={handleGenerate}
-              disabled={generating}
+              disabled={generating || mediaUploading || (selectedTool?.group === "continueGenerated" && !hasContinuationSource)}
             >
               {generating ? (
                 <>

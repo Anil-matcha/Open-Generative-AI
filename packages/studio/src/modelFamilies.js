@@ -6,6 +6,11 @@ import {
   v2vModels,
 } from "./models.js";
 import { getModelMediaCapabilities } from "./modelCapabilities.js";
+import {
+  getSeedanceConfiguration,
+  resolveSeedanceVariant,
+  SEEDANCE_FAMILY_NAMES,
+} from "./seedanceModels.js";
 
 const IMAGE_FAMILY_ALIASES = {
   "bytedance-seededit-v3": "bytedance-seedream-v3",
@@ -769,5 +774,67 @@ export const imageModelPickerEntryByVariantId = indexModelPickerEntries(
 
 export const videoModelPickerEntryByVariantId = indexModelPickerEntries(
   videoModelPickerEntries,
+  videoModelCatalog,
+);
+
+function buildVideoModelMenuEntries() {
+  const entries = [];
+  const groupedFamilies = new Set();
+  const variantIdsByFamily = new Map();
+  for (const variantId of videoModelCatalog.variantById.keys()) {
+    const config = getSeedanceConfiguration(variantId);
+    if (!config) continue;
+    let variantIds = variantIdsByFamily.get(config.familyId);
+    if (!variantIds) {
+      variantIds = new Set();
+      variantIdsByFamily.set(config.familyId, variantIds);
+    }
+    variantIds.add(variantId);
+  }
+  for (const entry of videoModelPickerEntries) {
+    const config = getSeedanceConfiguration(entry.defaultVariant?.model.id);
+    if (!config) {
+      entries.push(entry);
+      continue;
+    }
+    if (groupedFamilies.has(config.familyId)) continue;
+    groupedFamilies.add(config.familyId);
+    const family = entry.family;
+    const variantIds = variantIdsByFamily.get(config.familyId);
+    const variantsByMode = {};
+    for (const [mode, workflowIds] of Object.entries({
+      t2v: [null],
+      i2v: ["animate_image", "keyframes", "references"],
+      v2v: ["edit_video", "extend_uploaded_video"],
+    })) {
+      for (const workflowId of workflowIds) {
+        const variantId = resolveSeedanceVariant({ familyId: config.familyId, workflowId });
+        const variant = videoModelCatalog.variantById.get(variantId);
+        if (variant?.mode === mode) {
+          variantsByMode[mode] = variant;
+          break;
+        }
+      }
+    }
+    const name = SEEDANCE_FAMILY_NAMES[config.familyId];
+    entries.push(Object.freeze({
+      id: `${config.familyId}:grouped`,
+      family,
+      name,
+      groupedSeedance: true,
+      variantIds,
+      variantsByMode,
+      defaultVariant: variantsByMode.t2v || variantsByMode.i2v || variantsByMode.v2v,
+      searchText: `${family.searchText} ${name}`.toLowerCase(),
+    }));
+  }
+  return Object.freeze(entries);
+}
+
+// Menu grouping is presentation-only. The original picker entries still
+// describe compatible technical variants for existing workflow resolution.
+export const videoModelMenuEntries = buildVideoModelMenuEntries();
+export const videoModelMenuEntryByVariantId = indexModelPickerEntries(
+  videoModelMenuEntries,
   videoModelCatalog,
 );

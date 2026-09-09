@@ -135,14 +135,16 @@ export function buildReferenceParams(
   return params;
 }
 
-function normalizedUrls(params, capability, singularParam, pluralParam) {
+function normalizedUrls(model, params, capability, singularParam, pluralParam) {
   if (!capability.field) return [];
   const direct = params[capability.field];
-  if (Array.isArray(direct) && direct.length > 0) return direct;
+  if (Array.isArray(direct)) return direct;
   if (direct) return [direct];
-  const plural = params[pluralParam];
+  // A separately declared media field has its own role (for example Wan's
+  // optional image_url anchor); it is not an alias for the primary input.
+  const plural = model?.inputs?.[pluralParam] ? undefined : params[pluralParam];
   if (Array.isArray(plural) && plural.length > 0) return plural;
-  const singular = params[singularParam];
+  const singular = model?.inputs?.[singularParam] ? undefined : params[singularParam];
   return singular ? [singular] : [];
 }
 
@@ -167,6 +169,7 @@ export function mapReferenceParams(model, params = {}) {
     const config = MEDIA_CONFIG[mediaType];
     const capability = capabilities[mediaType];
     const urls = normalizedUrls(
+      model,
       params,
       capability,
       config.singularParam,

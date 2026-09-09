@@ -483,6 +483,8 @@ const CONTINUATION_FAMILIES = Object.freeze({
     sourceModelIds: Object.freeze([
       "seedance-v2.0-t2v",
       "seedance-v2.0-i2v",
+      "seedance-2-t2v",
+      "seedance-2-i2v",
       "seedance-v2.0-extend",
       "seedance-2-extend",
       "seedance-2-vip-extend",
@@ -538,6 +540,18 @@ const CONTINUATION_TARGETS = Object.freeze({
   },
   "grok-imagine-extend": { family: "grok" },
 });
+
+const continuationSourceModelIds = new Map(
+  Object.entries(CONTINUATION_FAMILIES).map(([family, config]) => [
+    family, new Set(config.sourceModelIds),
+  ]),
+);
+
+export function isContinuationSourceModel(modelOrId, sourceModelId) {
+  const modelId = typeof modelOrId === "string" ? modelOrId : modelOrId?.id;
+  const family = CONTINUATION_TARGETS[modelId]?.family;
+  return continuationSourceModelIds.get(family)?.has(sourceModelId) || false;
+}
 
 const MIN_CLIENT_TIMESTAMP = Date.UTC(2000, 0, 1);
 const MAX_CLIENT_TIMESTAMP = Date.UTC(2101, 0, 1);
@@ -731,11 +745,10 @@ function resolveContinuationRequestId(entry) {
 export function getCompatibleContinuationSources(modelOrId, history = []) {
   const config = getContinuationConfig(modelOrId);
   if (!config) return [];
-  const compatibleModelIds = new Set(config.sourceModelIds);
   const sources = [];
 
   for (const entry of history) {
-    if (!entry?.url || !compatibleModelIds.has(entry.model)) continue;
+    if (!entry?.url || !isContinuationSourceModel(modelOrId, entry.model)) continue;
     const requestId = resolveContinuationRequestId(entry);
     if (!requestId) continue;
     if (config.requiredSourceResolution) {

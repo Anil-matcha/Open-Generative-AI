@@ -3,6 +3,11 @@ import {
   videoModelCatalog,
   videoModelPickerEntryByVariantId,
 } from "./modelFamilies.js";
+import {
+  SEEDANCE_WORKFLOW_VARIANTS,
+  getSeedanceConfiguration,
+  resolveSeedanceVariant,
+} from "./seedanceModels.js";
 
 export const VIDEO_WORKFLOW_IDS = Object.freeze([
   "animate_image",
@@ -76,45 +81,6 @@ export const VIDEO_WORKFLOW_VARIANTS = Object.freeze({
     references: [
       "minimax-h3-open-reference-to-video",
       "minimax-h3-reference-to-video",
-    ],
-  },
-  "seedance-2": {
-    animate_image: [
-      "seedance-2-i2v",
-      "seedance-2-i2v-480p",
-      "seedance-2-image-to-video",
-      "seedance-2-image-to-video-fast",
-      "seedance-2-vip-image-to-video",
-      "seedance-2-vip-image-to-video-fast",
-      "seedance-2-vip-image-to-video-1080p",
-      "seedance-2-vip-image-to-video-fast-1080p",
-      "seedance-2-vip-image-to-video-4k",
-      "seedance-2-mini-image-to-video",
-      "seedance-2-spicy-image-to-video",
-      "seedance-2-spicy-image-to-video-fast",
-      "seedance-2-mini-spicy-image-to-video",
-    ],
-    keyframes: [
-      "seedance-2-new-first-last",
-      "seedance-2-first-last-frame",
-      "seedance-2-first-last-frame-fast",
-      "seedance-2-vip-first-last-frame",
-      "seedance-2-vip-first-last-frame-fast",
-      "seedance-2-vip-first-last-frame-1080p",
-      "seedance-2-vip-first-last-frame-4k",
-    ],
-    references: [
-      "seedance-2-new-omni",
-      "seedance-2-omni-reference",
-      "seedance-2-omni-reference-480p",
-      "seedance-2-omni-reference-no-video",
-      "seedance-2-omni-reference-no-video-fast",
-      "seedance-2-vip-omni-reference",
-      "seedance-2-vip-omni-reference-fast",
-      "seedance-2-vip-omni-reference-1080p",
-      "seedance-2-vip-omni-reference-fast-1080p",
-      "seedance-2-vip-omni-reference-4k",
-      "seedance-2-mini-omni-reference",
     ],
   },
   "gemini-omni": {
@@ -201,14 +167,6 @@ export const VIDEO_WORKFLOW_VARIANTS = Object.freeze({
     animate_image: ["ltx-2.3-image-to-video"],
     extend_uploaded_video: ["ltx-2.3-video-extend"],
   },
-  "seedance-1.5": {
-    animate_image: ["seedance-v1.5-pro-i2v-fast", "seedance-v1.5-pro-i2v"],
-    keyframes: ["seedance-v1.5-pro-i2v-fast", "seedance-v1.5-pro-i2v"],
-    extend_uploaded_video: [
-      "seedance-v1.5-pro-video-extend-fast",
-      "seedance-v1.5-pro-video-extend",
-    ],
-  },
   "wan-2.2": {
     animate_image: ["wan2.2-spicy-image-to-video", "wan2.2-image-to-video"],
     keyframes: ["wan2.2-image-to-video"],
@@ -218,11 +176,6 @@ export const VIDEO_WORKFLOW_VARIANTS = Object.freeze({
   "wan-2.1": {
     animate_image: ["wan2.1-image-to-video"],
     references: ["wan2.1-reference-video"],
-  },
-  "seedance-lite": {
-    animate_image: ["seedance-lite-i2v"],
-    keyframes: ["seedance-lite-i2v"],
-    references: ["seedance-lite-reference-video"],
   },
   "minimax-hailuo-02": {
     animate_image: ["minimax-hailuo-02-pro-i2v", "minimax-hailuo-02-standard-i2v"],
@@ -236,6 +189,7 @@ export const VIDEO_WORKFLOW_VARIANTS = Object.freeze({
     ],
     keyframes: ["kling-v2.1-pro-i2v"],
   },
+  ...SEEDANCE_WORKFLOW_VARIANTS,
 });
 
 const TECHNICAL_EXCLUDED_VARIANTS = Object.freeze({
@@ -461,6 +415,38 @@ function sameFamilyVariantId(familyId, variantId) {
     : null;
 }
 
+function resolveSeedanceWorkflowVariant(
+  familyId,
+  workflowId,
+  group,
+  currentVariantId,
+  preferredVariantId,
+) {
+  const current = getSeedanceConfiguration(currentVariantId);
+  const preferred = getSeedanceConfiguration(preferredVariantId);
+  const hasCurrent = current?.familyId === familyId;
+  const hasPreferred = preferred?.familyId === familyId;
+  // Remembering a workflow must not silently change a selected service,
+  // speed, or endpoint resolution when the user changes its source mode.
+  const canRestorePreferred = hasPreferred && (!hasCurrent || (
+    current.profile === preferred.profile &&
+    current.speed === preferred.speed &&
+    current.resolution === preferred.resolution
+  ));
+  if (canRestorePreferred) {
+    const remembered = variantForId(group, preferredVariantId);
+    if (remembered) return remembered;
+  }
+  const variantId = resolveSeedanceVariant({
+    familyId,
+    workflowId,
+    currentModelId: hasCurrent
+      ? currentVariantId
+      : hasPreferred ? preferredVariantId : null,
+  });
+  return variantForId(group, variantId);
+}
+
 export function resolveVideoWorkflowVariant(
   familyId,
   workflowId,
@@ -469,6 +455,11 @@ export function resolveVideoWorkflowVariant(
 ) {
   const group = getVideoWorkflowGroup(familyId, workflowId);
   if (!group) return null;
+  if (SEEDANCE_WORKFLOW_VARIANTS[familyId]) {
+    return resolveSeedanceWorkflowVariant(
+      familyId, workflowId, group, currentVariantId, preferredVariantId,
+    );
+  }
   return resolveVariantFromGroup(
     group,
     sameFamilyVariantId(familyId, currentVariantId),
@@ -483,6 +474,11 @@ export function resolveVideoBaseVariant(
 ) {
   const group = getVideoWorkflowGroup(familyId, null);
   if (!group) return null;
+  if (SEEDANCE_WORKFLOW_VARIANTS[familyId]) {
+    return resolveSeedanceWorkflowVariant(
+      familyId, null, group, currentVariantId, preferredVariantId,
+    );
+  }
   return resolveVariantFromGroup(
     group,
     sameFamilyVariantId(familyId, currentVariantId),
@@ -493,9 +489,10 @@ export function resolveVideoBaseVariant(
 export function inferVideoWorkflowId(
   familyId,
   variantId,
-  { hasEndFrame = false } = {},
+  { hasEndFrame = false, preferredWorkflowId = null } = {},
 ) {
   const ids = getVideoWorkflowFamily(familyId)?.workflowIdsByVariantId.get(variantId) || [];
+  if (ids.includes(preferredWorkflowId)) return preferredWorkflowId;
   if (hasEndFrame && ids.includes("keyframes")) return "keyframes";
   if (ids.includes("animate_image")) return "animate_image";
   return ids[0] || null;
@@ -573,6 +570,10 @@ export function getVideoWorkflowMediaConfig(model, workflowId) {
   if (workflowId === "edit_video" || workflowId === "extend_uploaded_video") {
     return {
       ...config,
+      imageLimit: workflowId === "extend_uploaded_video" &&
+        getSeedanceConfiguration(model?.id)?.familyId === "seedance-2.5"
+        ? Math.min(config.imageLimit, 1)
+        : config.imageLimit,
       videoLimit: Math.min(config.videoLimit, 1),
       separateEndImage: false,
     };
@@ -671,7 +672,8 @@ export function getVideoWorkflowMediaSlots(model, workflowId) {
   }
   if (workflowId === "keyframes") {
     if (!imageField) return [];
-    const sharedArrayField = capabilities.image.isArray && !lastImageField;
+    const sharedArrayField = capabilities.image.isArray &&
+      (!lastImageField || lastImageField === imageField);
     return [
       createMediaSlot(
         "startFrame",
@@ -746,6 +748,14 @@ export function getVideoWorkflowMediaSlots(model, workflowId) {
         Math.max(capabilities.image.maxItems, 1),
         {
           isArray: capabilities.image.isArray,
+          ...(SEEDANCE_WORKFLOW_VARIANTS[familyId] &&
+            model.inputs?.[capabilities.image.field]?.minItems > 0
+            ? {
+              required: true,
+              minItems: model.inputs[capabilities.image.field].minItems,
+              requiredMessage: "Please add a reference image.",
+            }
+            : {}),
           ...(familyId === "minimax-h3"
             ? MINIMAX_H3_REFERENCE_CONSTRAINT
             : {}),
@@ -822,6 +832,14 @@ export function getVideoWorkflowMediaSlots(model, workflowId) {
         "Video to extend",
         1,
         { isArray: capabilities.video.isArray },
+      ),
+      familyId === "seedance-2.5" && lastImageField && createMediaSlot(
+        "endFrame",
+        "image",
+        lastImageField,
+        "End",
+        "Optional target frame for the continuation",
+        1,
       ),
       audioField && createMediaSlot(
         "referenceAudios",
@@ -977,6 +995,11 @@ export function validateVideoWorkflowMedia(workflowId, media = {}, model = null)
   )) {
     if (mediaCount(activeMedia, slotId) === 0) {
       return { valid: false, message };
+    }
+  }
+  for (const slot of slots) {
+    if (slot.minItems && mediaCount(activeMedia, slot.id) < slot.minItems) {
+      return { valid: false, message: slot.requiredMessage };
     }
   }
 
