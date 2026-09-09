@@ -12,6 +12,8 @@ import { HAPPY_HORSE_MODEL_GROUP } from "./happyHorseModels.js";
 import { happyHorseParameters } from "./happyHorseParameters.js";
 import { KLING_MODEL_GROUP } from "./klingModels.js";
 import { klingParameters } from "./klingParameters.js";
+import { VIDU_MODEL_GROUP } from "./viduModels.js";
+import { viduParameters } from "./viduParameters.js";
 import {
   getMiniMaxResolutionOptions,
   getMiniMaxSelectionAdjustments,
@@ -27,6 +29,7 @@ import {
 } from "./veoParameters.js";
 
 const groups = [
+  { familyNames: VIDU_MODEL_GROUP.familyNames, ...viduParameters },
   { familyNames: KLING_MODEL_GROUP.familyNames, ...klingParameters },
   { familyNames: HAPPY_HORSE_MODEL_GROUP.familyNames, ...happyHorseParameters },
   { familyNames: ALIBABA_MODEL_GROUP.familyNames, ...alibabaParameters },

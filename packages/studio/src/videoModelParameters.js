@@ -46,7 +46,7 @@ function nearestDuration(options, value) {
   return nearest;
 }
 
-export function getVideoCommonOptions(model) {
+function getBaseOptions(model) {
   if (!model) return EMPTY_OPTIONS;
   const cached = optionsByModel.get(model);
   if (cached) return cached;
@@ -60,8 +60,7 @@ export function getVideoCommonOptions(model) {
   return options;
 }
 
-export function getVideoCommonValues(model, previous = {}) {
-  const options = getVideoCommonOptions(model);
+function resolveValues(model, options, previous) {
   return Object.fromEntries(COMMON_FIELDS.map(([key, field, optionsKey]) => {
     const allowed = options[optionsKey];
     const value = matchingVideoParameterValue(allowed, previous[key]) ??
@@ -71,10 +70,29 @@ export function getVideoCommonValues(model, previous = {}) {
   }));
 }
 
+export function getVideoCommonOptions(model, values = {}) {
+  const base = getBaseOptions(model);
+  if (!model?.commonParameterRules) return base;
+  const current = { ...values, ...resolveValues(model, base, values) };
+  const options = { ...base };
+  for (const rule of model.commonParameterRules) {
+    if (Object.entries(rule.when).every(([key, allowed]) =>
+      allowed.includes(current[key] ?? model.inputs?.[key]?.default))) {
+      Object.assign(options, rule.options);
+    }
+  }
+  return options;
+}
+
+export function getVideoCommonValues(model, previous = {}) {
+  return resolveValues(model, getVideoCommonOptions(model, previous), previous);
+}
+
 export function buildVideoCommonPayload(model, values = {}) {
-  const options = getVideoCommonOptions(model);
+  const options = getVideoCommonOptions(model, values);
+  const resolved = model?.commonParameterRules ? resolveValues(model, options, values) : values;
   return Object.fromEntries(COMMON_FIELDS.flatMap(([key, field, optionsKey]) => {
-    const value = matchingVideoParameterValue(options[optionsKey], values[key]);
+    const value = matchingVideoParameterValue(options[optionsKey], resolved[key]);
     return value === undefined || !model.inputs?.[field] ? [] : [[field, value]];
   }));
 }

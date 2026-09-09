@@ -425,5 +425,37 @@
         }
       }
     }
+  },
+  "vidu": {
+    "speed": "Speed",
+    "speeds": {
+      "standard": "Standard speed",
+      "fast": "Fast"
+    },
+    "speedDescriptions": {
+      "standard": "",
+      "fast": "Faster generation."
+    },
+    "fields": {
+      "audio": {
+        "title": "Generate audio",
+        "description": ""
+      },
+      "bgm": {
+        "title": "Background music",
+        "description": ""
+      },
+      "movement_amplitude": {
+        "title": "Motion",
+        "description": "How much subjects move.",
+        "optionLabels": {
+          "auto": "Let model choose",
+          "small": "Subtle",
+          "medium": "Moderate",
+          "large": "Strong"
+        }
+      }
+    },
+    "musicDuration": "Sets duration to 4 seconds."
   }
 }

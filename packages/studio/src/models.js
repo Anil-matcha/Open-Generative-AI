@@ -143,6 +143,23 @@ const KLING_OMNI_REFERENCE_INPUT = Object.freeze({
   name: "images_list", minItems: 1, maxItems: 4,
 });
 
+const VIDU_REFERENCE_INPUT = Object.freeze({
+  type: "array", items: { type: "string" }, title: "Reference images",
+  name: "images_list", minItems: 1,
+});
+const VIDU_Q2_MUSIC_INPUT = Object.freeze({
+  type: "boolean", title: "Background music", name: "bgm", default: false,
+  description: "Sets duration to 4 seconds.", descriptionKey: "musicDuration",
+});
+// Q2 music requires four seconds only on the regular text/image routes.
+const VIDU_Q2_MUSIC_RULES = Object.freeze([
+  { when: { bgm: [true] }, options: { durations: [4] } },
+]);
+const VIDU_2_FORMAT_RULES = Object.freeze([
+  { when: { resolution: ["360p", "720p"] }, options: { aspectRatios: ["16:9"] } },
+  { when: { resolution: ["1080p"] }, options: { aspectRatios: ["1:1"] } },
+]);
+
 export const t2iModels = [
   {
     "id": "nano-banana",
@@ -6918,6 +6935,7 @@ export const t2vModels = [
     "id": "vidu-q2-pro-text-to-video",
     "name": "Vidu Q2 Pro",
     "endpoint": "vidu-q2-pro-text-to-video",
+    "commonParameterRules": VIDU_Q2_MUSIC_RULES,
     "inputs": {
       "prompt": {
         "examples": [
@@ -6961,13 +6979,7 @@ export const t2vModels = [
         "maxValue": 8,
         "step": 1
       },
-      "bgm": {
-        "type": "boolean",
-        "title": "Bgm",
-        "name": "bgm",
-        "description": "Add background music to the output. When enabled, duration must be exactly 4 seconds.",
-        "default": false
-      },
+      "bgm": VIDU_Q2_MUSIC_INPUT,
       "movement_amplitude": {
         "enum": [
           "auto",
@@ -6989,6 +7001,7 @@ export const t2vModels = [
     "id": "vidu-q2-turbo-text-to-video",
     "name": "Vidu Q2 Turbo",
     "endpoint": "vidu-q2-turbo-text-to-video",
+    "commonParameterRules": VIDU_Q2_MUSIC_RULES,
     "inputs": {
       "prompt": {
         "examples": [
@@ -7032,13 +7045,7 @@ export const t2vModels = [
         "maxValue": 8,
         "step": 1
       },
-      "bgm": {
-        "type": "boolean",
-        "title": "Bgm",
-        "name": "bgm",
-        "description": "Add background music to the output. When enabled, duration must be exactly 4 seconds.",
-        "default": false
-      },
+      "bgm": VIDU_Q2_MUSIC_INPUT,
       "movement_amplitude": {
         "enum": [
           "auto",
@@ -13723,10 +13730,12 @@ export const i2vModels = [
     "id": "vidu-v2.0-i2v",
     "name": "Vidu v2.0 I2V",
     "endpoint": "vidu-v2.0-i2v",
+    "commonParameterRules": VIDU_2_FORMAT_RULES,
     "family": "vidu-v2",
     "imageField": "images_list",
     "lastImageField": "images_list",
     "hasPrompt": true,
+    "promptRequired": true,
     "inputs": {
       "prompt": {
         "type": "string",
@@ -13781,8 +13790,10 @@ export const i2vModels = [
     "family": "vidu-q1",
     "imageField": "images_list",
     "hasPrompt": true,
+    "promptRequired": true,
     "maxImages": 7,
     "inputs": {
+      "images_list": VIDU_REFERENCE_INPUT,
       "prompt": {
         "type": "string",
         "title": "Prompt",
@@ -14874,6 +14885,7 @@ export const i2vModels = [
     "promptRequired": true,
     "maxImages": 7,
     "inputs": {
+      "images_list": VIDU_REFERENCE_INPUT,
       "prompt": {
         "type": "string",
         "title": "Prompt",
@@ -15026,6 +15038,7 @@ export const i2vModels = [
         "name": "resolution",
         "description": "The resolution of the generated video.",
         "enum": [
+          "540p",
           "720p",
           "1080p"
         ],
@@ -15037,7 +15050,7 @@ export const i2vModels = [
         "name": "duration",
         "description": "The duration of the generated video in seconds",
         "default": 5,
-        "minValue": 2,
+        "minValue": 1,
         "maxValue": 8,
         "step": 1
       },
@@ -18791,6 +18804,7 @@ export const i2vModels = [
     "id": "vidu-q2-pro-image-to-video",
     "name": "Vidu Q2 Pro",
     "endpoint": "vidu-q2-pro-image-to-video",
+    "commonParameterRules": VIDU_Q2_MUSIC_RULES,
     "family": "vidu-q2",
     "imageField": "image_url",
     "hasPrompt": true,
@@ -18848,13 +18862,7 @@ export const i2vModels = [
         "maxValue": 8,
         "step": 1
       },
-      "bgm": {
-        "type": "boolean",
-        "title": "Bgm",
-        "name": "bgm",
-        "description": "Add background music to the output. When enabled, duration must be exactly 4 seconds.",
-        "default": false
-      },
+      "bgm": VIDU_Q2_MUSIC_INPUT,
       "movement_amplitude": {
         "enum": [
           "auto",
@@ -18876,6 +18884,7 @@ export const i2vModels = [
     "id": "vidu-q2-turbo-image-to-video",
     "name": "Vidu Q2 Turbo",
     "endpoint": "vidu-q2-turbo-image-to-video",
+    "commonParameterRules": VIDU_Q2_MUSIC_RULES,
     "family": "vidu-q2",
     "imageField": "image_url",
     "hasPrompt": true,
@@ -18933,13 +18942,7 @@ export const i2vModels = [
         "maxValue": 8,
         "step": 1
       },
-      "bgm": {
-        "type": "boolean",
-        "title": "Bgm",
-        "name": "bgm",
-        "description": "Add background music to the output. When enabled, duration must be exactly 4 seconds.",
-        "default": false
-      },
+      "bgm": VIDU_Q2_MUSIC_INPUT,
       "movement_amplitude": {
         "enum": [
           "auto",

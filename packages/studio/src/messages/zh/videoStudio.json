@@ -425,5 +425,37 @@
         }
       }
     }
+  },
+  "vidu": {
+    "speed": "速度",
+    "speeds": {
+      "standard": "标准速度",
+      "fast": "快速"
+    },
+    "speedDescriptions": {
+      "standard": "",
+      "fast": "更快生成。"
+    },
+    "fields": {
+      "audio": {
+        "title": "生成音频",
+        "description": ""
+      },
+      "bgm": {
+        "title": "背景音乐",
+        "description": ""
+      },
+      "movement_amplitude": {
+        "title": "动作幅度",
+        "description": "主体的动作幅度。",
+        "optionLabels": {
+          "auto": "由模型选择",
+          "small": "轻微",
+          "medium": "适中",
+          "large": "强烈"
+        }
+      }
+    },
+    "musicDuration": "时长设为 4 秒。"
   }
 }

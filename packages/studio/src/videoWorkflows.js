@@ -62,15 +62,6 @@ export const VIDEO_WORKFLOW_VARIANTS = Object.freeze({
     animate_image: ["grok-imagine-video-1-5-preview"],
     references: ["grok-imagine-image-to-video"],
   },
-  "vidu-q3": {
-    animate_image: ["vidu-q3-turbo-image-to-video", "vidu-q3-pro-image-to-video"],
-    keyframes: ["vidu-q3-turbo-first-last-frames", "vidu-q3-pro-first-last-frames"],
-  },
-  "vidu-q2": {
-    animate_image: ["vidu-q2-turbo-image-to-video", "vidu-q2-pro-image-to-video"],
-    keyframes: ["vidu-q2-pro-start-end-video", "vidu-q2-turbo-start-end-video"],
-    references: ["vidu-q2-reference"],
-  },
   "pixverse-6": {
     animate_image: ["pixverse-v6-i2v"],
     keyframes: ["pixverse-v6-transition"],

@@ -900,6 +900,7 @@ export default function VideoStudio({
   workflowMediaDraftsRef.current = workflowMediaDrafts;
   const commonParameterValuesRef = useRef(null);
   commonParameterValuesRef.current = {
+    ...modelParameterValues,
     aspectRatio: selectedAr,
     duration: selectedDuration,
     resolution: selectedResolution,
@@ -923,9 +924,7 @@ export default function VideoStudio({
 
   const getCurrentAspectRatios = useCallback(
     (id) =>
-      getGroupedVideoConfiguration(id)
-        ? getVideoCommonOptions(videoModelCatalog.variantById.get(id)?.model).aspectRatios
-        : imageMode
+      imageMode
         ? getAspectRatiosForI2VModel(id)
         : getAspectRatiosForVideoModel(id),
     [imageMode],
@@ -933,9 +932,7 @@ export default function VideoStudio({
 
   const getCurrentDurations = useCallback(
     (id) =>
-      getGroupedVideoConfiguration(id)
-        ? getVideoCommonOptions(videoModelCatalog.variantById.get(id)?.model).durations
-        : imageMode ? getDurationsForI2VModel(id) : getDurationsForModel(id),
+      imageMode ? getDurationsForI2VModel(id) : getDurationsForModel(id),
     [imageMode],
   );
 
@@ -966,7 +963,7 @@ export default function VideoStudio({
     (modelId, isImageMode, isV2vMode) => {
       if (getGroupedVideoConfiguration(modelId)) {
         const model = videoModelCatalog.variantById.get(modelId)?.model;
-        const options = getVideoCommonOptions(model);
+        const options = getVideoCommonOptions(model, commonParameterValuesRef.current);
         const values = getVideoCommonValues(model, commonParameterValuesRef.current);
         setShowAr(options.aspectRatios.length > 0);
         setShowDuration(options.durations.length > 0);
@@ -1103,11 +1100,12 @@ export default function VideoStudio({
     currentModelId: selectedModel,
     nativeResolution: selectedResolution,
     commonValues: {
+      ...modelParameterValues,
       aspectRatio: selectedAr, duration: selectedDuration,
       quality: selectedQuality,
     },
     ...options,
-  }), [selectedFamilyId, selectedWorkflowId, selectedModel, selectedResolution, selectedAr, selectedDuration, selectedQuality, activeWorkflowMediaDraft]);
+  }), [selectedFamilyId, selectedWorkflowId, selectedModel, selectedResolution, selectedAr, selectedDuration, selectedQuality, modelParameterValues, activeWorkflowMediaDraft]);
   const describeSelectionAdjustments = useCallback((adjustments) => {
     const valueLabel = (key, value) => {
       if (key === "duration") return getVideoDurationLabel(value, groupCopy);
@@ -1151,15 +1149,18 @@ export default function VideoStudio({
         const adjustments = option.disabled ? [] : getGroupedVideoSelectionAdjustments({
           currentModelId: selectedModel, nativeResolution: selectedResolution,
           currentWorkflowId: selectedWorkflowId, media: activeWorkflowMediaDraft,
-          commonValues: { aspectRatio: selectedAr, duration: selectedDuration, quality: selectedQuality },
+          commonValues: { ...modelParameterValues, aspectRatio: selectedAr, duration: selectedDuration, quality: selectedQuality },
           selection: option, changes: { resolution: option.value },
         });
         return { ...option, adjustmentDescription: describeSelectionAdjustments(adjustments) };
       }),
     };
-  }, [groupedConfiguration, selectedFamilyId, selectedWorkflowId, selectedModel, selectedResolution, selectedAr, selectedDuration, selectedQuality, describeSelectionAdjustments, groupCopy, groupCopyKey, activeWorkflowMediaDraft]);
+  }, [groupedConfiguration, selectedFamilyId, selectedWorkflowId, selectedModel, selectedResolution, selectedAr, selectedDuration, selectedQuality, modelParameterValues, describeSelectionAdjustments, groupCopy, groupCopyKey, activeWorkflowMediaDraft]);
   const commonOptions = useMemo(
-    () => getVideoCommonOptions(selectedVariant?.model), [selectedVariant],
+    () => getVideoCommonOptions(selectedVariant?.model, {
+      ...modelParameterValues, aspectRatio: selectedAr, duration: selectedDuration,
+      resolution: selectedResolution, quality: selectedQuality,
+    }), [selectedVariant, modelParameterValues, selectedAr, selectedDuration, selectedResolution, selectedQuality],
   );
   const groupedModes = useMemo(() => groupedConfiguration && workflowFamily
     ? [...(workflowFamily.hasBase ? [{ id: null }] : []), ...workflowFamily.workflows].map((workflow) => {
@@ -1194,6 +1195,7 @@ export default function VideoStudio({
         ? inputs.filter(({ key }) => key !== "omni_reference_task_type").map(({ key, schema }) => ({
             key, schema: {
               ...schema, ...groupCopy.fields[key],
+              ...(schema.descriptionKey ? { description: groupCopy[schema.descriptionKey] } : {}),
               ...(key === "generate_audio" && selectedWorkflowId === "edit_video" ? groupCopy.editAudio : {}),
             },
           }))
@@ -1202,7 +1204,11 @@ export default function VideoStudio({
   );
   const handleModelParameterChange = useCallback((key, value) => {
     setModelParameterValues((values) => ({ ...values, [key]: value }));
-  }, []);
+    if (selectedVariant?.model.commonParameterRules) {
+      commonParameterValuesRef.current = { ...commonParameterValuesRef.current, [key]: value };
+      applyControlsForModel(selectedModel, imageMode, v2vMode);
+    }
+  }, [selectedVariant, selectedModel, imageMode, v2vMode, applyControlsForModel]);
 
   const applySelectedVariant = useCallback(
     (variant, mode, family, workflowId = null) => {
@@ -1369,6 +1375,7 @@ export default function VideoStudio({
 
         // Update control visibility based on restored model/mode
         commonParameterValuesRef.current = {
+          ...data.modelParameterValues,
           aspectRatio: data.selectedAr,
           duration: data.selectedDuration,
           resolution: restoredResolution,
@@ -1923,6 +1930,9 @@ export default function VideoStudio({
     }
     const { selection, adjustments } = plan;
     const target = videoModelCatalog.variantById.get(selection.modelId);
+    if (selection.resolution !== undefined) {
+      commonParameterValuesRef.current = { ...commonParameterValuesRef.current, resolution: selection.resolution };
+    }
     applyUserSelectedVariant(target, target.mode, family, workflowId);
     if (selection.resolution !== undefined) setSelectedResolution(selection.resolution);
     if (adjustments.length) {
@@ -2076,6 +2086,7 @@ export default function VideoStudio({
       : activeParameterValues;
     const commonParams = grouped
       ? buildVideoCommonPayload(currentModel, {
+          ...generationParameterValues,
           aspectRatio: selectedAr, duration: selectedDuration,
           resolution: selectedResolution, quality: selectedQuality,
         })
@@ -3168,7 +3179,7 @@ export default function VideoStudio({
                         {copy.dropdowns.aspectRatio}
                       </PromptPopoverHeader>
                       <PromptMenuList>
-                        {getCurrentAspectRatios(selectedModel).map((r) => (
+                        {(groupedConfiguration ? commonOptions.aspectRatios : getCurrentAspectRatios(selectedModel)).map((r) => (
                           <PromptMenuItem
                             key={r}
                             selected={selectedAr === r}
