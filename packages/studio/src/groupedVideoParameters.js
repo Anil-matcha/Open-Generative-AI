@@ -5,6 +5,12 @@ import {
 } from "./seedanceParameters.js";
 import { SEEDANCE_MODEL_GROUP } from "./seedanceModels.js";
 import { VEO_MODEL_GROUP } from "./veoModels.js";
+import { MINIMAX_MODEL_GROUP } from "./minimaxModels.js";
+import {
+  getMiniMaxResolutionOptions,
+  getMiniMaxSelectionAdjustments,
+  planMiniMaxSelection,
+} from "./minimaxParameters.js";
 import { getGroupedVideoConfiguration } from "./groupedVideoModels.js";
 import {
   getVeoResolutionOptions,
@@ -24,6 +30,12 @@ const groups = [
     plan: planVeoSelection,
     resolutions: getVeoResolutionOptions,
     adjustments: getVeoSelectionAdjustments,
+  },
+  {
+    familyNames: MINIMAX_MODEL_GROUP.familyNames,
+    plan: planMiniMaxSelection,
+    resolutions: getMiniMaxResolutionOptions,
+    adjustments: getMiniMaxSelectionAdjustments,
   },
 ];
 const handlersByFamilyId = new Map();

@@ -237,5 +237,45 @@
     "adjustments": {
       "speed": "生成方式：{value}"
     }
+  },
+  "minimax": {
+    "speed": "速度",
+    "speeds": {
+      "standard": "标准速度",
+      "fast": "快速"
+    },
+    "speedDescriptions": {
+      "standard": "",
+      "fast": "更快生成。"
+    },
+    "provider": "自定义",
+    "providerHelp": "使用 LoRA 或 Spicy 模型。",
+    "profiles": {
+      "standard": {
+        "label": "标准",
+        "description": ""
+      },
+      "lora": {
+        "label": "LoRA",
+        "description": "应用自定义风格或角色。"
+      },
+      "spicy": {
+        "label": "Spicy",
+        "description": "用于图片动画的另一种模型。"
+      }
+    },
+    "adjustments": {
+      "profile": "自定义：{value}"
+    },
+    "fields": {
+      "go_fast": {
+        "title": "额外加速",
+        "description": "以细节换取速度。"
+      },
+      "loras": {
+        "title": "LoRA",
+        "description": "最多添加 3 个自定义风格或角色。"
+      }
+    }
   }
 }

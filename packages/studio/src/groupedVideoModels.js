@@ -1,7 +1,8 @@
 import { SEEDANCE_MODEL_GROUP } from "./seedanceModels.js";
 import { VEO_MODEL_GROUP } from "./veoModels.js";
+import { MINIMAX_MODEL_GROUP } from "./minimaxModels.js";
 
-const groups = [SEEDANCE_MODEL_GROUP, VEO_MODEL_GROUP];
+const groups = [SEEDANCE_MODEL_GROUP, VEO_MODEL_GROUP, MINIMAX_MODEL_GROUP];
 const groupByFamilyId = new Map();
 const configurationByModelId = new Map();
 const familyNames = {};
@@ -23,6 +24,10 @@ export const GROUPED_VIDEO_WORKFLOW_VARIANTS = Object.freeze(workflowVariants);
 
 export function getGroupedVideoConfiguration(modelId) {
   return configurationByModelId.get(modelId) || null;
+}
+
+export function getGroupedVideoCopyKey(familyId) {
+  return groupByFamilyId.get(familyId)?.copyKey;
 }
 
 export function resolveGroupedVideoVariant(options) {

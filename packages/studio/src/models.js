@@ -49,6 +49,13 @@ const SEEDANCE_25_SEED_INPUT = Object.freeze({
   minValue: -1,
   maxValue: 4294967295,
 });
+const MINIMAX_H3_OPEN_SEED_INPUT = Object.freeze({
+  type: "integer",
+  title: "Seed",
+  name: "seed",
+  description: "Random seed. Use -1 for random.",
+  default: -1,
+});
 
 export const t2iModels = [
   {
@@ -5287,6 +5294,9 @@ export const t2vModels = [
   {
     "id": "minimax-hailuo-2.3-pro-t2v",
     "name": "MiniMax Hailuo 2.3 Pro",
+    // Hailuo 2.3 supports 1080p only at 6s; MuAPI fixes the duration on this route.
+    // https://platform.minimax.io/docs/api-reference/video-generation-t2v
+    "fixedParameters": { "duration": 6 },
     "inputs": {
       "prompt": {
         "type": "string",
@@ -5311,6 +5321,8 @@ export const t2vModels = [
   {
     "id": "minimax-hailuo-2.3-standard-t2v",
     "name": "MiniMax Hailuo 2.3 Standard",
+    // https://muapi.ai/zh/playground/minimax-hailuo-2.3-standard-t2v
+    "fixedParameters": { "resolution": "768p" },
     "inputs": {
       "prompt": {
         "type": "string",
@@ -8161,7 +8173,8 @@ export const t2vModels = [
         "title": "Duration",
         "name": "duration",
         "default": 5
-      }
+      },
+      "seed": MINIMAX_H3_OPEN_SEED_INPUT
     },
     "provider": "minimax",
     "provider_name": "Minimax"
@@ -14947,6 +14960,8 @@ export const i2vModels = [
     "family": "minimax-2.3",
     "imageField": "image_url",
     "hasPrompt": true,
+    "promptRequired": true,
+    "fixedParameters": { "duration": 6 },
     "inputs": {
       "prompt": {
         "type": "string",
@@ -14978,6 +14993,8 @@ export const i2vModels = [
     "family": "minimax-2.3",
     "imageField": "image_url",
     "hasPrompt": true,
+    "promptRequired": true,
+    "fixedParameters": { "resolution": "768p" },
     "inputs": {
       "prompt": {
         "type": "string",
@@ -15010,6 +15027,8 @@ export const i2vModels = [
     "family": "minimax-2.3",
     "imageField": "image_url",
     "hasPrompt": true,
+    "promptRequired": true,
+    "fixedParameters": { "resolution": "768p" },
     "inputs": {
       "prompt": {
         "type": "string",
@@ -20520,6 +20539,7 @@ export const i2vModels = [
     "family": "minimax-h3",
     "imageField": "image_url",
     "lastImageField": "last_image_url",
+    "aspectRatioMode": "inherited",
     "hasPrompt": true,
     "promptRequired": true,
     "inputs": {
@@ -20579,6 +20599,7 @@ export const i2vModels = [
         "field": "image",
         "title": "Reference Images",
         "name": "reference_images",
+        "maxItems": 9,
         "items": {"type": "string"}
       },
       "reference_videos": {
@@ -20586,6 +20607,7 @@ export const i2vModels = [
         "field": "video",
         "title": "Reference Videos",
         "name": "reference_videos",
+        "maxItems": 3,
         "items": {"type": "string"}
       },
       "reference_audios": {
@@ -20593,6 +20615,7 @@ export const i2vModels = [
         "field": "audio",
         "title": "Reference Audio",
         "name": "reference_audios",
+        "maxItems": 3,
         "items": {"type": "string"}
       },
       "aspect_ratio": {
@@ -20627,6 +20650,7 @@ export const i2vModels = [
     "family": "minimax-h3",
     "imageField": "image_url",
     "lastImageField": "last_image",
+    "aspectRatioMode": "inherited",
     "hasPrompt": true,
     "promptRequired": true,
     "inputs": {
@@ -20661,7 +20685,8 @@ export const i2vModels = [
         "title": "Duration",
         "name": "duration",
         "default": 5
-      }
+      },
+      "seed": MINIMAX_H3_OPEN_SEED_INPUT
     },
     "provider": "minimax",
     "provider_name": "Minimax"
@@ -20726,7 +20751,8 @@ export const i2vModels = [
         "title": "Duration",
         "name": "duration",
         "default": 5
-      }
+      },
+      "seed": MINIMAX_H3_OPEN_SEED_INPUT
     },
     "provider": "minimax",
     "provider_name": "Minimax"

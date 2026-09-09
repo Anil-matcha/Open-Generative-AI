@@ -51,7 +51,9 @@ export function getVideoCommonOptions(model) {
   const options = Object.fromEntries(COMMON_FIELDS.map(([, field, key]) =>
     [key, field === "aspect_ratio" && model.aspectRatioMode === "inherited"
       ? []
-      : schemaOptions(model.inputs?.[field])]));
+      : model.fixedParameters?.[field] !== undefined
+        ? [model.fixedParameters[field]]
+        : schemaOptions(model.inputs?.[field])]));
   optionsByModel.set(model, options);
   return options;
 }
@@ -71,6 +73,18 @@ export function buildVideoCommonPayload(model, values = {}) {
   const options = getVideoCommonOptions(model);
   return Object.fromEntries(COMMON_FIELDS.flatMap(([key, field, optionsKey]) => {
     const value = matchingVideoParameterValue(options[optionsKey], values[key]);
-    return value === undefined ? [] : [[field, value]];
+    return value === undefined || !model.inputs?.[field] ? [] : [[field, value]];
   }));
+}
+
+export const normalizeVideoResolution = (value) => String(value).toLowerCase();
+
+export function formatVideoResolution(value) {
+  const normalized = normalizeVideoResolution(value);
+  return normalized.endsWith("k") ? normalized.toUpperCase() : normalized;
+}
+
+export function matchingVideoResolution(model, value) {
+  return getVideoCommonOptions(model).resolutions.find((option) =>
+    normalizeVideoResolution(option) === normalizeVideoResolution(value));
 }

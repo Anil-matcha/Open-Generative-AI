@@ -301,6 +301,7 @@ export function getSeedanceVariantOptions(familyId, workflowId = null, currentMo
 }
 
 export const SEEDANCE_MODEL_GROUP = Object.freeze({
+  copyKey: "seedance",
   familyNames: SEEDANCE_FAMILY_NAMES,
   configurations,
   workflowVariants: SEEDANCE_WORKFLOW_VARIANTS,

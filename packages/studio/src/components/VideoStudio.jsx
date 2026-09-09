@@ -29,8 +29,8 @@ import {
   videoModelMenuEntryByVariantId as videoModelPickerEntryByVariantId,
 } from "../modelFamilies.js";
 import { getSeedanceEndpointResolution, getSeedanceToolConfiguration } from "../seedanceModels.js";
-import { getVeoConfiguration, getVeoToolConfiguration } from "../veoModels.js";
-import { getGroupedVideoConfiguration, getGroupedVideoVariantOptions } from "../groupedVideoModels.js";
+import { getVeoToolConfiguration } from "../veoModels.js";
+import { getGroupedVideoConfiguration, getGroupedVideoCopyKey, getGroupedVideoVariantOptions } from "../groupedVideoModels.js";
 import {
   getVideoCommonOptions,
   getVideoCommonValues,
@@ -1048,12 +1048,14 @@ export default function VideoStudio({
     ? workflowFamily?.workflowById.get(selectedWorkflowId) || null
     : null;
   const groupedConfiguration = getGroupedVideoConfiguration(selectedModel);
-  const isVeo = Boolean(getVeoConfiguration(selectedModel));
+  const groupCopyKey = getGroupedVideoCopyKey(selectedFamilyId);
+  const providerCopy = copy[groupCopyKey] || copy.seedance;
   const groupCopy = useMemo(() => ({
     ...copy.modelControls,
-    ...(isVeo ? copy.veo : copy.seedance),
-    adjustments: { ...copy.modelControls.adjustments, ...(isVeo ? copy.veo.adjustments : {}) },
-  }), [copy, isVeo]);
+    ...providerCopy,
+    fields: { ...copy.modelControls.fields, ...providerCopy.fields },
+    adjustments: { ...copy.modelControls.adjustments, ...providerCopy.adjustments },
+  }), [copy, providerCopy]);
   const workflowControlState = groupedConfiguration && workflowFamily
     ? { kind: "menu", workflow: null }
     : getVideoWorkflowControlState(
@@ -1123,7 +1125,7 @@ export default function VideoStudio({
     return {
       ...field,
       key: "resolution",
-      ...(!isVeo && !field.value && selectedWorkflowId !== "extend_uploaded_video"
+      ...(groupCopyKey === "seedance" && !field.value && selectedWorkflowId !== "extend_uploaded_video"
         ? { label: groupCopy.defaultResolution } : {}),
       options: field.options.map((option) => {
         const adjustments = option.disabled ? [] : getGroupedVideoSelectionAdjustments({
@@ -1134,7 +1136,7 @@ export default function VideoStudio({
         return { ...option, adjustmentDescription: describeSelectionAdjustments(adjustments) };
       }),
     };
-  }, [groupedConfiguration, selectedFamilyId, selectedWorkflowId, selectedModel, selectedResolution, selectedAr, selectedDuration, selectedQuality, describeSelectionAdjustments, groupCopy, isVeo]);
+  }, [groupedConfiguration, selectedFamilyId, selectedWorkflowId, selectedModel, selectedResolution, selectedAr, selectedDuration, selectedQuality, describeSelectionAdjustments, groupCopy, groupCopyKey]);
   const commonOptions = useMemo(
     () => getVideoCommonOptions(selectedVariant?.model), [selectedVariant],
   );
@@ -2058,6 +2060,7 @@ export default function VideoStudio({
         })
       : {};
     const groupedHistorySettings = grouped ? {
+      ...currentModel.fixedParameters,
       ...commonParams,
       workflowId: selectedWorkflowId,
       modelParameterValues: { ...generationParameterValues },

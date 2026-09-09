@@ -237,5 +237,45 @@
     "adjustments": {
       "speed": "Generation: {value}"
     }
+  },
+  "minimax": {
+    "speed": "Speed",
+    "speeds": {
+      "standard": "Standard speed",
+      "fast": "Fast"
+    },
+    "speedDescriptions": {
+      "standard": "",
+      "fast": "Faster generation."
+    },
+    "provider": "Customization",
+    "providerHelp": "Use a LoRA or the Spicy model.",
+    "profiles": {
+      "standard": {
+        "label": "Standard",
+        "description": ""
+      },
+      "lora": {
+        "label": "LoRA",
+        "description": "Apply custom styles or characters."
+      },
+      "spicy": {
+        "label": "Spicy",
+        "description": "Alternative model for image animation."
+      }
+    },
+    "adjustments": {
+      "profile": "Customization: {value}"
+    },
+    "fields": {
+      "go_fast": {
+        "title": "Extra speed",
+        "description": "Trades detail for speed."
+      },
+      "loras": {
+        "title": "LoRAs",
+        "description": "Add up to 3 custom styles or characters."
+      }
+    }
   }
 }

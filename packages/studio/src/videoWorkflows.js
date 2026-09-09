@@ -76,14 +76,6 @@ export const VIDEO_WORKFLOW_VARIANTS = Object.freeze({
       "kling-v3.0-std-motion-control",
     ],
   },
-  "minimax-h3": {
-    animate_image: ["minimax-h3-open-image-to-video", "minimax-h3-image-to-video"],
-    keyframes: ["minimax-h3-open-image-to-video", "minimax-h3-image-to-video"],
-    references: [
-      "minimax-h3-open-reference-to-video",
-      "minimax-h3-reference-to-video",
-    ],
-  },
   "gemini-omni": {
     animate_image: ["gemini-omni-image-to-video"],
     references: ["gemini-omni-image-to-video"],
@@ -164,10 +156,6 @@ export const VIDEO_WORKFLOW_VARIANTS = Object.freeze({
   "wan-2.1": {
     animate_image: ["wan2.1-image-to-video"],
     references: ["wan2.1-reference-video"],
-  },
-  "minimax-hailuo-02": {
-    animate_image: ["minimax-hailuo-02-pro-i2v", "minimax-hailuo-02-standard-i2v"],
-    keyframes: ["minimax-hailuo-02-pro-i2v", "minimax-hailuo-02-standard-i2v"],
   },
   "kling-v2.1": {
     animate_image: [

@@ -90,6 +90,7 @@ export function getVeoVariantOptions(familyId, workflowId = null, currentModelId
 }
 
 export const VEO_MODEL_GROUP = Object.freeze({
+  copyKey: "veo",
   familyNames: VEO_FAMILY_NAMES,
   configurations,
   workflowVariants: VEO_WORKFLOW_VARIANTS,
