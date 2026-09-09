@@ -458,6 +458,27 @@
     },
     "musicDuration": "Sets duration to 4 seconds."
   },
+  "ltx": {
+    "provider": "Generation",
+    "providerHelp": "",
+    "profiles": {
+      "standard": {
+        "label": "Standard",
+        "description": "480p–1080p, 5–20 seconds."
+      },
+      "pro": {
+        "label": "Pro",
+        "description": "6, 8 or 10 seconds."
+      },
+      "fast": {
+        "label": "Fast",
+        "description": "Faster generation, up to 20 seconds."
+      }
+    },
+    "adjustments": {
+      "profile": "Generation: {value}"
+    }
+  },
   "pixverse": {
     "fields": {
       "audio": {

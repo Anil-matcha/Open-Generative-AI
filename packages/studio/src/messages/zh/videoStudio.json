@@ -458,6 +458,27 @@
     },
     "musicDuration": "时长设为 4 秒。"
   },
+  "ltx": {
+    "provider": "生成方式",
+    "providerHelp": "",
+    "profiles": {
+      "standard": {
+        "label": "标准",
+        "description": "480p–1080p，5–20 秒。"
+      },
+      "pro": {
+        "label": "Pro",
+        "description": "6、8 或 10 秒。"
+      },
+      "fast": {
+        "label": "快速",
+        "description": "更快生成，最长 20 秒。"
+      }
+    },
+    "adjustments": {
+      "profile": "生成方式：{value}"
+    }
+  },
   "pixverse": {
     "fields": {
       "audio": {

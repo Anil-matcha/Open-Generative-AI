@@ -334,10 +334,6 @@ Object.assign(VIDEO_TOOL_OVERRIDES, {
     estimateCost: true,
     inputs: {
       duration: {
-        title: "Extend duration",
-        type: "integer",
-        enum: Array.from({ length: 20 }, (_, index) => index + 1),
-        default: 5,
         configurable: true,
       },
     },

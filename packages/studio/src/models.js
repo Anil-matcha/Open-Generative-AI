@@ -186,6 +186,11 @@ const PIXVERSE_55_SETTINGS = Object.freeze({
   },
 });
 
+const LTX_GENERATE_AUDIO_INPUT = Object.freeze({
+  type: "boolean", title: "Generate Audio", name: "generate_audio",
+  description: "Whether to generate audio.", default: true,
+});
+
 export const t2iModels = [
   {
     "id": "nano-banana",
@@ -5742,6 +5747,7 @@ export const t2vModels = [
     "id": "ltx-2-pro-text-to-video",
     "name": "LTX 2 Pro",
     "inputs": {
+      "generate_audio": LTX_GENERATE_AUDIO_INPUT,
       "prompt": {
         "type": "string",
         "title": "Prompt",
@@ -5768,6 +5774,7 @@ export const t2vModels = [
     "id": "ltx-2-fast-text-to-video",
     "name": "LTX 2 Fast",
     "inputs": {
+      "generate_audio": LTX_GENERATE_AUDIO_INPUT,
       "prompt": {
         "type": "string",
         "title": "Prompt",
@@ -14829,6 +14836,7 @@ export const i2vModels = [
     "family": "ltx",
     "imageField": "image_url",
     "hasPrompt": true,
+    "promptRequired": true,
     "inputs": {
       "prompt": {
         "type": "string",
@@ -14851,13 +14859,7 @@ export const i2vModels = [
         ],
         "default": 6
       },
-      "generate_audio": {
-        "type": "boolean",
-        "title": "Generate Audio",
-        "name": "generate_audio",
-        "description": "Whether to generate audio.",
-        "default": true
-      }
+      "generate_audio": LTX_GENERATE_AUDIO_INPUT
     },
     "provider": "lightricks",
     "provider_name": "Lightricks"
@@ -14869,6 +14871,7 @@ export const i2vModels = [
     "family": "ltx",
     "imageField": "image_url",
     "hasPrompt": true,
+    "promptRequired": true,
     "inputs": {
       "prompt": {
         "type": "string",
@@ -14896,13 +14899,7 @@ export const i2vModels = [
         ],
         "default": 6
       },
-      "generate_audio": {
-        "type": "boolean",
-        "title": "Generate Audio",
-        "name": "generate_audio",
-        "description": "Whether to generate audio.",
-        "default": true
-      }
+      "generate_audio": LTX_GENERATE_AUDIO_INPUT
     },
     "provider": "lightricks",
     "provider_name": "Lightricks"
@@ -15851,6 +15848,7 @@ export const i2vModels = [
     "family": "ltx",
     "imageField": "image_url",
     "hasPrompt": true,
+    "promptRequired": true,
     "inputs": {
       "prompt": {
         "type": "string",
@@ -25004,6 +25002,15 @@ export const v2vModels = [
     "family": "ltx2.3",
     "videoField": "video_url",
     "hasPrompt": true,
+    "inputs": {
+      "duration": {
+        "title": "Extend duration",
+        "name": "duration",
+        "type": "integer",
+        "enum": Array.from({ length: 20 }, (_, index) => index + 1),
+        "default": 5
+      }
+    },
     "description": "LTX-2.3 Video Extend seamlessly continues an existing video clip by generating additional frames that match the original motion, style, and scene composition.",
     "provider": "lightricks",
     "provider_name": "Lightricks"

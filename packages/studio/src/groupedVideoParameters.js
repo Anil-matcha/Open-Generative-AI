@@ -16,6 +16,8 @@ import { VIDU_MODEL_GROUP } from "./viduModels.js";
 import { viduParameters } from "./viduParameters.js";
 import { PIXVERSE_MODEL_GROUP } from "./pixverseModels.js";
 import { pixverseParameters } from "./pixverseParameters.js";
+import { LTX_MODEL_GROUP } from "./ltxModels.js";
+import { ltxParameters } from "./ltxParameters.js";
 import {
   getMiniMaxResolutionOptions,
   getMiniMaxSelectionAdjustments,
@@ -31,6 +33,7 @@ import {
 } from "./veoParameters.js";
 
 const groups = [
+  { familyNames: LTX_MODEL_GROUP.familyNames, ...ltxParameters },
   { familyNames: PIXVERSE_MODEL_GROUP.familyNames, ...pixverseParameters },
   { familyNames: VIDU_MODEL_GROUP.familyNames, ...viduParameters },
   { familyNames: KLING_MODEL_GROUP.familyNames, ...klingParameters },
