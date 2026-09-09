@@ -111,6 +111,10 @@ export function createModelParameterValues(model, previousValues = {}) {
   return values;
 }
 
+export function mergeModelParameterValues(model, previousValues = {}) {
+  return { ...previousValues, ...createModelParameterValues(model, previousValues) };
+}
+
 export function buildSupplementalInputPayload(model, values = {}) {
   const payload = {};
   for (const { key, schema } of getSupplementalModelInputs(model)) {

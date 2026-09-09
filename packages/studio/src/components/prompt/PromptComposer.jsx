@@ -179,13 +179,35 @@ export const PromptPopover = forwardRef(function PromptPopover(
     const position = () => {
       const popover = popoverRef.current;
       popover.style.translate = "";
+      popover.style.height = "";
+      let left = 16;
+      let right = window.innerWidth - 16;
+      let top = 16;
+      for (let parent = popover.parentElement; parent; parent = parent.parentElement) {
+        const style = getComputedStyle(parent);
+        const clipsX = /auto|scroll|hidden|clip/.test(style.overflowX);
+        const clipsY = /auto|scroll|hidden|clip/.test(style.overflowY);
+        if (!clipsX && !clipsY) continue;
+        const bounds = parent.getBoundingClientRect();
+        if (clipsX) {
+          left = Math.max(left, bounds.left + 16);
+          right = Math.min(right, bounds.right - 16);
+        }
+        if (clipsY) top = Math.max(top, bounds.top + 16);
+      }
       const bounds = popover.getBoundingClientRect();
-      const shift = Math.max(16 - bounds.left, Math.min(0, window.innerWidth - 16 - bounds.right));
+      const shift = Math.max(left - bounds.left, Math.min(0, right - bounds.right));
       popover.style.translate = `${shift}px 0`;
+      if (bounds.top < top) popover.style.height = `${Math.max(0, bounds.bottom - top)}px`;
     };
     position();
+    const popover = popoverRef.current;
+    popover.addEventListener("toggle", position, true);
     window.addEventListener("resize", position);
-    return () => window.removeEventListener("resize", position);
+    return () => {
+      popover.removeEventListener("toggle", position, true);
+      window.removeEventListener("resize", position);
+    };
   }, [fitViewport, children]);
   return (
     <div

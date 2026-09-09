@@ -125,7 +125,13 @@
       "aspectRatio": "Format: {value}",
       "speed": "Speed: {value}",
       "profile": "Service: {value}",
-      "quality": "Quality: {value}"
+      "quality": "Quality: {value}",
+      "imageUnused": "Uploaded images won’t be used",
+      "videoUnused": "Uploaded videos won’t be used",
+      "audioUnused": "Uploaded audio won’t be used",
+      "imageCount": "Images used: {value}",
+      "videoCount": "Videos used: {value}",
+      "audioCount": "Audio files used: {value}"
     },
     "fields": {
       "seed": {
@@ -364,6 +370,58 @@
         "optionLabels": {
           "animate": "Animate character",
           "replace": "Replace character"
+        }
+      }
+    }
+  },
+  "kling": {
+    "speed": "Speed",
+    "speeds": {
+      "standard": "Standard speed",
+      "fast": "Fast"
+    },
+    "speedDescriptions": {
+      "standard": "",
+      "fast": "Faster generation."
+    },
+    "provider": "Generation",
+    "providerHelp": "",
+    "profiles": {
+      "standard": {
+        "label": "Standard",
+        "description": ""
+      },
+      "master": {
+        "label": "Master",
+        "description": "Improved motion and prompt following."
+      },
+      "pro": {
+        "label": "Pro",
+        "description": "More detail."
+      },
+      "fast": {
+        "label": "Fast",
+        "description": "Faster video editing."
+      }
+    },
+    "adjustments": {
+      "profile": "Generation: {value}"
+    },
+    "fields": {
+      "sound": {
+        "title": "Generate audio",
+        "description": ""
+      },
+      "keep_original_sound": {
+        "title": "Keep original audio",
+        "description": "Use the audio from your video."
+      },
+      "character_orientation": {
+        "title": "Character pose",
+        "description": "Choose which source sets the character’s pose.",
+        "optionLabels": {
+          "image": "From image (up to 10s)",
+          "video": "From video (up to 30s)"
         }
       }
     }

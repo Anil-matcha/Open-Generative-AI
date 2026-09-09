@@ -95,6 +95,54 @@ const HAPPY_HORSE_EDIT_INPUTS = Object.freeze({
   seed: HAPPY_HORSE_SEED_INPUT,
 });
 
+// Kling inputs verified against https://api.muapi.ai/openapi.json on 2026-09-09.
+// Output sizes are recorded only for documented routes;
+// resolution selects an endpoint and is not a native request parameter.
+const KLING_ASPECT_RATIO_INPUT = Object.freeze({
+  type: "string", title: "Aspect Ratio", name: "aspect_ratio",
+  enum: Object.freeze(["16:9", "9:16", "1:1"]), default: "16:9",
+});
+const KLING_AUDIO_INPUT = Object.freeze({
+  type: "boolean", title: "Generate audio", name: "generate_audio", default: true,
+});
+const KLING_SOUND_INPUT = Object.freeze({
+  type: "boolean", title: "Generate audio", name: "sound", default: true,
+});
+const KLING_KEEP_SOUND_INPUT = Object.freeze({
+  type: "boolean", title: "Keep original sound", name: "keep_original_sound",
+  default: true,
+});
+const KLING_MOTION_INPUTS = Object.freeze({
+  prompt: { type: "string", title: "Prompt", name: "prompt" },
+  image_url: { type: "string", field: "image", title: "Character image", name: "image_url" },
+  video_url: { type: "string", field: "video", title: "Motion video", name: "video_url" },
+  character_orientation: {
+    type: "string", title: "Character orientation", name: "character_orientation",
+    enum: ["image", "video"], default: "image",
+  },
+});
+const KLING_3_MOTION_INPUTS = Object.freeze({
+  ...KLING_MOTION_INPUTS,
+  keep_original_sound: KLING_KEEP_SOUND_INPUT,
+});
+const KLING_O1_EDIT_INPUTS = Object.freeze({
+  prompt: { type: "string", title: "Prompt", name: "prompt" },
+  video_url: { type: "string", field: "video", title: "Source video", name: "video_url" },
+  images_list: {
+    type: "array", items: { type: "string" }, title: "Reference images",
+    name: "images_list", maxItems: 4,
+  },
+  keep_original_sound: KLING_KEEP_SOUND_INPUT,
+});
+const KLING_O1_PRO_EDIT_INPUTS = Object.freeze({
+  ...KLING_O1_EDIT_INPUTS,
+  aspect_ratio: KLING_ASPECT_RATIO_INPUT,
+});
+const KLING_OMNI_REFERENCE_INPUT = Object.freeze({
+  type: "array", items: { type: "string" }, title: "Reference images",
+  name: "images_list", minItems: 1, maxItems: 4,
+});
+
 export const t2iModels = [
   {
     "id": "nano-banana",
@@ -4284,6 +4332,7 @@ export const t2vModels = [
   },
   {
     "id": "kling-v2.1-master-t2v",
+    "fixedParameters": { resolution: "1080p" },
     "name": "Kling 2.1 Master",
     "inputs": {
       "prompt": {
@@ -4358,6 +4407,7 @@ export const t2vModels = [
     "id": "kling-v2.6-pro-t2v",
     "name": "Kling 2.6 Pro",
     "inputs": {
+      "sound": KLING_SOUND_INPUT,
       "prompt": {
         "type": "string",
         "title": "Prompt",
@@ -4430,8 +4480,10 @@ export const t2vModels = [
   },
   {
     "id": "kling-v3.0-pro-text-to-video",
+    "fixedParameters": { resolution: "1080p" },
     "name": "Kling 3.0 Pro",
     "inputs": {
+      "generate_audio": KLING_AUDIO_INPUT,
       "prompt": {
         "type": "string",
         "title": "Prompt",
@@ -4466,8 +4518,10 @@ export const t2vModels = [
   },
   {
     "id": "kling-v3.0-standard-text-to-video",
+    "fixedParameters": { resolution: "720p" },
     "name": "Kling 3.0 Standard",
     "inputs": {
+      "generate_audio": KLING_AUDIO_INPUT,
       "prompt": {
         "type": "string",
         "title": "Prompt",
@@ -6696,6 +6750,7 @@ export const t2vModels = [
   },
   {
     "id": "kling-v3.0-4k-text-to-video",
+    "fixedParameters": { resolution: "4K" },
     "name": "Kling 3.0 4K",
     "endpoint": "kling-v3.0-4k-text-to-video",
     "inputs": {
@@ -6730,13 +6785,7 @@ export const t2vModels = [
         "maxValue": 15,
         "step": 1
       },
-      "generate_audio": {
-        "type": "boolean",
-        "default": true,
-        "title": "Generate Audio",
-        "name": "generate_audio",
-        "description": "Whether to generate audio for the video"
-      }
+      "generate_audio": KLING_AUDIO_INPUT
     },
     "provider": "kling",
     "provider_name": "Kling AI"
@@ -7211,6 +7260,7 @@ export const t2vModels = [
   },
   {
     "id": "kling-v3.0-omni-standard-text-to-video",
+    "fixedParameters": { resolution: "720p" },
     "name": "Kling 3.0 Omni Standard",
     "endpoint": "kling-v3.0-omni-standard-text-to-video",
     "inputs": {
@@ -7270,6 +7320,7 @@ export const t2vModels = [
   },
   {
     "id": "kling-v3.0-omni-pro-text-to-video",
+    "fixedParameters": { resolution: "1080p" },
     "name": "Kling 3.0 Omni Pro",
     "endpoint": "kling-v3.0-omni-pro-text-to-video",
     "inputs": {
@@ -7329,6 +7380,7 @@ export const t2vModels = [
   },
   {
     "id": "kling-v3.0-omni-4k-text-to-video",
+    "fixedParameters": { resolution: "4K" },
     "name": "Kling 3.0 Omni 4K",
     "endpoint": "kling-v3.0-omni-4k-text-to-video",
     "inputs": {
@@ -7464,6 +7516,7 @@ export const t2vModels = [
   },
   {
     "id": "kling-v3-turbo-standard-text-to-video",
+    "fixedParameters": { resolution: "720p" },
     "name": "Kling 3.0 Turbo Standard",
     "endpoint": "kling-v3-turbo-standard-text-to-video",
     "inputs": {
@@ -7504,6 +7557,7 @@ export const t2vModels = [
   },
   {
     "id": "kling-v3-turbo-pro-text-to-video",
+    "fixedParameters": { resolution: "1080p" },
     "name": "Kling 3.0 Turbo Pro",
     "endpoint": "kling-v3-turbo-pro-text-to-video",
     "inputs": {
@@ -13369,11 +13423,11 @@ export const i2vModels = [
   },
   {
     "id": "kling-v2.1-master-i2v",
+    "fixedParameters": { resolution: "1080p" },
     "name": "Kling v2.1 Master I2V",
     "endpoint": "kling-v2.1-master-i2v",
     "family": "kling-v2.1",
     "imageField": "image_url",
-    "lastImageField": "last_image",
     "hasPrompt": true,
     "promptRequired": true,
     "inputs": {
@@ -13414,11 +13468,11 @@ export const i2vModels = [
   },
   {
     "id": "kling-v2.1-standard-i2v",
+    "fixedParameters": { resolution: "720p" },
     "name": "Kling 2.1 Standard",
     "endpoint": "kling-v2.1-standard-i2v",
     "family": "kling-v2.1",
     "imageField": "image_url",
-    "lastImageField": "last_image",
     "hasPrompt": true,
     "promptRequired": true,
     "inputs": {
@@ -13459,6 +13513,7 @@ export const i2vModels = [
   },
   {
     "id": "kling-v2.1-pro-i2v",
+    "fixedParameters": { resolution: "1080p" },
     "name": "Kling 2.1 Pro",
     "endpoint": "kling-v2.1-pro-i2v",
     "family": "kling-v2.1",
@@ -14170,6 +14225,8 @@ export const i2vModels = [
     "family": "kling-v2.5",
     "imageField": "image_url",
     "hasPrompt": true,
+    "promptRequired": true,
+    "aspectRatioMode": "inherited",
     "inputs": {
       "prompt": {
         "type": "string",
@@ -15123,6 +15180,8 @@ export const i2vModels = [
     "family": "kling-v2.5",
     "imageField": "image_url",
     "hasPrompt": true,
+    "promptRequired": true,
+    "aspectRatioMode": "inherited",
     "inputs": {
       "prompt": {
         "type": "string",
@@ -15250,7 +15309,12 @@ export const i2vModels = [
     "hasPrompt": true,
     "promptRequired": true,
     "maxImages": 7,
+    "required": ["prompt", "images_list"],
     "inputs": {
+      "images_list": {
+        type: "array", items: { type: "string" }, title: "Reference images",
+        name: "images_list", maxItems: 7,
+      },
       "prompt": {
         "type": "string",
         "title": "Prompt",
@@ -15282,13 +15346,7 @@ export const i2vModels = [
         "maxValue": 10,
         "step": 1
       },
-      "keep_original_sound": {
-        "type": "boolean",
-        "title": "Keep Original Sound",
-        "name": "keep_original_sound",
-        "description": "Select whether to keep the video original sound through the parameter.",
-        "default": true
-      }
+      "keep_original_sound": KLING_KEEP_SOUND_INPUT
     },
     "provider": "kling",
     "provider_name": "Kling AI"
@@ -15301,7 +15359,7 @@ export const i2vModels = [
     "imageField": "image_url",
     "hasPrompt": true,
     "promptRequired": true,
-    "parameterNotice": "This integration supports 5 or 10 seconds.",
+    "aspectRatioMode": "inherited",
     "inputs": {
       "prompt": {
         "type": "string",
@@ -15323,13 +15381,7 @@ export const i2vModels = [
         ],
         "default": 5
       },
-      "sound": {
-        "type": "boolean",
-        "title": "Sound",
-        "name": "sound",
-        "description": "Whether sound is generated simultaneously when generating a video.",
-        "default": true
-      }
+      "sound": KLING_SOUND_INPUT
     },
     "provider": "kling",
     "provider_name": "Kling AI"
@@ -15557,6 +15609,7 @@ export const i2vModels = [
     "lastImageField": "last_image",
     "hasPrompt": true,
     "promptRequired": true,
+    "aspectRatioMode": "inherited",
     "inputs": {
       "prompt": {
         "type": "string",
@@ -15591,7 +15644,12 @@ export const i2vModels = [
     "hasPrompt": true,
     "promptRequired": true,
     "maxImages": 7,
+    "required": ["prompt", "images_list"],
     "inputs": {
+      "images_list": {
+        type: "array", items: { type: "string" }, title: "Reference images",
+        name: "images_list", minItems: 1, maxItems: 7,
+      },
       "prompt": {
         "type": "string",
         "title": "Prompt",
@@ -15824,6 +15882,7 @@ export const i2vModels = [
   },
   {
     "id": "kling-v3.0-omni-standard-image-to-video",
+    "fixedParameters": { resolution: "720p" },
     "name": "Kling v3.0 Omni Standard Image To Video",
     "endpoint": "kling-v3.0-omni-standard-image-to-video",
     "family": "kling-v3.0-omni",
@@ -15832,6 +15891,7 @@ export const i2vModels = [
     "promptRequired": true,
     "maxImages": 4,
     "inputs": {
+      "images_list": KLING_OMNI_REFERENCE_INPUT,
       "prompt": {
         "type": "string",
         "title": "Prompt",
@@ -15888,6 +15948,7 @@ export const i2vModels = [
   },
   {
     "id": "kling-v3.0-omni-pro-image-to-video",
+    "fixedParameters": { resolution: "1080p" },
     "name": "Kling v3.0 Omni Pro Image To Video",
     "endpoint": "kling-v3.0-omni-pro-image-to-video",
     "family": "kling-v3.0-omni",
@@ -15896,6 +15957,7 @@ export const i2vModels = [
     "promptRequired": true,
     "maxImages": 4,
     "inputs": {
+      "images_list": KLING_OMNI_REFERENCE_INPUT,
       "prompt": {
         "type": "string",
         "title": "Prompt",
@@ -15952,6 +16014,7 @@ export const i2vModels = [
   },
   {
     "id": "kling-v3.0-omni-4k-image-to-video",
+    "fixedParameters": { resolution: "4K" },
     "name": "Kling v3.0 Omni 4K Image To Video",
     "endpoint": "kling-v3.0-omni-4k-image-to-video",
     "family": "kling-v3.0-omni",
@@ -15960,6 +16023,7 @@ export const i2vModels = [
     "promptRequired": true,
     "maxImages": 4,
     "inputs": {
+      "images_list": KLING_OMNI_REFERENCE_INPUT,
       "prompt": {
         "type": "string",
         "title": "Prompt",
@@ -16009,6 +16073,7 @@ export const i2vModels = [
   },
   {
     "id": "kling-v3.0-pro-image-to-video",
+    "fixedParameters": { resolution: "1080p" },
     "name": "Kling v3.0 Pro Image To Video",
     "endpoint": "kling-v3.0-pro-image-to-video",
     "family": "kling-v3.0",
@@ -16016,6 +16081,7 @@ export const i2vModels = [
     "lastImageField": "last_image",
     "hasPrompt": true,
     "promptRequired": true,
+    "aspectRatioMode": "inherited",
     "inputs": {
       "prompt": {
         "type": "string",
@@ -16036,19 +16102,14 @@ export const i2vModels = [
         "maxValue": 15,
         "step": 1
       },
-      "generate_audio": {
-        "type": "boolean",
-        "title": "Generate Audio",
-        "name": "generate_audio",
-        "description": "Whether to generate audio for the video",
-        "default": true
-      }
+      "generate_audio": KLING_AUDIO_INPUT
     },
     "provider": "kling",
     "provider_name": "Kling AI"
   },
   {
     "id": "kling-v3.0-standard-image-to-video",
+    "fixedParameters": { resolution: "720p" },
     "name": "Kling v3.0 Standard Image To Video",
     "endpoint": "kling-v3.0-standard-image-to-video",
     "family": "kling-v3.0",
@@ -16056,6 +16117,7 @@ export const i2vModels = [
     "lastImageField": "last_image",
     "hasPrompt": true,
     "promptRequired": true,
+    "aspectRatioMode": "inherited",
     "inputs": {
       "prompt": {
         "type": "string",
@@ -16076,13 +16138,7 @@ export const i2vModels = [
         "maxValue": 15,
         "step": 1
       },
-      "generate_audio": {
-        "type": "boolean",
-        "title": "Generate Audio",
-        "name": "generate_audio",
-        "description": "Whether to generate audio for the video",
-        "default": true
-      }
+      "generate_audio": KLING_AUDIO_INPUT
     },
     "provider": "kling",
     "provider_name": "Kling AI"
@@ -18352,6 +18408,7 @@ export const i2vModels = [
   },
   {
     "id": "kling-v3.0-4k-image-to-video",
+    "fixedParameters": { resolution: "4K" },
     "name": "Kling v3.0 4K",
     "endpoint": "kling-v3.0-4k-image-to-video",
     "family": "kling-v3.0",
@@ -18359,6 +18416,7 @@ export const i2vModels = [
     "lastImageField": "last_image",
     "hasPrompt": true,
     "promptRequired": true,
+    "aspectRatioMode": "inherited",
     "inputs": {
       "prompt": {
         "examples": [
@@ -18399,13 +18457,7 @@ export const i2vModels = [
         "maxValue": 15,
         "step": 1
       },
-      "generate_audio": {
-        "type": "boolean",
-        "default": true,
-        "title": "Generate Audio",
-        "name": "generate_audio",
-        "description": "Whether to generate audio for the video"
-      }
+      "generate_audio": KLING_AUDIO_INPUT
     },
     "provider": "kling",
     "provider_name": "Kling AI"
@@ -19211,12 +19263,14 @@ export const i2vModels = [
   },
   {
     "id": "kling-v3-turbo-standard-image-to-video",
+    "fixedParameters": { resolution: "720p" },
     "name": "Kling v3 Turbo Standard",
     "endpoint": "kling-v3-turbo-standard-image-to-video",
     "family": "kling-v3.0",
     "imageField": "image_url",
     "hasPrompt": true,
     "promptRequired": true,
+    "aspectRatioMode": "inherited",
     "inputs": {
       "prompt": {
         "type": "string",
@@ -19253,12 +19307,14 @@ export const i2vModels = [
   },
   {
     "id": "kling-v3-turbo-pro-image-to-video",
+    "fixedParameters": { resolution: "1080p" },
     "name": "Kling v3 Turbo Pro",
     "endpoint": "kling-v3-turbo-pro-image-to-video",
     "family": "kling-v3.0",
     "imageField": "image_url",
     "hasPrompt": true,
     "promptRequired": true,
+    "aspectRatioMode": "inherited",
     "inputs": {
       "prompt": {
         "type": "string",
@@ -24657,6 +24713,7 @@ export const v2vModels = [
     "videoField": "video_url",
     "imageField": "image_url",
     "hasPrompt": true,
+    "inputs": KLING_MOTION_INPUTS,
     "promptRequired": true,
     "description": "Kling v2.6 Pro Motion Control allows precise control over camera movement, subject motion, and scene dynamics during video generation.",
     "provider": "kling",
@@ -24670,6 +24727,7 @@ export const v2vModels = [
     "videoField": "video_url",
     "imageField": "image_url",
     "hasPrompt": true,
+    "inputs": KLING_3_MOTION_INPUTS,
     "description": "Kling V3.0 Standard Motion Control allows for precise control over the camera and subject movement in generated videos.",
     "provider": "kling",
     "provider_name": "Kling AI"
@@ -24682,6 +24740,7 @@ export const v2vModels = [
     "videoField": "video_url",
     "imageField": "image_url",
     "hasPrompt": true,
+    "inputs": KLING_3_MOTION_INPUTS,
     "description": "Kling V3.0 Pro Motion Control provides the highest level of detail and control for video generation.",
     "provider": "kling",
     "provider_name": "Kling AI"
@@ -24819,16 +24878,7 @@ export const v2vModels = [
       "images_list",
       "video_url"
     ],
-    "inputs": {
-      "images_list": {
-        "field": "images_list",
-        "type": "array",
-        "items": {
-          "type": "string"
-        },
-        "maxItems": 4
-      }
-    },
+    "inputs": KLING_O1_PRO_EDIT_INPUTS,
     "description": "Kling O1 Video Edit lets you send an existing video clip plus an instruction/prompt to edit or transform the clip while preserving temporal coherence and subject identity.",
     "provider": "kling",
     "provider_name": "Kling AI"
@@ -24848,16 +24898,7 @@ export const v2vModels = [
       "images_list",
       "video_url"
     ],
-    "inputs": {
-      "images_list": {
-        "field": "images_list",
-        "type": "array",
-        "items": {
-          "type": "string"
-        },
-        "maxItems": 4
-      }
-    },
+    "inputs": KLING_O1_PRO_EDIT_INPUTS,
     "description": "Video Edit Fast is the lightweight, high-speed editing mode of Kling O1.",
     "provider": "kling",
     "provider_name": "Kling AI"
@@ -24877,16 +24918,7 @@ export const v2vModels = [
       "images_list",
       "video_url"
     ],
-    "inputs": {
-      "images_list": {
-        "field": "images_list",
-        "type": "array",
-        "items": {
-          "type": "string"
-        },
-        "maxItems": 4
-      }
-    },
+    "inputs": KLING_O1_EDIT_INPUTS,
     "description": "Kling O1 Standard Video-to-Video Edit modifies an existing video while preserving its original structure, motion, and realism.",
     "provider": "kling",
     "provider_name": "Kling AI"
@@ -25149,6 +25181,7 @@ export const v2vModels = [
     "videoField": "video_url",
     "imageField": "image_url",
     "hasPrompt": true,
+    "inputs": KLING_MOTION_INPUTS,
     "promptRequired": true,
     "description": "Kling v2.6 Pro Motion Control allows precise control over camera movement, subject motion, and scene dynamics during video generation.",
     "provider": "kling",

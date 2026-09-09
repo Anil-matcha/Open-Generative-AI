@@ -193,6 +193,8 @@ function imageFamilyId(model) {
 }
 
 function videoFamilyId(model) {
+  const grouped = getGroupedVideoConfiguration(model.id);
+  if (grouped) return grouped.familyId;
   const modelId = model.id.toLowerCase();
   const id = VIDEO_FAMILY_ALIASES[modelId] || modelId;
   let match = id.match(/^kling-(v?\d+(?:\.\d+)?|o1)(?:-|$)/);

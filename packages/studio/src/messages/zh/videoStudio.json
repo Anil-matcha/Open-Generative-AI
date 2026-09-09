@@ -125,7 +125,13 @@
       "aspectRatio": "画面比例：{value}",
       "speed": "速度：{value}",
       "profile": "服务：{value}",
-      "quality": "质量：{value}"
+      "quality": "质量：{value}",
+      "imageUnused": "不会使用已上传的图片",
+      "videoUnused": "不会使用已上传的视频",
+      "audioUnused": "不会使用已上传的音频",
+      "imageCount": "使用图片数量：{value}",
+      "videoCount": "使用视频数量：{value}",
+      "audioCount": "使用音频数量：{value}"
     },
     "fields": {
       "seed": {
@@ -364,6 +370,58 @@
         "optionLabels": {
           "animate": "生成角色动画",
           "replace": "替换角色"
+        }
+      }
+    }
+  },
+  "kling": {
+    "speed": "速度",
+    "speeds": {
+      "standard": "标准速度",
+      "fast": "快速"
+    },
+    "speedDescriptions": {
+      "standard": "",
+      "fast": "更快生成。"
+    },
+    "provider": "生成方式",
+    "providerHelp": "",
+    "profiles": {
+      "standard": {
+        "label": "标准",
+        "description": ""
+      },
+      "master": {
+        "label": "Master",
+        "description": "改善运动效果和提示词理解。"
+      },
+      "pro": {
+        "label": "Pro",
+        "description": "更多细节。"
+      },
+      "fast": {
+        "label": "快速",
+        "description": "更快编辑视频。"
+      }
+    },
+    "adjustments": {
+      "profile": "生成方式：{value}"
+    },
+    "fields": {
+      "sound": {
+        "title": "生成音频",
+        "description": ""
+      },
+      "keep_original_sound": {
+        "title": "保留原音频",
+        "description": "使用上传视频中的音频。"
+      },
+      "character_orientation": {
+        "title": "角色姿态",
+        "description": "选择用于确定角色姿态的素材。",
+        "optionLabels": {
+          "image": "来自图片（最长10秒）",
+          "video": "来自视频（最长30秒）"
         }
       }
     }

@@ -53,29 +53,6 @@ const WORKFLOW_REQUIRED_MEDIA = Object.freeze({
 
 // Opt-in only: models outside this registry retain their existing behavior.
 export const VIDEO_WORKFLOW_VARIANTS = Object.freeze({
-  "kling-v3": {
-    animate_image: [
-      "kling-v3-turbo-pro-image-to-video",
-      "kling-v3-turbo-standard-image-to-video",
-      "kling-v3.0-4k-image-to-video",
-      "kling-v3.0-standard-image-to-video",
-      "kling-v3.0-pro-image-to-video",
-    ],
-    keyframes: [
-      "kling-v3.0-4k-image-to-video",
-      "kling-v3.0-standard-image-to-video",
-      "kling-v3.0-pro-image-to-video",
-    ],
-    references: [
-      "kling-v3.0-omni-4k-image-to-video",
-      "kling-v3.0-omni-pro-image-to-video",
-      "kling-v3.0-omni-standard-image-to-video",
-    ],
-    motion_transfer: [
-      "kling-v3.0-pro-motion-control",
-      "kling-v3.0-std-motion-control",
-    ],
-  },
   "gemini-omni": {
     animate_image: ["gemini-omni-image-to-video"],
     references: ["gemini-omni-image-to-video"],
@@ -98,41 +75,11 @@ export const VIDEO_WORKFLOW_VARIANTS = Object.freeze({
     animate_image: ["pixverse-v6-i2v"],
     keyframes: ["pixverse-v6-transition"],
   },
-  "kling-o1": {
-    animate_image: ["kling-o1-standard-image-to-video", "kling-o1-image-to-video"],
-    keyframes: ["kling-o1-standard-image-to-video", "kling-o1-image-to-video"],
-    references: ["kling-o1-standard-reference-to-video", "kling-o1-reference-to-video"],
-    edit_video: [
-      "kling-o1-standard-video-edit",
-      "kling-o1-video-edit-fast",
-      "kling-o1-video-edit",
-    ],
-  },
-  "kling-v2.6": {
-    animate_image: ["kling-v2.6-pro-i2v"],
-    motion_transfer: ["kling-v2.6-pro-motion-control", "kling-v2.6-std-motion-control"],
-  },
   "ltx-2.3": {
     animate_image: ["ltx-2.3-image-to-video"],
     extend_uploaded_video: ["ltx-2.3-video-extend"],
   },
-  "kling-v2.1": {
-    animate_image: [
-      "kling-v2.1-pro-i2v",
-      "kling-v2.1-standard-i2v",
-      "kling-v2.1-master-i2v",
-    ],
-    keyframes: ["kling-v2.1-pro-i2v"],
-  },
   ...GROUPED_VIDEO_WORKFLOW_VARIANTS,
-});
-
-const TECHNICAL_EXCLUDED_VARIANTS = Object.freeze({
-  "kling-v3": new Set([
-    "kling-v3.0-omni-4k-text-to-video",
-    "kling-v3.0-omni-pro-text-to-video",
-    "kling-v3.0-omni-standard-text-to-video",
-  ]),
 });
 
 function createVariantGroup(variants) {
@@ -186,12 +133,10 @@ function createWorkflowCatalog() {
       }
     }
 
-    const excluded = TECHNICAL_EXCLUDED_VARIANTS[familyId] || new Set();
     const base = createVariantGroup(
       family.variants.t2v.filter(
         (variant) =>
           !workflowVariantIds.has(variant.model.id) &&
-          !excluded.has(variant.model.id) &&
           !variant.model.requiresRequestId,
       ),
     );
@@ -204,7 +149,6 @@ function createWorkflowCatalog() {
           (variant) =>
             !base.variantIds.has(variant.model.id) &&
             !workflowVariantIds.has(variant.model.id) &&
-            !excluded.has(variant.model.id) &&
             !variant.model.requiresRequestId,
         ),
       );
@@ -572,8 +516,15 @@ const WAN_REFERENCE_CONSTRAINT = Object.freeze({
 const MINIMAX_H3_REFERENCE_CONSTRAINT = Object.freeze({
   combinedSlotIds: MULTIMODAL_REFERENCE_SLOT_IDS,
   combinedLimit: 12,
-  requiredSlotIds: VISUAL_REFERENCE_SLOT_IDS,
   combinedLimitMessage: "MiniMax H3 supports up to 12 references in total.",
+});
+const KLING_O1_REFERENCE_CONSTRAINT = Object.freeze({
+  combinedSlotIds: VISUAL_REFERENCE_SLOT_IDS,
+  combinedLimit: 7,
+  // A video reduces the image allowance from seven to four.
+  slotWeights: Object.freeze({ referenceVideos: 3 }),
+  requiredSlotIds: VISUAL_REFERENCE_SLOT_IDS,
+  combinedLimitMessage: "Kling O1 supports up to 4 reference images when a video is included.",
 });
 
 export function getVideoWorkflowMediaSlots(model, workflowId) {
@@ -676,6 +627,12 @@ export function getVideoWorkflowMediaSlots(model, workflowId) {
         ),
       ];
     }
+    const minimaxReferenceConstraint = familyId === "minimax-h3" ? {
+      ...MINIMAX_H3_REFERENCE_CONSTRAINT,
+      // Open H3 and LoRA support standalone audio references.
+      requiredSlotIds: getGroupedVideoConfiguration(model.id)?.service === "official"
+        ? VISUAL_REFERENCE_SLOT_IDS : MULTIMODAL_REFERENCE_SLOT_IDS,
+    } : {};
     return [
       imageField && createMediaSlot(
         "referenceImages",
@@ -695,8 +652,9 @@ export function getVideoWorkflowMediaSlots(model, workflowId) {
               requiredMessage: "Please add a reference image.",
             }
             : {}),
-          ...(familyId === "minimax-h3"
-            ? MINIMAX_H3_REFERENCE_CONSTRAINT
+          ...minimaxReferenceConstraint,
+          ...(familyId === "kling-o1" && videoField
+            ? KLING_O1_REFERENCE_CONSTRAINT
             : {}),
         },
       ),
@@ -709,8 +667,9 @@ export function getVideoWorkflowMediaSlots(model, workflowId) {
         Math.max(capabilities.video.maxItems, 1),
         {
           isArray: capabilities.video.isArray,
-          ...(familyId === "minimax-h3"
-            ? MINIMAX_H3_REFERENCE_CONSTRAINT
+          ...minimaxReferenceConstraint,
+          ...(familyId === "kling-o1"
+            ? KLING_O1_REFERENCE_CONSTRAINT
             : {}),
         },
       ),
@@ -723,9 +682,7 @@ export function getVideoWorkflowMediaSlots(model, workflowId) {
         Math.max(capabilities.audio.maxItems, 1),
         {
           isArray: capabilities.audio.isArray,
-          ...(familyId === "minimax-h3"
-            ? MINIMAX_H3_REFERENCE_CONSTRAINT
-            : {}),
+          ...minimaxReferenceConstraint,
         },
       ),
     ].filter(Boolean);
@@ -820,6 +777,14 @@ export function getVideoWorkflowDraftKey(familyId, workflowId) {
   return `${familyId}:${workflowId}`;
 }
 
+export function migrateVideoWorkflowMediaDrafts(drafts) {
+  // Omni references used to share Kling 3.0's draft before becoming a separate model.
+  const { "kling-v3:references": omniReferences, ...migrated } = drafts;
+  const key = getVideoWorkflowDraftKey("kling-v3-omni", "references");
+  if (omniReferences && !Object.hasOwn(migrated, key)) migrated[key] = omniReferences;
+  return migrated;
+}
+
 export function appendVideoWorkflowMedia(
   drafts,
   draftKey,
@@ -889,6 +854,22 @@ export function projectVideoWorkflowMedia(model, workflowId, media = {}) {
   return projected;
 }
 
+export function getVideoWorkflowMediaAdjustments(currentModel, nextModel, workflowId, media) {
+  const current = projectVideoWorkflowMedia(currentModel, workflowId, media);
+  const next = projectVideoWorkflowMedia(nextModel, workflowId, media);
+  const counts = {};
+  for (const slot of getVideoWorkflowMediaSlots(currentModel, workflowId)) {
+    const count = counts[slot.mediaType] ||= { from: 0, to: 0 };
+    count.from += current[slot.id]?.length || 0;
+    count.to += next[slot.id]?.length || 0;
+  }
+  return Object.entries(counts)
+    .filter(([, { from, to }]) => from > to)
+    .map(([type, { from, to }]) => ({
+      key: `${type}${to === 0 ? "Unused" : "Count"}`, from, to,
+    }));
+}
+
 export function getVideoWorkflowSlotRemaining(slot, media = {}) {
   if (!slot) return 0;
   const ownRemaining = Math.max(
@@ -896,10 +877,10 @@ export function getVideoWorkflowSlotRemaining(slot, media = {}) {
     0,
   );
   if (!slot.combinedLimit || !slot.combinedSlotIds) return ownRemaining;
-  const combinedCount = combinedMediaCount(media, slot.combinedSlotIds);
+  const combinedCount = combinedMediaCount(media, slot.combinedSlotIds, slot.slotWeights);
   return Math.min(
     ownRemaining,
-    Math.max(slot.combinedLimit - combinedCount, 0),
+    Math.max(Math.floor((slot.combinedLimit - combinedCount) / (slot.slotWeights?.[slot.id] || 1)), 0),
   );
 }
 
@@ -916,10 +897,9 @@ function mediaCount(media, slotId) {
   return mediaValues(media, slotId).length;
 }
 
-function combinedMediaCount(media, slotIds, excludedSlotId = null) {
+function combinedMediaCount(media, slotIds, slotWeights) {
   return slotIds.reduce(
-    (total, slotId) =>
-      slotId === excludedSlotId ? total : total + mediaCount(media, slotId),
+    (total, slotId) => total + mediaCount(media, slotId) * (slotWeights?.[slotId] || 1),
     0,
   );
 }
@@ -959,6 +939,7 @@ export function validateVideoWorkflowMedia(workflowId, media = {}, model = null)
       const combinedCount = combinedMediaCount(
         activeMedia,
         combinedConstraint.combinedSlotIds,
+        combinedConstraint.slotWeights,
       );
       if (combinedCount > combinedConstraint.combinedLimit) {
         return {

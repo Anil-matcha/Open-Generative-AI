@@ -148,6 +148,19 @@ export function VideoSettingsControl({
       </label>
     );
   };
+  const profileControl = profile?.options.length > 1 && (
+    <fieldset className="min-w-0">
+      <legend className="text-xs font-semibold text-white/75">{copy.provider}</legend>
+      {copy.providerHelp && <p className="mb-2 mt-1 text-[11px] leading-relaxed text-white/45">{copy.providerHelp}</p>}
+      {profile.options.map(renderProfile)}
+      {onDefaultResolution && (
+        <button type="button" onClick={onDefaultResolution}
+          className="mt-2 px-3 py-2 text-xs text-[#22d3ee] hover:underline focus-visible:outline focus-visible:outline-1 focus-visible:outline-[#22d3ee]">
+          {copy.restoreDefaultResolution}
+        </button>
+      )}
+    </fieldset>
+  );
   return (
     <ModelParameterControls
       inputs={inputs}
@@ -162,20 +175,9 @@ export function VideoSettingsControl({
       solid
       advancedKeys={ADVANCED_KEYS}
       advancedLabel={copy.advanced}
-      advancedChildren={profile?.options.length > 1 && (
-        <fieldset className="min-w-0">
-          <legend className="text-xs font-semibold text-white/75">{copy.provider}</legend>
-          <p className="mb-2 mt-1 text-[11px] leading-relaxed text-white/45">{copy.providerHelp}</p>
-          {profile.options.map(renderProfile)}
-          {onDefaultResolution && (
-            <button type="button" onClick={onDefaultResolution}
-              className="mt-2 px-3 py-2 text-xs text-[#22d3ee] hover:underline focus-visible:outline focus-visible:outline-1 focus-visible:outline-[#22d3ee]">
-              {copy.restoreDefaultResolution}
-            </button>
-          )}
-        </fieldset>
-      )}
+      advancedChildren={profile?.advanced !== false && profileControl}
     >
+      {profile?.advanced === false && profileControl}
       {qualities.length > 0 && (
         <label className="flex flex-col gap-2 text-xs text-white/75">
           <span className="font-semibold">{copy.quality}</span>

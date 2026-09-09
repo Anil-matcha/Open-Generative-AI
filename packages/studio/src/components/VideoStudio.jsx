@@ -53,6 +53,7 @@ import {
   buildSupplementalInputPayload,
   createModelParameterValues,
   getSupplementalModelInputs,
+  mergeModelParameterValues,
 } from "../modelParameters.js";
 import { getCompatibleContinuationSources, getContinuationConfig, isContinuationSourceModel } from "../videoToolCapabilities.js";
 import {
@@ -64,6 +65,7 @@ import {
   getVideoWorkflowFamily,
   getVideoWorkflowMediaConfig,
   getVideoWorkflowMediaSlots,
+  migrateVideoWorkflowMediaDrafts,
   getVideoWorkflowSlotRemaining,
   inferVideoWorkflowId,
   legacyVideoMediaToWorkflowDraft,
@@ -1066,6 +1068,21 @@ export default function VideoStudio({
     ? getVideoWorkflowDraftKey(selectedFamilyId, selectedWorkflowId)
     : null;
   const selectedVariant = videoModelCatalog.variantById.get(selectedModel);
+  const activeWorkflowMediaDraft = useMemo(
+    () => workflowMediaDraftKey
+      ? projectVideoWorkflowMedia(
+          selectedVariant?.model,
+          selectedWorkflowId,
+          workflowMediaDrafts[workflowMediaDraftKey] || EMPTY_WORKFLOW_MEDIA_DRAFT,
+        )
+      : null,
+    [
+      selectedVariant,
+      selectedWorkflowId,
+      workflowMediaDraftKey,
+      workflowMediaDrafts,
+    ],
+  );
   const selectedPickerEntry = videoModelPickerEntryByVariantId.get(selectedModel);
   const selectedTool = getSeedanceToolConfiguration(selectedModel);
   const selectedVeoTool = getVeoToolConfiguration(selectedModel);
@@ -1081,14 +1098,16 @@ export default function VideoStudio({
   const getSelectionPlan = useCallback((options = {}) => planGroupedVideoSelection({
     familyId: selectedFamilyId,
     workflowId: selectedWorkflowId,
+    currentWorkflowId: selectedWorkflowId,
+    media: activeWorkflowMediaDraft,
     currentModelId: selectedModel,
     nativeResolution: selectedResolution,
     commonValues: {
       aspectRatio: selectedAr, duration: selectedDuration,
-      resolution: selectedResolution, quality: selectedQuality,
+      quality: selectedQuality,
     },
     ...options,
-  }), [selectedFamilyId, selectedWorkflowId, selectedModel, selectedResolution, selectedAr, selectedDuration, selectedQuality]);
+  }), [selectedFamilyId, selectedWorkflowId, selectedModel, selectedResolution, selectedAr, selectedDuration, selectedQuality, activeWorkflowMediaDraft]);
   const describeSelectionAdjustments = useCallback((adjustments) => {
     const valueLabel = (key, value) => {
       if (key === "duration") return getVideoDurationLabel(value, groupCopy);
@@ -1131,13 +1150,14 @@ export default function VideoStudio({
       options: field.options.map((option) => {
         const adjustments = option.disabled ? [] : getGroupedVideoSelectionAdjustments({
           currentModelId: selectedModel, nativeResolution: selectedResolution,
+          currentWorkflowId: selectedWorkflowId, media: activeWorkflowMediaDraft,
           commonValues: { aspectRatio: selectedAr, duration: selectedDuration, quality: selectedQuality },
           selection: option, changes: { resolution: option.value },
         });
         return { ...option, adjustmentDescription: describeSelectionAdjustments(adjustments) };
       }),
     };
-  }, [groupedConfiguration, selectedFamilyId, selectedWorkflowId, selectedModel, selectedResolution, selectedAr, selectedDuration, selectedQuality, describeSelectionAdjustments, groupCopy, groupCopyKey]);
+  }, [groupedConfiguration, selectedFamilyId, selectedWorkflowId, selectedModel, selectedResolution, selectedAr, selectedDuration, selectedQuality, describeSelectionAdjustments, groupCopy, groupCopyKey, activeWorkflowMediaDraft]);
   const commonOptions = useMemo(
     () => getVideoCommonOptions(selectedVariant?.model), [selectedVariant],
   );
@@ -1156,21 +1176,6 @@ export default function VideoStudio({
         };
       })
     : [], [groupedConfiguration, workflowFamily, getSelectionPlan, describeSelectionAdjustments, groupCopy]);
-  const activeWorkflowMediaDraft = useMemo(
-    () => workflowMediaDraftKey
-      ? projectVideoWorkflowMedia(
-          selectedVariant?.model,
-          selectedWorkflowId,
-          workflowMediaDrafts[workflowMediaDraftKey] || EMPTY_WORKFLOW_MEDIA_DRAFT,
-        )
-      : null,
-    [
-      selectedVariant,
-      selectedWorkflowId,
-      workflowMediaDraftKey,
-      workflowMediaDrafts,
-    ],
-  );
   const promptDisabled = Boolean(selectedVeoTool && !selectedVariant?.model.inputs?.prompt) || shouldDisableVideoPrompt(
     selectedVariant?.model,
     currentFamilyMode,
@@ -1228,7 +1233,7 @@ export default function VideoStudio({
       setSelectedModel(model.id);
       setSelectedWorkflowId(workflowId);
       setModelParameterValues((values) =>
-        createModelParameterValues(model, values),
+        mergeModelParameterValues(model, values),
       );
       setV2vMode(nextV2VMode);
       setImageMode(nextImageMode);
@@ -1282,11 +1287,12 @@ export default function VideoStudio({
         let restoredWorkflowId = null;
         let restoredModel = defaultModel;
         let restoredFamilyId = defaultFamily.id;
+        let restoredResolution = data.selectedResolution;
         if (data.selectedModel) {
           const restored = resolvePersistedVideoWorkflowSelection(
             migrateSeedanceResolutionSelection(data.selectedModel, data.selectedResolution),
             data.selectedWorkflowId || null,
-            { hasEndFrame: Boolean(data.uploadedEndImageUrl) },
+            { hasEndFrame: Boolean(data.uploadedEndImageUrl || data.uploadedImageUrls?.[1]) },
           );
           if (restored.family && restored.variant) {
             restoredModelId = restored.variant.model.id;
@@ -1294,12 +1300,19 @@ export default function VideoStudio({
             restoredWorkflowId = restored.workflowId;
             restoredModel = restored.variant.model;
             restoredFamilyId = restored.family.id;
+            const resolutionField = getGroupedVideoResolutionOptions(
+              restoredFamilyId, restoredWorkflowId, restoredModelId, restoredResolution,
+            );
+            // Restore the exact endpoint while respecting the workflow's allowed resolutions.
+            restoredResolution = resolutionField.options.find((option) =>
+              option.modelId === restoredModelId && option.value === resolutionField.value,
+            )?.resolution ?? restoredResolution;
             setSelectedModel(restoredModelId);
             setSelectedFamilyId(restored.family.id);
             setSelectedWorkflowId(restored.workflowId);
             setModelParameterValues(
-              createModelParameterValues(
-                restored.variant.model,
+              mergeModelParameterValues(
+                restoredModel,
                 data.modelParameterValues || {},
               ),
             );
@@ -1309,9 +1322,10 @@ export default function VideoStudio({
         setV2vMode(restoredMode === "v2v");
         if (data.selectedAr) setSelectedAr(data.selectedAr);
         if (data.selectedDuration) setSelectedDuration(data.selectedDuration);
-        if (data.selectedResolution) setSelectedResolution(data.selectedResolution);
+        if (restoredResolution) setSelectedResolution(restoredResolution);
         if (data.selectedQuality) setSelectedQuality(data.selectedQuality);
         if (data.selectedEffect) setSelectedEffect(data.selectedEffect);
+        if (data.selectedVeoSourceId) setSelectedVeoSourceId(data.selectedVeoSourceId);
         if (data.uploadedImageUrls) {
           setUploadedImageUrls(data.uploadedImageUrls);
         } else if (data.uploadedImageUrl) {
@@ -1326,21 +1340,22 @@ export default function VideoStudio({
         if (data.uploadedAudioUrls) setUploadedAudioUrls(data.uploadedAudioUrls);
         const persistedDrafts =
           data.workflowMediaDrafts && typeof data.workflowMediaDrafts === "object"
-            ? { ...data.workflowMediaDrafts }
+            ? migrateVideoWorkflowMediaDrafts(data.workflowMediaDrafts)
             : {};
         if (restoredWorkflowId) {
           const draftKey = getVideoWorkflowDraftKey(
             restoredFamilyId,
             restoredWorkflowId,
           );
-          if (!persistedDrafts[draftKey]) {
+          if (!data.selectedWorkflowId || !persistedDrafts[draftKey]) {
             persistedDrafts[draftKey] = legacyVideoMediaToWorkflowDraft(
               restoredModel,
               restoredWorkflowId,
               {
                 imageUrls: data.uploadedImageUrls ||
                   (data.uploadedImageUrl ? [data.uploadedImageUrl] : []),
-                endImageUrl: data.uploadedEndImageUrl || null,
+                endImageUrl: data.uploadedEndImageUrl ||
+                  (restoredWorkflowId === "keyframes" ? data.uploadedImageUrls?.[1] : null),
                 videoUrls: data.uploadedVideoUrls ||
                   (data.uploadedVideoUrl ? [data.uploadedVideoUrl] : []),
                 audioUrls: data.uploadedAudioUrls || [],
@@ -1356,7 +1371,7 @@ export default function VideoStudio({
         commonParameterValuesRef.current = {
           aspectRatio: data.selectedAr,
           duration: data.selectedDuration,
-          resolution: data.selectedResolution,
+          resolution: restoredResolution,
           quality: data.selectedQuality,
         };
         applyControlsForModel(
@@ -1387,6 +1402,7 @@ export default function VideoStudio({
           selectedResolution,
           selectedQuality,
           selectedEffect,
+          selectedVeoSourceId,
           modelParameterValues,
           uploadedImageUrls,
           uploadedEndImageUrl,
@@ -1413,6 +1429,7 @@ export default function VideoStudio({
     selectedResolution,
     selectedQuality,
     selectedEffect,
+    selectedVeoSourceId,
     modelParameterValues,
     uploadedImageUrls,
     uploadedEndImageUrl,
@@ -2021,6 +2038,8 @@ export default function VideoStudio({
     if (option.disabled) return;
     const adjustments = getGroupedVideoSelectionAdjustments({
       currentModelId: selectedModel,
+      currentWorkflowId: selectedWorkflowId,
+      media: activeWorkflowMediaDraft,
       nativeResolution: selectedResolution,
       commonValues: commonParameterValuesRef.current,
       selection: option,
@@ -2028,7 +2047,7 @@ export default function VideoStudio({
     });
     handleGroupedSelection({ selection: option, adjustments }, selectedFamily, selectedWorkflowId);
     setOpenDropdown(null);
-  }, [handleGroupedSelection, selectedFamily, selectedWorkflowId, selectedModel, selectedResolution]);
+  }, [handleGroupedSelection, selectedFamily, selectedWorkflowId, selectedModel, selectedResolution, activeWorkflowMediaDraft]);
 
   // ── add to local history ──────────────────────────────────────────────────
   const addToLocalHistory = useCallback((entry) => {
@@ -2051,9 +2070,10 @@ export default function VideoStudio({
     }
     const currentModel = getCurrentModel();
     const grouped = getGroupedVideoConfiguration(selectedModel);
+    const activeParameterValues = createModelParameterValues(currentModel, modelParameterValues);
     const generationParameterValues = grouped && currentModel.inputs?.omni_reference_task_type
-      ? { ...modelParameterValues, omni_reference_task_type: "auto" }
-      : modelParameterValues;
+      ? { ...activeParameterValues, omni_reference_task_type: "auto" }
+      : activeParameterValues;
     const commonParams = grouped
       ? buildVideoCommonPayload(currentModel, {
           aspectRatio: selectedAr, duration: selectedDuration,
