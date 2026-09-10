@@ -27,6 +27,9 @@ dist-ssr
 release/
 .webpack/
 
+# Staged native local-AI binaries (scripts/stage-local-ai-binary.js)
+build/local-ai/*/
+
 # Next.js
 .next/
 out/
