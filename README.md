@@ -7,8 +7,8 @@
 
 **Community:** Join [Discord](https://discord.gg/tANKJkHck) for discussions and support
 
-<p align="center"><a href="https://youtu.be/nk2u6ENW85Q"><img src="https://i.ytimg.com/vi/nk2u6ENW85Q/maxresdefault.jpg" width="720"></a></p>
-<p align="center"><a href="https://youtu.be/nk2u6ENW85Q"><b>▶ Watch: GPT Image 2.5 API (ChatGPT Images 2.5) — What's New + How to Access It | Muapi Tutorial </b></a></p>
+<p align="center"><a href="https://youtu.be/kT1CO4BYV3A"><img src="https://i.ytimg.com/vi/kT1CO4BYV3A/maxresdefault.jpg" width="720"></a></p>
+<p align="center"><a href="https://youtu.be/kT1CO4BYV3A"><b>▶ Watch: Free Unlimited AI Image Generator (Truly no limits, Open Source, No Watermark) </b></a></p>
 
 <p align="center">
   <a href="https://github.com/Anil-matcha/awesome-generative-ai-apps">
