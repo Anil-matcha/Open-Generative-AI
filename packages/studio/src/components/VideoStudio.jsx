@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo, useId } from "react";
 import toast, { Toaster } from "react-hot-toast";
-import { generateVideo, generateI2V, processV2V, uploadFile } from "../muapi.js";
+import { generateVideo, generateI2V, processV2V } from "../providerAwareVideo.js";
+import { uploadFile } from "../muapi.js";
 import { formatErrorMessage } from "../utils/formatError.js";
 import { scopedPersistKey, migrateLegacyPersistKey } from "../persistKey.js";
 import DrawModal from "./DrawModal.jsx";
@@ -99,6 +100,7 @@ import usePromptMenu from "./prompt/usePromptMenu.js";
 import en from "../messages/en/videoStudio.json";
 import zh from "../messages/zh/videoStudio.json";
 import { resolveCopy } from "../i18nUtils";
+import VideoProviderPicker from "./VideoProviderPicker.jsx";
 
 async function downloadFile(url, filename) {
   try {
@@ -2676,6 +2678,7 @@ export default function VideoStudio({
       </div>
 
       {/* ── BOTTOM PROMPT BAR ── */}
+      <VideoProviderPicker />
       <PromptComposer>
           <div className="flex flex-col gap-3">
             {/* Inline list of uploaded media files */}
