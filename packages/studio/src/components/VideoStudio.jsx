@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback, useMemo, useId } from "react"
 import toast, { Toaster } from "react-hot-toast";
 import { generateVideo, generateI2V, processV2V, uploadFile } from "../muapi.js";
 import { formatErrorMessage } from "../utils/formatError.js";
+import { getMuapiPriceMap, formatMuapiPrice } from "../utils/muapiPricing.js";
 import { scopedPersistKey, migrateLegacyPersistKey } from "../persistKey.js";
 import DrawModal from "./DrawModal.jsx";
 import ModelParameterControls from "./ModelParameterControls.jsx";
@@ -475,12 +476,23 @@ function ModelDropdown({ selectedModel, onSelect, onClose, copy = en }) {
   const modelEntries = activeCategory.entries;
 
   const activeItemRef = useRef(null);
+  const [priceMap, setPriceMap] = useState({});
 
   useEffect(() => {
     // Automatically scroll the active model into view when opening
     if (activeItemRef.current) {
       activeItemRef.current.scrollIntoView({ block: "nearest" });
     }
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    getMuapiPriceMap().then((map) => {
+      if (!cancelled) setPriceMap(map);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const getProviderStyle = (provider) => {
@@ -604,6 +616,11 @@ function ModelDropdown({ selectedModel, onSelect, onClose, copy = en }) {
             {selectedProvider === "all" && family.provider_name && (
               <span className="text-[9px] text-white/40">
                 {family.provider_name}
+              </span>
+            )}
+            {formatMuapiPrice(priceMap[entry.defaultVariant?.model?.id]) && (
+              <span className="text-[9px] font-semibold text-emerald-400/80">
+                {formatMuapiPrice(priceMap[entry.defaultVariant?.model?.id])}
               </span>
             )}
           </div>
