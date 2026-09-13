@@ -35,27 +35,16 @@ export async function getMuapiPriceMap() {
     return priceMapPromise;
 }
 
-// Turns { cost, cost_strategy } into a short label like "$0.05/s" or "$2.50/1M tok".
-// Falls back to showing the raw cost_strategy text for units we don't recognize.
+// Turns { cost } into a short "~$0.60" label. Muapi's `cost` is a flat base price for one
+// default-settings generation (not a per-second/per-token rate), and `cost_strategy` is an
+// internal pricing-group id rather than a display unit (verified against the live API —
+// e.g. cost_strategy "veo3.1-fast-video" for a $0.60 image-to-video task), so we only show
+// the amount, prefixed with "~" since the real cost can move with resolution/duration/etc.
 export function formatMuapiPrice(entry) {
     if (!entry || entry.cost == null) return null;
     const cost = Number(entry.cost);
-    if (!Number.isFinite(cost)) return null;
+    if (!Number.isFinite(cost) || cost <= 0) return null;
 
     const amount = cost >= 1 ? cost.toFixed(2) : cost >= 0.01 ? cost.toFixed(3) : cost.toFixed(4);
-    const strategy = String(entry.cost_strategy || "").toLowerCase();
-
-    let unit = "";
-    if (strategy.includes("token") && (strategy.includes("million") || strategy.includes("1m"))) unit = "/1M tok";
-    else if (strategy.includes("token")) unit = "/tok";
-    else if (strategy.includes("minute")) unit = "/min";
-    else if (strategy.includes("second")) unit = "/s";
-    else if (strategy.includes("char")) unit = "/char";
-    else if (strategy.includes("image")) unit = "/img";
-    else if (strategy.includes("video")) unit = "/clip";
-    else if (strategy && !strategy.includes("flat") && !strategy.includes("fixed") && !strategy.includes("request")) {
-        unit = ` (${entry.cost_strategy})`;
-    }
-
-    return `$${amount}${unit}`;
+    return `~$${amount}`;
 }

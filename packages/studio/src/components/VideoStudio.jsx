@@ -619,7 +619,10 @@ function ModelDropdown({ selectedModel, onSelect, onClose, copy = en }) {
               </span>
             )}
             {formatMuapiPrice(priceMap[entry.defaultVariant?.model?.id]) && (
-              <span className="text-[9px] font-semibold text-emerald-400/80">
+              <span
+                className="text-[9px] font-semibold text-emerald-400/80"
+                title="Approximate base cost at default settings — the final price depends on resolution, duration, etc."
+              >
                 {formatMuapiPrice(priceMap[entry.defaultVariant?.model?.id])}
               </span>
             )}
