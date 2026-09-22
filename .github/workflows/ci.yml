@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read   # security best practice — limits what the token can do
+
+jobs:
+  build:
+    name: Install, lint & build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15   # kill job if it hangs (saves free minutes)
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive   # REQUIRED — repo has 3 git submodules
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20        # upgraded: Next 15 + React 19 need Node 20+
+          cache: 'npm'            # caches node_modules between runs
+
+      - name: Install dependencies and build packages
+        run: npm run setup        # runs: git submodule update + npm install + build:packages
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
