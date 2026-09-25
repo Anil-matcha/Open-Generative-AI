@@ -42,7 +42,7 @@ function stripAnsiSequences(text) {
     return text.replace(/\u001b\[[0-9;?]*[ -/]*[@-~]/g, '');
 }
 
-function extractProgressEvents(text) {
+function extractProgressEvents(text, consumedLength = 0) {
     const events = [];
     const patterns = [
         /step\s+(\d+)\s*\/\s*(\d+)/ig,
@@ -54,7 +54,7 @@ function extractProgressEvents(text) {
         while (match) {
             const step = Number.parseInt(match[1], 10);
             const totalSteps = Number.parseInt(match[2], 10);
-            if (Number.isFinite(step) && Number.isFinite(totalSteps) && totalSteps > 0) {
+            if (pattern.lastIndex > consumedLength && Number.isFinite(step) && Number.isFinite(totalSteps) && totalSteps > 0) {
                 events.push({
                     step,
                     totalSteps,
@@ -75,7 +75,7 @@ function extractProgressEvents(text) {
 function parseGenerationProgressChunk(chunk, state = { tail: '', lastStep: 0, lastTotalSteps: 0 }) {
     const normalizedChunk = stripAnsiSequences(String(chunk)).replace(/\r/g, '\n');
     const combined = `${state.tail}${normalizedChunk}`;
-    const events = extractProgressEvents(combined);
+    const events = extractProgressEvents(combined, state.tail.length);
     const freshEvents = [];
 
     for (const event of events) {
