@@ -22,7 +22,6 @@ async function fetchAgentDetails(agentId, apiKey) {
   
   // Try fetching by slug first
   try {
-    console.log(`[AgentPage] Fetching agent by slug: ${agentId}`);
     const res = await fetch(
       `${BASE_URL}/agents/by-slug/${agentId}`,
       {
@@ -34,7 +33,6 @@ async function fetchAgentDetails(agentId, apiKey) {
     
     // If by-slug fails, try fetching by direct ID (if it looks like a UUID)
     if (agentId.length > 20) {
-      console.log(`[AgentPage] Fetch by slug failed, trying by ID: ${agentId}`);
       const resId = await fetch(
         `${BASE_URL}/agents/${agentId}`,
         {
@@ -71,8 +69,6 @@ export default async function AgentPage({ params }) {
   const { agent_id } = await params;
   const cookieStore = await cookies();
   const apiKey = cookieStore.get("muapi_key")?.value;
-
-  console.log(`[AgentPage] Loading page for agent: ${agent_id}, hasKey: ${!!apiKey}`);
 
   const [agentDetails, userData] = await Promise.all([
     fetchAgentDetails(agent_id, apiKey),
