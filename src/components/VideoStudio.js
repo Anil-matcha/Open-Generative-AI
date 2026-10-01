@@ -1161,7 +1161,6 @@ export function VideoStudio() {
                 };
                 if (imageMode && uploadedImageUrl) localParams.image = uploadedImageUrl;
                 const res = await localAI.generate(localParams);
-                console.log('[VideoStudio] Local response:', res);
                 if (res && res.url) {
                     const genId = Date.now().toString();
                     lastGenerationId = null;
@@ -1181,7 +1180,6 @@ export function VideoStudio() {
                 if (model?.imageField && uploadedImageUrl) v2vParams.image_url = uploadedImageUrl;
                 if (model?.hasPrompt && prompt) v2vParams.prompt = prompt;
                 const res = await muapi.processV2V(v2vParams);
-                console.log('[VideoStudio] V2V response:', res);
                 if (res && res.url) {
                     if (capturedRequestId) removePendingJob(capturedRequestId);
                     const genId = res.id || capturedRequestId || Date.now().toString();
@@ -1217,7 +1215,6 @@ export function VideoStudio() {
                 if (selectedEffectName) i2vParams.name = selectedEffectName;
 
                 const res = await muapi.generateI2V(i2vParams);
-                console.log('[VideoStudio] I2V response:', res);
 
                 if (res && res.url) {
                     if (capturedRequestId) removePendingJob(capturedRequestId);
@@ -1260,8 +1257,6 @@ export function VideoStudio() {
             if (selectedMode) params.mode = selectedMode;
 
             const res = await muapi.generateVideo(params);
-
-            console.log('[VideoStudio] Full response:', res);
 
             if (res && res.url) {
                 if (capturedRequestId) removePendingJob(capturedRequestId);

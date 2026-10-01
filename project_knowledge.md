@@ -1,5 +1,7 @@
 # Open Generative AI: Technical Documentation & Context
 
+> **Stale — describes only the legacy `src/` Vite/vanilla-JS renderer.** The repo has since grown a Next.js web app (`app/`) and a shared React component library (`packages/studio`) that this document predates and does not cover. See [CLAUDE.md](CLAUDE.md) at the repo root for the current architecture across all three surfaces. The gotchas and roadmap notes below may still be useful for the legacy `src/` app specifically.
+
 This document serves as a comprehensive knowledge base for the Open Generative AI project. It details the architecture, key components, API integration patterns, and state management strategies used in the application.
 
 ## 1. Project Vision & Overview
