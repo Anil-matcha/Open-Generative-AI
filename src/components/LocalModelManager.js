@@ -7,6 +7,10 @@ const TrashIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" s
 const CheckIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>`;
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
+function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
 function fmtGB(gb) {
     return gb >= 1 ? `${gb.toFixed(1)} GB` : `${(gb * 1024).toFixed(0)} MB`;
 }
@@ -153,66 +157,95 @@ function AuxRow(label, auxKey, initStatus, onStateChange) {
     return row;
 }
 
-// ─── Wan2GP Server Config ────────────────────────────────────────────────────
+// ─── Wan2GP Config ───────────────────────────────────────────────────────────
+// Two ways to reach Wan2GP: its folder on this machine (preferred — the app runs
+// `wgp.py` itself) or a remote WanGP MCP server. A folder wins when both are set.
 function Wan2gpConfigBar(onChange) {
+    const inputClass = 'flex-1 min-w-0 bg-white/5 border border-white/5 focus:border-primary/40 rounded-lg px-3 py-1.5 text-xs text-white placeholder-white/30 focus:outline-none';
+    const secondaryBtn = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-primary/20 text-primary border border-primary/30 hover:bg-primary/30 transition-all shrink-0';
     const wrap = document.createElement('div');
     wrap.className = 'flex flex-col gap-3 p-3 rounded-xl bg-white/3 border border-white/5';
     wrap.innerHTML = `
         <div class="flex flex-col gap-0.5">
-            <span class="text-xs font-bold text-white">Wan2GP server (optional)</span>
-            <span class="text-[11px] text-muted leading-relaxed">
-                Run <a href="https://github.com/deepbeepmeep/Wan2GP" target="_blank" class="text-primary hover:underline">Wan2GP</a>
-                on a CUDA box (<code class="text-primary/80">python wgp.py --listen --server-name 0.0.0.0</code>) to unlock video models from this UI.
-            </span>
+            <span class="text-xs font-bold text-white">${t('localModels.wan2gpTitle')}</span>
+            <span class="text-[11px] text-muted leading-relaxed">${t('localModels.wan2gpHelp')}</span>
         </div>
-        <div class="flex items-center gap-2">
-            <input id="wan2gp-url" type="text" placeholder="http://127.0.0.1:7860"
-                   class="flex-1 bg-white/5 border border-white/5 focus:border-primary/40 rounded-lg px-3 py-1.5 text-xs text-white placeholder-white/30 focus:outline-none"/>
-            <button id="wan2gp-test" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-primary/20 text-primary border border-primary/30 hover:bg-primary/30 transition-all">Test</button>
-            <button id="wan2gp-save" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-primary text-black hover:shadow-glow transition-all">Save</button>
+        <div class="flex flex-col gap-1.5">
+            <span class="text-[10px] font-bold text-secondary uppercase tracking-wider">${t('localModels.wan2gpFolder')}</span>
+            <div class="flex items-center gap-2">
+                <input id="wan2gp-dir" type="text" placeholder="/home/you/Wan2GP" class="${inputClass}"/>
+                <button id="wan2gp-browse" class="${secondaryBtn}">${t('localModels.browse')}</button>
+            </div>
+            <input id="wan2gp-python" type="text" class="${inputClass}"/>
         </div>
-        <div id="wan2gp-status" class="text-[11px] text-muted">${t('localModels.notConfigured')}</div>
+        <div class="flex flex-col gap-1.5">
+            <span class="text-[10px] font-bold text-secondary uppercase tracking-wider">${t('localModels.wan2gpRemote')}</span>
+            <input id="wan2gp-url" type="text" placeholder="http://192.168.1.42:7866/mcp" class="${inputClass}"/>
+            <span class="text-[10px] text-muted leading-relaxed">${t('localModels.wan2gpRemoteHelp')}</span>
+        </div>
+        <div class="flex items-center gap-2 justify-end">
+            <button id="wan2gp-check" class="${secondaryBtn}">${t('localModels.check')}</button>
+            <button id="wan2gp-save" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-primary text-black hover:shadow-glow transition-all">${t('localModels.save')}</button>
+        </div>
+        <div id="wan2gp-status" class="text-[11px] text-muted whitespace-pre-wrap break-words">${t('localModels.notConfigured')}</div>
     `;
 
-    const input = wrap.querySelector('#wan2gp-url');
-    const testBtn = wrap.querySelector('#wan2gp-test');
+    const dirInput = wrap.querySelector('#wan2gp-dir');
+    const pythonInput = wrap.querySelector('#wan2gp-python');
+    const urlInput = wrap.querySelector('#wan2gp-url');
+    const checkBtn = wrap.querySelector('#wan2gp-check');
     const saveBtn = wrap.querySelector('#wan2gp-save');
     const statusEl = wrap.querySelector('#wan2gp-status');
     const setStatus = (text, kind = 'muted') => {
         const colorMap = { muted: 'text-muted', ok: 'text-green-400', warn: 'text-yellow-400', err: 'text-red-400' };
-        statusEl.className = `text-[11px] ${colorMap[kind] || colorMap.muted}`;
+        statusEl.className = `text-[11px] whitespace-pre-wrap break-words ${colorMap[kind] || colorMap.muted}`;
         statusEl.textContent = text;
     };
+    const updatePythonPlaceholder = () => {
+        const dir = dirInput.value.trim().replace(/[\\/]+$/, '');
+        pythonInput.placeholder = dir
+            ? tf('localModels.pythonDefault', `${dir}/venv/bin/python`)
+            : t('localModels.pythonPath');
+    };
+    const formValues = () => ({ dir: dirInput.value.trim(), python: pythonInput.value.trim(), url: urlInput.value.trim() });
+    const runCheck = async (cfg) => {
+        setStatus(t('localModels.probing'), 'muted');
+        const r = await localAI.checkWan2gp(cfg);
+        const modeLabel = r.mode === 'remote' ? t('localModels.modeRemote') : t('localModels.modeLocal');
+        setStatus(r.ok ? `${modeLabel} · ${r.message}` : `${modeLabel} · ${r.error}`, r.ok ? 'ok' : 'err');
+        return r;
+    };
 
+    dirInput.oninput = updatePythonPlaceholder;
     (async () => {
         const cfg = await localAI.getWan2gpConfig();
-        if (cfg.url) {
-            input.value = cfg.url;
-            const r = await localAI.probeWan2gp(cfg.url);
-            setStatus(r.ok ? `Connected · Gradio ${r.version}` : `Saved URL not reachable: ${r.error}`, r.ok ? 'ok' : 'warn');
-        } else {
-            setStatus(t('localModels.notConfiguredNote'), 'muted');
-        }
+        dirInput.value = cfg.dir || '';
+        pythonInput.value = cfg.python || '';
+        urlInput.value = cfg.url || '';
+        updatePythonPlaceholder();
+        if (cfg.dir || cfg.url) await runCheck({ quick: true });
+        else setStatus(t('localModels.notConfiguredNote'), 'muted');
     })();
 
-    testBtn.onclick = async () => {
-        const url = input.value.trim();
-        if (!url) { setStatus('Enter a URL first', 'warn'); return; }
-        setStatus(t('localModels.probing'), 'muted');
-        testBtn.disabled = true;
-        try {
-            const r = await localAI.probeWan2gp(url);
-            setStatus(r.ok ? `Reachable · Gradio ${r.version}` : `Unreachable: ${r.error}`, r.ok ? 'ok' : 'err');
-        } finally { testBtn.disabled = false; }
+    wrap.querySelector('#wan2gp-browse').onclick = async () => {
+        const dir = await localAI.pickWan2gpFolder();
+        if (dir) { dirInput.value = dir; updatePythonPlaceholder(); }
+    };
+
+    checkBtn.onclick = async () => {
+        const cfg = formValues();
+        if (!cfg.dir && !cfg.url) { setStatus(t('localModels.wan2gpEnterFirst'), 'warn'); return; }
+        checkBtn.disabled = true;
+        try { await runCheck(cfg); } finally { checkBtn.disabled = false; }
     };
 
     saveBtn.onclick = async () => {
-        const url = input.value.trim();
         saveBtn.disabled = true;
         try {
-            await localAI.setWan2gpUrl(url);
-            const r = url ? await localAI.probeWan2gp(url) : { ok: false, error: 'cleared' };
-            setStatus(r.ok ? `Saved · Connected to Gradio ${r.version}` : (url ? `Saved, not reachable: ${r.error}` : 'Cleared'), r.ok ? 'ok' : 'warn');
+            const cfg = formValues();
+            await localAI.setWan2gpConfig(cfg);
+            if (cfg.dir || cfg.url) await runCheck({ quick: true });
+            else setStatus(t('localModels.notConfiguredNote'), 'muted');
             onChange?.();
         } finally { saveBtn.disabled = false; }
     };
@@ -232,9 +265,11 @@ function Wan2gpModelCard(model) {
                 ${ready ? `<span class="text-green-400">${CheckIcon}</span>` : ''}
             </div>
             <p class="text-[11px] text-muted leading-relaxed">${model.description}</p>
+            ${!ready && model.unavailableReason ? `<p class="text-[10px] text-yellow-400/80 leading-relaxed">${escapeHtml(model.unavailableReason)}</p>` : ''}
+            ${ready && model.availabilityNote ? `<p class="text-[10px] text-muted leading-relaxed">${escapeHtml(model.availabilityNote)}</p>` : ''}
             <div class="flex items-center gap-1.5 flex-wrap mt-1">
                 <span class="px-1.5 py-0.5 rounded-md text-[10px] font-bold ${model.type === 'video' ? 'bg-purple-500/15 text-purple-300' : 'bg-primary/10 text-primary'}">${model.type.toUpperCase()}</span>
-                <span class="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-white/5 text-muted">via Wan2GP</span>
+                <span class="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-white/5 text-muted">${model.modelType}</span>
                 ${(model.tags || []).filter(t => !['featured', 'remote'].includes(t)).map(t => `<span class="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-white/5 text-muted">${t}</span>`).join('')}
             </div>
         </div>

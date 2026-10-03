@@ -3,58 +3,54 @@ const assert = require('node:assert/strict');
 
 const { withWan2gpAvailability } = require('../electron/lib/wan2gpModelAvailability');
 
-const fluxModel = {
-    id: 'wan2gp:flux-dev',
-    name: 'Flux.1 Dev (Wan2GP)',
-    fn: 'flux',
+const wanModel = {
+    id: 'wan2gp:wan21-t2v-1.3b',
+    name: 'Wan 2.1 1.3B (Text-to-Video)',
+    modelType: 't2v_1.3B',
 };
 
-test('withWan2gpAvailability marks models unavailable when the server probe fails', () => {
-    const model = withWan2gpAvailability(fluxModel, { ok: false, error: 'Request timed out' });
+const engine = (mode, statuses) => ({ ok: true, mode, modelStatus: new Map(Object.entries(statuses)) });
+
+test('withWan2gpAvailability marks models unavailable when the engine is not usable', () => {
+    const model = withWan2gpAvailability(wanModel, { ok: false, error: 'wgp.py not found in /tmp' });
 
     assert.equal(model.ready, false);
-    assert.equal(model.unavailableReason, 'Request timed out');
+    assert.equal(model.unavailableReason, 'wgp.py not found in /tmp');
 });
 
-test('withWan2gpAvailability uses resolved api_name when endpoint metadata matches', () => {
-    const model = withWan2gpAvailability(
-        fluxModel,
-        { ok: true },
-        {
-            apiNames: ['flux_image'],
-            resolved: new Map([['wan2gp:flux-dev', 'flux_image']]),
-        }
-    );
-
-    assert.equal(model.ready, true);
-    assert.equal(model.fn, 'flux_image');
-});
-
-test('withWan2gpAvailability keeps default api_name available when Gradio omits endpoint metadata', () => {
-    const model = withWan2gpAvailability(
-        fluxModel,
-        { ok: true },
-        {
-            apiNames: [],
-            resolved: new Map([['wan2gp:flux-dev', null]]),
-        }
-    );
-
-    assert.equal(model.ready, true);
-    assert.equal(model.fn, 'flux');
-    assert.match(model.availabilityNote, /default api_name/);
-});
-
-test('withWan2gpAvailability rejects unmatched models when endpoint metadata is present', () => {
-    const model = withWan2gpAvailability(
-        fluxModel,
-        { ok: true },
-        {
-            apiNames: ['qwen_image'],
-            resolved: new Map([['wan2gp:flux-dev', null]]),
-        }
-    );
+test('withWan2gpAvailability explains a missing configuration', () => {
+    const model = withWan2gpAvailability(wanModel, undefined);
 
     assert.equal(model.ready, false);
-    assert.match(model.unavailableReason, /no api_name matching "flux"/);
+    assert.match(model.unavailableReason, /not configured/);
+});
+
+test('withWan2gpAvailability marks models ready when weights are on disk', () => {
+    const model = withWan2gpAvailability(wanModel, engine('local', { 't2v_1.3B': 'available' }));
+
+    assert.equal(model.ready, true);
+    assert.equal(model.availabilityNote, undefined);
+});
+
+test('withWan2gpAvailability keeps models with undownloaded weights ready, with a note', () => {
+    const model = withWan2gpAvailability(wanModel, engine('remote', { 't2v_1.3B': 'missing' }));
+
+    assert.equal(model.ready, true);
+    assert.match(model.availabilityNote, /first run downloads/);
+});
+
+test('withWan2gpAvailability treats a defined model with unknown weight files as ready', () => {
+    const model = withWan2gpAvailability(wanModel, engine('local', { 't2v_1.3B': 'installed' }));
+
+    assert.equal(model.ready, true);
+});
+
+test('withWan2gpAvailability rejects model types the Wan2GP install does not define', () => {
+    const localModel = withWan2gpAvailability(wanModel, engine('local', {}));
+    const remoteModel = withWan2gpAvailability(wanModel, engine('remote', { 't2v_1.3B': 'unknown-model' }));
+
+    assert.equal(localModel.ready, false);
+    assert.match(localModel.unavailableReason, /This Wan2GP install has no model "t2v_1.3B"/);
+    assert.equal(remoteModel.ready, false);
+    assert.match(remoteModel.unavailableReason, /The Wan2GP server has no model "t2v_1.3B"/);
 });

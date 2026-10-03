@@ -185,7 +185,7 @@ The desktop app supports **two independent local engines**. Pick whichever fits 
 | Engine | What it is | Best for |
 |---|---|---|
 | **sd.cpp** (bundled) | C++ engine from [stable-diffusion.cpp](https://github.com/leejet/stable-diffusion.cpp), runs on the same machine as the app. Metal GPU on Apple Silicon, CUDA/Vulkan/ROCm on Linux/Windows. | Image-only models. Works on Mac M-series. |
-| **Wan2GP** (BYO server) | HTTP client to a user-run [Wan2GP](https://github.com/deepbeepmeep/Wan2GP) server. The server runs Python + PyTorch on a CUDA/ROCm GPU; the desktop app only sends prompts and receives results. | Video models (Wan 2.2, Hunyuan, LTX) and large image models (Flux, Qwen-Image). NVIDIA/AMD GPU required on the *server*; the desktop app itself can run on a Mac. |
+| **Wan2GP** (BYO install) | A user-installed [Wan2GP](https://github.com/deepbeepmeep/Wan2GP): either its folder on this machine (the app runs `wgp.py` itself) or its MCP server on another machine. Python + PyTorch on a CUDA/ROCm GPU. | Video models (Wan 2.1/2.2, Hunyuan, LTX-2) in **Video Studio** and large image models (Flux, Qwen-Image). NVIDIA/AMD GPU required on the Wan2GP machine; the desktop app itself can run on a Mac. |
 
 Both engines share the same UI: open **Settings → Local Models** to configure each.
 
@@ -225,29 +225,38 @@ inside that directory, and **Settings -> Local Models** shows the resolved model
 Local engine output and download errors are written to the app process console, so launch
 from Terminal or PowerShell when you need troubleshooting logs.
 
-### Engine 2 — Wan2GP (remote Gradio server)
+### Engine 2 — Wan2GP (your own install)
 
-The app does **not** bundle Python or model weights for Wan2GP. You run Wan2GP yourself on a machine with a CUDA or ROCm GPU and point the desktop app at its URL.
+The app does **not** bundle Python or model weights for Wan2GP. Install Wan2GP yourself on a machine with a CUDA or ROCm GPU:
 
 ```bash
-# On your GPU machine
 git clone https://github.com/deepbeepmeep/Wan2GP
 cd Wan2GP
 ./install.sh                          # or install.bat on Windows
-python wgp.py --listen --server-name 0.0.0.0   # binds to all interfaces
 ```
 
-Then in the desktop app: **Settings → Local Models → Wan2GP server**, paste the URL (e.g. `http://192.168.1.42:7860`), click **Test**, then **Save**. The Wan2GP models become available — image models in **Image Studio**, video models reachable via the same generation API (Image Studio rejects video output explicitly; full Video Studio wiring is on the roadmap).
+**Same machine (recommended).** In the desktop app open **Settings → Local Models → Wan2GP**, set the Wan2GP folder (Python defaults to `<folder>/venv/bin/python`), click **Save**, then **Check** — it runs `wgp.py --dry-run` on a test task. Each generation runs Wan2GP's headless CLI (`wgp.py --process settings.json`); weights download automatically the first time a model is used, and the download shows up in the progress bar.
 
-| Model | Type | Notes |
-|---|---|---|
-| **Flux.1 Dev** | Image | 1024px, 28 steps |
-| **Qwen Image** | Image | 1024px, 30 steps |
-| **Wan 2.2 (T2V / I2V)** | Video | Slow on consumer GPUs |
-| **Hunyuan Video** | Video | High-quality T2V |
-| **LTX Video** | Video | Fastest video option |
+**Another machine.** Start WanGP's MCP server there and put its URL (e.g. `http://192.168.1.42:7866/mcp`) in the same settings panel:
 
-> **Why a separate server?** Wan2GP's runtime (Sage attention, flash-attn, AWQ/GGUF kernels) is CUDA-only — there is no MPS / Apple Silicon path. Treating it as a remote server lets a Mac-only user keep the desktop app while offloading inference to a Linux/Windows GPU box, a gaming PC on the LAN, or a rented RunPod/vast.ai instance.
+```bash
+python wgp.py --mcp --mcp-api-version 1 --mcp-transport streamable-http --mcp-host 0.0.0.0 --mcp-port 7866
+```
+
+Use `--mcp-host 0.0.0.0` only on a trusted network (see Wan2GP's `docs/AUTHENTICATION.md` for OAuth/HTTPS). The Gradio web UI port (7860) is **not** an API and cannot be used here.
+
+Then switch **Video Studio** to **⚡ Local** and pick a model. Models your Wan2GP version doesn't have are listed with the reason; models whose weights aren't downloaded yet are marked.
+
+| Model | WanGP `model_type` | Type | Notes |
+|---|---|---|---|
+| **Wan 2.1 1.3B** | `t2v_1.3B` | Video | Lightest option, 480p, ~8 GB VRAM |
+| **Wan 2.2 14B T2V / I2V** | `t2v_2_2` / `i2v_2_2` | Video | 480p, slow on consumer GPUs; I2V needs a start frame |
+| **Hunyuan Video 1.5** | `hunyuan_1_5_480_t2v` | Video | 480p T2V |
+| **LTX-2 Distilled** | `ltx2_22B_distilled` | Video | 8 steps, 720p |
+| **Flux.1 Dev** | `flux` | Image | Image Studio |
+| **Qwen Image** | `qwen_image_20B` | Image | Image Studio |
+
+> **Why the remote option?** Wan2GP's runtime (Sage attention, flash-attn, AWQ/GGUF kernels) is CUDA/ROCm-only — there is no MPS / Apple Silicon path. The MCP server lets a Mac-only user keep the desktop app while offloading inference to a Linux/Windows GPU box, a gaming PC on the LAN, or a rented RunPod/vast.ai instance.
 
 > **Local inference is only available in the desktop app.** The hosted web version always uses cloud APIs.
 
@@ -289,7 +298,7 @@ A healthy run on Apple Silicon prints `total params memory size = 1969.78MB (VRA
 ## ✨ Features
 
 - **Image Studio** — Generate images from text prompts (50+ text-to-image models) or transform existing images (55+ image-to-image models). Switches model set automatically based on whether a reference image is provided. Quality and resolution controls visible for models that support them.
-- **Local Inference** — Two engines: **sd.cpp** (bundled, runs on Mac/Win/Linux with Metal/CUDA/Vulkan/ROCm) for SD 1.5, SDXL, and Z-Image; and **Wan2GP** (BYO Gradio server) for Flux, Qwen-Image, and video models (Wan 2.2, Hunyuan, LTX). Configure both in Settings → Local Models.
+- **Local Inference** — Two engines: **sd.cpp** (bundled, runs on Mac/Win/Linux with Metal/CUDA/Vulkan/ROCm) for SD 1.5, SDXL, and Z-Image; and **Wan2GP** (your own install — local folder or remote MCP server) for Flux, Qwen-Image, and video models in Video Studio (Wan 2.1/2.2, Hunyuan, LTX-2). Configure both in Settings → Local Models.
 - **Multi-Image Input** — Upload up to 14 reference images for compatible edit models (Nano Banana 2 Edit, Flux Kontext Dev, GPT-4o Edit, and more). Multi-select picker with order badges, batch upload, and a "Use Selected" confirmation flow.
 - **Video Studio** — Generate videos from text prompts (40+ text-to-video models) or animate a start-frame image (60+ image-to-video models). Same intelligent mode switching as Image Studio.
 - **Audio Studio** — Generate and edit AI audio/music from text prompts.

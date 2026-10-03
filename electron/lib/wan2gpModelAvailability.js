@@ -1,32 +1,29 @@
-function withWan2gpAvailability(model, probeResult, cachedResolution) {
-    if (!probeResult?.ok) {
-        return {
-            ...model,
-            ready: false,
-            unavailableReason: probeResult?.error || 'Wan2GP probe failed',
-        };
+// Availability of a Wan2GP catalog model for the configured engine.
+//
+// engine = { ok, error, mode: 'local' | 'remote', modelStatus: Map<modelType, status> }
+//   local:  from <Wan2GP>/defaults/<modelType>.json + ckpts/ (see wan2gpLocal.localModelStatus)
+//   remote: from WanGP's MCP `wangp_get_model_availability`
+//   both:   'available' | 'missing' | 'installed'; anything else means the model is unknown
+// Weights that are not on disk yet are still usable — Wan2GP downloads them on
+// first use — so that case is ready with a note, not unavailable.
+function withWan2gpAvailability(model, engine) {
+    if (!engine?.ok) {
+        return { ...model, ready: false, unavailableReason: engine?.error || 'Wan2GP is not configured' };
     }
 
-    const apiNames = Array.isArray(cachedResolution?.apiNames) ? cachedResolution.apiNames : [];
-    const realFn = cachedResolution?.resolved?.get?.(model.id) || null;
-
-    if (realFn) {
-        return { ...model, ready: true, fn: realFn };
+    const status = engine.modelStatus?.get(model.modelType);
+    if (status === 'installed' || status === 'available') {
+        return { ...model, ready: true };
+    }
+    if (status === 'missing') {
+        return { ...model, ready: true, availabilityNote: 'Weights not downloaded yet — the first run downloads them (several GB).' };
     }
 
-    if (apiNames.length === 0) {
-        return {
-            ...model,
-            ready: true,
-            fn: model.fn,
-            availabilityNote: 'Wan2GP did not expose endpoint metadata; using the default api_name.',
-        };
-    }
-
+    const where = engine.mode === 'remote' ? 'The Wan2GP server' : 'This Wan2GP install';
     return {
         ...model,
         ready: false,
-        unavailableReason: `Wan2GP server has no api_name matching "${model.fn}". Check Wan2GP version or load this model in its UI.`,
+        unavailableReason: `${where} has no model "${model.modelType}" — update Wan2GP.`,
     };
 }
 

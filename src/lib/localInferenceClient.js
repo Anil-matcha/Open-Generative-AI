@@ -1,7 +1,7 @@
 // Frontend client for local inference — wraps window.localAI (Electron IPC).
 // Two providers live behind the same surface:
 //   - sd.cpp: bundled engine, downloads weights to disk, runs locally
-//   - wan2gp: user-run Gradio server, generation is remote HTTP
+//   - wan2gp: user-installed Wan2GP — a local folder (wgp.py CLI) or a remote MCP server
 // Provider is read off the model entry's `provider` field.
 
 import { getLocalModelById } from './localModels.js';
@@ -32,22 +32,34 @@ class LocalInferenceClient {
     }
 
     // ── Wan2GP APIs ───────────────────────────────────────────────────────
+    // Config: { dir, python, url, mode, defaultPython } — a folder wins over a URL.
     async getWan2gpConfig() {
-        if (!isLocalAIAvailable()) return { url: '' };
+        if (!isLocalAIAvailable()) return { dir: '', python: '', url: '' };
         return window.localAI.wan2gp.getConfig();
+    }
+    async setWan2gpConfig(cfg) {
+        if (!isLocalAIAvailable()) throw new Error('Local AI only available in the desktop app.');
+        return window.localAI.wan2gp.setConfig(cfg);
     }
     async setWan2gpUrl(url) {
         if (!isLocalAIAvailable()) throw new Error('Local AI only available in the desktop app.');
         return window.localAI.wan2gp.setUrl(url);
     }
+    // Local folder: `wgp.py --dry-run` on a test task. Remote URL: MCP probe.
+    async checkWan2gp(cfg) {
+        if (!isLocalAIAvailable()) return { ok: false, error: 'Not in desktop app' };
+        return window.localAI.wan2gp.check(cfg);
+    }
+    async pickWan2gpFolder() {
+        if (!isLocalAIAvailable()) return null;
+        return window.localAI.wan2gp.pickFolder();
+    }
     async probeWan2gp(url) {
         if (!isLocalAIAvailable()) return { ok: false, error: 'Not in desktop app' };
         return window.localAI.wan2gp.probe(url);
     }
-    // Pushes a File/Blob to the configured Wan2GP server's /upload endpoint
-    // and returns { url, path }. URL is a previewable HTTP link; the provider
-    // also remembers the path so a subsequent generate(params.image=url) call
-    // can rehydrate it as a Gradio file descriptor.
+    // Saves a start frame on disk and returns { url: file://…, path }. Local
+    // runs pass the path to Wan2GP; remote runs upload it to the MCP server.
     async uploadFileToWan2gp(file) {
         if (!isLocalAIAvailable()) throw new Error('Local AI only available in the desktop app.');
         const buf = await file.arrayBuffer();
@@ -91,7 +103,8 @@ class LocalInferenceClient {
     /**
      * Subscribe to generation progress events.
      * sd.cpp emits { step, totalSteps, progress, status }.
-     * Wan2GP emits { progress, status }.
+     * Wan2GP emits { progress, status, step?, totalSteps?, downloadedBytes? } with status
+     * starting | downloading | loading | encoding | generating | decoding | saving | done.
      */
     onProgress(callback) {
         if (!isLocalAIAvailable()) return () => {};

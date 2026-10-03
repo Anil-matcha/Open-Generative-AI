@@ -16,10 +16,13 @@ contextBridge.exposeInMainWorld('localAI', {
     generate: (params) => ipcRenderer.invoke('local-ai:generate', params),
     cancelGeneration: () => ipcRenderer.invoke('local-ai:cancel-generation'),
 
-    // ── Wan2GP engine (remote Gradio server) ───────────────────────────────
+    // ── Wan2GP engine (local folder or remote MCP server) ──────────────────
     wan2gp: {
         getConfig:  () => ipcRenderer.invoke('wan2gp:get-config'),
+        setConfig:  (cfg) => ipcRenderer.invoke('wan2gp:set-config', cfg),
         setUrl:     (url) => ipcRenderer.invoke('wan2gp:set-url', url),
+        check:      (cfg) => ipcRenderer.invoke('wan2gp:check', cfg),
+        pickFolder: () => ipcRenderer.invoke('wan2gp:pick-folder'),
         probe:      (url) => ipcRenderer.invoke('wan2gp:probe', url),
         listModels: () => ipcRenderer.invoke('wan2gp:list-models'),
         generate:   (params) => ipcRenderer.invoke('wan2gp:generate', params),

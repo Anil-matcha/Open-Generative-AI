@@ -1,7 +1,7 @@
 import { muapi } from '../lib/muapi.js';
 import { t2vModels, getAspectRatiosForVideoModel, getDurationsForModel, getResolutionsForVideoModel, i2vModels, getAspectRatiosForI2VModel, getDurationsForI2VModel, getResolutionsForI2VModel, v2vModels } from '../lib/models.js';
 import { AuthModal } from './AuthModal.js';
-import { t } from '../lib/i18n.js';
+import { t, tf } from '../lib/i18n.js';
 import { createUploadPicker } from './UploadPicker.js';
 import { savePendingJob, removePendingJob, getPendingJobs } from '../lib/pendingJobs.js';
 import { localAI, isLocalAIAvailable } from '../lib/localInferenceClient.js';
@@ -12,6 +12,7 @@ import { isWan2gpModelId, getLocalModelById, localT2VModels, localI2VModels } fr
 const adaptLocalToVideoEntry = (m) => ({
     id: m.id,
     name: m.name,
+    family: m.family,
     provider: 'wan2gp',
     inputs: {
         prompt: { type: 'string', name: 'prompt', title: 'Prompt' },
@@ -19,18 +20,37 @@ const adaptLocalToVideoEntry = (m) => ({
     },
 });
 
+const escapeHtml = (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+const formatBytes = (bytes) => bytes >= 1024 ** 3 ? `${(bytes / 1024 ** 3).toFixed(1)} GB` : `${Math.round(bytes / 1024 ** 2)} MB`;
+
+// Progress label for a Wan2GP event ({ status, step, totalSteps, downloadedBytes, message }).
+const localProgressLabel = ({ status, step, totalSteps, downloadedBytes, message }) => {
+    if (status === 'downloading') return tf('video.localDownloading', formatBytes(downloadedBytes || 0));
+    if (status === 'loading') return t('video.localLoading');
+    if (status === 'encoding') return t('video.localEncoding');
+    if (status === 'generating' && totalSteps) return tf('video.localStep', step, totalSteps);
+    if (status === 'decoding') return t('video.localDecoding');
+    if (status === 'saving' || status === 'done') return t('video.localSaving');
+    return message || t('video.localStarting');
+};
+
 export function VideoStudio() {
     const container = document.createElement('div');
     container.className = 'w-full h-full flex flex-col items-center justify-center bg-app-bg relative p-4 md:p-6 overflow-y-auto custom-scrollbar overflow-x-hidden';
 
-    // Merge Wan2GP video models in only when running inside Electron AND the
-    // user has a Wan2GP server configured. We can't probe synchronously, so
-    // we always include them when isLocalAIAvailable() — getCurrentModel()
-    // reads from these arrays, so they need to be present from init.
+    // Cloud (Muapi) and local (Wan2GP) models live in separate lists; the
+    // "⚡ Local" toggle — shown only in the desktop app — picks which one the
+    // model dropdown and generation use.
     const localT2V = isLocalAIAvailable() ? localT2VModels.map(adaptLocalToVideoEntry) : [];
     const localI2V = isLocalAIAvailable() ? localI2VModels.map(adaptLocalToVideoEntry) : [];
-    const allT2V = [...t2vModels, ...localT2V];
-    const allI2V = [...i2vModels, ...localI2V];
+    const allT2V = t2vModels;
+    const allI2V = i2vModels;
+    let useLocalModel = false;
+    // id → { ready, unavailableReason, availabilityNote } from the Wan2GP engine
+    let localAvailability = new Map();
+    const t2vList = () => useLocalModel ? localT2V : allT2V;
+    const i2vList = () => useLocalModel ? localI2V : allI2V;
 
     // --- State ---
     const defaultModel = allT2V[0];
@@ -51,7 +71,7 @@ export function VideoStudio() {
     let v2vMode = false;   // true = video-to-video tools mode
     let uploadedVideoUrl = null;
 
-    const getCurrentModels = () => v2vMode ? v2vModels : (imageMode ? allI2V : allT2V);
+    const getCurrentModels = () => v2vMode ? v2vModels : (imageMode ? i2vList() : t2vList());
     // Local Wan2GP entries don't live in the Muapi-derived helpers, so we
     // resolve aspect ratios off the catalog when the selected id is local.
     const getCurrentAspectRatios = (id) => {
@@ -140,11 +160,11 @@ export function VideoStudio() {
             }
             if (!imageMode) {
                 imageMode = true;
-                const currentT2V = allT2V.find(m => m.id === selectedModel);
+                const currentT2V = t2vList().find(m => m.id === selectedModel);
                 const sibling = currentT2V?.family
-                    ? allI2V.find(m => m.family === currentT2V.family)
+                    ? i2vList().find(m => m.family === currentT2V.family)
                     : null;
-                const target = sibling || allI2V[0];
+                const target = sibling || i2vList()[0];
                 selectedModel = target.id;
                 selectedModelName = target.name;
                 document.getElementById('v-model-btn-label').textContent = selectedModelName;
@@ -161,17 +181,17 @@ export function VideoStudio() {
             // Clearing the start frame invalidates any selected end frame.
             uploadedEndImageUrl = null;
             endPicker?.reset();
-            selectedModel = allT2V[0].id;
-            selectedModelName = allT2V[0].name;
+            selectedModel = t2vList()[0].id;
+            selectedModelName = t2vList()[0].name;
             document.getElementById('v-model-btn-label').textContent = selectedModelName;
             updateControlsForModel(selectedModel);
             textarea.placeholder = t('video.placeholder');
             textarea.disabled = false;
         },
-        // Route the upload through the configured Wan2GP server when the active
-        // model is local; otherwise fall back to the Muapi-hosted upload.
-        uploadFn: (file) => isWan2gpModelId(selectedModel) ? localAI.uploadFileToWan2gp(file) : muapi.uploadFile(file),
-        requireApiKey: () => !isWan2gpModelId(selectedModel),
+        // Local mode keeps the start frame on disk for Wan2GP; otherwise fall
+        // back to the Muapi-hosted upload.
+        uploadFn: (file) => useLocalModel ? localAI.uploadFileToWan2gp(file) : muapi.uploadFile(file),
+        requireApiKey: () => !useLocalModel,
     });
     topRow.appendChild(picker.trigger);
     container.appendChild(picker.panel);
@@ -184,8 +204,8 @@ export function VideoStudio() {
         anchorContainer: container,
         onSelect: ({ url }) => { uploadedEndImageUrl = url; },
         onClear: () => { uploadedEndImageUrl = null; },
-        uploadFn: (file) => isWan2gpModelId(selectedModel) ? localAI.uploadFileToWan2gp(file) : muapi.uploadFile(file),
-        requireApiKey: () => !isWan2gpModelId(selectedModel),
+        uploadFn: (file) => useLocalModel ? localAI.uploadFileToWan2gp(file) : muapi.uploadFile(file),
+        requireApiKey: () => !useLocalModel,
     });
     endPicker.trigger.title = 'End frame (optional)';
     // Visual marker: small "L" badge in the corner so users can tell the two
@@ -277,8 +297,8 @@ export function VideoStudio() {
             return;
         }
         v2vMode = false;
-        selectedModel = allT2V[0].id;
-        selectedModelName = allT2V[0].name;
+        selectedModel = t2vList()[0].id;
+        selectedModelName = t2vList()[0].name;
         document.getElementById('v-model-btn-label').textContent = selectedModelName;
         updateControlsForModel(selectedModel);
         textarea.placeholder = 'Describe the video you want to create';
@@ -413,6 +433,54 @@ export function VideoStudio() {
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="opacity-60 text-secondary"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z"/></svg>
     `, 'Effect', 'v-effect-btn', 'Select effect type');
 
+    // Local / API source toggle (only shown in Electron) — same pattern as Image Studio.
+    const refreshLocalAvailability = async () => {
+        try {
+            const models = await localAI.listModels();
+            localAvailability = new Map(models.filter(m => m.provider === 'wan2gp').map(m => [m.id, m]));
+        } catch (err) {
+            console.warn('[VideoStudio] Could not read Wan2GP status:', err);
+        }
+    };
+    if (isLocalAIAvailable()) {
+        const localToggleBtn = document.createElement('button');
+        localToggleBtn.id = 'v-local-toggle-btn';
+        const updateLocalToggleStyle = () => {
+            localToggleBtn.className = useLocalModel
+                ? 'flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all border text-xs font-bold whitespace-nowrap bg-primary/20 border-primary/40 text-primary'
+                : 'flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all border text-xs font-bold whitespace-nowrap bg-white/5 border-white/5 text-white/60 hover:bg-white/10';
+            localToggleBtn.textContent = useLocalModel ? t('image.local') : t('image.api');
+        };
+        updateLocalToggleStyle();
+        localToggleBtn.onclick = async (e) => {
+            e.stopPropagation();
+            useLocalModel = !useLocalModel;
+            updateLocalToggleStyle();
+            // Uploads and video tools belong to one source — start clean after switching.
+            if (v2vMode) {
+                v2vMode = false;
+                uploadedVideoUrl = null;
+                showVideoIcon();
+                textarea.disabled = false;
+            }
+            if (imageMode) {
+                picker.reset();
+                uploadedImageUrl = null;
+                imageMode = false;
+            }
+            videoPickerBtn.classList.toggle('hidden', useLocalModel);
+            if (useLocalModel) await refreshLocalAvailability();
+            const list = getCurrentModels();
+            const target = (useLocalModel && list.find(m => localAvailability.get(m.id)?.ready)) || list[0];
+            selectedModel = target.id;
+            selectedModelName = target.name;
+            document.getElementById('v-model-btn-label').textContent = selectedModelName;
+            updateControlsForModel(selectedModel);
+            textarea.placeholder = t('video.placeholder');
+        };
+        controlsLeft.appendChild(localToggleBtn);
+    }
+
     controlsLeft.appendChild(modelBtn);
     controlsLeft.appendChild(arBtn);
     controlsLeft.appendChild(durationBtn);
@@ -445,6 +513,61 @@ export function VideoStudio() {
     bar.appendChild(bottomRow);
     promptWrapper.appendChild(bar);
     container.appendChild(promptWrapper);
+
+    // Local generation progress + error panel (hidden until a local run starts)
+    const localPanel = document.createElement('div');
+    localPanel.id = 'v-local-panel';
+    localPanel.className = 'w-full max-w-4xl mt-4 hidden flex-col gap-2 relative z-30';
+    localPanel.innerHTML = `
+        <div class="v-local-progress flex flex-col gap-2">
+            <div class="flex items-center justify-between gap-3">
+                <span class="v-local-label text-xs font-bold text-white/60 truncate">${t('video.localStarting')}</span>
+                <span class="v-local-pct text-xs font-bold text-primary shrink-0">0%</span>
+            </div>
+            <div class="h-1.5 rounded-full bg-white/10 overflow-hidden">
+                <div class="v-local-fill h-full bg-primary transition-all duration-300" style="width:0%"></div>
+            </div>
+            <div class="flex justify-end">
+                <button class="v-local-cancel text-xs text-red-400 hover:text-red-300 transition-colors">${t('common.cancel')}</button>
+            </div>
+        </div>
+        <div class="v-local-error hidden flex-col gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20">
+            <div class="flex items-center justify-between gap-3">
+                <span class="v-local-error-title text-xs font-bold text-red-300"></span>
+                <button class="v-local-error-close text-xs text-white/50 hover:text-white">✕</button>
+            </div>
+            <pre class="v-local-error-log text-[10px] leading-relaxed text-white/60 whitespace-pre-wrap break-words max-h-48 overflow-y-auto custom-scrollbar"></pre>
+        </div>
+    `;
+    container.appendChild(localPanel);
+    const localProgressEl = localPanel.querySelector('.v-local-progress');
+    const localErrorEl = localPanel.querySelector('.v-local-error');
+    const showLocalPanel = (part) => {
+        localPanel.classList.remove('hidden');
+        localPanel.classList.add('flex');
+        localProgressEl.classList.toggle('hidden', part !== 'progress');
+        localErrorEl.classList.toggle('hidden', part !== 'error');
+        localErrorEl.classList.toggle('flex', part === 'error');
+    };
+    const hideLocalPanel = () => {
+        localPanel.classList.add('hidden');
+        localPanel.classList.remove('flex');
+    };
+    const setLocalProgress = (event) => {
+        const pct = Math.round((event.progress ?? 0) * 100);
+        localPanel.querySelector('.v-local-label').textContent = localProgressLabel(event);
+        localPanel.querySelector('.v-local-pct').textContent = `${pct}%`;
+        localPanel.querySelector('.v-local-fill').style.width = `${pct}%`;
+    };
+    // First line is the reason; the rest (if any) is the Wan2GP log tail.
+    const showLocalError = (message) => {
+        const [title, ...rest] = String(message).replace(/^Error invoking remote method '[^']+': (Error: )?/, '').split('\n');
+        localPanel.querySelector('.v-local-error-title').textContent = title;
+        localPanel.querySelector('.v-local-error-log').textContent = rest.join('\n').trim();
+        showLocalPanel('error');
+    };
+    localPanel.querySelector('.v-local-cancel').onclick = () => localAI.cancelGeneration();
+    localPanel.querySelector('.v-local-error-close').onclick = hideLocalPanel;
 
     // ==========================================
     // 3. DROPDOWNS
@@ -560,7 +683,7 @@ export function VideoStudio() {
                             <input type="text" id="v-model-search" placeholder="${t('common.searchModels')}" class="bg-transparent border-none text-xs text-white focus:ring-0 w-full p-0">
                         </div>
                     </div>
-                    <div class="text-[10px] font-bold text-secondary uppercase tracking-widest px-3 py-2 shrink-0">Video models</div>
+                    <div class="text-[10px] font-bold text-secondary uppercase tracking-widest px-3 py-2 shrink-0">${useLocalModel ? t('video.localModels') : 'Video models'}</div>
                     <div id="v-model-list-container" class="flex flex-col gap-1.5 overflow-y-auto custom-scrollbar pr-1 pb-2"></div>
                 </div>
             `;
@@ -568,20 +691,28 @@ export function VideoStudio() {
 
             const makeModelItem = (m, isV2V = false) => {
                 const item = document.createElement('div');
-                item.className = `flex items-center justify-between p-3.5 hover:bg-white/5 rounded-2xl cursor-pointer transition-all border border-transparent hover:border-white/5 ${selectedModel === m.id ? 'bg-white/5 border-white/5' : ''}`;
+                // Local Wan2GP models carry the engine's verdict; unavailable ones stay visible with the reason.
+                const local = m.provider === 'wan2gp' ? localAvailability.get(m.id) : null;
+                const unavailable = local && !local.ready;
+                item.className = `flex items-center justify-between p-3.5 rounded-2xl transition-all border border-transparent ${unavailable ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white/5 cursor-pointer hover:border-white/5'} ${selectedModel === m.id ? 'bg-white/5 border-white/5' : ''}`;
                 const iconColor = isV2V ? 'bg-orange-500/10 text-orange-400' : m.id.includes('kling') ? 'bg-blue-500/10 text-blue-400' : m.id.includes('veo') ? 'bg-purple-500/10 text-purple-400' : m.id.includes('sora') ? 'bg-rose-500/10 text-rose-400' : 'bg-primary/10 text-primary';
+                const localNote = unavailable
+                    ? `<span class="v-local-reason text-[9px] text-yellow-400/80 leading-snug">${escapeHtml(local.unavailableReason)}</span>`
+                    : local?.availabilityNote ? `<span class="text-[9px] text-muted leading-snug">${escapeHtml(local.availabilityNote)}</span>` : '';
                 item.innerHTML = `
-                    <div class="flex items-center gap-3.5">
-                         <div class="w-10 h-10 ${iconColor} border border-white/5 rounded-xl flex items-center justify-center font-black text-sm shadow-inner uppercase">${m.name.charAt(0)}</div>
-                         <div class="flex flex-col gap-0.5">
+                    <div class="flex items-center gap-3.5 min-w-0">
+                         <div class="w-10 h-10 shrink-0 ${iconColor} border border-white/5 rounded-xl flex items-center justify-center font-black text-sm shadow-inner uppercase">${m.provider === 'wan2gp' ? '⚡' : m.name.charAt(0)}</div>
+                         <div class="flex flex-col gap-0.5 min-w-0">
                             <span class="text-xs font-bold text-white tracking-tight">${m.name}</span>
                             ${isV2V ? `<span class="text-[9px] text-orange-400/70">${m.imageField ? 'Upload a video and image' : 'Upload a video to use'}</span>` : ''}
+                            ${localNote}
                          </div>
                     </div>
                     ${selectedModel === m.id ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
                 `;
                 item.onclick = (e) => {
                     e.stopPropagation();
+                    if (unavailable) return;
                     if (isV2V) {
                         // Switch to v2v mode
                         v2vMode = true;
@@ -629,13 +760,13 @@ export function VideoStudio() {
                 const lf = filter.toLowerCase();
 
                 // Regular generation models (always t2v or i2v, never v2v)
-                const generationModels = imageMode ? allI2V : allT2V;
+                const generationModels = imageMode ? i2vList() : t2vList();
                 const filteredMain = generationModels
                     .filter(m => m.name.toLowerCase().includes(lf) || m.id.toLowerCase().includes(lf));
                 filteredMain.forEach(m => list.appendChild(makeModelItem(m, false)));
 
-                // Video Tools section
-                const filteredV2V = v2vModels.filter(m => m.name.toLowerCase().includes(lf) || m.id.toLowerCase().includes(lf));
+                // Video Tools section (cloud-only)
+                const filteredV2V = useLocalModel ? [] : v2vModels.filter(m => m.name.toLowerCase().includes(lf) || m.id.toLowerCase().includes(lf));
                 if (filteredV2V.length > 0) {
                     const sectionLabel = document.createElement('div');
                     sectionLabel.className = 'text-[10px] font-bold text-orange-400/70 uppercase tracking-widest px-3 py-2 mt-1 border-t border-white/5';
@@ -649,6 +780,10 @@ export function VideoStudio() {
             const searchInput = dropdown.querySelector('#v-model-search');
             searchInput.onclick = (e) => e.stopPropagation();
             searchInput.oninput = (e) => renderModels(e.target.value);
+            // Settings may have changed since the toggle — re-read Wan2GP availability.
+            if (useLocalModel) {
+                refreshLocalAvailability().then(() => { if (dropdownOpen === 'model') renderModels(searchInput.value); });
+            }
 
         } else if (type === 'ar') {
             dropdown.classList.add('max-w-[240px]');
@@ -1053,8 +1188,9 @@ export function VideoStudio() {
         uploadedVideoUrl = null;
         v2vMode = false;
         showVideoIcon();
-        selectedModel = allT2V[0].id;
-        selectedModelName = allT2V[0].name;
+        hideLocalPanel();
+        selectedModel = t2vList()[0].id;
+        selectedModelName = t2vList()[0].name;
         document.getElementById('v-model-btn-label').textContent = selectedModelName;
         updateControlsForModel(selectedModel);
         textarea.placeholder = 'Describe the video you want to create';
@@ -1115,10 +1251,18 @@ export function VideoStudio() {
             }
         }
 
-        const isLocal = isWan2gpModelId(selectedModel);
+        const isLocal = useLocalModel && isWan2gpModelId(selectedModel);
 
-        // Local Wan2GP generations don't go through Muapi — skip the auth gate.
-        if (!isLocal) {
+        // Local Wan2GP generations don't go through Muapi — skip the auth gate,
+        // but refuse models the engine reported as unavailable.
+        if (isLocal) {
+            if (!localAvailability.size) await refreshLocalAvailability();
+            const status = localAvailability.get(selectedModel);
+            if (status && !status.ready) {
+                showLocalError(status.unavailableReason);
+                return;
+            }
+        } else {
             const apiKey = localStorage.getItem('muapi_key');
             if (!apiKey) {
                 AuthModal(() => generateBtn.click());
@@ -1130,13 +1274,14 @@ export function VideoStudio() {
         generateBtn.disabled = true;
         generateBtn.innerHTML = `<span class="animate-spin inline-block mr-2 text-black">◌</span> ${t('common.generating')}`;
 
-        // For local generations, surface step progress in the button label.
+        // Local generations stream phase/step progress into the panel and the button.
         let unsubscribeProgress = null;
         if (isLocal) {
-            unsubscribeProgress = localAI.onProgress(({ status, progress, message }) => {
-                const pct = typeof progress === 'number' ? Math.round(progress * 100) : null;
-                const label = message || `${status || t('common.generating')}${pct != null ? ` ${pct}%` : '...'}`;
-                generateBtn.innerHTML = `<span class="animate-spin inline-block mr-2 text-black">◌</span> ${label}`;
+            setLocalProgress({ status: 'starting', progress: 0 });
+            showLocalPanel('progress');
+            unsubscribeProgress = localAI.onProgress((event) => {
+                setLocalProgress(event);
+                generateBtn.innerHTML = `<span class="animate-spin inline-block mr-2 text-black">◌</span> ${localProgressLabel(event)}`;
             });
         }
 
@@ -1151,8 +1296,8 @@ export function VideoStudio() {
 
         try {
             // ─── Local Wan2GP path ───────────────────────────────────────────
-            // Uploaded image URLs were minted by uploadFileToWan2gp(), so
-            // wan2gpProvider can rehydrate the Gradio file descriptor.
+            // Start frames were saved on disk by uploadFileToWan2gp(); the
+            // provider passes that path to Wan2GP (or uploads it to a remote one).
             if (isLocal) {
                 const localParams = {
                     model: selectedModel,
@@ -1162,11 +1307,12 @@ export function VideoStudio() {
                 if (imageMode && uploadedImageUrl) localParams.image = uploadedImageUrl;
                 const res = await localAI.generate(localParams);
                 console.log('[VideoStudio] Local response:', res);
+                hideLocalPanel();
                 if (res && res.url) {
                     const genId = Date.now().toString();
                     lastGenerationId = null;
                     lastGenerationModel = null;
-                    addToHistory({ id: genId, url: res.url, prompt, model: selectedModel, aspect_ratio: selectedAr, timestamp: new Date().toISOString() });
+                    addToHistory({ id: genId, url: res.url, prompt, model: selectedModel, aspect_ratio: selectedAr, seed: res.seed, timestamp: new Date().toISOString() });
                     showVideoInCanvas(res.url, selectedModel);
                 } else {
                     throw new Error('No video URL returned by Wan2GP');
@@ -1295,7 +1441,15 @@ export function VideoStudio() {
             console.error(e);
             // Restore hero so the page doesn't look broken after a failed generation
             hero.classList.remove('opacity-0', 'scale-95', '-translate-y-10', 'pointer-events-none');
-            generateBtn.innerHTML = `Error: ${e.message.slice(0, 60)}`;
+            const cancelled = isLocal && /Generation cancelled/.test(e.message);
+            if (isLocal) {
+                // Local errors carry the Wan2GP log tail — show all of it, not a 60-char button label.
+                if (cancelled) hideLocalPanel();
+                else showLocalError(e.message);
+            }
+            generateBtn.innerHTML = cancelled ? t('video.localCancelled')
+                : isLocal ? t('video.localFailed')
+                : `Error: ${e.message.slice(0, 60)}`;
             setTimeout(() => {
                 generateBtn.innerHTML = t('common.generate');
             }, 4000);
