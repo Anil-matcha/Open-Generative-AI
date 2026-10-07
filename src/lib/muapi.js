@@ -66,9 +66,6 @@ export class MuapiClient {
             finalPayload.seed = params.seed;
         }
 
-        console.log('[Muapi] Requesting:', url);
-        console.log('[Muapi] Payload:', finalPayload);
-
         try {
             // Step 1: Submit the task
             const response = await fetch(url, {
@@ -87,7 +84,6 @@ export class MuapiClient {
             }
 
             const submitData = await response.json();
-            console.log('[Muapi] Submit Response:', submitData);
 
             // Extract request_id for polling
             const requestId = submitData.request_id || submitData.id;
@@ -100,12 +96,10 @@ export class MuapiClient {
             if (params.onRequestId) params.onRequestId(requestId);
 
             // Step 2: Poll for results
-            console.log('[Muapi] Polling for results, request_id:', requestId);
             const result = await this.pollForResult(requestId, key);
 
             // Normalize: extract image URL from outputs array
             const imageUrl = result.outputs?.[0] || result.url || result.output?.url;
-            console.log('[Muapi] Image URL:', imageUrl);
             return { ...result, url: imageUrl };
 
         } catch (error) {
@@ -149,9 +143,6 @@ export class MuapiClient {
         if (params.mode) finalPayload.mode = params.mode;
         if (params.image_url) finalPayload.image_url = params.image_url;
 
-        console.log('[Muapi] Video Request:', url);
-        console.log('[Muapi] Video Payload:', finalPayload);
-
         try {
             const response = await fetch(url, {
                 method: 'POST',
@@ -169,18 +160,15 @@ export class MuapiClient {
             }
 
             const submitData = await response.json();
-            console.log('[Muapi] Video Submit Response:', submitData);
 
             const requestId = submitData.request_id || submitData.id;
             if (!requestId) return submitData;
 
             if (params.onRequestId) params.onRequestId(requestId);
 
-            console.log('[Muapi] Polling for video results, request_id:', requestId);
             const result = await this.pollForResult(requestId, key, 900, 2000);
 
             const videoUrl = result.outputs?.[0] || result.url || result.output?.url;
-            console.log('[Muapi] Video URL:', videoUrl);
             return { ...result, url: videoUrl };
 
         } catch (error) {
@@ -225,9 +213,6 @@ export class MuapiClient {
         if (params.resolution) finalPayload.resolution = params.resolution;
         if (params.quality) finalPayload.quality = params.quality;
 
-        console.log('[Muapi] I2I Request:', url);
-        console.log('[Muapi] I2I Payload:', finalPayload);
-
         try {
             const response = await fetch(url, {
                 method: 'POST',
@@ -241,7 +226,6 @@ export class MuapiClient {
             }
 
             const submitData = await response.json();
-            console.log('[Muapi] I2I Submit Response:', submitData);
 
             const requestId = submitData.request_id || submitData.id;
             if (!requestId) return submitData;
@@ -250,7 +234,6 @@ export class MuapiClient {
 
             const result = await this.pollForResult(requestId, key);
             const imageUrl = result.outputs?.[0] || result.url || result.output?.url;
-            console.log('[Muapi] I2I Result URL:', imageUrl);
             return { ...result, url: imageUrl };
         } catch (error) {
             console.error('Muapi I2I Error:', error);
@@ -316,9 +299,6 @@ export class MuapiClient {
         if (params.mode) finalPayload.mode = params.mode;
         if (params.name) finalPayload.name = params.name;
 
-        console.log('[Muapi] I2V Request:', url);
-        console.log('[Muapi] I2V Payload:', finalPayload);
-
         try {
             const response = await fetch(url, {
                 method: 'POST',
@@ -332,7 +312,6 @@ export class MuapiClient {
             }
 
             const submitData = await response.json();
-            console.log('[Muapi] I2V Submit Response:', submitData);
 
             const requestId = submitData.request_id || submitData.id;
             if (!requestId) return submitData;
@@ -341,7 +320,6 @@ export class MuapiClient {
 
             const result = await this.pollForResult(requestId, key, 900, 2000);
             const videoUrl = result.outputs?.[0] || result.url || result.output?.url;
-            console.log('[Muapi] I2V Result URL:', videoUrl);
             return { ...result, url: videoUrl };
         } catch (error) {
             console.error('Muapi I2V Error:', error);
@@ -361,8 +339,6 @@ export class MuapiClient {
         const formData = new FormData();
         formData.append('file', file);
 
-        console.log('[Muapi] Uploading file:', file.name);
-
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'x-api-key': key },
@@ -375,7 +351,6 @@ export class MuapiClient {
         }
 
         const data = await response.json();
-        console.log('[Muapi] Upload response:', data);
 
         const fileUrl = data.url || data.file_url || data.data?.url;
         if (!fileUrl) throw new Error('No URL returned from file upload');
@@ -408,9 +383,6 @@ export class MuapiClient {
             finalPayload.prompt = params.prompt;
         }
 
-        console.log('[Muapi] V2V Request:', url);
-        console.log('[Muapi] V2V Payload:', finalPayload);
-
         try {
             const response = await fetch(url, {
                 method: 'POST',
@@ -424,7 +396,6 @@ export class MuapiClient {
             }
 
             const submitData = await response.json();
-            console.log('[Muapi] V2V Submit Response:', submitData);
 
             const requestId = submitData.request_id || submitData.id;
             if (!requestId) return submitData;
@@ -433,7 +404,6 @@ export class MuapiClient {
 
             const result = await this.pollForResult(requestId, key, 900, 2000);
             const videoUrl = result.outputs?.[0] || result.url || result.output?.url;
-            console.log('[Muapi] V2V Result URL:', videoUrl);
             return { ...result, url: videoUrl };
         } catch (error) {
             console.error('Muapi V2V Error:', error);
@@ -469,9 +439,6 @@ export class MuapiClient {
         if (params.resolution) finalPayload.resolution = params.resolution;
         if (params.seed !== undefined && params.seed !== -1) finalPayload.seed = params.seed;
 
-        console.log('[Muapi] LipSync Request:', url);
-        console.log('[Muapi] LipSync Payload:', finalPayload);
-
         try {
             const response = await fetch(url, {
                 method: 'POST',
@@ -486,7 +453,6 @@ export class MuapiClient {
             }
 
             const submitData = await response.json();
-            console.log('[Muapi] LipSync Submit Response:', submitData);
 
             const requestId = submitData.request_id || submitData.id;
             if (!requestId) return submitData;
@@ -495,7 +461,6 @@ export class MuapiClient {
 
             const result = await this.pollForResult(requestId, key, 900, 2000);
             const videoUrl = result.outputs?.[0] || result.url || result.output?.url;
-            console.log('[Muapi] LipSync Result URL:', videoUrl);
             return { ...result, url: videoUrl };
         } catch (error) {
             console.error('Muapi LipSync Error:', error);
