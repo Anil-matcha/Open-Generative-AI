@@ -6,6 +6,7 @@ import { createUploadPicker } from './UploadPicker.js';
 import { savePendingJob, removePendingJob, getPendingJobs } from '../lib/pendingJobs.js';
 import { localAI, isLocalAIAvailable } from '../lib/localInferenceClient.js';
 import { isWan2gpModelId, getLocalModelById, localT2VModels, localI2VModels } from '../lib/localModels.js';
+import { createProviderFallbackTile, getProviderLogo, getProviderLogoAlt, getProviderFallbackText, handleProviderLogoError, shouldInvertProviderLogo } from '../lib/providerLogos.js';
 
 // Promotes a wan2gp catalog entry (lib/localModels.js shape) into the
 // `inputs`-shaped descriptor the Video Studio dropdowns/controls expect.
@@ -543,7 +544,7 @@ export function VideoStudio() {
             extendBanner.classList.remove('flex');
         }
     };
-
+    const failedProviderLogos = new Set();
     const showDropdown = (type, anchorBtn) => {
         dropdown.innerHTML = '';
         dropdown.classList.remove('opacity-0', 'pointer-events-none');
@@ -570,9 +571,19 @@ export function VideoStudio() {
                 const item = document.createElement('div');
                 item.className = `flex items-center justify-between p-3.5 hover:bg-white/5 rounded-2xl cursor-pointer transition-all border border-transparent hover:border-white/5 ${selectedModel === m.id ? 'bg-white/5 border-white/5' : ''}`;
                 const iconColor = isV2V ? 'bg-orange-500/10 text-orange-400' : m.id.includes('kling') ? 'bg-blue-500/10 text-blue-400' : m.id.includes('veo') ? 'bg-purple-500/10 text-purple-400' : m.id.includes('sora') ? 'bg-rose-500/10 text-rose-400' : 'bg-primary/10 text-primary';
+                const fallbackText = getProviderFallbackText(m);
+                const fallbackClasses = `w-10 h-10 ${iconColor} border border-white/5 rounded-xl flex items-center justify-center font-black text-sm shadow-inner uppercase`;
+                const fallbackMarkup = `<div data-provider-fallback class="${fallbackClasses}">${fallbackText}</div>`;
+                const configuredProviderLogo = getProviderLogo(m.provider);
+                const providerLogo = configuredProviderLogo && !failedProviderLogos.has(configuredProviderLogo)
+                    ? configuredProviderLogo
+                    : null;
+                const logoMarkup = providerLogo
+                    ? `<div class="w-10 h-10 rounded-xl border border-white/5 overflow-hidden shrink-0 flex items-center justify-center bg-white/[0.02]"><img data-provider-logo src="${providerLogo}" alt="${getProviderLogoAlt(m)}" loading="lazy" class="w-full h-full object-contain p-1 ${shouldInvertProviderLogo(m.provider) ? 'invert' : ''}"></div>`
+                    : fallbackMarkup;
                 item.innerHTML = `
                     <div class="flex items-center gap-3.5">
-                         <div class="w-10 h-10 ${iconColor} border border-white/5 rounded-xl flex items-center justify-center font-black text-sm shadow-inner uppercase">${m.name.charAt(0)}</div>
+                         ${logoMarkup}
                          <div class="flex flex-col gap-0.5">
                             <span class="text-xs font-bold text-white tracking-tight">${m.name}</span>
                             ${isV2V ? `<span class="text-[9px] text-orange-400/70">${m.imageField ? 'Upload a video and image' : 'Upload a video to use'}</span>` : ''}
@@ -580,6 +591,16 @@ export function VideoStudio() {
                     </div>
                     ${selectedModel === m.id ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
                 `;
+                const logoImage = item.querySelector('[data-provider-logo]');
+                logoImage?.addEventListener('error', () => {
+                    const fallback = createProviderFallbackTile(document, fallbackClasses, fallbackText);
+                    handleProviderLogoError({
+                        image: logoImage,
+                        failedProviderLogos,
+                        providerLogo,
+                        fallback,
+                    });
+                }, { once: true });
                 item.onclick = (e) => {
                     e.stopPropagation();
                     if (isV2V) {
