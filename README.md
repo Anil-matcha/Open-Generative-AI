@@ -3,13 +3,13 @@
 [![Powered by MuAPI](https://img.shields.io/badge/Powered%20by-MuAPI-6366f1?style=flat-square&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMiAyQzYuNDggMiAyIDYuNDggMiAxMnM0LjQ4IDEwIDEwIDEwIDEwLTQuNDggMTAtMTBTMTcuNTIgMiAxMiAyem0tMSAxNHYtNGgtMnYtMmg0djZoLTJ6bTAtOFY2aDJ2MmgtMnoiLz48L3N2Zz4=)](https://muapi.ai?utm_source=github&utm_medium=badge&utm_campaign=open-generative-ai)
 
 
-> **The free, open-source alternative to AI Video Platforms.** Generate AI images and videos using 400+ state-of-the-art models across 14 studios — no content filters, no closed ecosystem, no subscription fees.
+> **The free, open-source alternative to AI Video Platforms.** Generate AI images and videos using 600+ state-of-the-art models across 14 studios — no content filters, no closed ecosystem, no subscription fees.
 
 **Community:** Join [Discord](https://discord.gg/tANKJkHck) for discussions and support
 
 
-<p align="center"><a href="https://youtu.be/10Ep2pmfyVI"><img src="https://i.ytimg.com/vi/10Ep2pmfyVI/maxresdefault.jpg" width="720"></a></p>
-<p align="center"><a href="https://youtu.be/10Ep2pmfyVI"><b>▶ Watch: How to Use the Nano Banana 2.1 API (Step-by-Step Guide) </b></a></p>
+<p align="center"><a href="https://youtu.be/ZGDImpmyHVo"><img src="https://i.ytimg.com/vi/ZGDImpmyHVo/maxresdefault.jpg" width="720"></a></p>
+<p align="center"><a href="https://youtu.be/ZGDImpmyHVo"><b>▶ Watch: Best Free Uncensored AI Models 2026 (No GPU) </b></a></p>
 
 <p align="center">
   <a href="https://github.com/Anil-matcha/awesome-generative-ai-apps">
