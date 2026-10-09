@@ -63,3 +63,24 @@ test('parseGenerationProgressChunk does not replay old buffered steps when later
         { step: 3, totalSteps: 3, progress: 1 },
     ]);
 });
+
+test('parseGenerationProgressChunk does not replay a previous stage on unrelated output', () => {
+    const state = { tail: '', lastStep: 0, lastTotalSteps: 0 };
+    parseGenerationProgressChunk('step 2/2\n', state);
+    assert.deepEqual(parseGenerationProgressChunk('step 1/3\n', state), [
+        { step: 1, totalSteps: 3, progress: 1 / 3 },
+    ]);
+
+    assert.deepEqual(parseGenerationProgressChunk('writing preview\n', state), []);
+    assert.deepEqual(parseGenerationProgressChunk('step 2/3\n', state), [
+        { step: 2, totalSteps: 3, progress: 2 / 3 },
+    ]);
+});
+
+test('parseGenerationProgressChunk still joins a progress record split across chunks', () => {
+    const state = { tail: '', lastStep: 0, lastTotalSteps: 0 };
+    assert.deepEqual(parseGenerationProgressChunk('step 1/', state), []);
+    assert.deepEqual(parseGenerationProgressChunk('20\n', state), [
+        { step: 1, totalSteps: 20, progress: 0.05 },
+    ]);
+});
