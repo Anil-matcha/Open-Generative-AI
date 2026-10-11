@@ -8,8 +8,8 @@
 **Community:** Join [Discord](https://discord.gg/tANKJkHck) for discussions and support
 
 
-<p align="center"><a href="https://youtu.be/z1dek_eYq2U"><img src="https://i.ytimg.com/vi/z1dek_eYq2U/maxresdefault.jpg" width="720"></a></p>
-<p align="center"><a href="https://youtu.be/z1dek_eYq2U"><b>▶ Watch: Free Seedance 2 Uncensored (Spicy) API — How to Access the Unrestricted Model </b></a></p>
+<p align="center"><a href="https://youtu.be/Bj-iwmMl-cc"><img src="https://i.ytimg.com/vi/Bj-iwmMl-cc/maxresdefault.jpg" width="720"></a></p>
+<p align="center"><a href="https://youtu.be/Bj-iwmMl-cc"><b>▶ Watch: Free Uncensored AI Generator : Open Source, No Restrictions </b></a></p>
 
 <p align="center">
   <a href="https://github.com/Anil-matcha/awesome-generative-ai-apps">
