@@ -20625,6 +20625,149 @@ export const i2vModels = [
     "provider_name": "Vidu"
   },
   {
+    "id": "vidu-q4-image-to-video",
+    "name": "Vidu Q4",
+    "endpoint": "vidu-q4-image-to-video",
+    "family": "vidu-q4",
+    "imageField": "image_url",
+    "hasPrompt": true,
+    "promptRequired": false,
+    "inputs": {
+      "prompt": {
+        "examples": [
+          "The astronaut waves and the camera slowly moves up."
+        ],
+        "description": "Text description of the motion and scene. Optional.",
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt"
+      },
+      "image_url": {
+        "examples": [
+          "https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/vidu-q3-pro-image-to-video.jpg"
+        ],
+        "description": "First-frame image URL. The video inherits this image's aspect ratio.",
+        "field": "image",
+        "type": "string",
+        "title": "Image URL",
+        "name": "image_url"
+      },
+      "resolution": {
+        "enum": [
+          "540p",
+          "720p",
+          "1080p",
+          "2k",
+          "4k"
+        ],
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output resolution.",
+        "default": "720p"
+      },
+      "duration": {
+        "title": "Duration",
+        "name": "duration",
+        "type": "int",
+        "description": "Video length in seconds (3-16).",
+        "default": 5,
+        "minValue": 3,
+        "maxValue": 16,
+        "step": 1
+      },
+      "audio": {
+        "type": "boolean",
+        "title": "Audio",
+        "name": "audio",
+        "description": "Generate synchronized audio (dialogue and sound effects).",
+        "default": true
+      }
+    },
+    "provider": "vidu",
+    "provider_name": "Vidu"
+  },
+  {
+    "id": "vidu-q4-reference-to-video",
+    "name": "Vidu Q4 Reference",
+    "endpoint": "vidu-q4-reference-to-video",
+    "family": "vidu-q4",
+    "imageField": "images_list",
+    "hasPrompt": true,
+    "promptRequired": true,
+    "maxImages": 15,
+    "inputs": {
+      "images_list": {
+        "examples": [],
+        "description": "Reference image URLs (1 to 15).",
+        "field": "images_list",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "title": "Reference Image URLs",
+        "name": "images_list",
+        "maxItems": 15
+      },
+      "prompt": {
+        "examples": [
+          "In the scene of reference image 1, the person in reference image 2 turns to the person in reference image 3 and says: \"What are you doing?\""
+        ],
+        "description": "Describe the video; refer to inputs by order, e.g. reference image 2.",
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt"
+      },
+      "aspect_ratio": {
+        "enum": [
+          "16:9",
+          "9:16",
+          "1:1",
+          "4:3",
+          "3:4"
+        ],
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "type": "string",
+        "description": "Output aspect ratio.",
+        "default": "16:9"
+      },
+      "resolution": {
+        "enum": [
+          "540p",
+          "720p",
+          "1080p",
+          "2k",
+          "4k"
+        ],
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output resolution.",
+        "default": "720p"
+      },
+      "duration": {
+        "title": "Duration",
+        "name": "duration",
+        "type": "int",
+        "description": "Video length in seconds (3-16).",
+        "default": 5,
+        "minValue": 3,
+        "maxValue": 16,
+        "step": 1
+      },
+      "audio": {
+        "type": "boolean",
+        "title": "Audio",
+        "name": "audio",
+        "description": "Generate synchronized audio (dialogue and sound effects).",
+        "default": true
+      }
+    },
+    "provider": "vidu",
+    "provider_name": "Vidu"
+  },
+  {
     "id": "vidu-q2-pro-image-to-video",
     "name": "Vidu Q2 Pro",
     "endpoint": "vidu-q2-pro-image-to-video",

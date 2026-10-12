@@ -1,6 +1,7 @@
 import { createGroupedVideoRegistry } from "./groupedVideoRegistry.js";
 
 export const VIDU_FAMILY_NAMES = Object.freeze({
+  "vidu-q4": "Vidu Q4",
   "vidu-q3": "Vidu Q3",
   "vidu-q2": "Vidu Q2",
   "vidu-q1": "Vidu Q1",
@@ -26,6 +27,8 @@ const registry = createGroupedVideoRegistry({
           familyId, ["keyframes"], { speed });
       }
     }
+    register("vidu-q4-image-to-video", "vidu-q4", ["animate_image"]);
+    register("vidu-q4-reference-to-video", "vidu-q4", ["references"]);
     register("vidu-q2-reference", "vidu-q2", ["references"]);
     register("vidu-q1-reference", "vidu-q1", ["references"]);
     register("vidu-v2.0-t2v", "vidu-2", [null]);
