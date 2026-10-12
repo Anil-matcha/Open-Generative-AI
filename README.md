@@ -8,8 +8,8 @@
 **Community:** Join [Discord](https://discord.gg/tANKJkHck) for discussions and support
 
 
-<p align="center"><a href="https://youtu.be/Bj-iwmMl-cc"><img src="https://i.ytimg.com/vi/Bj-iwmMl-cc/maxresdefault.jpg" width="720"></a></p>
-<p align="center"><a href="https://youtu.be/Bj-iwmMl-cc"><b>▶ Watch: Free Uncensored AI Generator : Open Source, No Restrictions </b></a></p>
+<p align="center"><a href="https://youtu.be/8Ua5lRiePFg"><img src="https://i.ytimg.com/vi/8Ua5lRiePFg/maxresdefault.jpg" width="720"></a></p>
+<p align="center"><a href="https://youtu.be/8Ua5lRiePFg"><b>▶ Watch: How to Access Kling 4.0 Flash API - Best Alternative to Seedance 2 </b></a></p>
 
 <p align="center">
   <a href="https://github.com/Anil-matcha/awesome-generative-ai-apps">
