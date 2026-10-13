@@ -5,7 +5,7 @@
 
 > **The free, open-source alternative to AI Video Platforms.** Generate AI images and videos using 600+ state-of-the-art models across 14 studios — no content filters, no closed ecosystem, no subscription fees.
 
-**Community:** Join [Discord](https://discord.gg/tANKJkHck) for discussions and support
+**Community:** Join [Discord](https://discord.com/invite/zpnuBRXhKg) for discussions and support
 
 
 <p align="center"><a href="https://youtu.be/_SK1mQPfzF4"><img src="https://i.ytimg.com/vi/_SK1mQPfzF4/maxresdefault.jpg" width="720"></a></p>
@@ -84,10 +84,10 @@ One-click installers — no Node.js or terminal required.
 
 | Platform | Download |
 |---|---|
-| macOS Apple Silicon (M1/M2/M3/M4) | [Open Generative AI-1.0.9-arm64.dmg](https://github.com/Anil-matcha/Open-Generative-AI/releases/download/v1.0.9/Open.Generative.AI-1.0.9-arm64.dmg) |
-| macOS Intel (x64) | [Open Generative AI-1.0.9.dmg](https://github.com/Anil-matcha/Open-Generative-AI/releases/download/v1.0.9/Open.Generative.AI-1.0.9.dmg) |
-| Windows (x64) | [Open Generative AI Setup 1.0.9.exe](https://github.com/Anil-matcha/Open-Generative-AI/releases/download/v1.0.9/Open.Generative.AI.Setup.1.0.9.exe) |
-| Linux (Ubuntu x64) | [v1.0.9 release](https://github.com/Anil-matcha/Open-Generative-AI/releases/tag/v1.0.9) (`.AppImage` / `.deb`), or build locally with `npm run electron:build:linux`. |
+| macOS Apple Silicon (M1/M2/M3/M4) | [Open Generative AI-2.0.0-arm64.dmg](https://github.com/Anil-matcha/Open-Generative-AI/releases/download/v2.0.0/Open.Generative.AI-2.0.0-arm64.dmg) |
+| macOS Intel (x64) | [Open Generative AI-2.0.0.dmg](https://github.com/Anil-matcha/Open-Generative-AI/releases/download/v2.0.0/Open.Generative.AI-2.0.0.dmg) |
+| Windows (x64) | [Open Generative AI Setup 2.0.0.exe](https://github.com/Anil-matcha/Open-Generative-AI/releases/download/v2.0.0/Open.Generative.AI.Setup.2.0.0.exe) |
+| Linux (Ubuntu x64) | [`.AppImage`](https://github.com/Anil-matcha/Open-Generative-AI/releases/download/v2.0.0/Open.Generative.AI-2.0.0.AppImage) / [`.deb`](https://github.com/Anil-matcha/Open-Generative-AI/releases/download/v2.0.0/open-generative-ai_2.0.0_amd64.deb), or build locally with `npm run electron:build:linux`. |
 
 All releases: [github.com/Anil-matcha/Open-Generative-AI/releases](https://github.com/Anil-matcha/Open-Generative-AI/releases)
 
