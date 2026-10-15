@@ -4389,6 +4389,50 @@ export const t2iModels = [
     "description": "Seedream 5.0 Flash is ByteDance's fast, low-cost Seedream 5 text-to-image tier, delivering photorealistic 1K and 2K images with strong prompt adherence and in-image text for high-volume creative workflows.",
     "example_url": "https://cdn.muapi.ai/assets/2d089b7e-0bbd-43b1-87b0-1b25516d9c41.avif",
     "image_url": "https://cdn.muapi.ai/assets/2d089b7e-0bbd-43b1-87b0-1b25516d9c41.avif"
+  },
+  {
+    "id": "ideogram-v4",
+    "name": "Ideogram 4.0",
+    "endpoint": "ideogram-v4",
+    "family": "ideogram",
+    "inputs": {
+      "prompt": {
+        "examples": [
+          "A premium editorial poster on a flat deep forest-green background. One vivid orange lily in a sculptural cobalt-blue glass vase on the right; on the empty left, large elegant cream-white serif typography spelling exactly BOTANICA on a single line. No other text. Museum-quality botanical still life, subtle paper texture, generous negative space."
+        ],
+        "description": "Text prompt describing the image (up to 4,000 characters). Put any text to render in the image in quotes or spell it out exactly.",
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt"
+      },
+      "aspect_ratio": {
+        "enum": [
+          "1:1",
+          "4:3",
+          "3:4",
+          "16:9",
+          "9:16"
+        ],
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "type": "string",
+        "description": "Aspect ratio of the output image.",
+        "default": "1:1"
+      },
+      "resolution": {
+        "enum": [
+          "1K",
+          "2K"
+        ],
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output resolution. Same price at 1K and 2K.",
+        "default": "1K"
+      }
+    },
+    "provider": "ideogram",
+    "provider_name": "Ideogram"
   }
 ];
 
@@ -34963,6 +35007,137 @@ export const audioModels = [
         "name": "is_instrumental",
         "description": "Whether to generate instrumental music with no vocals.",
         "default": false
+      }
+    }
+  },
+  {
+    "id": "elevenlabs-v4",
+    "name": "Eleven v4",
+    "endpoint": "elevenlabs-v4",
+    "family": "audio-generation",
+    "description": "Eleven v4 is ElevenLabs' latest text-to-speech model, delivering highly expressive, natural single-voice narration. Send up to 2,000 characters and get back a studio-quality MP3 \u2014 ideal for voiceovers, audiobooks, ads and app audio.",
+    "required": [
+      "prompt"
+    ],
+    "inputs": {
+      "prompt": {
+        "examples": [
+          "Welcome to the future of voice. This is Eleven v4, speaking with natural rhythm and emotion."
+        ],
+        "description": "Text to speak (up to 2,000 characters).",
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "maxLength": 2000
+      },
+      "voice_id": {
+        "enum": [
+          "voice_daniel",
+          "voice_liam"
+        ],
+        "title": "Voice",
+        "name": "voice_id",
+        "type": "string",
+        "description": "Voice to use for the narration.",
+        "default": "voice_daniel"
+      }
+    }
+  },
+  {
+    "id": "fish-s2-1-pro",
+    "name": "Fish Audio S2.1 Pro",
+    "endpoint": "fish-s2-1-pro",
+    "family": "audio-generation",
+    "description": "Fish Audio S2.1 Pro is a high-fidelity text-to-speech model built for long-form narration. Send up to 10,000 characters in one request and get back a natural-sounding MP3. Billed per UTF-8 byte of text.",
+    "required": [
+      "prompt"
+    ],
+    "inputs": {
+      "prompt": {
+        "examples": [
+          "Welcome to the show. Today we look at how voice models have changed the way we tell stories."
+        ],
+        "description": "Text to speak (up to 10,000 characters). Billed per UTF-8 byte; non-Latin scripts use 3-4 bytes per character.",
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "maxLength": 10000
+      },
+      "voice_id": {
+        "enum": [
+          "voice_fish_narrator"
+        ],
+        "title": "Voice",
+        "name": "voice_id",
+        "type": "string",
+        "description": "Voice to use for the narration.",
+        "default": "voice_fish_narrator"
+      }
+    }
+  },
+  {
+    "id": "lyria-3-pro",
+    "name": "Lyria 3 Pro",
+    "endpoint": "lyria-3-pro",
+    "family": "lyria",
+    "description": "Lyria 3 Pro is Google's flagship music model: describe a genre, mood, instruments and structure and it composes a full-length song of up to three minutes, returned as an MP3.",
+    "required": [
+      "prompt"
+    ],
+    "inputs": {
+      "prompt": {
+        "examples": [
+          "An upbeat synth-pop song about driving at night, shimmering arpeggios, punchy drums, female vocals, anthemic chorus."
+        ],
+        "description": "Describe the music: genre, mood, tempo, instruments, structure, and lyrics if you want vocals (up to 2,000 characters).",
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "maxLength": 2000
+      }
+    }
+  },
+  {
+    "id": "lyria-3",
+    "name": "Lyria 3",
+    "endpoint": "lyria-3",
+    "family": "lyria",
+    "description": "Lyria 3 generates short, high-quality music clips of up to 30 seconds from a text prompt \u2014 perfect for jingles, intros, loops and background tracks. Returned as an MP3.",
+    "required": [
+      "prompt"
+    ],
+    "inputs": {
+      "prompt": {
+        "examples": [
+          "A warm lo-fi hip hop loop with mellow Rhodes chords, vinyl crackle and a laid-back drum groove."
+        ],
+        "description": "Describe the music clip: genre, mood, tempo and instruments (up to 2,000 characters).",
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "maxLength": 2000
+      }
+    }
+  },
+  {
+    "id": "lyria-2",
+    "name": "Lyria 2",
+    "endpoint": "lyria-2",
+    "family": "lyria",
+    "description": "Lyria 2 is Google's instrumental music generation model. Describe the style and mood in a text prompt and get a roughly 30-second instrumental track as an MP3.",
+    "required": [
+      "prompt"
+    ],
+    "inputs": {
+      "prompt": {
+        "examples": [
+          "A cinematic orchestral build with soaring strings, deep brass and thundering timpani."
+        ],
+        "description": "Describe the instrumental music: genre, mood, tempo and instruments (up to 2,000 characters).",
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "maxLength": 2000
       }
     }
   }
