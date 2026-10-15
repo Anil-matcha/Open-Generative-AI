@@ -46,6 +46,27 @@ const UPLOAD_STATE = {
   READY: "ready",
 };
 
+const isAudioFile = (file) => {
+  if (!file) return false;
+  if (file.type && file.type.startsWith("audio/")) return true;
+  const ext = file.name?.split(".").pop()?.toLowerCase();
+  return ["mp3", "wav", "ogg", "m4a", "aac", "flac", "wma"].includes(ext);
+};
+
+const isImageFile = (file) => {
+  if (!file) return false;
+  if (file.type && file.type.startsWith("image/")) return true;
+  const ext = file.name?.split(".").pop()?.toLowerCase();
+  return ["jpg", "jpeg", "png", "webp", "avif", "gif", "bmp"].includes(ext);
+};
+
+const isVideoFile = (file) => {
+  if (!file) return false;
+  if (file.type && file.type.startsWith("video/")) return true;
+  const ext = file.name?.split(".").pop()?.toLowerCase();
+  return ["mp4", "mov", "webm", "mkv", "avi"].includes(ext);
+};
+
 function MediaPickerButton({
   accept,
   label,
@@ -57,17 +78,44 @@ function MediaPickerButton({
   fileName,
   previewUrl,
   isVideo,
+  isAudio,
   apiKey,
   mediaCopy = en.media,
 }) {
   const inputRef = useRef(null);
+  const audioRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
   const dragCounterRef = useRef(0);
   const acceptPrefix = accept?.split("/")[0];
+
+  useEffect(() => {
+    if (uploadState !== UPLOAD_STATE.READY) {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+      setIsPlaying(false);
+    }
+  }, [uploadState, previewUrl]);
+
+  const togglePlayAudio = (e) => {
+    e.stopPropagation();
+    if (!audioRef.current) return;
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play().catch(console.warn);
+    }
+  };
 
   const handleClick = (e) => {
     e.stopPropagation();
     if (uploadState === UPLOAD_STATE.READY) {
+      if (isAudio) {
+        togglePlayAudio(e);
+        return;
+      }
       onClear();
       return;
     }
@@ -77,8 +125,9 @@ function MediaPickerButton({
   const handleChange = async (e) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
+    const fileList = Array.from(files);
     e.target.value = "";
-    await onUpload(Array.from(files));
+    await onUpload(fileList);
   };
 
   const handleDragEnter = (e) => {
@@ -105,119 +154,181 @@ function MediaPickerButton({
     e.stopPropagation();
   };
 
+  const isAcceptedFile = (file) => {
+    if (!file) return false;
+    if (acceptPrefix === "audio") return isAudioFile(file);
+    if (acceptPrefix === "image") return isImageFile(file);
+    if (acceptPrefix === "video") return isVideoFile(file);
+    return true;
+  };
+
   const handleDrop = async (e) => {
     e.preventDefault();
     e.stopPropagation();
     dragCounterRef.current = 0;
     setIsDragging(false);
     if (uploadState === UPLOAD_STATE.UPLOADING) return;
-    const files = e.dataTransfer?.files;
-    if (!files || files.length === 0) return;
-    const matched = acceptPrefix
-      ? Array.from(files).filter((f) => f.type.startsWith(`${acceptPrefix}/`))
-      : Array.from(files);
-    if (matched.length === 0) return;
-    await onUpload(matched);
+    const files = Array.from(e.dataTransfer?.files || []).filter(isAcceptedFile);
+    if (files.length === 0) return;
+    await onUpload(files);
   };
 
   return (
-    <button
-      type="button"
-      title={
-        uploadState === UPLOAD_STATE.READY
-          ? `${fileName} — ${mediaCopy.clickToClear}`
-          : `${mediaCopy.uploadFilePrefix} ${label} ${mediaCopy.uploadFileSuffix}`
-      }
-      onClick={handleClick}
-      onDragEnter={handleDragEnter}
-      onDragLeave={handleDragLeave}
-      onDragOver={handleDragOver}
-      onDrop={handleDrop}
-      className={promptMediaButtonClassName({
-        active: uploadState === UPLOAD_STATE.READY,
-        className: isDragging
-          ? "ring-2 ring-[#22d3ee] ring-offset-1 ring-offset-black scale-105"
-          : "",
-      })}
-    >
+    <div className="relative inline-flex group/media">
       <input
         ref={inputRef}
         type="file"
         accept={accept}
         className="hidden"
+        onClick={(e) => e.stopPropagation()}
         onChange={handleChange}
       />
+      <button
+        type="button"
+        title={
+          uploadState === UPLOAD_STATE.READY
+            ? isAudio
+              ? `${fileName} — ${isPlaying ? "Pause" : "Play"}`
+              : `${fileName} — ${mediaCopy.clickToClear}`
+            : `${mediaCopy.uploadFilePrefix} ${label} ${mediaCopy.uploadFileSuffix}`
+        }
+        onClick={handleClick}
+        onDragEnter={handleDragEnter}
+        onDragLeave={handleDragLeave}
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+        className={promptMediaButtonClassName({
+          active: uploadState === UPLOAD_STATE.READY,
+          className: isDragging
+            ? "ring-2 ring-[#22d3ee] ring-offset-1 ring-offset-black scale-105"
+            : "",
+        })}
+      >
+        {/* Idle state */}
+        {uploadState === UPLOAD_STATE.IDLE && (
+          <div className="flex flex-col items-center justify-center gap-1 w-full h-full">
+            {icon}
+          </div>
+        )}
 
-      {/* Idle state */}
-      {uploadState === UPLOAD_STATE.IDLE && (
-        <div className="flex flex-col items-center justify-center gap-1 w-full h-full">
-          {icon}
-        </div>
-      )}
-
-      {/* Uploading indicator */}
-      {uploadState === UPLOAD_STATE.UPLOADING && (
-        <div className="flex flex-col items-center justify-center w-full h-full absolute inset-0 bg-black/80 z-20 backdrop-blur-[2px]">
-          <svg className="w-8 h-8 -rotate-90">
-            <circle
-              cx="16"
-              cy="16"
-              r="14"
-              stroke="currentColor"
-              strokeWidth="2"
-              fill="transparent"
-              className="text-white/10"
-            />
-            <circle
-              cx="16"
-              cy="16"
-              r="14"
-              stroke="currentColor"
-              strokeWidth="2"
-              fill="transparent"
-              strokeDasharray={88}
-              strokeDashoffset={88 - (88 * progress) / 100}
-              className="text-primary transition-all duration-300"
-            />
-          </svg>
-          <span className="absolute text-[9px] font-black text-primary leading-none">
-            {progress}%
-          </span>
-        </div>
-      )}
-
-      {/* Ready state */}
-      {uploadState === UPLOAD_STATE.READY && (
-        <div className="flex flex-col items-center justify-center gap-1 w-full h-full absolute inset-0 bg-primary/10 rounded-full group-hover:bg-primary/20 transition-all">
-          {previewUrl ? (
-            isVideo ? (
-              <video
-                src={previewUrl}
-                className="w-full h-full object-cover"
-                muted
+        {/* Uploading indicator */}
+        {uploadState === UPLOAD_STATE.UPLOADING && (
+          <div className="flex flex-col items-center justify-center w-full h-full absolute inset-0 bg-black/80 z-20 backdrop-blur-[2px]">
+            <svg className="w-8 h-8 -rotate-90">
+              <circle
+                cx="16"
+                cy="16"
+                r="14"
+                stroke="currentColor"
+                strokeWidth="2"
+                fill="transparent"
+                className="text-white/10"
               />
+              <circle
+                cx="16"
+                cy="16"
+                r="14"
+                stroke="currentColor"
+                strokeWidth="2"
+                fill="transparent"
+                strokeDasharray={88}
+                strokeDashoffset={88 - (88 * progress) / 100}
+                className="text-primary transition-all duration-300"
+              />
+            </svg>
+            <span className="absolute text-[9px] font-black text-primary leading-none">
+              {progress}%
+            </span>
+          </div>
+        )}
+
+        {/* Ready state */}
+        {uploadState === UPLOAD_STATE.READY && (
+          <div className="flex flex-col items-center justify-center gap-1 w-full h-full absolute inset-0 bg-primary/10 rounded-full group-hover:bg-primary/20 transition-all">
+            {isAudio ? (
+              <div className="flex flex-col items-center justify-center w-full h-full text-primary">
+                {previewUrl && (
+                  <audio
+                    ref={audioRef}
+                    src={previewUrl}
+                    onEnded={() => setIsPlaying(false)}
+                    onPause={() => setIsPlaying(false)}
+                    onPlay={() => setIsPlaying(true)}
+                  />
+                )}
+                {isPlaying ? (
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="text-primary animate-pulse"
+                  >
+                    <rect x="6" y="4" width="4" height="16" rx="1" />
+                    <rect x="14" y="4" width="4" height="16" rx="1" />
+                  </svg>
+                ) : (
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="text-primary translate-x-0.5"
+                  >
+                    <polygon points="5 3 19 12 5 21 5 3" />
+                  </svg>
+                )}
+              </div>
+            ) : previewUrl ? (
+              isVideo ? (
+                <video
+                  src={previewUrl}
+                  className="w-full h-full object-cover"
+                  muted
+                />
+              ) : (
+                <img
+                  src={previewUrl}
+                  alt=""
+                  className="w-full h-full object-cover"
+                />
+              )
             ) : (
-              <img
-                src={previewUrl}
-                alt=""
-                className="w-full h-full object-cover"
-              />
-            )
-          ) : (
-            <div className="flex flex-col items-center justify-center w-full px-1">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-primary mb-0.5">
-                <path d="M9 18V5l12-2v13" />
-                <circle cx="6" cy="18" r="3" />
-                <circle cx="18" cy="16" r="3" />
-              </svg>
-              <span className="text-[7px] font-black text-primary uppercase truncate w-full text-center">
-                {fileName?.split('.').pop() || "AUD"}
-              </span>
-            </div>
-          )}
-        </div>
+              <div className="flex flex-col items-center justify-center w-full px-1">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-primary mb-0.5">
+                  <path d="M9 18V5l12-2v13" />
+                  <circle cx="6" cy="18" r="3" />
+                  <circle cx="18" cy="16" r="3" />
+                </svg>
+                <span className="text-[7px] font-black text-primary uppercase truncate w-full text-center">
+                  {fileName?.split('.').pop() || "AUD"}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+      </button>
+
+      {/* Clear badge button on top corner for uploaded media */}
+      {uploadState === UPLOAD_STATE.READY && (
+        <button
+          type="button"
+          title={mediaCopy.clickToClear || "Clear"}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (audioRef.current) {
+              audioRef.current.pause();
+              audioRef.current.currentTime = 0;
+            }
+            setIsPlaying(false);
+            onClear();
+          }}
+          className="absolute -top-1 -right-1 w-4 h-4 bg-black/80 hover:bg-red-500 rounded-full flex items-center justify-center text-white text-[10px] border border-white/20 transition-all z-20 shadow-md group-hover/media:opacity-100 opacity-80 sm:opacity-0 sm:group-hover/media:opacity-100"
+        >
+          ×
+        </button>
       )}
-    </button>
+    </div>
   );
 }
 
@@ -446,6 +557,7 @@ export default function LipSyncStudio({
 
   // ── Persistence: Load ────────────────────────────────────────────────────
   useEffect(() => {
+    hasRestored.current = false;
     try {
       const stored = localStorage.getItem(PERSIST_KEY);
       if (stored) {
@@ -476,10 +588,11 @@ export default function LipSyncStudio({
     } finally {
       hasRestored.current = true;
     }
-  }, []);
+  }, [PERSIST_KEY]);
 
   // ── Persistence: Save ────────────────────────────────────────────────────
   useEffect(() => {
+    if (!hasRestored.current) return;
     const timer = setTimeout(() => {
       try {
         const state = {
@@ -502,6 +615,7 @@ export default function LipSyncStudio({
     }, 500); // 500ms debounce
     return () => clearTimeout(timer);
   }, [
+    PERSIST_KEY,
     inputMode,
     selectedModelId,
     selectedResolution,
@@ -538,7 +652,7 @@ export default function LipSyncStudio({
       const file = Array.isArray(files) ? files[0] : files;
       if (!file) return;
       if (file.size > 10 * 1024 * 1024) {
-        alert(copy.errors.imageTooLarge);
+        toast.error(copy.errors.imageTooLarge);
         return;
       }
       setImageState(UPLOAD_STATE.UPLOADING);
@@ -552,12 +666,12 @@ export default function LipSyncStudio({
         setImageState(UPLOAD_STATE.READY);
       } catch (err) {
         setImageState(UPLOAD_STATE.IDLE);
-        alert(copy.errors.imageUploadFailed.replace("{message}", err.message));
+        toast.error(copy.errors.imageUploadFailed.replace("{message}", err.message));
       } finally {
         setImageProgress(0);
       }
     },
-    [apiKey],
+    [apiKey, copy],
   );
 
   const handleVideoPick = useCallback(
@@ -565,7 +679,7 @@ export default function LipSyncStudio({
       const file = Array.isArray(files) ? files[0] : files;
       if (!file) return;
       if (file.size > 50 * 1024 * 1024) {
-        alert(copy.errors.videoTooLarge);
+        toast.error(copy.errors.videoTooLarge);
         return;
       }
       setVideoState(UPLOAD_STATE.UPLOADING);
@@ -579,12 +693,12 @@ export default function LipSyncStudio({
         setVideoState(UPLOAD_STATE.READY);
       } catch (err) {
         setVideoState(UPLOAD_STATE.IDLE);
-        alert(copy.errors.videoUploadFailed.replace("{message}", err.message));
+        toast.error(copy.errors.videoUploadFailed.replace("{message}", err.message));
       } finally {
         setVideoProgress(0);
       }
     },
-    [apiKey],
+    [apiKey, copy],
   );
 
   const handlePromptInput = (e) => {
@@ -596,7 +710,7 @@ export default function LipSyncStudio({
       const file = Array.isArray(files) ? files[0] : files;
       if (!file) return;
       if (file.size > 10 * 1024 * 1024) {
-        alert(copy.errors.audioTooLarge);
+        toast.error(copy.errors.audioTooLarge);
         return;
       }
       setAudioState(UPLOAD_STATE.UPLOADING);
@@ -610,24 +724,25 @@ export default function LipSyncStudio({
         setAudioState(UPLOAD_STATE.READY);
       } catch (err) {
         setAudioState(UPLOAD_STATE.IDLE);
-        alert(copy.errors.audioUploadFailed.replace("{message}", err.message));
+        toast.error(copy.errors.audioUploadFailed.replace("{message}", err.message));
       } finally {
         setAudioProgress(0);
       }
     },
-    [apiKey],
+    [apiKey, copy],
   );
 
   // ── Handle Dropped Files ────────────────────────────────────────────────
   useEffect(() => {
     if (droppedFiles && droppedFiles.length > 0) {
-      const imageFiles = droppedFiles.filter(f => f.type.startsWith('image/'));
-      const videoFiles = droppedFiles.filter(f => f.type.startsWith('video/'));
-      const audioFiles = droppedFiles.filter(f => f.type.startsWith('audio/'));
+      const audioFiles = droppedFiles.filter(isAudioFile);
+      const videoFiles = droppedFiles.filter(isVideoFile);
+      const imageFiles = droppedFiles.filter(isImageFile);
       
       if (audioFiles.length > 0) {
         handleAudioPick(audioFiles[0]);
-      } else if (videoFiles.length > 0) {
+      }
+      if (videoFiles.length > 0) {
         switchToVideo();
         handleVideoPick(videoFiles[0]);
       } else if (imageFiles.length > 0) {
@@ -701,15 +816,15 @@ export default function LipSyncStudio({
   // ── Generation ──────────────────────────────────────────────────────────
   const handleGenerate = async () => {
     if (!audioUrl) {
-      alert(copy.errors.needAudio);
+      toast.error(copy.errors.needAudio);
       return;
     }
     if (inputMode === "image" && !imageUrl) {
-      alert(copy.errors.needImage);
+      toast.error(copy.errors.needImage);
       return;
     }
     if (inputMode === "video" && !videoUrl) {
-      alert(copy.errors.needVideo);
+      toast.error(copy.errors.needVideo);
       return;
     }
 
@@ -1078,7 +1193,8 @@ export default function LipSyncStudio({
                 uploadState={audioState}
                 progress={audioProgress}
                 fileName={audioName}
-                previewUrl={null}
+                previewUrl={audioUrl}
+                isAudio={true}
                 isVideo={false}
                 apiKey={apiKey}
               />
