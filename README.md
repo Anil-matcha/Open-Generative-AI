@@ -8,8 +8,8 @@
 **Community:** Join [Discord](https://discord.com/invite/zpnuBRXhKg) for discussions and support
 
 
-<p align="center"><a href="https://youtu.be/YFYumX6YYOs"><img src="https://i.ytimg.com/vi/YFYumX6YYOs/maxresdefault.jpg" width="720"></a></p>
-<p align="center"><a href="https://youtu.be/YFYumX6YYOs"><b>▶ Watch: Best, Cheapest, Unlimited AI Generator </b></a></p>
+<p align="center"><a href="https://youtu.be/vsEb-yolUqI"><img src="https://i.ytimg.com/vi/vsEb-yolUqI/maxresdefault.jpg" width="720"></a></p>
+<p align="center"><a href="https://youtu.be/vsEb-yolUqI"><b>▶ Watch: Best, Cheapest, Unlimited AI Generator </b></a></p>
 
 <p align="center">
   <a href="https://github.com/Anil-matcha/awesome-generative-ai-apps">
