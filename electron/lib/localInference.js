@@ -2,8 +2,8 @@ const { ipcMain, app, BrowserWindow } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const https = require('https');
-const http = require('http');
 const { spawn, execFile } = require('child_process');
+const { downloadFile } = require('./localInferenceDownload');
 const {
     getBundledBinaryResourceDir,
     pickBinaryAssetForPlatform,
@@ -65,84 +65,6 @@ function fetchJson(url) {
             res.on('error', reject);
         }).on('error', reject);
     });
-}
-
-// ─── Robust HTTPS download with redirect-following, range-resume, and retry ───
-function downloadFile(url, destPath, onProgress) {
-    const tmp = destPath + '.part';
-
-    // Outer total so progress never goes backwards across retries/redirects
-    let knownTotal = 0;
-
-    const attempt = (requestUrl, redirectsLeft, retriesLeft) => new Promise((resolve, reject) => {
-        // Resume from however many bytes are already on disk
-        const alreadyDownloaded = fs.existsSync(tmp) ? fs.statSync(tmp).size : 0;
-
-        const parsed = new URL(requestUrl);
-        const mod = parsed.protocol === 'https:' ? https : http;
-
-        const reqHeaders = {
-            'User-Agent': 'Mozilla/5.0 (compatible; open-generative-ai/1.0)',
-            'Accept': '*/*',
-            'Connection': 'keep-alive',
-        };
-        if (alreadyDownloaded > 0) reqHeaders['Range'] = `bytes=${alreadyDownloaded}-`;
-
-        const req = mod.get({ hostname: parsed.hostname, path: parsed.pathname + parsed.search, headers: reqHeaders }, (res) => {
-            const { statusCode, headers } = res;
-
-            // Follow redirects
-            if ([301, 302, 303, 307, 308].includes(statusCode)) {
-                res.resume();
-                if (redirectsLeft <= 0) { reject(new Error('Too many redirects')); return; }
-                resolve(attempt(headers.location, redirectsLeft - 1, retriesLeft));
-                return;
-            }
-
-            // 206 Partial Content (range accepted) or 200 OK (server ignored Range)
-            if (statusCode !== 200 && statusCode !== 206) {
-                res.resume();
-                reject(new Error(`HTTP ${statusCode} from ${parsed.hostname}${parsed.pathname}`));
-                return;
-            }
-
-            // content-length on a 206 is the remaining bytes; on 200 it's the full file
-            const chunkSize = parseInt(headers['content-length'] || '0', 10);
-            if (statusCode === 200) {
-                // Server ignored our Range header — restart the file
-                if (fs.existsSync(tmp)) fs.unlinkSync(tmp);
-                knownTotal = chunkSize;
-            } else {
-                // 206: total = already downloaded + remaining
-                knownTotal = alreadyDownloaded + chunkSize;
-            }
-
-            let received = alreadyDownloaded;
-            const out = fs.createWriteStream(tmp, { flags: statusCode === 206 ? 'a' : 'w' });
-
-            res.on('data', (chunk) => {
-                received += chunk.length;
-                if (knownTotal && onProgress) onProgress(received / knownTotal);
-            });
-            res.pipe(out);
-            out.on('finish', () => { fs.renameSync(tmp, destPath); resolve(); });
-            out.on('error', reject);
-            res.on('error', reject);
-        });
-
-        req.on('error', (err) => {
-            if (retriesLeft > 0) {
-                console.warn(`[download] ${err.message} — retrying in 3s (${retriesLeft} left)`);
-                setTimeout(() => resolve(attempt(requestUrl, redirectsLeft, retriesLeft - 1)), 3000);
-            } else {
-                reject(err);
-            }
-        });
-
-        req.setTimeout(60000, () => req.destroy(new Error('Request timed out')));
-    });
-
-    return attempt(url, 10, 5);
 }
 
 // ─── Extract zip on each platform ────────────────────────────────────────────
@@ -405,8 +327,10 @@ async function deleteModel(modelId) {
 
     const filePath = path.join(MODELS_DIR, model.filename);
     if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-    const partPath = filePath + '.part';
-    if (fs.existsSync(partPath)) fs.unlinkSync(partPath);
+    for (const suffix of ['.part', '.part.meta.json', '.part.fresh']) {
+        const partialArtifact = filePath + suffix;
+        if (fs.existsSync(partialArtifact)) fs.unlinkSync(partialArtifact);
+    }
     return { ok: true };
 }
 
