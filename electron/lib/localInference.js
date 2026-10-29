@@ -41,6 +41,13 @@ function ensureLocalAiPaths() {
 const BINARY_NAME = process.platform === 'win32' ? 'sd-cli.exe' : 'sd-cli';
 let BINARY_PATH;
 
+// Request inactivity tolerance for model-file downloads. Model binaries are
+// multi-gigabyte (e.g. Z-Image Base ~5 GB) and consumer connections can stall
+// for well over a minute. The previous 60 s inactivity timeout destroyed the
+// request with "Request timed out" before large files could finish, so model
+// downloads reliably failed on slower or intermittent networks (#274).
+const DOWNLOAD_REQUEST_TIMEOUT_MS = 300_000;
+
 // ─── State ────────────────────────────────────────────────────────────────────
 let activeProcess = null;
 const activeDownloads = new Map(); // modelId → request object
@@ -88,14 +95,20 @@ function downloadFile(url, destPath, onProgress) {
         };
         if (alreadyDownloaded > 0) reqHeaders['Range'] = `bytes=${alreadyDownloaded}-`;
 
-        const req = mod.get({ hostname: parsed.hostname, path: parsed.pathname + parsed.search, headers: reqHeaders }, (res) => {
+        const reqOptions = {
+            hostname: parsed.hostname,
+            path: parsed.pathname + parsed.search,
+            headers: reqHeaders,
+        };
+        if (parsed.port) reqOptions.port = Number(parsed.port);
+        const req = mod.get(reqOptions, (res) => {
             const { statusCode, headers } = res;
 
             // Follow redirects
             if ([301, 302, 303, 307, 308].includes(statusCode)) {
                 res.resume();
                 if (redirectsLeft <= 0) { reject(new Error('Too many redirects')); return; }
-                resolve(attempt(headers.location, redirectsLeft - 1, retriesLeft));
+                resolve(attempt(new URL(headers.location, requestUrl).href, redirectsLeft - 1, retriesLeft));
                 return;
             }
 
@@ -139,7 +152,7 @@ function downloadFile(url, destPath, onProgress) {
             }
         });
 
-        req.setTimeout(60000, () => req.destroy(new Error('Request timed out')));
+        req.setTimeout(DOWNLOAD_REQUEST_TIMEOUT_MS, () => req.destroy(new Error('Request timed out')));
     });
 
     return attempt(url, 10, 5);
@@ -599,4 +612,5 @@ function register() {
 
 module.exports = {
     register,
+    downloadFile,
 };
