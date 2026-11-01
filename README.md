@@ -8,8 +8,8 @@
 **Community:** Join [Discord](https://discord.com/invite/zpnuBRXhKg) for discussions and support
 
 
-<p align="center"><a href="https://youtu.be/5LzYa02JdgY"><img src="https://i.ytimg.com/vi/5LzYa02JdgY/maxresdefault.jpg" width="720"></a></p>
-<p align="center"><a href="https://youtu.be/5LzYa02JdgY"><b>▶ Watch: Free Open-Source Genjutsu-Style Video Recast App (Open Genjutsu) </b></a></p>
+<p align="center"><a href="https://youtu.be/HD47qeTJgtw"><img src="https://i.ytimg.com/vi/HD47qeTJgtw/maxresdefault.jpg" width="720"></a></p>
+<p align="center"><a href="https://youtu.be/HD47qeTJgtw"><b>▶ Watch: Free Unrestricted AI Image & Video Generator (No Filters, No Limits) </b></a></p>
 
 <p align="center">
   <a href="https://github.com/Anil-matcha/awesome-generative-ai-apps">
