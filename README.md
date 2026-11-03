@@ -8,8 +8,8 @@
 **Community:** Join [Discord](https://discord.com/invite/zpnuBRXhKg) for discussions and support
 
 
-<p align="center"><a href="https://youtu.be/HD47qeTJgtw"><img src="https://i.ytimg.com/vi/HD47qeTJgtw/maxresdefault.jpg" width="720"></a></p>
-<p align="center"><a href="https://youtu.be/HD47qeTJgtw"><b>▶ Watch: Free Unrestricted AI Image & Video Generator (No Filters, No Limits) </b></a></p>
+<p align="center"><a href="https://youtu.be/SOLQDH7BVak"><img src="https://i.ytimg.com/vi/SOLQDH7BVak/maxresdefault.jpg" width="720"></a></p>
+<p align="center"><a href="https://youtu.be/SOLQDH7BVak"><b>▶ Watch: Seedance 2.0 & 2.5: Free, Open-Source, Unlimited Studio (No Subscription) </b></a></p>
 
 <p align="center">
   <a href="https://github.com/Anil-matcha/awesome-generative-ai-apps">
