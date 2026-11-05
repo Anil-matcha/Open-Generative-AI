@@ -1,13 +1,19 @@
 const fs = require('fs');
 const path = require('path');
 
+// Entry points that must exist in the source directory for a staged build to
+// be usable. Everything else found alongside them is copied verbatim.
+//
+// sd.cpp splits its runtime across many files — ggml backend libraries, per-ISA
+// CPU variants, codec libraries, and (for CUDA builds) the CUDA runtime — and
+// the exact set differs per platform and per build flavour (CPU / CUDA / Vulkan
+// / ROCm). Copying only an allowlist of known names silently drops the rest and
+// produces a packaged app whose bundled engine cannot load at all.
 const REQUIRED_FILES = {
     darwin: ['sd-cli', 'libstable-diffusion.dylib'],
     linux: ['sd-cli', 'libstable-diffusion.so'],
-    win32: ['sd-cli.exe'],
+    win32: ['sd-cli.exe', 'stable-diffusion.dll'],
 };
-
-const OPTIONAL_FILES = ['sd-server'];
 
 function resolveSourceBinDir(sourcePath) {
     const absoluteSourcePath = path.resolve(sourcePath);
@@ -18,6 +24,25 @@ function resolveSourceBinDir(sourcePath) {
     }
 
     return absoluteSourcePath;
+}
+
+function copyTree(sourceDir, targetDir, platform) {
+    for (const entry of fs.readdirSync(sourceDir, { withFileTypes: true })) {
+        const sourceFile = path.join(sourceDir, entry.name);
+        const targetFile = path.join(targetDir, entry.name);
+
+        if (entry.isDirectory()) {
+            fs.mkdirSync(targetFile, { recursive: true });
+            copyTree(sourceFile, targetFile, platform);
+            continue;
+        }
+
+        fs.copyFileSync(sourceFile, targetFile);
+
+        if (platform !== 'win32') {
+            fs.chmodSync(targetFile, 0o755);
+        }
+    }
 }
 
 function stageLocalAiBinary({ platform, arch, sourcePath }) {
@@ -39,17 +64,7 @@ function stageLocalAiBinary({ platform, arch, sourcePath }) {
     fs.rmSync(stageDir, { recursive: true, force: true });
     fs.mkdirSync(stageDir, { recursive: true });
 
-    for (const fileName of [...requiredFiles, ...OPTIONAL_FILES]) {
-        const sourceFile = path.join(sourceBinDir, fileName);
-        if (!fs.existsSync(sourceFile)) continue;
-
-        const targetFile = path.join(stageDir, fileName);
-        fs.copyFileSync(sourceFile, targetFile);
-
-        if (platform !== 'win32') {
-            fs.chmodSync(targetFile, 0o755);
-        }
-    }
+    copyTree(sourceBinDir, stageDir, platform);
 
     return stageDir;
 }
