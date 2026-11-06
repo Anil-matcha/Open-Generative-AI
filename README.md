@@ -8,8 +8,8 @@
 **Community:** Join [Discord](https://discord.com/invite/zpnuBRXhKg) for discussions and support
 
 
-<p align="center"><a href="https://youtu.be/DVPye2uAJQc"><img src="https://i.ytimg.com/vi/DVPye2uAJQc/maxresdefault.jpg" width="720"></a></p>
-<p align="center"><a href="https://youtu.be/DVPye2uAJQc"><b>▶ Watch: GPT Image 2.6 API (ChatGPT Images 2.6): GIFs, Flare vs Sunburst & How to Use It </b></a></p>
+<p align="center"><a href="https://youtu.be/PUYsfx_ZCaE"><img src="https://i.ytimg.com/vi/PUYsfx_ZCaE/maxresdefault.jpg" width="720"></a></p>
+<p align="center"><a href="https://youtu.be/PUYsfx_ZCaE"><b>▶ Watch: Best Free Uncensored AI Image & Video Models in 2026 (Ranked) </b></a></p>
 
 <p align="center">
   <a href="https://github.com/Anil-matcha/awesome-generative-ai-apps">
