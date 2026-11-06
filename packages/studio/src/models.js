@@ -4434,6 +4434,422 @@ export const t2iModels = [
     "provider": "ideogram",
     "provider_name": "Ideogram"
   }
+,
+{
+  "id": "tiktok-carousel",
+  "name": "TikTok Carousel Generator",
+  "endpoint": "tiktok-carousel",
+  "family": "carousel",
+  "description": "AI TikTok Carousel Generator — create viral TikTok carousel posts from a single text prompt. Choose a proven storytelling format (Problem-Solution, Listicle, Tutorial, Before & After), set your slide count (3-10), and get stunning AI-generated images at 1080x1920 portrait resolution, ready to upload to TikTok.",
+  "inputs": {
+    "topic": {
+      "examples": [
+        "5 morning habits that changed my productivity"
+      ],
+      "description": "The topic or subject of the TikTok carousel.",
+      "type": "string",
+      "title": "Topic",
+      "name": "topic"
+    },
+    "format": {
+      "enum": [
+        "Problem-Solution",
+        "Listicle",
+        "Tutorial",
+        "Before & After"
+      ],
+      "title": "Format",
+      "name": "format",
+      "type": "string",
+      "description": "The storytelling format for the carousel slides.",
+      "default": "Problem-Solution"
+    },
+    "image_count": {
+      "title": "Image Count",
+      "name": "image_count",
+      "type": "int",
+      "description": "Number of images (slides) to generate.",
+      "default": 6,
+      "minValue": 3,
+      "maxValue": 10,
+      "step": 1
+    }
+  },
+  "required": [
+    "topic"
+  ],
+  "hasPrompt": false,
+  "promptRequired": false,
+  "provider": "muapi",
+  "provider_name": "MUAPI_AI",
+  "example_url": "https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/tiktok-carousel.jpg",
+  "image_url": "https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/tiktok-carousel.avif"
+},
+{
+  "id": "flux-3-text-to-image",
+  "name": "Text to Image",
+  "endpoint": "flux-3-text-to-image",
+  "family": "flux-3",
+  "description": "FLUX 3 Text-to-Image is Black Forest Labs' next-generation multimodal frontier model, jointly trained across image, video, and audio for outputs that are truer to life in every style. It generates highly photorealistic and stylistically flexible images from text prompts, with sharper detail, more coherent composition, and stronger prompt adherence than the FLUX.2 generation.",
+  "inputs": {
+    "prompt": {
+      "examples": [
+        "A hyperrealistic portrait of an astronaut standing on red Martian dunes at golden hour, dust particles catching the light, ultra-detailed suit reflections, cinematic depth of field."
+      ],
+      "description": "Text prompt describing the image. Supports long, richly detailed descriptions.",
+      "type": "string",
+      "title": "Prompt",
+      "name": "prompt"
+    },
+    "aspect_ratio": {
+      "enum": [
+        "16:9",
+        "9:16",
+        "1:1",
+        "4:3",
+        "3:4",
+        "2:3",
+        "3:2",
+        "21:9"
+      ],
+      "title": "Aspect Ratio",
+      "name": "aspect_ratio",
+      "type": "string",
+      "description": "Aspect ratio of the output image.",
+      "default": "1:1"
+    },
+    "resolution": {
+      "enum": [
+        "1k",
+        "2k",
+        "4k"
+      ],
+      "title": "Resolution",
+      "name": "resolution",
+      "type": "string",
+      "description": "Target resolution of the generated image.",
+      "default": "2k"
+    }
+  },
+  "required": [
+    "prompt"
+  ],
+  "hasPrompt": true,
+  "promptRequired": true,
+  "provider": "blackforest",
+  "provider_name": "BLACKFOREST_LABS",
+  "example_url": "https://cdn.muapi.ai/assets/bb70f6e1-adc7-4743-92be-726847e3536b.avif",
+  "image_url": "https://cdn.muapi.ai/assets/bb70f6e1-adc7-4743-92be-726847e3536b.avif"
+},
+{
+  "id": "flux-3-dev",
+  "name": "Dev",
+  "endpoint": "flux-3-dev",
+  "family": "flux-3",
+  "description": "FLUX 3 Dev is the faster, lower-cost variant of Black Forest Labs' FLUX 3 frontier model, planned for open-weight release. It trades a small amount of peak fidelity for significantly reduced latency and price, making it well suited for rapid iteration, prototyping, and high-volume text-to-image generation.",
+  "inputs": {
+    "prompt": {
+      "examples": [
+        "A hyperrealistic portrait of an astronaut standing on red Martian dunes at golden hour, dust particles catching the light, ultra-detailed suit reflections, cinematic depth of field."
+      ],
+      "description": "Text prompt describing the image. Supports long, richly detailed descriptions.",
+      "type": "string",
+      "title": "Prompt",
+      "name": "prompt"
+    },
+    "aspect_ratio": {
+      "enum": [
+        "16:9",
+        "9:16",
+        "1:1",
+        "4:3",
+        "3:4",
+        "2:3",
+        "3:2",
+        "21:9"
+      ],
+      "title": "Aspect Ratio",
+      "name": "aspect_ratio",
+      "type": "string",
+      "description": "Aspect ratio of the output image.",
+      "default": "1:1"
+    },
+    "resolution": {
+      "enum": [
+        "1k",
+        "2k",
+        "4k"
+      ],
+      "title": "Resolution",
+      "name": "resolution",
+      "type": "string",
+      "description": "Target resolution of the generated image.",
+      "default": "2k"
+    }
+  },
+  "required": [
+    "prompt"
+  ],
+  "hasPrompt": true,
+  "promptRequired": true,
+  "provider": "blackforest",
+  "provider_name": "BLACKFOREST_LABS",
+  "example_url": "https://cdn.muapi.ai/assets/32c912c6-a66e-467e-83d3-8eda06b5d921.avif",
+  "image_url": "https://cdn.muapi.ai/assets/32c912c6-a66e-467e-83d3-8eda06b5d921.avif"
+},
+{
+  "id": "wan3.0-text-to-image",
+  "name": "Wan 3.0 Text to Image",
+  "endpoint": "wan3.0-text-to-image",
+  "family": "wan3.0",
+  "description": "Wan 3.0 Text to Image is an upcoming AI image model. Confirmed API controls, output specifications, and pricing will be published at launch.",
+  "inputs": {
+    "prompt": {
+      "type": "string",
+      "title": "Prompt",
+      "name": "prompt",
+      "description": "Describe the image you want to create.",
+      "examples": [
+        "An editorial product photograph of a glass perfume bottle on blue silk, soft studio lighting."
+      ]
+    }
+  },
+  "required": [
+    "prompt"
+  ],
+  "hasPrompt": true,
+  "promptRequired": true,
+  "provider": "alibaba",
+  "provider_name": "ALIBABA",
+  "example_url": "https://cdn.muapi.ai/assets/daef56fb-8eb3-43e7-aec4-30c56a0328d3.avif",
+  "image_url": "https://cdn.muapi.ai/assets/daef56fb-8eb3-43e7-aec4-30c56a0328d3.avif"
+},
+{
+  "id": "gpt-image-2.6-flare-text-to-image",
+  "name": "GPT Image 2.6 Flare Text to Image",
+  "endpoint": "gpt-image-2.6-flare-text-to-image",
+  "family": "gpt-image-2.6",
+  "description": "Generate images from text prompts using GPT-Image-2.6 Flare, OpenAI's faster GPT Image 2.6 model, built for quick iteration with stronger layouts for posters, product imagery and other professional visuals. Output up to 4K with transparent backgrounds and animated GIF support.",
+  "inputs": {
+    "prompt": {
+      "examples": [
+        "A girl doing livestream makeup tutorials while tiny workers inside her mirror physically repaint the reflection in real time, miniature ladders, paint buckets, glowing vanity lights, cluttered modern bedroom aesthetic, insanely detailed reflections, playful surreal realism, highly creative composition, luxury commercial quality."
+      ],
+      "description": "Text prompt describing the image to generate. Maximum 20,000 characters.",
+      "type": "string",
+      "title": "Prompt",
+      "name": "prompt"
+    },
+    "aspect_ratio": {
+      "enum": [
+        "auto",
+        "1:1",
+        "3:2",
+        "2:3",
+        "4:3",
+        "3:4",
+        "5:4",
+        "4:5",
+        "16:9",
+        "9:16",
+        "2:1",
+        "1:2",
+        "21:9",
+        "9:21",
+        "3:1",
+        "1:3"
+      ],
+      "type": "string",
+      "title": "Aspect Ratio",
+      "name": "aspect_ratio",
+      "description": "Output aspect ratio. 'auto' lets the model choose the best frame.",
+      "default": "auto"
+    },
+    "resolution": {
+      "enum": [
+        "1K",
+        "2K",
+        "4K"
+      ],
+      "type": "string",
+      "title": "Resolution",
+      "name": "resolution",
+      "description": "Output size tier. Higher tiers take longer and cost more.",
+      "default": "1K"
+    },
+    "background": {
+      "enum": [
+        "auto",
+        "transparent",
+        "opaque"
+      ],
+      "type": "string",
+      "title": "Background",
+      "name": "background",
+      "description": "Background handling. Only applies at 1K resolution.",
+      "default": "auto"
+    },
+    "output_format": {
+      "enum": [
+        "png",
+        "jpeg",
+        "webp",
+        "gif"
+      ],
+      "type": "string",
+      "title": "Output Format",
+      "name": "output_format",
+      "description": "Output image format. GIF costs the same as a still image.",
+      "default": "png"
+    },
+    "frame_count": {
+      "enum": [
+        "auto",
+        "4",
+        "9",
+        "16",
+        "25",
+        "36",
+        "64"
+      ],
+      "type": "string",
+      "title": "Frame Count",
+      "name": "frame_count",
+      "description": "Number of GIF frames. Only used when output_format is gif.",
+      "default": "auto"
+    },
+    "frame_duration_ms": {
+      "type": "integer",
+      "title": "Frame Duration (ms)",
+      "name": "frame_duration_ms",
+      "description": "Duration of each GIF frame in ms (20-2000). Only used when output_format is gif.",
+      "minimum": 20,
+      "maximum": 2000
+    }
+  },
+  "required": [
+    "prompt"
+  ],
+  "hasPrompt": true,
+  "promptRequired": true,
+  "provider": "openai",
+  "provider_name": "KIE_AI",
+  "example_url": "https://cdn.muapi.ai/assets/97abf8ec-65f6-4057-92df-2c5a4f1a29df.avif",
+  "image_url": "https://cdn.muapi.ai/assets/97abf8ec-65f6-4057-92df-2c5a4f1a29df.avif"
+},
+{
+  "id": "gpt-image-2.6-sunburst-text-to-image",
+  "name": "GPT Image 2.6 Sunburst Text to Image",
+  "endpoint": "gpt-image-2.6-sunburst-text-to-image",
+  "family": "gpt-image-2.6",
+  "description": "Generate images from text prompts using GPT-Image-2.6 Sunburst, OpenAI's GPT Image 2.6 model for detailed visual work, with higher-quality generation and stronger consistency across edits. Output up to 4K with transparent backgrounds and animated GIF support.",
+  "inputs": {
+    "prompt": {
+      "examples": [
+        "A girl doing livestream makeup tutorials while tiny workers inside her mirror physically repaint the reflection in real time, miniature ladders, paint buckets, glowing vanity lights, cluttered modern bedroom aesthetic, insanely detailed reflections, playful surreal realism, highly creative composition, luxury commercial quality."
+      ],
+      "description": "Text prompt describing the image to generate. Maximum 20,000 characters.",
+      "type": "string",
+      "title": "Prompt",
+      "name": "prompt"
+    },
+    "aspect_ratio": {
+      "enum": [
+        "auto",
+        "1:1",
+        "3:2",
+        "2:3",
+        "4:3",
+        "3:4",
+        "5:4",
+        "4:5",
+        "16:9",
+        "9:16",
+        "2:1",
+        "1:2",
+        "21:9",
+        "9:21",
+        "3:1",
+        "1:3"
+      ],
+      "type": "string",
+      "title": "Aspect Ratio",
+      "name": "aspect_ratio",
+      "description": "Output aspect ratio. 'auto' lets the model choose the best frame.",
+      "default": "auto"
+    },
+    "resolution": {
+      "enum": [
+        "1K",
+        "2K",
+        "4K"
+      ],
+      "type": "string",
+      "title": "Resolution",
+      "name": "resolution",
+      "description": "Output size tier. Higher tiers take longer and cost more.",
+      "default": "1K"
+    },
+    "background": {
+      "enum": [
+        "auto",
+        "transparent",
+        "opaque"
+      ],
+      "type": "string",
+      "title": "Background",
+      "name": "background",
+      "description": "Background handling. Only applies at 1K resolution.",
+      "default": "auto"
+    },
+    "output_format": {
+      "enum": [
+        "png",
+        "jpeg",
+        "webp",
+        "gif"
+      ],
+      "type": "string",
+      "title": "Output Format",
+      "name": "output_format",
+      "description": "Output image format. GIF costs the same as a still image.",
+      "default": "png"
+    },
+    "frame_count": {
+      "enum": [
+        "auto",
+        "4",
+        "9",
+        "16",
+        "25",
+        "36",
+        "64"
+      ],
+      "type": "string",
+      "title": "Frame Count",
+      "name": "frame_count",
+      "description": "Number of GIF frames. Only used when output_format is gif.",
+      "default": "auto"
+    },
+    "frame_duration_ms": {
+      "type": "integer",
+      "title": "Frame Duration (ms)",
+      "name": "frame_duration_ms",
+      "description": "Duration of each GIF frame in ms (20-2000). Only used when output_format is gif.",
+      "minimum": 20,
+      "maximum": 2000
+    }
+  },
+  "required": [
+    "prompt"
+  ],
+  "hasPrompt": true,
+  "promptRequired": true,
+  "provider": "openai",
+  "provider_name": "KIE_AI",
+  "example_url": "https://cdn.muapi.ai/assets/d0d4707f-33e4-40bb-899d-e3265ae23670.avif",
+  "image_url": "https://cdn.muapi.ai/assets/d0d4707f-33e4-40bb-899d-e3265ae23670.avif"
+}
 ];
 
 export const getModelById = (id) => t2iModels.find(m => m.id === id);
@@ -10233,6 +10649,538 @@ export const t2vModels = [
     "example_url": "https://cdn.muapi.ai/assets/2d77df89-9492-4c7d-b434-7684d0ce3bb8.avif",
     "image_url": "https://cdn.muapi.ai/assets/2d77df89-9492-4c7d-b434-7684d0ce3bb8.avif"
   }
+,
+{
+  "id": "motion-graphics",
+  "name": "Motion Graphics",
+  "endpoint": "motion-graphics",
+  "family": "motion-graphics",
+  "description": "Generate animated motion graphics videos from a text prompt using AI-generated React/Remotion code rendered on Modal.",
+  "inputs": {
+    "prompt": {
+      "type": "string",
+      "title": "Prompt",
+      "name": "prompt",
+      "description": "Describe the motion graphics animation to generate.",
+      "examples": [
+        "Animated sales dashboard with bar charts and rising numbers",
+        "Kinetic typography logo reveal with glowing particles"
+      ]
+    },
+    "category": {
+      "enum": [
+        "auto",
+        "infographics",
+        "text-animation",
+        "social-media",
+        "presentation",
+        "logo",
+        "product",
+        "3d",
+        "slideshow",
+        "showcase",
+        "reel"
+      ],
+      "type": "string",
+      "title": "Category",
+      "name": "category",
+      "description": "Animation category. Use 'auto' to let AI detect the best style, or pick a category for optimised results. Use 'slideshow', 'showcase', or 'reel' when providing images/videos.",
+      "default": "auto"
+    },
+    "images_list": {
+      "examples": [
+        "https://cdn.muapi.ai/uploads/photo1.jpg"
+      ],
+      "description": "Optional images to incorporate into the animation (up to 6). Required for slideshow, showcase, and reel categories.",
+      "field": "images_list",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Images",
+      "name": "images_list",
+      "maxItems": 6
+    },
+    "video_files": {
+      "examples": [
+        "https://cdn.muapi.ai/uploads/clip.mp4"
+      ],
+      "description": "Optional video clips to use as background or showcase footage (up to 2).",
+      "field": "videos_list",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Video Clips",
+      "name": "video_files",
+      "maxItems": 2
+    },
+    "aspect_ratio": {
+      "enum": [
+        "16:9",
+        "9:16",
+        "1:1"
+      ],
+      "type": "string",
+      "title": "Aspect Ratio",
+      "name": "aspect_ratio",
+      "description": "Output canvas aspect ratio.",
+      "default": "16:9"
+    },
+    "duration_seconds": {
+      "type": "int",
+      "title": "Duration (seconds)",
+      "name": "duration_seconds",
+      "description": "Length of the animation in seconds (5–30).",
+      "default": 6,
+      "minValue": 5,
+      "maxValue": 30,
+      "step": 1
+    }
+  },
+  "required": [
+    "prompt"
+  ],
+  "hasPrompt": true,
+  "promptRequired": true,
+  "imageField": "images_list",
+  "maxImages": 6,
+  "videoField": "video_files",
+  "maxVideos": 2,
+  "provider": "muapi",
+  "provider_name": "MODAL",
+  "example_url": "https://d3adwkbyhxyrtq.cloudfront.net/ai-images/186/712345784292/4a8c5c70-abcc-4920-873e-b0e219986453.jpg",
+  "image_url": "https://d3adwkbyhxyrtq.cloudfront.net/ai-images/186/712345784292/4a8c5c70-abcc-4920-873e-b0e219986453.jpg"
+},
+{
+  "id": "seedance-2.1-text-to-video",
+  "name": "Text to Video",
+  "endpoint": "seedance-2.1-text-to-video",
+  "family": "seedance-2.1",
+  "description": "Seedance 2.1 Text-to-Video generates high-quality cinematic videos directly from text prompts. The model excels at complex scene composition, smooth temporal flow, and accurate prompt interpretation — producing vivid motion sequences up to 1080p with enhanced realism over the previous generation.",
+  "inputs": {
+    "prompt": {
+      "examples": [
+        "A colossal floating city drifts above luminous clouds at dusk, golden energy streams flowing between its towers, cinematic wide shot with subtle camera push, epic atmospheric lighting."
+      ],
+      "description": "Text prompt describing the video scene and motion.",
+      "type": "string",
+      "title": "Prompt",
+      "name": "prompt"
+    },
+    "aspect_ratio": {
+      "enum": [
+        "16:9",
+        "9:16",
+        "1:1",
+        "3:4",
+        "4:3",
+        "21:9"
+      ],
+      "title": "Aspect Ratio",
+      "name": "aspect_ratio",
+      "type": "string",
+      "description": "Aspect ratio of the output video.",
+      "default": "16:9"
+    },
+    "resolution": {
+      "enum": [
+        "480p",
+        "720p",
+        "1080p"
+      ],
+      "title": "Resolution",
+      "name": "resolution",
+      "type": "string",
+      "description": "Output video resolution.",
+      "default": "720p"
+    },
+    "duration": {
+      "title": "Duration",
+      "name": "duration",
+      "type": "int",
+      "description": "The duration of the generated video in seconds.",
+      "default": 5,
+      "minValue": 4,
+      "maxValue": 12,
+      "step": 1
+    },
+    "generate_audio": {
+      "type": "boolean",
+      "title": "Generate Audio",
+      "name": "generate_audio",
+      "description": "Whether to generate audio for the video.",
+      "default": true
+    },
+    "camera_fixed": {
+      "type": "boolean",
+      "title": "Camera Fixed",
+      "name": "camera_fixed",
+      "description": "Whether to fix the camera position.",
+      "default": false
+    }
+  },
+  "required": [
+    "prompt"
+  ],
+  "hasPrompt": true,
+  "promptRequired": true,
+  "provider": "bytedance",
+  "provider_name": "WAVESPEED_AI",
+  "example_url": "https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/seedance-v1.5-pro-t2v.mp4",
+  "image_url": "https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/seedance-v1.5-pro-t2v.avif"
+},
+{
+  "id": "grok-imagine-video-1-5-text-to-video",
+  "name": "Grok Imagine Video 1.5 Text to Video",
+  "endpoint": "grok-imagine-video-1-5-text-to-video",
+  "family": "grok-imagine-video-1-5",
+  "description": "Generate videos with Grok Imagine Video 1.5 (xAI) from a text prompt, with native audio, up to 15 seconds.",
+  "inputs": {
+    "prompt": {
+      "type": "string",
+      "title": "Prompt",
+      "name": "prompt",
+      "description": "Text description of the video.",
+      "examples": [
+        "A dog running on a sunny beach, cinematic slow motion."
+      ]
+    },
+    "aspect_ratio": {
+      "enum": [
+        "16:9",
+        "9:16",
+        "1:1",
+        "4:3",
+        "3:4",
+        "3:2",
+        "2:3",
+        "21:9",
+        "5:2"
+      ],
+      "type": "string",
+      "title": "Aspect Ratio",
+      "name": "aspect_ratio",
+      "description": "Aspect ratio of the video.",
+      "default": "16:9"
+    },
+    "resolution": {
+      "enum": [
+        "480p",
+        "720p",
+        "1080p"
+      ],
+      "type": "string",
+      "title": "Resolution",
+      "name": "resolution",
+      "description": "Output resolution. 1080p is generated by upscaling 720p.",
+      "default": "480p"
+    },
+    "duration": {
+      "type": "int",
+      "title": "Duration (seconds)",
+      "name": "duration",
+      "description": "Video duration in seconds.",
+      "default": 8,
+      "minValue": 1,
+      "maxValue": 15,
+      "step": 1
+    },
+    "generate_audio": {
+      "type": "boolean",
+      "title": "Generate Audio",
+      "name": "generate_audio",
+      "description": "Generate a native audio track. Turn off for a silent video.",
+      "default": true
+    }
+  },
+  "required": [
+    "prompt"
+  ],
+  "hasPrompt": true,
+  "promptRequired": true,
+  "provider": "grok",
+  "provider_name": "SEEGEN",
+  "example_url": "https://cdn.muapi.ai/assets/grok-imagine-video-1-5-text-to-video.mp4",
+  "image_url": "https://cdn.muapi.ai/assets/grok-imagine-video-1-5-text-to-video.avif"
+},
+{
+  "id": "grok-imagine-video-1-5-lite-text-to-video",
+  "name": "Grok Imagine Video 1.5 Lite Text to Video",
+  "endpoint": "grok-imagine-video-1-5-lite-text-to-video",
+  "family": "grok-imagine-video-1-5",
+  "description": "Generate videos with Grok Imagine Video 1.5 Lite (xAI) from a text prompt, with native audio, up to 15 seconds.",
+  "inputs": {
+    "prompt": {
+      "type": "string",
+      "title": "Prompt",
+      "name": "prompt",
+      "description": "Text description of the video.",
+      "examples": [
+        "A dog running on a sunny beach, cinematic slow motion."
+      ]
+    },
+    "aspect_ratio": {
+      "enum": [
+        "16:9",
+        "9:16",
+        "1:1",
+        "4:3",
+        "3:4",
+        "3:2",
+        "2:3",
+        "21:9",
+        "5:2"
+      ],
+      "type": "string",
+      "title": "Aspect Ratio",
+      "name": "aspect_ratio",
+      "description": "Aspect ratio of the video.",
+      "default": "16:9"
+    },
+    "resolution": {
+      "enum": [
+        "480p",
+        "720p",
+        "1080p"
+      ],
+      "type": "string",
+      "title": "Resolution",
+      "name": "resolution",
+      "description": "Output resolution. 1080p is generated by upscaling 720p.",
+      "default": "480p"
+    },
+    "duration": {
+      "type": "int",
+      "title": "Duration (seconds)",
+      "name": "duration",
+      "description": "Video duration in seconds.",
+      "default": 8,
+      "minValue": 1,
+      "maxValue": 15,
+      "step": 1
+    },
+    "generate_audio": {
+      "type": "boolean",
+      "title": "Generate Audio",
+      "name": "generate_audio",
+      "description": "Generate a native audio track. Turn off for a silent video.",
+      "default": true
+    }
+  },
+  "required": [
+    "prompt"
+  ],
+  "hasPrompt": true,
+  "promptRequired": true,
+  "provider": "grok",
+  "provider_name": "SEEGEN",
+  "example_url": "https://cdn.muapi.ai/assets/grok-imagine-video-1-5-lite-text-to-video.mp4",
+  "image_url": "https://cdn.muapi.ai/assets/grok-imagine-video-1-5-lite-text-to-video.avif"
+},
+{
+  "id": "kling-4.0-text-to-video",
+  "name": "Kling 4.0 Text to Video",
+  "endpoint": "kling-4.0-text-to-video",
+  "family": "kling-4",
+  "description": "Kling 4.0 Text-to-Video generates 3-30 second clips at 720p/1080p with native audio from a text prompt.",
+  "inputs": {
+    "prompt": {
+      "type": "string",
+      "title": "Prompt",
+      "name": "prompt",
+      "description": "Video description (max 8000 chars).",
+      "examples": [
+        "A lone astronaut walks across a red desert at sunrise, dust drifting past the camera, cinematic wide shot with wind and distant thunder"
+      ]
+    },
+    "duration": {
+      "title": "Duration",
+      "name": "duration",
+      "type": "int",
+      "description": "Video length in seconds (3-30).",
+      "default": 5,
+      "minValue": 3,
+      "maxValue": 30,
+      "step": 1
+    },
+    "resolution": {
+      "enum": [
+        "720p",
+        "1080p"
+      ],
+      "title": "Resolution",
+      "name": "resolution",
+      "type": "string",
+      "description": "Output resolution.",
+      "default": "720p"
+    },
+    "aspect_ratio": {
+      "enum": [
+        "16:9",
+        "9:16",
+        "1:1",
+        "21:9"
+      ],
+      "title": "Aspect Ratio",
+      "name": "aspect_ratio",
+      "type": "string",
+      "description": "Output aspect ratio.",
+      "default": "16:9"
+    }
+  },
+  "required": [
+    "prompt"
+  ],
+  "hasPrompt": true,
+  "promptRequired": true,
+  "provider": "kling",
+  "provider_name": "kie",
+  "example_url": "https://cdn.muapi.ai/assets/kling-v3.0-omni-pro-text-to-video.mp4",
+  "image_url": "https://cdn.muapi.ai/assets/kling-v3.0-omni-pro-text-to-video.avif"
+},
+{
+  "id": "pixverse-v6-max-text-to-video",
+  "name": "PixVerse V6 Max Text to Video",
+  "endpoint": "pixverse-v6-max-text-to-video",
+  "family": "pixverse-v6-max",
+  "description": "Generate cinematic videos from text with PixVerse V6 Max: up to 15 seconds at up to 1080p, stronger prompt following and camera control, and optional native audio.",
+  "inputs": {
+    "prompt": {
+      "type": "string",
+      "title": "Prompt",
+      "name": "prompt",
+      "description": "Text description of the video (max 5000 characters).",
+      "examples": [
+        "A young woman sprints through a dense futuristic city street when gravity suddenly shifts sideways. Cars slide across buildings, streetlights bend, and debris floats mid-air. She jumps between tilted surfaces while the camera dynamically rotates with the changing gravity, creating a disorienting chase sequence with intense motion blur and sparks flying."
+      ]
+    },
+    "aspect_ratio": {
+      "enum": [
+        "16:9",
+        "4:3",
+        "1:1",
+        "3:4",
+        "9:16",
+        "2:3",
+        "3:2",
+        "21:9"
+      ],
+      "type": "string",
+      "title": "Aspect Ratio",
+      "name": "aspect_ratio",
+      "description": "Output video aspect ratio.",
+      "default": "16:9"
+    },
+    "resolution": {
+      "enum": [
+        "360p",
+        "540p",
+        "720p",
+        "1080p"
+      ],
+      "type": "string",
+      "title": "Resolution",
+      "name": "resolution",
+      "description": "Output video resolution.",
+      "default": "720p"
+    },
+    "duration": {
+      "type": "int",
+      "title": "Duration (seconds)",
+      "name": "duration",
+      "description": "Video duration in seconds (1-15).",
+      "default": 5,
+      "minValue": 1,
+      "maxValue": 15,
+      "step": 1
+    },
+    "generate_audio_switch": {
+      "type": "boolean",
+      "title": "Generate Audio",
+      "name": "generate_audio_switch",
+      "description": "Generate native audio synchronized with the video.",
+      "default": false
+    },
+    "seed": {
+      "type": "int",
+      "title": "Seed",
+      "name": "seed",
+      "description": "Random seed (0-2147483647) for reproducibility. Leave empty for a random seed.",
+      "minValue": 0,
+      "maxValue": 2147483647
+    }
+  },
+  "required": [
+    "prompt"
+  ],
+  "hasPrompt": true,
+  "promptRequired": true,
+  "provider": "pixverse",
+  "provider_name": "KIE_AI",
+  "example_url": "https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/pixverse-v6-t2v.mp4",
+  "image_url": "https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/pixverse-v6-t2v.avif"
+},
+{
+  "id": "kling-4.0-flash-text-to-video",
+  "name": "Kling 4.0 Flash Text to Video",
+  "endpoint": "kling-4.0-flash-text-to-video",
+  "family": "kling-4-flash",
+  "description": "Kling 4.0 Flash Text-to-Video generates fast, low-cost 3-20 second 720p clips with native audio from a text prompt.",
+  "inputs": {
+    "prompt": {
+      "type": "string",
+      "title": "Prompt",
+      "name": "prompt",
+      "description": "Video description (max 8000 chars).",
+      "examples": [
+        "A lone astronaut walks across a red desert at sunrise, dust drifting past the camera, cinematic wide shot with wind and distant thunder"
+      ]
+    },
+    "duration": {
+      "title": "Duration",
+      "name": "duration",
+      "type": "int",
+      "description": "Video length in seconds (3-20).",
+      "default": 5,
+      "minValue": 3,
+      "maxValue": 20,
+      "step": 1
+    },
+    "resolution": {
+      "enum": [
+        "720p"
+      ],
+      "title": "Resolution",
+      "name": "resolution",
+      "type": "string",
+      "description": "Output resolution (Kling 4.0 Flash is 720p only).",
+      "default": "720p"
+    },
+    "aspect_ratio": {
+      "enum": [
+        "16:9",
+        "9:16",
+        "1:1",
+        "21:9"
+      ],
+      "title": "Aspect Ratio",
+      "name": "aspect_ratio",
+      "type": "string",
+      "description": "Output aspect ratio.",
+      "default": "16:9"
+    }
+  },
+  "required": [
+    "prompt"
+  ],
+  "hasPrompt": true,
+  "promptRequired": true,
+  "provider": "kling",
+  "provider_name": "kie",
+  "example_url": "https://cdn.muapi.ai/assets/kling-v3.0-omni-pro-text-to-video.mp4",
+  "image_url": "https://cdn.muapi.ai/assets/kling-v3.0-omni-pro-text-to-video.avif"
+}
 ];
 
 export const getVideoModelById = (id) => t2vModels.find(m => m.id === id);
@@ -14799,6 +15747,491 @@ export const i2iModels = [
     "example_url": "https://cdn.muapi.ai/assets/9c8cc044-ed81-4990-a437-e15405ab130c.avif",
     "image_url": "https://cdn.muapi.ai/assets/9c8cc044-ed81-4990-a437-e15405ab130c.avif"
   }
+,
+{
+  "id": "photo-pack",
+  "name": "Photo Packs",
+  "endpoint": "photo-pack",
+  "family": "nano",
+  "description": "Generate a pack of high-quality, professional portraits in various styles (LinkedIn, CEO, Tinder, etc.) while preserving your facial features.",
+  "inputs": {
+    "image_url": {
+      "description": "URL of the reference face image.",
+      "examples": [
+        "https://cdn.muapi.ai/outputs/f4de34961d154abbb93c38dc8c53cfe2.jpg"
+      ],
+      "field": "image",
+      "type": "string",
+      "title": "Image URL",
+      "name": "image_url"
+    },
+    "category": {
+      "enum": [
+        "LinkedIn",
+        "Tinder",
+        "Bumble",
+        "OldMoney",
+        "Cyberpunk",
+        "CEO",
+        "CleanGirl",
+        "DarkAcademia",
+        "Anime",
+        "Doctor",
+        "Lawyer",
+        "MobWife",
+        "Bali",
+        "90s",
+        "Fitness",
+        "Christmas",
+        "Halloween",
+        "EuropeanElegance",
+        "ChampionSportsMoment",
+        "JobSwapDaydream",
+        "TravelTheWorld",
+        "DatingPack",
+        "FlashPosePerfection",
+        "CapAndGown",
+        "CorporateBoss",
+        "RocknRollLuxury",
+        "TheBigWeddingDay",
+        "RusticCharm",
+        "DressedToImpress",
+        "IdentificationPhoto",
+        "DontMissYourProm",
+        "GoddessOfNature",
+        "BlackAndWhiteMagic",
+        "HomelyComforts",
+        "BalloonsBalloonsBalloons",
+        "BeautyBlooms",
+        "SuperheroAdventure",
+        "BoldFashionStatements",
+        "FantasyOutfits",
+        "OnTheCatwalk",
+        "HalloweenHorror",
+        "CosplayGalore",
+        "Ghibli",
+        "Pixar",
+        "SpiderVerse"
+      ],
+      "description": "The category/style of the photo pack.",
+      "type": "string",
+      "title": "Category",
+      "name": "category",
+      "default": "LinkedIn"
+    },
+    "aspect_ratio": {
+      "enum": [
+        "1:1",
+        "3:4",
+        "4:3",
+        "9:16",
+        "16:9"
+      ],
+      "description": "Output image aspect ratio.",
+      "type": "string",
+      "title": "Aspect Ratio",
+      "name": "aspect_ratio",
+      "default": "1:1"
+    },
+    "model_name": {
+      "enum": [
+        "nano-banana-edit",
+        "nano-banana-2-edit",
+        "nano-banana-pro-edit"
+      ],
+      "description": "The underlying model to use.",
+      "type": "string",
+      "title": "Model Name",
+      "name": "model_name",
+      "default": "nano-banana-2-edit"
+    }
+  },
+  "required": [
+    "image_url"
+  ],
+  "hasPrompt": false,
+  "promptRequired": false,
+  "imageField": "image_url",
+  "imageOptional": false,
+  "provider": "google",
+  "provider_name": "KIE_AI",
+  "example_url": "https://cdn.muapi.ai/outputs/1343723e9655485e95a71ba55b652732.jpg",
+  "image_url": "https://cdn.muapi.ai/outputs/1343723e9655485e95a71ba55b652732.jpg"
+},
+{
+  "id": "flux-3-image-to-image",
+  "name": "Image to Image",
+  "endpoint": "flux-3-image-to-image",
+  "family": "flux-3",
+  "description": "FLUX 3 Image-to-Image edits and restyles existing images using a text instruction plus up to several reference images. Built on Black Forest Labs' unified multimodal architecture, it preserves subject identity and scene structure while applying precise, prompt-driven edits — ideal for product retouching, style transfer, and character-consistent edits.",
+  "inputs": {
+    "prompt": {
+      "examples": [
+        "A hyperrealistic portrait of an astronaut standing on red Martian dunes at golden hour, dust particles catching the light, ultra-detailed suit reflections, cinematic depth of field."
+      ],
+      "description": "Text prompt describing the image. Supports long, richly detailed descriptions.",
+      "type": "string",
+      "title": "Prompt",
+      "name": "prompt"
+    },
+    "aspect_ratio": {
+      "enum": [
+        "16:9",
+        "9:16",
+        "1:1",
+        "4:3",
+        "3:4",
+        "2:3",
+        "3:2",
+        "21:9"
+      ],
+      "title": "Aspect Ratio",
+      "name": "aspect_ratio",
+      "type": "string",
+      "description": "Aspect ratio of the output image.",
+      "default": "1:1"
+    },
+    "resolution": {
+      "enum": [
+        "1k",
+        "2k",
+        "4k"
+      ],
+      "title": "Resolution",
+      "name": "resolution",
+      "type": "string",
+      "description": "Target resolution of the generated image.",
+      "default": "2k"
+    },
+    "images_list": {
+      "examples": [
+        "https://d3adwkbyhxyrtq.cloudfront.net/ai-images/186/712345784292/4a8c5c70-abcc-4920-873e-b0e219986453.jpg"
+      ],
+      "description": "Reference image(s) to edit or use as visual guidance.",
+      "field": "images_list",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Image URLs",
+      "name": "images_list",
+      "maxItems": 4
+    }
+  },
+  "required": [
+    "prompt",
+    "images_list"
+  ],
+  "hasPrompt": true,
+  "promptRequired": true,
+  "imageField": "images_list",
+  "maxImages": 4,
+  "imageOptional": false,
+  "provider": "blackforest",
+  "provider_name": "BLACKFOREST_LABS",
+  "example_url": "https://cdn.muapi.ai/assets/fa0367e9-beb6-4927-bf81-741170302e37.avif",
+  "image_url": "https://cdn.muapi.ai/assets/fa0367e9-beb6-4927-bf81-741170302e37.avif"
+},
+{
+  "id": "wan3.0-image-edit",
+  "name": "Wan 3.0 Image Edit",
+  "endpoint": "wan3.0-image-edit",
+  "family": "wan3.0",
+  "description": "Wan 3.0 Image Edit is an upcoming AI image-editing model. Confirmed API controls, output specifications, and pricing will be published at launch.",
+  "inputs": {
+    "prompt": {
+      "type": "string",
+      "title": "Prompt",
+      "name": "prompt",
+      "description": "Describe the edit you want to make.",
+      "examples": [
+        "Replace the background with a warm, sunlit Mediterranean terrace while preserving the subject."
+      ]
+    },
+    "image_url": {
+      "type": "string",
+      "title": "Image URL",
+      "name": "image_url",
+      "description": "Source image to edit.",
+      "field": "image",
+      "examples": []
+    }
+  },
+  "required": [
+    "prompt",
+    "image_url"
+  ],
+  "hasPrompt": true,
+  "promptRequired": true,
+  "imageField": "image_url",
+  "imageOptional": false,
+  "provider": "alibaba",
+  "provider_name": "ALIBABA",
+  "example_url": "https://cdn.muapi.ai/assets/ae29a801-d504-4c74-bb3b-37b496446915.avif",
+  "image_url": "https://cdn.muapi.ai/assets/ae29a801-d504-4c74-bb3b-37b496446915.avif"
+},
+{
+  "id": "gpt-image-2.6-flare-image-to-image",
+  "name": "GPT Image 2.6 Flare Image to Image",
+  "endpoint": "gpt-image-2.6-flare-image-to-image",
+  "family": "gpt-image-2.6",
+  "description": "Edit or combine up to 16 reference images using GPT-Image-2.6 Flare, OpenAI's faster GPT Image 2.6 model. Say what should stay the same and what should change, and get fast, layout-aware edits at up to 4K.",
+  "inputs": {
+    "prompt": {
+      "examples": [
+        "Change only the beverage bottle in the center to a matte black can labeled \"PEAK\", keeping the exact same lighting, shadows, reflective surface, background props, and camera angle. Do not change anything else in the scene."
+      ],
+      "description": "Text instructions describing the desired transformation. Maximum 20,000 characters.",
+      "type": "string",
+      "title": "Prompt",
+      "name": "prompt"
+    },
+    "images_list": {
+      "examples": [
+        "https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/gpt-image-2-image-to-image-in.jpg"
+      ],
+      "description": "Upload or provide input images to transform. Up to 16 images supported.",
+      "field": "images_list",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Image URLs",
+      "name": "images_list",
+      "maxItems": 16
+    },
+    "aspect_ratio": {
+      "enum": [
+        "auto",
+        "1:1",
+        "3:2",
+        "2:3",
+        "4:3",
+        "3:4",
+        "5:4",
+        "4:5",
+        "16:9",
+        "9:16",
+        "2:1",
+        "1:2",
+        "21:9",
+        "9:21",
+        "3:1",
+        "1:3"
+      ],
+      "type": "string",
+      "title": "Aspect Ratio",
+      "name": "aspect_ratio",
+      "description": "Output aspect ratio. 'auto' lets the model choose the best frame.",
+      "default": "auto"
+    },
+    "resolution": {
+      "enum": [
+        "1K",
+        "2K",
+        "4K"
+      ],
+      "type": "string",
+      "title": "Resolution",
+      "name": "resolution",
+      "description": "Output size tier. Higher tiers take longer and cost more.",
+      "default": "1K"
+    },
+    "background": {
+      "enum": [
+        "auto",
+        "transparent",
+        "opaque"
+      ],
+      "type": "string",
+      "title": "Background",
+      "name": "background",
+      "description": "Background handling. Only applies at 1K resolution.",
+      "default": "auto"
+    },
+    "output_format": {
+      "enum": [
+        "png",
+        "jpeg",
+        "webp",
+        "gif"
+      ],
+      "type": "string",
+      "title": "Output Format",
+      "name": "output_format",
+      "description": "Output image format. GIF costs the same as a still image.",
+      "default": "png"
+    },
+    "frame_count": {
+      "enum": [
+        "auto",
+        "4",
+        "9",
+        "16",
+        "25",
+        "36",
+        "64"
+      ],
+      "type": "string",
+      "title": "Frame Count",
+      "name": "frame_count",
+      "description": "Number of GIF frames. Only used when output_format is gif.",
+      "default": "auto"
+    },
+    "frame_duration_ms": {
+      "type": "integer",
+      "title": "Frame Duration (ms)",
+      "name": "frame_duration_ms",
+      "description": "Duration of each GIF frame in ms (20-2000). Only used when output_format is gif.",
+      "minimum": 20,
+      "maximum": 2000
+    }
+  },
+  "required": [
+    "prompt",
+    "images_list"
+  ],
+  "hasPrompt": true,
+  "promptRequired": true,
+  "imageField": "images_list",
+  "maxImages": 16,
+  "imageOptional": false,
+  "provider": "openai",
+  "provider_name": "KIE_AI",
+  "example_url": "https://cdn.muapi.ai/assets/dc2079a3-b9d9-4654-86d6-81974fa9d0f1.avif",
+  "image_url": "https://cdn.muapi.ai/assets/dc2079a3-b9d9-4654-86d6-81974fa9d0f1.avif"
+},
+{
+  "id": "gpt-image-2.6-sunburst-image-to-image",
+  "name": "GPT Image 2.6 Sunburst Image to Image",
+  "endpoint": "gpt-image-2.6-sunburst-image-to-image",
+  "family": "gpt-image-2.6",
+  "description": "Edit or combine up to 16 reference images using GPT-Image-2.6 Sunburst, OpenAI's GPT Image 2.6 model for detailed visual work, with stronger consistency across edits at up to 4K.",
+  "inputs": {
+    "prompt": {
+      "examples": [
+        "Change only the beverage bottle in the center to a matte black can labeled \"PEAK\", keeping the exact same lighting, shadows, reflective surface, background props, and camera angle. Do not change anything else in the scene."
+      ],
+      "description": "Text instructions describing the desired transformation. Maximum 20,000 characters.",
+      "type": "string",
+      "title": "Prompt",
+      "name": "prompt"
+    },
+    "images_list": {
+      "examples": [
+        "https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/gpt-image-2-image-to-image-in.jpg"
+      ],
+      "description": "Upload or provide input images to transform. Up to 16 images supported.",
+      "field": "images_list",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Image URLs",
+      "name": "images_list",
+      "maxItems": 16
+    },
+    "aspect_ratio": {
+      "enum": [
+        "auto",
+        "1:1",
+        "3:2",
+        "2:3",
+        "4:3",
+        "3:4",
+        "5:4",
+        "4:5",
+        "16:9",
+        "9:16",
+        "2:1",
+        "1:2",
+        "21:9",
+        "9:21",
+        "3:1",
+        "1:3"
+      ],
+      "type": "string",
+      "title": "Aspect Ratio",
+      "name": "aspect_ratio",
+      "description": "Output aspect ratio. 'auto' lets the model choose the best frame.",
+      "default": "auto"
+    },
+    "resolution": {
+      "enum": [
+        "1K",
+        "2K",
+        "4K"
+      ],
+      "type": "string",
+      "title": "Resolution",
+      "name": "resolution",
+      "description": "Output size tier. Higher tiers take longer and cost more.",
+      "default": "1K"
+    },
+    "background": {
+      "enum": [
+        "auto",
+        "transparent",
+        "opaque"
+      ],
+      "type": "string",
+      "title": "Background",
+      "name": "background",
+      "description": "Background handling. Only applies at 1K resolution.",
+      "default": "auto"
+    },
+    "output_format": {
+      "enum": [
+        "png",
+        "jpeg",
+        "webp",
+        "gif"
+      ],
+      "type": "string",
+      "title": "Output Format",
+      "name": "output_format",
+      "description": "Output image format. GIF costs the same as a still image.",
+      "default": "png"
+    },
+    "frame_count": {
+      "enum": [
+        "auto",
+        "4",
+        "9",
+        "16",
+        "25",
+        "36",
+        "64"
+      ],
+      "type": "string",
+      "title": "Frame Count",
+      "name": "frame_count",
+      "description": "Number of GIF frames. Only used when output_format is gif.",
+      "default": "auto"
+    },
+    "frame_duration_ms": {
+      "type": "integer",
+      "title": "Frame Duration (ms)",
+      "name": "frame_duration_ms",
+      "description": "Duration of each GIF frame in ms (20-2000). Only used when output_format is gif.",
+      "minimum": 20,
+      "maximum": 2000
+    }
+  },
+  "required": [
+    "prompt",
+    "images_list"
+  ],
+  "hasPrompt": true,
+  "promptRequired": true,
+  "imageField": "images_list",
+  "maxImages": 16,
+  "imageOptional": false,
+  "provider": "openai",
+  "provider_name": "KIE_AI",
+  "example_url": "https://cdn.muapi.ai/assets/17776e8a-5679-4c77-9db6-f24025642bdf.avif",
+  "image_url": "https://cdn.muapi.ai/assets/17776e8a-5679-4c77-9db6-f24025642bdf.avif"
+}
 ];
 
 // Auto-generated from schema_data.json — Image to Video models
@@ -27413,6 +28846,1088 @@ export const i2vModels = [
     "example_url": "https://cdn.muapi.ai/assets/75c82e2e-3772-4289-9f7b-2cb794643bea.avif",
     "image_url": "https://cdn.muapi.ai/assets/75c82e2e-3772-4289-9f7b-2cb794643bea.avif"
   }
+,
+{
+  "id": "seedance-2.1-image-to-video",
+  "name": "Image to Video",
+  "endpoint": "seedance-2.1-image-to-video",
+  "family": "seedance-2.1",
+  "description": "Seedance 2.1 Image-to-Video converts a single still image into a high-fidelity cinematic video. This next-generation model delivers enhanced temporal consistency, improved motion realism, and smarter prompt adherence — producing smooth, coherent clips up to 1080p.",
+  "inputs": {
+    "prompt": {
+      "examples": [
+        "Add a slow cinematic orbit around the subject, gentle parallax depth, fog drifting naturally, sky colors shifting while preserving original lighting and mood."
+      ],
+      "description": "Text prompt describing the video motion and style.",
+      "type": "string",
+      "title": "Prompt",
+      "name": "prompt"
+    },
+    "image_url": {
+      "examples": [
+        "https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/seedance-v1.5-pro-i2v.jpg"
+      ],
+      "description": "URL of the input image to animate into video.",
+      "field": "image",
+      "type": "string",
+      "title": "Image URL",
+      "name": "image_url"
+    },
+    "last_image": {
+      "examples": [
+        null
+      ],
+      "description": "Optional URL of the last frame image for first-last frame control.",
+      "field": "image",
+      "type": "string",
+      "title": "Last Image",
+      "name": "last_image"
+    },
+    "aspect_ratio": {
+      "enum": [
+        "16:9",
+        "9:16",
+        "1:1",
+        "3:4",
+        "4:3",
+        "21:9"
+      ],
+      "title": "Aspect Ratio",
+      "name": "aspect_ratio",
+      "type": "string",
+      "description": "Aspect ratio of the output video.",
+      "default": "16:9"
+    },
+    "resolution": {
+      "enum": [
+        "480p",
+        "720p",
+        "1080p"
+      ],
+      "title": "Resolution",
+      "name": "resolution",
+      "type": "string",
+      "description": "Output video resolution.",
+      "default": "720p"
+    },
+    "duration": {
+      "title": "Duration",
+      "name": "duration",
+      "type": "int",
+      "description": "The duration of the generated video in seconds.",
+      "default": 5,
+      "minValue": 4,
+      "maxValue": 12,
+      "step": 1
+    },
+    "generate_audio": {
+      "type": "boolean",
+      "title": "Generate Audio",
+      "name": "generate_audio",
+      "description": "Whether to generate audio for the video.",
+      "default": true
+    },
+    "camera_fixed": {
+      "type": "boolean",
+      "title": "Camera Fixed",
+      "name": "camera_fixed",
+      "description": "Whether to fix the camera position.",
+      "default": false
+    }
+  },
+  "required": [
+    "prompt",
+    "image_url"
+  ],
+  "hasPrompt": true,
+  "promptRequired": true,
+  "imageField": "image_url",
+  "imageOptional": false,
+  "provider": "bytedance",
+  "provider_name": "WAVESPEED_AI",
+  "example_url": "https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/seedance-v1.5-pro-i2v.mp4",
+  "image_url": "https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/seedance-v1.5-pro-i2v.avif"
+},
+{
+  "id": "flux-3-omni",
+  "name": "Omni Reference",
+  "endpoint": "flux-3-omni",
+  "family": "flux-3",
+  "description": "FLUX 3 Omni is Black Forest Labs' Omni Reference mode — it takes multiple reference images and video clips at once and generates new images or video that keep the same subject, style, and scene consistent across every output. Listed by Black Forest Labs as coming soon.",
+  "inputs": {
+    "prompt": {
+      "examples": [
+        "Keep this character and outfit consistent while placing them in a rooftop garden at sunset."
+      ],
+      "description": "Text prompt describing the desired output, guided by the reference images/videos.",
+      "type": "string",
+      "title": "Prompt",
+      "name": "prompt"
+    },
+    "images_list": {
+      "examples": [
+        "https://d3adwkbyhxyrtq.cloudfront.net/ai-images/186/712345784292/4a8c5c70-abcc-4920-873e-b0e219986453.jpg"
+      ],
+      "description": "Reference image(s) to guide subject, style, or scene.",
+      "field": "images_list",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Image URLs",
+      "name": "images_list",
+      "maxItems": 10
+    },
+    "videos_list": {
+      "examples": [
+        "https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/flux-3-video.mp4"
+      ],
+      "description": "Reference video(s) to guide motion, style, or scene.",
+      "field": "videos_list",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Video URLs",
+      "name": "videos_list",
+      "maxItems": 4
+    },
+    "aspect_ratio": {
+      "enum": [
+        "16:9",
+        "9:16",
+        "1:1",
+        "4:3",
+        "3:4",
+        "21:9"
+      ],
+      "title": "Aspect Ratio",
+      "name": "aspect_ratio",
+      "type": "string",
+      "description": "Aspect ratio of the output.",
+      "default": "16:9"
+    },
+    "resolution": {
+      "enum": [
+        "720p",
+        "1080p"
+      ],
+      "title": "Resolution",
+      "name": "resolution",
+      "type": "string",
+      "description": "Output resolution.",
+      "default": "720p"
+    }
+  },
+  "required": [
+    "prompt"
+  ],
+  "hasPrompt": true,
+  "promptRequired": true,
+  "imageField": "images_list",
+  "maxImages": 10,
+  "imageOptional": false,
+  "videoField": "videos_list",
+  "maxVideos": 4,
+  "provider": "blackforest",
+  "provider_name": "BLACKFOREST_LABS",
+  "example_url": "https://cdn.muapi.ai/assets/fa0367e9-beb6-4927-bf81-741170302e37.avif",
+  "image_url": "https://cdn.muapi.ai/assets/fa0367e9-beb6-4927-bf81-741170302e37.avif"
+},
+{
+  "id": "grok-imagine-video-1-5-image-to-video",
+  "name": "Grok Imagine Video 1.5 Image to Video",
+  "endpoint": "grok-imagine-video-1-5-image-to-video",
+  "family": "grok-imagine-video-1-5",
+  "description": "Generate videos with Grok Imagine Video 1.5 (xAI) by animating an image, with native audio, up to 15 seconds.",
+  "inputs": {
+    "prompt": {
+      "type": "string",
+      "title": "Prompt",
+      "name": "prompt",
+      "description": "Text description of the video. Optional; describes the motion.",
+      "examples": [
+        "A dog running on a sunny beach, cinematic slow motion."
+      ]
+    },
+    "image_url": {
+      "type": "string",
+      "title": "Image URL",
+      "name": "image_url",
+      "field": "image",
+      "description": "Image to animate. The video follows this image's aspect ratio.",
+      "examples": []
+    },
+    "last_image": {
+      "type": "string",
+      "title": "Last Frame Image URL",
+      "name": "last_image",
+      "field": "image",
+      "description": "Optional last-frame image. When provided the video interpolates from the first to the last frame; resolution is limited to 480p/720p.",
+      "examples": []
+    },
+    "aspect_ratio": {
+      "enum": [
+        "16:9",
+        "9:16",
+        "1:1",
+        "4:3",
+        "3:4",
+        "3:2",
+        "2:3",
+        "21:9",
+        "5:2"
+      ],
+      "type": "string",
+      "title": "Aspect Ratio",
+      "name": "aspect_ratio",
+      "description": "Ignored — the video uses the input image's aspect ratio.",
+      "default": "16:9"
+    },
+    "resolution": {
+      "enum": [
+        "480p",
+        "720p",
+        "1080p"
+      ],
+      "type": "string",
+      "title": "Resolution",
+      "name": "resolution",
+      "description": "Output resolution. 1080p is generated by upscaling 720p.",
+      "default": "480p"
+    },
+    "duration": {
+      "type": "int",
+      "title": "Duration (seconds)",
+      "name": "duration",
+      "description": "Video duration in seconds.",
+      "default": 8,
+      "minValue": 1,
+      "maxValue": 15,
+      "step": 1
+    },
+    "generate_audio": {
+      "type": "boolean",
+      "title": "Generate Audio",
+      "name": "generate_audio",
+      "description": "Generate a native audio track. Turn off for a silent video.",
+      "default": true
+    }
+  },
+  "required": [
+    "image_url"
+  ],
+  "hasPrompt": true,
+  "promptRequired": false,
+  "imageField": "image_url",
+  "imageOptional": false,
+  "provider": "grok",
+  "provider_name": "SEEGEN",
+  "example_url": "https://cdn.muapi.ai/assets/grok-imagine-video-1-5-image-to-video.mp4",
+  "image_url": "https://cdn.muapi.ai/assets/grok-imagine-video-1-5-image-to-video.avif"
+},
+{
+  "id": "grok-imagine-video-1-5-reference-to-video",
+  "name": "Grok Imagine Video 1.5 Reference to Video",
+  "endpoint": "grok-imagine-video-1-5-reference-to-video",
+  "family": "grok-imagine-video-1-5",
+  "description": "Generate videos with Grok Imagine Video 1.5 (xAI) guided by multiple reference images, with native audio, up to 15 seconds.",
+  "inputs": {
+    "prompt": {
+      "type": "string",
+      "title": "Prompt",
+      "name": "prompt",
+      "description": "Text description of the video.",
+      "examples": [
+        "A dog running on a sunny beach, cinematic slow motion."
+      ]
+    },
+    "images_list": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Reference Images",
+      "name": "images_list",
+      "field": "images_list",
+      "minItems": 1,
+      "maxItems": 7,
+      "description": "Reference image URLs that guide the video.",
+      "examples": []
+    },
+    "aspect_ratio": {
+      "enum": [
+        "16:9",
+        "9:16",
+        "1:1",
+        "4:3",
+        "3:4",
+        "3:2",
+        "2:3",
+        "21:9",
+        "5:2"
+      ],
+      "type": "string",
+      "title": "Aspect Ratio",
+      "name": "aspect_ratio",
+      "description": "Aspect ratio of the video.",
+      "default": "16:9"
+    },
+    "resolution": {
+      "enum": [
+        "480p",
+        "720p"
+      ],
+      "type": "string",
+      "title": "Resolution",
+      "name": "resolution",
+      "description": "Output resolution.",
+      "default": "480p"
+    },
+    "duration": {
+      "type": "int",
+      "title": "Duration (seconds)",
+      "name": "duration",
+      "description": "Video duration in seconds.",
+      "default": 8,
+      "minValue": 1,
+      "maxValue": 15,
+      "step": 1
+    },
+    "generate_audio": {
+      "type": "boolean",
+      "title": "Generate Audio",
+      "name": "generate_audio",
+      "description": "Generate a native audio track. Turn off for a silent video.",
+      "default": true
+    }
+  },
+  "required": [
+    "prompt",
+    "images_list"
+  ],
+  "hasPrompt": true,
+  "promptRequired": true,
+  "imageField": "images_list",
+  "maxImages": 7,
+  "imageOptional": false,
+  "provider": "grok",
+  "provider_name": "SEEGEN",
+  "example_url": "https://cdn.muapi.ai/assets/grok-imagine-video-1-5-reference-to-video.mp4",
+  "image_url": "https://cdn.muapi.ai/assets/grok-imagine-video-1-5-reference-to-video.avif"
+},
+{
+  "id": "grok-imagine-video-1-5-lite-image-to-video",
+  "name": "Grok Imagine Video 1.5 Lite Image to Video",
+  "endpoint": "grok-imagine-video-1-5-lite-image-to-video",
+  "family": "grok-imagine-video-1-5",
+  "description": "Generate videos with Grok Imagine Video 1.5 Lite (xAI) by animating an image, with native audio, up to 15 seconds.",
+  "inputs": {
+    "prompt": {
+      "type": "string",
+      "title": "Prompt",
+      "name": "prompt",
+      "description": "Text description of the video. Optional; describes the motion.",
+      "examples": [
+        "A dog running on a sunny beach, cinematic slow motion."
+      ]
+    },
+    "image_url": {
+      "type": "string",
+      "title": "Image URL",
+      "name": "image_url",
+      "field": "image",
+      "description": "Image to animate. The video follows this image's aspect ratio.",
+      "examples": []
+    },
+    "resolution": {
+      "enum": [
+        "480p",
+        "720p",
+        "1080p"
+      ],
+      "type": "string",
+      "title": "Resolution",
+      "name": "resolution",
+      "description": "Output resolution. 1080p is generated by upscaling 720p.",
+      "default": "480p"
+    },
+    "duration": {
+      "type": "int",
+      "title": "Duration (seconds)",
+      "name": "duration",
+      "description": "Video duration in seconds.",
+      "default": 8,
+      "minValue": 1,
+      "maxValue": 15,
+      "step": 1
+    },
+    "generate_audio": {
+      "type": "boolean",
+      "title": "Generate Audio",
+      "name": "generate_audio",
+      "description": "Generate a native audio track. Turn off for a silent video.",
+      "default": true
+    }
+  },
+  "required": [
+    "image_url"
+  ],
+  "hasPrompt": true,
+  "promptRequired": false,
+  "imageField": "image_url",
+  "imageOptional": false,
+  "provider": "grok",
+  "provider_name": "SEEGEN",
+  "example_url": "https://cdn.muapi.ai/assets/grok-imagine-video-1-5-lite-image-to-video.mp4",
+  "image_url": "https://cdn.muapi.ai/assets/grok-imagine-video-1-5-lite-image-to-video.avif"
+},
+{
+  "id": "kling-4.0-reference-to-video",
+  "name": "Kling 4.0 Reference to Video",
+  "endpoint": "kling-4.0-reference-to-video",
+  "family": "kling-4",
+  "description": "Kling 4.0 Reference-to-Video generates 3-30 second clips at 720p/1080p with native audio from reference images, reference videos, named elements and voices, all addressable in the prompt with @tags.",
+  "inputs": {
+    "prompt": {
+      "type": "string",
+      "title": "Prompt",
+      "name": "prompt",
+      "description": "Video description (max 8000 chars). Reference materials with @image_1, @video_1 or @name for elements/voices.",
+      "examples": [
+        "@Hero sits at the desk in @video_1, picks up the doll from @image_1, and greets using @Narrator"
+      ]
+    },
+    "image_urls": {
+      "examples": [],
+      "description": "Up to 10 reference images. Mention as @image_1, @image_2, ... in array order.",
+      "field": "images_list",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Reference Image URLs",
+      "name": "image_urls",
+      "maxItems": 10
+    },
+    "video_urls": {
+      "examples": [],
+      "description": "Up to 5 reference videos (2-30s each, 30s combined). Mention as @video_1, @video_2, ...",
+      "field": "videos_list",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Reference Video URLs",
+      "name": "video_urls",
+      "maxItems": 5
+    },
+    "keep_original_sound": {
+      "type": "boolean",
+      "title": "Keep Original Sound",
+      "name": "keep_original_sound",
+      "description": "Keep the original audio of the reference videos (only applies when video_urls is set).",
+      "default": false
+    },
+    "elements": {
+      "type": "array",
+      "title": "Elements",
+      "name": "elements",
+      "description": "Up to 7 named subjects (at most 3 can use video). Each needs 2-4 images or one 3-8 second video, not both. Mention each as @name.",
+      "items": {
+        "type": "object",
+        "x-order-properties": [
+          "name",
+          "image_urls",
+          "video_url",
+          "tag",
+          "description",
+          "voice_url"
+        ],
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Reference name used in the prompt, e.g. Hero. Use 1-20 Chinese characters, letters, numbers, or underscores.",
+            "minLength": 1,
+            "maxLength": 20,
+            "pattern": "^[\\u4e00-\\u9fa5A-Za-z0-9_]{1,20}$"
+          },
+          "image_urls": {
+            "type": "array",
+            "title": "Images",
+            "description": "Add 2-4 images. The first image should show the main/front view; the rest are references. Cannot be used together with a video.",
+            "field": "images_list",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            },
+            "minItems": 2,
+            "maxItems": 4
+          },
+          "video_url": {
+            "type": "string",
+            "title": "Video",
+            "description": "One 3-8 second continuous-shot video. Cannot be used together with images.",
+            "field": "video",
+            "format": "uri"
+          },
+          "tag": {
+            "type": "string",
+            "title": "Tag",
+            "description": "Element category. Video elements are always characters.",
+            "enum": [
+              "character",
+              "animal",
+              "prop",
+              "costume",
+              "scene",
+              "effect",
+              "others"
+            ],
+            "enum_labels": {
+              "character": "Character",
+              "animal": "Animal",
+              "prop": "Prop",
+              "costume": "Costume",
+              "scene": "Scene",
+              "effect": "Effect",
+              "others": "Others"
+            },
+            "default": "character"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "description": "Optional details to help identify or describe this element (up to 100 characters).",
+            "format": "text",
+            "maxLength": 100
+          },
+          "voice_url": {
+            "type": "string",
+            "title": "Voice",
+            "description": "Optional audio sample associated with this character.",
+            "field": "audio",
+            "format": "uri"
+          }
+        }
+      },
+      "maxItems": 7
+    },
+    "voices": {
+      "type": "array",
+      "title": "Voices",
+      "name": "voices",
+      "description": "Up to 3 named voices, each {name, audio_url}. Mention as @name.",
+      "items": {
+        "type": "object",
+        "x-order-properties": [
+          "name",
+          "audio_url"
+        ],
+        "required": [
+          "name",
+          "audio_url"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Reference name used in the prompt, e.g. Narrator. Use 1-20 Chinese characters, letters, numbers, or underscores.",
+            "minLength": 1,
+            "maxLength": 20,
+            "pattern": "^[\\u4e00-\\u9fa5A-Za-z0-9_]{1,20}$"
+          },
+          "audio_url": {
+            "type": "string",
+            "title": "Voice audio",
+            "description": "Upload an audio reference for this voice.",
+            "field": "audio",
+            "format": "uri"
+          }
+        }
+      },
+      "maxItems": 3
+    },
+    "duration": {
+      "title": "Duration",
+      "name": "duration",
+      "type": "int",
+      "description": "Video length in seconds (3-30).",
+      "default": 5,
+      "minValue": 3,
+      "maxValue": 30,
+      "step": 1
+    },
+    "resolution": {
+      "enum": [
+        "720p",
+        "1080p"
+      ],
+      "title": "Resolution",
+      "name": "resolution",
+      "type": "string",
+      "description": "Output resolution.",
+      "default": "720p"
+    },
+    "aspect_ratio": {
+      "enum": [
+        "auto",
+        "16:9",
+        "9:16",
+        "1:1",
+        "21:9"
+      ],
+      "title": "Aspect Ratio",
+      "name": "aspect_ratio",
+      "type": "string",
+      "description": "Output aspect ratio. Defaults to auto when reference media is provided, otherwise 16:9."
+    }
+  },
+  "required": [
+    "prompt"
+  ],
+  "hasPrompt": true,
+  "promptRequired": true,
+  "imageField": "image_urls",
+  "maxImages": 10,
+  "imageOptional": false,
+  "videoField": "video_urls",
+  "maxVideos": 5,
+  "provider": "kling",
+  "provider_name": "kie",
+  "example_url": "https://cdn.muapi.ai/assets/kling-v3.0-omni-pro-text-to-video.mp4",
+  "image_url": "https://cdn.muapi.ai/assets/kling-v3.0-omni-pro-text-to-video.avif"
+},
+{
+  "id": "kling-4.0-keyframe-to-video",
+  "name": "Kling 4.0 Keyframe to Video",
+  "endpoint": "kling-4.0-keyframe-to-video",
+  "family": "kling-4",
+  "description": "Kling 4.0 Keyframe-to-Video turns a first frame, up to 8 middle keyframes and a last frame into a 3-30 second clip at 720p/1080p, with each frame addressable in the prompt.",
+  "inputs": {
+    "prompt": {
+      "type": "string",
+      "title": "Prompt",
+      "name": "prompt",
+      "description": "Video description (max 8000 chars). Mention frames with @first_frame, @keyframe_1, ..., @last_frame.",
+      "examples": [
+        "The girl in @first_frame walks out, passes the street in @keyframe_1, and arrives at the party in @last_frame"
+      ]
+    },
+    "first_frame_url": {
+      "type": "string",
+      "title": "First Frame URL",
+      "name": "first_frame_url",
+      "field": "image",
+      "description": "First-frame image URL. Mention as @first_frame."
+    },
+    "keyframe_urls": {
+      "examples": [],
+      "description": "Middle-frame image URLs in chronological order (up to 8, also limited by duration). Mention as @keyframe_1, @keyframe_2, ...",
+      "field": "images_list",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Keyframe URLs",
+      "name": "keyframe_urls",
+      "maxItems": 8
+    },
+    "last_frame_url": {
+      "type": "string",
+      "title": "Last Frame URL",
+      "name": "last_frame_url",
+      "field": "image",
+      "description": "Last-frame image URL. Mention as @last_frame."
+    },
+    "duration": {
+      "title": "Duration",
+      "name": "duration",
+      "type": "int",
+      "description": "Video length in seconds (3-30).",
+      "default": 5,
+      "minValue": 3,
+      "maxValue": 30,
+      "step": 1
+    },
+    "resolution": {
+      "enum": [
+        "720p",
+        "1080p"
+      ],
+      "title": "Resolution",
+      "name": "resolution",
+      "type": "string",
+      "description": "Output resolution.",
+      "default": "720p"
+    },
+    "aspect_ratio": {
+      "enum": [
+        "auto",
+        "16:9",
+        "9:16",
+        "1:1",
+        "21:9"
+      ],
+      "title": "Aspect Ratio",
+      "name": "aspect_ratio",
+      "type": "string",
+      "description": "Only used when no frame is provided; otherwise the output follows the first frame."
+    }
+  },
+  "required": [
+    "prompt",
+    "first_frame_url"
+  ],
+  "hasPrompt": true,
+  "promptRequired": true,
+  "imageField": "first_frame_url",
+  "imageOptional": false,
+  "provider": "kling",
+  "provider_name": "kie",
+  "example_url": "https://cdn.muapi.ai/assets/kling-v3.0-omni-pro-text-to-video.mp4",
+  "image_url": "https://cdn.muapi.ai/assets/kling-v3.0-omni-pro-text-to-video.avif"
+},
+{
+  "id": "pixverse-v6-max-image-to-video",
+  "name": "PixVerse V6 Max Image to Video",
+  "endpoint": "pixverse-v6-max-image-to-video",
+  "family": "pixverse-v6-max",
+  "description": "Animate an image into cinematic video with PixVerse V6 Max: up to 15 seconds at up to 1080p, consistent subjects, and optional native audio.",
+  "inputs": {
+    "prompt": {
+      "type": "string",
+      "title": "Prompt",
+      "name": "prompt",
+      "description": "Text description of the video (max 5000 characters).",
+      "examples": [
+        "Cracks spread across the statue as it suddenly comes to life. Stone pieces fall off while glowing energy emerges from inside. The statue pulls itself free from the sand and takes a heavy step forward, shaking the ground as dust rises into the air."
+      ]
+    },
+    "images_list": {
+      "examples": [
+        "https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/pixverse-v6-i2v.avif"
+      ],
+      "description": "Input image used as the first frame. The output aspect ratio follows this image.",
+      "field": "images_list",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Image URL",
+      "name": "images_list",
+      "maxItems": 1
+    },
+    "resolution": {
+      "enum": [
+        "360p",
+        "540p",
+        "720p",
+        "1080p"
+      ],
+      "type": "string",
+      "title": "Resolution",
+      "name": "resolution",
+      "description": "Output video resolution.",
+      "default": "720p"
+    },
+    "duration": {
+      "type": "int",
+      "title": "Duration (seconds)",
+      "name": "duration",
+      "description": "Video duration in seconds (1-15).",
+      "default": 5,
+      "minValue": 1,
+      "maxValue": 15,
+      "step": 1
+    },
+    "generate_audio_switch": {
+      "type": "boolean",
+      "title": "Generate Audio",
+      "name": "generate_audio_switch",
+      "description": "Generate native audio synchronized with the video.",
+      "default": false
+    },
+    "seed": {
+      "type": "int",
+      "title": "Seed",
+      "name": "seed",
+      "description": "Random seed (0-2147483647) for reproducibility. Leave empty for a random seed.",
+      "minValue": 0,
+      "maxValue": 2147483647
+    }
+  },
+  "required": [
+    "prompt",
+    "images_list"
+  ],
+  "hasPrompt": true,
+  "promptRequired": true,
+  "imageField": "images_list",
+  "maxImages": 1,
+  "imageOptional": false,
+  "provider": "pixverse",
+  "provider_name": "KIE_AI",
+  "example_url": "https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/pixverse-v6-i2v.mp4",
+  "image_url": "https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/pixverse-v6-i2v.avif"
+},
+{
+  "id": "kling-4.0-flash-reference-to-video",
+  "name": "Kling 4.0 Flash Reference to Video",
+  "endpoint": "kling-4.0-flash-reference-to-video",
+  "family": "kling-4-flash",
+  "description": "Kling 4.0 Flash Reference-to-Video generates 3-20 second 720p clips with native audio from reference images, reference videos and named elements, all addressable in the prompt with @tags.",
+  "inputs": {
+    "prompt": {
+      "type": "string",
+      "title": "Prompt",
+      "name": "prompt",
+      "description": "Video description (max 8000 chars). Reference materials with @image_1, @video_1 or @name for elements/voices.",
+      "examples": [
+        "@Hero sits at the desk in @video_1, picks up the doll from @image_1, and greets using @Narrator"
+      ]
+    },
+    "image_urls": {
+      "examples": [],
+      "description": "Up to 10 reference images. Mention as @image_1, @image_2, ... in array order.",
+      "field": "images_list",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Reference Image URLs",
+      "name": "image_urls",
+      "maxItems": 10
+    },
+    "video_urls": {
+      "examples": [],
+      "description": "Up to 5 reference videos (2-30s each, 30s combined). Mention as @video_1, @video_2, ...",
+      "field": "videos_list",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Reference Video URLs",
+      "name": "video_urls",
+      "maxItems": 5
+    },
+    "keep_original_sound": {
+      "type": "boolean",
+      "title": "Keep Original Sound",
+      "name": "keep_original_sound",
+      "description": "Keep the original audio of the reference videos (only applies when video_urls is set).",
+      "default": false
+    },
+    "elements": {
+      "type": "array",
+      "title": "Elements",
+      "name": "elements",
+      "description": "Up to 7 named subjects (at most 3 can use video). Each needs 2-4 images or one 3-8 second video, not both. Mention each as @name.",
+      "items": {
+        "type": "object",
+        "x-order-properties": [
+          "name",
+          "image_urls",
+          "video_url",
+          "tag",
+          "description",
+          "voice_url"
+        ],
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Reference name used in the prompt, e.g. Hero. Use 1-20 Chinese characters, letters, numbers, or underscores.",
+            "minLength": 1,
+            "maxLength": 20,
+            "pattern": "^[\\u4e00-\\u9fa5A-Za-z0-9_]{1,20}$"
+          },
+          "image_urls": {
+            "type": "array",
+            "title": "Images",
+            "description": "Add 2-4 images. The first image should show the main/front view; the rest are references. Cannot be used together with a video.",
+            "field": "images_list",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            },
+            "minItems": 2,
+            "maxItems": 4
+          },
+          "video_url": {
+            "type": "string",
+            "title": "Video",
+            "description": "One 3-8 second continuous-shot video. Cannot be used together with images.",
+            "field": "video",
+            "format": "uri"
+          },
+          "tag": {
+            "type": "string",
+            "title": "Tag",
+            "description": "Element category. Video elements are always characters.",
+            "enum": [
+              "character",
+              "animal",
+              "prop",
+              "costume",
+              "scene",
+              "effect",
+              "others"
+            ],
+            "enum_labels": {
+              "character": "Character",
+              "animal": "Animal",
+              "prop": "Prop",
+              "costume": "Costume",
+              "scene": "Scene",
+              "effect": "Effect",
+              "others": "Others"
+            },
+            "default": "character"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "description": "Optional details to help identify or describe this element (up to 100 characters).",
+            "format": "text",
+            "maxLength": 100
+          },
+          "voice_url": {
+            "type": "string",
+            "title": "Voice",
+            "description": "Optional audio sample associated with this character.",
+            "field": "audio",
+            "format": "uri"
+          }
+        }
+      },
+      "maxItems": 7
+    },
+    "duration": {
+      "title": "Duration",
+      "name": "duration",
+      "type": "int",
+      "description": "Video length in seconds (3-20).",
+      "default": 5,
+      "minValue": 3,
+      "maxValue": 20,
+      "step": 1
+    },
+    "resolution": {
+      "enum": [
+        "720p"
+      ],
+      "title": "Resolution",
+      "name": "resolution",
+      "type": "string",
+      "description": "Output resolution (Kling 4.0 Flash is 720p only).",
+      "default": "720p"
+    },
+    "aspect_ratio": {
+      "enum": [
+        "auto",
+        "16:9",
+        "9:16",
+        "1:1",
+        "21:9"
+      ],
+      "title": "Aspect Ratio",
+      "name": "aspect_ratio",
+      "type": "string",
+      "description": "Output aspect ratio. Defaults to auto when reference media is provided, otherwise 16:9."
+    }
+  },
+  "required": [
+    "prompt"
+  ],
+  "hasPrompt": true,
+  "promptRequired": true,
+  "imageField": "image_urls",
+  "maxImages": 10,
+  "imageOptional": false,
+  "videoField": "video_urls",
+  "maxVideos": 5,
+  "provider": "kling",
+  "provider_name": "kie",
+  "example_url": "https://cdn.muapi.ai/assets/kling-v3.0-omni-pro-text-to-video.mp4",
+  "image_url": "https://cdn.muapi.ai/assets/kling-v3.0-omni-pro-text-to-video.avif"
+},
+{
+  "id": "kling-4.0-flash-keyframe-to-video",
+  "name": "Kling 4.0 Flash Keyframe to Video",
+  "endpoint": "kling-4.0-flash-keyframe-to-video",
+  "family": "kling-4-flash",
+  "description": "Kling 4.0 Flash Keyframe-to-Video animates a first-frame image into a 3-20 second 720p clip, with the frame addressable in the prompt as @first_frame.",
+  "inputs": {
+    "prompt": {
+      "type": "string",
+      "title": "Prompt",
+      "name": "prompt",
+      "description": "Video description (max 8000 chars). Mention the first frame with @first_frame.",
+      "examples": [
+        "Animate @first_frame as one continuous shot: the camera slowly pushes in as the skier turns her head toward the sunlit window, gentle cabin sway, ambient wind"
+      ]
+    },
+    "first_frame_url": {
+      "type": "string",
+      "title": "First Frame URL",
+      "name": "first_frame_url",
+      "field": "image",
+      "description": "First-frame image URL. Mention as @first_frame."
+    },
+    "duration": {
+      "title": "Duration",
+      "name": "duration",
+      "type": "int",
+      "description": "Video length in seconds (3-20).",
+      "default": 5,
+      "minValue": 3,
+      "maxValue": 20,
+      "step": 1
+    },
+    "resolution": {
+      "enum": [
+        "720p"
+      ],
+      "title": "Resolution",
+      "name": "resolution",
+      "type": "string",
+      "description": "Output resolution (Kling 4.0 Flash is 720p only).",
+      "default": "720p"
+    },
+    "aspect_ratio": {
+      "enum": [
+        "16:9",
+        "9:16",
+        "1:1",
+        "21:9"
+      ],
+      "title": "Aspect Ratio",
+      "name": "aspect_ratio",
+      "type": "string",
+      "description": "Only used when no first frame is provided (plain text-to-video); otherwise the output follows the first frame."
+    }
+  },
+  "required": [
+    "prompt",
+    "first_frame_url"
+  ],
+  "hasPrompt": true,
+  "promptRequired": true,
+  "imageField": "first_frame_url",
+  "imageOptional": false,
+  "provider": "kling",
+  "provider_name": "kie",
+  "example_url": "https://cdn.muapi.ai/assets/kling-v3.0-omni-pro-text-to-video.mp4",
+  "image_url": "https://cdn.muapi.ai/assets/kling-v3.0-omni-pro-text-to-video.avif"
+}
 ];
 
 export const getI2IModelById = (id) => i2iModels.find(m => m.id === id);
@@ -31459,6 +33974,194 @@ export const v2vModels = [
     "example_url": "https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/topaz-upscaler.mp4",
     "image_url": "https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/topaz-upscaler.avif"
   }
+,
+{
+  "id": "ai-clipping",
+  "name": "AI Clipping",
+  "endpoint": "ai-clipping",
+  "family": "video",
+  "description": "Convert long-form videos into engaging short clips using AI clipping.",
+  "inputs": {
+    "video_url": {
+      "type": "string",
+      "title": "Video URL",
+      "field": "video",
+      "name": "video_url",
+      "description": "The URL of the video to be clipped.",
+      "examples": [
+        "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+      ]
+    },
+    "num_highlights": {
+      "title": "Number of Highlights",
+      "name": "num_highlights",
+      "type": "int",
+      "description": "Number of highlights to extract from the video.",
+      "default": 3,
+      "minValue": 1,
+      "maxValue": 60,
+      "step": 1
+    },
+    "aspect_ratio": {
+      "type": "string",
+      "title": "Aspect Ratio",
+      "enum": [
+        "9:16",
+        "16:9",
+        "1:1",
+        "4:5",
+        "4:3",
+        "3:4"
+      ],
+      "default": "9:16",
+      "name": "aspect_ratio",
+      "description": "The aspect ratio for the resulting clips.",
+      "examples": [
+        "9:16"
+      ]
+    },
+    "return_coordinates_only": {
+      "type": "boolean",
+      "title": "Return Coordinates Only",
+      "default": false,
+      "name": "return_coordinates_only",
+      "description": "Whether to return only the coordinates instead of processed clips.",
+      "examples": [
+        false
+      ]
+    }
+  },
+  "required": [
+    "video_url"
+  ],
+  "hasPrompt": false,
+  "promptRequired": false,
+  "videoField": "video_url",
+  "provider": "muapi",
+  "provider_name": "VADOO_AI",
+  "example_url": "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+  "image_url": "https://muapi.ai/blog/clipping.jpg"
+},
+{
+  "id": "video-combiner",
+  "name": "Video Combiner",
+  "endpoint": "video-combiner",
+  "family": "video-tools",
+  "description": "Combine multiple short video clips (5s, 10s, etc.) into a single seamless full-length video. Upload your clips in order and choose the final output aspect ratio. 'Auto' preserves the aspect ratio of your first clip.",
+  "inputs": {
+    "videos_list": {
+      "examples": [
+        "https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/seedance-v2.0-i2v.mp4"
+      ],
+      "description": "Upload the video clips you want to combine, in order. Each clip can be 5–60 seconds.",
+      "field": "videos_list",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Video Clips",
+      "name": "videos_list",
+      "maxItems": 20
+    },
+    "aspect_ratio": {
+      "enum": [
+        "auto",
+        "16:9",
+        "9:16",
+        "1:1",
+        "4:3",
+        "3:4",
+        "21:9",
+        "9:21"
+      ],
+      "title": "Aspect Ratio",
+      "name": "aspect_ratio",
+      "type": "string",
+      "default": "auto",
+      "description": "Output aspect ratio. 'auto' uses the aspect ratio of the first uploaded clip."
+    }
+  },
+  "required": [
+    "videos_list"
+  ],
+  "hasPrompt": false,
+  "promptRequired": false,
+  "videoField": "videos_list",
+  "maxVideos": 20,
+  "provider": "muapi",
+  "provider_name": "INTERNAL",
+  "example_url": "https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/seedance-v2.0-i2v.mp4",
+  "image_url": "https://d3adwkbyhxyrtq.cloudfront.net/muapi/homepage/ai-video-effects.avif"
+},
+{
+  "id": "autocrop",
+  "name": "Autocrop",
+  "endpoint": "autocrop",
+  "family": "video",
+  "description": "Automatically crop and reframe a specific video segment to your chosen aspect ratio using AI subject tracking.",
+  "inputs": {
+    "video_url": {
+      "type": "string",
+      "title": "Video URL",
+      "field": "video",
+      "name": "video_url",
+      "description": "The URL of the source video to crop.",
+      "examples": [
+        "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+      ]
+    },
+    "start_time": {
+      "type": "int",
+      "title": "Start Time (seconds)",
+      "name": "start_time",
+      "description": "Start time of the segment to crop in seconds.",
+      "default": 0,
+      "minValue": 0,
+      "maxValue": 86400,
+      "step": 1
+    },
+    "end_time": {
+      "type": "int",
+      "title": "End Time (seconds)",
+      "name": "end_time",
+      "description": "End time of the segment to crop in seconds.",
+      "default": 60,
+      "minValue": 1,
+      "maxValue": 86400,
+      "step": 1
+    },
+    "aspect_ratio": {
+      "type": "string",
+      "title": "Aspect Ratio",
+      "enum": [
+        "9:16",
+        "16:9",
+        "1:1",
+        "4:5",
+        "4:3",
+        "3:4"
+      ],
+      "default": "9:16",
+      "name": "aspect_ratio",
+      "description": "The aspect ratio for the resulting clip.",
+      "examples": [
+        "9:16"
+      ]
+    }
+  },
+  "required": [
+    "video_url",
+    "start_time",
+    "end_time"
+  ],
+  "hasPrompt": false,
+  "promptRequired": false,
+  "videoField": "video_url",
+  "provider": "muapi",
+  "provider_name": "VADOO_AI",
+  "example_url": "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+  "image_url": "https://muapi.ai/blog/clipping.jpg"
+}
 ];
 
 // ─── LipSync / Speech-to-Video models ────────────────────────────────────────
@@ -31675,6 +34378,64 @@ export const lipsyncModels = [
       }
     }
   }
+,
+{
+  "id": "omnihuman-2-0",
+  "name": "OmniHuman 2.0",
+  "endpoint": "omnihuman-2-0",
+  "family": "omnihuman",
+  "description": "Generate realistic talking and singing avatar video from a portrait image and audio using OmniHuman 2.0. Optional text prompt controls scene, motion and camera.",
+  "inputs": {
+    "prompt": {
+      "type": "string",
+      "title": "Prompt",
+      "name": "prompt",
+      "description": "Optional prompt (max 300 characters) for scene, character motion and camera movement.",
+      "examples": [
+        "A museum guide explains how starlight lets us look into the universe's past in a friendly, engaging manner."
+      ]
+    },
+    "image_url": {
+      "type": "string",
+      "title": "Image URL",
+      "name": "image_url",
+      "description": "URL of the portrait image (jpeg, png, webp, bmp, tiff, gif, heic; under 30 MB; aspect ratio 0.4-2.5).",
+      "field": "image",
+      "examples": [
+        "https://cdn.muapi.ai/assets/omnihuman-1-5.jpg"
+      ]
+    },
+    "audio_url": {
+      "type": "string",
+      "title": "Audio URL",
+      "name": "audio_url",
+      "description": "URL of the audio that drives motion and lip sync (wav or mp3, 4-300 seconds, under 15 MB).",
+      "field": "audio",
+      "examples": [
+        "https://cdn.muapi.ai/assets/omnihuman-1-5.mp3"
+      ]
+    },
+    "enable_watermark": {
+      "type": "boolean",
+      "title": "Watermark",
+      "name": "enable_watermark",
+      "description": "Add a watermark to the output video.",
+      "default": false
+    }
+  },
+  "required": [
+    "image_url",
+    "audio_url"
+  ],
+  "category": "image",
+  "hasPrompt": true,
+  "imageField": "image_url",
+  "audioField": "audio_url",
+  "provider": "bytedance",
+  "provider_name": "KIE_AI",
+  "example_url": "https://cdn.muapi.ai/assets/omnihuman-1-5.mp4",
+  "image_url": "https://cdn.muapi.ai/assets/omnihuman-1-5.avif"
+}
 ];
 
 export const getLipSyncModelById = (id) => lipsyncModels.find(m => m.id === id);
@@ -35141,6 +37902,474 @@ export const audioModels = [
       }
     }
   }
+,
+{
+  "id": "gemini-3-8-flash-tts",
+  "name": "3.8 Flash",
+  "endpoint": "gemini-3-8-flash-tts",
+  "family": "gemini-tts",
+  "description": "Gemini 3.8 Flash TTS turns written dialogue into expressive, natural multi-speaker speech with studio-grade voice fidelity, expressive acting, and long-form stability. Control voice, accent, emotional style, and pace per speaker for fast, affordable voiceovers, character dialogue, and narration.",
+  "inputs": {
+    "speakers": {
+      "type": "array",
+      "title": "Speakers",
+      "name": "speakers",
+      "description": "List of speaker voice configurations. Each dialogue turn references a speaker by its ID.",
+      "examples": [
+        [
+          {
+            "speaker_id": "Speaker 1",
+            "voice_name": "Fenrir",
+            "audio_profile": "A stern and weary gatekeeper",
+            "accent": "British (RP)",
+            "style": "Deadpan",
+            "pace": "Natural"
+          },
+          {
+            "speaker_id": "Speaker 2",
+            "voice_name": "Puck",
+            "audio_profile": "A determined and courageous traveler seeking answers.",
+            "accent": "American (Gen)",
+            "style": "Empathetic",
+            "pace": "Staccato"
+          }
+        ]
+      ],
+      "items": {
+        "type": "object",
+        "properties": {
+          "speaker_id": {
+            "type": "string",
+            "title": "Speaker ID",
+            "description": "Speaker identifier. Must be in \"Speaker N\" format (e.g. \"Speaker 1\")."
+          },
+          "voice_name": {
+            "type": "string",
+            "title": "Voice",
+            "description": "Prebuilt Gemini voice name.",
+            "enum": [
+              "Achernar",
+              "Achird",
+              "Algenib",
+              "Algieba",
+              "Alnilam",
+              "Aoede",
+              "Autonoe",
+              "Callirrhoe",
+              "Charon",
+              "Despina",
+              "Enceladus",
+              "Erinome",
+              "Fenrir",
+              "Gacrux",
+              "Iapetus",
+              "Kore",
+              "Laomedeia",
+              "Leda",
+              "Orus",
+              "Puck",
+              "Pulcherrima",
+              "Rasalgethi",
+              "Sadachbia",
+              "Sadaltager",
+              "Schedar",
+              "Sulafat",
+              "Umbriel",
+              "Vindemiatrix",
+              "Zephyr",
+              "Zubenelgenubi"
+            ]
+          },
+          "audio_profile": {
+            "type": "string",
+            "title": "Audio Profile",
+            "description": "Optional natural-language description of the persona, e.g. \"A warm and soothing narrator\"."
+          },
+          "accent": {
+            "type": "string",
+            "title": "Accent",
+            "description": "Speaking accent.",
+            "enum": [
+              "Neutral",
+              "American (Gen)",
+              "American (Valley)",
+              "American (South)",
+              "British (RP)",
+              "British (Brixton)",
+              "Transatlantic",
+              "Australian"
+            ],
+            "default": "Neutral"
+          },
+          "style": {
+            "type": "string",
+            "title": "Style",
+            "description": "Emotional delivery style.",
+            "enum": [
+              "Vocal Smile",
+              "Newscaster",
+              "Whisper",
+              "Empathetic",
+              "Promo/Hype",
+              "Deadpan"
+            ],
+            "default": "Empathetic"
+          },
+          "pace": {
+            "type": "string",
+            "title": "Pace",
+            "description": "Speaking pace.",
+            "enum": [
+              "Natural",
+              "Rapid Fire",
+              "The Drift",
+              "Staccato"
+            ],
+            "default": "Natural"
+          }
+        },
+        "required": [
+          "speaker_id",
+          "voice_name",
+          "accent",
+          "style",
+          "pace"
+        ]
+      }
+    },
+    "dialogue_turns": {
+      "type": "array",
+      "title": "Dialogue Turns",
+      "name": "dialogue_turns",
+      "description": "Ordered list of dialogue lines. Each turn's speaker_id must match a speaker defined above. Text may include tone tags like [shouting] or [whispers].",
+      "examples": [
+        [
+          {
+            "speaker_id": "Speaker 1",
+            "text": "[shouting] Halt, traveler! The northern pass is sealed by order of the council."
+          },
+          {
+            "speaker_id": "Speaker 2",
+            "text": "[determination] I carry a message for the elder. Step aside, or I will force my way through."
+          },
+          {
+            "speaker_id": "Speaker 1",
+            "text": "[caution] No one passes. [pensive] The elder is... he's no longer receiving visitors."
+          },
+          {
+            "speaker_id": "Speaker 2",
+            "text": "It's too late. [whispers] The shadow... it reached him first. [urgency] You need to leave. [shouting] Now."
+          }
+        ]
+      ],
+      "items": {
+        "type": "object",
+        "properties": {
+          "speaker_id": {
+            "type": "string",
+            "title": "Speaker ID",
+            "description": "ID of the speaker delivering this line (e.g. \"Speaker 1\")."
+          },
+          "text": {
+            "type": "string",
+            "title": "Text",
+            "description": "The line to speak. Supports inline tone tags. Max 10000 characters."
+          }
+        },
+        "required": [
+          "speaker_id",
+          "text"
+        ]
+      }
+    },
+    "scene": {
+      "type": "string",
+      "title": "Scene",
+      "name": "scene",
+      "description": "Optional scene description that sets the acoustic setting, e.g. \"A quiet, warm room with a fireplace crackling softly.\"",
+      "default": ""
+    },
+    "sample_context": {
+      "type": "string",
+      "title": "Sample Context",
+      "name": "sample_context",
+      "description": "Optional overall tone/style, e.g. \"Audiobook style narration. Tone is gentle and inviting.\"",
+      "default": ""
+    },
+    "temperature": {
+      "type": "number",
+      "title": "Temperature",
+      "name": "temperature",
+      "description": "Sampling temperature (0-2). Higher values produce more varied delivery.",
+      "default": 1,
+      "minimum": 0,
+      "maximum": 2
+    }
+  },
+  "required": [
+    "speakers",
+    "dialogue_turns"
+  ],
+  "hasPrompt": false,
+  "promptRequired": false,
+  "provider": "google",
+  "provider_name": "KIE",
+  "example_url": "https://cdn.muapi.ai/assets/3302336b-a140-40d5-8629-42246cc0f40d.avif",
+  "image_url": "https://cdn.muapi.ai/assets/3302336b-a140-40d5-8629-42246cc0f40d.avif"
+},
+{
+  "id": "gemini-3-8-flash-lite-tts",
+  "name": "3.8 Flash Lite",
+  "endpoint": "gemini-3-8-flash-lite-tts",
+  "family": "gemini-tts",
+  "description": "Gemini 3.8 Flash Lite TTS is Google's high-throughput, low-latency, cost-efficient text-to-speech model for expressive multi-speaker conversational audio. Control voice, accent, emotional style, and pace per speaker for high-volume voiceovers, real-time dialogue, and budget-conscious narration.",
+  "inputs": {
+    "speakers": {
+      "type": "array",
+      "title": "Speakers",
+      "name": "speakers",
+      "description": "List of speaker voice configurations. Each dialogue turn references a speaker by its ID.",
+      "examples": [
+        [
+          {
+            "speaker_id": "Speaker 1",
+            "voice_name": "Fenrir",
+            "audio_profile": "A stern and weary gatekeeper",
+            "accent": "British (RP)",
+            "style": "Deadpan",
+            "pace": "Natural"
+          },
+          {
+            "speaker_id": "Speaker 2",
+            "voice_name": "Puck",
+            "audio_profile": "A determined and courageous traveler seeking answers.",
+            "accent": "American (Gen)",
+            "style": "Empathetic",
+            "pace": "Staccato"
+          }
+        ]
+      ],
+      "items": {
+        "type": "object",
+        "properties": {
+          "speaker_id": {
+            "type": "string",
+            "title": "Speaker ID",
+            "description": "Speaker identifier. Must be in \"Speaker N\" format (e.g. \"Speaker 1\")."
+          },
+          "voice_name": {
+            "type": "string",
+            "title": "Voice",
+            "description": "Prebuilt Gemini voice name.",
+            "enum": [
+              "Achernar",
+              "Achird",
+              "Algenib",
+              "Algieba",
+              "Alnilam",
+              "Aoede",
+              "Autonoe",
+              "Callirrhoe",
+              "Charon",
+              "Despina",
+              "Enceladus",
+              "Erinome",
+              "Fenrir",
+              "Gacrux",
+              "Iapetus",
+              "Kore",
+              "Laomedeia",
+              "Leda",
+              "Orus",
+              "Puck",
+              "Pulcherrima",
+              "Rasalgethi",
+              "Sadachbia",
+              "Sadaltager",
+              "Schedar",
+              "Sulafat",
+              "Umbriel",
+              "Vindemiatrix",
+              "Zephyr",
+              "Zubenelgenubi"
+            ]
+          },
+          "audio_profile": {
+            "type": "string",
+            "title": "Audio Profile",
+            "description": "Optional natural-language description of the persona, e.g. \"A warm and soothing narrator\"."
+          },
+          "accent": {
+            "type": "string",
+            "title": "Accent",
+            "description": "Speaking accent.",
+            "enum": [
+              "Neutral",
+              "American (Gen)",
+              "American (Valley)",
+              "American (South)",
+              "British (RP)",
+              "British (Brixton)",
+              "Transatlantic",
+              "Australian"
+            ],
+            "default": "Neutral"
+          },
+          "style": {
+            "type": "string",
+            "title": "Style",
+            "description": "Emotional delivery style.",
+            "enum": [
+              "Vocal Smile",
+              "Newscaster",
+              "Whisper",
+              "Empathetic",
+              "Promo/Hype",
+              "Deadpan"
+            ],
+            "default": "Empathetic"
+          },
+          "pace": {
+            "type": "string",
+            "title": "Pace",
+            "description": "Speaking pace.",
+            "enum": [
+              "Natural",
+              "Rapid Fire",
+              "The Drift",
+              "Staccato"
+            ],
+            "default": "Natural"
+          }
+        },
+        "required": [
+          "speaker_id",
+          "voice_name",
+          "accent",
+          "style",
+          "pace"
+        ]
+      }
+    },
+    "dialogue_turns": {
+      "type": "array",
+      "title": "Dialogue Turns",
+      "name": "dialogue_turns",
+      "description": "Ordered list of dialogue lines. Each turn's speaker_id must match a speaker defined above. Text may include tone tags like [shouting] or [whispers].",
+      "examples": [
+        [
+          {
+            "speaker_id": "Speaker 1",
+            "text": "[shouting] Halt, traveler! The northern pass is sealed by order of the council."
+          },
+          {
+            "speaker_id": "Speaker 2",
+            "text": "[determination] I carry a message for the elder. Step aside, or I will force my way through."
+          },
+          {
+            "speaker_id": "Speaker 1",
+            "text": "[caution] No one passes. [pensive] The elder is... he's no longer receiving visitors."
+          },
+          {
+            "speaker_id": "Speaker 2",
+            "text": "It's too late. [whispers] The shadow... it reached him first. [urgency] You need to leave. [shouting] Now."
+          }
+        ]
+      ],
+      "items": {
+        "type": "object",
+        "properties": {
+          "speaker_id": {
+            "type": "string",
+            "title": "Speaker ID",
+            "description": "ID of the speaker delivering this line (e.g. \"Speaker 1\")."
+          },
+          "text": {
+            "type": "string",
+            "title": "Text",
+            "description": "The line to speak. Supports inline tone tags. Max 10000 characters."
+          }
+        },
+        "required": [
+          "speaker_id",
+          "text"
+        ]
+      }
+    },
+    "scene": {
+      "type": "string",
+      "title": "Scene",
+      "name": "scene",
+      "description": "Optional scene description that sets the acoustic setting, e.g. \"A quiet, warm room with a fireplace crackling softly.\"",
+      "default": ""
+    },
+    "sample_context": {
+      "type": "string",
+      "title": "Sample Context",
+      "name": "sample_context",
+      "description": "Optional overall tone/style, e.g. \"Audiobook style narration. Tone is gentle and inviting.\"",
+      "default": ""
+    },
+    "temperature": {
+      "type": "number",
+      "title": "Temperature",
+      "name": "temperature",
+      "description": "Sampling temperature (0-2). Higher values produce more varied delivery.",
+      "default": 1,
+      "minimum": 0,
+      "maximum": 2
+    }
+  },
+  "required": [
+    "speakers",
+    "dialogue_turns"
+  ],
+  "hasPrompt": false,
+  "promptRequired": false,
+  "provider": "google",
+  "provider_name": "KIE",
+  "example_url": "https://cdn.muapi.ai/assets/2e022307-018c-4562-9e64-6432d6c7014b.avif",
+  "image_url": "https://cdn.muapi.ai/assets/2e022307-018c-4562-9e64-6432d6c7014b.avif"
+},
+{
+  "id": "elevenlabs-v4-turbo",
+  "name": "v4 Turbo Text to Speech",
+  "endpoint": "elevenlabs-v4-turbo",
+  "family": "audio-generation",
+  "description": "Eleven v4 Turbo is ElevenLabs' lower-latency, lower-cost text-to-speech model with natural, expressive single-voice narration. Send up to 5,000 characters and get back a studio-quality MP3 — ideal for fast voiceovers, bulk narration and app audio.",
+  "inputs": {
+    "prompt": {
+      "examples": [
+        "Welcome to the future of voice. This is Eleven v4 Turbo, fast and natural."
+      ],
+      "description": "Text to speak (up to 5,000 characters).",
+      "type": "string",
+      "title": "Prompt",
+      "name": "prompt",
+      "maxLength": 5000
+    },
+    "voice_id": {
+      "enum": [
+        "voice_daniel",
+        "voice_liam"
+      ],
+      "title": "Voice",
+      "name": "voice_id",
+      "type": "string",
+      "description": "Voice to use for the narration.",
+      "default": "voice_daniel"
+    }
+  },
+  "required": [
+    "prompt"
+  ],
+  "hasPrompt": true,
+  "promptRequired": true,
+  "provider": "elevenlabs",
+  "provider_name": "POYO",
+  "example_url": "https://cdn.muapi.ai/assets/3d05bfb2-745e-4827-a9c7-0d6a1832e634.avif",
+  "image_url": "https://cdn.muapi.ai/assets/3d05bfb2-745e-4827-a9c7-0d6a1832e634.avif"
+}
 ];
 
 export const getAudioModelById = (id) => audioModels.find(m => m.id === id);
