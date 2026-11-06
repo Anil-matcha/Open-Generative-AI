@@ -4,6 +4,7 @@ import { AuthModal } from './AuthModal.js';
 import { t } from '../lib/i18n.js';
 import { createUploadPicker } from './UploadPicker.js';
 import { savePendingJob, removePendingJob, getPendingJobs } from '../lib/pendingJobs.js';
+import { createHistoryMediaWithDownload } from '../lib/historyDom.mjs';
 
 export function LipSyncStudio() {
     const container = document.createElement('div');
@@ -541,14 +542,16 @@ export function LipSyncStudio() {
         generationHistory.forEach((entry, idx) => {
             const thumb = document.createElement('div');
             thumb.className = `relative group/thumb cursor-pointer rounded-xl overflow-hidden border-2 transition-all duration-300 ${idx === 0 ? 'border-primary shadow-glow' : 'border-white/10 hover:border-white/30'}`;
-            thumb.innerHTML = `
-                <video src="${entry.url}" preload="metadata" muted class="w-full aspect-square object-cover"></video>
-                <div class="absolute inset-0 bg-black/60 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center">
-                    <button class="hist-download p-1.5 bg-primary rounded-lg text-black hover:scale-110 transition-transform" title="Download">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-                    </button>
-                </div>
-            `;
+            const { media, overlay } = createHistoryMediaWithDownload({
+                document,
+                tagName: 'video',
+                url: entry.url,
+                mediaClassName: 'w-full aspect-square object-cover',
+                overlayClassName: 'absolute inset-0 bg-black/60 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center',
+                buttonClassName: 'hist-download p-1.5 bg-primary rounded-lg text-black hover:scale-110 transition-transform',
+            });
+            thumb.appendChild(media);
+            thumb.appendChild(overlay);
             thumb.onclick = (e) => {
                 if (e.target.closest('.hist-download')) { downloadFile(entry.url, `lipsync-${entry.id || idx}.mp4`); return; }
                 showVideoInCanvas(entry.url);

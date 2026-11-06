@@ -4,6 +4,7 @@ import { CameraControls } from './CameraControls.js';
 import { buildNanoBananaPrompt, CAMERA_MAP, LENS_MAP, FOCAL_PERSPECTIVE, APERTURE_EFFECT } from '../lib/promptUtils.js';
 import { AuthModal } from './AuthModal.js';
 import { t } from '../lib/i18n.js';
+import { createHistoryImageWithLabel } from '../lib/historyDom.mjs';
 
 export function CinemaStudio() {
     const container = document.createElement('div');
@@ -420,12 +421,16 @@ export function CinemaStudio() {
             const thumb = document.createElement('div');
             thumb.className = `relative group/thumb cursor-pointer rounded-lg overflow-hidden border-2 transition-all duration-300 aspect-square ${idx === 0 ? 'border-[#22d3ee] shadow-glow-sm' : 'border-white/10 hover:border-white/30'}`;
 
-            thumb.innerHTML = `
-                <img src="${entry.url}" class="w-full h-full object-cover opacity-80 group-hover/thumb:opacity-100 transition-opacity">
-                <div class="absolute inset-0 bg-black/50 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center">
-                    <span class="text-[8px] font-bold text-white uppercase">${t('cinema.load')}</span>
-                </div>
-            `;
+            const { media, overlay } = createHistoryImageWithLabel({
+                document,
+                url: entry.url,
+                mediaClassName: 'w-full h-full object-cover opacity-80 group-hover/thumb:opacity-100 transition-opacity',
+                overlayClassName: 'absolute inset-0 bg-black/50 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center',
+                labelClassName: 'text-[8px] font-bold text-white uppercase',
+                label: t('cinema.load'),
+            });
+            thumb.appendChild(media);
+            thumb.appendChild(overlay);
 
             thumb.onclick = () => loadHistoryItem(entry, thumb);
             historyList.appendChild(thumb);
