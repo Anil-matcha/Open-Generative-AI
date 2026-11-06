@@ -37,6 +37,7 @@ export default function VideoPanel() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [consent, setConsent] = useState(false);
+  const [workflow, setWorkflow] = useState('official');
   const provider = PROVIDERS.find(item => item.id === providerId);
   const character = studio.characters.find(item => item.id === characterId);
   const active = studio.jobs.some(job => ACTIVE_STATUSES.includes(job.status));
@@ -66,7 +67,7 @@ export default function VideoPanel() {
 
   const finalPrompt = composePrompt({ prompt, cameraId, appearance: character?.appearance, style: character?.style });
   async function generate(event) {
-    event.preventDefault(); if (submitting || active) return;
+    event.preventDefault(); if (workflow !== 'anonymous' || submitting || active) return;
     setSubmitting(true); setError('');
     try {
       if (!consent) throw new Error('Hugging Face’e gönderimi onaylayın.');
@@ -78,6 +79,8 @@ export default function VideoPanel() {
   return <div className="ps-video-layout">
     <form onSubmit={generate} className="ps-card ps-composer">
       <div className="ps-card-heading"><h2>Yeni çekim</h2><span className="ps-pill">Görsel → video</span></div>
+      <Field label="Üretim yolu"><select value={workflow} onChange={event=>setWorkflow(event.target.value)}><option value="official">HF hesabımla resmi Space · manuel MP4 aktarımı</option><option value="anonymous">Anonim API · ayrı ücretsiz kota</option></select></Field>
+      <p className="ps-info">Resmi Space’teki HF oturumunuz bu siteye taşınmaz. Hesabınızla üretim için aşağıdaki resmi Space bağlantısını kullanın; indirilen MP4’ü buraya aktarın. Bu yol otomatik üretim değildir.</p>
       {scene && <p className="ps-info">Sahne: {scene.title || scene.id.slice(0,8)}. Bu çekim sahnenize bağlanacak.</p>}
       <Field label="Video motoru"><select value={providerId} onChange={event => { setProviderId(event.target.value); setDuration(String(PROVIDERS.find(item => item.id === event.target.value).defaultDuration)); storage('preferences','put',{id:'video',providerId:event.target.value}).catch(error=>studio.setNotice(error.message)); }}>
         {PROVIDERS.map(item => <option key={item.id} value={item.id} disabled={item.disabled}>{item.name} · {PROVIDER_LABELS[item.cost]}</option>)}
@@ -101,10 +104,12 @@ export default function VideoPanel() {
       <details className="ps-details"><summary>Gönderilecek açıklamayı göster</summary><p>{finalPrompt || 'Açıklama henüz hazırlanmadı.'}</p></details>
       <label className="ps-checkbox"><input type="checkbox" checked={consent} onChange={event => setConsent(event.target.checked)} />Görsel ve açıklamamın seçilen Hugging Face Space’e gönderilmesini kabul ediyorum.</label>
       {error && <p className="ps-error" role="alert">{error}</p>}
-      <button className="ps-button primary wide" type="submit" disabled={!studio.ready || !imageId || !prompt.trim() || active || submitting || !consent}>{submitting ? 'İş hazırlanıyor…' : active ? 'Mevcut çekim tamamlanıyor…' : '✦ Ücretsiz kotayla üret'}</button>
+      <button className="ps-button" type="button" onClick={async()=>{try{await navigator.clipboard.writeText(finalPrompt);studio.setNotice('Açıklama kopyalandı. Resmi Space’e kendiniz yapıştırabilirsiniz.');}catch{setError('Kopyalanamadı; açıklama önizlemesinden metni seçin.');}}}>Açıklamayı kopyala</button>
+      {workflow === 'official' ? <a className="ps-button primary wide" href={`https://huggingface.co/spaces/${provider.space}`} target="_blank" rel="noreferrer">Resmi Space’te hesabımla üret ↗</a> : <button className="ps-button primary wide" type="submit" disabled={!studio.ready || !imageId || !prompt.trim() || active || submitting || !consent}>{submitting ? 'İş hazırlanıyor…' : active ? 'Mevcut çekim tamamlanıyor…' : '✦ Ücretsiz kotayla üret'}</button>}
     </form>
     <div className="ps-preview-column"><div className="ps-card ps-preview-card"><div className="ps-card-heading"><h2>Önizleme</h2>{selectedJob && <Status status={selectedJob.status} />}</div><MediaPreview job={selectedJob} /><VideoActions job={selectedJob} />
       {selectedJob?.error && <p className="ps-error" role="alert">{selectedJob.error}</p>}
+      {selectedJob?.diagnostic && <p className="ps-muted">Tanı: {selectedJob.diagnostic.code} · aşama: {selectedJob.diagnostic.phase} · anonim API</p>}
       {selectedJob && ACTIVE_STATUSES.includes(selectedJob.status) && <div className="ps-job-info" role="status"><span className="ps-live-dot" />Bulut işi sürüyor. Bu sekmeyi açık tutun.{Number.isFinite(selectedJob.position) && ` Sıra: ${selectedJob.position + 1}.`}{Number.isFinite(selectedJob.progress) && ` Sağlayıcı ilerlemesi: %${selectedJob.progress}.`}<button type="button" className="ps-button" onClick={() => studio.cancel(selectedJob.id)}>İzlemeyi durdur</button></div>}
     </div>
     <div className="ps-card ps-manual"><span className="ps-eyebrow">ALTERNATİF ÇALIŞMA AKIŞI</span><h3>Resmi üreticide oluştur, buraya aktar.</h3><p>Ücretsiz kota, oturum veya ağ nedeniyle otomatik üretim çalışmıyorsa resmi Space’i açın. İndirdiğiniz MP4’ü burada önizleyip sahnenize ekleyebilirsiniz. Bu işlem manuel içe aktarımdır.</p>

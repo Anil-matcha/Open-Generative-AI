@@ -82,6 +82,7 @@ export default function StudioContextProvider({ children }) {
         await updateJob(job.id, {
           status: controller.signal.aborted && !timedOut ? 'cancelled' : 'failed',
           error: timedOut ? providerError(reason) : controller.signal.aborted ? 'İzleme durduruldu. Uzak GPU işinin iptali garanti edilmez.' : (/[^\x00-\x7F]/.test(error.message) ? error.message : providerError(error)),
+          diagnostic: error.diagnostic || null,
         });
       } finally { clearTimeout(deadline); running.current.delete(job.id); }
     })().catch(error => { if (mounted.current) setNotice(error.message); });

@@ -78,6 +78,9 @@ test('character, scene, audio and imported MP4 persist; manifest and download wo
   const manifest=JSON.parse(await readFile(await (await exported).path(),'utf8'));
   expect(manifest.scenes[0].character.name).toBe('Deniz');expect(manifest.scenes[0].audioId).toBeTruthy();
   await page.getByRole('link',{name:'Bu sahneyi üret'}).click();
+  await expect(page.getByLabel('Üretim yolu',{exact:true})).toHaveValue('official');
+  await expect(page.getByRole('link',{name:'Resmi Space’te hesabımla üret'})).toHaveAttribute('href','https://huggingface.co/spaces/Lightricks/ltx-video-distilled');
+  await expect(page.getByRole('button',{name:'Ücretsiz kotayla üret'})).toHaveCount(0);
   await expect(page.getByLabel('Hareket açıklaması',{exact:true})).toHaveValue(/quiet seaside/);
   await expect(page.locator('img[alt="Başlangıç karesi"]')).toBeVisible();
   await page.getByLabel('MP4 içe aktar',{exact:true}).setInputFiles(syntheticVideo);
@@ -100,6 +103,8 @@ test('character, scene, audio and imported MP4 persist; manifest and download wo
 test('model controls reflect capabilities and invalid import is rejected',async({page})=>{
   await login(page);await page.goto('/personal/video');
   await expect(page.getByLabel('Görüntü oranı',{exact:true})).toBeVisible();
+  await page.getByLabel('Üretim yolu',{exact:true}).selectOption('anonymous');
+  await expect(page.getByRole('button',{name:'Ücretsiz kotayla üret'})).toBeVisible();
   await page.getByLabel('Video motoru',{exact:true}).selectOption('wan');
   await expect(page.getByLabel('Görüntü oranı',{exact:true})).toHaveCount(0);
   await expect(page.getByLabel('Kalite',{exact:true})).toHaveCount(0);
@@ -124,6 +129,7 @@ test('optional real browser LTX generation downloads an actual MP4',async({page}
   test.skip(process.env.STUDIO_LIVE_TEST!=='1','External GPU test is opt-in and consumes the anonymous free quota.');
   test.setTimeout(240000);
   await login(page);await page.goto('/personal/video');
+  await page.getByLabel('Üretim yolu',{exact:true}).selectOption('anonymous');
   await page.getByLabel('Karakter / sahne görseli seç',{exact:true}).setInputFiles(image);
   await page.getByLabel('Hareket açıklaması',{exact:true}).fill('Gentle natural motion, steady camera, the subject blinks softly.');
   await page.getByLabel('Süre',{exact:true}).selectOption('1');

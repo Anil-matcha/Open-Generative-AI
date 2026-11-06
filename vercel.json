@@ -2,5 +2,10 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
   "installCommand": "node scripts/prepare-web-workspaces.mjs && npm ci --ignore-scripts --include=dev",
-  "buildCommand": "npm run build:packages && npm run build"
+  "buildCommand": "npm run build:packages && npm run build",
+  "git": {
+    "deploymentEnabled": {
+      "fix/hf-anonymous-diagnostics": false
+    }
+  }
 }

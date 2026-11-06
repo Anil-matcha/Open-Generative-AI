@@ -5,6 +5,7 @@ import { createVideoProvider } from '../lib/personal/provider.mjs';
 import { validateAsset } from '../lib/personal/validation.mjs';
 import { accessConfigured, issueSession, verifySession, passwordMatches } from '../lib/personal/access.mjs';
 import { sceneManifest } from '../lib/personal/storage.mjs';
+import { diagnoseProviderFailure } from '../lib/personal/providerDiagnostics.mjs';
 
 const image = new Blob([new Uint8Array([137,80,78,71,13,10,26,10])],{type:'image/png'});
 const input = { image, prompt: 'Gentle natural movement.', duration: 1, aspectRatio:'9:16',quality:'fast' };
@@ -108,4 +109,22 @@ test('scene manifest preserves audio, character and job links without serializin
   const result=sceneManifest([{id:'scene',characterId:'char',audioId:'audio',referenceId:'ref',dialogue:'Hello',latestGeneration:{id:'job',status:'completed'}}],[{id:'char',name:'Deniz',mainImageId:'ref'}],[{id:'audio',name:'voice.wav',blob:new Blob(['sound'])}]);
   assert.equal(result.schemaVersion,1);assert.equal(result.scenes[0].character.name,'Deniz');assert.equal(result.scenes[0].latestGeneration.id,'job');
   assert.equal(result.scenes[0].references[0].name,'voice.wav');assert.ok(!('blob' in result.scenes[0].references[0]));
+});
+
+test('provider diagnostics distinguish quota, auth, CSP and network without persisting raw secrets',()=>{
+  const quota=diagnoseProviderFailure(new Error('You have exceeded your ZeroGPU quota (120s requested vs. -60s left). Authenticate with a Hugging Face token.'),'ltx','events');
+  assert.equal(quota.diagnostic.code,'QUOTA_EXHAUSTED');assert.match(quota.message,/Anonim API/);
+  assert.equal(diagnoseProviderFailure(new Error('401 Unauthorized'),'ltx','connect').diagnostic.code,'AUTH_REQUIRED');
+  assert.equal(diagnoseProviderFailure(new Error('Failed to fetch'),'ltx','connect',true).diagnostic.code,'CSP_BLOCKED');
+  const failed=diagnoseProviderFailure(new Error('Failed to fetch private prompt with Bearer sensitive-value'),'ltx','connect');
+  assert.equal(failed.diagnostic.code,'NETWORK_OR_CORS');assert.ok(!JSON.stringify(failed.diagnostic).includes('sensitive-value'));assert.ok(!failed.message.includes('private prompt'));
+  assert.equal(diagnoseProviderFailure(new Error('stream ended'),'ltx','events').diagnostic.code,'EVENT_STREAM_FAILED');
+  assert.equal(diagnoseProviderFailure(Object.assign(new Error('Too many requests'),{status:429}),'ltx','connect').diagnostic.code,'RATE_LIMITED');
+  const untrusted=Object.assign(new Error('Failed to fetch'),{diagnostic:{token:'private-value'}});
+  assert.ok(!JSON.stringify(diagnoseProviderFailure(untrusted,'ltx','connect').diagnostic).includes('private-value'));
+});
+
+test('connection failure keeps its phase and a safe diagnostic instead of collapsing to provider unavailable',async()=>{
+  const provider=createVideoProvider('ltx',{loadClient:async()=>({Client:{connect:async()=>{throw new TypeError('Failed to fetch');}}})});
+  await assert.rejects(provider.submitGeneration(input),error=>error.diagnostic.code==='NETWORK_OR_CORS' && error.diagnostic.phase==='connect');
 });
