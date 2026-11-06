@@ -18,7 +18,8 @@ export default async function RootLayout({ children }) {
   // through as a plain response header — the root layout is shared by
   // every locale's route tree, so it can't take a `locale` prop directly.
   const headerList = await headers();
-  const { htmlLang } = getLocaleConfig(headerList.get('x-locale'));
+  const locale = headerList.get('x-locale');
+  const htmlLang = locale === 'tr' ? 'tr' : getLocaleConfig(locale).htmlLang;
 
   return (
     <html lang={htmlLang}>
