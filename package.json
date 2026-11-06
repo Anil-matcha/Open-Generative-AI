@@ -34,7 +34,10 @@
     "package:linux:deb": "node scripts/package-linux-deb.js",
     "package:linux:deb:arm64": "node scripts/package-linux-deb.js --arch arm64",
     "package:linux:deb:x64": "node scripts/package-linux-deb.js --arch x64",
-    "electron:build:all": "vite build && electron-builder --mac --win --linux"
+    "electron:build:all": "vite build && electron-builder --mac --win --linux",
+    "test:personal": "node tests/personalStudio.test.mjs",
+    "test:browser": "playwright test",
+    "lint:personal": "eslint --config eslint.personal.config.mjs app/personal app/login app/api/personal components/personal lib/personal tests/personalStudio.test.mjs tests/browser playwright.config.mjs middleware.js"
   },
   "build": {
     "appId": "ai.generative.open",
@@ -115,6 +118,7 @@
     }
   },
   "dependencies": {
+    "@gradio/client": "^2.7.2",
     "ai-agent": "file:./packages/Open-Poe-AI/packages/agents",
     "axios": "^1.7.0",
     "next": "^15.0.0",
@@ -127,6 +131,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@playwright/test": "^1.65.0",
     "@tailwindcss/vite": "^4.1.18",
     "autoprefixer": "^10.4.24",
     "electron": "^33.4.11",
@@ -137,5 +142,8 @@
     "tailwindcss": "^3.4.0",
     "vite": "^5.4.0"
   },
-  "main": "electron/main.js"
+  "main": "electron/main.js",
+  "engines": {
+    "node": "24.x"
+  }
 }

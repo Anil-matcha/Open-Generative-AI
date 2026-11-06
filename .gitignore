@@ -36,3 +36,23 @@ out/
 .env
 .env.*
 !.env.example
+
+# Local verification artifacts
+work/
+playwright-report/
+test-results/
+
+# Private deployment state and generated/user media (upstream tracked assets remain tracked)
+.vercel/
+uploads/
+generated/
+private-media/
+*.mp4
+*.mov
+*.webm
+*.mp3
+*.wav
+*.m4a
+*.key
+*.p12
+*.pfx
