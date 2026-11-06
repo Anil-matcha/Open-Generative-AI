@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { getCommonCopy } from '@/lib/locales';
 
 export default function ApiKeyModal({ onSave, onClose, overlay = false, title, subtitle, locale = 'en' }) {
@@ -50,6 +51,11 @@ export default function ApiKeyModal({ onSave, onClose, overlay = false, title, s
           </p>
         </div>
 
+        {!overlay && (
+          <Link href="/personal/video" className="mb-6 block rounded-md border border-[#22d3ee]/30 px-4 py-3 text-center text-sm text-[#22d3ee]">
+            Ücretsiz AI Video Stüdyosu
+          </Link>
+        )}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <label className="block text-xs font-bold text-white/30 ml-1">
