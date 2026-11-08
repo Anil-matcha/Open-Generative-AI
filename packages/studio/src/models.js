@@ -11180,7 +11180,144 @@ export const t2vModels = [
   "provider_name": "kie",
   "example_url": "https://cdn.muapi.ai/assets/kling-v3.0-omni-pro-text-to-video.mp4",
   "image_url": "https://cdn.muapi.ai/assets/kling-v3.0-omni-pro-text-to-video.avif"
-}
+},
+  {
+    "id": "minimax-h3-max-spicy-text-to-video",
+    "name": "MiniMax H3 Max Spicy Text to Video",
+    "endpoint": "minimax-h3-max-spicy-text-to-video",
+    "family": "minimax-h3-max",
+    "hasPrompt": true,
+    "promptRequired": true,
+    "inputs": {
+      "prompt": {
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "description": "Describe the video scene, action, camera movement, and style.",
+        "examples": [
+          "A cinematic tracking shot of a silver sports car driving through a rain-soaked city at night."
+        ]
+      },
+      "aspect_ratio": {
+        "type": "string",
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "enum": [
+          "21:9",
+          "16:9",
+          "4:3",
+          "1:1",
+          "3:4",
+          "9:16"
+        ],
+        "default": "16:9"
+      },
+      "resolution": {
+        "type": "string",
+        "title": "Resolution",
+        "name": "resolution",
+        "enum": [
+          "480p",
+          "768p"
+        ],
+        "default": "768p",
+        "description": "Output resolution. 1080p applies latent refinement from a 768p source."
+      },
+      "duration": {
+        "type": "integer",
+        "title": "Duration",
+        "name": "duration",
+        "enum": [
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "default": 5,
+        "description": "Output duration in seconds."
+      }
+    },
+    "provider": "minimax",
+    "provider_name": "MINIMAX",
+    "description": "MiniMax H3 Max Spicy Text to Video is the relaxed-moderation tier of MiniMax H3 Max, generating video from text with native audio at 480p or 768p through the Muapi API.",
+    "example_url": "https://cdn.muapi.ai/assets/image_download_28.avif",
+    "image_url": "https://cdn.muapi.ai/assets/image_download_28.avif"
+  },
+  {
+    "id": "minimax-h3-max-turbo-spicy-text-to-video",
+    "name": "MiniMax H3 Max Turbo Spicy Text to Video",
+    "endpoint": "minimax-h3-max-turbo-spicy-text-to-video",
+    "family": "minimax-h3-max",
+    "hasPrompt": true,
+    "promptRequired": true,
+    "inputs": {
+      "prompt": {
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "description": "Describe the video scene, action, camera movement, and style.",
+        "examples": [
+          "A cinematic tracking shot of a silver sports car driving through a rain-soaked city at night."
+        ]
+      },
+      "aspect_ratio": {
+        "type": "string",
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "enum": [
+          "21:9",
+          "16:9",
+          "4:3",
+          "1:1",
+          "3:4",
+          "9:16"
+        ],
+        "default": "16:9"
+      },
+      "resolution": {
+        "type": "string",
+        "title": "Resolution",
+        "name": "resolution",
+        "enum": [
+          "480p",
+          "768p"
+        ],
+        "default": "768p"
+      },
+      "duration": {
+        "type": "integer",
+        "title": "Duration",
+        "name": "duration",
+        "enum": [
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "default": 5,
+        "description": "Output duration in seconds."
+      }
+    },
+    "provider": "minimax",
+    "provider_name": "MINIMAX",
+    "description": "MiniMax H3 Max Turbo Spicy Text to Video is the relaxed-moderation tier of MiniMax H3 Max Turbo, generating video from text at low cost at 480p or 768p through the Muapi API.",
+    "example_url": "https://cdn.muapi.ai/assets/image_download_28.avif",
+    "image_url": "https://cdn.muapi.ai/assets/image_download_28.avif"
+  }
 ];
 
 export const getVideoModelById = (id) => t2vModels.find(m => m.id === id);
@@ -29927,7 +30064,259 @@ export const i2vModels = [
   "provider_name": "kie",
   "example_url": "https://cdn.muapi.ai/assets/kling-v3.0-omni-pro-text-to-video.mp4",
   "image_url": "https://cdn.muapi.ai/assets/kling-v3.0-omni-pro-text-to-video.avif"
-}
+},
+  {
+    "id": "minimax-h3-max-spicy-image-to-video",
+    "name": "MiniMax H3 Max Spicy Image to Video",
+    "endpoint": "minimax-h3-max-spicy-image-to-video",
+    "family": "minimax-h3-max",
+    "imageField": "image_url",
+    "imageOptional": true,
+    "hasPrompt": true,
+    "promptRequired": true,
+    "inputs": {
+      "prompt": {
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "description": "Describe the motion, action, and camera movement.",
+        "examples": [
+          "The camera slowly pushes in as the subject turns toward the light and fabric moves in a soft breeze."
+        ]
+      },
+      "image_url": {
+        "type": "string",
+        "title": "Image URL",
+        "name": "image_url",
+        "description": "Starting frame image. The output canvas follows this image.",
+        "field": "image",
+        "examples": []
+      },
+      "end_image_url": {
+        "type": "string",
+        "title": "End Image URL",
+        "name": "end_image_url",
+        "description": "Optional final frame image. Can be used alone for end-keyframe generation.",
+        "field": "image",
+        "examples": []
+      },
+      "resolution": {
+        "type": "string",
+        "title": "Resolution",
+        "name": "resolution",
+        "enum": [
+          "480p",
+          "768p"
+        ],
+        "default": "768p"
+      },
+      "duration": {
+        "type": "integer",
+        "title": "Duration",
+        "name": "duration",
+        "enum": [
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "default": 5,
+        "description": "Output duration in seconds."
+      }
+    },
+    "provider": "minimax",
+    "provider_name": "MINIMAX",
+    "description": "MiniMax H3 Max Spicy Image to Video is the relaxed-moderation tier of MiniMax H3 Max, animating a source image with native audio at 480p or 768p through the Muapi API.",
+    "example_url": "https://cdn.muapi.ai/assets/image_download_27.avif",
+    "image_url": "https://cdn.muapi.ai/assets/image_download_27.avif"
+  },
+  {
+    "id": "minimax-h3-max-spicy-reference-to-video",
+    "name": "MiniMax H3 Max Spicy Reference to Video",
+    "endpoint": "minimax-h3-max-spicy-reference-to-video",
+    "family": "minimax-h3-max",
+    "imageField": "reference_images",
+    "videoField": "reference_videos",
+    "imageOptional": true,
+    "hasPrompt": true,
+    "promptRequired": true,
+    "inputs": {
+      "prompt": {
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "description": "Describe the video scene and how the references should be used (e.g. 'Image 1', 'Video 1').",
+        "examples": [
+          "Use the references to create a cinematic product reveal with a slow camera orbit."
+        ]
+      },
+      "reference_images": {
+        "type": "array",
+        "title": "Reference Images",
+        "name": "reference_images",
+        "description": "Reference image URLs (up to 9). Provide at least one image or video reference. Max 12 combined reference files.",
+        "maxItems": 9,
+        "field": "images_list",
+        "items": {
+          "type": "string"
+        },
+        "examples": []
+      },
+      "reference_videos": {
+        "type": "array",
+        "title": "Reference Videos",
+        "name": "reference_videos",
+        "description": "Reference video URLs (up to 3; 2-15s each, 15s combined max). Provide at least one image or video reference.",
+        "maxItems": 3,
+        "field": "videos_list",
+        "items": {
+          "type": "string"
+        },
+        "examples": []
+      },
+      "reference_audios": {
+        "type": "array",
+        "title": "Reference Audio",
+        "name": "reference_audios",
+        "description": "Optional reference audio URLs (up to 3; 2-15s each, 15s combined max). Audio cannot be used alone.",
+        "maxItems": 3,
+        "field": "audios_list",
+        "items": {
+          "type": "string"
+        },
+        "examples": []
+      },
+      "aspect_ratio": {
+        "type": "string",
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "enum": [
+          "adaptive",
+          "21:9",
+          "16:9",
+          "4:3",
+          "1:1",
+          "3:4",
+          "9:16"
+        ],
+        "default": "adaptive"
+      },
+      "resolution": {
+        "type": "string",
+        "title": "Resolution",
+        "name": "resolution",
+        "enum": [
+          "480p",
+          "768p"
+        ],
+        "default": "768p"
+      },
+      "duration": {
+        "type": "integer",
+        "title": "Duration",
+        "name": "duration",
+        "enum": [
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "default": 5,
+        "description": "Output duration in seconds."
+      }
+    },
+    "provider": "minimax",
+    "provider_name": "MINIMAX",
+    "description": "MiniMax H3 Max Spicy Reference to Video is the relaxed-moderation tier of MiniMax H3 Max, generating video from image, video and audio references at 480p or 768p through the Muapi API.",
+    "example_url": "https://cdn.muapi.ai/assets/image_download_26.avif",
+    "image_url": "https://cdn.muapi.ai/assets/image_download_26.avif"
+  },
+  {
+    "id": "minimax-h3-max-turbo-spicy-image-to-video",
+    "name": "MiniMax H3 Max Turbo Spicy Image to Video",
+    "endpoint": "minimax-h3-max-turbo-spicy-image-to-video",
+    "family": "minimax-h3-max",
+    "imageField": "image_url",
+    "imageOptional": true,
+    "hasPrompt": true,
+    "promptRequired": true,
+    "inputs": {
+      "prompt": {
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "description": "Describe the motion, action, and camera movement.",
+        "examples": [
+          "The camera slowly pushes in as the subject turns toward the light and fabric moves in a soft breeze."
+        ]
+      },
+      "image_url": {
+        "type": "string",
+        "title": "Image URL",
+        "name": "image_url",
+        "description": "Starting frame image. The output canvas follows this image.",
+        "field": "image",
+        "examples": []
+      },
+      "end_image_url": {
+        "type": "string",
+        "title": "End Image URL",
+        "name": "end_image_url",
+        "description": "Optional final frame image. Can be used alone for end-keyframe generation.",
+        "field": "image",
+        "examples": []
+      },
+      "resolution": {
+        "type": "string",
+        "title": "Resolution",
+        "name": "resolution",
+        "enum": [
+          "480p",
+          "768p"
+        ],
+        "default": "768p"
+      },
+      "duration": {
+        "type": "integer",
+        "title": "Duration",
+        "name": "duration",
+        "enum": [
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "default": 5,
+        "description": "Output duration in seconds."
+      }
+    },
+    "provider": "minimax",
+    "provider_name": "MINIMAX",
+    "description": "MiniMax H3 Max Turbo Spicy Image to Video is the relaxed-moderation tier of MiniMax H3 Max Turbo, animating a source image at low cost at 480p or 768p through the Muapi API.",
+    "example_url": "https://cdn.muapi.ai/assets/image_download_27.avif",
+    "image_url": "https://cdn.muapi.ai/assets/image_download_27.avif"
+  }
 ];
 
 export const getI2IModelById = (id) => i2iModels.find(m => m.id === id);
