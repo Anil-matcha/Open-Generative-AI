@@ -43,7 +43,14 @@ function getBundledBinaryResourceDir({ resourcesPath, platform, arch }) {
     return pathLib.join(resourcesPath, 'local-ai', `${platform}-${arch}`, 'bin');
 }
 
+// A Location header may be relative (Hugging Face sends one after a repo rename).
+function resolveRedirectUrl(location, requestUrl) {
+    if (!location) throw new Error(`Redirect from ${requestUrl} has no Location header`);
+    return new URL(location, requestUrl).toString();
+}
+
 module.exports = {
     getBundledBinaryResourceDir,
     pickBinaryAssetForPlatform,
+    resolveRedirectUrl,
 };

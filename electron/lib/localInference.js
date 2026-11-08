@@ -7,6 +7,7 @@ const { spawn, execFile } = require('child_process');
 const {
     getBundledBinaryResourceDir,
     pickBinaryAssetForPlatform,
+    resolveRedirectUrl,
 } = require('./localInferenceAssets');
 const {
     formatStartupProgressMessage,
@@ -95,7 +96,15 @@ function downloadFile(url, destPath, onProgress) {
             if ([301, 302, 303, 307, 308].includes(statusCode)) {
                 res.resume();
                 if (redirectsLeft <= 0) { reject(new Error('Too many redirects')); return; }
-                resolve(attempt(headers.location, redirectsLeft - 1, retriesLeft));
+                // Throwing here would escape the promise, so report it through reject.
+                let nextUrl;
+                try {
+                    nextUrl = resolveRedirectUrl(headers.location, requestUrl);
+                } catch (err) {
+                    reject(err);
+                    return;
+                }
+                resolve(attempt(nextUrl, redirectsLeft - 1, retriesLeft));
                 return;
             }
 
