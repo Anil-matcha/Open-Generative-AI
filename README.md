@@ -8,8 +8,8 @@
 **Community:** Join [Discord](https://discord.com/invite/zpnuBRXhKg) for discussions and support
 
 
-<p align="center"><a href="https://youtu.be/PUYsfx_ZCaE"><img src="https://i.ytimg.com/vi/PUYsfx_ZCaE/maxresdefault.jpg" width="720"></a></p>
-<p align="center"><a href="https://youtu.be/PUYsfx_ZCaE"><b>▶ Watch: Best Free Uncensored AI Image & Video Models in 2026 (Ranked) </b></a></p>
+<p align="center"><a href="https://youtu.be/oP4ioCVRK-o"><img src="https://i.ytimg.com/vi/oP4ioCVRK-o/maxresdefault.jpg" width="720"></a></p>
+<p align="center"><a href="https://youtu.be/oP4ioCVRK-o"><b>▶ Watch: MiniMax H3 Uncensored (Spicy) Video Generator API: H3 vs H3 Max vs H3 Max Turbo </b></a></p>
 
 <p align="center">
   <a href="https://github.com/Anil-matcha/awesome-generative-ai-apps">
