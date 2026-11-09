@@ -301,7 +301,7 @@ Object.assign(VIDEO_TOOL_OVERRIDES, {
     hasPrompt: false,
     operation: "translate",
     summary:
-      "Source language is automatic and cannot be configured in this integration. Choose a target language. Voice translation and lip sync are automatic; separate audio and subtitle settings are not available.",
+      "Source language is automatic and cannot be configured in this integration. Choose a target language. Voice translation and lip sync are automatic; separate audio and subtitle settings are not available. Input video can be up to 120 seconds long.",
     inputs: {
       language: {
         title: "Target language",

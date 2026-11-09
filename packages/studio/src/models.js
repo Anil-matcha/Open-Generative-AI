@@ -30557,7 +30557,7 @@ export const v2vModels = [
     "family": "tools",
     "videoField": "video_url",
     "hasPrompt": false,
-    "description": "Convert any video into 175+ languages with synchronized voice translation, AI-voice cloning, and accurate lip sync.",
+    "description": "Convert any video into 175+ languages with synchronized voice translation, AI-voice cloning, and accurate lip sync. Input videos can be up to 120 seconds long.",
     "provider": "muapi",
     "provider_name": "Muapi"
   },
