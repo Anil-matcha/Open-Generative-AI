@@ -8,8 +8,8 @@
 **Community:** Join [Discord](https://discord.com/invite/zpnuBRXhKg) for discussions and support
 
 
-<p align="center"><a href="https://youtu.be/DksS8GiXMcg"><img src="https://i.ytimg.com/vi/DksS8GiXMcg/maxresdefault.jpg" width="720"></a></p>
-<p align="center"><a href="https://youtu.be/DksS8GiXMcg"><b>▶ Watch: Cheapest Seedance 2.5 & 2.0 API: Real Faces, No Restrictions </b></a></p>
+<p align="center"><a href="https://youtu.be/4Nehxhw-YXY"><img src="https://i.ytimg.com/vi/4Nehxhw-YXY/maxresdefault.jpg" width="720"></a></p>
+<p align="center"><a href="https://youtu.be/4Nehxhw-YXY"><b>▶ Watch: Seedream 5.5 Uncensored (Spicy) API Guide: Text-to-Image, Edit & Layer Decomposition </b></a></p>
 
 <p align="center">
   <a href="https://github.com/Anil-matcha/awesome-generative-ai-apps">
