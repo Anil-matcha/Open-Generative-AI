@@ -8,8 +8,8 @@
 **Community:** Join [Discord](https://discord.com/invite/zpnuBRXhKg) for discussions and support
 
 
-<p align="center"><a href="https://youtu.be/4Nehxhw-YXY"><img src="https://i.ytimg.com/vi/4Nehxhw-YXY/maxresdefault.jpg" width="720"></a></p>
-<p align="center"><a href="https://youtu.be/4Nehxhw-YXY"><b>▶ Watch: Seedream 5.5 Uncensored (Spicy) API Guide: Text-to-Image, Edit & Layer Decomposition </b></a></p>
+<p align="center"><a href="https://youtu.be/DiiO9Mhdy7M"><img src="https://i.ytimg.com/vi/DiiO9Mhdy7M/maxresdefault.jpg" width="720"></a></p>
+<p align="center"><a href="https://youtu.be/DiiO9Mhdy7M"><b>▶ Watch: MiniMax H3 Image API Guide: Uncensored, Spicy Mode, Text-to-Image, Edit & Highspeed </b></a></p>
 
 <p align="center">
   <a href="https://github.com/Anil-matcha/awesome-generative-ai-apps">
