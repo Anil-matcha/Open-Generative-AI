@@ -224,6 +224,7 @@ export function ImageStudio() {
             if (useLocalModel) {
                 const lm = getLocalModelById(selectedLocalModel);
                 if (lm) document.getElementById('model-btn-label').textContent = lm.name;
+                applyLocalModelDefaults(lm);
             } else {
                 document.getElementById('model-btn-label').textContent = selectedModelName;
             }
@@ -626,6 +627,23 @@ export function ImageStudio() {
             stepsValue.textContent = steps;
         };
     }
+
+    // Local models are tuned for specific step/guidance values (e.g. Z-Image
+    // Turbo needs 8 steps at cfg 1.0) — sync state and sliders to the model's
+    // catalog defaults whenever one becomes active.
+    function applyLocalModelDefaults(model) {
+        if (!model) return;
+        if (Number.isFinite(model.defaultSteps)) {
+            steps = model.defaultSteps;
+            if (stepsSlider) stepsSlider.value = steps;
+            if (stepsValue) stepsValue.textContent = steps;
+        }
+        if (Number.isFinite(model.defaultGuidance)) {
+            guidanceScale = model.defaultGuidance;
+            if (guidanceSlider) guidanceSlider.value = guidanceScale;
+            if (guidanceValue) guidanceValue.textContent = guidanceScale;
+        }
+    }
     
     // Seed input
     const seedInput = advancedPanel.querySelector('#seed-input');
@@ -765,6 +783,7 @@ export function ImageStudio() {
                             e.stopPropagation();
                             selectedLocalModel = m.id;
                             document.getElementById('model-btn-label').textContent = m.name;
+                            applyLocalModelDefaults(m);
                             selectedAr = m.aspectRatios[0];
                             document.getElementById('ar-btn-label').textContent = selectedAr;
                             qualityBtn.style.display = 'none';
