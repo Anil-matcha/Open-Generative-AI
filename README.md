@@ -508,6 +508,22 @@ npm run build
 npm run start
 ```
 
+### Run with Docker
+
+The image builds from the submodule packages, so clone with submodules first. Without them, `docker compose up --build` stops with `failed to solve: lstat /packages/Vibe-Workflow/packages/workflow-builder: no such file or directory`.
+
+```bash
+git clone --recurse-submodules https://github.com/Anil-matcha/Open-Generative-AI.git
+cd Open-Generative-AI
+
+# If you already cloned without --recurse-submodules, run this once:
+# git submodule update --init --recursive
+
+docker compose up --build
+```
+
+The app is then at http://localhost:3001. To use another port, change the first number under `ports` in `docker-compose.yml`.
+
 ### Desktop App Build
 
 Build native desktop apps with Electron:
