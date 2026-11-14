@@ -8,8 +8,8 @@
 **Community:** Join [Discord](https://discord.com/invite/zpnuBRXhKg) for discussions and support
 
 
-<p align="center"><a href="https://youtu.be/eVOV_WK4yHw"><img src="https://i.ytimg.com/vi/eVOV_WK4yHw/maxresdefault.jpg" width="720"></a></p>
-<p align="center"><a href="https://youtu.be/eVOV_WK4yHw"><b>▶ Watch: Seedance 2.5 Flash API: Nearly 2x Faster, 34% Cheaper (How to Use It) </b></a></p>
+<p align="center"><a href="https://youtu.be/-L_ZpYD0huk"><img src="https://i.ytimg.com/vi/-L_ZpYD0huk/maxresdefault.jpg" width="720"></a></p>
+<p align="center"><a href="https://youtu.be/-L_ZpYD0huk"><b>▶ Watch: Wan 3.0 Uncensored (Spicy) API: Spicy vs Standard vs Prime </b></a></p>
 
 <p align="center">
   <a href="https://github.com/Anil-matcha/awesome-generative-ai-apps">
