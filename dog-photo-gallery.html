@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dog Photo Gallery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .breed-select {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            background-color: white;
+            color: #667eea;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .breed-select:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .load-more-btn {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            background-color: white;
+            color: #667eea;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .load-more-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .load-more-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .photo-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .photo-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .photo-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .photo-info {
+            padding: 15px;
+            text-align: center;
+        }
+
+        .photo-breed {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #333;
+            text-transform: capitalize;
+        }
+
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 1.2em;
+            padding: 40px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background-color: #ff6b6b;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            animation: slideIn 0.3s;
+            overflow: hidden;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 2em;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.5);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .modal-close:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .info-text {
+            text-align: center;
+            color: white;
+            margin-top: 20px;
+            font-size: 0.95em;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+
+            .gallery {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 15px;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 20% auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🐕 Dog Photo Gallery</h1>
+            <p>Discover adorable dog photos from around the world</p>
+        </header>
+
+        <div class="controls">
+            <select class="breed-select" id="breedSelect">
+                <option value="">All Breeds</option>
+            </select>
+            <button class="load-more-btn" id="loadMoreBtn">Load More Photos</button>
+        </div>
+
+        <div id="error"></div>
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Loading dog photos...</p>
+        </div>
+
+        <div class="gallery" id="gallery"></div>
+        <div class="info-text">
+            <p>Powered by <strong>Dog.ceo</strong> API</p>
+        </div>
+    </div>
+
+    <div id="photoModal" class="modal">
+        <button class="modal-close" id="modalClose">&times;</button>
+        <div class="modal-content">
+            <img id="modalImage" src="" alt="Dog photo">
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://dog.ceo/api';
+        const gallery = document.getElementById('gallery');
+        const breedSelect = document.getElementById('breedSelect');
+        const loadMoreBtn = document.getElementById('loadMoreBtn');
+        const loading = document.getElementById('loading');
+        const errorDiv = document.getElementById('error');
+        const photoModal = document.getElementById('photoModal');
+        const modalImage = document.getElementById('modalImage');
+        const modalClose = document.getElementById('modalClose');
+
+        let currentBreed = '';
+        let currentPhotoCount = 12;
+
+        // Fetch all dog breeds on page load
+        async function loadBreeds() {
+            try {
+                const response = await fetch(`${API_BASE}/breeds/list/all`);
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    const breeds = Object.keys(data.message).sort();
+                    breeds.forEach(breed => {
+                        const option = document.createElement('option');
+                        option.value = breed;
+                        option.textContent = breed.charAt(0).toUpperCase() + breed.slice(1);
+                        breedSelect.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                showError('Failed to load breeds');
+                console.error('Error loading breeds:', error);
+            }
+        }
+
+        // Fetch dog photos based on breed
+        async function loadPhotos(breed = '', count = 12) {
+            showLoading(true);
+            errorDiv.innerHTML = '';
+
+            try {
+                let url;
+                if (breed) {
+                    url = `${API_BASE}/breed/${breed}/images/random/${count}`;
+                } else {
+                    url = `${API_BASE}/breeds/image/random/${count}`;
+                }
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                showLoading(false);
+
+                if (data.status === 'success') {
+                    const images = Array.isArray(data.message) ? data.message : [data.message];
+                    displayPhotos(images);
+                } else {
+                    showError('Failed to load photos. Please try again.');
+                }
+            } catch (error) {
+                showLoading(false);
+                showError('An error occurred while loading photos');
+                console.error('Error loading photos:', error);
+            }
+        }
+
+        // Display photos in the gallery
+        function displayPhotos(images) {
+            gallery.innerHTML = '';
+
+            images.forEach((imageUrl, index) => {
+                const card = document.createElement('div');
+                card.className = 'photo-card';
+                card.innerHTML = `
+                    <img src="${imageUrl}" alt="Dog photo" loading="lazy">
+                    <div class="photo-info">
+                        <div class="photo-breed">${currentBreed || 'Random Doggo'}</div>
+                    </div>
+                `;
+
+                card.addEventListener('click', () => openModal(imageUrl));
+                gallery.appendChild(card);
+            });
+        }
+
+        // Show/hide loading spinner
+        function showLoading(show) {
+            loading.style.display = show ? 'flex' : 'none';
+            loadMoreBtn.disabled = show;
+        }
+
+        // Show error message
+        function showError(message) {
+            errorDiv.innerHTML = `<div class="error">${message}</div>`;
+        }
+
+        // Modal functions
+        function openModal(imageUrl) {
+            modalImage.src = imageUrl;
+            photoModal.style.display = 'block';
+        }
+
+        function closeModal() {
+            photoModal.style.display = 'none';
+        }
+
+        // Event listeners
+        breedSelect.addEventListener('change', (e) => {
+            currentBreed = e.target.value;
+            currentPhotoCount = 12;
+            loadPhotos(currentBreed, currentPhotoCount);
+        });
+
+        loadMoreBtn.addEventListener('click', () => {
+            currentPhotoCount += 12;
+            loadPhotos(currentBreed, currentPhotoCount);
+        });
+
+        modalClose.addEventListener('click', closeModal);
+
+        photoModal.addEventListener('click', (e) => {
+            if (e.target === photoModal) closeModal();
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // Initialize the app
+        loadBreeds();
+        loadPhotos('', currentPhotoCount);
+    </script>
+</body>
+</html>
