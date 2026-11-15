@@ -9,7 +9,7 @@
 
 
 <p align="center"><a href="https://youtu.be/FxSprPEKiC8"><img src="https://i.ytimg.com/vi/FxSprPEKiC8/maxresdefault.jpg" width="720"></a></p>
-<p align="center"><a href="https://youtu.be/FxSprPEKiC8"><b>▶ Watch: Cheapest Nano Banana Pro API: 85% Below Other Providers </b></a></p>
+<p align="center"><a href="https://youtu.be/FxSprPEKiC8"><b>▶ Watch: Cheapest AI Image generator </b></a></p>
 
 <p align="center">
   <a href="https://github.com/Anil-matcha/awesome-generative-ai-apps">
