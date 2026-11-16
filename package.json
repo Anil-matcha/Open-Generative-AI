@@ -15,6 +15,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "test": "node --test",
     "lint": "next lint",
     "build:studio": "npm run build -w studio",
     "build:workflow": "npm run build -w workflow-builder",
