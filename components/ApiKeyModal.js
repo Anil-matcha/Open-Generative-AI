@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { getCommonCopy } from '@/lib/locales';
+import { validateApiKey } from './apiKeyValidation.mjs';
 
 export default function ApiKeyModal({ onSave, onClose, overlay = false, title, subtitle, locale = 'en' }) {
   const [key, setKey] = useState('');
@@ -10,9 +11,9 @@ export default function ApiKeyModal({ onSave, onClose, overlay = false, title, s
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const trimmed = key.trim();
-    if (!trimmed) { setError(copy.missingKeyError); return; }
-    onSave(trimmed);
+    const result = validateApiKey(key);
+    if (result.error) { setError(result.value === undefined && !key.trim() ? copy.missingKeyError : result.error); return; }
+    onSave(result.value);
   };
 
   const wrapperClass = overlay
