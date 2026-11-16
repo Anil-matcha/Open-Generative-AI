@@ -58,3 +58,42 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 .animate-fade-in-up { animation: fade-in-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+/* ---- Light theme (opt-in via data-theme="light"; dark is the default) ----
+   Minimal override: page/surface variables plus the most common hardcoded
+   Tailwind surface/text utilities. Studio-internal hardcoded colors are not
+   all restyled yet. */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg-app: #f6f7f9;
+  --bg-panel: #ffffff;
+  --bg-card: #eef0f3;
+  --border-color: rgba(0,0,0,0.1);
+  --glass-bg: rgba(0, 0, 0, 0.03);
+  --glass-border: rgba(0, 0, 0, 0.1);
+}
+[data-theme="light"] body { background: #f6f7f9; color: #111113; }
+[data-theme="light"] .bg-app-bg,
+[data-theme="light"] .bg-black,
+[data-theme="light"] .bg-\[\#050505\],
+[data-theme="light"] .bg-\[\#030303\] { background-color: #f6f7f9; }
+[data-theme="light"] .bg-panel-bg,
+[data-theme="light"] .bg-\[\#0a0a0a\],
+[data-theme="light"] .bg-\[\#0a0a0b\]\/80 { background-color: #ffffff; }
+[data-theme="light"] .bg-card-bg,
+[data-theme="light"] .bg-\[\#141414\],
+[data-theme="light"] .bg-\[\#111111\] { background-color: #eef0f3; }
+[data-theme="light"] .text-white { color: #111113; }
+[data-theme="light"] .text-white\/90,
+[data-theme="light"] .text-white\/80 { color: rgba(17,17,19,0.85); }
+[data-theme="light"] .text-white\/70,
+[data-theme="light"] .text-white\/60 { color: rgba(17,17,19,0.65); }
+[data-theme="light"] .text-white\/50,
+[data-theme="light"] .text-white\/40,
+[data-theme="light"] .text-white\/20 { color: rgba(17,17,19,0.5); }
+[data-theme="light"] .bg-white\/5,
+[data-theme="light"] .bg-white\/\[0\.03\] { background-color: rgba(0,0,0,0.05); }
+[data-theme="light"] .hover\:bg-white\/10:hover { background-color: rgba(0,0,0,0.09); }
+[data-theme="light"] .border-white\/5,
+[data-theme="light"] .border-white\/10,
+[data-theme="light"] .border-white\/\[0\.05\] { border-color: rgba(0,0,0,0.1); }
