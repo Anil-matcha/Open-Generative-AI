@@ -4,15 +4,15 @@ WORKDIR /app
 # Install dependencies
 FROM base AS deps
 COPY package*.json ./
-COPY packages/Vibe-Workflow/packages/workflow-builder/package*.json ./packages/Vibe-Workflow/packages/workflow-builder/
-COPY packages/Open-Poe-AI/packages/agents/package*.json ./packages/Open-Poe-AI/packages/agents/
-COPY packages/Open-AI-Design-Agent/packages/design-agent/package*.json ./packages/Open-AI-Design-Agent/packages/design-agent/
-COPY packages/studio/package*.json ./packages/studio/
+COPY . .
+# The app builds from git submodules; fail early with a clear message if missing.
+RUN for d in packages/Vibe-Workflow/packages/workflow-builder packages/Open-Poe-AI/packages/agents packages/Open-AI-Design-Agent/packages/design-agent; do \
+      [ -f "$d/package.json" ] || { echo "ERROR: $d is missing. Submodules are not initialized. Run: git submodule update --init --recursive (or clone with --recurse-submodules), then rebuild." >&2; exit 1; }; \
+    done
 RUN npm install
 
 # Build sub-packages
 FROM deps AS builder
-COPY . .
 RUN npm run build:packages
 RUN npm run build
 
