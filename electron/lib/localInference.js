@@ -7,6 +7,8 @@ const { downloadFile } = require('./localInferenceDownload');
 const {
     getBundledBinaryResourceDir,
     pickBinaryAssetForPlatform,
+    rankWindowsAssets,
+    describeExitCode,
     resolveRedirectUrl,
 } = require('./localInferenceAssets');
 const {
@@ -32,13 +34,19 @@ function ensureLocalAiPaths() {
     BIN_DIR = resolved.binDir;
     MODELS_DIR = resolved.modelsDir;
     TMP_DIR = resolved.tmpDir;
-    BINARY_PATH = path.join(BIN_DIR, BINARY_NAME);
+    // Power users can point at an existing sd-cli build (#396). Models already
+    // can via OPEN_GENERATIVE_AI_LOCAL_AI_DIR.
+    const customBinary = (process.env[SD_CLI_ENV] || '').trim();
+    BINARY_PATH = customBinary && fs.existsSync(customBinary)
+        ? path.resolve(customBinary)
+        : path.join(BIN_DIR, BINARY_NAME);
 
     for (const dir of [BIN_DIR, MODELS_DIR, TMP_DIR]) {
         fs.mkdirSync(dir, { recursive: true });
     }
 }
 
+const SD_CLI_ENV = 'OPEN_GENERATIVE_AI_SD_CLI';
 const BINARY_NAME = process.platform === 'win32' ? 'sd-cli.exe' : 'sd-cli';
 let BINARY_PATH;
 
@@ -199,6 +207,40 @@ async function ensureCudaRuntime(release, send) {
     }
 }
 
+// Detect an NVIDIA GPU on Windows so we can prefer the CUDA build (#260).
+function detectWindowsGpu() {
+    return new Promise((resolve) => {
+        execFile('nvidia-smi', ['-L'], { timeout: 8000, windowsHide: true }, (err, stdout) => {
+            if (!err && /GPU \d+/i.test(stdout || '')) return resolve('nvidia');
+            execFile('powershell', ['-NoProfile', '-Command',
+                '(Get-CimInstance Win32_VideoController | Select-Object -ExpandProperty Name) -join ";"'],
+                { timeout: 8000, windowsHide: true }, (e2, out2) => {
+                    if (e2) return resolve(null);
+                    resolve(/nvidia/i.test(out2) ? 'nvidia' : (/amd|radeon|intel/i.test(out2) ? 'other' : null));
+                });
+        });
+    });
+}
+
+// Run the freshly installed sd-cli to make sure it actually loads (missing DLLs
+// give 0xC0000135 before main() runs). Resolves { ok, code }.
+function validateBinary() {
+    return new Promise((resolve) => {
+        execFile(BINARY_PATH, ['--help'], { timeout: 20000, windowsHide: true, cwd: path.dirname(BINARY_PATH) }, (err) => {
+            const code = err && typeof err.code === 'number' ? err.code : 0;
+            // Loader/crash failures are NTSTATUS values (>= 0xC0000000); a normal
+            // non-zero exit from --help is still a working binary.
+            resolve({ ok: !((code >>> 0) >= 0xC0000000), code });
+        });
+    });
+}
+
+function clearBinDir() {
+    for (const entry of fs.readdirSync(BIN_DIR)) {
+        fs.rmSync(path.join(BIN_DIR, entry), { recursive: true, force: true });
+    }
+}
+
 async function downloadBinary(mainWindow) {
     const send = (data) => mainWindow?.webContents.send('local-ai:download-progress', { id: '__binary__', ...data });
 
@@ -206,8 +248,16 @@ async function downloadBinary(mainWindow) {
         send({ phase: 'fetching-release', progress: 0 });
 
         if (ensureBundledBinaryInstalled()) {
-            send({ phase: 'done', progress: 1 });
-            return { ok: true, source: 'bundled' };
+            // An existing Windows install that cannot start (missing DLLs, wrong
+            // build) must be replaced rather than reported as installed (#356).
+            const isManaged = path.dirname(BINARY_PATH) === BIN_DIR;
+            const healthy = process.platform !== 'win32' || !isManaged || (await validateBinary()).ok;
+            if (healthy) {
+                send({ phase: 'done', progress: 1 });
+                return { ok: true, source: 'bundled' };
+            }
+            console.warn('[local-ai] Existing sd-cli failed to start; re-installing.');
+            clearBinDir();
         }
 
         const platformKey = `${process.platform}-${process.arch}`;
@@ -215,6 +265,8 @@ async function downloadBinary(mainWindow) {
 
         let downloadUrl, zipName;
         let chosenRelease = null;
+        let windowsGpu = null;
+        let windowsFallbacks = [];
 
         if (customUrl) {
             downloadUrl = customUrl;
@@ -230,6 +282,9 @@ async function downloadBinary(mainWindow) {
 
             let chosen = null;
             let lastSeen = [];
+            if (process.platform === 'win32') {
+                windowsGpu = await detectWindowsGpu();
+            }
             for (const release of releases) {
                 const zips = (release.assets || [])
                     .filter(a => a.name.endsWith('.zip'));
@@ -238,9 +293,15 @@ async function downloadBinary(mainWindow) {
                     platform: process.platform,
                     arch: process.arch,
                     zipNames: lastSeen,
+                    gpu: windowsGpu,
                 });
                 if (pickedName) {
                     chosen = zips.find(a => a.name === pickedName);
+                    if (process.platform === 'win32') {
+                        windowsFallbacks = rankWindowsAssets({ zipNames: lastSeen, gpu: windowsGpu })
+                            .filter((n) => n !== pickedName)
+                            .map((n) => zips.find(a => a.name === n));
+                    }
                     chosenRelease = release;
                     break;
                 }
@@ -260,29 +321,54 @@ async function downloadBinary(mainWindow) {
             zipName = chosen.name;
         }
 
-        send({ phase: 'downloading', progress: 0 });
-        const zipPath = path.join(BIN_DIR, zipName);
-        await downloadFile(downloadUrl, zipPath, (p) => {
-            send({ phase: 'downloading', progress: p });
-        });
+        const installZip = async (url, name) => {
+            send({ phase: 'downloading', progress: 0 });
+            const zipPath = path.join(BIN_DIR, name);
+            await downloadFile(url, zipPath, (p) => {
+                send({ phase: 'downloading', progress: p });
+            });
 
-        send({ phase: 'extracting', progress: 0.95 });
-        await extractZip(zipPath, BIN_DIR);
-        fs.unlinkSync(zipPath);
+            send({ phase: 'extracting', progress: 0.95 });
+            await extractZip(zipPath, BIN_DIR);
+            fs.unlinkSync(zipPath);
 
-        // The zip may extract into a subdirectory — find the binary wherever it landed
-        const foundBinary = findFile(BIN_DIR, BINARY_NAME);
-        if (!foundBinary) throw new Error(`Extracted archive but could not find "${BINARY_NAME}" inside ${BIN_DIR}`);
+            // The zip may extract into a subdirectory — find the binary wherever it landed
+            const foundBinary = findFile(BIN_DIR, BINARY_NAME);
+            if (!foundBinary) throw new Error(`Extracted archive but could not find "${BINARY_NAME}" inside ${BIN_DIR}`);
 
-        // Move it to the expected root location if it's nested
-        if (foundBinary !== BINARY_PATH) {
-            fs.renameSync(foundBinary, BINARY_PATH);
+            // Move it (and, if nested, its sibling DLLs) to the expected root location
+            if (foundBinary !== BINARY_PATH) {
+                const nestedDir = path.dirname(foundBinary);
+                for (const entry of fs.readdirSync(nestedDir, { withFileTypes: true })) {
+                    if (entry.isFile()) fs.renameSync(path.join(nestedDir, entry.name), path.join(BIN_DIR, entry.name));
+                }
+            }
+
+            ensureBinaryPermissions();
+
+            // Windows CUDA builds are useless without the CUDA runtime beside them
+            await ensureCudaRuntime(chosenRelease, send);
+        };
+
+        await installZip(downloadUrl, zipName);
+
+        // Windows: confirm the binary actually loads; otherwise fall back through
+        // the ranked list (GPU build -> Vulkan -> CPU) instead of leaving a broken
+        // install that fails later with 0xC0000135 (#356, #260).
+        if (process.platform === 'win32' && !customUrl && !process.env[SD_CLI_ENV]) {
+            let check = await validateBinary();
+            for (const asset of windowsFallbacks) {
+                if (check.ok) break;
+                console.warn(`[local-ai] ${zipName} failed to start (exit ${check.code}); trying ${asset.name}`);
+                clearBinDir();
+                zipName = asset.name;
+                await installZip(asset.browser_download_url, asset.name);
+                check = await validateBinary();
+            }
+            if (!check.ok) {
+                throw new Error(`${describeExitCode(check.code, 'win32')}The downloaded engine (${zipName}) could not start (exit code ${check.code}).`);
+            }
         }
-
-        ensureBinaryPermissions();
-
-        // Windows CUDA builds are useless without the CUDA runtime beside them
-        await ensureCudaRuntime(chosenRelease, send);
 
         // macOS: strip Gatekeeper quarantine so the downloaded binary can run
         if (process.platform === 'darwin') {
@@ -519,7 +605,7 @@ async function generate(params, mainWindow) {
                 const killed = code === null;
                 const hint = killed
                     ? 'sd-cli was terminated before finishing (often OOM on Z-Image/SDXL — try a smaller SD 1.5 model or close other apps). '
-                    : '';
+                    : describeExitCode(code);
                 reject(new Error(`${hint}sd-cli exited (code ${code ?? 'signal'}):\n${tail}`));
                 return;
             }
