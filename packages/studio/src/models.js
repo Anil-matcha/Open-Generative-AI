@@ -2170,6 +2170,67 @@ export const t2iModels = [
     "provider_name": "Black Forest Labs"
   },
   {
+    "id": "flux-3-klein-text-to-image",
+    "name": "FLUX 3 Klein Text to Image",
+    "endpoint": "flux-3-klein-text-to-image",
+    "family": "flux-klein",
+    "inputs": {
+      "prompt": {
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "description": "Describe the image to generate (up to 5,000 characters).",
+        "examples": ["A sculptural glass perfume bottle on a warm limestone plinth, soft editorial light, crisp product photography."]
+      },
+      "aspect_ratio": {
+        "type": "string",
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "enum": ["1:1", "4:3", "3:4", "3:2", "2:3", "16:9", "9:16", "21:9", "9:21"],
+        "default": "1:1"
+      },
+      "resolution": {
+        "type": "string",
+        "title": "Resolution",
+        "name": "resolution",
+        "enum": ["1K", "2K", "4K"],
+        "default": "1K"
+      },
+      "output_format": {
+        "type": "string",
+        "title": "Output Format",
+        "name": "output_format",
+        "enum": ["png", "jpeg", "webp"],
+        "default": "png"
+      },
+      "num_images": {
+        "type": "integer",
+        "title": "Number of Images",
+        "name": "num_images",
+        "default": 1,
+        "minValue": 1,
+        "maxValue": 4,
+        "step": 1
+      },
+      "seed": {
+        "type": "integer",
+        "title": "Seed",
+        "name": "seed",
+        "minValue": 0,
+        "maxValue": 2147483647,
+        "step": 1
+      },
+      "enhance_prompt": {
+        "type": "boolean",
+        "title": "Enhance Prompt",
+        "name": "enhance_prompt",
+        "default": true
+      }
+    },
+    "provider": "blackforest",
+    "provider_name": "Black Forest Labs"
+  },
+  {
     "id": "z-image-base",
     "name": "Z Image Base",
     "inputs": {
@@ -10165,6 +10226,66 @@ export const t2vModels = [
     "provider_name": "Google"
   },
   {
+    "id": "gemini-omni-flash-1-2-text-to-video",
+    "name": "Gemini Omni 1.2 Flash",
+    "endpoint": "gemini-omni-flash-1-2-text-to-video",
+    "inputs": {
+      "prompt": {
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "description": "Describe the scene, action, camera movement, and sound.",
+        "examples": [
+          "A cat plays piano in a jazz bar, one continuous shot, soft live jazz"
+        ]
+      },
+      "duration": {
+        "type": "integer",
+        "title": "Duration",
+        "name": "duration",
+        "description": "Video length in seconds (3-15).",
+        "minimum": 3,
+        "maximum": 15,
+        "default": 8
+      },
+      "aspect_ratio": {
+        "enum": [
+          "16:9",
+          "9:16",
+          "auto"
+        ],
+        "type": "string",
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "description": "Output aspect ratio. `auto` follows the reference image and is treated as 16:9 when none is provided.",
+        "default": "16:9"
+      },
+      "resolution": {
+        "enum": [
+          "360p",
+          "720p",
+          "1080p",
+          "4k"
+        ],
+        "type": "string",
+        "title": "Resolution",
+        "name": "resolution",
+        "description": "Output resolution. Output priced per second of generated video: $0.023/s at 360p, $0.07/s at 720p, $0.105/s at 1080p, $0.21/s at 4K.",
+        "default": "720p"
+      },
+      "seed": {
+        "type": "integer",
+        "title": "Seed",
+        "name": "seed",
+        "description": "Random seed (10000-99999). Omit for a random seed.",
+        "minimum": 10000,
+        "maximum": 99999
+      }
+    },
+    "provider": "google",
+    "provider_name": "Google"
+  },
+  {
     "id": "openai-sora-2-pro-storyboard",
     "name": "OpenAI Sora 2 Pro Storyboard",
     "endpoint": "openai-sora-2-pro-storyboard",
@@ -13229,6 +13350,78 @@ export const i2iModels = [
           "9:21"
         ],
         "default": "1:1"
+      }
+    },
+    "provider": "blackforest",
+    "provider_name": "Black Forest Labs"
+  },
+  {
+    "id": "flux-3-klein-edit-image",
+    "name": "FLUX 3 Klein Image Edit",
+    "endpoint": "flux-3-klein-edit-image",
+    "family": "flux-klein",
+    "imageField": "images_list",
+    "hasPrompt": true,
+    "maxImages": 10,
+    "inputs": {
+      "prompt": {
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "description": "Describe the edit to apply (up to 5,000 characters).",
+        "examples": ["Change the background to a warm studio setting while preserving the product shape and label."]
+      },
+      "images_list": {
+        "type": "array",
+        "items": { "type": "string" },
+        "title": "Image URLs",
+        "name": "images_list",
+        "minItems": 1,
+        "maxItems": 10
+      },
+      "aspect_ratio": {
+        "type": "string",
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "enum": ["auto", "1:1", "4:3", "3:4", "3:2", "2:3", "16:9", "9:16", "21:9", "9:21"],
+        "default": "auto"
+      },
+      "resolution": {
+        "type": "string",
+        "title": "Resolution",
+        "name": "resolution",
+        "enum": ["1K", "2K", "4K"],
+        "default": "1K"
+      },
+      "output_format": {
+        "type": "string",
+        "title": "Output Format",
+        "name": "output_format",
+        "enum": ["png", "jpeg", "webp"],
+        "default": "png"
+      },
+      "num_images": {
+        "type": "integer",
+        "title": "Number of Images",
+        "name": "num_images",
+        "default": 1,
+        "minValue": 1,
+        "maxValue": 4,
+        "step": 1
+      },
+      "seed": {
+        "type": "integer",
+        "title": "Seed",
+        "name": "seed",
+        "minValue": 0,
+        "maxValue": 2147483647,
+        "step": 1
+      },
+      "enhance_prompt": {
+        "type": "boolean",
+        "title": "Enhance Prompt",
+        "name": "enhance_prompt",
+        "default": true
       }
     },
     "provider": "blackforest",
@@ -28001,6 +28194,85 @@ export const i2vModels = [
     "provider_name": "Google"
   },
   {
+    "id": "gemini-omni-flash-1-2-image-to-video",
+    "name": "Gemini Omni 1.2 Flash Image to Video",
+    "endpoint": "gemini-omni-flash-1-2-image-to-video",
+    "family": "gemini-omni",
+    "imageField": "first_frame_url",
+    "lastImageField": "last_frame_url",
+    "hasPrompt": true,
+    "promptRequired": true,
+    "inputs": {
+      "prompt": {
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "description": "Describe the scene, action, camera movement, and sound.",
+        "examples": [
+          "The camera slowly pushes in as the subject turns and smiles, soft ambient music"
+        ]
+      },
+      "first_frame_url": {
+        "field": "image",
+        "type": "string",
+        "title": "First Frame",
+        "name": "first_frame_url",
+        "description": "Image used as the first frame of the video."
+      },
+      "last_frame_url": {
+        "field": "image",
+        "type": "string",
+        "title": "Last Frame",
+        "name": "last_frame_url",
+        "description": "Optional image used as the last frame. Requires first_frame_url; duration is then limited to 3-10 seconds."
+      },
+      "duration": {
+        "type": "integer",
+        "title": "Duration",
+        "name": "duration",
+        "description": "Video length in seconds (3-15).",
+        "minimum": 3,
+        "maximum": 15,
+        "default": 8
+      },
+      "aspect_ratio": {
+        "enum": [
+          "16:9",
+          "9:16",
+          "auto"
+        ],
+        "type": "string",
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "description": "Output aspect ratio. `auto` follows the reference image and is treated as 16:9 when none is provided.",
+        "default": "16:9"
+      },
+      "resolution": {
+        "enum": [
+          "360p",
+          "720p",
+          "1080p",
+          "4k"
+        ],
+        "type": "string",
+        "title": "Resolution",
+        "name": "resolution",
+        "description": "Output resolution. Output priced per second of generated video: $0.023/s at 360p, $0.07/s at 720p, $0.105/s at 1080p, $0.21/s at 4K.",
+        "default": "720p"
+      },
+      "seed": {
+        "type": "integer",
+        "title": "Seed",
+        "name": "seed",
+        "description": "Random seed (10000-99999). Omit for a random seed.",
+        "minimum": 10000,
+        "maximum": 99999
+      }
+    },
+    "provider": "google",
+    "provider_name": "Google"
+  },
+  {
     "id": "gemini-omni-flash-1-1-reference-to-video",
     "name": "Gemini Omni 1.1 Flash Reference",
     "endpoint": "gemini-omni-flash-1-1-reference-to-video",
@@ -28073,6 +28345,82 @@ export const i2vModels = [
         "minValue": 3,
         "maxValue": 10,
         "default": 8
+      }
+    },
+    "provider": "google",
+    "provider_name": "Google"
+  },
+  {
+    "id": "gemini-omni-flash-1-2-reference-to-video",
+    "name": "Gemini Omni 1.2 Flash Reference to Video",
+    "endpoint": "gemini-omni-flash-1-2-reference-to-video",
+    "family": "gemini-omni",
+    "imageField": "image_urls",
+    "hasPrompt": true,
+    "promptRequired": true,
+    "inputs": {
+      "prompt": {
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "description": "Describe the scene, action, camera movement, and sound.",
+        "examples": [
+          "The character from the first image walks through the city in the second image at sunset, ambient street sounds"
+        ]
+      },
+      "image_urls": {
+        "field": "images_list",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "title": "Reference Images",
+        "name": "image_urls",
+        "description": "1-6 reference images used for subject, scene, style, or storyboard reference (not a starting keyframe).",
+        "minItems": 1,
+        "maxItems": 6
+      },
+      "duration": {
+        "type": "integer",
+        "title": "Duration",
+        "name": "duration",
+        "description": "Video length in seconds (3-15).",
+        "minimum": 3,
+        "maximum": 15,
+        "default": 8
+      },
+      "aspect_ratio": {
+        "enum": [
+          "16:9",
+          "9:16",
+          "auto"
+        ],
+        "type": "string",
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "description": "Output aspect ratio. `auto` follows the reference image and is treated as 16:9 when none is provided.",
+        "default": "16:9"
+      },
+      "resolution": {
+        "enum": [
+          "360p",
+          "720p",
+          "1080p",
+          "4k"
+        ],
+        "type": "string",
+        "title": "Resolution",
+        "name": "resolution",
+        "description": "Output resolution. Output priced per second of generated video: $0.023/s at 360p, $0.07/s at 720p, $0.105/s at 1080p, $0.21/s at 4K.",
+        "default": "720p"
+      },
+      "seed": {
+        "type": "integer",
+        "title": "Seed",
+        "name": "seed",
+        "description": "Random seed (10000-99999). Omit for a random seed.",
+        "minimum": 10000,
+        "maximum": 99999
       }
     },
     "provider": "google",
@@ -33678,6 +34026,66 @@ export const v2vModels = [
       }
     },
     "description": "Gemini Omni 1.1 Flash Video Edit \u2014 restyle or edit a source video with a single text instruction, powered by Gemini Omni's natively multimodal any-to-any model.",
+    "provider": "google",
+    "provider_name": "Google"
+  },
+  {
+    "id": "gemini-omni-flash-1-2-edit",
+    "name": "Gemini Omni 1.2 Flash Edit",
+    "endpoint": "gemini-omni-flash-1-2-edit",
+    "family": "gemini-omni",
+    "videoField": "video_url",
+    "hasPrompt": true,
+    "promptRequired": true,
+    "operation": "edit",
+    "required": [
+      "prompt",
+      "video_url"
+    ],
+    "inputs": {
+      "prompt": {
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "description": "Describe the scene, action, camera movement, and sound.",
+        "examples": [
+          "Make this video anime. Keep everything else the same."
+        ]
+      },
+      "video_url": {
+        "field": "video",
+        "type": "string",
+        "title": "Source Video",
+        "name": "video_url",
+        "description": "URL of the video to edit (MP4 recommended, max 15 seconds)."
+      },
+      "aspect_ratio": {
+        "enum": [
+          "16:9",
+          "9:16",
+          "auto"
+        ],
+        "type": "string",
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "description": "Output aspect ratio. `auto` follows the reference image and is treated as 16:9 when none is provided.",
+        "default": "16:9"
+      },
+      "resolution": {
+        "enum": [
+          "360p",
+          "720p",
+          "1080p",
+          "4k"
+        ],
+        "type": "string",
+        "title": "Resolution",
+        "name": "resolution",
+        "description": "Output resolution. Output priced per second of generated video: $0.023/s at 360p, $0.07/s at 720p, $0.105/s at 1080p, $0.21/s at 4K.",
+        "default": "720p"
+      }
+    },
+    "description": "Gemini Omni 1.2 Flash \u2014 edit an existing video with a simple text instruction, optionally guided by reference images. Output length follows the source video (max 15s).",
     "provider": "google",
     "provider_name": "Google"
   },
