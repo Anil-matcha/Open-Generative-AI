@@ -1036,6 +1036,13 @@ export function ImageStudio() {
             thumb.appendChild(overlay);
 
             thumb.onclick = (e) => {
+                if (e.target.closest('.hist-delete')) {
+                    const at = generationHistory.indexOf(entry);
+                    if (at !== -1) generationHistory.splice(at, 1);
+                    try { localStorage.setItem('muapi_history', JSON.stringify(generationHistory.slice(0, 50))); } catch (err) { /* ignore */ }
+                    renderHistory();
+                    return;
+                }
                 if (e.target.closest('.hist-download')) {
                     downloadImage(entry.url, `muapi-${entry.id || idx}.jpg`);
                     return;
@@ -1215,7 +1222,7 @@ export function ImageStudio() {
                 console.error('[Local] generation error:', e);
                 hero.classList.remove('opacity-0', 'scale-95', '-translate-y-10', 'pointer-events-none');
                 console.error('[Local] full error:', e.message);
-                generateBtn.innerHTML = `Error: ${e.message.slice(0, 120)}`;
+                generateBtn.textContent = `Error: ${e.message.slice(0, 120)}`;
                 setTimeout(() => { generateBtn.innerHTML = t('common.generate'); }, 6000);
             } finally {
                 generateBtn.disabled = false;

@@ -553,6 +553,13 @@ export function LipSyncStudio() {
             thumb.appendChild(media);
             thumb.appendChild(overlay);
             thumb.onclick = (e) => {
+                if (e.target.closest('.hist-delete')) {
+                    const at = generationHistory.indexOf(entry);
+                    if (at !== -1) generationHistory.splice(at, 1);
+                    try { localStorage.setItem('lipsync_history', JSON.stringify(generationHistory.slice(0, 30))); } catch (err) { /* ignore */ }
+                    renderHistory();
+                    return;
+                }
                 if (e.target.closest('.hist-download')) { downloadFile(entry.url, `lipsync-${entry.id || idx}.mp4`); return; }
                 showVideoInCanvas(entry.url);
                 historyList.querySelectorAll('div').forEach(t => { t.classList.remove('border-primary', 'shadow-glow'); t.classList.add('border-white/10'); });
@@ -723,7 +730,7 @@ export function LipSyncStudio() {
             if (capturedRequestId) removePendingJob(capturedRequestId);
             console.error(e);
             hero.classList.remove('opacity-0', 'scale-95', '-translate-y-10', 'pointer-events-none');
-            generateBtn.innerHTML = `Error: ${e.message.slice(0, 60)}`;
+            generateBtn.textContent = `Error: ${e.message.slice(0, 60)}`;
             setTimeout(() => { generateBtn.innerHTML = t('common.generate'); }, 4000);
         } finally {
             generateBtn.disabled = false;

@@ -56,8 +56,8 @@ test('history download media keeps untrusted URL and prompt out of HTML setters'
     assert.equal(media.src, maliciousUrl);
     assert.equal(media.alt, maliciousPrompt);
     assert.equal(downloadButton.title, maliciousPrompt);
-    assert.deepEqual(overlay.children, [downloadButton]);
-    assert.equal(innerHtmlWrites.length, 1, 'only the static download SVG uses innerHTML');
+    assert.equal(overlay.children[0], downloadButton);
+    assert.equal(innerHtmlWrites.length, 2, 'only the static download and delete SVGs use innerHTML');
     assert.match(innerHtmlWrites[0].value, /^\s*<svg\b/);
     assert.doesNotMatch(innerHtmlWrites[0].value, /onerror|globalThis\.pwned/);
 });
@@ -95,4 +95,12 @@ test('history label uses textContent for localized copy', async () => {
     assert.equal(labelElement.textContent, maliciousLabel);
     assert.deepEqual(overlay.children, [labelElement]);
     assert.deepEqual(innerHtmlWrites, []);
+});
+
+test('history media includes a delete button', async () => {
+    const { createHistoryMediaWithDownload } = await import('../src/lib/historyDom.mjs');
+    const { document } = createFakeDocument();
+    const { overlay, deleteButton } = createHistoryMediaWithDownload({ document, tagName: 'img', url: 'x' });
+    assert.ok(deleteButton.className.includes('hist-delete'));
+    assert.equal(overlay.children.length, 2);
 });

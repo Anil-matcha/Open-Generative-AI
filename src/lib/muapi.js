@@ -1,6 +1,16 @@
 import { getModelById, getVideoModelById, getI2IModelById, getI2VModelById, getV2VModelById, getLipSyncModelById } from './models.js';
 import { pollForGenerationResult } from '../../packages/studio/src/utils/generationLifecycle.js';
 
+export function formatApiError(status, statusText, errText = '') {
+    if (status === 401 || status === 403) {
+        return 'Invalid or missing API key. Add a valid Muapi API key in Settings (get one at muapi.ai).';
+    }
+    if (status === 402) {
+        return 'Insufficient credits. Generation needs a Muapi API key with credit balance - top up at muapi.ai and try again.';
+    }
+    return `API Request Failed: ${status} ${statusText} - ${String(errText).slice(0, 100)}`;
+}
+
 export class MuapiClient {
     constructor() {
         // Ideally user provides this in settings
@@ -10,7 +20,12 @@ export class MuapiClient {
     getKey() {
         const key = window.__MUAPI_KEY__ || localStorage.getItem('muapi_key');
         if (!key) throw new Error('API Key missing. Please set it in Settings.');
-        return key;
+        const trimmed = String(key).trim();
+        // Header values must be ISO-8859-1 / visible ASCII; unicode here makes fetch() throw.
+        if (!trimmed || !/^[\x21-\x7E]+$/.test(trimmed)) {
+            throw new Error('Your API key contains invalid characters (spaces or non-ASCII). Please re-enter it in Settings.');
+        }
+        return trimmed;
     }
 
     /**
@@ -83,7 +98,7 @@ export class MuapiClient {
             if (!response.ok) {
                 const errText = await response.text();
                 console.error('[Muapi] API Error Body:', errText);
-                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+                throw new Error(formatApiError(response.status, response.statusText, errText));
             }
 
             const submitData = await response.json();
@@ -165,7 +180,7 @@ export class MuapiClient {
             if (!response.ok) {
                 const errText = await response.text();
                 console.error('[Muapi] API Error Body:', errText);
-                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+                throw new Error(formatApiError(response.status, response.statusText, errText));
             }
 
             const submitData = await response.json();
@@ -237,7 +252,7 @@ export class MuapiClient {
 
             if (!response.ok) {
                 const errText = await response.text();
-                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+                throw new Error(formatApiError(response.status, response.statusText, errText));
             }
 
             const submitData = await response.json();
@@ -328,7 +343,7 @@ export class MuapiClient {
 
             if (!response.ok) {
                 const errText = await response.text();
-                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+                throw new Error(formatApiError(response.status, response.statusText, errText));
             }
 
             const submitData = await response.json();
@@ -420,7 +435,7 @@ export class MuapiClient {
 
             if (!response.ok) {
                 const errText = await response.text();
-                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+                throw new Error(formatApiError(response.status, response.statusText, errText));
             }
 
             const submitData = await response.json();
@@ -482,7 +497,7 @@ export class MuapiClient {
             if (!response.ok) {
                 const errText = await response.text();
                 console.error('[Muapi] LipSync API Error:', errText);
-                throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${errText.slice(0, 100)}`);
+                throw new Error(formatApiError(response.status, response.statusText, errText));
             }
 
             const submitData = await response.json();
