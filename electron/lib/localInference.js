@@ -2,11 +2,13 @@ const { ipcMain, app, BrowserWindow } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const https = require('https');
-const http = require('http');
 const { spawn, execFile } = require('child_process');
+const { downloadFile } = require('./localInferenceDownload');
 const {
     getBundledBinaryResourceDir,
     pickBinaryAssetForPlatform,
+    rankWindowsAssets,
+    describeExitCode,
     resolveRedirectUrl,
 } = require('./localInferenceAssets');
 const {
@@ -32,13 +34,19 @@ function ensureLocalAiPaths() {
     BIN_DIR = resolved.binDir;
     MODELS_DIR = resolved.modelsDir;
     TMP_DIR = resolved.tmpDir;
-    BINARY_PATH = path.join(BIN_DIR, BINARY_NAME);
+    // Power users can point at an existing sd-cli build (#396). Models already
+    // can via OPEN_GENERATIVE_AI_LOCAL_AI_DIR.
+    const customBinary = (process.env[SD_CLI_ENV] || '').trim();
+    BINARY_PATH = customBinary && fs.existsSync(customBinary)
+        ? path.resolve(customBinary)
+        : path.join(BIN_DIR, BINARY_NAME);
 
     for (const dir of [BIN_DIR, MODELS_DIR, TMP_DIR]) {
         fs.mkdirSync(dir, { recursive: true });
     }
 }
 
+const SD_CLI_ENV = 'OPEN_GENERATIVE_AI_SD_CLI';
 const BINARY_NAME = process.platform === 'win32' ? 'sd-cli.exe' : 'sd-cli';
 let BINARY_PATH;
 
@@ -66,92 +74,6 @@ function fetchJson(url) {
             res.on('error', reject);
         }).on('error', reject);
     });
-}
-
-// ─── Robust HTTPS download with redirect-following, range-resume, and retry ───
-function downloadFile(url, destPath, onProgress) {
-    const tmp = destPath + '.part';
-
-    // Outer total so progress never goes backwards across retries/redirects
-    let knownTotal = 0;
-
-    const attempt = (requestUrl, redirectsLeft, retriesLeft) => new Promise((resolve, reject) => {
-        // Resume from however many bytes are already on disk
-        const alreadyDownloaded = fs.existsSync(tmp) ? fs.statSync(tmp).size : 0;
-
-        const parsed = new URL(requestUrl);
-        const mod = parsed.protocol === 'https:' ? https : http;
-
-        const reqHeaders = {
-            'User-Agent': 'Mozilla/5.0 (compatible; open-generative-ai/1.0)',
-            'Accept': '*/*',
-            'Connection': 'keep-alive',
-        };
-        if (alreadyDownloaded > 0) reqHeaders['Range'] = `bytes=${alreadyDownloaded}-`;
-
-        const req = mod.get({ hostname: parsed.hostname, path: parsed.pathname + parsed.search, headers: reqHeaders }, (res) => {
-            const { statusCode, headers } = res;
-
-            // Follow redirects
-            if ([301, 302, 303, 307, 308].includes(statusCode)) {
-                res.resume();
-                if (redirectsLeft <= 0) { reject(new Error('Too many redirects')); return; }
-                // Throwing here would escape the promise, so report it through reject.
-                let nextUrl;
-                try {
-                    nextUrl = resolveRedirectUrl(headers.location, requestUrl);
-                } catch (err) {
-                    reject(err);
-                    return;
-                }
-                resolve(attempt(nextUrl, redirectsLeft - 1, retriesLeft));
-                return;
-            }
-
-            // 206 Partial Content (range accepted) or 200 OK (server ignored Range)
-            if (statusCode !== 200 && statusCode !== 206) {
-                res.resume();
-                reject(new Error(`HTTP ${statusCode} from ${parsed.hostname}${parsed.pathname}`));
-                return;
-            }
-
-            // content-length on a 206 is the remaining bytes; on 200 it's the full file
-            const chunkSize = parseInt(headers['content-length'] || '0', 10);
-            if (statusCode === 200) {
-                // Server ignored our Range header — restart the file
-                if (fs.existsSync(tmp)) fs.unlinkSync(tmp);
-                knownTotal = chunkSize;
-            } else {
-                // 206: total = already downloaded + remaining
-                knownTotal = alreadyDownloaded + chunkSize;
-            }
-
-            let received = alreadyDownloaded;
-            const out = fs.createWriteStream(tmp, { flags: statusCode === 206 ? 'a' : 'w' });
-
-            res.on('data', (chunk) => {
-                received += chunk.length;
-                if (knownTotal && onProgress) onProgress(received / knownTotal);
-            });
-            res.pipe(out);
-            out.on('finish', () => { fs.renameSync(tmp, destPath); resolve(); });
-            out.on('error', reject);
-            res.on('error', reject);
-        });
-
-        req.on('error', (err) => {
-            if (retriesLeft > 0) {
-                console.warn(`[download] ${err.message} — retrying in 3s (${retriesLeft} left)`);
-                setTimeout(() => resolve(attempt(requestUrl, redirectsLeft, retriesLeft - 1)), 3000);
-            } else {
-                reject(err);
-            }
-        });
-
-        req.setTimeout(60000, () => req.destroy(new Error('Request timed out')));
-    });
-
-    return attempt(url, 10, 5);
 }
 
 // ─── Extract zip on each platform ────────────────────────────────────────────
@@ -239,6 +161,86 @@ const CUSTOM_BINARIES = {
     'darwin-arm64': 'https://github.com/Anil-matcha/Open-Generative-AI/releases/download/v1.0.3-binaries/sd-cli-metal-macos-arm64.zip',
 };
 
+// The Windows CUDA build ships ggml-cuda.dll but not the CUDA runtime it links
+// against. Without these DLLs next to the binary, ggml silently skips the CUDA
+// backend and falls back to CPU — orders of magnitude slower, with no error
+// surfaced anywhere. leejet publishes them as a separate asset in the same
+// release, so pull it whenever we installed a CUDA build that lacks them.
+const CUDA_RUNTIME_FILES = ['cudart64_12.dll', 'cublas64_12.dll', 'cublasLt64_12.dll'];
+
+function cudaRuntimeInstalled() {
+    return CUDA_RUNTIME_FILES.every((name) => fs.existsSync(path.join(BIN_DIR, name)));
+}
+
+async function ensureCudaRuntime(release, send) {
+    if (process.platform !== 'win32') return;
+    // Only CUDA builds ship ggml-cuda.dll; CPU/Vulkan/ROCm builds need nothing extra.
+    if (!fs.existsSync(path.join(BIN_DIR, 'ggml-cuda.dll'))) return;
+    if (cudaRuntimeInstalled()) return;
+
+    const asset = (release?.assets || []).find((a) => /^cudart-sd-bin-win-cu\d+-x64\.zip$/.test(a.name));
+    if (!asset) {
+        console.warn('[local-ai] Installed a CUDA build but found no cudart asset in the release — generation will fall back to CPU.');
+        return;
+    }
+
+    send({ phase: 'downloading', progress: 0 });
+    const zipPath = path.join(BIN_DIR, asset.name);
+    await downloadFile(asset.browser_download_url, zipPath, (p) => {
+        send({ phase: 'downloading', progress: p });
+    });
+
+    send({ phase: 'extracting', progress: 0.98 });
+    await extractZip(zipPath, BIN_DIR);
+    fs.unlinkSync(zipPath);
+
+    // The archive may extract into a subdirectory — flatten to BIN_DIR so the
+    // DLLs sit next to sd-cli.exe, which is where the loader looks for them.
+    for (const name of CUDA_RUNTIME_FILES) {
+        if (fs.existsSync(path.join(BIN_DIR, name))) continue;
+        const found = findFile(BIN_DIR, name);
+        if (found) fs.renameSync(found, path.join(BIN_DIR, name));
+    }
+
+    if (!cudaRuntimeInstalled()) {
+        console.warn('[local-ai] CUDA runtime install incomplete — generation may fall back to CPU.');
+    }
+}
+
+// Detect an NVIDIA GPU on Windows so we can prefer the CUDA build (#260).
+function detectWindowsGpu() {
+    return new Promise((resolve) => {
+        execFile('nvidia-smi', ['-L'], { timeout: 8000, windowsHide: true }, (err, stdout) => {
+            if (!err && /GPU \d+/i.test(stdout || '')) return resolve('nvidia');
+            execFile('powershell', ['-NoProfile', '-Command',
+                '(Get-CimInstance Win32_VideoController | Select-Object -ExpandProperty Name) -join ";"'],
+                { timeout: 8000, windowsHide: true }, (e2, out2) => {
+                    if (e2) return resolve(null);
+                    resolve(/nvidia/i.test(out2) ? 'nvidia' : (/amd|radeon|intel/i.test(out2) ? 'other' : null));
+                });
+        });
+    });
+}
+
+// Run the freshly installed sd-cli to make sure it actually loads (missing DLLs
+// give 0xC0000135 before main() runs). Resolves { ok, code }.
+function validateBinary() {
+    return new Promise((resolve) => {
+        execFile(BINARY_PATH, ['--help'], { timeout: 20000, windowsHide: true, cwd: path.dirname(BINARY_PATH) }, (err) => {
+            const code = err && typeof err.code === 'number' ? err.code : 0;
+            // Loader/crash failures are NTSTATUS values (>= 0xC0000000); a normal
+            // non-zero exit from --help is still a working binary.
+            resolve({ ok: !((code >>> 0) >= 0xC0000000), code });
+        });
+    });
+}
+
+function clearBinDir() {
+    for (const entry of fs.readdirSync(BIN_DIR)) {
+        fs.rmSync(path.join(BIN_DIR, entry), { recursive: true, force: true });
+    }
+}
+
 async function downloadBinary(mainWindow) {
     const send = (data) => mainWindow?.webContents.send('local-ai:download-progress', { id: '__binary__', ...data });
 
@@ -246,14 +248,25 @@ async function downloadBinary(mainWindow) {
         send({ phase: 'fetching-release', progress: 0 });
 
         if (ensureBundledBinaryInstalled()) {
-            send({ phase: 'done', progress: 1 });
-            return { ok: true, source: 'bundled' };
+            // An existing Windows install that cannot start (missing DLLs, wrong
+            // build) must be replaced rather than reported as installed (#356).
+            const isManaged = path.dirname(BINARY_PATH) === BIN_DIR;
+            const healthy = process.platform !== 'win32' || !isManaged || (await validateBinary()).ok;
+            if (healthy) {
+                send({ phase: 'done', progress: 1 });
+                return { ok: true, source: 'bundled' };
+            }
+            console.warn('[local-ai] Existing sd-cli failed to start; re-installing.');
+            clearBinDir();
         }
 
         const platformKey = `${process.platform}-${process.arch}`;
         const customUrl = CUSTOM_BINARIES[platformKey];
 
         let downloadUrl, zipName;
+        let chosenRelease = null;
+        let windowsGpu = null;
+        let windowsFallbacks = [];
 
         if (customUrl) {
             downloadUrl = customUrl;
@@ -269,6 +282,9 @@ async function downloadBinary(mainWindow) {
 
             let chosen = null;
             let lastSeen = [];
+            if (process.platform === 'win32') {
+                windowsGpu = await detectWindowsGpu();
+            }
             for (const release of releases) {
                 const zips = (release.assets || [])
                     .filter(a => a.name.endsWith('.zip'));
@@ -277,9 +293,16 @@ async function downloadBinary(mainWindow) {
                     platform: process.platform,
                     arch: process.arch,
                     zipNames: lastSeen,
+                    gpu: windowsGpu,
                 });
                 if (pickedName) {
                     chosen = zips.find(a => a.name === pickedName);
+                    if (process.platform === 'win32') {
+                        windowsFallbacks = rankWindowsAssets({ zipNames: lastSeen, gpu: windowsGpu })
+                            .filter((n) => n !== pickedName)
+                            .map((n) => zips.find(a => a.name === n));
+                    }
+                    chosenRelease = release;
                     break;
                 }
             }
@@ -298,26 +321,54 @@ async function downloadBinary(mainWindow) {
             zipName = chosen.name;
         }
 
-        send({ phase: 'downloading', progress: 0 });
-        const zipPath = path.join(BIN_DIR, zipName);
-        await downloadFile(downloadUrl, zipPath, (p) => {
-            send({ phase: 'downloading', progress: p });
-        });
+        const installZip = async (url, name) => {
+            send({ phase: 'downloading', progress: 0 });
+            const zipPath = path.join(BIN_DIR, name);
+            await downloadFile(url, zipPath, (p) => {
+                send({ phase: 'downloading', progress: p });
+            });
 
-        send({ phase: 'extracting', progress: 0.95 });
-        await extractZip(zipPath, BIN_DIR);
-        fs.unlinkSync(zipPath);
+            send({ phase: 'extracting', progress: 0.95 });
+            await extractZip(zipPath, BIN_DIR);
+            fs.unlinkSync(zipPath);
 
-        // The zip may extract into a subdirectory — find the binary wherever it landed
-        const foundBinary = findFile(BIN_DIR, BINARY_NAME);
-        if (!foundBinary) throw new Error(`Extracted archive but could not find "${BINARY_NAME}" inside ${BIN_DIR}`);
+            // The zip may extract into a subdirectory — find the binary wherever it landed
+            const foundBinary = findFile(BIN_DIR, BINARY_NAME);
+            if (!foundBinary) throw new Error(`Extracted archive but could not find "${BINARY_NAME}" inside ${BIN_DIR}`);
 
-        // Move it to the expected root location if it's nested
-        if (foundBinary !== BINARY_PATH) {
-            fs.renameSync(foundBinary, BINARY_PATH);
+            // Move it (and, if nested, its sibling DLLs) to the expected root location
+            if (foundBinary !== BINARY_PATH) {
+                const nestedDir = path.dirname(foundBinary);
+                for (const entry of fs.readdirSync(nestedDir, { withFileTypes: true })) {
+                    if (entry.isFile()) fs.renameSync(path.join(nestedDir, entry.name), path.join(BIN_DIR, entry.name));
+                }
+            }
+
+            ensureBinaryPermissions();
+
+            // Windows CUDA builds are useless without the CUDA runtime beside them
+            await ensureCudaRuntime(chosenRelease, send);
+        };
+
+        await installZip(downloadUrl, zipName);
+
+        // Windows: confirm the binary actually loads; otherwise fall back through
+        // the ranked list (GPU build -> Vulkan -> CPU) instead of leaving a broken
+        // install that fails later with 0xC0000135 (#356, #260).
+        if (process.platform === 'win32' && !customUrl && !process.env[SD_CLI_ENV]) {
+            let check = await validateBinary();
+            for (const asset of windowsFallbacks) {
+                if (check.ok) break;
+                console.warn(`[local-ai] ${zipName} failed to start (exit ${check.code}); trying ${asset.name}`);
+                clearBinDir();
+                zipName = asset.name;
+                await installZip(asset.browser_download_url, asset.name);
+                check = await validateBinary();
+            }
+            if (!check.ok) {
+                throw new Error(`${describeExitCode(check.code, 'win32')}The downloaded engine (${zipName}) could not start (exit code ${check.code}).`);
+            }
         }
-
-        ensureBinaryPermissions();
 
         // macOS: strip Gatekeeper quarantine so the downloaded binary can run
         if (process.platform === 'darwin') {
@@ -414,8 +465,10 @@ async function deleteModel(modelId) {
 
     const filePath = path.join(MODELS_DIR, model.filename);
     if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-    const partPath = filePath + '.part';
-    if (fs.existsSync(partPath)) fs.unlinkSync(partPath);
+    for (const suffix of ['.part', '.part.meta.json', '.part.fresh']) {
+        const partialArtifact = filePath + suffix;
+        if (fs.existsSync(partialArtifact)) fs.unlinkSync(partialArtifact);
+    }
     return { ok: true };
 }
 
@@ -489,13 +542,11 @@ async function generate(params, mainWindow) {
         args.push('--llm', llmPath);
         args.push('--vae', vaePath);
         if (model.scheduler) args.push('--scheduler', model.scheduler);
-    } else if (model.type === 'sdxl') {
-        args.push('--sd-version', 'sdxl');
-    } else if (model.type === 'sd2') {
-        args.push('--sd-version', 'sd2');
-    } else if (model.type === 'flux') {
-        args.push('--flux');
     }
+    // sdxl/sd2/flux used to need an explicit architecture flag (--sd-version,
+    // --flux). Those flags were removed upstream — sd.cpp now detects the
+    // architecture from the checkpoint itself, and passing them aborts with
+    // "unknown argument" before any work starts. Nothing to add here.
 
     return new Promise((resolve, reject) => {
         const startupStartedAt = Date.now();
@@ -554,7 +605,7 @@ async function generate(params, mainWindow) {
                 const killed = code === null;
                 const hint = killed
                     ? 'sd-cli was terminated before finishing (often OOM on Z-Image/SDXL — try a smaller SD 1.5 model or close other apps). '
-                    : '';
+                    : describeExitCode(code);
                 reject(new Error(`${hint}sd-cli exited (code ${code ?? 'signal'}):\n${tail}`));
                 return;
             }
