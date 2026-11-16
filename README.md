@@ -8,8 +8,8 @@
 **Community:** Join [Discord](https://discord.com/invite/zpnuBRXhKg) for discussions and support
 
 
-<p align="center"><a href="https://youtu.be/FxSprPEKiC8"><img src="https://i.ytimg.com/vi/FxSprPEKiC8/maxresdefault.jpg" width="720"></a></p>
-<p align="center"><a href="https://youtu.be/FxSprPEKiC8"><b>▶ Watch: Cheapest AI Image generator </b></a></p>
+<p align="center"><a href="https://youtu.be/3kc9oqXJN5k"><img src="https://i.ytimg.com/vi/3kc9oqXJN5k/maxresdefault.jpg" width="720"></a></p>
+<p align="center"><a href="https://youtu.be/3kc9oqXJN5k"><b>▶ Watch: Seedance 2.5 Flash Uncensored (Spicy) API: 33% Cheaper </b></a></p>
 
 <p align="center">
   <a href="https://github.com/Anil-matcha/awesome-generative-ai-apps">
