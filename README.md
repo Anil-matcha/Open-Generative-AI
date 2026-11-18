@@ -8,8 +8,8 @@
 **Community:** Join [Discord](https://discord.com/invite/zpnuBRXhKg) for discussions and support
 
 
-<p align="center"><a href="https://youtu.be/1l1Swm-tNxQ"><img src="https://i.ytimg.com/vi/1l1Swm-tNxQ/maxresdefault.jpg" width="720"></a></p>
-<p align="center"><a href="https://youtu.be/1l1Swm-tNxQ"><b>▶ Watch: How to access free Seedance 2.5 4K </b></a></p>
+<p align="center"><a href="https://youtu.be/0iEgx6s5Ufg"><img src="https://i.ytimg.com/vi/0iEgx6s5Ufg/maxresdefault.jpg" width="720"></a></p>
+<p align="center"><a href="https://youtu.be/0iEgx6s5Ufg"><b>▶ Watch: How to access free Wan 3.0 Uncensored </b></a></p>
 
 <p align="center">
   <a href="https://github.com/Anil-matcha/awesome-generative-ai-apps">
