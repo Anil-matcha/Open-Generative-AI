@@ -437,7 +437,11 @@ export function LocalModelManager() {
                 listEl.appendChild(ModelCard(m, renderModels));
             });
         } catch (err) {
-            listEl.innerHTML = `<div class="text-xs text-red-400 text-center py-4">${t('localModels.errorLoading')}${err.message}</div>`;
+            listEl.innerHTML = '';
+            const errEl = document.createElement('div');
+            errEl.className = 'text-xs text-red-400 text-center py-4';
+            errEl.textContent = `${t('localModels.errorLoading')}${err.message}`;
+            listEl.appendChild(errEl);
         }
     };
 

@@ -49,6 +49,10 @@ const IMAGE_FAMILY_ALIASES = {
   "gpt-image-2.5-sunburst-text-to-image": "gpt-image-2.5",
   "gpt-image-2.5-flare-image-to-image": "gpt-image-2.5",
   "gpt-image-2.5-sunburst-image-to-image": "gpt-image-2.5",
+  "gpt-image-2.6-flare-text-to-image": "gpt-image-2.6",
+  "gpt-image-2.6-sunburst-text-to-image": "gpt-image-2.6",
+  "gpt-image-2.6-flare-image-to-image": "gpt-image-2.6",
+  "gpt-image-2.6-sunburst-image-to-image": "gpt-image-2.6",
   "gemini-omni-character": "gemini-omni",
   "grok-imagine-image-2-edit": "grok-imagine",
   "qwen2-1-text-to-image": "qwen2-1",
@@ -91,6 +95,7 @@ const IMAGE_FAMILY_ALIASES = {
   "vidu-q2-reference-to-image": "vidu-q2",
   "vidu-q2-text-to-image": "vidu-q2",
   "wan2.7-image-edit-pro": "wan2.7",
+  "wan3.0-image-edit": "wan3.0",
   "wan2.7-text-to-image-pro": "wan2.7",
 };
 
@@ -105,6 +110,8 @@ const IMAGE_FAMILY_NAMES = {
   "seedream-5.0": "Seedream 5.0",
   "gpt-image-2": "GPT Image 2",
   "gpt-image-2.5": "GPT Image 2.5",
+  "gpt-image-2.6": "GPT Image 2.6",
+  "wan3.0": "Wan 3.0",
   "qwen2-1": "Qwen 2.1",
   "topaz-upscale-image": "Topaz Image Upscale",
   "qwen-image-2.0": "Qwen Image 2.0",
@@ -147,6 +154,14 @@ const PREFERRED_IMAGE_VARIANTS = {
   "gpt-image-2.5": {
     t2i: "gpt-image-2.5-flare-text-to-image",
     i2i: "gpt-image-2.5-flare-image-to-image",
+  },
+  "gpt-image-2.6": {
+    t2i: "gpt-image-2.6-flare-text-to-image",
+    i2i: "gpt-image-2.6-flare-image-to-image",
+  },
+  "wan3.0": {
+    t2i: "wan3.0-text-to-image",
+    i2i: "wan3.0-image-edit",
   },
   "flux-2-klein": {
     t2i: "flux-2-klein-4b",

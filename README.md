@@ -8,8 +8,8 @@
 **Community:** Join [Discord](https://discord.com/invite/zpnuBRXhKg) for discussions and support
 
 
-<p align="center"><a href="https://youtu.be/_SK1mQPfzF4"><img src="https://i.ytimg.com/vi/_SK1mQPfzF4/maxresdefault.jpg" width="720"></a></p>
-<p align="center"><a href="https://youtu.be/_SK1mQPfzF4"><b>▶ Watch: Best Spicy AI Video & Image Generator 2026 (Free, Unlimited) </b></a></p>
+<p align="center"><a href="https://youtu.be/0iEgx6s5Ufg"><img src="https://i.ytimg.com/vi/0iEgx6s5Ufg/maxresdefault.jpg" width="720"></a></p>
+<p align="center"><a href="https://youtu.be/0iEgx6s5Ufg"><b>▶ Watch: How to access free Wan 3.0 Uncensored </b></a></p>
 
 <p align="center">
   <a href="https://github.com/Anil-matcha/awesome-generative-ai-apps">
@@ -18,6 +18,8 @@
 </p>
 
 > 🎨 **[Explore 50+ more open-source AI apps →](https://github.com/Anil-matcha/awesome-generative-ai-apps)**
+
+> 🤝 **New: [Open Duet](https://github.com/Anil-matcha/open-duet)** — open-source, self-hosted AI coworkers (named agents) with instructions, memory, routines, their own isolated computer, and your approval before they act. An alternative to Claude Duet, OpenAI Dots, and Manus Cue. [Star it on GitHub →](https://github.com/Anil-matcha/open-duet)
 
 ## 💰 Turn This Into Your Own Product — White Label & Resell
 
@@ -64,6 +66,7 @@ This is a curated set of high-value hubs, popular distribution tools, and model-
 - [awesome-ai-video-models](https://github.com/Anil-matcha/awesome-ai-video-models) — compare video models by API, price, and capability.
 - [awesome-ai-image-models](https://github.com/Anil-matcha/awesome-ai-image-models) — compare image models by API, price, and quality.
 - [AI-Youtube-Shorts-Generator](https://github.com/SamurAIGPT/AI-Youtube-Shorts-Generator) — Open-source Opus Clip alternative application.
+- [open-duet](https://github.com/Anil-matcha/open-duet) — Open-source, self-hosted AI coworkers with memory, routines, isolated computers, and approval-gated actions.
 - [Open-AI-Design-Agent](https://github.com/Anil-matcha/Open-AI-Design-Agent) — Ppen-source autonomous AI design agent.
 - [muapi-skills](https://github.com/SamurAIGPT/muapi-skills) — Agent-ready skills for driving generative-media workflows.
 - [Seedance-2.5-API](https://github.com/SamurAIGPT/Seedance-2.5-API) — Python SDK for Seedance 2.5 video generation.
@@ -504,6 +507,22 @@ You'll be prompted to enter your Muapi API key on first use (skip the key if you
 npm run build
 npm run start
 ```
+
+### Run with Docker
+
+The image builds from the submodule packages, so clone with submodules first. Without them, `docker compose up --build` stops with `failed to solve: lstat /packages/Vibe-Workflow/packages/workflow-builder: no such file or directory`.
+
+```bash
+git clone --recurse-submodules https://github.com/Anil-matcha/Open-Generative-AI.git
+cd Open-Generative-AI
+
+# If you already cloned without --recurse-submodules, run this once:
+# git submodule update --init --recursive
+
+docker compose up --build
+```
+
+The app is then at http://localhost:3001. To use another port, change the first number under `ports` in `docker-compose.yml`.
 
 ### Desktop App Build
 

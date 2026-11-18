@@ -6,6 +6,8 @@ import { createUploadPicker } from './UploadPicker.js';
 import { savePendingJob, removePendingJob, getPendingJobs } from '../lib/pendingJobs.js';
 import { localAI, isLocalAIAvailable } from '../lib/localInferenceClient.js';
 import { isWan2gpModelId, getLocalModelById, localT2VModels, localI2VModels } from '../lib/localModels.js';
+import { createHistoryMediaWithDownload } from '../lib/historyDom.mjs';
+import { createProviderFallbackTile, getProviderLogo, getProviderLogoAlt, getProviderFallbackText, handleProviderLogoError, shouldInvertProviderLogo } from '../lib/providerLogos.js';
 
 // Promotes a wan2gp catalog entry (lib/localModels.js shape) into the
 // `inputs`-shaped descriptor the Video Studio dropdowns/controls expect.
@@ -666,7 +668,7 @@ export function VideoStudio() {
             extendBanner.classList.remove('flex');
         }
     };
-
+    const failedProviderLogos = new Set();
     const showDropdown = (type, anchorBtn) => {
         dropdown.innerHTML = '';
         dropdown.classList.remove('opacity-0', 'pointer-events-none');
@@ -699,9 +701,19 @@ export function VideoStudio() {
                 const localNote = unavailable
                     ? `<span class="v-local-reason text-[9px] text-yellow-400/80 leading-snug">${escapeHtml(local.unavailableReason)}</span>`
                     : local?.availabilityNote ? `<span class="text-[9px] text-muted leading-snug">${escapeHtml(local.availabilityNote)}</span>` : '';
+                const fallbackText = getProviderFallbackText(m);
+                const fallbackClasses = `w-10 h-10 ${iconColor} border border-white/5 rounded-xl flex items-center justify-center font-black text-sm shadow-inner uppercase`;
+                const fallbackMarkup = `<div data-provider-fallback class="${fallbackClasses}">${fallbackText}</div>`;
+                const configuredProviderLogo = getProviderLogo(m.provider);
+                const providerLogo = configuredProviderLogo && !failedProviderLogos.has(configuredProviderLogo)
+                    ? configuredProviderLogo
+                    : null;
+                const logoMarkup = providerLogo
+                    ? `<div class="w-10 h-10 rounded-xl border border-white/5 overflow-hidden shrink-0 flex items-center justify-center bg-white/[0.02]"><img data-provider-logo src="${providerLogo}" alt="${getProviderLogoAlt(m)}" loading="lazy" class="w-full h-full object-contain p-1 ${shouldInvertProviderLogo(m.provider) ? 'invert' : ''}"></div>`
+                    : fallbackMarkup;
                 item.innerHTML = `
                     <div class="flex items-center gap-3.5 min-w-0">
-                         <div class="w-10 h-10 shrink-0 ${iconColor} border border-white/5 rounded-xl flex items-center justify-center font-black text-sm shadow-inner uppercase">${m.provider === 'wan2gp' ? '⚡' : m.name.charAt(0)}</div>
+                         ${m.provider === 'wan2gp' ? `<div class="w-10 h-10 shrink-0 ${iconColor} border border-white/5 rounded-xl flex items-center justify-center font-black text-sm shadow-inner uppercase">⚡</div>` : logoMarkup}
                          <div class="flex flex-col gap-0.5 min-w-0">
                             <span class="text-xs font-bold text-white tracking-tight">${m.name}</span>
                             ${isV2V ? `<span class="text-[9px] text-orange-400/70">${m.imageField ? 'Upload a video and image' : 'Upload a video to use'}</span>` : ''}
@@ -710,6 +722,16 @@ export function VideoStudio() {
                     </div>
                     ${selectedModel === m.id ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
                 `;
+                const logoImage = item.querySelector('[data-provider-logo]');
+                logoImage?.addEventListener('error', () => {
+                    const fallback = createProviderFallbackTile(document, fallbackClasses, fallbackText);
+                    handleProviderLogoError({
+                        image: logoImage,
+                        failedProviderLogos,
+                        providerLogo,
+                        fallback,
+                    });
+                }, { once: true });
                 item.onclick = (e) => {
                     e.stopPropagation();
                     if (unavailable) return;
@@ -1061,16 +1083,25 @@ export function VideoStudio() {
             const thumb = document.createElement('div');
             thumb.className = `relative group/thumb cursor-pointer rounded-xl overflow-hidden border-2 transition-all duration-300 ${idx === 0 ? 'border-primary shadow-glow' : 'border-white/10 hover:border-white/30'}`;
 
-            thumb.innerHTML = `
-                <video src="${entry.url}" preload="metadata" muted class="w-full aspect-square object-cover"></video>
-                <div class="absolute inset-0 bg-black/60 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center gap-1">
-                    <button class="hist-download p-1.5 bg-primary rounded-lg text-black hover:scale-110 transition-transform" title="Download">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-                    </button>
-                </div>
-            `;
+            const { media, overlay } = createHistoryMediaWithDownload({
+                document,
+                tagName: 'video',
+                url: entry.url,
+                mediaClassName: 'w-full aspect-square object-cover',
+                overlayClassName: 'absolute inset-0 bg-black/60 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center gap-1',
+                buttonClassName: 'hist-download p-1.5 bg-primary rounded-lg text-black hover:scale-110 transition-transform',
+            });
+            thumb.appendChild(media);
+            thumb.appendChild(overlay);
 
             thumb.onclick = (e) => {
+                if (e.target.closest('.hist-delete')) {
+                    const at = generationHistory.indexOf(entry);
+                    if (at !== -1) generationHistory.splice(at, 1);
+                    try { localStorage.setItem('video_history', JSON.stringify(generationHistory.slice(0, 30))); } catch (err) { /* ignore */ }
+                    renderHistory();
+                    return;
+                }
                 if (e.target.closest('.hist-download')) {
                     downloadFile(entry.url, `video-${entry.id || idx}.mp4`);
                     return;

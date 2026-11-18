@@ -13,6 +13,7 @@ import { createUploadPicker } from './UploadPicker.js';
 import { savePendingJob, removePendingJob, getPendingJobs } from '../lib/pendingJobs.js';
 import { downloadImage } from '../../packages/studio/src/utils/downloadImage.js';
 import { appendGenerationRefundNotice } from '../../packages/studio/src/utils/generationLifecycle.js';
+import { createHistoryMediaWithDownload } from '../lib/historyDom.mjs';
 
 function createInlineInstructions(type) {
     const el = document.createElement('div');
@@ -224,6 +225,7 @@ export function ImageStudio() {
             if (useLocalModel) {
                 const lm = getLocalModelById(selectedLocalModel);
                 if (lm) document.getElementById('model-btn-label').textContent = lm.name;
+                applyLocalModelDefaults(lm);
             } else {
                 document.getElementById('model-btn-label').textContent = selectedModelName;
             }
@@ -626,6 +628,23 @@ export function ImageStudio() {
             stepsValue.textContent = steps;
         };
     }
+
+    // Local models are tuned for specific step/guidance values (e.g. Z-Image
+    // Turbo needs 8 steps at cfg 1.0) — sync state and sliders to the model's
+    // catalog defaults whenever one becomes active.
+    function applyLocalModelDefaults(model) {
+        if (!model) return;
+        if (Number.isFinite(model.defaultSteps)) {
+            steps = model.defaultSteps;
+            if (stepsSlider) stepsSlider.value = steps;
+            if (stepsValue) stepsValue.textContent = steps;
+        }
+        if (Number.isFinite(model.defaultGuidance)) {
+            guidanceScale = model.defaultGuidance;
+            if (guidanceSlider) guidanceSlider.value = guidanceScale;
+            if (guidanceValue) guidanceValue.textContent = guidanceScale;
+        }
+    }
     
     // Seed input
     const seedInput = advancedPanel.querySelector('#seed-input');
@@ -765,6 +784,7 @@ export function ImageStudio() {
                             e.stopPropagation();
                             selectedLocalModel = m.id;
                             document.getElementById('model-btn-label').textContent = m.name;
+                            applyLocalModelDefaults(m);
                             selectedAr = m.aspectRatios[0];
                             document.getElementById('ar-btn-label').textContent = selectedAr;
                             qualityBtn.style.display = 'none';
@@ -1020,17 +1040,28 @@ export function ImageStudio() {
         generationHistory.forEach((entry, idx) => {
             const thumb = document.createElement('div');
             thumb.className = `relative group/thumb cursor-pointer rounded-xl overflow-hidden border-2 transition-all duration-300 ${idx === 0 ? 'border-primary shadow-glow' : 'border-white/10 hover:border-white/30'}`;
+            const promptPreview = typeof entry.prompt === 'string' ? entry.prompt.substring(0, 30) : '';
 
-            thumb.innerHTML = `
-                <img src="${entry.url}" alt="${entry.prompt?.substring(0, 30) || 'Generated'}" class="w-full aspect-square object-cover">
-                <div class="absolute inset-0 bg-black/60 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center gap-1">
-                    <button class="hist-download p-1.5 bg-primary rounded-lg text-black hover:scale-110 transition-transform" title="Download">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-                    </button>
-                </div>
-            `;
+            const { media, overlay } = createHistoryMediaWithDownload({
+                document,
+                tagName: 'img',
+                url: entry.url,
+                alt: promptPreview || 'Generated',
+                mediaClassName: 'w-full aspect-square object-cover',
+                overlayClassName: 'absolute inset-0 bg-black/60 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center gap-1',
+                buttonClassName: 'hist-download p-1.5 bg-primary rounded-lg text-black hover:scale-110 transition-transform',
+            });
+            thumb.appendChild(media);
+            thumb.appendChild(overlay);
 
             thumb.onclick = (e) => {
+                if (e.target.closest('.hist-delete')) {
+                    const at = generationHistory.indexOf(entry);
+                    if (at !== -1) generationHistory.splice(at, 1);
+                    try { localStorage.setItem('muapi_history', JSON.stringify(generationHistory.slice(0, 50))); } catch (err) { /* ignore */ }
+                    renderHistory();
+                    return;
+                }
                 if (e.target.closest('.hist-download')) {
                     downloadImage(entry.url, `muapi-${entry.id || idx}.jpg`);
                     return;
@@ -1210,7 +1241,7 @@ export function ImageStudio() {
                 console.error('[Local] generation error:', e);
                 hero.classList.remove('opacity-0', 'scale-95', '-translate-y-10', 'pointer-events-none');
                 console.error('[Local] full error:', e.message);
-                generateBtn.innerHTML = `Error: ${e.message.slice(0, 120)}`;
+                generateBtn.textContent = `Error: ${e.message.slice(0, 120)}`;
                 setTimeout(() => { generateBtn.innerHTML = t('common.generate'); }, 6000);
             } finally {
                 generateBtn.disabled = false;

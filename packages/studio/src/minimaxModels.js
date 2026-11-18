@@ -58,6 +58,11 @@ const registry = createGroupedVideoRegistry({
     register("minimax-h3-max-reference-to-video", "minimax-h3-max", ["references"]);
     register("minimax-h3-max-turbo-text-to-video", "minimax-h3-max", [null], { speed: "turbo" });
     register("minimax-h3-max-turbo-image-to-video", "minimax-h3-max", ["animate_image", "keyframes"], { speed: "turbo" });
+    register("minimax-h3-max-spicy-text-to-video", "minimax-h3-max", [null], { profile: "spicy" });
+    register("minimax-h3-max-spicy-image-to-video", "minimax-h3-max", ["animate_image", "keyframes"], { profile: "spicy" });
+    register("minimax-h3-max-spicy-reference-to-video", "minimax-h3-max", ["references"], { profile: "spicy" });
+    register("minimax-h3-max-turbo-spicy-text-to-video", "minimax-h3-max", [null], { speed: "turbo", profile: "spicy" });
+    register("minimax-h3-max-turbo-spicy-image-to-video", "minimax-h3-max", ["animate_image", "keyframes"], { speed: "turbo", profile: "spicy" });
   },
 });
 
