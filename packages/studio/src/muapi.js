@@ -61,9 +61,42 @@ function normalizePredictionResult(submitData, result, outputUrl) {
     };
 }
 
+/**
+ * Retry a fetch request with exponential backoff for transient errors.
+ * Retries on: 429 (rate limit), 502 (bad gateway), 503 (service unavailable).
+ * Does NOT retry on: 400, 401, 403, 404, 422 (client errors) or 5xx other than 502/503.
+ */
+async function fetchWithRetry(url, options, { maxRetries = 3, baseDelay = 1000 } = {}) {
+    const RETRYABLE_STATUSES = new Set([429, 502, 503]);
+    let lastError;
+
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        try {
+            const response = await fetch(url, options);
+            // Only retry on specific transient server errors
+            if (RETRYABLE_STATUSES.has(response.status) && attempt < maxRetries) {
+                const delay = baseDelay * Math.pow(2, attempt);
+                await new Promise(resolve => setTimeout(resolve, delay));
+                continue;
+            }
+            return response;
+        } catch (err) {
+            lastError = err;
+            // Retry on network errors (not HTTP errors)
+            if (attempt < maxRetries && (err.name === 'TypeError' || err.message?.includes('network') || err.message?.includes('fetch'))) {
+                const delay = baseDelay * Math.pow(2, attempt);
+                await new Promise(resolve => setTimeout(resolve, delay));
+                continue;
+            }
+            throw err;
+        }
+    }
+    throw lastError || new Error('Max retries exceeded');
+}
+
 async function submitAndPoll(endpoint, payload, key, onRequestId, maxAttempts = 60) {
     const url = `${BASE_URL}/api/v1/${endpoint}`;
-    const response = await fetch(url, {
+    const response = await fetchWithRetry(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-api-key': key },
         body: JSON.stringify(payload)

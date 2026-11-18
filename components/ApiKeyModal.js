@@ -1,17 +1,50 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getCommonCopy } from '@/lib/locales';
 
 export default function ApiKeyModal({ onSave, onClose, overlay = false, title, subtitle, locale = 'en' }) {
   const [key, setKey] = useState('');
   const [error, setError] = useState('');
+  const inputRef = useRef(null);
   const copy = getCommonCopy(locale).apiKeyModal;
+
+  // Auto-focus the input on mount
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  // Focus trapping: keep focus within modal when overlay
+  useEffect(() => {
+    if (!overlay) return;
+    const modal = document.querySelector('[data-modal="api-key"]');
+    if (!modal) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key !== 'Tab') return;
+      const focusable = modal.querySelectorAll(
+        'input, button, [href], select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [overlay]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const trimmed = key.trim();
-    if (!trimmed) { setError(copy.missingKeyError); return; }
+    if (!trimmed) { setError(copy.missingKeyError); inputRef.current?.focus(); return; }
     onSave(trimmed);
   };
 
@@ -20,8 +53,8 @@ export default function ApiKeyModal({ onSave, onClose, overlay = false, title, s
     : 'min-h-screen bg-[#030303] flex items-center justify-center px-4 font-inter';
 
   return (
-    <div className={wrapperClass}>
-      <div className="w-full max-w-sm bg-[#0a0a0a]/90 backdrop-blur-xl border border-white/10 rounded-xl p-10 shadow-2xl relative">
+    <div className={wrapperClass} data-modal={overlay ? 'api-key' : undefined}>
+      <div className="w-full max-w-sm bg-[#0a0a0a]/90 backdrop-blur-xl border border-white/10 rounded-xl p-10 shadow-2xl relative" role="dialog" aria-labelledby="api-key-title" aria-describedby="api-key-desc" aria-modal={overlay ? 'true' : undefined}>
         {overlay && onClose && (
           <button
             type="button"
@@ -40,10 +73,10 @@ export default function ApiKeyModal({ onSave, onClose, overlay = false, title, s
               <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L12 17.25l-4.5-4.5L15.5 7.5z" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
-          <h1 className="text-xl font-bold text-white tracking-tight mb-2">
+          <h1 id="api-key-title" className="text-xl font-bold text-white tracking-tight mb-2">
             {title || copy.title}
           </h1>
-          <p className="text-white/40 text-[13px] leading-relaxed px-4">
+          <p id="api-key-desc" className="text-white/40 text-[13px] leading-relaxed px-4">
             {subtitle || (
               <>{copy.subtitlePrefix} <a href="https://muapi.ai/access-keys" target="_blank" rel="noreferrer" className="text-[#22d3ee] hover:text-[#e5ff33] transition-colors">Muapi.ai</a> {copy.subtitleSuffix}</>
             )}
@@ -56,6 +89,7 @@ export default function ApiKeyModal({ onSave, onClose, overlay = false, title, s
               {copy.label}
             </label>
             <input
+              ref={inputRef}
               type="password"
               value={key}
               onChange={(e) => { setKey(e.target.value); setError(''); }}
