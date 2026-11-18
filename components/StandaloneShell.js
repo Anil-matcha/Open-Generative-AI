@@ -3,13 +3,29 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { ImageStudio, VideoStudio, ClippingStudio, MotionControlStudio, VibeMotionStudio, LipSyncStudio, RecastStudio, CinemaStudio, AudioStudio, MarketingStudio, WorkflowStudio, AgentStudio, AppsStudio, AiInfluencerStudio, LayersStudio, getUserBalance } from 'studio';
+import { ImageStudio, VideoStudio, getUserBalance } from 'studio';
 import StudioErrorBoundary from 'studio/components/StudioErrorBoundary';
 
-const DesignAgentStudio = dynamic(() => import('studio').then(mod => mod.DesignAgentStudio), {
-  ssr: false,
-  loading: () => <div className="h-full w-full bg-black flex items-center justify-center text-white/20">Loading Design Studio...</div>
-});
+// Lazy-load non-primary studios to reduce initial bundle size.
+// ImageStudio and VideoStudio are eager-loaded (most-used tabs).
+const LayersStudio = dynamic(() => import('studio').then(m => ({ default: m.LayersStudio })), { ssr: false, loading: () => <StudioLoading /> });
+const ClippingStudio = dynamic(() => import('studio').then(m => ({ default: m.ClippingStudio })), { ssr: false, loading: () => <StudioLoading /> });
+const MotionControlStudio = dynamic(() => import('studio').then(m => ({ default: m.MotionControlStudio })), { ssr: false, loading: () => <StudioLoading /> });
+const VibeMotionStudio = dynamic(() => import('studio').then(m => ({ default: m.VibeMotionStudio })), { ssr: false, loading: () => <StudioLoading /> });
+const LipSyncStudio = dynamic(() => import('studio').then(m => ({ default: m.LipSyncStudio })), { ssr: false, loading: () => <StudioLoading /> });
+const RecastStudio = dynamic(() => import('studio').then(m => ({ default: m.RecastStudio })), { ssr: false, loading: () => <StudioLoading /> });
+const CinemaStudio = dynamic(() => import('studio').then(m => ({ default: m.CinemaStudio })), { ssr: false, loading: () => <StudioLoading /> });
+const AudioStudio = dynamic(() => import('studio').then(m => ({ default: m.AudioStudio })), { ssr: false, loading: () => <StudioLoading /> });
+const MarketingStudio = dynamic(() => import('studio').then(m => ({ default: m.MarketingStudio })), { ssr: false, loading: () => <StudioLoading /> });
+const WorkflowStudio = dynamic(() => import('studio').then(m => ({ default: m.WorkflowStudio })), { ssr: false, loading: () => <StudioLoading /> });
+const AgentStudio = dynamic(() => import('studio').then(m => ({ default: m.AgentStudio })), { ssr: false, loading: () => <StudioLoading /> });
+const AppsStudio = dynamic(() => import('studio').then(m => ({ default: m.AppsStudio })), { ssr: false, loading: () => <StudioLoading /> });
+const AiInfluencerStudio = dynamic(() => import('studio').then(m => ({ default: m.AiInfluencerStudio })), { ssr: false, loading: () => <StudioLoading /> });
+const DesignAgentStudio = dynamic(() => import('studio').then(m => m.DesignAgentStudio), { ssr: false, loading: () => <StudioLoading /> });
+
+function StudioLoading() {
+  return <div className="h-full w-full bg-[#030303] flex items-center justify-center"><div className="animate-spin text-[#22d3ee] text-3xl">◌</div></div>;
+}
 import axios from 'axios';
 import ApiKeyModal from './ApiKeyModal';
 import { getCommonCopy, getLocaleConfig, localizeStudioPath } from '@/lib/locales';
@@ -335,18 +351,6 @@ export default function StandaloneShell({ locale = 'en' }) {
       {children}
     </StudioErrorBoundary>
   ), []);
-  const getWorkflowInfo = useCallback(() => {
-    if (idFromParams) {
-        return { id: idFromParams, tab: tabFromParams || null };
-    }
-    const wfIndex = slug.findIndex(s => s === 'workflows' || s === 'workflow');
-    if (wfIndex === -1) return { id: null, tab: null };
-    return {
-      id: slug[wfIndex + 1] || null,
-      tab: slug[wfIndex + 2] || null
-    };
-  }, [slug, idFromParams, tabFromParams]);
-
   const { id: urlWorkflowId } = getWorkflowInfo();
 
   // Initialize activeTab from URL slug/params or default to 'image'
@@ -701,11 +705,21 @@ export default function StandaloneShell({ locale = 'en' }) {
   return (
     <div 
       className="h-screen bg-[#030303] flex flex-col overflow-hidden text-white relative"
+      role="application"
+      aria-label={copy.shell?.brand || "Open Generative AI"}
       onDragOver={handleDragOver}
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
+      {/* Skip to content — accessibility */}
+      <a
+        href="#studio-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-[200] focus:px-4 focus:py-2 focus:bg-[#22d3ee] focus:text-black focus:rounded-lg focus:font-bold focus:text-sm focus:outline-none"
+      >
+        {copy.shell?.skipToContent || "Skip to content"}
+      </a>
+
       {/* Drag Overlay */}
       {isDragging && (
         <div className="fixed inset-0 z-[100] bg-[#22d3ee]/10 backdrop-blur-md border-4 border-dashed border-[#22d3ee]/50 flex items-center justify-center pointer-events-none transition-all duration-300">
@@ -993,7 +1007,7 @@ export default function StandaloneShell({ locale = 'en' }) {
         )}
 
         {/* Studio Content */}
-        <div className="flex-1 min-h-0 h-full relative overflow-hidden bg-[#030303]">
+        <div id="studio-content" className="flex-1 min-h-0 h-full relative overflow-hidden bg-[#030303]">
         <div className={activeTab === 'image' ? "h-full w-full" : "hidden"}>
           {wrapWithErrorBoundary('image',
           <ImageStudio apiKey={apiKey} locale={locale} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('image')} onGenerationEnd={makeGenerationEndCallback('image')} onGenerationComplete={makeSuccessCallback('image')} onGenerationError={makeErrorCallback('image')} />
