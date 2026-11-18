@@ -17,7 +17,7 @@
 | 8 | Accessibility | 🟡 Medium | ✅ 85% | axe-core audit (10 tests), skip-link, focus trapping, ARIA roles, keyboard nav |
 | 9 | PWA / Offline | 🟢 Low | ✅ Done | Service worker, manifest, offline queue, caching |
 | 10 | Streaming API | 🟡 Medium | 🔴 Blocked | Requires Muapi API SSE/streaming endpoints |
-| 11 | TypeScript Migration | 🟢 Low | 🟡 20% | Core types defined (`models.d.ts`) |
+| 11 | TypeScript Migration | 🟢 Low | 🟡 30% | Core types (`models.d.ts`) + `modelCapabilities.ts` (226 lines, 7 imports updated) |
 
 ## Completed Items (Detail)
 
@@ -78,6 +78,14 @@
   - Message handlers for queue management
 - **Registration**: Auto-registers in root layout
 - **PWA metadata**: `appleWebApp`, `themeColor`, manifest link
+
+### 10. TypeScript Migration (Started — 30%)
+- **`packages/studio/src/types/models.d.ts`**: Core type definitions (ModelInput, ModelDefinition, GenerationParams, PollResult, etc.)
+- **`packages/studio/src/modelCapabilities.ts`**: First production file converted from JS to TypeScript (226 lines)
+  - Full type annotations on all functions, interfaces for ModelInfo/MediaCapability/GenerationSources
+  - 7 consumer imports updated (muapi.js, models.js, modelFamilies.js, modelParameters.js, videoWorkflows.js, ImageStudio.jsx, VideoStudio.jsx)
+  - Old `modelCapabilities.js` removed
+- **Migration pattern established**: `.js` → `.ts` conversion with explicit interfaces, consumer imports drop `.js` extension
 
 ## Blocked Items
 

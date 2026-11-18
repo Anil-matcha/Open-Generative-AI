@@ -6,7 +6,7 @@ import {
 import { buildImageSizePayload } from './imageSizing.js';
 import { buildImageInputPayload, getImageInputValidationError, normalizePrimaryImageUrls } from './imageInputContracts.js';
 import { pollForGenerationResult } from './utils/generationLifecycle.js';
-import { getModelMediaCapabilities, mapReferenceParams } from './modelCapabilities.js';
+import { getModelMediaCapabilities, mapReferenceParams } from './modelCapabilities';
 import { buildSupplementalInputPayload } from './modelParameters.js';
 import { getGroupedVideoConfiguration } from './groupedVideoModels.js';
 

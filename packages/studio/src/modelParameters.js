@@ -1,4 +1,4 @@
-import { getModelMediaCapabilities } from "./modelCapabilities.js";
+import { getModelMediaCapabilities } from "./modelCapabilities";
 
 const COMMON_INPUT_KEYS = new Set([
   "prompt",

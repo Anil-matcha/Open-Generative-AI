@@ -33,7 +33,7 @@ import {
 import {
   buildReferenceParams,
   getModelMediaCapabilities,
-} from "../modelCapabilities.js";
+} from "../modelCapabilities";
 import {
   buildSupplementalInputPayload,
   createModelParameterValues,

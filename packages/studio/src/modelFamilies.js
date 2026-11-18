@@ -5,7 +5,7 @@ import {
   t2vModels,
   v2vModels,
 } from "./models.js";
-import { getModelMediaCapabilities } from "./modelCapabilities.js";
+import { getModelMediaCapabilities } from "./modelCapabilities";
 import {
   getGroupedVideoConfiguration,
   resolveGroupedVideoVariant,

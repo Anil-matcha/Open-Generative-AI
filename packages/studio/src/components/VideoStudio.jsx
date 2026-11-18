@@ -48,7 +48,7 @@ import {
   getModelMediaCapabilities,
   recordGenerationSource,
   shouldDisableVideoPrompt,
-} from "../modelCapabilities.js";
+} from "../modelCapabilities";
 import {
   buildSupplementalInputPayload,
   createModelParameterValues,

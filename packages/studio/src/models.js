@@ -1,4 +1,4 @@
-import { getMediaCapability } from "./modelCapabilities.js";
+import { getMediaCapability } from "./modelCapabilities";
 
 // Synced from the canonical Muapi schema_data.json catalog.
 import {
