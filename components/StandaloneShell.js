@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { ImageStudio, VideoStudio, ClippingStudio, MotionControlStudio, VibeMotionStudio, LipSyncStudio, RecastStudio, CinemaStudio, AudioStudio, MarketingStudio, WorkflowStudio, AgentStudio, AppsStudio, AiInfluencerStudio, LayersStudio, getUserBalance } from 'studio';
+import StudioErrorBoundary from 'studio/components/StudioErrorBoundary';
 
 const DesignAgentStudio = dynamic(() => import('studio').then(mod => mod.DesignAgentStudio), {
   ssr: false,
@@ -316,6 +317,24 @@ export default function StandaloneShell({ locale = 'en' }) {
   const studioPath = useCallback((tabId) => localizeStudioPath(locale, tabId), [locale]);
 
   // Helper to extract workflow details precisely from either route structure
+  const getWorkflowInfo = useCallback(() => {
+    if (idFromParams) {
+        return { id: idFromParams, tab: tabFromParams || null };
+    }
+    const wfIndex = slug.findIndex(s => s === 'workflows' || s === 'workflow');
+    if (wfIndex === -1) return { id: null, tab: null };
+    return {
+      id: slug[wfIndex + 1] || null,
+      tab: slug[wfIndex + 2] || null
+    };
+  }, [slug, idFromParams, tabFromParams]);
+
+  // Helper to wrap studio content with error boundary
+  const wrapWithErrorBoundary = useCallback((tabId, children) => (
+    <StudioErrorBoundary studio={tabId} onError={(err) => console.error('Studio crash:', err)}>
+      {children}
+    </StudioErrorBoundary>
+  ), []);
   const getWorkflowInfo = useCallback(() => {
     if (idFromParams) {
         return { id: idFromParams, tab: tabFromParams || null };
@@ -976,39 +995,62 @@ export default function StandaloneShell({ locale = 'en' }) {
         {/* Studio Content */}
         <div className="flex-1 min-h-0 h-full relative overflow-hidden bg-[#030303]">
         <div className={activeTab === 'image' ? "h-full w-full" : "hidden"}>
+          {wrapWithErrorBoundary('image',
           <ImageStudio apiKey={apiKey} locale={locale} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('image')} onGenerationEnd={makeGenerationEndCallback('image')} onGenerationComplete={makeSuccessCallback('image')} onGenerationError={makeErrorCallback('image')} />
+          )}
         </div>
         <div className={activeTab === 'layers' ? "h-full w-full" : "hidden"}>
+          {wrapWithErrorBoundary('layers',
           <LayersStudio apiKey={apiKey} locale={locale} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('layers')} onGenerationEnd={makeGenerationEndCallback('layers')} onGenerationComplete={makeSuccessCallback('layers')} onGenerationError={makeErrorCallback('layers')} />
+          )}
         </div>
         <div className={activeTab === 'video' ? "h-full w-full" : "hidden"}>
+          {wrapWithErrorBoundary('video',
           <VideoStudio apiKey={apiKey} locale={locale} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('video')} onGenerationEnd={makeGenerationEndCallback('video')} onGenerationComplete={makeSuccessCallback('video')} onGenerationError={makeErrorCallback('video')} />
+          )}
         </div>
         <div className={activeTab === 'clipping' ? "h-full w-full" : "hidden"}>
+          {wrapWithErrorBoundary('clipping',
           <ClippingStudio apiKey={apiKey} locale={locale} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('clipping')} onGenerationEnd={makeGenerationEndCallback('clipping')} onGenerationComplete={makeSuccessCallback('clipping')} onGenerationError={makeErrorCallback('clipping')} />
+          )}
         </div>
         <div className={activeTab === 'motion-control' ? "h-full w-full" : "hidden"}>
+          {wrapWithErrorBoundary('motion-control',
           <MotionControlStudio apiKey={apiKey} locale={locale} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('motion-control')} onGenerationEnd={makeGenerationEndCallback('motion-control')} onGenerationComplete={makeSuccessCallback('motion-control')} onGenerationError={makeErrorCallback('motion-control')} />
+          )}
         </div>
         <div className={activeTab === 'vibe-motion' ? "h-full w-full" : "hidden"}>
+          {wrapWithErrorBoundary('vibe-motion',
           <VibeMotionStudio apiKey={apiKey} locale={locale} onGenerationStart={makeGenerationStartCallback('vibe-motion')} onGenerationEnd={makeGenerationEndCallback('vibe-motion')} onGenerationComplete={makeSuccessCallback('vibe-motion')} onGenerationError={makeErrorCallback('vibe-motion')} />
+          )}
         </div>
         <div className={activeTab === 'lipsync' ? "h-full w-full" : "hidden"}>
+          {wrapWithErrorBoundary('lipsync',
           <LipSyncStudio apiKey={apiKey} locale={locale} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('lipsync')} onGenerationEnd={makeGenerationEndCallback('lipsync')} onGenerationComplete={makeSuccessCallback('lipsync')} onGenerationError={makeErrorCallback('lipsync')} />
+          )}
         </div>
         <div className={activeTab === 'body-swap' ? "h-full w-full" : "hidden"}>
+          {wrapWithErrorBoundary('body-swap',
           <RecastStudio apiKey={apiKey} locale={locale} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('body-swap')} onGenerationEnd={makeGenerationEndCallback('body-swap')} onGenerationComplete={makeSuccessCallback('body-swap')} onGenerationError={makeErrorCallback('body-swap')} />
+          )}
         </div>
         <div className={activeTab === 'cinema' ? "h-full w-full" : "hidden"}>
+          {wrapWithErrorBoundary('cinema',
           <CinemaStudio apiKey={apiKey} locale={locale} onGenerationStart={makeGenerationStartCallback('cinema')} onGenerationEnd={makeGenerationEndCallback('cinema')} onGenerationComplete={makeSuccessCallback('cinema')} onGenerationError={makeErrorCallback('cinema')} />
+          )}
         </div>
         <div className={activeTab === 'audio' ? "h-full w-full" : "hidden"}>
+          {wrapWithErrorBoundary('audio',
           <AudioStudio apiKey={apiKey} locale={locale} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('audio')} onGenerationEnd={makeGenerationEndCallback('audio')} onGenerationComplete={makeSuccessCallback('audio')} onGenerationError={makeErrorCallback('audio')} />
+          )}
         </div>
         <div className={activeTab === 'marketing' ? "h-full w-full" : "hidden"}>
+          {wrapWithErrorBoundary('marketing',
           <MarketingStudio apiKey={apiKey} locale={locale} droppedFiles={droppedFiles} onFilesHandled={handleFilesHandled} onGenerationStart={makeGenerationStartCallback('marketing')} onGenerationEnd={makeGenerationEndCallback('marketing')} onGenerationComplete={makeSuccessCallback('marketing')} onGenerationError={makeErrorCallback('marketing')} />
+          )}
         </div>
         <div className={activeTab === 'workflows' ? "h-full w-full" : "hidden"}>
+          {wrapWithErrorBoundary('workflows',
           <WorkflowStudio
             apiKey={apiKey}
             isHeaderVisible={isHeaderVisible}
@@ -1018,12 +1060,15 @@ export default function StandaloneShell({ locale = 'en' }) {
             onGenerationComplete={makeSuccessCallback('workflows')}
             onGenerationError={makeErrorCallback('workflows')}
           />
+          )}
         </div>
         <div className={activeTab === 'agents' ? "h-full w-full" : "hidden"}>
+          {wrapWithErrorBoundary('agents',
           <AgentStudio apiKey={apiKey} locale={locale} isHeaderVisible={isHeaderVisible} onToggleHeader={setIsHeaderVisible} />
+          )}
         </div>
         <div className={activeTab === 'design-agent' ? "h-full w-full" : "hidden"}>
-          {activeTab === 'design-agent' && (
+          {activeTab === 'design-agent' && wrapWithErrorBoundary('design-agent',
             <DesignAgentStudio
               apiKey={apiKey}
               isHeaderVisible={isHeaderVisible}
@@ -1036,9 +1081,12 @@ export default function StandaloneShell({ locale = 'en' }) {
           )}
         </div>
         <div className={activeTab === 'apps' ? "h-full w-full" : "hidden"}>
+          {wrapWithErrorBoundary('apps',
           <AppsStudio apiKey={apiKey} locale={locale} />
+          )}
         </div>
         <div className={activeTab === 'ai-influencer' ? "h-full w-full" : "hidden"}>
+          {wrapWithErrorBoundary('ai-influencer',
           <AiInfluencerStudio
             apiKey={apiKey}
             locale={locale}
@@ -1047,6 +1095,7 @@ export default function StandaloneShell({ locale = 'en' }) {
             onGenerationComplete={makeSuccessCallback('ai-influencer')}
             onGenerationError={makeErrorCallback('ai-influencer')}
           />
+          )}
         </div>
       </div>
     </div>
