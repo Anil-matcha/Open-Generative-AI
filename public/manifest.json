@@ -1,0 +1,53 @@
+{
+  "name": "Open Generative AI",
+  "short_name": "Open Gen AI",
+  "description": "Free, open-source AI image and video generation studio with 579 models across 17 studios",
+  "start_url": "/studio/image",
+  "display": "standalone",
+  "background_color": "#030303",
+  "theme_color": "#22d3ee",
+  "orientation": "any",
+  "categories": ["productivity", "utilities", "graphics"],
+  "icons": [
+    {
+      "src": "/banner.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/banner.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/thumbnail.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Image Studio with generation results"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Image Studio",
+      "short_name": "Image",
+      "description": "Generate AI images from text prompts",
+      "url": "/studio/image"
+    },
+    {
+      "name": "Video Studio",
+      "short_name": "Video",
+      "description": "Generate AI videos from text or images",
+      "url": "/studio/video"
+    },
+    {
+      "name": "Lip Sync Studio",
+      "short_name": "Lip Sync",
+      "description": "Animate portraits with audio-driven lip sync",
+      "url": "/studio/lipsync"
+    }
+  ]
+}

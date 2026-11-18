@@ -139,6 +139,7 @@
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.12",
     "autoprefixer": "^10.4.24",
+    "axe-core": "^4.14.1",
     "electron": "^33.4.11",
     "electron-builder": "^25.1.8",
     "eslint": "^9",

@@ -11,6 +11,13 @@ const inter = Inter({
 export const metadata = {
   title: 'Open Generative AI — Free AI Image & Video Studio',
   description: 'Generate AI images and videos using 200+ models — Flux, Midjourney, Kling, Veo, Seedance and more.',
+  manifest: '/manifest.json',
+  themeColor: '#22d3ee',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Open Gen AI',
+  },
 };
 
 export default async function RootLayout({ children }) {
@@ -22,6 +29,22 @@ export default async function RootLayout({ children }) {
 
   return (
     <html lang={htmlLang}>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                  navigator.serviceWorker.register('/sw.js').then(
+                    (reg) => console.log('[SW] Registered:', reg.scope),
+                    (err) => console.warn('[SW] Registration failed:', err)
+                  );
+                });
+              }
+            `,
+          }}
+        />
+      </head>
       <body className={inter.variable}>{children}</body>
     </html>
   );
