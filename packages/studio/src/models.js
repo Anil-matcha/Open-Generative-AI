@@ -11438,6 +11438,164 @@ export const t2vModels = [
     "description": "MiniMax H3 Max Turbo Spicy Text to Video is the relaxed-moderation tier of MiniMax H3 Max Turbo, generating video from text at low cost at 480p or 768p through the Muapi API.",
     "example_url": "https://cdn.muapi.ai/assets/image_download_28.avif",
     "image_url": "https://cdn.muapi.ai/assets/image_download_28.avif"
+  },
+  {
+    "id": "ltx-2.5-fast-text-to-video",
+    "name": "LTX 2.5 Fast",
+    "endpoint": "ltx-2.5-fast-text-to-video",
+    "inputs": {
+      "prompt": {
+        "examples": [
+          "A cinematic ocean wave crashing onto golden sand at sunrise, seagulls calling, highly detailed photorealistic."
+        ],
+        "description": "Text prompt, up to 5000 characters. Describe the scene, action, camera and sound. Text inside quotes is spoken as dialogue. Write 'Shot 1 / Shot 2 ...' for multiple shots.",
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt"
+      },
+      "resolution": {
+        "enum": [
+          "720p",
+          "1080p",
+          "1440p"
+        ],
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output resolution (short side).",
+        "default": "1080p"
+      },
+      "fps": {
+        "enum": [
+          24,
+          25,
+          48,
+          50
+        ],
+        "title": "FPS",
+        "name": "fps",
+        "type": "int",
+        "description": "Frame rate. Does not change the price. 48 and 50 fps allow up to 10 seconds.",
+        "default": 24
+      },
+      "duration": {
+        "enum": [
+          6,
+          8,
+          10,
+          12,
+          14,
+          16,
+          18,
+          20
+        ],
+        "title": "Duration",
+        "name": "duration",
+        "type": "int",
+        "description": "Video length in seconds: 6-20 at 720p/1080p with 24/25 fps; only 6, 8 or 10 at 1440p or 48/50 fps.",
+        "default": 10
+      },
+      "aspect_ratio": {
+        "enum": [
+          "16:9",
+          "9:16",
+          "1:1",
+          "3:2",
+          "2:3"
+        ],
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "type": "string",
+        "description": "Aspect ratio of the video.",
+        "default": "16:9"
+      },
+      "seed": {
+        "title": "Seed",
+        "name": "seed",
+        "type": "int",
+        "description": "Optional random seed (0-2147483647). Random if omitted.",
+        "minValue": 0,
+        "maxValue": 2147483647
+      }
+    },
+    "provider": "lightricks",
+    "provider_name": "Lightricks"
+  },
+  {
+    "id": "ltx-2.5-pro-text-to-video",
+    "name": "LTX 2.5 Pro",
+    "endpoint": "ltx-2.5-pro-text-to-video",
+    "inputs": {
+      "prompt": {
+        "examples": [
+          "A cinematic ocean wave crashing onto golden sand at sunrise, seagulls calling, highly detailed photorealistic."
+        ],
+        "description": "Text prompt, up to 5000 characters. Describe the scene, action, camera and sound. Text inside quotes is spoken as dialogue. Write 'Shot 1 / Shot 2 ...' for multiple shots.",
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt"
+      },
+      "resolution": {
+        "enum": [
+          "720p",
+          "1080p"
+        ],
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output resolution (short side).",
+        "default": "1080p"
+      },
+      "fps": {
+        "enum": [
+          24,
+          25,
+          48,
+          50
+        ],
+        "title": "FPS",
+        "name": "fps",
+        "type": "int",
+        "description": "Frame rate. Does not change the price.",
+        "default": 24
+      },
+      "duration": {
+        "enum": [
+          6,
+          8,
+          10
+        ],
+        "title": "Duration",
+        "name": "duration",
+        "type": "int",
+        "description": "Video length in seconds: 6, 8 or 10.",
+        "default": 10
+      },
+      "aspect_ratio": {
+        "enum": [
+          "16:9",
+          "9:16",
+          "1:1",
+          "3:2",
+          "2:3"
+        ],
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "type": "string",
+        "description": "Aspect ratio of the video.",
+        "default": "16:9"
+      },
+      "seed": {
+        "title": "Seed",
+        "name": "seed",
+        "type": "int",
+        "description": "Optional random seed (0-2147483647). Random if omitted.",
+        "minValue": 0,
+        "maxValue": 2147483647
+      }
+    },
+    "provider": "lightricks",
+    "provider_name": "Lightricks"
   }
 ];
 
@@ -30664,6 +30822,162 @@ export const i2vModels = [
     "description": "MiniMax H3 Max Turbo Spicy Image to Video is the relaxed-moderation tier of MiniMax H3 Max Turbo, animating a source image at low cost at 480p or 768p through the Muapi API.",
     "example_url": "https://cdn.muapi.ai/assets/image_download_27.avif",
     "image_url": "https://cdn.muapi.ai/assets/image_download_27.avif"
+  },
+  {
+    "id": "ltx-2.5-fast-image-to-video",
+    "name": "LTX 2.5 Fast",
+    "endpoint": "ltx-2.5-fast-image-to-video",
+    "family": "ltx2.5",
+    "imageField": "image_url",
+    "aspectRatioMode": "inherited",
+    "hasPrompt": true,
+    "promptRequired": true,
+    "inputs": {
+      "prompt": {
+        "examples": [
+          "The camera slowly pushes in as the subject turns toward the light and speaks softly, ambient room tone."
+        ],
+        "description": "Text prompt, up to 5000 characters. Describe the scene, action, camera and sound. Text inside quotes is spoken as dialogue. Write 'Shot 1 / Shot 2 ...' for multiple shots.",
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt"
+      },
+      "image_url": {
+        "examples": [],
+        "field": "image",
+        "description": "Public URL of the first-frame image (JPG / PNG / WEBP, up to 10 MB). The output keeps the image's aspect ratio.",
+        "type": "string",
+        "title": "Image URL",
+        "name": "image_url"
+      },
+      "resolution": {
+        "enum": [
+          "720p",
+          "1080p",
+          "1440p"
+        ],
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output resolution (short side).",
+        "default": "1080p"
+      },
+      "fps": {
+        "enum": [
+          24,
+          25,
+          48,
+          50
+        ],
+        "title": "FPS",
+        "name": "fps",
+        "type": "int",
+        "description": "Frame rate. Does not change the price. 48 and 50 fps allow up to 10 seconds.",
+        "default": 24
+      },
+      "duration": {
+        "enum": [
+          6,
+          8,
+          10,
+          12,
+          14,
+          16,
+          18,
+          20
+        ],
+        "title": "Duration",
+        "name": "duration",
+        "type": "int",
+        "description": "Video length in seconds: 6-20 at 720p/1080p with 24/25 fps; only 6, 8 or 10 at 1440p or 48/50 fps.",
+        "default": 10
+      },
+      "seed": {
+        "title": "Seed",
+        "name": "seed",
+        "type": "int",
+        "description": "Optional random seed (0-2147483647). Random if omitted.",
+        "minValue": 0,
+        "maxValue": 2147483647
+      }
+    },
+    "provider": "lightricks",
+    "provider_name": "Lightricks"
+  },
+  {
+    "id": "ltx-2.5-pro-image-to-video",
+    "name": "LTX 2.5 Pro",
+    "endpoint": "ltx-2.5-pro-image-to-video",
+    "family": "ltx2.5",
+    "imageField": "image_url",
+    "aspectRatioMode": "inherited",
+    "hasPrompt": true,
+    "promptRequired": true,
+    "inputs": {
+      "prompt": {
+        "examples": [
+          "The camera slowly pushes in as the subject turns toward the light and speaks softly, ambient room tone."
+        ],
+        "description": "Text prompt, up to 5000 characters. Describe the scene, action, camera and sound. Text inside quotes is spoken as dialogue. Write 'Shot 1 / Shot 2 ...' for multiple shots.",
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt"
+      },
+      "image_url": {
+        "examples": [],
+        "field": "image",
+        "description": "Public URL of the first-frame image (JPG / PNG / WEBP, up to 10 MB). The output keeps the image's aspect ratio.",
+        "type": "string",
+        "title": "Image URL",
+        "name": "image_url"
+      },
+      "resolution": {
+        "enum": [
+          "720p",
+          "1080p"
+        ],
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output resolution (short side).",
+        "default": "1080p"
+      },
+      "fps": {
+        "enum": [
+          24,
+          25,
+          48,
+          50
+        ],
+        "title": "FPS",
+        "name": "fps",
+        "type": "int",
+        "description": "Frame rate. Does not change the price.",
+        "default": 24
+      },
+      "duration": {
+        "enum": [
+          6,
+          8,
+          10
+        ],
+        "title": "Duration",
+        "name": "duration",
+        "type": "int",
+        "description": "Video length in seconds: 6, 8 or 10.",
+        "default": 10
+      },
+      "seed": {
+        "title": "Seed",
+        "name": "seed",
+        "type": "int",
+        "description": "Optional random seed (0-2147483647). Random if omitted.",
+        "minValue": 0,
+        "maxValue": 2147483647
+      }
+    },
+    "provider": "lightricks",
+    "provider_name": "Lightricks"
   }
 ];
 
@@ -35232,7 +35546,44 @@ export const lipsyncModels = [
   "provider_name": "KIE_AI",
   "example_url": "https://cdn.muapi.ai/assets/omnihuman-1-5.mp4",
   "image_url": "https://cdn.muapi.ai/assets/omnihuman-1-5.avif"
-}
+},
+  {
+    "id": "ltx-2.5-fast-audio-to-video",
+    "name": "LTX 2.5 Fast Audio to Video",
+    "endpoint": "ltx-2.5-fast-audio-to-video",
+    "family": "ltx",
+    "category": "image",
+    "hasPrompt": true,
+    "hasSeed": true,
+    "description": "Audio-driven video with native sound from a portrait image (optional) and audio using LTX 2.5 Fast, up to 1440p.",
+    "inputs": {
+      "resolution": {
+        "enum": [
+          "720p",
+          "1080p",
+          "1440p"
+        ],
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output resolution (short side).",
+        "default": "1080p"
+      },
+      "fps": {
+        "enum": [
+          24,
+          25,
+          48,
+          50
+        ],
+        "title": "FPS",
+        "name": "fps",
+        "type": "int",
+        "description": "Frame rate. Does not change the price. 48 and 50 fps allow up to 10 seconds.",
+        "default": 24
+      }
+    }
+  }
 ];
 
 export const getLipSyncModelById = (id) => lipsyncModels.find(m => m.id === id);
