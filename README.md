@@ -8,8 +8,8 @@
 **Community:** Join [Discord](https://discord.com/invite/zpnuBRXhKg) for discussions and support
 
 
-<p align="center"><a href="https://youtu.be/5YcmNKusRJQ"><img src="https://i.ytimg.com/vi/5YcmNKusRJQ/maxresdefault.jpg" width="720"></a></p>
-<p align="center"><a href="https://youtu.be/5YcmNKusRJQ"><b>▶ Watch: Cheapest AI Video Generator </b></a></p>
+<p align="center"><a href="https://youtu.be/16f6fyhmX1c"><img src="https://i.ytimg.com/vi/16f6fyhmX1c/maxresdefault.jpg" width="720"></a></p>
+<p align="center"><a href="https://youtu.be/16f6fyhmX1c"><b>▶ Watch: Suno API Guide: Best AI Music API(Full Songs From Code) </b></a></p>
 
 <p align="center">
   <a href="https://github.com/Anil-matcha/awesome-generative-ai-apps">
