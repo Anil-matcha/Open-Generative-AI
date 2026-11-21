@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import toast, { Toaster } from "react-hot-toast";
-import { generateImage, generateI2I, uploadFile } from "../muapi.js";
+import { generateImage, generateI2I } from "../providerAwareImage.js";
+import { uploadFile } from "../muapi.js";
 import { formatErrorMessage } from "../utils/formatError.js";
 import { scopedPersistKey, migrateLegacyPersistKey } from "../persistKey.js";
 import DrawModal from "./DrawModal.jsx";
@@ -60,6 +61,7 @@ import {
 import en from "../messages/en/imageStudio.json";
 import zh from "../messages/zh/imageStudio.json";
 import { resolveCopy } from "../i18nUtils";
+import ProviderPicker from "./ProviderPicker.jsx";
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -1615,6 +1617,7 @@ export default function ImageStudio({
       </div>
 
       {/* ── BOTTOM PROMPT BAR ── */}
+      <ProviderPicker />
       <PromptComposer>
           {/* Top row: upload picker + textarea */}
           <div className="flex flex-col gap-3">
