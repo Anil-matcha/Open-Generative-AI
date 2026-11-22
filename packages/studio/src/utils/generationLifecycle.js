@@ -28,6 +28,65 @@ export function appendGenerationRefundNotice(message, error) {
   return `${message} ${notice}`;
 }
 
+const WORKFLOW_SUCCESS_STATUSES = new Set(["completed", "succeeded", "success"]);
+
+// Workflow runs report a different payload shape (and failure detail) from
+// prediction polls, but the retry policy is the same: a terminal answer from
+// the server ends the wait, while 5xx responses and network errors are
+// transient. Kept here so both pollers share one set of semantics.
+export async function pollForWorkflowResult({
+  baseUrl,
+  runId,
+  apiKey,
+  maxAttempts = 900,
+  interval = 2000,
+  fetchImpl = fetch,
+}) {
+  const pollUrl = `${baseUrl}/workflow/run/${runId}/api-outputs`;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    await wait(interval);
+
+    let response;
+    try {
+      response = await fetchImpl(pollUrl, {
+        headers: { "Content-Type": "application/json", "x-api-key": apiKey },
+      });
+    } catch (error) {
+      if (attempt === maxAttempts) throw error;
+      continue;
+    }
+
+    if (!response.ok) {
+      if (response.status >= 500 && attempt < maxAttempts) continue;
+      const error = new Error(`Poll Failed: ${response.status}`);
+      error.runId = runId;
+      throw error;
+    }
+
+    let result;
+    try {
+      result = await response.json();
+    } catch (error) {
+      if (attempt === maxAttempts) throw error;
+      continue;
+    }
+
+    const status = result.status?.toLowerCase();
+    if (WORKFLOW_SUCCESS_STATUSES.has(status)) return result;
+    if (FAILURE_STATUSES.has(status)) {
+      const error = new Error(`Workflow failed: ${result.error || "Unknown error"}`);
+      error.runId = runId;
+      error.workflowResult = result;
+      throw error;
+    }
+  }
+
+  const error = new Error("Workflow timed out after polling.");
+  error.runId = runId;
+  throw error;
+}
+
 export async function pollForGenerationResult({
   baseUrl,
   requestId,

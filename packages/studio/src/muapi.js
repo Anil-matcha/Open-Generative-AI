@@ -5,7 +5,7 @@ import {
 } from './videoToolCapabilities.js';
 import { buildImageSizePayload } from './imageSizing.js';
 import { buildImageInputPayload, getImageInputValidationError, normalizePrimaryImageUrls } from './imageInputContracts.js';
-import { pollForGenerationResult } from './utils/generationLifecycle.js';
+import { pollForGenerationResult, pollForWorkflowResult } from './utils/generationLifecycle.js';
 import { getModelMediaCapabilities, mapReferenceParams } from './modelCapabilities.js';
 import { buildSupplementalInputPayload } from './modelParameters.js';
 import { getGroupedVideoConfiguration } from './groupedVideoModels.js';
@@ -728,26 +728,13 @@ export async function executeWorkflow(apiKey, workflowId, inputs) {
 };
 
 async function pollWorkflowResult(runId, apiKey, maxAttempts = 900, interval = 2000) {
-    const pollUrl = `${BASE_URL}/workflow/run/${runId}/api-outputs`;
-    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-        await new Promise(resolve => setTimeout(resolve, interval));
-        try {
-            const response = await fetch(pollUrl, {
-                headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey }
-            });
-            if (!response.ok) {
-                if (response.status >= 500) continue;
-                throw new Error(`Poll Failed: ${response.status}`);
-            }
-            const data = await response.json();
-            const status = data.status?.toLowerCase();
-            if (status === 'completed' || status === 'succeeded' || status === 'success') return data;
-            if (status === 'failed' || status === 'error') throw new Error(`Workflow failed: ${data.error || 'Unknown error'}`);
-        } catch (error) {
-            if (attempt === maxAttempts) throw error;
-        }
-    }
-    throw new Error('Workflow timed out after polling.');
+    return pollForWorkflowResult({
+        baseUrl: BASE_URL,
+        runId,
+        apiKey,
+        maxAttempts,
+        interval,
+    });
 };
 
 export async function getAllNodeSchemas(apiKey, workflowId) {
