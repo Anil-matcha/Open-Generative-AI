@@ -68,6 +68,7 @@ This is a curated set of high-value hubs, popular distribution tools, and model-
 - [AI-Youtube-Shorts-Generator](https://github.com/SamurAIGPT/AI-Youtube-Shorts-Generator) — Open-source Opus Clip alternative application.
 - [open-duet](https://github.com/Anil-matcha/open-duet) — Open-source, self-hosted AI coworkers with memory, routines, isolated computers, and approval-gated actions.
 - [Open-AI-Design-Agent](https://github.com/Anil-matcha/Open-AI-Design-Agent) — Ppen-source autonomous AI design agent.
+- [Kling AI official agent plugins](https://kling.ai/app/mcp/guide) — OAuth-enabled remote MCP for image and video workflows: [Global Claude plugin](https://github.com/klingai-tech/claude-plugin) at `https://kling.ai/mcp/plugin`, and [China Claude plugin](https://github.com/klingai-tech/claude-plugin-cn) at `https://klingai.com/mcp/plugin`. Use the matching regional Kling account; generation consumes that account’s credits.
 - [muapi-skills](https://github.com/SamurAIGPT/muapi-skills) — Agent-ready skills for driving generative-media workflows.
 - [Seedance-2.5-API](https://github.com/SamurAIGPT/Seedance-2.5-API) — Python SDK for Seedance 2.5 video generation.
 
