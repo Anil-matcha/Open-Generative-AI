@@ -4911,6 +4911,229 @@ export const t2iModels = [
   "example_url": "https://cdn.muapi.ai/assets/d0d4707f-33e4-40bb-899d-e3265ae23670.avif",
   "image_url": "https://cdn.muapi.ai/assets/d0d4707f-33e4-40bb-899d-e3265ae23670.avif"
 }
+,
+  {
+    "id": "seedream-5.5",
+    "name": "5.5",
+    "endpoint": "seedream-5.5",
+    "category": "Text to Image",
+    "cost": 0.02,
+    "variant": "5.5",
+    "family": "seedream-5.5",
+    "group_of": "image",
+    "description": "Seedream 5.5 is ByteDance's image model for photographic realism and aesthetics, with native transparent-background output, 8 aspect ratios and 1K, 1.5K and 2K tiers.",
+    "example_url": "https://cdn.muapi.ai/assets/91c53d66-4403-4ed0-9742-736fdc10f8ca.avif",
+    "image_url": "https://cdn.muapi.ai/assets/91c53d66-4403-4ed0-9742-736fdc10f8ca.avif",
+    "inputs": {
+      "prompt": {
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "description": "Text prompt describing the image to generate",
+        "examples": [
+          "A cozy street-side cafe in Lisbon at golden hour, a barista handing a cup of coffee across the counter, warm natural light, blue azulejo tiles, a chalkboard menu written in English, photorealistic, shot on 35mm"
+        ]
+      },
+      "aspect_ratio": {
+        "enum": [
+          "1:1",
+          "4:3",
+          "3:4",
+          "16:9",
+          "9:16",
+          "2:3",
+          "3:2",
+          "21:9"
+        ],
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "type": "string",
+        "description": "Aspect ratio of the output image.",
+        "default": "1:1"
+      },
+      "resolution": {
+        "enum": [
+          "1K",
+          "1.5K",
+          "2K"
+        ],
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output resolution tier: 1K, 1.5K or 2K.",
+        "default": "1K"
+      },
+      "output_format": {
+        "enum": [
+          "png",
+          "jpeg"
+        ],
+        "title": "Output Format",
+        "name": "output_format",
+        "type": "string",
+        "description": "Format of the output image.",
+        "default": "png"
+      },
+      "background": {
+        "enum": [
+          "auto",
+          "transparent",
+          "opaque"
+        ],
+        "title": "Background",
+        "name": "background",
+        "type": "string",
+        "description": "auto (default), transparent (alpha channel, forces png) or opaque.",
+        "default": "auto"
+      }
+    },
+    "provider": "bytedance",
+    "provider_name": "KIE_AI"
+  },
+  {
+    "id": "minimax-h3-image-text-to-image",
+    "name": "H3 Image",
+    "endpoint": "minimax-h3-image-text-to-image",
+    "category": "Text to Image",
+    "cost": 0.03,
+    "variant": "H3 Image",
+    "family": "minimax-h3-image",
+    "group_of": "image",
+    "description": "MiniMax H3 Image generates images from text with built-in prompt enhancement, 13 aspect ratios and 1K, 2K or 4K output.",
+    "example_url": "https://cdn.muapi.ai/assets/9edfb740-39fe-4705-8805-a350da3fd49b.avif",
+    "image_url": "https://cdn.muapi.ai/assets/9edfb740-39fe-4705-8805-a350da3fd49b.avif",
+    "inputs": {
+      "prompt": {
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "description": "Text prompt describing the image to generate",
+        "examples": [
+          "A frosted glass serum bottle on wet travertine stone, soft morning light, editorial product photography"
+        ]
+      },
+      "aspect_ratio": {
+        "enum": [
+          "1:1",
+          "1:2",
+          "2:1",
+          "2:3",
+          "3:2",
+          "3:4",
+          "4:3",
+          "4:5",
+          "5:4",
+          "9:16",
+          "16:9",
+          "9:21",
+          "21:9"
+        ],
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "type": "string",
+        "description": "Aspect ratio of the output image.",
+        "default": "1:1"
+      },
+      "resolution": {
+        "enum": [
+          "1K",
+          "2K",
+          "4K"
+        ],
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output resolution tier: 1K, 2K or 4K.",
+        "default": "1K"
+      },
+      "output_format": {
+        "enum": [
+          "png",
+          "jpg",
+          "webp"
+        ],
+        "title": "Output Format",
+        "name": "output_format",
+        "type": "string",
+        "description": "Format of the output image.",
+        "default": "png"
+      }
+    },
+    "provider": "minimax",
+    "provider_name": "RUNWARE"
+  },
+  {
+    "id": "minimax-h3-image-highspeed-text-to-image",
+    "name": "H3 Image Highspeed",
+    "endpoint": "minimax-h3-image-highspeed-text-to-image",
+    "category": "Text to Image",
+    "cost": 0.06,
+    "variant": "H3 Image Highspeed",
+    "family": "minimax-h3-image",
+    "group_of": "image",
+    "description": "MiniMax H3 Image Highspeed is the fast tier of H3 Image for text-to-image, with 13 aspect ratios and 1K, 2K or 4K output.",
+    "example_url": "https://cdn.muapi.ai/assets/8a1af02f-d4b1-4d7b-98cf-e3f5247fa94d.avif",
+    "image_url": "https://cdn.muapi.ai/assets/8a1af02f-d4b1-4d7b-98cf-e3f5247fa94d.avif",
+    "inputs": {
+      "prompt": {
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "description": "Text prompt describing the image to generate",
+        "examples": [
+          "A frosted glass serum bottle on wet travertine stone, soft morning light, editorial product photography"
+        ]
+      },
+      "aspect_ratio": {
+        "enum": [
+          "1:1",
+          "1:2",
+          "2:1",
+          "2:3",
+          "3:2",
+          "3:4",
+          "4:3",
+          "4:5",
+          "5:4",
+          "9:16",
+          "16:9",
+          "9:21",
+          "21:9"
+        ],
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "type": "string",
+        "description": "Aspect ratio of the output image.",
+        "default": "1:1"
+      },
+      "resolution": {
+        "enum": [
+          "1K",
+          "2K",
+          "4K"
+        ],
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output resolution tier: 1K, 2K or 4K.",
+        "default": "1K"
+      },
+      "output_format": {
+        "enum": [
+          "png",
+          "jpg",
+          "webp"
+        ],
+        "title": "Output Format",
+        "name": "output_format",
+        "type": "string",
+        "description": "Format of the output image.",
+        "default": "png"
+      }
+    },
+    "provider": "minimax",
+    "provider_name": "RUNWARE"
+  }
 ];
 
 export const getModelById = (id) => t2iModels.find(m => m.id === id);
@@ -11597,6 +11820,324 @@ export const t2vModels = [
     "provider": "lightricks",
     "provider_name": "Lightricks"
   }
+,
+  {
+    "id": "minimax-h3-text-to-video-spicy",
+    "name": "MiniMax H3 Spicy Text to Video",
+    "endpoint": "minimax-h3-text-to-video-spicy",
+    "category": "Text to Video",
+    "cost": 0.58,
+    "variant": "MiniMax H3 Spicy Text to Video",
+    "family": "minimax-h3-spicy",
+    "group_of": "video",
+    "description": "MiniMax H3 Spicy Text to Video is the relaxed-moderation tier of MiniMax H3, generating video with native audio from a written prompt at 480p, 768p or 2K through the Muapi API.",
+    "example_url": "https://cdn.muapi.ai/assets/9ae3c2df-b207-4d5d-a0ac-6696db55d7df.avif",
+    "image_url": "https://cdn.muapi.ai/assets/9ae3c2df-b207-4d5d-a0ac-6696db55d7df.avif",
+    "inputs": {
+      "prompt": {
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "description": "Describe the video scene, action, camera movement, and style.",
+        "examples": [
+          "A cinematic tracking shot of a silver sports car driving through a rain-soaked city at night."
+        ]
+      },
+      "aspect_ratio": {
+        "type": "string",
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "enum": [
+          "21:9",
+          "16:9",
+          "4:3",
+          "1:1",
+          "3:4",
+          "9:16"
+        ],
+        "default": "16:9"
+      },
+      "resolution": {
+        "type": "string",
+        "title": "Resolution",
+        "name": "resolution",
+        "enum": [
+          "480p",
+          "768p",
+          "2k"
+        ],
+        "default": "768p"
+      },
+      "duration": {
+        "type": "integer",
+        "title": "Duration",
+        "name": "duration",
+        "enum": [
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "default": 5,
+        "description": "Output duration in seconds."
+      },
+      "aigc_watermark": {
+        "type": "boolean",
+        "title": "AIGC Watermark",
+        "name": "aigc_watermark",
+        "description": "Optional. Add an AIGC watermark to the generated video."
+      }
+    },
+    "provider": "minimax",
+    "provider_name": "MINIMAX"
+  },
+  {
+    "id": "seedance-2.5-flash-text-to-video",
+    "name": "Text to Video",
+    "endpoint": "seedance-2.5-flash-text-to-video",
+    "category": "Text to Video",
+    "cost": 1.14,
+    "variant": "Text to Video",
+    "family": "seedance-2.5-flash",
+    "group_of": "video",
+    "description": "Seedance 2.5 Flash Text-to-Video is the fast, low-cost Seedance 2.5 tier: 4-30 second 480p/720p clips with native synchronized audio generated from a text prompt.",
+    "example_url": "https://cdn.muapi.ai/assets/86fd7718-9508-4687-8287-e3b65d5aeab5.avif",
+    "image_url": "https://cdn.muapi.ai/assets/86fd7718-9508-4687-8287-e3b65d5aeab5.avif",
+    "inputs": {
+      "prompt": {
+        "title": "Prompt",
+        "name": "prompt",
+        "type": "string",
+        "description": "Text prompt describing the video scene and motion.",
+        "examples": [
+          "A slow dolly shot through a rainy neon street at night, reflections on wet asphalt, ambient city sound"
+        ]
+      },
+      "aspect_ratio": {
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "type": "string",
+        "description": "Output aspect ratio.",
+        "enum": [
+          "16:9",
+          "9:16",
+          "1:1",
+          "4:3",
+          "3:4",
+          "21:9"
+        ],
+        "default": "16:9"
+      },
+      "duration": {
+        "title": "Duration",
+        "name": "duration",
+        "type": "int",
+        "description": "Video duration in seconds (4-30).",
+        "default": 5,
+        "minValue": 4,
+        "maxValue": 30,
+        "step": 1
+      },
+      "resolution": {
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output resolution (480p or 720p).",
+        "enum": [
+          "480p",
+          "720p"
+        ],
+        "default": "720p"
+      },
+      "generate_audio": {
+        "title": "Generate Audio",
+        "name": "generate_audio",
+        "type": "boolean",
+        "description": "Generate synchronized audio.",
+        "default": true
+      },
+      "seed": {
+        "title": "Seed",
+        "name": "seed",
+        "type": "int",
+        "description": "Random seed for reproducible generation. Use -1 for random.",
+        "minValue": -1,
+        "maxValue": 2147483647,
+        "examples": [
+          42
+        ]
+      }
+    },
+    "provider": "bytedance",
+    "provider_name": "SEEGEN"
+  },
+  {
+    "id": "seedance-2.5-flash-spicy-text-to-video",
+    "name": "Spicy Text to Video",
+    "endpoint": "seedance-2.5-flash-spicy-text-to-video",
+    "category": "Text to Video",
+    "cost": 1.254,
+    "variant": "Spicy Text to Video",
+    "family": "seedance-2.5-flash",
+    "group_of": "video",
+    "description": "Seedance 2.5 Flash Spicy Text-to-Video is the fast, low-cost Seedance 2.5 tier: 4-30 second 480p/720p clips with native synchronized audio generated from a text prompt. Relaxed-moderation variant with reduced content-safety filtering.",
+    "example_url": "https://cdn.muapi.ai/assets/ca0815a5-1320-4a99-bc1f-07e54ffedaa1.avif",
+    "image_url": "https://cdn.muapi.ai/assets/ca0815a5-1320-4a99-bc1f-07e54ffedaa1.avif",
+    "inputs": {
+      "prompt": {
+        "title": "Prompt",
+        "name": "prompt",
+        "type": "string",
+        "description": "Text prompt describing the video scene and motion.",
+        "examples": [
+          "A slow dolly shot through a rainy neon street at night, reflections on wet asphalt, ambient city sound"
+        ]
+      },
+      "aspect_ratio": {
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "type": "string",
+        "description": "Output aspect ratio.",
+        "enum": [
+          "16:9",
+          "9:16",
+          "1:1",
+          "4:3",
+          "3:4",
+          "21:9"
+        ],
+        "default": "16:9"
+      },
+      "duration": {
+        "title": "Duration",
+        "name": "duration",
+        "type": "int",
+        "description": "Video duration in seconds (4-30).",
+        "default": 5,
+        "minValue": 4,
+        "maxValue": 30,
+        "step": 1
+      },
+      "resolution": {
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output resolution (480p or 720p).",
+        "enum": [
+          "480p",
+          "720p"
+        ],
+        "default": "720p"
+      },
+      "generate_audio": {
+        "title": "Generate Audio",
+        "name": "generate_audio",
+        "type": "boolean",
+        "description": "Generate synchronized audio.",
+        "default": true
+      },
+      "seed": {
+        "title": "Seed",
+        "name": "seed",
+        "type": "int",
+        "description": "Random seed for reproducible generation. Use -1 for random.",
+        "minValue": -1,
+        "maxValue": 2147483647,
+        "examples": [
+          42
+        ]
+      }
+    },
+    "provider": "bytedance",
+    "provider_name": "SEEGEN"
+  },
+  {
+    "id": "seedance-2.5-flash-intl-text-to-video",
+    "name": "Intl Text to Video",
+    "endpoint": "seedance-2.5-flash-intl-text-to-video",
+    "category": "Text to Video",
+    "cost": 1.254,
+    "variant": "Intl Text to Video",
+    "family": "seedance-2.5-flash",
+    "group_of": "video",
+    "description": "Seedance 2.5 Flash Intl Text-to-Video is the fast, low-cost Seedance 2.5 tier: 4-30 second 480p/720p clips with native synchronized audio generated from a text prompt. International (Dreamina) route variant with standard content-safety filtering.",
+    "example_url": "https://cdn.muapi.ai/assets/eb25be92-c2d0-4be8-a892-012a7c72b282.avif",
+    "image_url": "https://cdn.muapi.ai/assets/eb25be92-c2d0-4be8-a892-012a7c72b282.avif",
+    "inputs": {
+      "prompt": {
+        "title": "Prompt",
+        "name": "prompt",
+        "type": "string",
+        "description": "Text prompt describing the video scene and motion.",
+        "examples": [
+          "A slow dolly shot through a rainy neon street at night, reflections on wet asphalt, ambient city sound"
+        ]
+      },
+      "aspect_ratio": {
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "type": "string",
+        "description": "Output aspect ratio.",
+        "enum": [
+          "16:9",
+          "9:16",
+          "1:1",
+          "4:3",
+          "3:4",
+          "21:9"
+        ],
+        "default": "16:9"
+      },
+      "duration": {
+        "title": "Duration",
+        "name": "duration",
+        "type": "int",
+        "description": "Video duration in seconds (4-30).",
+        "default": 5,
+        "minValue": 4,
+        "maxValue": 30,
+        "step": 1
+      },
+      "resolution": {
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output resolution (480p or 720p).",
+        "enum": [
+          "480p",
+          "720p"
+        ],
+        "default": "720p"
+      },
+      "generate_audio": {
+        "title": "Generate Audio",
+        "name": "generate_audio",
+        "type": "boolean",
+        "description": "Generate synchronized audio.",
+        "default": true
+      },
+      "seed": {
+        "title": "Seed",
+        "name": "seed",
+        "type": "int",
+        "description": "Random seed for reproducible generation. Use -1 for random.",
+        "minValue": -1,
+        "maxValue": 2147483647,
+        "examples": [
+          42
+        ]
+      }
+    },
+    "provider": "bytedance",
+    "provider_name": "SEEGEN"
+  }
 ];
 
 export const getVideoModelById = (id) => t2vModels.find(m => m.id === id);
@@ -16720,6 +17261,295 @@ export const i2iModels = [
   "example_url": "https://cdn.muapi.ai/assets/17776e8a-5679-4c77-9db6-f24025642bdf.avif",
   "image_url": "https://cdn.muapi.ai/assets/17776e8a-5679-4c77-9db6-f24025642bdf.avif"
 }
+,
+  {
+    "id": "seedream-5.5-edit",
+    "name": "5.5 Edit",
+    "endpoint": "seedream-5.5-edit",
+    "category": "Image to Image",
+    "cost": 0.028,
+    "variant": "5.5 Edit",
+    "family": "seedream-5.5",
+    "group_of": "image",
+    "description": "Seedream 5.5 Edit edits and composes images from one or up to 10 reference images, preserving unedited areas across repeated edits, with transparent-background output and 1K to 2K tiers.",
+    "example_url": "https://cdn.muapi.ai/assets/df9fb253-9953-4e46-88f7-913a2d18510f.avif",
+    "image_url": "https://cdn.muapi.ai/assets/df9fb253-9953-4e46-88f7-913a2d18510f.avif",
+    "inputs": {
+      "prompt": {
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "description": "Text prompt describing the desired edit",
+        "examples": [
+          "Change the scene to a rainy blue-hour evening, warm lamps glowing inside, keep the subject and composition unchanged"
+        ]
+      },
+      "images_list": {
+        "examples": [
+          "https://static.aiquickdraw.com/tools/example/1764851484363_ScV1s2aq.webp"
+        ],
+        "description": "Upload or provide up to 10 reference images.",
+        "field": "images_list",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "title": "Image URLs",
+        "name": "images_list",
+        "maxItems": 10
+      },
+      "aspect_ratio": {
+        "enum": [
+          "1:1",
+          "4:3",
+          "3:4",
+          "16:9",
+          "9:16",
+          "2:3",
+          "3:2",
+          "21:9"
+        ],
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "type": "string",
+        "description": "Output aspect ratio. Leave empty to match the first input image (auto)."
+      },
+      "resolution": {
+        "enum": [
+          "1K",
+          "1.5K",
+          "2K"
+        ],
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output resolution tier: 1K, 1.5K or 2K.",
+        "default": "1K"
+      },
+      "output_format": {
+        "enum": [
+          "png",
+          "jpeg"
+        ],
+        "title": "Output Format",
+        "name": "output_format",
+        "type": "string",
+        "description": "Format of the output image.",
+        "default": "png"
+      },
+      "background": {
+        "enum": [
+          "auto",
+          "transparent",
+          "opaque"
+        ],
+        "title": "Background",
+        "name": "background",
+        "type": "string",
+        "description": "auto (default), transparent (alpha channel, forces png) or opaque.",
+        "default": "auto"
+      }
+    },
+    "provider": "bytedance",
+    "provider_name": "KIE_AI"
+  },
+  {
+    "id": "seedream-5.5-layer",
+    "name": "5.5 Layer Decomposition",
+    "endpoint": "seedream-5.5-layer",
+    "category": "Image to Image",
+    "cost": 0.6,
+    "variant": "5.5 Layer Decomposition",
+    "family": "seedream-5.5",
+    "group_of": "image",
+    "description": "Seedream 5.5 Layer Decomposition splits a single image into a base image plus transparent PNG layers for compositing, asset extraction and layered design workflows.",
+    "example_url": "https://cdn.muapi.ai/assets/9f2b8055-f38d-4b4d-852a-7184ad0edb5f.avif",
+    "image_url": "https://cdn.muapi.ai/assets/9f2b8055-f38d-4b4d-852a-7184ad0edb5f.avif",
+    "inputs": {
+      "image_url": {
+        "examples": [
+          "https://static.aiquickdraw.com/tools/example/1786019968051_cKRYLHHu.png"
+        ],
+        "description": "Source image to decompose (exactly 1; PNG or JPEG).",
+        "field": "image",
+        "type": "string",
+        "title": "Image URL",
+        "name": "image_url"
+      },
+      "prompt": {
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "description": "Optional. Describe the layers, targets or grouping you want. Leave empty to auto-detect key elements.",
+        "examples": [
+          "Separate the headline text, the subtitle, the croissant photo and the decorative border into their own layers"
+        ]
+      },
+      "resolution": {
+        "enum": [
+          "auto",
+          "1K",
+          "1.5K",
+          "2K"
+        ],
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output resolution tier: auto (keeps input size, billed at 2K), 1K, 1.5K or 2K.",
+        "default": "1K"
+      },
+      "max_images": {
+        "type": "integer",
+        "title": "Max Images",
+        "name": "max_images",
+        "description": "Maximum images to return (base image + layers), 2-100. You are charged for max_images, not the number returned.",
+        "minValue": 2,
+        "maxValue": 100,
+        "default": 30
+      },
+      "output_format": {
+        "enum": [
+          "png",
+          "jpeg"
+        ],
+        "title": "Output Format",
+        "name": "output_format",
+        "type": "string",
+        "description": "Format of the base image only; layers are always transparent PNG.",
+        "default": "png"
+      }
+    },
+    "provider": "bytedance",
+    "provider_name": "KIE_AI"
+  },
+  {
+    "id": "minimax-h3-image-edit",
+    "name": "H3 Image Edit",
+    "endpoint": "minimax-h3-image-edit",
+    "category": "Image to Image",
+    "cost": 0.038,
+    "variant": "H3 Image Edit",
+    "family": "minimax-h3-image",
+    "group_of": "image",
+    "description": "MiniMax H3 Image Edit edits and combines up to 16 reference images with a text instruction, outputting at 1K, 2K or 4K.",
+    "example_url": "https://cdn.muapi.ai/assets/a3c4df16-7a2c-4d01-a823-4b3bc26d9389.avif",
+    "image_url": "https://cdn.muapi.ai/assets/a3c4df16-7a2c-4d01-a823-4b3bc26d9389.avif",
+    "inputs": {
+      "prompt": {
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "description": "Text prompt describing the desired edit",
+        "examples": [
+          "Change the scene to a rainy blue-hour evening, warm lamps glowing inside, keep the subject and composition unchanged"
+        ]
+      },
+      "images_list": {
+        "examples": [
+          "https://static.aiquickdraw.com/tools/example/1764851484363_ScV1s2aq.webp"
+        ],
+        "description": "Upload or provide up to 16 reference images.",
+        "field": "images_list",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "title": "Image URLs",
+        "name": "images_list",
+        "maxItems": 16
+      },
+      "resolution": {
+        "enum": [
+          "1K",
+          "2K",
+          "4K"
+        ],
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output resolution tier: 1K, 2K or 4K. The output keeps the aspect ratio of the first input image.",
+        "default": "1K"
+      },
+      "output_format": {
+        "enum": [
+          "png",
+          "jpg",
+          "webp"
+        ],
+        "title": "Output Format",
+        "name": "output_format",
+        "type": "string",
+        "description": "Format of the output image.",
+        "default": "png"
+      }
+    },
+    "provider": "minimax",
+    "provider_name": "RUNWARE"
+  },
+  {
+    "id": "minimax-h3-image-highspeed-edit",
+    "name": "H3 Image Highspeed Edit",
+    "endpoint": "minimax-h3-image-highspeed-edit",
+    "category": "Image to Image",
+    "cost": 0.076,
+    "variant": "H3 Image Highspeed Edit",
+    "family": "minimax-h3-image",
+    "group_of": "image",
+    "description": "MiniMax H3 Image Highspeed Edit is the fast tier for editing and combining up to 16 reference images at 1K, 2K or 4K.",
+    "example_url": "https://cdn.muapi.ai/assets/99c23f24-3219-4dac-b658-aad24b687687.avif",
+    "image_url": "https://cdn.muapi.ai/assets/99c23f24-3219-4dac-b658-aad24b687687.avif",
+    "inputs": {
+      "prompt": {
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "description": "Text prompt describing the desired edit",
+        "examples": [
+          "Change the scene to a rainy blue-hour evening, warm lamps glowing inside, keep the subject and composition unchanged"
+        ]
+      },
+      "images_list": {
+        "examples": [
+          "https://static.aiquickdraw.com/tools/example/1764851484363_ScV1s2aq.webp"
+        ],
+        "description": "Upload or provide up to 16 reference images.",
+        "field": "images_list",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "title": "Image URLs",
+        "name": "images_list",
+        "maxItems": 16
+      },
+      "resolution": {
+        "enum": [
+          "1K",
+          "2K",
+          "4K"
+        ],
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output resolution tier: 1K, 2K or 4K. The output keeps the aspect ratio of the first input image.",
+        "default": "1K"
+      },
+      "output_format": {
+        "enum": [
+          "png",
+          "jpg",
+          "webp"
+        ],
+        "title": "Output Format",
+        "name": "output_format",
+        "type": "string",
+        "description": "Format of the output image.",
+        "default": "png"
+      }
+    },
+    "provider": "minimax",
+    "provider_name": "RUNWARE"
+  }
 ];
 
 // Auto-generated from schema_data.json — Image to Video models
@@ -30979,6 +31809,912 @@ export const i2vModels = [
     "provider": "lightricks",
     "provider_name": "Lightricks"
   }
+,
+  {
+    "id": "minimax-h3-reference-to-video-spicy",
+    "name": "MiniMax H3 Spicy Reference to Video",
+    "endpoint": "minimax-h3-reference-to-video-spicy",
+    "category": "Image to Video",
+    "cost": 0.58,
+    "variant": "MiniMax H3 Spicy Reference to Video",
+    "family": "minimax-h3-spicy",
+    "group_of": "video",
+    "description": "MiniMax H3 Spicy Reference to Video is the relaxed-moderation tier of MiniMax H3, generating video with native audio from a prompt plus image, video and optional audio references at 480p, 768p or 2K through the Muapi API.",
+    "example_url": "https://cdn.muapi.ai/assets/7df636c2-4126-4ce6-b857-2a236cbfebf9.avif",
+    "image_url": "https://cdn.muapi.ai/assets/7df636c2-4126-4ce6-b857-2a236cbfebf9.avif",
+    "inputs": {
+      "prompt": {
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "description": "Describe the video scene and how the references should be used.",
+        "examples": [
+          "Use the references to create a cinematic product reveal with a slow camera orbit."
+        ]
+      },
+      "reference_images": {
+        "type": "array",
+        "title": "Reference Images",
+        "name": "reference_images",
+        "description": "Reference image URLs. Provide at least one image or video reference.",
+        "field": "images_list",
+        "maxItems": 9,
+        "items": {
+          "type": "string"
+        },
+        "examples": []
+      },
+      "reference_videos": {
+        "type": "array",
+        "title": "Reference Videos",
+        "name": "reference_videos",
+        "description": "Reference video URLs. Provide at least one image or video reference.",
+        "field": "videos_list",
+        "items": {
+          "type": "string"
+        },
+        "examples": []
+      },
+      "reference_audios": {
+        "type": "array",
+        "title": "Reference Audio",
+        "name": "reference_audios",
+        "description": "Optional reference audio URLs (up to 3). Audio cannot be used alone.",
+        "maxItems": 3,
+        "field": "audios_list",
+        "items": {
+          "type": "string"
+        },
+        "examples": []
+      },
+      "aspect_ratio": {
+        "type": "string",
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "enum": [
+          "adaptive",
+          "21:9",
+          "16:9",
+          "4:3",
+          "1:1",
+          "3:4",
+          "9:16"
+        ],
+        "default": "adaptive"
+      },
+      "resolution": {
+        "type": "string",
+        "title": "Resolution",
+        "name": "resolution",
+        "enum": [
+          "480p",
+          "768p",
+          "2k"
+        ],
+        "default": "768p"
+      },
+      "duration": {
+        "type": "integer",
+        "title": "Duration",
+        "name": "duration",
+        "enum": [
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "default": 5,
+        "description": "Output duration in seconds."
+      },
+      "aigc_watermark": {
+        "type": "boolean",
+        "title": "AIGC Watermark",
+        "name": "aigc_watermark",
+        "description": "Optional. Add an AIGC watermark to the generated video."
+      }
+    },
+    "provider": "minimax",
+    "provider_name": "MINIMAX"
+  },
+  {
+    "id": "seedance-2.5-flash-image-to-video",
+    "name": "Image to Video",
+    "endpoint": "seedance-2.5-flash-image-to-video",
+    "category": "Image to Video",
+    "cost": 1.14,
+    "variant": "Image to Video",
+    "family": "seedance-2.5-flash",
+    "group_of": "video",
+    "description": "Seedance 2.5 Flash Image-to-Video animates a single image into a 4-30 second 480p/720p clip with native audio, following the image's aspect ratio.",
+    "example_url": "https://cdn.muapi.ai/assets/7878bba2-a86f-4c02-9265-469ba90ba1e9.avif",
+    "image_url": "https://cdn.muapi.ai/assets/7878bba2-a86f-4c02-9265-469ba90ba1e9.avif",
+    "inputs": {
+      "prompt": {
+        "title": "Prompt",
+        "name": "prompt",
+        "type": "string",
+        "description": "Text prompt describing the motion.",
+        "examples": [
+          "A slow dolly shot through a rainy neon street at night, reflections on wet asphalt, ambient city sound"
+        ]
+      },
+      "image_url": {
+        "type": "string",
+        "title": "Image URL",
+        "name": "image_url",
+        "description": "First-frame image. Output follows the image's aspect ratio.",
+        "field": "image",
+        "examples": [
+          "https://cdn.muapi.ai/assets/image_download_23.avif"
+        ]
+      },
+      "duration": {
+        "title": "Duration",
+        "name": "duration",
+        "type": "int",
+        "description": "Video duration in seconds (4-30).",
+        "default": 5,
+        "minValue": 4,
+        "maxValue": 30,
+        "step": 1
+      },
+      "resolution": {
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output resolution (480p or 720p).",
+        "enum": [
+          "480p",
+          "720p"
+        ],
+        "default": "720p"
+      },
+      "generate_audio": {
+        "title": "Generate Audio",
+        "name": "generate_audio",
+        "type": "boolean",
+        "description": "Generate synchronized audio.",
+        "default": true
+      },
+      "seed": {
+        "title": "Seed",
+        "name": "seed",
+        "type": "int",
+        "description": "Random seed for reproducible generation. Use -1 for random.",
+        "minValue": -1,
+        "maxValue": 2147483647,
+        "examples": [
+          42
+        ]
+      }
+    },
+    "provider": "bytedance",
+    "provider_name": "SEEGEN"
+  },
+  {
+    "id": "seedance-2.5-flash-first-last-frame",
+    "name": "First & Last Frame",
+    "endpoint": "seedance-2.5-flash-first-last-frame",
+    "category": "Image to Video",
+    "cost": 1.14,
+    "variant": "First & Last Frame",
+    "family": "seedance-2.5-flash",
+    "group_of": "video",
+    "description": "Seedance 2.5 Flash First & Last Frame generates a smooth 4-30 second transition between a start and end image, with native audio at 480p or 720p.",
+    "example_url": "https://cdn.muapi.ai/assets/7b38999a-0eab-4b67-964c-56fe4ab41abe.avif",
+    "image_url": "https://cdn.muapi.ai/assets/7b38999a-0eab-4b67-964c-56fe4ab41abe.avif",
+    "inputs": {
+      "prompt": {
+        "title": "Prompt",
+        "name": "prompt",
+        "type": "string",
+        "description": "Text prompt describing the transition.",
+        "examples": [
+          "A slow dolly shot through a rainy neon street at night, reflections on wet asphalt, ambient city sound"
+        ]
+      },
+      "images_list": {
+        "field": "images_list",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "title": "Images List",
+        "name": "images_list",
+        "description": "[first_frame, last_frame] image URLs.",
+        "maxItems": 2
+      },
+      "duration": {
+        "title": "Duration",
+        "name": "duration",
+        "type": "int",
+        "description": "Video duration in seconds (4-30).",
+        "default": 5,
+        "minValue": 4,
+        "maxValue": 30,
+        "step": 1
+      },
+      "resolution": {
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output resolution (480p or 720p).",
+        "enum": [
+          "480p",
+          "720p"
+        ],
+        "default": "720p"
+      },
+      "generate_audio": {
+        "title": "Generate Audio",
+        "name": "generate_audio",
+        "type": "boolean",
+        "description": "Generate synchronized audio.",
+        "default": true
+      },
+      "seed": {
+        "title": "Seed",
+        "name": "seed",
+        "type": "int",
+        "description": "Random seed for reproducible generation. Use -1 for random.",
+        "minValue": -1,
+        "maxValue": 2147483647,
+        "examples": [
+          42
+        ]
+      }
+    },
+    "provider": "bytedance",
+    "provider_name": "SEEGEN"
+  },
+  {
+    "id": "seedance-2.5-flash-reference-to-video",
+    "name": "Reference to Video",
+    "endpoint": "seedance-2.5-flash-reference-to-video",
+    "category": "Image to Video",
+    "cost": 1.14,
+    "variant": "Reference to Video",
+    "family": "seedance-2.5-flash",
+    "group_of": "video",
+    "description": "Seedance 2.5 Flash Reference-to-Video generates 4-30 second clips guided by up to 10 reference images, 5 reference videos and 5 reference audio clips (use @Image1, @Video1, @Audio1 in the prompt).",
+    "example_url": "https://cdn.muapi.ai/assets/68db6bb9-982c-413f-ac60-11352e23a670.avif",
+    "image_url": "https://cdn.muapi.ai/assets/68db6bb9-982c-413f-ac60-11352e23a670.avif",
+    "inputs": {
+      "prompt": {
+        "title": "Prompt",
+        "name": "prompt",
+        "type": "string",
+        "description": "Prompt; refer to assets in order as @Image1, @Video1, @Audio1.",
+        "examples": [
+          "A slow dolly shot through a rainy neon street at night, reflections on wet asphalt, ambient city sound"
+        ]
+      },
+      "images_list": {
+        "field": "images_list",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "title": "Images List",
+        "name": "images_list",
+        "description": "Reference image URLs (up to 10).",
+        "maxItems": 10
+      },
+      "videos_list": {
+        "field": "videos_list",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "title": "Videos List",
+        "name": "videos_list",
+        "description": "Reference video URLs (up to 5).",
+        "maxItems": 5
+      },
+      "audios_list": {
+        "field": "audios_list",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "title": "Audios List",
+        "name": "audios_list",
+        "description": "Reference audio URLs (up to 5).",
+        "maxItems": 5
+      },
+      "aspect_ratio": {
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "type": "string",
+        "description": "Only used when no reference image or video is supplied.",
+        "enum": [
+          "16:9",
+          "9:16",
+          "1:1",
+          "4:3",
+          "3:4",
+          "21:9"
+        ],
+        "default": "16:9"
+      },
+      "duration": {
+        "title": "Duration",
+        "name": "duration",
+        "type": "int",
+        "description": "Video duration in seconds (4-30).",
+        "default": 5,
+        "minValue": 4,
+        "maxValue": 30,
+        "step": 1
+      },
+      "resolution": {
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output resolution (480p or 720p).",
+        "enum": [
+          "480p",
+          "720p"
+        ],
+        "default": "720p"
+      },
+      "generate_audio": {
+        "title": "Generate Audio",
+        "name": "generate_audio",
+        "type": "boolean",
+        "description": "Generate synchronized audio.",
+        "default": true
+      },
+      "seed": {
+        "title": "Seed",
+        "name": "seed",
+        "type": "int",
+        "description": "Random seed for reproducible generation. Use -1 for random.",
+        "minValue": -1,
+        "maxValue": 2147483647,
+        "examples": [
+          42
+        ]
+      }
+    },
+    "provider": "bytedance",
+    "provider_name": "SEEGEN"
+  },
+  {
+    "id": "seedance-2.5-flash-spicy-image-to-video",
+    "name": "Spicy Image to Video",
+    "endpoint": "seedance-2.5-flash-spicy-image-to-video",
+    "category": "Image to Video",
+    "cost": 1.254,
+    "variant": "Spicy Image to Video",
+    "family": "seedance-2.5-flash",
+    "group_of": "video",
+    "description": "Seedance 2.5 Flash Spicy Image-to-Video animates a single image into a 4-30 second 480p/720p clip with native audio, following the image's aspect ratio. Relaxed-moderation variant with reduced content-safety filtering.",
+    "example_url": "https://cdn.muapi.ai/assets/b1b28a45-9f6d-41a8-81b1-f05a29b491c1.avif",
+    "image_url": "https://cdn.muapi.ai/assets/b1b28a45-9f6d-41a8-81b1-f05a29b491c1.avif",
+    "inputs": {
+      "prompt": {
+        "title": "Prompt",
+        "name": "prompt",
+        "type": "string",
+        "description": "Text prompt describing the motion.",
+        "examples": [
+          "A slow dolly shot through a rainy neon street at night, reflections on wet asphalt, ambient city sound"
+        ]
+      },
+      "image_url": {
+        "type": "string",
+        "title": "Image URL",
+        "name": "image_url",
+        "description": "First-frame image. Output follows the image's aspect ratio.",
+        "field": "image",
+        "examples": [
+          "https://cdn.muapi.ai/assets/image_download_23.avif"
+        ]
+      },
+      "duration": {
+        "title": "Duration",
+        "name": "duration",
+        "type": "int",
+        "description": "Video duration in seconds (4-30).",
+        "default": 5,
+        "minValue": 4,
+        "maxValue": 30,
+        "step": 1
+      },
+      "resolution": {
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output resolution (480p or 720p).",
+        "enum": [
+          "480p",
+          "720p"
+        ],
+        "default": "720p"
+      },
+      "generate_audio": {
+        "title": "Generate Audio",
+        "name": "generate_audio",
+        "type": "boolean",
+        "description": "Generate synchronized audio.",
+        "default": true
+      },
+      "seed": {
+        "title": "Seed",
+        "name": "seed",
+        "type": "int",
+        "description": "Random seed for reproducible generation. Use -1 for random.",
+        "minValue": -1,
+        "maxValue": 2147483647,
+        "examples": [
+          42
+        ]
+      }
+    },
+    "provider": "bytedance",
+    "provider_name": "SEEGEN"
+  },
+  {
+    "id": "seedance-2.5-flash-spicy-first-last-frame",
+    "name": "Spicy First & Last Frame",
+    "endpoint": "seedance-2.5-flash-spicy-first-last-frame",
+    "category": "Image to Video",
+    "cost": 1.254,
+    "variant": "Spicy First & Last Frame",
+    "family": "seedance-2.5-flash",
+    "group_of": "video",
+    "description": "Seedance 2.5 Flash Spicy First & Last Frame generates a smooth 4-30 second transition between a start and end image, with native audio at 480p or 720p. Relaxed-moderation variant with reduced content-safety filtering.",
+    "example_url": "https://cdn.muapi.ai/assets/df90f589-4743-414b-9702-795df818d146.avif",
+    "image_url": "https://cdn.muapi.ai/assets/df90f589-4743-414b-9702-795df818d146.avif",
+    "inputs": {
+      "prompt": {
+        "title": "Prompt",
+        "name": "prompt",
+        "type": "string",
+        "description": "Text prompt describing the transition.",
+        "examples": [
+          "A slow dolly shot through a rainy neon street at night, reflections on wet asphalt, ambient city sound"
+        ]
+      },
+      "images_list": {
+        "field": "images_list",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "title": "Images List",
+        "name": "images_list",
+        "description": "[first_frame, last_frame] image URLs.",
+        "maxItems": 2
+      },
+      "duration": {
+        "title": "Duration",
+        "name": "duration",
+        "type": "int",
+        "description": "Video duration in seconds (4-30).",
+        "default": 5,
+        "minValue": 4,
+        "maxValue": 30,
+        "step": 1
+      },
+      "resolution": {
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output resolution (480p or 720p).",
+        "enum": [
+          "480p",
+          "720p"
+        ],
+        "default": "720p"
+      },
+      "generate_audio": {
+        "title": "Generate Audio",
+        "name": "generate_audio",
+        "type": "boolean",
+        "description": "Generate synchronized audio.",
+        "default": true
+      },
+      "seed": {
+        "title": "Seed",
+        "name": "seed",
+        "type": "int",
+        "description": "Random seed for reproducible generation. Use -1 for random.",
+        "minValue": -1,
+        "maxValue": 2147483647,
+        "examples": [
+          42
+        ]
+      }
+    },
+    "provider": "bytedance",
+    "provider_name": "SEEGEN"
+  },
+  {
+    "id": "seedance-2.5-flash-spicy-reference-to-video",
+    "name": "Spicy Reference to Video",
+    "endpoint": "seedance-2.5-flash-spicy-reference-to-video",
+    "category": "Image to Video",
+    "cost": 1.254,
+    "variant": "Spicy Reference to Video",
+    "family": "seedance-2.5-flash",
+    "group_of": "video",
+    "description": "Seedance 2.5 Flash Spicy Reference-to-Video generates 4-30 second clips guided by up to 10 reference images, 5 reference videos and 5 reference audio clips (use @Image1, @Video1, @Audio1 in the prompt). Relaxed-moderation variant with reduced content-safety filtering.",
+    "example_url": "https://cdn.muapi.ai/assets/d3ef8448-1d4f-45bc-9775-777988699625.avif",
+    "image_url": "https://cdn.muapi.ai/assets/d3ef8448-1d4f-45bc-9775-777988699625.avif",
+    "inputs": {
+      "prompt": {
+        "title": "Prompt",
+        "name": "prompt",
+        "type": "string",
+        "description": "Prompt; refer to assets in order as @Image1, @Video1, @Audio1.",
+        "examples": [
+          "A slow dolly shot through a rainy neon street at night, reflections on wet asphalt, ambient city sound"
+        ]
+      },
+      "images_list": {
+        "field": "images_list",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "title": "Images List",
+        "name": "images_list",
+        "description": "Reference image URLs (up to 10).",
+        "maxItems": 10
+      },
+      "videos_list": {
+        "field": "videos_list",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "title": "Videos List",
+        "name": "videos_list",
+        "description": "Reference video URLs (up to 5).",
+        "maxItems": 5
+      },
+      "audios_list": {
+        "field": "audios_list",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "title": "Audios List",
+        "name": "audios_list",
+        "description": "Reference audio URLs (up to 5).",
+        "maxItems": 5
+      },
+      "aspect_ratio": {
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "type": "string",
+        "description": "Only used when no reference image or video is supplied.",
+        "enum": [
+          "16:9",
+          "9:16",
+          "1:1",
+          "4:3",
+          "3:4",
+          "21:9"
+        ],
+        "default": "16:9"
+      },
+      "duration": {
+        "title": "Duration",
+        "name": "duration",
+        "type": "int",
+        "description": "Video duration in seconds (4-30).",
+        "default": 5,
+        "minValue": 4,
+        "maxValue": 30,
+        "step": 1
+      },
+      "resolution": {
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output resolution (480p or 720p).",
+        "enum": [
+          "480p",
+          "720p"
+        ],
+        "default": "720p"
+      },
+      "generate_audio": {
+        "title": "Generate Audio",
+        "name": "generate_audio",
+        "type": "boolean",
+        "description": "Generate synchronized audio.",
+        "default": true
+      },
+      "seed": {
+        "title": "Seed",
+        "name": "seed",
+        "type": "int",
+        "description": "Random seed for reproducible generation. Use -1 for random.",
+        "minValue": -1,
+        "maxValue": 2147483647,
+        "examples": [
+          42
+        ]
+      }
+    },
+    "provider": "bytedance",
+    "provider_name": "SEEGEN"
+  },
+  {
+    "id": "seedance-2.5-flash-intl-image-to-video",
+    "name": "Intl Image to Video",
+    "endpoint": "seedance-2.5-flash-intl-image-to-video",
+    "category": "Image to Video",
+    "cost": 1.254,
+    "variant": "Intl Image to Video",
+    "family": "seedance-2.5-flash",
+    "group_of": "video",
+    "description": "Seedance 2.5 Flash Intl Image-to-Video animates a single image into a 4-30 second 480p/720p clip with native audio, following the image's aspect ratio. International (Dreamina) route variant with standard content-safety filtering.",
+    "example_url": "https://cdn.muapi.ai/assets/e51f2833-6a45-470c-99ad-ef31a8c632f8.avif",
+    "image_url": "https://cdn.muapi.ai/assets/e51f2833-6a45-470c-99ad-ef31a8c632f8.avif",
+    "inputs": {
+      "prompt": {
+        "title": "Prompt",
+        "name": "prompt",
+        "type": "string",
+        "description": "Text prompt describing the motion.",
+        "examples": [
+          "A slow dolly shot through a rainy neon street at night, reflections on wet asphalt, ambient city sound"
+        ]
+      },
+      "image_url": {
+        "type": "string",
+        "title": "Image URL",
+        "name": "image_url",
+        "description": "First-frame image. Output follows the image's aspect ratio.",
+        "field": "image",
+        "examples": [
+          "https://cdn.muapi.ai/assets/image_download_23.avif"
+        ]
+      },
+      "duration": {
+        "title": "Duration",
+        "name": "duration",
+        "type": "int",
+        "description": "Video duration in seconds (4-30).",
+        "default": 5,
+        "minValue": 4,
+        "maxValue": 30,
+        "step": 1
+      },
+      "resolution": {
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output resolution (480p or 720p).",
+        "enum": [
+          "480p",
+          "720p"
+        ],
+        "default": "720p"
+      },
+      "generate_audio": {
+        "title": "Generate Audio",
+        "name": "generate_audio",
+        "type": "boolean",
+        "description": "Generate synchronized audio.",
+        "default": true
+      },
+      "seed": {
+        "title": "Seed",
+        "name": "seed",
+        "type": "int",
+        "description": "Random seed for reproducible generation. Use -1 for random.",
+        "minValue": -1,
+        "maxValue": 2147483647,
+        "examples": [
+          42
+        ]
+      }
+    },
+    "provider": "bytedance",
+    "provider_name": "SEEGEN"
+  },
+  {
+    "id": "seedance-2.5-flash-intl-first-last-frame",
+    "name": "Intl First & Last Frame",
+    "endpoint": "seedance-2.5-flash-intl-first-last-frame",
+    "category": "Image to Video",
+    "cost": 1.254,
+    "variant": "Intl First & Last Frame",
+    "family": "seedance-2.5-flash",
+    "group_of": "video",
+    "description": "Seedance 2.5 Flash Intl First & Last Frame generates a smooth 4-30 second transition between a start and end image, with native audio at 480p or 720p. International (Dreamina) route variant with standard content-safety filtering.",
+    "example_url": "https://cdn.muapi.ai/assets/e5ff984b-3a71-4292-affc-e0af7b63a5a6.avif",
+    "image_url": "https://cdn.muapi.ai/assets/e5ff984b-3a71-4292-affc-e0af7b63a5a6.avif",
+    "inputs": {
+      "prompt": {
+        "title": "Prompt",
+        "name": "prompt",
+        "type": "string",
+        "description": "Text prompt describing the transition.",
+        "examples": [
+          "A slow dolly shot through a rainy neon street at night, reflections on wet asphalt, ambient city sound"
+        ]
+      },
+      "images_list": {
+        "field": "images_list",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "title": "Images List",
+        "name": "images_list",
+        "description": "[first_frame, last_frame] image URLs.",
+        "maxItems": 2
+      },
+      "duration": {
+        "title": "Duration",
+        "name": "duration",
+        "type": "int",
+        "description": "Video duration in seconds (4-30).",
+        "default": 5,
+        "minValue": 4,
+        "maxValue": 30,
+        "step": 1
+      },
+      "resolution": {
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output resolution (480p or 720p).",
+        "enum": [
+          "480p",
+          "720p"
+        ],
+        "default": "720p"
+      },
+      "generate_audio": {
+        "title": "Generate Audio",
+        "name": "generate_audio",
+        "type": "boolean",
+        "description": "Generate synchronized audio.",
+        "default": true
+      },
+      "seed": {
+        "title": "Seed",
+        "name": "seed",
+        "type": "int",
+        "description": "Random seed for reproducible generation. Use -1 for random.",
+        "minValue": -1,
+        "maxValue": 2147483647,
+        "examples": [
+          42
+        ]
+      }
+    },
+    "provider": "bytedance",
+    "provider_name": "SEEGEN"
+  },
+  {
+    "id": "seedance-2.5-flash-intl-reference-to-video",
+    "name": "Intl Reference to Video",
+    "endpoint": "seedance-2.5-flash-intl-reference-to-video",
+    "category": "Image to Video",
+    "cost": 1.254,
+    "variant": "Intl Reference to Video",
+    "family": "seedance-2.5-flash",
+    "group_of": "video",
+    "description": "Seedance 2.5 Flash Intl Reference-to-Video generates 4-30 second clips guided by up to 10 reference images, 5 reference videos and 5 reference audio clips (use @Image1, @Video1, @Audio1 in the prompt). International (Dreamina) route variant with standard content-safety filtering.",
+    "example_url": "https://cdn.muapi.ai/assets/e3b36daa-1bc7-4e73-ac1f-c45a629898cb.avif",
+    "image_url": "https://cdn.muapi.ai/assets/e3b36daa-1bc7-4e73-ac1f-c45a629898cb.avif",
+    "inputs": {
+      "prompt": {
+        "title": "Prompt",
+        "name": "prompt",
+        "type": "string",
+        "description": "Prompt; refer to assets in order as @Image1, @Video1, @Audio1.",
+        "examples": [
+          "A slow dolly shot through a rainy neon street at night, reflections on wet asphalt, ambient city sound"
+        ]
+      },
+      "images_list": {
+        "field": "images_list",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "title": "Images List",
+        "name": "images_list",
+        "description": "Reference image URLs (up to 10).",
+        "maxItems": 10
+      },
+      "videos_list": {
+        "field": "videos_list",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "title": "Videos List",
+        "name": "videos_list",
+        "description": "Reference video URLs (up to 5).",
+        "maxItems": 5
+      },
+      "audios_list": {
+        "field": "audios_list",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "title": "Audios List",
+        "name": "audios_list",
+        "description": "Reference audio URLs (up to 5).",
+        "maxItems": 5
+      },
+      "aspect_ratio": {
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "type": "string",
+        "description": "Only used when no reference image or video is supplied.",
+        "enum": [
+          "16:9",
+          "9:16",
+          "1:1",
+          "4:3",
+          "3:4",
+          "21:9"
+        ],
+        "default": "16:9"
+      },
+      "duration": {
+        "title": "Duration",
+        "name": "duration",
+        "type": "int",
+        "description": "Video duration in seconds (4-30).",
+        "default": 5,
+        "minValue": 4,
+        "maxValue": 30,
+        "step": 1
+      },
+      "resolution": {
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output resolution (480p or 720p).",
+        "enum": [
+          "480p",
+          "720p"
+        ],
+        "default": "720p"
+      },
+      "generate_audio": {
+        "title": "Generate Audio",
+        "name": "generate_audio",
+        "type": "boolean",
+        "description": "Generate synchronized audio.",
+        "default": true
+      },
+      "seed": {
+        "title": "Seed",
+        "name": "seed",
+        "type": "int",
+        "description": "Random seed for reproducible generation. Use -1 for random.",
+        "minValue": -1,
+        "maxValue": 2147483647,
+        "examples": [
+          42
+        ]
+      }
+    },
+    "provider": "bytedance",
+    "provider_name": "SEEGEN"
+  }
 ];
 
 export const getI2IModelById = (id) => i2iModels.find(m => m.id === id);
@@ -35273,6 +37009,936 @@ export const v2vModels = [
   "example_url": "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
   "image_url": "https://muapi.ai/blog/clipping.jpg"
 }
+,
+  {
+    "id": "video-passthrough",
+    "name": "Video to Video",
+    "endpoint": "video-passthrough",
+    "category": "Video to Video",
+    "cost": 0.14,
+    "variant": "Video to Video",
+    "family": "video",
+    "group_of": "video",
+    "description": "Video Passthrough model.",
+    "example_url": "",
+    "image_url": "",
+    "inputs": {
+      "video_url": {
+        "examples": [
+          null
+        ],
+        "description": "URL of the input video.",
+        "field": "video",
+        "type": "string",
+        "title": "Video URL",
+        "name": "video_url"
+      },
+      "make_input": {
+        "type": "boolean",
+        "title": "Make Input",
+        "name": "make_input",
+        "description": "",
+        "default": true
+      }
+    },
+    "provider": "unknown",
+    "provider_name": "KIE_AI"
+  },
+  {
+    "id": "motion-graphics-edit",
+    "name": "Motion Graphics Edit",
+    "endpoint": "motion-graphics-edit",
+    "category": "Video to Video",
+    "cost": 0.63,
+    "variant": "Motion Graphics Edit",
+    "family": "motion-graphics",
+    "group_of": "video",
+    "description": "Edit and modify a previously generated motion graphics animation using a text instruction.",
+    "example_url": "https://cdn.muapi.ai/assets/41fe6d3b-ca18-4d2f-a312-a05658133dfe.avif",
+    "image_url": "https://cdn.muapi.ai/assets/41fe6d3b-ca18-4d2f-a312-a05658133dfe.avif",
+    "inputs": {
+      "request_id": {
+        "type": "string",
+        "title": "Original Request ID",
+        "name": "request_id",
+        "description": "The request_id from a completed motion-graphics generation."
+      },
+      "edit_prompt": {
+        "type": "string",
+        "title": "Edit Instruction",
+        "name": "edit_prompt",
+        "description": "Describe what to change (e.g. 'change the background to dark blue and make the bars gold').",
+        "examples": [
+          "Change the background to deep navy and make all text gold",
+          "Add a subtle particle effect in the background",
+          "Slow down all animations by 50%"
+        ]
+      },
+      "duration_seconds": {
+        "type": "int",
+        "title": "Duration (seconds)",
+        "name": "duration_seconds",
+        "description": "Override the output duration (5–30 s). Defaults to the original generation’s duration.",
+        "default": 6,
+        "minValue": 5,
+        "maxValue": 30,
+        "step": 1
+      },
+      "aspect_ratio": {
+        "enum": [
+          "16:9",
+          "9:16",
+          "1:1"
+        ],
+        "type": "string",
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "description": "Override the output canvas aspect ratio. Defaults to the original generation’s ratio.",
+        "default": "16:9"
+      }
+    },
+    "provider": "muapi",
+    "provider_name": "REMOTION_MODAL"
+  },
+  {
+    "id": "seedance-2-motion-control",
+    "name": "Seedance 2 Motion Control",
+    "endpoint": "seedance-2-motion-control",
+    "category": "Video to Video",
+    "cost": 1,
+    "variant": "Seedance 2 Motion Control",
+    "family": "seedance-2-motion-control",
+    "group_of": "video",
+    "description": "Recast an existing performance video with new performers while preserving the original motion, choreography, blocking, and camera work, and while keeping the original location. Upload a reference video plus character images of the new performers, and optionally a short instruction — the environment, motion, and camera work are automatically preserved and the identities are swapped.",
+    "example_url": "https://cdn.muapi.ai/assets/7aac004f-f615-428a-80d6-9e35812e94de.avif",
+    "image_url": "https://cdn.muapi.ai/assets/7aac004f-f615-428a-80d6-9e35812e94de.avif",
+    "inputs": {
+      "prompt": {
+        "examples": [
+          "Swap the two dancers with the people in the reference images, keep the same room."
+        ],
+        "description": "Optional short creative brief describing the recast, e.g. 'swap the two dancers with the people in the reference images'. If omitted, roles are inferred automatically from the reference video and images.",
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt"
+      },
+      "video_url": {
+        "examples": [
+          "https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/seedance-v2.0-omni-reference.mp4"
+        ],
+        "description": "Reference video whose motion, choreography, blocking, and camera work will be preserved. The original performers and location are automatically replaced.",
+        "field": "video",
+        "type": "string",
+        "title": "Reference Video",
+        "name": "video_url"
+      },
+      "images_list": {
+        "examples": [
+          "https://cdn.muapi.ai/assets/image_download_21.avif"
+        ],
+        "description": "Character reference images — the new performers who will be recast into the video, in the order they should appear.",
+        "field": "images_list",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "title": "Character Reference Images",
+        "name": "images_list",
+        "maxItems": 9
+      },
+      "aspect_ratio": {
+        "enum": [
+          "21:9",
+          "16:9",
+          "4:3",
+          "1:1",
+          "3:4",
+          "9:16"
+        ],
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "type": "string",
+        "default": "16:9",
+        "description": "Output video aspect ratio."
+      },
+      "duration": {
+        "type": "int",
+        "title": "Duration (seconds)",
+        "name": "duration",
+        "description": "Video duration in seconds (4-15).",
+        "default": 5,
+        "minValue": 4,
+        "maxValue": 15,
+        "step": 1
+      },
+      "quality": {
+        "enum": [
+          "high",
+          "basic"
+        ],
+        "title": "Quality",
+        "name": "quality",
+        "type": "string",
+        "default": "high",
+        "description": "Generation quality. 'high' uses the standard model, 'basic' uses the faster model."
+      },
+      "generate_audio": {
+        "type": "boolean",
+        "title": "Generate Audio",
+        "name": "generate_audio",
+        "default": false,
+        "description": "Generate audio (music/SFX) for the recast video. Off by default — a motion-control recast usually shouldn't have fabricated audio layered over the preserved performance."
+      }
+    },
+    "provider": "unknown",
+    "provider_name": "KINOVI"
+  },
+  {
+    "id": "seedance-2.5-motion-control",
+    "name": "Seedance 2.5 Motion Control",
+    "endpoint": "seedance-2.5-motion-control",
+    "category": "Video to Video",
+    "cost": 1.5,
+    "variant": "Seedance 2.5 Motion Control",
+    "family": "seedance-2.5-motion-control",
+    "group_of": "video",
+    "description": "Recast an existing performance video with new performers while preserving the original motion, choreography, blocking, and camera work, and while keeping the original location. Upload a reference video plus character images of the new performers, and optionally a short instruction — the environment, motion, and camera work are automatically preserved and the identities are swapped.",
+    "example_url": "https://cdn.muapi.ai/assets/182831a1-4811-4527-82f5-f16675e9a49c.avif",
+    "image_url": "https://cdn.muapi.ai/assets/182831a1-4811-4527-82f5-f16675e9a49c.avif",
+    "inputs": {
+      "prompt": {
+        "examples": [
+          "Swap the two dancers with the people in the reference images, keep the same room."
+        ],
+        "description": "Optional short creative brief describing the recast, e.g. 'swap the two dancers with the people in the reference images'. If omitted, roles are inferred automatically from the reference video and images.",
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt"
+      },
+      "video_url": {
+        "examples": [
+          "https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/seedance-v2.0-omni-reference.mp4"
+        ],
+        "description": "Reference video whose motion, choreography, blocking, and camera work will be preserved. The original performers and location are automatically replaced.",
+        "field": "video",
+        "type": "string",
+        "title": "Reference Video",
+        "name": "video_url"
+      },
+      "images_list": {
+        "examples": [
+          "https://cdn.muapi.ai/assets/image_download_21.avif"
+        ],
+        "description": "Character reference images — the new performers who will be recast into the video, in the order they should appear.",
+        "field": "images_list",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "title": "Character Reference Images",
+        "name": "images_list",
+        "maxItems": 30
+      },
+      "aspect_ratio": {
+        "enum": [
+          "adaptive",
+          "16:9",
+          "9:16",
+          "1:1",
+          "4:3",
+          "3:4",
+          "21:9",
+          "9:21"
+        ],
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "type": "string",
+        "default": "16:9",
+        "description": "Output video aspect ratio."
+      },
+      "duration": {
+        "type": "int",
+        "title": "Duration (seconds)",
+        "name": "duration",
+        "description": "Video duration in seconds (4-30).",
+        "default": 5,
+        "minValue": 4,
+        "maxValue": 30,
+        "step": 1
+      },
+      "seed": {
+        "type": "int",
+        "title": "Seed",
+        "name": "seed",
+        "description": "Random seed for reproducible generation. Use -1 for random.",
+        "minValue": -1,
+        "maxValue": 4294967295,
+        "examples": [
+          42
+        ]
+      },
+      "high_bitrate": {
+        "type": "boolean",
+        "title": "High Bitrate",
+        "name": "high_bitrate",
+        "description": "Enable high bitrate mode for better visual fidelity. Produces larger files.",
+        "default": false
+      },
+      "generate_audio": {
+        "type": "boolean",
+        "title": "Generate Audio",
+        "name": "generate_audio",
+        "default": false,
+        "description": "Generate audio (music/SFX) for the recast video. Off by default — a motion-control recast usually shouldn't have fabricated audio layered over the preserved performance."
+      }
+    },
+    "provider": "unknown",
+    "provider_name": "SEEGEN"
+  },
+  {
+    "id": "seedance-2-spicy-motion-control",
+    "name": "Seedance 2 Spicy Motion Control",
+    "endpoint": "seedance-2-spicy-motion-control",
+    "category": "Video to Video",
+    "cost": 1.1,
+    "variant": "Seedance 2 Spicy Motion Control",
+    "family": "seedance-2-motion-control",
+    "group_of": "video",
+    "description": "Spicy Seedance 2 Motion Control — recast an existing performance video with a bolder creative treatment while preserving the original motion, choreography, blocking, camera work, and location. Upload a reference video plus character images of the new performers, and optionally a short instruction — the environment, motion, and camera work are automatically preserved and the identities are swapped.",
+    "example_url": "https://cdn.muapi.ai/assets/922aff7f-31e1-4c53-961f-57c6b552278c.avif",
+    "image_url": "https://cdn.muapi.ai/assets/922aff7f-31e1-4c53-961f-57c6b552278c.avif",
+    "inputs": {
+      "prompt": {
+        "examples": [
+          "Swap the two dancers with the people in the reference images, keep the same room."
+        ],
+        "description": "Optional short creative brief describing the recast, e.g. 'swap the two dancers with the people in the reference images'. If omitted, roles are inferred automatically from the reference video and images.",
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt"
+      },
+      "video_url": {
+        "examples": [
+          "https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/seedance-v2.0-omni-reference.mp4"
+        ],
+        "description": "Reference video whose motion, choreography, blocking, and camera work will be preserved. The original performers and location are automatically replaced.",
+        "field": "video",
+        "type": "string",
+        "title": "Reference Video",
+        "name": "video_url"
+      },
+      "images_list": {
+        "examples": [
+          "https://cdn.muapi.ai/assets/image_download_21.avif"
+        ],
+        "description": "Character reference images — the new performers who will be recast into the video, in the order they should appear.",
+        "field": "images_list",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "title": "Character Reference Images",
+        "name": "images_list",
+        "maxItems": 9
+      },
+      "aspect_ratio": {
+        "enum": [
+          "21:9",
+          "16:9",
+          "4:3",
+          "1:1",
+          "3:4",
+          "9:16"
+        ],
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "type": "string",
+        "default": "16:9",
+        "description": "Output video aspect ratio."
+      },
+      "duration": {
+        "type": "int",
+        "title": "Duration (seconds)",
+        "name": "duration",
+        "description": "Video duration in seconds (4-15).",
+        "default": 5,
+        "minValue": 4,
+        "maxValue": 15,
+        "step": 1
+      },
+      "quality": {
+        "enum": [
+          "high",
+          "basic"
+        ],
+        "title": "Quality",
+        "name": "quality",
+        "type": "string",
+        "default": "high",
+        "description": "Generation quality. 'high' uses the standard model, 'basic' uses the faster model."
+      },
+      "generate_audio": {
+        "type": "boolean",
+        "title": "Generate Audio",
+        "name": "generate_audio",
+        "default": false,
+        "description": "Generate audio (music/SFX) for the recast video. Off by default — a motion-control recast usually shouldn't have fabricated audio layered over the preserved performance."
+      }
+    },
+    "provider": "unknown",
+    "provider_name": "KINOVI"
+  },
+  {
+    "id": "gemini-omni-flash-1-2-video-edit",
+    "name": "1.2 Flash",
+    "endpoint": "gemini-omni-flash-1-2-video-edit",
+    "category": "Video to Video",
+    "cost": 0.56,
+    "variant": "1.2 Flash",
+    "family": "gemini-omni",
+    "group_of": "video",
+    "description": "Gemini Omni 1.2 Flash — edit an existing video with a simple text instruction, optionally guided by reference images. Output length follows the source video (max 15s).",
+    "example_url": "https://cdn.muapi.ai/assets/fa61fdf7-ec54-44c5-91ab-6d05d7ac7417.avif",
+    "image_url": "https://cdn.muapi.ai/assets/fa61fdf7-ec54-44c5-91ab-6d05d7ac7417.avif",
+    "inputs": {
+      "prompt": {
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "description": "Describe the scene, action, camera movement, and sound.",
+        "examples": [
+          "Make this video anime. Keep everything else the same."
+        ]
+      },
+      "video_url": {
+        "field": "video",
+        "type": "string",
+        "title": "Source Video",
+        "name": "video_url",
+        "description": "URL of the video to edit (MP4 recommended, max 15 seconds)."
+      },
+      "images_list": {
+        "field": "images_list",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "title": "Reference Images",
+        "name": "images_list",
+        "description": "Optional reference images (max 5) for subject, scene, or style guidance.",
+        "maxItems": 5
+      },
+      "character_ids": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "title": "Characters",
+        "name": "character_ids",
+        "description": "Optional character IDs (max 2) created with Gemini Omni Character. Characters keep a person's look consistent across shots and don't count toward the reference-image limit. Cannot be combined with first/last frames.",
+        "maxItems": 2
+      },
+      "aspect_ratio": {
+        "enum": [
+          "16:9",
+          "9:16",
+          "auto"
+        ],
+        "type": "string",
+        "title": "Aspect Ratio",
+        "name": "aspect_ratio",
+        "description": "Output aspect ratio. `auto` follows the reference image and is treated as 16:9 when none is provided.",
+        "default": "16:9"
+      },
+      "resolution": {
+        "enum": [
+          "360p",
+          "720p",
+          "1080p",
+          "4k"
+        ],
+        "type": "string",
+        "title": "Resolution",
+        "name": "resolution",
+        "description": "Output resolution. Output priced per second of generated video: $0.023/s at 360p, $0.07/s at 720p, $0.105/s at 1080p, $0.21/s at 4K.",
+        "default": "720p"
+      }
+    },
+    "provider": "google",
+    "provider_name": "KIE_AI"
+  },
+  {
+    "id": "gemini-omni-flash-1-2-extend",
+    "name": "1.2 Flash",
+    "endpoint": "gemini-omni-flash-1-2-extend",
+    "category": "Video to Video",
+    "cost": 0.12,
+    "variant": "1.2 Flash",
+    "family": "gemini-omni",
+    "group_of": "video",
+    "description": "Gemini Omni 1.2 Flash Extend — continue a finished Gemini Omni 1.2 Flash video from its last frame by 3-10 seconds and get the full clip back as one video.",
+    "example_url": "https://cdn.muapi.ai/assets/ece2f832-490e-4715-8247-50bfb475fb2e.avif",
+    "image_url": "https://cdn.muapi.ai/assets/ece2f832-490e-4715-8247-50bfb475fb2e.avif",
+    "inputs": {
+      "request_id": {
+        "type": "string",
+        "title": "Source Request ID",
+        "name": "request_id",
+        "description": "request_id of a completed Gemini Omni 1.2 Flash (or Extend) video, 360p or 720p, 15 seconds or shorter."
+      },
+      "prompt": {
+        "type": "string",
+        "title": "Prompt",
+        "name": "prompt",
+        "description": "Describe what happens next: action, camera, environment, and sound.",
+        "examples": [
+          "The scene continues: the robot turns to the camera and waves, the camera slowly pulls back."
+        ]
+      },
+      "duration": {
+        "type": "integer",
+        "title": "Extend Duration",
+        "name": "duration",
+        "description": "Seconds to add to the end of the video (3-10). Only the added seconds are billed: $0.023/s at 360p, $0.05/s at 720p.",
+        "minValue": 3,
+        "maxValue": 10,
+        "default": 5
+      },
+      "images_list": {
+        "field": "images_list",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "title": "Reference Images",
+        "name": "images_list",
+        "description": "Optional reference images (max 3) to keep people and objects consistent in the new part.",
+        "maxItems": 3
+      }
+    },
+    "provider": "google",
+    "provider_name": "KIE_AI"
+  },
+  {
+    "id": "seedance-2.5-flash-video-edit",
+    "name": "Video Edit",
+    "endpoint": "seedance-2.5-flash-video-edit",
+    "category": "Video to Video",
+    "cost": 1.5,
+    "variant": "Video Edit",
+    "family": "seedance-2.5-flash",
+    "group_of": "video",
+    "description": "Seedance 2.5 Flash Video Edit restyles, relights or changes elements of an existing clip at 480p or 720p, keeping the source length, at a lower price than Seedance 2.5.",
+    "example_url": "https://cdn.muapi.ai/assets/280a2eb3-0b7b-48d7-b984-02d2050563cc.avif",
+    "image_url": "https://cdn.muapi.ai/assets/280a2eb3-0b7b-48d7-b984-02d2050563cc.avif",
+    "inputs": {
+      "prompt": {
+        "title": "Prompt",
+        "name": "prompt",
+        "type": "string",
+        "description": "Instructions for the edit: lighting, style, weather, environment, or elements to change.",
+        "examples": [
+          "Change the scene to golden hour with warm light and light fog"
+        ]
+      },
+      "video_url": {
+        "type": "string",
+        "title": "Video URL",
+        "name": "video_url",
+        "description": "URL of the video to edit.",
+        "field": "video",
+        "examples": [
+          "https://cdn.muapi.ai/assets/reference.mp4"
+        ]
+      },
+      "images_list": {
+        "field": "images_list",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "title": "Images List",
+        "name": "images_list",
+        "description": "Reference image URLs guiding subject identity or style (up to 10).",
+        "maxItems": 10
+      },
+      "audios_list": {
+        "field": "audios_list",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "title": "Audios List",
+        "name": "audios_list",
+        "description": "Reference audio URLs (up to 5).",
+        "maxItems": 5
+      },
+      "resolution": {
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output resolution (480p or 720p).",
+        "enum": [
+          "480p",
+          "720p"
+        ],
+        "default": "720p"
+      },
+      "generate_audio": {
+        "title": "Generate Audio",
+        "name": "generate_audio",
+        "type": "boolean",
+        "description": "Generate synchronized audio.",
+        "default": true
+      }
+    },
+    "provider": "bytedance",
+    "provider_name": "SEEGEN"
+  },
+  {
+    "id": "seedance-2.5-flash-video-extend",
+    "name": "Video Extend",
+    "endpoint": "seedance-2.5-flash-video-extend",
+    "category": "Video to Video",
+    "cost": 1.5,
+    "variant": "Video Extend",
+    "family": "seedance-2.5-flash",
+    "group_of": "video",
+    "description": "Seedance 2.5 Flash Video Extend continues an existing clip forward by 4-30 seconds with native audio at 480p or 720p, at a lower price than Seedance 2.5.",
+    "example_url": "https://cdn.muapi.ai/assets/cef62ed5-8d14-4a2b-a0cb-acb860364fcd.avif",
+    "image_url": "https://cdn.muapi.ai/assets/cef62ed5-8d14-4a2b-a0cb-acb860364fcd.avif",
+    "inputs": {
+      "prompt": {
+        "title": "Prompt",
+        "name": "prompt",
+        "type": "string",
+        "description": "Desired continuation: action, camera movement, lighting, mood.",
+        "examples": [
+          "The camera keeps pushing forward as the rain gets heavier"
+        ]
+      },
+      "video_url": {
+        "type": "string",
+        "title": "Video URL",
+        "name": "video_url",
+        "description": "URL of the video to extend. Generation continues from its last frame.",
+        "field": "video",
+        "examples": [
+          "https://cdn.muapi.ai/assets/reference.mp4"
+        ]
+      },
+      "duration": {
+        "title": "Duration",
+        "name": "duration",
+        "type": "int",
+        "description": "Seconds of new footage to generate (4-30).",
+        "default": 5,
+        "minValue": 4,
+        "maxValue": 30,
+        "step": 1
+      },
+      "resolution": {
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output resolution (480p or 720p).",
+        "enum": [
+          "480p",
+          "720p"
+        ],
+        "default": "720p"
+      },
+      "generate_audio": {
+        "title": "Generate Audio",
+        "name": "generate_audio",
+        "type": "boolean",
+        "description": "Generate synchronized audio.",
+        "default": true
+      }
+    },
+    "provider": "bytedance",
+    "provider_name": "SEEGEN"
+  },
+  {
+    "id": "seedance-2.5-flash-spicy-video-edit",
+    "name": "Spicy Video Edit",
+    "endpoint": "seedance-2.5-flash-spicy-video-edit",
+    "category": "Video to Video",
+    "cost": 1.65,
+    "variant": "Spicy Video Edit",
+    "family": "seedance-2.5-flash",
+    "group_of": "video",
+    "description": "Seedance 2.5 Flash Spicy Video Edit restyles, relights or changes elements of an existing clip at 480p or 720p, keeping the source length, at a lower price than Seedance 2.5. Relaxed-moderation variant with reduced content-safety filtering.",
+    "example_url": "https://cdn.muapi.ai/assets/c2a94d9d-ec5d-4641-9a71-ca0620e6a603.avif",
+    "image_url": "https://cdn.muapi.ai/assets/c2a94d9d-ec5d-4641-9a71-ca0620e6a603.avif",
+    "inputs": {
+      "prompt": {
+        "title": "Prompt",
+        "name": "prompt",
+        "type": "string",
+        "description": "Instructions for the edit: lighting, style, weather, environment, or elements to change.",
+        "examples": [
+          "Change the scene to golden hour with warm light and light fog"
+        ]
+      },
+      "video_url": {
+        "type": "string",
+        "title": "Video URL",
+        "name": "video_url",
+        "description": "URL of the video to edit.",
+        "field": "video",
+        "examples": [
+          "https://cdn.muapi.ai/assets/reference.mp4"
+        ]
+      },
+      "images_list": {
+        "field": "images_list",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "title": "Images List",
+        "name": "images_list",
+        "description": "Reference image URLs guiding subject identity or style (up to 10).",
+        "maxItems": 10
+      },
+      "audios_list": {
+        "field": "audios_list",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "title": "Audios List",
+        "name": "audios_list",
+        "description": "Reference audio URLs (up to 5).",
+        "maxItems": 5
+      },
+      "resolution": {
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output resolution (480p or 720p).",
+        "enum": [
+          "480p",
+          "720p"
+        ],
+        "default": "720p"
+      },
+      "generate_audio": {
+        "title": "Generate Audio",
+        "name": "generate_audio",
+        "type": "boolean",
+        "description": "Generate synchronized audio.",
+        "default": true
+      }
+    },
+    "provider": "bytedance",
+    "provider_name": "SEEGEN"
+  },
+  {
+    "id": "seedance-2.5-flash-spicy-video-extend",
+    "name": "Spicy Video Extend",
+    "endpoint": "seedance-2.5-flash-spicy-video-extend",
+    "category": "Video to Video",
+    "cost": 1.65,
+    "variant": "Spicy Video Extend",
+    "family": "seedance-2.5-flash",
+    "group_of": "video",
+    "description": "Seedance 2.5 Flash Spicy Video Extend continues an existing clip forward by 4-30 seconds with native audio at 480p or 720p, at a lower price than Seedance 2.5. Relaxed-moderation variant with reduced content-safety filtering.",
+    "example_url": "https://cdn.muapi.ai/assets/bb988265-8182-43cd-9b16-1a76cc88683a.avif",
+    "image_url": "https://cdn.muapi.ai/assets/bb988265-8182-43cd-9b16-1a76cc88683a.avif",
+    "inputs": {
+      "prompt": {
+        "title": "Prompt",
+        "name": "prompt",
+        "type": "string",
+        "description": "Desired continuation: action, camera movement, lighting, mood.",
+        "examples": [
+          "The camera keeps pushing forward as the rain gets heavier"
+        ]
+      },
+      "video_url": {
+        "type": "string",
+        "title": "Video URL",
+        "name": "video_url",
+        "description": "URL of the video to extend. Generation continues from its last frame.",
+        "field": "video",
+        "examples": [
+          "https://cdn.muapi.ai/assets/reference.mp4"
+        ]
+      },
+      "duration": {
+        "title": "Duration",
+        "name": "duration",
+        "type": "int",
+        "description": "Seconds of new footage to generate (4-30).",
+        "default": 5,
+        "minValue": 4,
+        "maxValue": 30,
+        "step": 1
+      },
+      "resolution": {
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output resolution (480p or 720p).",
+        "enum": [
+          "480p",
+          "720p"
+        ],
+        "default": "720p"
+      },
+      "generate_audio": {
+        "title": "Generate Audio",
+        "name": "generate_audio",
+        "type": "boolean",
+        "description": "Generate synchronized audio.",
+        "default": true
+      }
+    },
+    "provider": "bytedance",
+    "provider_name": "SEEGEN"
+  },
+  {
+    "id": "seedance-2.5-flash-intl-video-edit",
+    "name": "Intl Video Edit",
+    "endpoint": "seedance-2.5-flash-intl-video-edit",
+    "category": "Video to Video",
+    "cost": 1.65,
+    "variant": "Intl Video Edit",
+    "family": "seedance-2.5-flash",
+    "group_of": "video",
+    "description": "Seedance 2.5 Flash Intl Video Edit restyles, relights or changes elements of an existing clip at 480p or 720p, keeping the source length, at a lower price than Seedance 2.5. International (Dreamina) route variant with standard content-safety filtering.",
+    "example_url": "https://cdn.muapi.ai/assets/e0e240dc-8e78-446d-827e-0f51b28ee957.avif",
+    "image_url": "https://cdn.muapi.ai/assets/e0e240dc-8e78-446d-827e-0f51b28ee957.avif",
+    "inputs": {
+      "prompt": {
+        "title": "Prompt",
+        "name": "prompt",
+        "type": "string",
+        "description": "Instructions for the edit: lighting, style, weather, environment, or elements to change.",
+        "examples": [
+          "Change the scene to golden hour with warm light and light fog"
+        ]
+      },
+      "video_url": {
+        "type": "string",
+        "title": "Video URL",
+        "name": "video_url",
+        "description": "URL of the video to edit.",
+        "field": "video",
+        "examples": [
+          "https://cdn.muapi.ai/assets/reference.mp4"
+        ]
+      },
+      "images_list": {
+        "field": "images_list",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "title": "Images List",
+        "name": "images_list",
+        "description": "Reference image URLs guiding subject identity or style (up to 10).",
+        "maxItems": 10
+      },
+      "audios_list": {
+        "field": "audios_list",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "title": "Audios List",
+        "name": "audios_list",
+        "description": "Reference audio URLs (up to 5).",
+        "maxItems": 5
+      },
+      "resolution": {
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output resolution (480p or 720p).",
+        "enum": [
+          "480p",
+          "720p"
+        ],
+        "default": "720p"
+      },
+      "generate_audio": {
+        "title": "Generate Audio",
+        "name": "generate_audio",
+        "type": "boolean",
+        "description": "Generate synchronized audio.",
+        "default": true
+      }
+    },
+    "provider": "bytedance",
+    "provider_name": "SEEGEN"
+  },
+  {
+    "id": "seedance-2.5-flash-intl-video-extend",
+    "name": "Intl Video Extend",
+    "endpoint": "seedance-2.5-flash-intl-video-extend",
+    "category": "Video to Video",
+    "cost": 1.65,
+    "variant": "Intl Video Extend",
+    "family": "seedance-2.5-flash",
+    "group_of": "video",
+    "description": "Seedance 2.5 Flash Intl Video Extend continues an existing clip forward by 4-30 seconds with native audio at 480p or 720p, at a lower price than Seedance 2.5. International (Dreamina) route variant with standard content-safety filtering.",
+    "example_url": "https://cdn.muapi.ai/assets/d1beb2b4-177e-4fe4-aaed-537ffeb4956c.avif",
+    "image_url": "https://cdn.muapi.ai/assets/d1beb2b4-177e-4fe4-aaed-537ffeb4956c.avif",
+    "inputs": {
+      "prompt": {
+        "title": "Prompt",
+        "name": "prompt",
+        "type": "string",
+        "description": "Desired continuation: action, camera movement, lighting, mood.",
+        "examples": [
+          "The camera keeps pushing forward as the rain gets heavier"
+        ]
+      },
+      "video_url": {
+        "type": "string",
+        "title": "Video URL",
+        "name": "video_url",
+        "description": "URL of the video to extend. Generation continues from its last frame.",
+        "field": "video",
+        "examples": [
+          "https://cdn.muapi.ai/assets/reference.mp4"
+        ]
+      },
+      "duration": {
+        "title": "Duration",
+        "name": "duration",
+        "type": "int",
+        "description": "Seconds of new footage to generate (4-30).",
+        "default": 5,
+        "minValue": 4,
+        "maxValue": 30,
+        "step": 1
+      },
+      "resolution": {
+        "title": "Resolution",
+        "name": "resolution",
+        "type": "string",
+        "description": "Output resolution (480p or 720p).",
+        "enum": [
+          "480p",
+          "720p"
+        ],
+        "default": "720p"
+      },
+      "generate_audio": {
+        "title": "Generate Audio",
+        "name": "generate_audio",
+        "type": "boolean",
+        "description": "Generate synchronized audio.",
+        "default": true
+      }
+    },
+    "provider": "bytedance",
+    "provider_name": "SEEGEN"
+  }
 ];
 
 // ─── LipSync / Speech-to-Video models ────────────────────────────────────────
@@ -39518,6 +42184,121 @@ export const audioModels = [
   "example_url": "https://cdn.muapi.ai/assets/3d05bfb2-745e-4827-a9c7-0d6a1832e634.avif",
   "image_url": "https://cdn.muapi.ai/assets/3d05bfb2-745e-4827-a9c7-0d6a1832e634.avif"
 }
+,
+  {
+    "id": "audio-passthrough",
+    "name": "Text to Audio",
+    "endpoint": "audio-passthrough",
+    "category": "Text to Audio",
+    "cost": 0.14,
+    "variant": "Text to Audio",
+    "family": "audio",
+    "group_of": "audio",
+    "description": "Audio Passthrough model.",
+    "example_url": "",
+    "image_url": "",
+    "inputs": {
+      "audio_url": {
+        "examples": [
+          null
+        ],
+        "description": "URL of the input audio.",
+        "field": "audio",
+        "type": "string",
+        "title": "Audio URL",
+        "name": "audio_url"
+      },
+      "make_input": {
+        "type": "boolean",
+        "title": "Make Input",
+        "name": "make_input",
+        "description": "Whether to convert the input audio to a format compatible with the passthrough interface.",
+        "default": true
+      }
+    },
+    "provider": "unknown",
+    "provider_name": "KIE_AI"
+  },
+  {
+    "id": "suno-speech",
+    "name": "Suno Speech",
+    "endpoint": "suno-speech",
+    "category": "Text to Audio",
+    "cost": 0.1,
+    "variant": "Suno Speech",
+    "family": "suno",
+    "group_of": "music",
+    "description": "Generate expressive AI speech with tone, rhythm, emotion and optional background music from a scene prompt or a full script.",
+    "example_url": "https://d3adwkbyhxyrtq.cloudfront.net/muapi/homepage/suno-extend-music.avif",
+    "image_url": "https://d3adwkbyhxyrtq.cloudfront.net/muapi/homepage/suno-extend-music.avif",
+    "inputs": {
+      "custom_mode": {
+        "type": "boolean",
+        "title": "Custom Mode",
+        "name": "custom_mode",
+        "description": "Off (Simple): describe a scene in `prompt` and the model writes and speaks the script. On (Advanced): provide your own `script` plus optional tone, variety, vocal gender and background music.",
+        "default": false
+      },
+      "prompt": {
+        "type": "string",
+        "title": "Scene Prompt",
+        "name": "prompt",
+        "description": "Simple mode only. A one-line scene description; the model writes the script. 1-3000 characters.",
+        "examples": [
+          "A short morning news intro about sunny weather"
+        ]
+      },
+      "script": {
+        "type": "string",
+        "title": "Script",
+        "name": "script",
+        "description": "Advanced mode only. The exact text to be spoken, 1-5000 characters. Multiline supported.",
+        "examples": [
+          "Welcome to today's briefing. The weather is clear and the city is awake."
+        ]
+      },
+      "tone": {
+        "type": "string",
+        "title": "Tone",
+        "name": "tone",
+        "description": "Advanced mode only, optional. Tone, rhythm, emotion, setting, accent or accompaniment style. Up to 1000 characters.",
+        "examples": [
+          "Warm, calm female narrator, slightly smiling"
+        ]
+      },
+      "variety": {
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "type": "integer",
+        "title": "Variety",
+        "name": "variety",
+        "description": "Advanced mode only, optional. 0 = exact style, 1 = balanced variety, 2 = distinct styles, 3 = bold exploration, 4 = unreasonably varied."
+      },
+      "vocal_gender": {
+        "enum": [
+          "female",
+          "male"
+        ],
+        "type": "string",
+        "title": "Vocal Gender",
+        "name": "vocal_gender",
+        "description": "Advanced mode only, optional. Voice gender."
+      },
+      "background_music": {
+        "type": "boolean",
+        "title": "Background Music",
+        "name": "background_music",
+        "description": "Advanced mode only, optional. Add background music under the speech."
+      }
+    },
+    "provider": "suno",
+    "provider_name": "KIE_AI"
+  }
 ];
 
 export const getAudioModelById = (id) => audioModels.find(m => m.id === id);

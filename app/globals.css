@@ -101,30 +101,45 @@ body {
 }
 
 /* Card footers across all studios */
+[data-theme="light"] .bg-black\/80,
 [data-theme="light"] .p-3.bg-black\/80 {
   background-color: #ffffff !important;
   border-top-color: rgba(0, 0, 0, 0.07) !important;
 }
 
+[data-theme="light"] .bg-black\/80 p {
+  color: #374151 !important;
+}
+
 /* Floating Prompt Composer */
-[data-theme="light"] .from-\[\#18181c\]\/90,
 [data-theme="light"] .prompt-composer-panel {
-  background: rgba(255, 255, 255, 0.96) !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
   border-color: rgba(0, 0, 0, 0.1) !important;
   box-shadow: 0 15px 45px rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-theme="light"] .prompt-composer-panel textarea,
+[data-theme="light"] textarea.prompt-composer-textarea {
+  color: #111113 !important;
+}
+
+[data-theme="light"] .prompt-composer-panel textarea::placeholder,
+[data-theme="light"] textarea.prompt-composer-textarea::placeholder {
+  color: rgba(17, 17, 19, 0.45) !important;
 }
 
 /* PromptComposer controls & buttons */
 [data-theme="light"] .bg-\[\#16161a\]\/60,
 [data-theme="light"] .prompt-control-idle {
-  background-color: rgba(0, 0, 0, 0.04) !important;
+  background-color: #f1f3f5 !important;
   color: #111113 !important;
   border-color: rgba(0, 0, 0, 0.08) !important;
 }
 
 [data-theme="light"] .hover\:bg-\[\#202026\]\/80:hover,
 [data-theme="light"] .prompt-control-idle:hover {
-  background-color: rgba(0, 0, 0, 0.08) !important;
+  background-color: #e5e7eb !important;
 }
 
 /* Popovers & Dropdowns */
@@ -519,123 +534,44 @@ body {
 }
 
 /* 7. Agents & Workflows Studio Headers & Cards (/studio/agents, /studio/workflows) */
-[data-theme="light"] .h-16.bg-black\/40,
-[data-theme="light"] .h-14.bg-black\/40,
-[data-theme="light"] .border-b.bg-black\/40,
-[data-theme="light"] .border-t.bg-black\/40 {
+[data-theme="light"] div.h-16.bg-black\/40,
+[data-theme="light"] div.h-14.bg-black\/40,
+[data-theme="light"] div.border-b.bg-black\/40,
+[data-theme="light"] div.border-t.bg-black\/40,
+[data-theme="light"] header.bg-black\/40 {
   background-color: #ffffff !important;
   border-color: rgba(0, 0, 0, 0.08) !important;
 }
 
-/* Agent & Workflow Card Overlays: Keep title and category text crisp and white on top of media */
-[data-theme="light"] .aspect-\[4\/5\] .text-white,
-[data-theme="light"] .aspect-\[4\/5\] h3,
-[data-theme="light"] .aspect-\[4\/5\] p,
-[data-theme="light"] .from-black\/90 ~ div .text-white,
-[data-theme="light"] .from-black\/90 ~ div h3,
-[data-theme="light"] .from-black\/90 ~ div p,
-[data-theme="light"] .from-black\/80 ~ div .text-white,
-[data-theme="light"] .from-black\/80 ~ div h3,
-[data-theme="light"] .from-black\/80 ~ div p {
-  color: #ffffff !important;
+[data-theme="light"] .bg-white\/5 {
+  background-color: #f1f3f5 !important;
+  border-color: rgba(0, 0, 0, 0.06) !important;
 }
 
-[data-theme="light"] .aspect-\[4\/5\] .text-white\/40,
-[data-theme="light"] .from-black\/90 ~ div .text-white\/40,
-[data-theme="light"] .from-black\/80 ~ div .text-white\/40 {
-  color: rgba(255, 255, 255, 0.7) !important;
+[data-theme="light"] .bg-white\/5 button {
+  color: #4b5563;
 }
 
-/* Card base background in light mode */
-[data-theme="light"] .aspect-\[4\/5\] > div.bg-\[\#0a0a0a\],
-[data-theme="light"] .aspect-\[4\/5\] > div {
-  background-color: #111114 !important;
-  border-color: rgba(0, 0, 0, 0.08) !important;
+[data-theme="light"] .bg-white\/5 button:hover {
+  color: #111113;
 }
 
-/* Edit / Options button on cards */
-[data-theme="light"] .aspect-\[4\/5\] button.bg-black\/60,
-[data-theme="light"] .aspect-\[4\/5\] button.bg-black\/40 {
-  background-color: rgba(0, 0, 0, 0.6) !important;
-  color: #ffffff !important;
-}
-
-/* 6. Audio Studio & Zinc Surfaces (/studio/audio, /studio/clipping) */
-[data-theme="light"] .bg-zinc-950\/40,
-[data-theme="light"] .bg-zinc-950 {
-  background-color: #ffffff !important;
-  border-color: rgba(0, 0, 0, 0.08) !important;
-}
-
-[data-theme="light"] .bg-zinc-950\/80 {
-  background-color: rgba(255, 255, 255, 0.95) !important;
-  border-top-color: rgba(0, 0, 0, 0.08) !important;
-}
-
-[data-theme="light"] .bg-zinc-900\/40,
-[data-theme="light"] .bg-zinc-900\/60,
-[data-theme="light"] .bg-zinc-900\/30,
-[data-theme="light"] .bg-zinc-950\/20 {
-  background-color: #ffffff !important;
-  border-color: rgba(0, 0, 0, 0.08) !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
-}
-
-[data-theme="light"] .bg-zinc-900,
-[data-theme="light"] .bg-zinc-905,
-[data-theme="light"] .bg-zinc-850 {
-  background-color: #ffffff !important;
+/* Audio inputs & form controls */
+[data-theme="light"] input.bg-zinc-900,
+[data-theme="light"] textarea.bg-zinc-900,
+[data-theme="light"] button.bg-zinc-900 {
+  background-color: #f9fafb !important;
+  color: #111113 !important;
   border-color: rgba(0, 0, 0, 0.12) !important;
-  color: #111113 !important;
 }
 
-[data-theme="light"] .hover\:bg-zinc-900:hover,
-[data-theme="light"] .hover\:bg-zinc-850:hover {
-  background-color: rgba(0, 0, 0, 0.04) !important;
+[data-theme="light"] input.bg-zinc-900::placeholder,
+[data-theme="light"] textarea.bg-zinc-900::placeholder {
+  color: rgba(17, 17, 19, 0.45) !important;
 }
 
-[data-theme="light"] .bg-zinc-800\/80 {
-  background-color: rgba(0, 0, 0, 0.05) !important;
-  border-color: rgba(0, 0, 0, 0.1) !important;
-  color: #111113 !important;
-}
-
-[data-theme="light"] .bg-zinc-800 {
-  background-color: rgba(0, 0, 0, 0.08) !important;
-}
-
-[data-theme="light"] .border-zinc-900,
-[data-theme="light"] .border-zinc-800,
-[data-theme="light"] .border-zinc-705,
-[data-theme="light"] .border-zinc-700,
-[data-theme="light"] .border-zinc-700\/80,
-[data-theme="light"] .border-zinc-600 {
-  border-color: rgba(0, 0, 0, 0.08) !important;
-}
-
-[data-theme="light"] .text-zinc-100,
-[data-theme="light"] .text-zinc-200,
-[data-theme="light"] .text-zinc-300 {
-  color: #111113 !important;
-}
-
-[data-theme="light"] .text-zinc-400 {
-  color: #52525b !important;
-}
-
-[data-theme="light"] .text-zinc-500,
-[data-theme="light"] .text-zinc-650,
-[data-theme="light"] .text-zinc-700 {
-  color: #71717a !important;
-}
-
-/* 7. Agents & Workflows Studio Headers & Cards (/studio/agents, /studio/workflows) */
-[data-theme="light"] .h-16.bg-black\/40,
-[data-theme="light"] .h-14.bg-black\/40,
-[data-theme="light"] .border-b.bg-black\/40,
-[data-theme="light"] .border-t.bg-black\/40 {
-  background-color: #ffffff !important;
-  border-color: rgba(0, 0, 0, 0.08) !important;
+[data-theme="light"] button.bg-zinc-900:hover {
+  background-color: #f3f4f6 !important;
 }
 
 /* Agent & Workflow Card Overlays: Keep title and category text crisp and white on top of media */

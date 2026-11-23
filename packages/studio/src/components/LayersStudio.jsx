@@ -36,7 +36,7 @@ const UPSCALE_MODELS = [
 
 // Sample initial image & decomposed layers for demonstration (Seedream Wild Beauty via CDN)
 const DEFAULT_SAMPLE_IMAGE =
-  "https://cdn.muapi.ai/assets/1786019968051_cKRYLHHu.png";
+  "https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/sdxl-image.avif";
 
 const DEFAULT_SAMPLE_LAYERS = [
   "https://cdn.muapi.ai/assets/1786021161819_iOe80bNR.webp",
@@ -2227,7 +2227,7 @@ export default function LayersStudio({
                   <div className="flex items-center gap-2.5">
                     <div className="relative w-28 h-36 rounded-2xl overflow-hidden bg-zinc-900 flex-shrink-0 shadow-md">
                       <img
-                        src="https://cdn.muapi.ai/assets/1786019968051_cKRYLHHu.png"
+                        src="https://d3adwkbyhxyrtq.cloudfront.net/webassets/videomodels/sdxl-image.avif"
                         alt="Seedream original demo"
                         className="w-full h-full object-cover"
                       />
