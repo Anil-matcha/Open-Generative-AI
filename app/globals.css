@@ -59,41 +59,614 @@ body {
 }
 .animate-fade-in-up { animation: fade-in-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
-/* ---- Light theme (opt-in via data-theme="light"; dark is the default) ----
-   Minimal override: page/surface variables plus the most common hardcoded
-   Tailwind surface/text utilities. Studio-internal hardcoded colors are not
-   all restyled yet. */
+/* ---- Light theme (opt-in via data-theme="light"; dark is the default) ---- */
 :root[data-theme="light"] {
   color-scheme: light;
   --bg-app: #f6f7f9;
   --bg-panel: #ffffff;
-  --bg-card: #eef0f3;
-  --border-color: rgba(0,0,0,0.1);
+  --bg-card: #ffffff;
+  --border-color: rgba(0, 0, 0, 0.08);
   --glass-bg: rgba(0, 0, 0, 0.03);
-  --glass-border: rgba(0, 0, 0, 0.1);
+  --glass-border: rgba(0, 0, 0, 0.08);
 }
-[data-theme="light"] body { background: #f6f7f9; color: #111113; }
+
+[data-theme="light"] body {
+  background: #f6f7f9;
+  color: #111113;
+}
+
+/* Background surfaces */
 [data-theme="light"] .bg-app-bg,
 [data-theme="light"] .bg-black,
 [data-theme="light"] .bg-\[\#050505\],
-[data-theme="light"] .bg-\[\#030303\] { background-color: #f6f7f9; }
+[data-theme="light"] .bg-\[\#030303\] {
+  background-color: #f6f7f9 !important;
+}
+
 [data-theme="light"] .bg-panel-bg,
 [data-theme="light"] .bg-\[\#0a0a0a\],
-[data-theme="light"] .bg-\[\#0a0a0b\]\/80 { background-color: #ffffff; }
+[data-theme="light"] .bg-\[\#0a0a0b\],
+[data-theme="light"] .bg-\[\#0a0a0b\]\/80,
+[data-theme="light"] .bg-\[\#0a0a0b\]\/95,
+[data-theme="light"] .sidebar-nav-panel {
+  background-color: #ffffff !important;
+}
+
 [data-theme="light"] .bg-card-bg,
 [data-theme="light"] .bg-\[\#141414\],
-[data-theme="light"] .bg-\[\#111111\] { background-color: #eef0f3; }
-[data-theme="light"] .text-white { color: #111113; }
+[data-theme="light"] .bg-\[\#111111\],
+[data-theme="light"] .bg-\[\#121215\],
+[data-theme="light"] .bg-\[\#121215\]\/95 {
+  background-color: #ffffff !important;
+}
+
+/* Card footers across all studios */
+[data-theme="light"] .p-3.bg-black\/80 {
+  background-color: #ffffff !important;
+  border-top-color: rgba(0, 0, 0, 0.07) !important;
+}
+
+/* Floating Prompt Composer */
+[data-theme="light"] .from-\[\#18181c\]\/90,
+[data-theme="light"] .prompt-composer-panel {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* PromptComposer controls & buttons */
+[data-theme="light"] .bg-\[\#16161a\]\/60,
+[data-theme="light"] .prompt-control-idle {
+  background-color: rgba(0, 0, 0, 0.04) !important;
+  color: #111113 !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-theme="light"] .hover\:bg-\[\#202026\]\/80:hover,
+[data-theme="light"] .prompt-control-idle:hover {
+  background-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Popovers & Dropdowns */
+[data-theme="light"] .bg-\[\#0c0c0f\],
+[data-theme="light"] .bg-\[\#0c0c0f\]\/95,
+[data-theme="light"] .prompt-popover-panel {
+  background-color: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  color: #111113 !important;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.12) !important;
+}
+
+[data-theme="light"] .shadow-\[0_10px_40px_rgba\(0\,0\,0\,0\.8\)\] {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Text colors */
+[data-theme="light"] .text-white {
+  color: #111113 !important;
+}
+
+[data-theme="light"] .text-white\/95,
 [data-theme="light"] .text-white\/90,
-[data-theme="light"] .text-white\/80 { color: rgba(17,17,19,0.85); }
+[data-theme="light"] .text-white\/85,
+[data-theme="light"] .text-white\/80 {
+  color: rgba(17, 17, 19, 0.88) !important;
+}
+
+[data-theme="light"] .text-white\/75,
 [data-theme="light"] .text-white\/70,
-[data-theme="light"] .text-white\/60 { color: rgba(17,17,19,0.65); }
+[data-theme="light"] .text-white\/65,
+[data-theme="light"] .text-white\/60 {
+  color: rgba(17, 17, 19, 0.72) !important;
+}
+
+[data-theme="light"] .text-white\/55,
 [data-theme="light"] .text-white\/50,
-[data-theme="light"] .text-white\/40,
-[data-theme="light"] .text-white\/20 { color: rgba(17,17,19,0.5); }
+[data-theme="light"] .text-white\/45,
+[data-theme="light"] .text-white\/40 {
+  color: rgba(17, 17, 19, 0.58) !important;
+}
+
+[data-theme="light"] .text-white\/35,
+[data-theme="light"] .text-white\/30,
+[data-theme="light"] .text-white\/25,
+[data-theme="light"] .text-white\/20,
+[data-theme="light"] .text-white\/10 {
+  color: rgba(17, 17, 19, 0.42) !important;
+}
+
+/* Text hover & group-hover states */
+[data-theme="light"] .hover\:text-white:hover {
+  color: #111113 !important;
+}
+
+[data-theme="light"] .group:hover .group-hover\:text-white {
+  color: #111113 !important;
+}
+
+[data-theme="light"] .group:hover .group-hover\:text-white\/80 {
+  color: rgba(17, 17, 19, 0.88) !important;
+}
+
+[data-theme="light"] .group:hover .group-hover\:text-white\/70 {
+  color: rgba(17, 17, 19, 0.75) !important;
+}
+
+/* Placeholder colors */
+[data-theme="light"] input::placeholder,
+[data-theme="light"] textarea::placeholder,
+[data-theme="light"] .placeholder\:text-white\/20::placeholder,
+[data-theme="light"] .placeholder\:text-white\/10::placeholder {
+  color: rgba(17, 17, 19, 0.4) !important;
+}
+
+/* Opacity background utils */
 [data-theme="light"] .bg-white\/5,
-[data-theme="light"] .bg-white\/\[0\.03\] { background-color: rgba(0,0,0,0.05); }
-[data-theme="light"] .hover\:bg-white\/10:hover { background-color: rgba(0,0,0,0.09); }
+[data-theme="light"] .bg-white\/10,
+[data-theme="light"] .bg-white\/\[0\.01\],
+[data-theme="light"] .bg-white\/\[0\.02\],
+[data-theme="light"] .bg-white\/\[0\.03\],
+[data-theme="light"] .bg-white\/\[0\.04\],
+[data-theme="light"] .bg-white\/\[0\.05\],
+[data-theme="light"] .bg-white\/\[0\.06\] {
+  background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
+[data-theme="light"] .hover\:bg-white\/5:hover,
+[data-theme="light"] .hover\:bg-white\/10:hover,
+[data-theme="light"] .hover\:bg-white\/20:hover,
+[data-theme="light"] .hover\:bg-white\/\[0\.04\]:hover,
+[data-theme="light"] .hover\:bg-white\/\[0\.06\]:hover {
+  background-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Border utils */
 [data-theme="light"] .border-white\/5,
 [data-theme="light"] .border-white\/10,
-[data-theme="light"] .border-white\/\[0\.05\] { border-color: rgba(0,0,0,0.1); }
+[data-theme="light"] .border-white\/15,
+[data-theme="light"] .border-white\/20,
+[data-theme="light"] .border-white\/\[0\.03\],
+[data-theme="light"] .border-white\/\[0\.04\],
+[data-theme="light"] .border-white\/\[0\.05\],
+[data-theme="light"] .border-white\/\[0\.06\],
+[data-theme="light"] .border-white\/\[0\.07\],
+[data-theme="light"] .border-white\/\[0\.08\] {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Secondary & Muted text */
+[data-theme="light"] .text-secondary {
+  color: #52525b !important;
+}
+
+[data-theme="light"] .text-muted {
+  color: #71717a !important;
+}
+
+[data-theme="light"] .text-primary {
+  color: #0891b2 !important;
+}
+
+/* Active navigation badge & pills */
+[data-theme="light"] a[aria-current="page"],
+[data-theme="light"] a.bg-\[\#22d3ee\]\/12 {
+  background-color: rgba(6, 182, 212, 0.12) !important;
+  border-color: rgba(6, 182, 212, 0.25) !important;
+}
+
+/* Scrollbars */
+[data-theme="light"] .custom-scrollbar::-webkit-scrollbar-thumb,
+[data-theme="light"] .scrollbar-none::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+}
+[data-theme="light"] .scrollbar-none {
+  scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+}
+
+/* =========================================================================
+   Light Theme Fixes for Studios, Dropdowns, Canvases, and Inputs
+   ========================================================================= */
+
+/* 1. Provider Logos & Invert Reset (fixes invisible black logos in light mode) */
+[data-theme="light"] img.invert,
+[data-theme="light"] .invert {
+  filter: none !important;
+}
+
+/* 2. Model Dropdown & Popover styling */
+[data-theme="light"] .prompt-popover-panel .text-white\/30,
+[data-theme="light"] .prompt-popover-panel .text-white\/40 {
+  color: #71717a !important;
+}
+
+[data-theme="light"] .prompt-popover-panel .border-r {
+  border-right-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-theme="light"] .prompt-popover-panel .border-b {
+  border-bottom-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* 3. Layers Studio (/studio/layers) Light Theme */
+[data-theme="light"] .bg-\[\#121318\] {
+  background-color: #f6f7f9 !important;
+  color: #111113 !important;
+}
+
+[data-theme="light"] .from-\[\#1d2029\].via-\[\#0f1015\].to-\[\#08090c\] {
+  --tw-gradient-from: #ffffff var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: #e5e7eb var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), #f3f4f6 var(--tw-gradient-via-position), var(--tw-gradient-to) !important;
+}
+
+/* Right inspector panel in Layers Studio */
+[data-theme="light"] .bg-\[\#242833\] {
+  background-color: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Cards & containers inside inspector */
+[data-theme="light"] .bg-\[\#2d313d\] {
+  background-color: #f4f5f8 !important;
+  border-color: rgba(0, 0, 0, 0.06) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+}
+
+[data-theme="light"] .bg-\[\#1a1c24\],
+[data-theme="light"] .bg-\[\#1a1c23\],
+[data-theme="light"] .bg-\[\#1a1c23\]\/80,
+[data-theme="light"] .bg-\[\#13151d\],
+[data-theme="light"] .bg-\[\#1a1d26\],
+[data-theme="light"] .bg-\[\#111319\],
+[data-theme="light"] .bg-\[\#181a22\],
+[data-theme="light"] .bg-\[\#1f222b\],
+[data-theme="light"] .bg-\[\#1f222d\],
+[data-theme="light"] .bg-\[\#151720\],
+[data-theme="light"] .bg-\[\#161822\] {
+  background-color: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Segmented control buttons in Layers Studio (e.g. 1K, 1.5K, 2K) */
+[data-theme="light"] .bg-\[\#383c4a\],
+[data-theme="light"] .bg-\[\#343946\] {
+  background-color: #ffffff !important;
+  color: #111113 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Floating toolbars & bottom prompt bar in Layers Studio */
+[data-theme="light"] .bg-\[\#15171e\]\/95,
+[data-theme="light"] .bg-\[\#161822\]\/95,
+[data-theme="light"] .bg-\[\#1b1e26\]\/95,
+[data-theme="light"] .bg-\[\#181a20\]\/95 {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+  color: #111113 !important;
+}
+
+[data-theme="light"] .bg-\[\#16181f\]\/50,
+[data-theme="light"] .bg-\[\#16181f\]\/80 {
+  background-color: rgba(0, 0, 0, 0.03) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* 4. AI Influencer Studio (/studio/ai-influencer) Tags & Bottom Bar */
+[data-theme="light"] .text-gray-200,
+[data-theme="light"] .text-gray-300 {
+  color: #111113 !important;
+}
+
+[data-theme="light"] .text-gray-400 {
+  color: rgba(17, 17, 19, 0.75) !important;
+}
+
+[data-theme="light"] .text-gray-500 {
+  color: #52525b !important;
+}
+
+[data-theme="light"] .text-gray-600 {
+  color: #71717a !important;
+}
+
+[data-theme="light"] .text-gray-700 {
+  color: #52525b !important;
+}
+
+/* Bottom custom prompt bar */
+[data-theme="light"] .bg-\[\#161616\] {
+  background-color: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+  color: #111113 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Tag pill backgrounds & borders */
+[data-theme="light"] .bg-white\/\[0\.04\],
+[data-theme="light"] .bg-white\/\[0\.07\],
+[data-theme="light"] .bg-white\/\[0\.08\],
+[data-theme="light"] .bg-white\/\[0\.09\],
+[data-theme="light"] .bg-white\/\[0\.10\],
+[data-theme="light"] .bg-white\/\[0\.13\] {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+[data-theme="light"] .hover\:bg-white\/\[0\.09\]:hover,
+[data-theme="light"] .hover\:bg-white\/\[0\.13\]:hover {
+  background-color: rgba(0, 0, 0, 0.09) !important;
+}
+
+[data-theme="light"] .border-white\/\[0\.07\],
+[data-theme="light"] .border-white\/\[0\.08\],
+[data-theme="light"] .border-white\/\[0\.10\] {
+  border-color: rgba(0, 0, 0, 0.09) !important;
+}
+
+/* 5. Motion Control Studio (/studio/motion-control) Hero Title & Inputs */
+[data-theme="light"] .from-white.via-\[\#22d3ee\].to-white {
+  --tw-gradient-from: #09090b var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: #09090b var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), #0891b2 var(--tw-gradient-via-position), var(--tw-gradient-to) !important;
+}
+
+/* Dark input controls in popovers & options */
+[data-theme="light"] input.bg-black\/60,
+[data-theme="light"] .bg-black\/60,
+[data-theme="light"] .prompt-popover-panel input {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+  color: #111113 !important;
+}
+
+/* 6. Audio Studio & Zinc Surfaces (/studio/audio, /studio/clipping) */
+[data-theme="light"] .bg-\[\#161618\],
+[data-theme="light"] .bg-\[\#17191c\],
+[data-theme="light"] .bg-\[\#0f0f0f\],
+[data-theme="light"] .bg-\[\#0d0d0f\],
+[data-theme="light"] .bg-\[\#111\],
+[data-theme="light"] .bg-\[\#0b0b0d\],
+[data-theme="light"] .bg-\[\#0f0f12\],
+[data-theme="light"] .bg-\[\#1c1c22\],
+[data-theme="light"] .bg-\[\#151515\]\/95,
+[data-theme="light"] .bg-zinc-950\/40,
+[data-theme="light"] .bg-zinc-950 {
+  background-color: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Audio Studio Model & Param dropdown menus */
+[data-theme="light"] .bg-\[\#161618\] {
+  background-color: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.12) !important;
+}
+
+[data-theme="light"] .bg-\[\#161618\] button {
+  color: #111113 !important;
+}
+
+[data-theme="light"] .bg-\[\#161618\] button:hover {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+[data-theme="light"] .bg-\[\#161618\] button span.text-zinc-300 {
+  color: #52525b !important;
+}
+
+[data-theme="light"] .bg-zinc-950\/80 {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-top-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-theme="light"] .bg-zinc-900\/40,
+[data-theme="light"] .bg-zinc-900\/60,
+[data-theme="light"] .bg-zinc-900\/30,
+[data-theme="light"] .bg-zinc-950\/20 {
+  background-color: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+}
+
+[data-theme="light"] .bg-zinc-900,
+[data-theme="light"] .bg-zinc-905,
+[data-theme="light"] .bg-zinc-850 {
+  background-color: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+  color: #111113 !important;
+}
+
+[data-theme="light"] .hover\:bg-zinc-900:hover,
+[data-theme="light"] .hover\:bg-zinc-850:hover {
+  background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
+[data-theme="light"] .bg-zinc-800\/80 {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  color: #111113 !important;
+}
+
+[data-theme="light"] .bg-zinc-800 {
+  background-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-theme="light"] .border-zinc-900,
+[data-theme="light"] .border-zinc-800,
+[data-theme="light"] .border-zinc-705,
+[data-theme="light"] .border-zinc-700,
+[data-theme="light"] .border-zinc-700\/80,
+[data-theme="light"] .border-zinc-600 {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-theme="light"] .text-zinc-100,
+[data-theme="light"] .text-zinc-200,
+[data-theme="light"] .text-zinc-300 {
+  color: #111113 !important;
+}
+
+[data-theme="light"] .text-zinc-400 {
+  color: #52525b !important;
+}
+
+[data-theme="light"] .text-zinc-500,
+[data-theme="light"] .text-zinc-650,
+[data-theme="light"] .text-zinc-700 {
+  color: #71717a !important;
+}
+
+/* 7. Agents & Workflows Studio Headers & Cards (/studio/agents, /studio/workflows) */
+[data-theme="light"] .h-16.bg-black\/40,
+[data-theme="light"] .h-14.bg-black\/40,
+[data-theme="light"] .border-b.bg-black\/40,
+[data-theme="light"] .border-t.bg-black\/40 {
+  background-color: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Agent & Workflow Card Overlays: Keep title and category text crisp and white on top of media */
+[data-theme="light"] .aspect-\[4\/5\] .text-white,
+[data-theme="light"] .aspect-\[4\/5\] h3,
+[data-theme="light"] .aspect-\[4\/5\] p,
+[data-theme="light"] .from-black\/90 ~ div .text-white,
+[data-theme="light"] .from-black\/90 ~ div h3,
+[data-theme="light"] .from-black\/90 ~ div p,
+[data-theme="light"] .from-black\/80 ~ div .text-white,
+[data-theme="light"] .from-black\/80 ~ div h3,
+[data-theme="light"] .from-black\/80 ~ div p {
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .aspect-\[4\/5\] .text-white\/40,
+[data-theme="light"] .from-black\/90 ~ div .text-white\/40,
+[data-theme="light"] .from-black\/80 ~ div .text-white\/40 {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Card base background in light mode */
+[data-theme="light"] .aspect-\[4\/5\] > div.bg-\[\#0a0a0a\],
+[data-theme="light"] .aspect-\[4\/5\] > div {
+  background-color: #111114 !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Edit / Options button on cards */
+[data-theme="light"] .aspect-\[4\/5\] button.bg-black\/60,
+[data-theme="light"] .aspect-\[4\/5\] button.bg-black\/40 {
+  background-color: rgba(0, 0, 0, 0.6) !important;
+  color: #ffffff !important;
+}
+
+/* 6. Audio Studio & Zinc Surfaces (/studio/audio, /studio/clipping) */
+[data-theme="light"] .bg-zinc-950\/40,
+[data-theme="light"] .bg-zinc-950 {
+  background-color: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-theme="light"] .bg-zinc-950\/80 {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-top-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-theme="light"] .bg-zinc-900\/40,
+[data-theme="light"] .bg-zinc-900\/60,
+[data-theme="light"] .bg-zinc-900\/30,
+[data-theme="light"] .bg-zinc-950\/20 {
+  background-color: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+}
+
+[data-theme="light"] .bg-zinc-900,
+[data-theme="light"] .bg-zinc-905,
+[data-theme="light"] .bg-zinc-850 {
+  background-color: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+  color: #111113 !important;
+}
+
+[data-theme="light"] .hover\:bg-zinc-900:hover,
+[data-theme="light"] .hover\:bg-zinc-850:hover {
+  background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
+[data-theme="light"] .bg-zinc-800\/80 {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  color: #111113 !important;
+}
+
+[data-theme="light"] .bg-zinc-800 {
+  background-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-theme="light"] .border-zinc-900,
+[data-theme="light"] .border-zinc-800,
+[data-theme="light"] .border-zinc-705,
+[data-theme="light"] .border-zinc-700,
+[data-theme="light"] .border-zinc-700\/80,
+[data-theme="light"] .border-zinc-600 {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-theme="light"] .text-zinc-100,
+[data-theme="light"] .text-zinc-200,
+[data-theme="light"] .text-zinc-300 {
+  color: #111113 !important;
+}
+
+[data-theme="light"] .text-zinc-400 {
+  color: #52525b !important;
+}
+
+[data-theme="light"] .text-zinc-500,
+[data-theme="light"] .text-zinc-650,
+[data-theme="light"] .text-zinc-700 {
+  color: #71717a !important;
+}
+
+/* 7. Agents & Workflows Studio Headers & Cards (/studio/agents, /studio/workflows) */
+[data-theme="light"] .h-16.bg-black\/40,
+[data-theme="light"] .h-14.bg-black\/40,
+[data-theme="light"] .border-b.bg-black\/40,
+[data-theme="light"] .border-t.bg-black\/40 {
+  background-color: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Agent & Workflow Card Overlays: Keep title and category text crisp and white on top of media */
+[data-theme="light"] .aspect-\[4\/5\] .text-white,
+[data-theme="light"] .aspect-\[4\/5\] h3,
+[data-theme="light"] .aspect-\[4\/5\] p,
+[data-theme="light"] .from-black\/90 ~ div .text-white,
+[data-theme="light"] .from-black\/90 ~ div h3,
+[data-theme="light"] .from-black\/90 ~ div p,
+[data-theme="light"] .from-black\/80 ~ div .text-white,
+[data-theme="light"] .from-black\/80 ~ div h3,
+[data-theme="light"] .from-black\/80 ~ div p {
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .aspect-\[4\/5\] .text-white\/40,
+[data-theme="light"] .from-black\/90 ~ div .text-white\/40,
+[data-theme="light"] .from-black\/80 ~ div .text-white\/40 {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Card base background in light mode */
+[data-theme="light"] .aspect-\[4\/5\] > div.bg-\[\#0a0a0a\],
+[data-theme="light"] .aspect-\[4\/5\] > div {
+  background-color: #111114 !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Edit / Options button on cards */
+[data-theme="light"] .aspect-\[4\/5\] button.bg-black\/60,
+[data-theme="light"] .aspect-\[4\/5\] button.bg-black\/40 {
+  background-color: rgba(0, 0, 0, 0.6) !important;
+  color: #ffffff !important;
+}

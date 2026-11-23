@@ -610,8 +610,9 @@ export default function StandaloneShell({ locale = 'en' }) {
 
     const interceptorId = axios.interceptors.request.use((config) => {
       // Check if URL is local/proxied
-      const isRelative = config.url.startsWith('/') || !config.url.startsWith('http');
-      const isInternalProxy = config.url.includes('/api/app') || config.url.includes('/api/workflow') || config.url.includes('/api/agents') || config.url.includes('/api/api') || config.url.includes('/api/v1');
+      const url = config.url || '';
+      const isRelative = url.startsWith('/') || (!url.startsWith('http') && !url.startsWith('//'));
+      const isInternalProxy = url.includes('/api/app') || url.includes('/api/workflow') || url.includes('/api/agents') || url.includes('/api/api') || url.includes('/api/v1');
 
       if (isRelative || isInternalProxy) {
         config.headers['x-api-key'] = apiKey;
@@ -834,7 +835,7 @@ export default function StandaloneShell({ locale = 'en' }) {
         {isHeaderVisible && (
           <aside
             className={`
-              fixed top-14 bottom-0 left-0 md:static md:h-full z-30 bg-[#0a0a0b]/95 backdrop-blur-md border-r border-white/[0.06] flex flex-col transition-all duration-300 ease-in-out flex-shrink-0 select-none
+              fixed top-14 bottom-0 left-0 md:static md:h-full z-30 bg-[#0a0a0b]/95 sidebar-nav-panel backdrop-blur-md border-r border-white/[0.06] flex flex-col transition-all duration-300 ease-in-out flex-shrink-0 select-none
               ${isMobileOpen ? 'translate-x-0 w-60 z-50' : '-translate-x-full md:translate-x-0'}
               ${isSidebarCollapsed ? 'md:w-16' : 'md:w-52'}
             `}
