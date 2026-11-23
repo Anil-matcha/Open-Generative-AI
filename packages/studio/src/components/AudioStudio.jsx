@@ -782,7 +782,7 @@ export default function AudioStudio({
             </button>
 
             {openDropdown && (
-              <div className="absolute left-0 right-0 mt-2 z-50 bg-[#161618] border border-zinc-700 rounded shadow-3xl max-h-60 overflow-y-auto custom-scrollbar p-1.5">
+              <div className="audio-dropdown-panel absolute left-0 right-0 mt-2 z-50 bg-[#161618] border border-zinc-700 rounded shadow-3xl max-h-60 overflow-y-auto custom-scrollbar p-1.5">
                 {audioModels.map((model) => (
                   <button
                     key={model.id}
@@ -898,7 +898,7 @@ export default function AudioStudio({
                     </button>
 
                     {isOpen && (
-                      <div className="absolute left-0 right-0 mt-1 z-50 bg-[#161618] border border-zinc-700 rounded shadow-3xl max-h-60 overflow-y-auto custom-scrollbar p-1">
+                      <div className="audio-dropdown-panel absolute left-0 right-0 mt-1 z-50 bg-[#161618] border border-zinc-700 rounded shadow-3xl max-h-60 overflow-y-auto custom-scrollbar p-1">
                         {schema.enum.map((opt) => {
                           const optionValue = typeof opt === "object" ? opt.value : opt;
                           const optionLabel = typeof opt === "object" ? (opt.label || opt.value) : opt;

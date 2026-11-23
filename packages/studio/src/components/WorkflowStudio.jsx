@@ -459,7 +459,7 @@ export default function WorkflowStudio({
       <div className="h-full flex flex-col bg-[#030303] text-white">
         {/* Immersive Sub-header / Floating Toggle */}
         {isHeaderVisible ? (
-          <div className="flex-shrink-0 h-14 border-b border-white/5 flex items-center justify-between px-6 bg-black/40 z-30">
+          <div className="flex-shrink-0 h-14 border-b border-white/5 flex items-center justify-between px-6 bg-panel-bg z-30">
             <div className="flex items-center gap-8 h-full">
               <button
                 onClick={() => router.push("/studio/workflows")}

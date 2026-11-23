@@ -453,22 +453,39 @@ body {
 }
 
 /* Audio Studio Model & Param dropdown menus */
-[data-theme="light"] .bg-\[\#161618\] {
+[data-theme="light"] .audio-dropdown-panel,
+[data-theme="light"] .bg-\[\#161618\],
+[data-theme="light"] div.bg-\[\#161618\] {
   background-color: #ffffff !important;
   border-color: rgba(0, 0, 0, 0.1) !important;
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.12) !important;
 }
 
+[data-theme="light"] .audio-dropdown-panel button,
 [data-theme="light"] .bg-\[\#161618\] button {
   color: #111113 !important;
 }
 
+[data-theme="light"] .audio-dropdown-panel button:hover,
 [data-theme="light"] .bg-\[\#161618\] button:hover {
   background-color: rgba(0, 0, 0, 0.05) !important;
 }
 
+[data-theme="light"] .audio-dropdown-panel button span,
+[data-theme="light"] .bg-\[\#161618\] button span {
+  color: #111113 !important;
+}
+
+[data-theme="light"] .audio-dropdown-panel button span.text-zinc-300,
 [data-theme="light"] .bg-\[\#161618\] button span.text-zinc-300 {
   color: #52525b !important;
+}
+
+[data-theme="light"] .audio-dropdown-panel button.text-primary,
+[data-theme="light"] .audio-dropdown-panel button.text-primary span,
+[data-theme="light"] .bg-\[\#161618\] button.text-primary,
+[data-theme="light"] .bg-\[\#161618\] button.text-primary span {
+  color: #0891b2 !important;
 }
 
 [data-theme="light"] .bg-zinc-950\/80 {
@@ -534,6 +551,7 @@ body {
 }
 
 /* 7. Agents & Workflows Studio Headers & Cards (/studio/agents, /studio/workflows) */
+[data-theme="light"] .bg-black\/40,
 [data-theme="light"] div.h-16.bg-black\/40,
 [data-theme="light"] div.h-14.bg-black\/40,
 [data-theme="light"] div.border-b.bg-black\/40,

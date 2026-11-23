@@ -363,7 +363,7 @@ export default function AgentStudio({ apiKey, locale = "en" }) {
   if (view === "create") {
     return (
       <div className="h-full flex flex-col bg-[#030303] text-white overflow-y-auto custom-scrollbar">
-        <div className="flex-shrink-0 h-16 border-b border-white/5 flex items-center gap-6 px-8 bg-black/40">
+        <div className="flex-shrink-0 h-16 border-b border-white/5 flex items-center gap-6 px-8 bg-panel-bg">
           <button
             onClick={() => router.push("/agents")}
             className="flex items-center gap-2 text-xs font-bold text-white/50 hover:text-white transition-colors"
@@ -450,7 +450,7 @@ export default function AgentStudio({ apiKey, locale = "en" }) {
   if (view === "chat") {
     return (
       <div className="h-full flex flex-col bg-[#030303] text-white">
-        <div className="flex-shrink-0 h-16 border-b border-white/5 flex items-center gap-4 px-8 bg-black/40">
+        <div className="flex-shrink-0 h-16 border-b border-white/5 flex items-center gap-4 px-8 bg-panel-bg">
           <button
             onClick={() => router.push("/agents")}
             className="flex items-center gap-2 text-xs font-bold text-white/50 hover:text-white transition-colors"
@@ -501,7 +501,7 @@ export default function AgentStudio({ apiKey, locale = "en" }) {
           )}
         </div>
 
-        <div className="flex-shrink-0 border-t border-white/5 p-6 bg-black/40">
+        <div className="flex-shrink-0 border-t border-white/5 p-6 bg-panel-bg">
           <form
             onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }}
             className="max-w-3xl w-full mx-auto flex items-end gap-3"
@@ -536,7 +536,7 @@ export default function AgentStudio({ apiKey, locale = "en" }) {
   return (
     <div className="h-full flex flex-col bg-[#030303] text-white">
       {/* Header */}
-      <div className="flex-shrink-0 h-16 border-b border-white/5 flex items-center justify-between px-8 bg-black/40">
+      <div className="flex-shrink-0 h-16 border-b border-white/5 flex items-center justify-between px-8 bg-panel-bg">
         <div className="flex items-center gap-8 h-full">
           <h2 className="text-sm font-black uppercase tracking-[0.2em] text-[#22d3ee]">
             {copy.headings.agents}
