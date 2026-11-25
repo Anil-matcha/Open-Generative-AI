@@ -8,8 +8,8 @@
 **Community:** Join [Discord](https://discord.com/invite/zpnuBRXhKg) for discussions and support
 
 
-<p align="center"><a href="https://youtu.be/Xw-H-B0F3xI"><img src="https://i.ytimg.com/vi/Xw-H-B0F3xI/maxresdefault.jpg" width="720"></a></p>
-<p align="center"><a href="https://youtu.be/Xw-H-B0F3xI"><b>▶ Watch: Best NSFW AI (Uncensored) </b></a></p>
+<p align="center"><a href="https://youtu.be/tVXeGuGCMnE"><img src="https://i.ytimg.com/vi/tVXeGuGCMnE/maxresdefault.jpg" width="720"></a></p>
+<p align="center"><a href="https://youtu.be/tVXeGuGCMnE"><b>▶ Watch: Best Uncensored AI Video Model </b></a></p>
 
 <p align="center">
   <a href="https://github.com/Anil-matcha/awesome-generative-ai-apps">
