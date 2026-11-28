@@ -15,7 +15,7 @@ const ZIMAGE_AUXILIARY = {
         filename: 'ae.safetensors',
         displayName: 'FLUX VAE',
         sizeGB: 0.33,
-        downloadUrl: 'https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/vae/ae.safetensors',
+        downloadUrl: 'https://huggingface.co/Comfy-Org/Z-Image-Turbo/resolve/main/split_files/vae/ae.safetensors',
     },
 };
 
